@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chess", "Chess\Chess.csproj", "{44D2509D-D267-4416-92FB-FDE8381A3F46}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chess.Test", "Chess.Test\Chess.Test.csproj", "{3640B882-CBCC-41DB-AE6A-43CCC2037F19}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Perft", "Perft\Perft.csproj", "{F3BF5A5B-445F-4B85-A6A4-1C5622C7D7DC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{44D2509D-D267-4416-92FB-FDE8381A3F46}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{44D2509D-D267-4416-92FB-FDE8381A3F46}.Debug|Any CPU.Build.0 = Debug|x64
+		{44D2509D-D267-4416-92FB-FDE8381A3F46}.Release|Any CPU.ActiveCfg = Release|x64
+		{44D2509D-D267-4416-92FB-FDE8381A3F46}.Release|Any CPU.Build.0 = Release|x64
+		{3640B882-CBCC-41DB-AE6A-43CCC2037F19}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3640B882-CBCC-41DB-AE6A-43CCC2037F19}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3640B882-CBCC-41DB-AE6A-43CCC2037F19}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3640B882-CBCC-41DB-AE6A-43CCC2037F19}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F3BF5A5B-445F-4B85-A6A4-1C5622C7D7DC}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{F3BF5A5B-445F-4B85-A6A4-1C5622C7D7DC}.Debug|Any CPU.Build.0 = Debug|x64
+		{F3BF5A5B-445F-4B85-A6A4-1C5622C7D7DC}.Release|Any CPU.ActiveCfg = Release|x64
+		{F3BF5A5B-445F-4B85-A6A4-1C5622C7D7DC}.Release|Any CPU.Build.0 = Release|x64
+	EndGlobalSection
+EndGlobal
