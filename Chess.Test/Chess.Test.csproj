@@ -50,6 +50,7 @@
     <Compile Include="MaterialTests.cs" />
     <Compile Include="MoveTests.cs" />
     <Compile Include="PawnPushTests.cs" />
+    <Compile Include="PerftTest.cs" />
     <Compile Include="PieceAttacks.cs" />
     <Compile Include="PieceAttacksBishopTests.cs" />
     <Compile Include="PieceAttacksKingTests.cs" />
