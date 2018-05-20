@@ -1,0 +1,135 @@
+﻿/*
+ChessLib, a chess data structure library
+
+MIT License
+
+Copyright (c) 2017-2018 Rudy Alex Kohn
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
+namespace Rudz.Chess.Types
+{
+    using System.Runtime.CompilerServices;
+    using Enums;
+
+    /// <summary>
+    /// Square data struct.
+    /// Contains a single enum value which represents a square on the board.
+    /// </summary>
+    public struct Square
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Square(int square) => Value = (ESquare)square;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Square(Square square) => Value = square.Value;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Square(int rank, int file)
+            : this((ESquare)(rank << 3) + file) { }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Square(ERank rank, EFile file)
+            : this((int)rank, (int)file) { }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private Square(ESquare square) => Value = square;
+
+        public ESquare Value { get; private set; }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static implicit operator Square(int value) => new Square(value);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static implicit operator Square(ESquare value) => new Square(value);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool operator ==(Square left, Square right) => left.Equals(right);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool operator !=(Square left, Square right) => !left.Equals(right);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool operator ==(Square left, ESquare right) => left.Value == right;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool operator !=(Square left, ESquare right) => left.Value != right;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Square operator +(Square left, Square right) => left.ToInt() + right.ToInt();
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Square operator +(Square left, int right) => left.ToInt() + right;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Square operator -(Square left, Square right) => left.ToInt() - right.ToInt();
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Square operator -(Square left, int right) => left.ToInt() - right;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Square operator ++(Square square) => ++square.Value;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static BitBoard operator &(Square left, ulong right) => left.BitBoardSquare() & right;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static BitBoard operator &(ulong left, Square right) => left & right.BitBoardSquare();
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static BitBoard operator |(Square left, Square right) => left.BitBoardSquare() | right.BitBoardSquare();
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static BitBoard operator |(ulong left, Square right) => left | right.BitBoardSquare();
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int operator |(Square left, int right) => left.ToInt() | right;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static BitBoard operator ~(Square left) => ~left.BitBoardSquare();
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int operator >>(Square left, int right) => left.ToInt() >> right;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool operator >(Square left, Square right) => left.ToInt() > right.ToInt();
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool operator <(Square left, Square right) => left.ToInt() < right.ToInt();
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool operator true(Square sq) => sq.IsValid();
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool operator false(Square sq) => !sq.IsValid();
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public override string ToString() => this.GetSquareString();
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool Equals(Square other) => Value == other.Value;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public override bool Equals(object obj) => obj is Square square && Equals(square);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public override int GetHashCode() => this.ToInt();
+    }
+}
