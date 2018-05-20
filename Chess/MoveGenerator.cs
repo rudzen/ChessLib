@@ -257,7 +257,7 @@ namespace Rudz.Chess
         /// The move type
         /// </param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void AddMove(ICollection<Move> moves, Piece piece, Square from, Square to, EPieces promoted = EPieces.WhiteNoPiece, EMoveType type = EMoveType.Quiet)
+        private void AddMove(ICollection<Move> moves, Piece piece, Square from, Square to, EPieces promoted = EPieces.NoPiece, EMoveType type = EMoveType.Quiet)
         {
             Move move;
 
@@ -279,14 +279,10 @@ namespace Rudz.Chess
         private void AddMoves(ICollection<Move> moves, Piece piece, Square from, BitBoard attacks)
         {
             foreach (Square to in attacks) {
-                switch (ChessBoard.GetPieceType(to)) {
-                    case EPieceType.NoPiece:
-                        AddMove(moves, piece, from, to);
-                        break;
-                    default:
-                        AddMove(moves, piece, from, to, EPieces.WhiteNoPiece, EMoveType.Capture);
-                        break;
-                }
+                if (ChessBoard.GetPiece(to) == EPieces.NoPiece)
+                    AddMove(moves, piece, from, to);
+                else
+                    AddMove(moves, piece, from, to, EPieces.NoPiece, EMoveType.Capture);
             }
         }
 
@@ -339,7 +335,7 @@ namespace Rudz.Chess
             foreach (Square squareTo in targetSquares) {
                 Square squareFrom = squareTo - distance;
                 if (!squareTo.IsPromotionRank()) {
-                    AddMove(moves, piece, squareFrom, squareTo, EPieces.WhiteNoPiece, type);
+                    AddMove(moves, piece, squareFrom, squareTo, EPieces.NoPiece, type);
                     continue;
                 }
 
@@ -354,7 +350,7 @@ namespace Rudz.Chess
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void AddCastleMove(ICollection<Move> moves, Square from, Square to) => AddMove(moves, EPieceType.King | (EPieceType)(SideToMove << 3), from, to, EPieces.WhiteNoPiece, EMoveType.Castle);
+        private void AddCastleMove(ICollection<Move> moves, Square from, Square to) => AddMove(moves, EPieceType.King | (EPieceType)(SideToMove << 3), from, to, EPieces.NoPiece, EMoveType.Castle);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private bool CanCastle(ECastleling type)

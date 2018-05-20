@@ -95,7 +95,7 @@ namespace Rudz.Chess
 
         public void Clear()
         {
-            BoardLayout.Fill(EPieces.WhiteNoPiece);
+            BoardLayout.Fill(EPieces.NoPiece);
             OccupiedBySide.Fill(Zero);
             KingSquares.Fill(ESquare.none);
             BoardPieces.Fill(Zero);
@@ -309,7 +309,7 @@ namespace Rudz.Chess
             BoardLayout[square.ToInt()] = PieceExtensions.EmptyPiece;
             if (IsProbing)
                 return;
-            PieceUpdated?.Invoke(EPieces.WhiteNoPiece, square);
+            PieceUpdated?.Invoke(EPieces.NoPiece, square);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

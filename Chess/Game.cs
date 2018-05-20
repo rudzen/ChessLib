@@ -36,7 +36,6 @@ namespace Rudz.Chess
     using System.Linq;
     using System.Runtime.CompilerServices;
     using System.Text;
-    using System.Threading.Tasks;
     using Data;
     using Enums;
     using Extensions;
@@ -168,11 +167,9 @@ namespace Rudz.Chess
             State.Key = previous.Key;
             State.PawnStructureKey = previous.PawnStructureKey;
 
-            Task updateKeyTask = Task.Factory.StartNew(() => UpdateKey(move));
-            Task materialMoveMake = Task.Factory.StartNew(() => State.Material.MakeMove(move));
-
-            Task.WaitAll(updateKeyTask, materialMoveMake);
-
+            UpdateKey(move);
+            State.Material.MakeMove(move);
+            
             State.GenerateMoves();
 
             return true;

@@ -31,36 +31,32 @@ namespace Rudz.Chess.Enums
     [Flags]
     public enum EPieces
     {
-        WhitePawn = 0,
+        NoPiece = 0,
+        
+        WhitePawn = 1,
 
-        WhiteKnight = 1,
+        WhiteKnight = 2,
 
-        WhiteBishop = 2,
+        WhiteBishop = 3,
 
-        WhiteRook = 3,
+        WhiteRook = 4,
 
-        WhiteQueen = 4,
+        WhiteQueen = 5,
 
-        WhiteKing = 5,
+        WhiteKing = 6,
 
-        WhiteNoPiece = 6,
+        BlackPawn = 9,
 
-        WhiteSeperator = 7,
+        BlackKnight = 10,
 
-        BlackPawn = 8,
+        BlackBishop = 11,
 
-        BlackKnight = 9,
+        BlackRook = 12,
 
-        BlackBishop = 10,
+        BlackQueen = 13,
 
-        BlackRook = 11,
-
-        BlackQueen = 12,
-
-        BlackKing = 13,
-
-        BlackNoPiece = 14,
-
-        BlackSeperator = 15,
+        BlackKing = 14,
+        
+        PieceNb = 15
     }
 }

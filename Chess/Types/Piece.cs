@@ -114,10 +114,10 @@ namespace Rudz.Chess.Types
         public static Piece operator --(Piece left) => new Piece(--left.Value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator true(Piece piece) => !piece.Empty();
+        public static bool operator true(Piece piece) => piece.Value != EPieces.NoPiece;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator false(Piece piece) => piece.Empty();
+        public static bool operator false(Piece piece) => piece.Value == EPieces.NoPiece;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int ColorOf() => (int)Value >> 3;
@@ -162,7 +162,7 @@ namespace Rudz.Chess.Types
                 case 'k':
                     return EPieces.BlackKing;
                 default:
-                    return EPieces.WhiteNoPiece;
+                    return EPieces.NoPiece;
             }
         }
 

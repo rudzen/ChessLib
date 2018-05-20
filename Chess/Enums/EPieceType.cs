@@ -31,18 +31,20 @@ namespace Rudz.Chess.Enums
     [Flags]
     public enum EPieceType
     {
-        Pawn = 0,
+        AllPieces = 0,
+        
+        Pawn = 1,
 
-        Knight = 1,
+        Knight = 2,
 
-        Bishop = 2,
+        Bishop = 3,
 
-        Rook = 3,
+        Rook = 4,
 
-        Queen = 4,
+        Queen = 5,
 
-        King = 5,
+        King = 6,
 
-        NoPiece = 6
+        PieceTypeNb = 7
     }
 }

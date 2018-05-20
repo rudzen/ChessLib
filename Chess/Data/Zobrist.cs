@@ -56,7 +56,7 @@ namespace Rudz.Chess.Data
         /// <summary>
         /// Represents the piece index (as in EPieces), with each a square of the board value to match.
         /// </summary>
-        private static readonly ulong[,] ZobristPst = new ulong[14, 64];
+        private static readonly ulong[,] ZobristPst = new ulong[16, 64];
 
         /// <summary>
         /// Represents the castleling rights.
@@ -73,15 +73,21 @@ namespace Rudz.Chess.Data
         /// </summary>
         private static readonly ulong ZobristSide;
 
+        /// <summary>
+        /// To use as base for pawn hash table
+        /// </summary>
+        private static readonly ulong ZobristNoPawn;
+        
         static Zobrist()
         {
             RKiss rnd = (ulong)DateTime.Now.Ticks;
 
-            /* pawn = 0, king = 5 */
-            for (EPieceType pieceType = EPieceType.Pawn; pieceType <= EPieceType.King; pieceType++) {
-                for (ESquare square = ESquare.a1; square <= ESquare.h8; square++) {
-                    ZobristPst[(int)pieceType, (int)square] = rnd.Rand();
-                    ZobristPst[(int)(pieceType + 8), (int)square] = rnd.Rand();
+            for (EPlayer side = EPlayer.White; side < EPlayer.PlayerNb; ++side) {
+                for (EPieceType pieceType = EPieceType.Pawn; pieceType < EPieceType.PieceTypeNb; pieceType++) {
+                    Piece piece = pieceType.MakePiece(side);
+                    for (ESquare square = ESquare.a1; square <= ESquare.h8; square++) {
+                        ZobristPst[piece.ToInt(), (int)square] = rnd.Rand();
+                    }
                 }
             }
 
@@ -92,6 +98,7 @@ namespace Rudz.Chess.Data
                 ZobristEpFile[i] = rnd.Rand();
 
             ZobristSide = rnd.Rand();
+            ZobristNoPawn = rnd.Rand();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

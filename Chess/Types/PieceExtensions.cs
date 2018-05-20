@@ -33,19 +33,19 @@ namespace Rudz.Chess.Types
 
     public static class PieceExtensions
     {
-        public static readonly Piece EmptyPiece = EPieces.WhiteNoPiece;
+        public static readonly Piece EmptyPiece = EPieces.NoPiece;
 
-        public static readonly EPieceValue[] PieceValues = { EPieceValue.Pawn, EPieceValue.Knight, EPieceValue.Bishop, EPieceValue.Rook, EPieceValue.Queen, EPieceValue.King };
+        public static readonly EPieceValue[] PieceValues = { EPieceValue.King /* king = 0 */, EPieceValue.Pawn, EPieceValue.Knight, EPieceValue.Bishop, EPieceValue.Rook, EPieceValue.Queen, EPieceValue.King };
 
-        internal static readonly char[] PieceChars = { 'P', 'N', 'B', 'R', 'Q', 'K', ' ', '.', 'p', 'n', 'b', 'r', 'q', 'k', ' ', '.' };
+        internal static readonly char[] PieceChars = { ' ', 'P', 'N', 'B', 'R', 'Q', 'K', ' ', '.', 'p', 'n', 'b', 'r', 'q', 'k' };
 
-        private static readonly char[] PromotionPieceNotation = { 'p', 'n', 'b', 'r', 'q', 'k' };
+        private static readonly char[] PromotionPieceNotation = { ' ', ' ', 'n', 'b', 'r', 'q', 'k' };
 
-        private static readonly string[] PieceStrings = { "P", "N", "B", "R", "Q", "K", "  ", ".", "p", "n", "b", "r", "q", "k", "  ", "." };
+        private static readonly string[] PieceStrings = { " ", "P", "N", "B", "R", "Q", "K", " ", " ", "p", "n", "b", "r", "q", "k" };
 
-        private static readonly char[] PgnPieceChars = { 'P', 'N', 'B', 'R', 'Q', 'K' };
+        private static readonly char[] PgnPieceChars = { ' ', 'P', 'N', 'B', 'R', 'Q', 'K' };
 
-        private static readonly string[] PieceNames = { "Pawn", "Knight", "Bishop", "Rook", "Queen", "King", "None", "None", "Pawn", "Knight", "Bishop", "Rook", "Queen", "King", "None", "None" };
+        private static readonly string[] PieceNames = { "None", "Pawn", "Knight", "Bishop", "Rook", "Queen", "King" };
 
         /*
  * white chess king 	♔ 	U+2654 	&#9812;
@@ -73,9 +73,6 @@ namespace Rudz.Chess.Types
         // for polyglot support in the future
         private static readonly char[] BookPieceNames = { 'p', 'P', 'n', 'N', 'b', 'B', 'r', 'R', 'q', 'Q', 'k', 'K' };
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Empty(this Piece p) => p.ToInt().InBetween((int)EPieces.WhitePawn, (int)EPieces.WhiteKing) && p.ToInt().InBetween((int)EPieces.BlackPawn, (int)EPieces.BlackKing);
-
         // Generic helper functions
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsWhite(this Piece p) => p.ToInt().InBetween((int)EPieces.WhitePawn, (int)EPieces.WhiteKing);
@@ -96,10 +93,10 @@ namespace Rudz.Chess.Types
         public static EPieceType Type(this Piece p) => (EPieceType)(p.ToInt() & 0x7);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Piece MakePiece(this EPieceType @this, Player side) => @this + (side << 3);
+        public static Piece MakePiece(this EPieceType @this, Player side) => @this + (side.Side << 3);
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsNoPiece(this Piece p) => p.Type() == EPieceType.NoPiece;
+        public static bool IsNoPiece(this Piece p) => p == EPieces.NoPiece;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static char GetPieceChar(this Piece p) => PieceChars[p.ToInt()];
@@ -120,10 +117,7 @@ namespace Rudz.Chess.Types
         public static EPieceValue PieceValue(this Piece p) => PieceValues[(int)p.Type()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ref string GetName(this Piece p) => ref PieceNames[p.ToInt()];
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ref string GetName(this EPieces p) => ref PieceNames[(int)p];
+        public static ref string GetName(this Piece p) => ref PieceNames[p.Type().ToInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static char GetPromotionChar(this Piece p) => PromotionPieceNotation[(int)p.Type()];
