@@ -54,8 +54,8 @@ namespace Rudz.Chess
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Add(Piece piece)
         {
-            UpdateKey(piece.ToInt() >> 3, piece.Type(), 1);
-            MaterialValue[piece.ToInt() >> 3] += (int)piece.PieceValue();
+            UpdateKey(piece.ColorOf(), piece.Type(), 1);
+            MaterialValue[piece.ColorOf()] += (int)piece.PieceValue();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -84,6 +84,7 @@ namespace Rudz.Chess
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int Count(Player side, EPieceType pieceType) => (int)((_key[side.Side] >> PieceBitShift[(int)pieceType]) & 15u);
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Clear()
         {
@@ -94,8 +95,8 @@ namespace Rudz.Chess
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void Remove(Piece piece)
         {
-            UpdateKey(piece.ToInt() >> 3, piece.Type(), -1);
-            MaterialValue[piece.ToInt() >> 3] -= (int)piece.PieceValue();
+            UpdateKey(piece.ColorOf(), piece.Type(), -1);
+            MaterialValue[piece.ColorOf()] -= (int)piece.PieceValue();
         }
     }
 }

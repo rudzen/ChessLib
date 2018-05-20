@@ -78,7 +78,7 @@ namespace Rudz.Chess.Fen
                     Square square = new Square(rank, file);
                     Piece piece = state.ChessBoard.BoardLayout[square.ToInt()];
 
-                    if (piece.NoPiece()) {
+                    if (piece.IsNoPiece()) {
                         empty++;
                         continue;
                     }

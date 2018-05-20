@@ -32,6 +32,7 @@ namespace Rudz.Chess.Enums
     public enum EPlayer
     {
         White = 0,
-        Black = 1
+        Black = 1,
+        PlayerNb = 2
     }
 }

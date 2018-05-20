@@ -171,9 +171,6 @@ namespace Rudz.Chess
             Task updateKeyTask = Task.Factory.StartNew(() => UpdateKey(move));
             Task materialMoveMake = Task.Factory.StartNew(() => State.Material.MakeMove(move));
 
-            //UpdateKey(move);
-            //Position.Material.MakeMove(move);
-
             Task.WaitAll(updateKeyTask, materialMoveMake);
 
             State.GenerateMoves();
@@ -209,10 +206,12 @@ namespace Rudz.Chess
         /// -6 = Error while parsing en-passant square
         /// -9 = FEN lenght exceeding maximum
         /// </returns>
-        public FenError SetFen([CanBeNull] string fenString)
+        public FenError SetFen([CanBeNull] string fenString, bool validate = false)
         {
+            // TODO : Replace with stream at some point
+            
             // basic validation, catches format errors
-            if (!Fen.Fen.Validate(fenString))
+            if (validate && !Fen.Fen.Validate(fenString))
                 return new FenError(-9, 0);
 
             foreach (Square square in Occupied)
@@ -243,6 +242,7 @@ namespace Rudz.Chess
                     continue;
                 }
 
+                // ReSharper disable once SwitchStatementMissingSomeCases
                 switch (c) {
                     case '/' when f != 9:
                         return new FenError(-2, fen.GetIndex());
@@ -318,6 +318,7 @@ namespace Rudz.Chess
 
             State.SideToMove = player;
 
+            // ReSharper disable once SwitchStatementMissingSomeCases
             switch (epSq.Value) {
                 case ESquare.none:
                     State.EnPassantSquare = 0;
@@ -436,9 +437,8 @@ namespace Rudz.Chess
         public ulong Perft(int depth)
         {
             State.GenerateMoves();
-            if (depth == 1) {
+            if (depth == 1)
                 return (ulong) State.Moves.Count;
-            }
 
             ulong tot = 0;
             
@@ -543,7 +543,7 @@ namespace Rudz.Chess
             return false;
         }
 
-        private int SetupCastleling(FenData fen)
+        private int SetupCastleling(IFenData fen)
         {
             // reset castleling rights to defaults
             _castleRightsMask.Fill(15);

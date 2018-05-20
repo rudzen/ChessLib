@@ -71,6 +71,8 @@ namespace Rudz.Chess
             Clear();
         }
 
+        // TODO : redesign BoardPieces + OccupiedBySide into simple arrays
+        
         [NotNull]
         public BitBoard[] BoardPieces { get; }
 
@@ -104,12 +106,13 @@ namespace Rudz.Chess
         public void AddPiece(Piece piece, Square square)
         {
             BitBoard bbsq = square;
+            int color = piece.ColorOf();
             BoardPieces[piece.ToInt()] |= bbsq;
-            OccupiedBySide[piece.ToInt() >> 3] |= bbsq;
+            OccupiedBySide[color] |= bbsq;
             Occupied |= bbsq;
             BoardLayout[square.ToInt()] = piece;
             if (piece.Type() == EPieceType.King)
-                KingSquares[piece.ToInt() >> 3] = square;
+                KingSquares[color] = square;
             if (IsProbing)
                 return;
             PieceUpdated?.Invoke(piece, square);
@@ -118,7 +121,7 @@ namespace Rudz.Chess
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void AddPiece(EPieceType pieceType, Square square, Player side)
         {
-            Piece piece = pieceType + (side << 3);
+            Piece piece = pieceType.MakePiece(side);
             BoardPieces[piece.ToInt()] |= square;
             OccupiedBySide[side.Side] |= square;
             Occupied |= square;
@@ -213,6 +216,8 @@ namespace Rudz.Chess
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public BitBoard GetPinnedPieces(Square square, Player side)
         {
+            // TODO : Move into state data structure instead of real-time calculation
+            
             BitBoard pinnedPieces = 0;
             int oppShift = ~side << 3;
             BitBoard pinners = MagicBB.XrayBishopAttacks(Occupied, OccupiedBySide[side.Side], square) & (BoardPieces[(int)EPieceType.Bishop + oppShift] | BoardPieces[(int)EPieceType.Queen | oppShift]);
@@ -285,9 +290,13 @@ namespace Rudz.Chess
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool PawnIsolated(Square square, Player side)
         {
-            BitBoard bbsq = square.BitBoardSquare();
-            BitBoard neighbourFiles = (bbsq.WestOne() | bbsq.EastOne()).SouthFill().NorthFill() & Pawns(side);
-            return !neighbourFiles.Empty();
+            BitBoard b = square.PassedPawnFronAttackSpan(side) | square.PassedPawnFronAttackSpan(~side);
+            return b.Empty();
+            
+//            // TODO : Replace with adjacent files bb array
+//            BitBoard bbsq = square.BitBoardSquare();
+//            BitBoard neighbourFiles = (bbsq.WestOne() | bbsq.EastOne()).SouthFill().NorthFill() & Pawns(side);
+//            return !neighbourFiles.Empty();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -295,7 +304,7 @@ namespace Rudz.Chess
         {
             BitBoard invertedSq = square;
             BoardPieces[piece.ToInt()] &= ~invertedSq;
-            OccupiedBySide[piece.ToInt() >> 3] &= ~invertedSq;
+            OccupiedBySide[piece.ColorOf()] &= ~invertedSq;
             Occupied &= ~invertedSq;
             BoardLayout[square.ToInt()] = PieceExtensions.EmptyPiece;
             if (IsProbing)

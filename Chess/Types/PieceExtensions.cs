@@ -96,7 +96,10 @@ namespace Rudz.Chess.Types
         public static EPieceType Type(this Piece p) => (EPieceType)(p.ToInt() & 0x7);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool NoPiece(this Piece p) => p.Type() == EPieceType.NoPiece;
+        public static Piece MakePiece(this EPieceType @this, Player side) => @this + (side << 3);
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool IsNoPiece(this Piece p) => p.Type() == EPieceType.NoPiece;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static char GetPieceChar(this Piece p) => PieceChars[p.ToInt()];

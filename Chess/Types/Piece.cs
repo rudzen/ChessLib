@@ -120,10 +120,13 @@ namespace Rudz.Chess.Types
         public static bool operator false(Piece piece) => piece.Empty();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public int ColorOf() => (int)Value >> 3;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals(Piece other) => Value == other.Value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public override bool Equals(object obj) => !ReferenceEquals(null, obj) && obj is Piece && Equals((Piece)obj);
+        public override bool Equals(object obj) => obj is Piece piece && Equals(piece);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override int GetHashCode() => (int)Value << 16;

@@ -111,12 +111,12 @@ namespace Rudz.Chess
 
         private const ulong LightSquares = 0x55AA55AA55AA55AA;
 
-        private static readonly ulong[] File =
+        private static readonly ulong[] FileBB =
             {
                 FILEA, FILEB, FILEC, FILED, FILEE, FILEF, FILEG, FILEH
             };
 
-        private static readonly ulong[] Rank =
+        private static readonly ulong[] RankBB =
             {
                 RANK1, RANK2, RANK3, RANK4, RANK5, RANK6, RANK7, RANK8
             };
@@ -158,36 +158,43 @@ namespace Rudz.Chess
                 10, 45, 25, 39, 14, 33, 19, 30, 9, 24, 13, 18, 8, 12, 7, 6, 5, 63
             };
 
-        private static readonly BitBoard[] BbRank = new BitBoard[64];
+        private static readonly BitBoard[] AdjacentFilesBB = { FILEB, FILEA | FILEC, FILEB | FILED, FILEC | FILEE, FILED | FILEF, FILEE | FILEG, FILEF | FILEH, FILEG };
+        
+        private static readonly BitBoard[,] BetweenBB;
 
-        private static readonly BitBoard[] BbFile = new BitBoard[64];
+        private static readonly BitBoard[,] PawnAttackSpanBB;
 
-        private static readonly BitBoard[,] BbBetween = new BitBoard[64, 64];
+        private static readonly BitBoard[,] PassedPawnMaskBB;
 
-        private static readonly BitBoard[,] PassedPawnFrontSpan = new BitBoard[2, 64];
-
-        private static readonly BitBoard[,] PawnFrontSpan = new BitBoard[2, 64];
+        private static readonly BitBoard[,] ForwardRanksBB;
+        
+        private static readonly BitBoard[,] ForwardFileBB;
 
         static BitBoards()
         {
-            BitBoard[,] pawnEastAttackSpan = new BitBoard[2, 64];
-            BitBoard[,] pawnWestAttackSpan = new BitBoard[2, 64];
+            BetweenBB = new BitBoard[64, 64];
+            PawnAttackSpanBB = new BitBoard[2, 64];
+            PassedPawnMaskBB = new BitBoard[2, 64];
+            ForwardRanksBB = new BitBoard[2, 64];
+            ForwardFileBB = new BitBoard[2, 64];
 
+            // ForwardRanksBB population loop idea from sf
+            for (ERank r = ERank.Rank1; r < ERank.RankNb; ++r)
+                ForwardRanksBB[0, (int)r] = ~(ForwardRanksBB[1, (int)r + 1] = ForwardRanksBB[1, (int)r] | RankBB[(int)r]);
+            
+            for (EPlayer side = EPlayer.White; side < EPlayer.PlayerNb; ++side) {
+                int c = (int) side;
+                foreach (Square square in AllSquares) {
+                    int s = square.ToInt();
+                    ForwardFileBB[c, s]    = ForwardRanksBB[c, (int)square.RankOf()] & FileBB[square.File()];
+                    PawnAttackSpanBB[c, s] = ForwardRanksBB[c, (int)square.RankOf()] & AdjacentFilesBB[square.File()];
+                    PassedPawnMaskBB[c, s] = ForwardFileBB [c, s] | PawnAttackSpanBB[c, s];
+                }
+            }
+            
             foreach (Square sq in AllSquares) {
-                BbRank[sq.ToInt()] = RANK1 << (sq.ToInt() & 56);
-                BbFile[sq.ToInt()] = FILEA << (sq.ToInt() & 7);
-
-                sq.SetPawnFrontSpan(PlayerExtensions.White, sq.BitBoardSquare().NorthOne().NorthFill());
-                sq.SetPawnFrontSpan(PlayerExtensions.Black, sq.BitBoardSquare().SouthOne().SouthFill());
-                pawnEastAttackSpan[PlayerExtensions.White.Side, sq.ToInt()] = sq.BitBoardSquare().NorthEastOne().NorthFill();
-                pawnEastAttackSpan[PlayerExtensions.Black.Side, sq.ToInt()] = sq.BitBoardSquare().SouthEastOne().SouthFill();
-                pawnWestAttackSpan[PlayerExtensions.White.Side, sq.ToInt()] = sq.BitBoardSquare().NorthWestOne().NorthFill();
-                pawnWestAttackSpan[PlayerExtensions.Black.Side, sq.ToInt()] = sq.BitBoardSquare().SouthWestOne().SouthFill();
-                PassedPawnFrontSpan[PlayerExtensions.White.Side, sq.ToInt()] = pawnEastAttackSpan[PlayerExtensions.White.Side, sq.ToInt()] | PawnFrontSpan[PlayerExtensions.White.Side, sq.ToInt()] | pawnWestAttackSpan[PlayerExtensions.White.Side, sq.ToInt()];
-                PassedPawnFrontSpan[PlayerExtensions.Black.Side, sq.ToInt()] = pawnEastAttackSpan[PlayerExtensions.Black.Side, sq.ToInt()] | PawnFrontSpan[PlayerExtensions.Black.Side, sq.ToInt()] | pawnWestAttackSpan[PlayerExtensions.Black.Side, sq.ToInt()];
-
                 foreach (Square fillSq in AllSquares)
-                    BbBetween[sq.ToInt(), fillSq.ToInt()] = 0;
+                    BetweenBB[sq.ToInt(), fillSq.ToInt()] = 0;
 
                 InitBetweenBitboards(sq, NorthOne, 8);
                 InitBetweenBitboards(sq, NorthEastOne, 9);
@@ -228,11 +235,55 @@ namespace Rudz.Chess
             CornerH8 = MakeBitboard(ESquare.h8, ESquare.g8, ESquare.h7, ESquare.g7);
         }
 
+        /// <summary>
+        /// Returns the bitboard representation of the rank of which the square is located.
+        /// </summary>
+        /// <param name="sq">The square</param>
+        /// <returns>The bitboard of square rank</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static BitBoard BitBoardRank(this Square sq) => BbFile[sq.ToInt()];
+        public static BitBoard BitBoardRank(this Square sq) => RankBB[(int)sq.RankOf()];
+
+        /// <summary>
+        /// Returns the bitboard representaion of the file of which the square is located.
+        /// </summary>
+        /// <param name="this">The square</param>
+        /// <returns>The bitboard of square file</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static BitBoard BitBoardFile(this Square @this) => FileBB[@this.File()];
+
+        /// <summary>
+        /// Returns all squares in front of the square in the same file as bitboard
+        /// </summary>
+        /// <param name="this">The square</param>
+        /// <param name="side">The side, white is north and black is south</param>
+        /// <returns>The bitboard of all forward file squares</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static BitBoard ForwardFile(this Square @this, Player side) => ForwardFileBB[side.Side, @this.ToInt()];
+
+        /// <summary>
+        /// Returns all squares in pawn attack pattern in front of the square.
+        /// </summary>
+        /// <param name="this">The square</param>
+        /// <param name="side">White = north, Black = south</param>
+        /// <returns>The bitboard representation</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static BitBoard PawnAttackSpan(this Square @this, Player side) => PawnAttackSpanBB[side.Side, @this.ToInt()];
+
+        /// <summary>
+        /// Returns all square of both file and pawn attack pattern in front of square.
+        /// This is the same as ForwardFile() | PawnAttackSpan().
+        /// </summary>
+        /// <param name="this">The square</param>
+        /// <param name="side">White = north, Black = south</param>
+        /// <returns>The bitboard representation</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static BitBoard PassedPawnFronAttackSpan(this Square @this, Player side) => PassedPawnMaskBB[side.Side, @this.ToInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static BitBoard BitboardBetween(this Square firstSquare, Square secondSquare) => BbBetween[firstSquare.ToInt(), secondSquare.ToInt()];
+        public static BitBoard ForwardRanks(this Square @this, Player side) => ForwardRanksBB[side.Side, @this.ToInt()];
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static BitBoard BitboardBetween(this Square firstSquare, Square secondSquare) => BetweenBB[firstSquare.ToInt(), secondSquare.ToInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Square Get(this BitBoard bb, int pos) => (int)(bb.Value >> pos) & 0x1;
@@ -347,6 +398,15 @@ namespace Rudz.Chess
             return bb;
         }
 
+        /// <summary>
+        /// Shorthand method for north or south fill of bitboard depending on color
+        /// </summary>
+        /// <param name="bb">The bitboard to fill</param>
+        /// <param name="side">The direction to fill in, white = north, black = south</param>
+        /// <returns>Filled bitboard</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static BitBoard Fill(this BitBoard bb, Player side) => side == EPlayer.White ? bb.NorthFill() : bb.SouthFill();
+
         /* non extension methods */
 
         /// <summary>
@@ -404,14 +464,11 @@ namespace Rudz.Chess
                 if (!from.IsValid() || !to.IsValid())
                     continue;
 
-                BbBetween[from.ToInt(), to.ToInt()] = between;
+                BetweenBB[from.ToInt(), to.ToInt()] = between;
                 between |= bb;
                 bb = stepFunc(bb);
                 to += step;
             }
         }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void SetPawnFrontSpan(this Square square, Player side, BitBoard bb) => PawnFrontSpan[side.Side, square.ToInt()] = bb;
     }
 }

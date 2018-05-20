@@ -38,6 +38,7 @@ namespace Rudz.Chess.Enums
         Rank5 = 4,
         Rank6 = 5,
         Rank7 = 6,
-        Rank8 = 7
+        Rank8 = 7,
+        RankNb = 8
     }
 }

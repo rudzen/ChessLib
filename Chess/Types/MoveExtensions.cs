@@ -132,7 +132,7 @@ namespace Rudz.Chess.Types
                         if (!ambiguousFile)
                             notation.Append(from.FileChar());
                         else if (!ambiguousRank)
-                            notation.Append(from.RankChar());
+                            notation.Append(from.RankOfChar());
                         else
                             notation.Append(from);
                 }
@@ -201,7 +201,7 @@ namespace Rudz.Chess.Types
                         if (!ambiguousFile)
                             notation.Append(@from.FileChar());
                         else if (!ambiguousRank)
-                            notation.Append(@from.RankChar());
+                            notation.Append(@from.RankOfChar());
                         else
                             notation.Append(@from);
                     }
@@ -378,7 +378,7 @@ namespace Rudz.Chess.Types
                 if (moveGenerator.ChessBoard.OccupiedBySide[move.GetMovingSide().Side] & square) {
                     if (square.File() == move.GetFromSquare().File())
                         ambiguousFile = true;
-                    else if (square.Rank() == move.GetFromSquare().Rank())
+                    else if (square.RankOf() == move.GetFromSquare().RankOf())
                         ambiguousRank = true;
 
                     ambiguousMove = true;
