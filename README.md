@@ -23,7 +23,7 @@ Yes. As far as C# goes it should be able to hold its own.
 ## Features
 
  * Complete move generation with legality check.
- * Custom compact types for Bitboard, Square, Piece, Move (a single int) and Player with tons of operators and helper functionality.
+ * Custom compact and very efficient types for Bitboard, Square, Piece, Move (a single int) and Player with tons of operators and helper functionality.
  * 100% Bitboard support with piece attacks for all types, including lots of helper functions.
  * Lots of pre-calculated bitboard arrays to aid in the creation of an evaluation functionality.
  * FEN handling with optional legality check.
