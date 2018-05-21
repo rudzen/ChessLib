@@ -45,21 +45,11 @@ namespace Rudz.Chess.Types
 
         static MoveExtensions() => NotationFuncs = new Dictionary<EMoveNotation, Func<Move, State, string>>
                                                        {
-                                                           {
-                                                               EMoveNotation.Fan, ToFan
-                                                           },
-                                                           {
-                                                               EMoveNotation.San, ToSan
-                                                           },
-                                                           {
-                                                               EMoveNotation.Lan, ToLan
-                                                           },
-                                                           {
-                                                               EMoveNotation.Ran, ToRan
-                                                           },
-                                                           {
-                                                               EMoveNotation.Uci, ToUci
-                                                           }
+                                                           { EMoveNotation.Fan, ToFan },
+                                                           { EMoveNotation.San, ToSan },
+                                                           { EMoveNotation.Lan, ToLan },
+                                                           { EMoveNotation.Ran, ToRan },
+                                                           { EMoveNotation.Uci, ToUci }
                                                        };
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

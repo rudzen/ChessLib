@@ -32,29 +32,18 @@ namespace Rudz.Chess.Enums
 
     public static class ECastlelingExtensions
     {
-        private static readonly int[] OoAllowedMask =
-            {
-                1, 4
-            };
+        private static readonly int[] OoAllowedMask = { 1, 4 };
 
-        private static readonly int[] OooAllowedMask =
-            {
-                2, 8
-            };
+        private static readonly int[] OooAllowedMask = { 2, 8 };
 
-        private static readonly Square[] OoKingTo =
-            {
-                ESquare.g1, ESquare.g8
-            };
+        private static readonly Square[] OoKingTo = { ESquare.g1, ESquare.g8 };
 
-        private static readonly Square[] OooKingTo =
-            {
-                ESquare.c1, ESquare.c8
-            };
+        private static readonly Square[] OooKingTo = { ESquare.c1, ESquare.c8 };
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Square GetKingCastleTo(this ECastleling castleType, Player side)
         {
+            // ReSharper disable once SwitchStatementMissingSomeCases
             switch (castleType) {
                 case ECastleling.Short:
                     return OoKingTo[side.Side];
@@ -68,6 +57,7 @@ namespace Rudz.Chess.Enums
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static int GetCastleAllowedMask(this ECastleling castleType, Player side)
         {
+            // ReSharper disable once SwitchStatementMissingSomeCases
             switch (castleType) {
                 case ECastleling.Short:
                     return OoAllowedMask[side.Side];

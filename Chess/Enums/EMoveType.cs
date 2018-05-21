@@ -31,6 +31,7 @@ namespace Rudz.Chess.Enums
     [Flags]
     public enum EMoveType
     {
+        Normal = 0,
         Quiet = 1,
         Doublepush = 2,
         Castle = 4,
