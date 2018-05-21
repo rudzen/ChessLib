@@ -185,6 +185,13 @@ namespace Rudz.Chess.Types
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Xor(int pos) => Value ^= (uint)pos;
 
+        public void OrAll(params BitBoard[] bbs)
+        {
+            // ReSharper disable once ForCanBeConvertedToForeach
+            for (int i = 0; i < bbs.Length; ++i)
+                Value |= bbs[i].Value;
+        }
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public IEnumerator<Square> GetEnumerator()
         {
