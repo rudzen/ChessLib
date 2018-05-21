@@ -21,12 +21,6 @@
  * Converted from C to C# code by Rudy Alex Kohn, 2017 - for use in MUCI.
  * The same conditions as descriped above is *STILL* in effect.
  * 
- * It has been ammended with a few extra functions to extract the bitboards,
- * not only from the Rooks and Bishop tables, but the non-magic bitboard
- * tables located elsewhere in the project.
- * These functions can be removed if desired, as they have no effect on the
- * original purpose of this class.
- * 
  * Original files: magicmoves.c and magicmoves.h
  * Conditional compile paths were removed.
  * The original algorithm and data were not changed in any way.
@@ -149,63 +143,6 @@ namespace Rudz.Chess
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static BitBoard QueenAttacks(this Square square, BitBoard occupied) => BishopAttacks(square, occupied) | RookAttacks(square, occupied);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static BitBoard XrayBishopAttacks(BitBoard occupied, BitBoard blockers, Square square)
-        {
-            BitBoard attacks = square.BishopAttacks(occupied);
-            blockers &= attacks;
-            return attacks ^ square.BishopAttacks(occupied ^ blockers);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static BitBoard XrayRookAttacks(BitBoard occupied, BitBoard blockers, Square square)
-        {
-            BitBoard attacks = square.RookAttacks(occupied);
-            blockers &= attacks;
-            return attacks ^ square.RookAttacks(occupied ^ blockers);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static BitBoard KnightAttacks(this Square square) => BitBoards.KnightAttacks[square.ToInt()];
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static BitBoard KingAttacks(this Square square) => BitBoards.KingAttacks[square.ToInt()];
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ref BitBoard PawnAttacks(this Square square, Player side) => ref BitBoards.PawnCaptures[square | (side << 6)];
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ref BitBoard GetAttacks(this Square square, EPieceType pieceType)
-        {
-            // ReSharper disable once SwitchStatementMissingSomeCases
-            switch (pieceType) {
-                case EPieceType.Pawn:
-                    throw new ArgumentException("Pawn type not allowed.");
-                case EPieceType.Knight:
-                    return ref BitBoards.KnightAttacks[square.ToInt()];
-                case EPieceType.King:
-                    return ref BitBoards.KingAttacks[square.ToInt()];
-                default:
-                    throw new ArgumentException($"Invalid piece type [{pieceType}].");
-            }
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static BitBoard GetAttacks(this Square square, EPieceType pieceType, BitBoard occupied)
-        {
-            // ReSharper disable once SwitchStatementMissingSomeCases
-            switch (pieceType) {
-                case EPieceType.Bishop:
-                    return BishopAttacks(square, occupied);
-                case EPieceType.Rook:
-                    return RookAttacks(square, occupied);
-                case EPieceType.Queen:
-                    return QueenAttacks(square, occupied);
-                default:
-                    throw new ArgumentException($"Invalid piece type [{pieceType}].");
-            }
-        }
 
         private static ulong InitmagicmovesOcc(IReadOnlyList<int> squares, int numSquares, ulong linocc)
         {

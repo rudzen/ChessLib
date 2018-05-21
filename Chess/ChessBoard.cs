@@ -220,14 +220,14 @@ namespace Rudz.Chess
             
             BitBoard pinnedPieces = 0;
             int oppShift = ~side << 3;
-            BitBoard pinners = MagicBB.XrayBishopAttacks(Occupied, OccupiedBySide[side.Side], square) & (BoardPieces[(int)EPieceType.Bishop + oppShift] | BoardPieces[(int)EPieceType.Queen | oppShift]);
+            BitBoard pinners = square.XrayBishopAttacks(Occupied, OccupiedBySide[side.Side]) & (BoardPieces[(int)EPieceType.Bishop + oppShift] | BoardPieces[(int)EPieceType.Queen | oppShift]);
 
             while (pinners) {
                 pinnedPieces |= pinners.Lsb().BitboardBetween(square) & OccupiedBySide[side.Side];
                 pinners--;
             }
 
-            pinners = MagicBB.XrayRookAttacks(Occupied, OccupiedBySide[side.Side], square) & (BoardPieces[(int)EPieceType.Rook + oppShift] | BoardPieces[(int)EPieceType.Queen | oppShift]);
+            pinners = square.XrayRookAttacks(Occupied, OccupiedBySide[side.Side]) & (BoardPieces[(int)EPieceType.Rook + oppShift] | BoardPieces[(int)EPieceType.Queen | oppShift]);
 
             while (pinners) {
                 pinnedPieces |= pinners.Lsb().BitboardBetween(square) & OccupiedBySide[side.Side];
@@ -348,7 +348,7 @@ namespace Rudz.Chess
         public bool AttackedByKnight(Square square, Player side) => (BoardPieces[(int)(EPieces)EPieceType.Knight + (side << 3)] & square.KnightAttacks()) != 0;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool AttackedByPawn(Square square, Player side) => (BoardPieces[(int)(EPieces)EPieceType.Pawn | (side << 3)] & BitBoards.PawnCaptures[square.ToInt() | (~side << 6)]) != 0;
+        public bool AttackedByPawn(Square square, Player side) => (BoardPieces[(int)(EPieces)EPieceType.Pawn | (side << 3)] & BitBoards.PawnAttacksBB[square.ToInt() | (~side << 6)]) != 0;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool AttackedByKing(Square square, Player side) => (BoardPieces[(int)(EPieces)EPieceType.King + (side << 3)] & square.KingAttacks()) != 0;

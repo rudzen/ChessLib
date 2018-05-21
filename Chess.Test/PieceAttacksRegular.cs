@@ -57,7 +57,7 @@ namespace ChessLibTest
         // pawn = 0 (N/A for now), knight = 1, king = 2
         protected readonly Func<Square, BitBoard>[] RegAttacks =
             {
-                MagicBB.KnightAttacks, MagicBB.KnightAttacks, MagicBB.KingAttacks
+                BitBoards.KnightAttacks, BitBoards.KnightAttacks, BitBoards.KingAttacks
             };
 
         public abstract override void AlphaPattern();

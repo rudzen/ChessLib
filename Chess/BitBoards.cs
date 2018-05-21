@@ -53,11 +53,7 @@ namespace Rudz.Chess
 
         public static readonly BitBoard PromotionRanks = RANK8 | RANK1;
 
-        public static readonly BitBoard[] PawnCaptures = new BitBoard[128];
-
-        public static readonly BitBoard[] KnightAttacks = new BitBoard[64];
-
-        public static readonly BitBoard[] KingAttacks = new BitBoard[64];
+        public static readonly BitBoard[] PawnAttacksBB = new BitBoard[128];
 
         public static BitBoard CornerA1;
 
@@ -66,6 +62,10 @@ namespace Rudz.Chess
         public static BitBoard CornerH1;
 
         public static BitBoard CornerH8;
+
+        private static readonly BitBoard[] KnightAttacksBB = new BitBoard[64];
+
+        private static readonly BitBoard[] KingAttacksBB = new BitBoard[64];
 
         internal const ulong One = 0x1ul;
 
@@ -205,34 +205,91 @@ namespace Rudz.Chess
                 InitBetweenBitboards(sq, WestOne, -1);
                 InitBetweenBitboards(sq, NorthWestOne, 7);
 
-                PawnCaptures[sq.ToInt()] = (sq.BitBoardSquare() & ~FILEH) << 9;
-                PawnCaptures[sq.ToInt()] |= (sq.BitBoardSquare() & ~FILEA) << 7;
-                PawnCaptures[sq.ToInt() + 64] = (sq.BitBoardSquare() & ~FILEA) >> 9;
-                PawnCaptures[sq.ToInt() + 64] |= (sq.BitBoardSquare() & ~FILEH) >> 7;
+                PawnAttacksBB[sq.ToInt()] = (sq.BitBoardSquare() & ~FILEH) << 9;
+                PawnAttacksBB[sq.ToInt()] |= (sq.BitBoardSquare() & ~FILEA) << 7;
+                PawnAttacksBB[sq.ToInt() + 64] = (sq.BitBoardSquare() & ~FILEA) >> 9;
+                PawnAttacksBB[sq.ToInt() + 64] |= (sq.BitBoardSquare() & ~FILEH) >> 7;
 
-                KnightAttacks[sq.ToInt()] = (sq.BitBoardSquare() & ~(FILEA | FILEB)) << 6;
-                KnightAttacks[sq.ToInt()] |= (sq.BitBoardSquare() & ~FILEA) << 15;
-                KnightAttacks[sq.ToInt()] |= (sq.BitBoardSquare() & ~FILEH) << 17;
-                KnightAttacks[sq.ToInt()] |= (sq.BitBoardSquare() & ~(FILEG | FILEH)) << 10;
-                KnightAttacks[sq.ToInt()] |= (sq.BitBoardSquare() & ~(FILEG | FILEH)) >> 6;
-                KnightAttacks[sq.ToInt()] |= (sq.BitBoardSquare() & ~FILEH) >> 15;
-                KnightAttacks[sq.ToInt()] |= (sq.BitBoardSquare() & ~FILEA) >> 17;
-                KnightAttacks[sq.ToInt()] |= (sq.BitBoardSquare() & ~(FILEA | FILEB)) >> 10;
+                KnightAttacksBB[sq.ToInt()] = (sq.BitBoardSquare() & ~(FILEA | FILEB)) << 6;
+                KnightAttacksBB[sq.ToInt()] |= (sq.BitBoardSquare() & ~FILEA) << 15;
+                KnightAttacksBB[sq.ToInt()] |= (sq.BitBoardSquare() & ~FILEH) << 17;
+                KnightAttacksBB[sq.ToInt()] |= (sq.BitBoardSquare() & ~(FILEG | FILEH)) << 10;
+                KnightAttacksBB[sq.ToInt()] |= (sq.BitBoardSquare() & ~(FILEG | FILEH)) >> 6;
+                KnightAttacksBB[sq.ToInt()] |= (sq.BitBoardSquare() & ~FILEH) >> 15;
+                KnightAttacksBB[sq.ToInt()] |= (sq.BitBoardSquare() & ~FILEA) >> 17;
+                KnightAttacksBB[sq.ToInt()] |= (sq.BitBoardSquare() & ~(FILEA | FILEB)) >> 10;
 
-                KingAttacks[sq.ToInt()] = (sq.BitBoardSquare() & ~FILEA) >> 1;
-                KingAttacks[sq.ToInt()] |= (sq.BitBoardSquare() & ~FILEA) << 7;
-                KingAttacks[sq.ToInt()] |= sq.BitBoardSquare() << 8;
-                KingAttacks[sq.ToInt()] |= (sq.BitBoardSquare() & ~FILEH) << 9;
-                KingAttacks[sq.ToInt()] |= (sq.BitBoardSquare() & ~FILEH) << 1;
-                KingAttacks[sq.ToInt()] |= (sq.BitBoardSquare() & ~FILEH) >> 7;
-                KingAttacks[sq.ToInt()] |= sq.BitBoardSquare() >> 8;
-                KingAttacks[sq.ToInt()] |= (sq.BitBoardSquare() & ~FILEA) >> 9;
+                KingAttacksBB[sq.ToInt()] = (sq.BitBoardSquare() & ~FILEA) >> 1;
+                KingAttacksBB[sq.ToInt()] |= (sq.BitBoardSquare() & ~FILEA) << 7;
+                KingAttacksBB[sq.ToInt()] |= sq.BitBoardSquare() << 8;
+                KingAttacksBB[sq.ToInt()] |= (sq.BitBoardSquare() & ~FILEH) << 9;
+                KingAttacksBB[sq.ToInt()] |= (sq.BitBoardSquare() & ~FILEH) << 1;
+                KingAttacksBB[sq.ToInt()] |= (sq.BitBoardSquare() & ~FILEH) >> 7;
+                KingAttacksBB[sq.ToInt()] |= sq.BitBoardSquare() >> 8;
+                KingAttacksBB[sq.ToInt()] |= (sq.BitBoardSquare() & ~FILEA) >> 9;
             }
 
             CornerA1 = MakeBitboard(ESquare.a1, ESquare.b1, ESquare.a2, ESquare.b2);
             CornerA8 = MakeBitboard(ESquare.a8, ESquare.b8, ESquare.a7, ESquare.b7);
             CornerH1 = MakeBitboard(ESquare.h1, ESquare.g1, ESquare.h2, ESquare.g2);
             CornerH8 = MakeBitboard(ESquare.h8, ESquare.g8, ESquare.h7, ESquare.g7);
+        }
+
+                [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static BitBoard XrayBishopAttacks(this Square square, BitBoard occupied, BitBoard blockers)
+        {
+            BitBoard attacks = square.BishopAttacks(occupied);
+            blockers &= attacks;
+            return attacks ^ square.BishopAttacks(occupied ^ blockers);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static BitBoard XrayRookAttacks(this Square square, BitBoard occupied, BitBoard blockers)
+        {
+            BitBoard attacks = square.RookAttacks(occupied);
+            blockers &= attacks;
+            return attacks ^ square.RookAttacks(occupied ^ blockers);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static BitBoard KnightAttacks(this Square square) => KnightAttacksBB[square.ToInt()];
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static BitBoard KingAttacks(this Square square) => KingAttacksBB[square.ToInt()];
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static ref BitBoard PawnAttacks(this Square square, Player side) => ref PawnAttacksBB[square | (side << 6)];
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static ref BitBoard GetAttacks(this Square square, EPieceType pieceType)
+        {
+            // ReSharper disable once SwitchStatementMissingSomeCases
+            switch (pieceType) {
+                case EPieceType.Pawn:
+                    throw new ArgumentException("Pawn type not allowed.");
+                case EPieceType.Knight:
+                    return ref KnightAttacksBB[square.ToInt()];
+                case EPieceType.King:
+                    return ref KingAttacksBB[square.ToInt()];
+                default:
+                    throw new ArgumentException($"Invalid piece type [{pieceType}].");
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static BitBoard GetAttacks(this Square square, EPieceType pieceType, BitBoard occupied)
+        {
+            // ReSharper disable once SwitchStatementMissingSomeCases
+            switch (pieceType) {
+                case EPieceType.Bishop:
+                    return square.BishopAttacks(occupied);
+                case EPieceType.Rook:
+                    return square.RookAttacks(occupied);
+                case EPieceType.Queen:
+                    return square.QueenAttacks(occupied);
+                default:
+                    throw new ArgumentException($"Invalid piece type [{pieceType}].");
+            }
         }
 
         /// <summary>
