@@ -16,7 +16,6 @@ Since the UI needs to handle legality, mate check etc etc, all these features ar
 
 Yes you can, it is designed with that in mind.
 
-
 ## Is it fast?
 
 Yes. As far as C# goes it should be able to hold its own.
@@ -26,7 +25,7 @@ Yes. As far as C# goes it should be able to hold its own.
  * Complete move generation with legality check.
  * Custom compact types for Bitboard, Square, Piece, Move (a single int) and Player with tons of operators and helper functionality.
  * 100% Bitboard support with piece attacks for all types, including lots of helper functions.
- * Lots of pre-calculated bitboard arrays.
+ * Lots of pre-calculated bitboard arrays to aid in the creation of an evaluation functionality.
  * FEN handling with optional legality check.
  * Magic bitboard implementation Copyright (C) 2007 Pradyumna Kannan. Converted to C#.
  * FEN input and output supported.
