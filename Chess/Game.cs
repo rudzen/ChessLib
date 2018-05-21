@@ -103,26 +103,6 @@ namespace Rudz.Chess
         public EGameEndType GameEndType { get; set; }
 
         /// <summary>
-        /// Adds a piece to the board, and updates the hash keys if needed
-        /// </summary>
-        /// <param name="square">The square for the piece</param>
-        /// <param name="side">For which side the piece is to be added</param>
-        /// <param name="pieceType">The type of piece to add</param>
-        public void AddPiece(Square square, Player side, EPieceType pieceType)
-        {
-            Piece piece = (int)pieceType | (side << 3);
-
-            ChessBoard.AddPiece(piece, square);
-
-            State.Key ^= Zobrist.GetZobristPst(piece, square);
-
-            if (pieceType == EPieceType.Pawn)
-                State.PawnStructureKey ^= Zobrist.GetZobristPst(piece, square);
-
-            State.Material.Add(piece);
-        }
-
-        /// <summary>
         /// Makes a chess move in the data structure
         /// </summary>
         /// <param name="move">The move to make</param>
@@ -430,7 +410,6 @@ namespace Rudz.Chess
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Player CurrentPlayer() => State.SideToMove;
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ulong Perft(int depth)
         {
             State.GenerateMoves();
@@ -448,6 +427,26 @@ namespace Rudz.Chess
             return tot;
         }
         
+        /// <summary>
+        /// Adds a piece to the board, and updates the hash keys if needed
+        /// </summary>
+        /// <param name="square">The square for the piece</param>
+        /// <param name="side">For which side the piece is to be added</param>
+        /// <param name="pieceType">The type of piece to add</param>
+        private void AddPiece(Square square, Player side, EPieceType pieceType)
+        {
+            Piece piece = (int)pieceType | (side << 3);
+
+            ChessBoard.AddPiece(piece, square);
+
+            State.Key ^= Zobrist.GetZobristPst(piece, square);
+
+            if (pieceType == EPieceType.Pawn)
+                State.PawnStructureKey ^= Zobrist.GetZobristPst(piece, square);
+
+            State.Material.Add(piece);
+        }
+
         /// <summary>
         /// Updates the hashkey depending on a move
         /// </summary>

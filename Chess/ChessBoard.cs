@@ -287,16 +287,33 @@ namespace Rudz.Chess
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool PieceOnFile(Square square, Player side, EPieceType pieceType) => (BoardPieces[(int)(pieceType + (side << 3))] & square) != 0;
 
+        /// <summary>
+        /// Determin if a pawn is isolated e.i. no own pawns on either neighboor files
+        /// </summary>
+        /// <param name="square"></param>
+        /// <param name="side"></param>
+        /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool PawnIsolated(Square square, Player side)
         {
-            BitBoard b = square.PassedPawnFronAttackSpan(side) | square.PassedPawnFronAttackSpan(~side);
+            BitBoard b = (square.PawnAttackSpan(side) | square.PawnAttackSpan(~side)) & Pawns(side);
             return b.Empty();
-            
-//            // TODO : Replace with adjacent files bb array
-//            BitBoard bbsq = square.BitBoardSquare();
-//            BitBoard neighbourFiles = (bbsq.WestOne() | bbsq.EastOne()).SouthFill().NorthFill() & Pawns(side);
-//            return !neighbourFiles.Empty();
+        }
+
+        /// <summary>
+        /// Determin if a specific square is a passed pawn
+        /// </summary>
+        /// <param name="square"></param>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool PassedPawn(Square square)
+        {
+            Piece pc = BoardLayout[square.ToInt()];
+            Player c = pc.ColorOf();
+            if (pc.Type() != EPieceType.Pawn)
+                return false;
+
+            return (square.PassedPawnFrontAttackSpan(c) & Pawns(c)) == 0;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -376,7 +393,7 @@ namespace Rudz.Chess
         {
             // ReSharper disable once ForCanBeConvertedToForeach
             // ReSharper disable once LoopCanBeConvertedToQuery
-            for /*stfu resharper*/ (int index = 0; index < BoardLayout.Length; index++)
+            for (int index = 0; index < BoardLayout.Length; index++)
                 yield return BoardLayout[index];
         }
 

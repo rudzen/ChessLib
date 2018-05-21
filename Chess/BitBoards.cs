@@ -277,7 +277,7 @@ namespace Rudz.Chess
         /// <param name="side">White = north, Black = south</param>
         /// <returns>The bitboard representation</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static BitBoard PassedPawnFronAttackSpan(this Square @this, Player side) => PassedPawnMaskBB[side.Side, @this.ToInt()];
+        public static BitBoard PassedPawnFrontAttackSpan(this Square @this, Player side) => PassedPawnMaskBB[side.Side, @this.ToInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static BitBoard ForwardRanks(this Square @this, Player side) => ForwardRanksBB[side.Side, @this.ToInt()];

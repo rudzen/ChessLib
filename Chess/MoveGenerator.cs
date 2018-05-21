@@ -40,7 +40,7 @@ namespace Rudz.Chess
         [NotNull]
         public readonly ChessBoard ChessBoard;
 
-        protected static readonly ConcurrentDictionary<ulong, List<Move>> Table;
+        private static readonly ConcurrentDictionary<ulong, List<Move>> Table;
 
         private readonly Func<BitBoard, BitBoard>[] _pawnPush =
             {
@@ -63,7 +63,13 @@ namespace Rudz.Chess
 
         private BitBoard _occupied;
 
-        static MoveGenerator() => Table = new ConcurrentDictionary<ulong, List<Move>>();
+        static MoveGenerator()
+        {
+            Table = new ConcurrentDictionary<ulong, List<Move>>();
+            
+            // Force cleaning when process exists
+            AppDomain.CurrentDomain.ProcessExit += Clean;
+        }
 
         protected MoveGenerator(ChessBoard chessBoard)
         {
@@ -88,6 +94,11 @@ namespace Rudz.Chess
 
         public IList<Move> Moves { get; set; }
         
+        public static void ClearMoveCache()
+        {
+            Table.Clear();
+        }
+
         public void GenerateMoves(bool force = false)
         {
             // Align current structure to chessboard.
@@ -178,6 +189,16 @@ namespace Rudz.Chess
             return true;
         }
 
+        /// <summary>
+        /// Class clean up method, to be expanded at some point.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="ea"></param>
+        private static void Clean(object sender, EventArgs ea)
+        {
+            ClearMoveCache();
+        }
+        
         /// <summary>
         /// Aligns the current positional data to the chessboards data.
         /// </summary>
@@ -355,6 +376,7 @@ namespace Rudz.Chess
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private bool CanCastle(ECastleling type)
         {
+            // ReSharper disable once SwitchStatementMissingSomeCases
             switch (type) {
                 case ECastleling.Short:
                 case ECastleling.Long:
