@@ -2,14 +2,13 @@
 {
     using System.Collections.Generic;
 
-    public static class PerftData
+    public partial class Perft
     {
+        private static readonly IList<PerftPositions> Positions;
 
-        public static readonly IList<PerftPositions> positions;
-
-        static PerftData()
+        static Perft()
         {
-            positions = new List<PerftPositions>();
+            Positions = new List<PerftPositions>();
             IList<ulong> vals = new List<ulong>(6);
             vals.Add(20);
             vals.Add(400);
@@ -17,7 +16,7 @@
             vals.Add(197281);
             vals.Add(4865609);
             vals.Add(119060324);
-            positions.Add(new PerftPositions("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", vals));
+            Positions.Add(new PerftPositions("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", vals));
         }
 
     }

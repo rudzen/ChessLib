@@ -35,7 +35,7 @@ namespace Perft
             if (depth == 6)
                 Console.WriteLine("Brace yourself, this could take a little while.");
             
-            Perf p = new Perf(depth);
+            Perft p = new Perft(depth);
             
             Stopwatch watch = Stopwatch.StartNew();
             ulong result = p.DoPerft();

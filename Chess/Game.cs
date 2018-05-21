@@ -139,10 +139,9 @@ namespace Rudz.Chess
                 State.ReversibleHalfMoveCount = previous.ReversibleHalfMoveCount + 1;
 
             // compute en-passant if present
-            if (move.IsDoublePush())
-                State.EnPassantSquare = BitBoards.First(move.GetToSquare().BitBoardSquare()) + State.SideToMove.PawnPushDistance();
-            else
-                State.EnPassantSquare = 0ul;
+            State.EnPassantSquare = move.IsDoublePush()
+                                  ? (BitBoard) (BitBoards.First(move.GetToSquare().BitBoardSquare()) + State.SideToMove.PawnPushDistance())
+                                  : 0ul;
 
             State.Key = previous.Key;
             State.PawnStructureKey = previous.PawnStructureKey;
@@ -173,6 +172,7 @@ namespace Rudz.Chess
         /// *EXCEPTION FREE FUNCTION*
         /// </summary>
         /// <param name="fenString">Da mutafucking string to set</param>
+        /// <param name="validate">If true, the fen string is validated, otherwise not</param>
         /// <returns>
         /// 0 = all ok.
         /// -1 = Error in piece file layout parsing
@@ -270,10 +270,10 @@ namespace Rudz.Chess
             if (epSq == ESquare.fail)
                 return new FenError(-6, fen.GetIndex());
 
+            // temporary.. the whole method should be using this, but this will do for now.
             string first = string.Empty;
             string second = string.Empty;
 
-            // temporary.. the whole method should be using this, but this will do for now.
             IList<string> moveCounters = fen.Fen.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
             first = moveCounters[moveCounters.Count - 2];

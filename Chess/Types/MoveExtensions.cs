@@ -189,11 +189,11 @@ namespace Rudz.Chess.Types
 
                     if (ambiguousMove) {
                         if (!ambiguousFile)
-                            notation.Append(@from.FileChar());
+                            notation.Append(from.FileChar());
                         else if (!ambiguousRank)
-                            notation.Append(@from.RankOfChar());
+                            notation.Append(from.RankOfChar());
                         else
-                            notation.Append(@from);
+                            notation.Append(from);
                     }
                 }
 
@@ -202,7 +202,7 @@ namespace Rudz.Chess.Types
                     notation.Append(from.FileChar());
                 } else if (move.IsCaptureMove()) {
                     if (pt == EPieceType.Pawn)
-                        notation.Append(@from.FileChar());
+                        notation.Append(from.FileChar());
 
                     notation.Append('x');
                 }
@@ -259,7 +259,7 @@ namespace Rudz.Chess.Types
                     notation.Append(from.FileChar());
                 } else if (move.IsCaptureMove()) {
                     if (pt == EPieceType.Pawn)
-                        notation.Append(@from.FileChar());
+                        notation.Append(from.FileChar());
 
                     notation.Append('x');
                 } else {
@@ -318,7 +318,7 @@ namespace Rudz.Chess.Types
                     notation.Append(from.FileChar());
                 } else if (move.IsCaptureMove()) {
                     if (pt == EPieceType.Pawn)
-                        notation.Append(@from.FileChar());
+                        notation.Append(from.FileChar());
 
                     notation.Append('x');
                     notation.Append(move.GetCapturedPiece().Type().GetPieceChar());

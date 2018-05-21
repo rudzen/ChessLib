@@ -24,6 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using System.Collections.Generic;
+
 namespace Rudz.Chess.UCI
 {
     using System;
@@ -72,7 +74,7 @@ namespace Rudz.Chess.UCI
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public SearchParameters(ulong whiteTimeMilliseconds, ulong blackTimeMilliseconds, ulong whiteIncrementTimeMilliseconds, ulong blackIncrementTimeMilliseconds, int[] movesToGo, int moveTime)
+        public SearchParameters(ulong whiteTimeMilliseconds, ulong blackTimeMilliseconds, ulong whiteIncrementTimeMilliseconds, ulong blackIncrementTimeMilliseconds, IReadOnlyList<int> movesToGo, int moveTime)
             : this(whiteTimeMilliseconds, blackTimeMilliseconds, whiteIncrementTimeMilliseconds, blackIncrementTimeMilliseconds)
         {
             MovesToGo = new []{ movesToGo[0], movesToGo[1] };

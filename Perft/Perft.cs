@@ -5,17 +5,15 @@
     using Rudz.Chess.Types;
 
     
-    public class Perf
+    public partial class Perft
     {
 
-        public Perf(int depth) => _perftLimit = depth;
+        public Perft(int depth) => _perftLimit = depth;
 
         /// <summary>
         /// How deep the test should proceed.
         /// </summary>
         private readonly int _perftLimit;
-
-        private readonly Game game = new Game();
 
         /// <summary>
         /// To notify about update.
@@ -24,8 +22,9 @@
 
         public ulong DoPerft()
         {
+            Game game = new Game();
             ulong total = 0;
-            foreach (PerftPositions perftPositions in PerftData.positions) {
+            foreach (PerftPositions perftPositions in Positions) {
                 game.SetFen(perftPositions.fen);
                 total += game.Perft(_perftLimit);
             }

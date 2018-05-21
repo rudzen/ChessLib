@@ -24,6 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+// ReSharper disable NotAccessedField.Local
 namespace Rudz.Chess.Data
 {
     using System;
@@ -85,9 +86,8 @@ namespace Rudz.Chess.Data
             for (EPlayer side = EPlayer.White; side < EPlayer.PlayerNb; ++side) {
                 for (EPieceType pieceType = EPieceType.Pawn; pieceType < EPieceType.PieceTypeNb; pieceType++) {
                     Piece piece = pieceType.MakePiece(side);
-                    for (ESquare square = ESquare.a1; square <= ESquare.h8; square++) {
+                    for (ESquare square = ESquare.a1; square <= ESquare.h8; square++)
                         ZobristPst[piece.ToInt(), (int)square] = rnd.Rand();
-                    }
                 }
             }
 

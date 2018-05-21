@@ -241,12 +241,11 @@ namespace Rudz.Chess
         private void GenerateQuietMoves(ICollection<Move> moves)
         {
             Player currentSide = SideToMove;
-            if (!InCheck) {
+            if (!InCheck)
                 for (ECastleling castleType = ECastleling.Short; castleType <= ECastleling.Long; castleType++) {
                     if (CanCastle(castleType))
                         AddCastleMove(moves, ChessBoard.GetKingCastleFrom(currentSide, castleType), castleType.GetKingCastleTo(currentSide));
                 }
-            }
 
             BitBoard notOccupied = ~_occupied;
             BitBoard pushed = _pawnPush[currentSide.Side](ChessBoard.Pawns(currentSide).Value & ~currentSide.Rank7()) & notOccupied;

@@ -203,9 +203,10 @@ namespace Rudz.Chess.Fen
             short blackKingCount = 0;
             short blackBishopCount = 0;
 
-            foreach (char testString in testArray[0])
+            foreach (char c in testArray[0])
             {
-                switch (testString)
+                // ReSharper disable once SwitchStatementMissingSomeCases
+                switch (c)
                 {
                     case 'p':
                         if (++whitePawnCount > 8 && whiteRookCount + whitePawnCount + whiteBishopCount + whiteKnightCount + whiteQueenCount < 15)
@@ -273,6 +274,7 @@ namespace Rudz.Chess.Fen
             int spaceCount = 0;
             int seperatorCount = 0;
             foreach (char c in str) {
+                // ReSharper disable once SwitchStatementMissingSomeCases
                 switch (c) {
                     case Seperator:
                         seperatorCount++;

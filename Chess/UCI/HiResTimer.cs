@@ -95,15 +95,15 @@ namespace Rudz.Chess.UCI
 
         public static bool operator ==(HiResTimer left, HiResTimer right) => Equals(left, right);
 
-        public static bool operator ==([NotNull] HiResTimer left, int right) => left.Id == right;
+        public static bool operator ==([NotNull] HiResTimer left, int right) => left != null && left.Id == right;
 
-        public static bool operator ==([NotNull] HiResTimer left, Player right) => left.Id == right.Side;
+        public static bool operator ==([NotNull] HiResTimer left, Player right) => left != null && left.Id == right.Side;
 
         public static bool operator !=(HiResTimer left, HiResTimer right) => !Equals(left, right);
 
-        public static bool operator !=([NotNull] HiResTimer left, int right) => left.Id != right;
+        public static bool operator !=([NotNull] HiResTimer left, int right) => left != null && left.Id != right;
 
-        public static bool operator !=([NotNull] HiResTimer left, Player right) => left.Id != right.Side;
+        public static bool operator !=([NotNull] HiResTimer left, Player right) => left != null && left.Id != right.Side;
 
         public void Start()
         {

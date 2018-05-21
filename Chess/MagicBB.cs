@@ -43,6 +43,7 @@ namespace Rudz.Chess
     using Enums;
     using Types;
 
+    // ReSharper disable once InconsistentNaming
     public static class MagicBB
     {
         private const ulong One = 1UL;

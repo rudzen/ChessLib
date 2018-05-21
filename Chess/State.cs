@@ -154,12 +154,13 @@ namespace Rudz.Chess
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ECastleling IsCastleMove(string m)
         {
+            // ReSharper disable once SwitchStatementMissingSomeCases
             switch (m) {
                 case "O-O":
                 case "OO":
                 case "0-0":
                 case "00":
-                case "e1g1" when ChessBoard.IsPieceTypeOnSquare(ESquare.e1, EPieceType.King): // bug (stylecop) fake vs syntax error
+                case "e1g1" when ChessBoard.IsPieceTypeOnSquare(ESquare.e1, EPieceType.King):
                 case "e8g8" when ChessBoard.IsPieceTypeOnSquare(ESquare.e8, EPieceType.King):
                     return ECastleling.Short;
                 case "O-O-O":
@@ -170,6 +171,7 @@ namespace Rudz.Chess
                 case "e8c8" when ChessBoard.IsPieceTypeOnSquare(ESquare.e8, EPieceType.King):
                     return ECastleling.Long;
             }
+
             return ECastleling.None;
         }
     }

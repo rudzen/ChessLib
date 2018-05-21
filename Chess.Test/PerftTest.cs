@@ -35,6 +35,10 @@ namespace ChessLibTest
     [TestFixture]
     public class PerftTest
     {
+        private const int ShortCount = 2;
+
+        private const int MediumCount = 4;
+        
         private static readonly Tuple<string, ulong[]>[] positions;
 
         static PerftTest()
@@ -52,7 +56,7 @@ namespace ChessLibTest
         {
             Game game = new Game();
             foreach (Tuple<string,ulong[]> tuple in positions) {
-                for (int i = 0; i < 2; ++i) {
+                for (int i = 0; i < ShortCount; ++i) {
                     ulong res = DoPerft(ref game, tuple.Item1, i + 1);
                     Assert.AreEqual(tuple.Item2[i], res);
                 }
@@ -64,7 +68,7 @@ namespace ChessLibTest
         {
             Game game = new Game();
             foreach (Tuple<string,ulong[]> tuple in positions) {
-                for (int i = 0; i < 4; ++i) {
+                for (int i = 0; i < MediumCount; ++i) {
                     ulong res = DoPerft(ref game, tuple.Item1, i + 1);
                     Assert.AreEqual(tuple.Item2[i], res);
                 }
