@@ -42,20 +42,13 @@ namespace Rudz.Chess
 
         private static readonly ConcurrentDictionary<ulong, List<Move>> Table;
 
-        private readonly Func<BitBoard, BitBoard>[] _pawnPush =
-            {
-                BitBoards.NorthOne, BitBoards.SouthOne
-            };
+        private readonly Func<BitBoard, BitBoard>[] _pawnPush = { BitBoards.NorthOne, BitBoards.SouthOne };
 
-        private readonly Func<BitBoard, BitBoard>[] _pawnAttacksWest =
-            {
-                BitBoards.NorthEastOne, BitBoards.SouthEastOne
-            };
+        // to be replaced
+        private readonly Func<BitBoard, BitBoard>[] _pawnAttacksWest = { BitBoards.NorthEastOne, BitBoards.SouthEastOne };
 
-        private readonly Func<BitBoard, BitBoard>[] _pawnAttacksEast =
-            {
-                BitBoards.NorthWestOne, BitBoards.SouthWestOne
-            };
+        // to be replaced
+        private readonly Func<BitBoard, BitBoard>[] _pawnAttacksEast = { BitBoards.NorthWestOne, BitBoards.SouthWestOne };
 
         private BitBoard[] _bitboardPieces;
 
@@ -92,7 +85,7 @@ namespace Rudz.Chess
 
         public Emgf Flags { get; set; } = Emgf.Legalmoves;
 
-        public IList<Move> Moves { get; set; }
+        public IList<Move> Moves { get; private set; }
         
         public static void ClearMoveCache()
         {
@@ -258,24 +251,12 @@ namespace Rudz.Chess
         /// Move generation leaf method.
         /// Constructs the actual move based on the arguments.
         /// </summary>
-        /// <param name="moves">
-        /// The move list to add the generated (if any) moves into
-        /// </param>
-        /// <param name="piece">
-        /// The moving piece
-        /// </param>
-        /// <param name="from">
-        /// The from square
-        /// </param>
-        /// <param name="to">
-        /// The to square
-        /// </param>
-        /// <param name="promoted">
-        /// The promotion piece (if any, defaults to NoPiece type)
-        /// </param>
-        /// <param name="type">
-        /// The move type
-        /// </param>
+        /// <param name="moves">The move list to add the generated (if any) moves into</param>
+        /// <param name="piece">The moving piece</param>
+        /// <param name="from">The from square</param>
+        /// <param name="to">The to square</param>
+        /// <param name="promoted">The promotion piece (if any, defaults to NoPiece type)</param>
+        /// <param name="type">The move type</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void AddMove(ICollection<Move> moves, Piece piece, Square from, Square to, EPieces promoted = EPieces.NoPiece, EMoveType type = EMoveType.Quiet)
         {

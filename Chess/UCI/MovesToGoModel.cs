@@ -36,14 +36,8 @@ namespace Rudz.Chess.UCI
 
         public MovesToGoModel(ISearchParameters original)
         {
-            _time = new[]
-                        {
-                            original.WhiteTimeMilliseconds, original.BlackTimeMilliseconds
-                        };
-            MovesToGo = new[]
-                            {
-                                original.MovesToGo[0], original.MovesToGo[1]
-                            };
+            _time = new[] { original.WhiteTimeMilliseconds, original.BlackTimeMilliseconds };
+            MovesToGo = new[] { original.MovesToGo[0], original.MovesToGo[1] };
         }
 
         public int[] MovesToGo { get; set; }

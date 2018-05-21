@@ -53,6 +53,7 @@ namespace Rudz.Chess
 
         public static readonly BitBoard AllSquares;
 
+        // TODO : merge into pseudo attacks array
         public static readonly BitBoard[] PawnAttacksBB;
 
         public static readonly BitBoard CornerA1;
@@ -63,9 +64,7 @@ namespace Rudz.Chess
 
         public static readonly BitBoard CornerH8;
 
-        private static readonly BitBoard[] KnightAttacksBB;
-
-        private static readonly BitBoard[] KingAttacksBB;
+        private static readonly BitBoard[,] PseudoAttacksBB;
 
         internal const ulong One = 0x1ul;
 
@@ -111,40 +110,19 @@ namespace Rudz.Chess
 
         private const ulong LightSquares = 0x55AA55AA55AA55AA;
 
-        private static readonly ulong[] FileBB =
-            {
-                FILEA, FILEB, FILEC, FILED, FILEE, FILEF, FILEG, FILEH
-            };
+        private static readonly ulong[] FileBB = { FILEA, FILEB, FILEC, FILED, FILEE, FILEF, FILEG, FILEH };
 
-        private static readonly ulong[] RankBB =
-            {
-                RANK1, RANK2, RANK3, RANK4, RANK5, RANK6, RANK7, RANK8
-            };
+        private static readonly ulong[] RankBB = { RANK1, RANK2, RANK3, RANK4, RANK5, RANK6, RANK7, RANK8 };
 
-        private static readonly ulong[] Rank1 =
-            {
-                RANK1, RANK8
-            };
+        private static readonly ulong[] Rank1 = { RANK1, RANK8 };
 
-        private static readonly ulong[] Rank3BitBoards =
-            {
-                RANK3, RANK6
-            };
+        private static readonly ulong[] Rank3BitBoards = { RANK3, RANK6 };
 
-        private static readonly BitBoard[] Rank7BitBoards =
-            {
-                RANK7, RANK2
-            };
+        private static readonly BitBoard[] Rank7BitBoards = { RANK7, RANK2 };
 
-        private static readonly ulong[] Rank6And7 =
-            {
-                RANK6 | RANK7, RANK2 | RANK3
-            };
+        private static readonly ulong[] Rank6And7 = { RANK6 | RANK7, RANK2 | RANK3 };
 
-        private static readonly ulong[] Rank7And8 =
-            {
-                RANK7 | RANK8, RANK1 | RANK2
-            };
+        private static readonly ulong[] Rank7And8 = { RANK7 | RANK8, RANK1 | RANK2 };
 
         private static readonly int[] Lsb64Table =
             {
@@ -173,10 +151,9 @@ namespace Rudz.Chess
         static BitBoards()
         {
             BetweenBB = new BitBoard[64, 64];
-            KingAttacksBB = new BitBoard[64];
-            KnightAttacksBB = new BitBoard[64];
+            PseudoAttacksBB = new BitBoard[EPieceType.PieceTypeNb.ToInt(), 64];
             PawnAttacksBB = new BitBoard[128];
-            AllSquares = WhiteArea | BlackArea;
+            AllSquares = ~Zero;
             PawnAttackSpanBB = new BitBoard[2, 64];
             PassedPawnMaskBB = new BitBoard[2, 64];
             ForwardRanksBB = new BitBoard[2, 64];
@@ -195,42 +172,62 @@ namespace Rudz.Chess
                     PassedPawnMaskBB[c, s] = ForwardFileBB [c, s] | PawnAttackSpanBB[c, s];
                 }
             }
-            
-            foreach (Square sq in AllSquares) {
+
+            foreach (Square s in AllSquares) {
                 foreach (Square fillSq in AllSquares)
-                    BetweenBB[sq.ToInt(), fillSq.ToInt()] = 0;
+                    BetweenBB[s.ToInt(), fillSq.ToInt()] = 0;
 
-                InitBetweenBitboards(sq, NorthOne, 8);
-                InitBetweenBitboards(sq, NorthEastOne, 9);
-                InitBetweenBitboards(sq, EastOne, 1);
-                InitBetweenBitboards(sq, SouthEastOne, -7);
-                InitBetweenBitboards(sq, SouthOne, -8);
-                InitBetweenBitboards(sq, SouthWestOne, -9);
-                InitBetweenBitboards(sq, WestOne, -1);
-                InitBetweenBitboards(sq, NorthWestOne, 7);
+                InitBetweenBitboards(s, NorthOne, 8);
+                InitBetweenBitboards(s, NorthEastOne, 9);
+                InitBetweenBitboards(s, EastOne, 1);
+                InitBetweenBitboards(s, SouthEastOne, -7);
+                InitBetweenBitboards(s, SouthOne, -8);
+                InitBetweenBitboards(s, SouthWestOne, -9);
+                InitBetweenBitboards(s, WestOne, -1);
+                InitBetweenBitboards(s, NorthWestOne, 7);
+            }
 
-                PawnAttacksBB[sq.ToInt()] = (sq.BitBoardSquare() & ~FILEH) << 9;
-                PawnAttacksBB[sq.ToInt()] |= (sq.BitBoardSquare() & ~FILEA) << 7;
-                PawnAttacksBB[sq.ToInt() + 64] = (sq.BitBoardSquare() & ~FILEA) >> 9;
-                PawnAttacksBB[sq.ToInt() + 64] |= (sq.BitBoardSquare() & ~FILEH) >> 7;
+            // pawn attacks
+            foreach (Square s in AllSquares) {
+                PawnAttacksBB[s.ToInt()] = (s.BitBoardSquare() & ~FILEH) << 9;
+                PawnAttacksBB[s.ToInt()] |= (s.BitBoardSquare() & ~FILEA) << 7;
+                PawnAttacksBB[s.ToInt() + 64] = (s.BitBoardSquare() & ~FILEA) >> 9;
+                PawnAttacksBB[s.ToInt() + 64] |= (s.BitBoardSquare() & ~FILEH) >> 7;
+            }
 
-                KnightAttacksBB[sq.ToInt()] = (sq.BitBoardSquare() & ~(FILEA | FILEB)) << 6;
-                KnightAttacksBB[sq.ToInt()] |= (sq.BitBoardSquare() & ~FILEA) << 15;
-                KnightAttacksBB[sq.ToInt()] |= (sq.BitBoardSquare() & ~FILEH) << 17;
-                KnightAttacksBB[sq.ToInt()] |= (sq.BitBoardSquare() & ~(FILEG | FILEH)) << 10;
-                KnightAttacksBB[sq.ToInt()] |= (sq.BitBoardSquare() & ~(FILEG | FILEH)) >> 6;
-                KnightAttacksBB[sq.ToInt()] |= (sq.BitBoardSquare() & ~FILEH) >> 15;
-                KnightAttacksBB[sq.ToInt()] |= (sq.BitBoardSquare() & ~FILEA) >> 17;
-                KnightAttacksBB[sq.ToInt()] |= (sq.BitBoardSquare() & ~(FILEA | FILEB)) >> 10;
+            // Pseudo attacks for all pieces except pawns
+            foreach (Square s in AllSquares) {
+                int sq = s.ToInt();
+                BitBoard b = s.BitBoardSquare();
+                
+                int pt = EPieceType.Knight.ToInt();
+                PseudoAttacksBB[pt, sq] =  (b & ~(FILEA | FILEB)) << 6;
+                PseudoAttacksBB[pt, sq] |= (b & ~FILEA) << 15;
+                PseudoAttacksBB[pt, sq] |= (b & ~FILEH) << 17;
+                PseudoAttacksBB[pt, sq] |= (b & ~(FILEG | FILEH)) << 10;
+                PseudoAttacksBB[pt, sq] |= (b & ~(FILEG | FILEH)) >> 6;
+                PseudoAttacksBB[pt, sq] |= (b & ~FILEH) >> 15;
+                PseudoAttacksBB[pt, sq] |= (b & ~FILEA) >> 17;
+                PseudoAttacksBB[pt, sq] |= (b & ~(FILEA | FILEB)) >> 10;
 
-                KingAttacksBB[sq.ToInt()] = (sq.BitBoardSquare() & ~FILEA) >> 1;
-                KingAttacksBB[sq.ToInt()] |= (sq.BitBoardSquare() & ~FILEA) << 7;
-                KingAttacksBB[sq.ToInt()] |= sq.BitBoardSquare() << 8;
-                KingAttacksBB[sq.ToInt()] |= (sq.BitBoardSquare() & ~FILEH) << 9;
-                KingAttacksBB[sq.ToInt()] |= (sq.BitBoardSquare() & ~FILEH) << 1;
-                KingAttacksBB[sq.ToInt()] |= (sq.BitBoardSquare() & ~FILEH) >> 7;
-                KingAttacksBB[sq.ToInt()] |= sq.BitBoardSquare() >> 8;
-                KingAttacksBB[sq.ToInt()] |= (sq.BitBoardSquare() & ~FILEA) >> 9;
+                pt = EPieceType.Bishop.ToInt();
+                PseudoAttacksBB[pt, sq] = s.BishopAttacks(Zero);
+
+                pt = EPieceType.Rook.ToInt();
+                PseudoAttacksBB[pt, sq] = s.RookAttacks(Zero);
+
+                pt = EPieceType.Queen.ToInt();
+                PseudoAttacksBB[pt, sq] = s.QueenAttacks(Zero);
+                
+                pt = EPieceType.King.ToInt();
+                PseudoAttacksBB[pt, sq] = (b & ~FILEA) >> 1;
+                PseudoAttacksBB[pt, sq] |= (b & ~FILEA) << 7;
+                PseudoAttacksBB[pt, sq] |= b << 8;
+                PseudoAttacksBB[pt, sq] |= (b & ~FILEH) << 9;
+                PseudoAttacksBB[pt, sq] |= (b & ~FILEH) << 1;
+                PseudoAttacksBB[pt, sq] |= (b & ~FILEH) >> 7;
+                PseudoAttacksBB[pt, sq] |= b >> 8;
+                PseudoAttacksBB[pt, sq] |= (b & ~FILEA) >> 9;
             }
 
             CornerA1 = MakeBitboard(ESquare.a1, ESquare.b1, ESquare.a2, ESquare.b2);
@@ -239,7 +236,7 @@ namespace Rudz.Chess
             CornerH8 = MakeBitboard(ESquare.h8, ESquare.g8, ESquare.h7, ESquare.g7);
         }
 
-                [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static BitBoard XrayBishopAttacks(this Square square, BitBoard occupied, BitBoard blockers)
         {
             BitBoard attacks = square.BishopAttacks(occupied);
@@ -256,44 +253,31 @@ namespace Rudz.Chess
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static BitBoard KnightAttacks(this Square square) => KnightAttacksBB[square.ToInt()];
+        public static BitBoard KnightAttacks(this Square square) => PseudoAttacksBB[EPieceType.Knight.ToInt(), square.ToInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static BitBoard KingAttacks(this Square square) => KingAttacksBB[square.ToInt()];
+        public static BitBoard KingAttacks(this Square square) => PseudoAttacksBB[EPieceType.King.ToInt(), square.ToInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ref BitBoard PawnAttacks(this Square square, Player side) => ref PawnAttacksBB[square | (side << 6)];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ref BitBoard GetAttacks(this Square square, EPieceType pieceType)
+        public static BitBoard GetAttacks(this Square square, EPieceType pieceType, BitBoard occupied = new BitBoard())
         {
-            // ReSharper disable once SwitchStatementMissingSomeCases
-            switch (pieceType) {
-                case EPieceType.Pawn:
-                    throw new ArgumentException("Pawn type not allowed.");
-                case EPieceType.Knight:
-                    return ref KnightAttacksBB[square.ToInt()];
-                case EPieceType.King:
-                    return ref KingAttacksBB[square.ToInt()];
-                default:
-                    throw new ArgumentException($"Invalid piece type [{pieceType}].");
-            }
+            return pieceType == EPieceType.Knight || pieceType == EPieceType.King
+                ? PseudoAttacksBB[pieceType.ToInt(), square.ToInt()]
+                : pieceType == EPieceType.Bishop
+                    ? square.BishopAttacks(occupied)
+                    : pieceType == EPieceType.Rook
+                        ? square.RookAttacks(occupied)
+                        : pieceType == EPieceType.Queen
+                            ? square.QueenAttacks(occupied)
+                            : Zero;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static BitBoard GetAttacks(this Square square, EPieceType pieceType, BitBoard occupied)
+        public static BitBoard PseudoAttack(this Square @this, EPieceType pieceType)
         {
-            // ReSharper disable once SwitchStatementMissingSomeCases
-            switch (pieceType) {
-                case EPieceType.Bishop:
-                    return square.BishopAttacks(occupied);
-                case EPieceType.Rook:
-                    return square.RookAttacks(occupied);
-                case EPieceType.Queen:
-                    return square.QueenAttacks(occupied);
-                default:
-                    throw new ArgumentException($"Invalid piece type [{pieceType}].");
-            }
+            return pieceType != EPieceType.Pawn ? PseudoAttacksBB[pieceType.ToInt(), @this.ToInt()] : Zero;
         }
 
         /// <summary>
