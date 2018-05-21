@@ -248,6 +248,8 @@ namespace Rudz.Chess
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public BitBoard PieceAttacks(Square square, EPieceType pieceType)
         {
+            // TODO : Re-code
+            
             // Impossible to determin which of these types are used more often :-)
             // ReSharper disable once SwitchStatementMissingSomeCases
             switch (pieceType) {
@@ -265,6 +267,8 @@ namespace Rudz.Chess
             return BitBoards.ZeroBb;
         }
 
+        // TODO : Re-write the piece extraction methods to mirror those of Mirage chess engine.
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public BitBoard Pieces(Piece piece, Player side) => BoardPieces[(int)piece.Type() | (side << 3)];
 
@@ -330,6 +334,19 @@ namespace Rudz.Chess
                 return;
             PieceUpdated?.Invoke(EPieces.NoPiece, square);
         }
+
+        public BitBoard AttacksTo(Square square, BitBoard occupied)
+        {
+            // temporary
+            return  (square.PawnAttacks(PlayerExtensions.White)       & OccupiedBySide[PlayerExtensions.Black.Side])
+                    | (square.PawnAttacks(PlayerExtensions.Black)     & OccupiedBySide[PlayerExtensions.White.Side])
+                    | (square.GetAttacks(EPieceType.Knight)           & (Knights(PlayerExtensions.White) | Knights(1)))
+                    | (square.GetAttacks(EPieceType.Rook, occupied)   & (Rooks(0) | Rooks(1) | Queens(0) | Queens(1)))
+                    | (square.GetAttacks(EPieceType.Bishop, occupied) & (Bishops(0) | Bishops(1) | Queens(0) | Queens(1)))
+                    | (square.GetAttacks(EPieceType.King)             & (King(0) | King(1)));
+        }
+
+        public BitBoard AttacksTo(Square square) => AttacksTo(square, Occupied);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool AttackedBySlider(Square square, Player side)
