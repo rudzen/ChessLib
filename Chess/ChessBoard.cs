@@ -44,10 +44,7 @@ namespace Rudz.Chess
     {
         private const ulong Zero = 0;
 
-        private static readonly Func<BitBoard, BitBoard>[] EnPasCapturePos =
-            {
-                BitBoards.SouthOne, BitBoards.NorthOne
-            };
+        private static readonly Func<BitBoard, BitBoard>[] EnPasCapturePos;
 
         [NotNull]
         private readonly Square[] _rookCastlesFrom; // indexed by position of the king
@@ -71,6 +68,11 @@ namespace Rudz.Chess
             Clear();
         }
 
+        static ChessBoard()
+        {
+            EnPasCapturePos = new Func<BitBoard, BitBoard>[] { BitBoards.SouthOne, BitBoards.NorthOne };
+        }
+        
         // TODO : redesign BoardPieces + OccupiedBySide into simple arrays
         
         [NotNull]

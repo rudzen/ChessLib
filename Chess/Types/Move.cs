@@ -61,12 +61,8 @@ namespace Rudz.Chess.Types
         /// Initializes a new instance of the <see cref="Move"/> struct. 
         /// Neccesary extra constructor as it can sometimes be required to only created a basic move.
         /// </summary>
-        /// <param name="from">
-        /// The from square
-        /// </param>
-        /// <param name="to">
-        /// The to square
-        /// </param>
+        /// <param name="from">The from square/// </param>
+        /// <param name="to">The to square</param>
         public Move(Square from, Square to)
             : this()
         {
@@ -78,21 +74,11 @@ namespace Rudz.Chess.Types
         /// Initializes a new instance of the <see cref="Move"/> struct. 
         /// Constructor for capture moves
         /// </summary>
-        /// <param name="piece">
-        /// The moving piece
-        /// </param>
-        /// <param name="captured">
-        /// The captured piece
-        /// </param>
-        /// <param name="from">
-        /// The from square
-        /// </param>
-        /// <param name="to">
-        /// The to square
-        /// </param>
-        /// <param name="type">
-        /// The move type
-        /// </param>
+        /// <param name="piece">The moving piece</param>
+        /// <param name="captured">The captured piece</param>
+        /// <param name="from">The from square</param>
+        /// <param name="to">The to square</param>
+        /// <param name="type">The move type</param>
         public Move(Piece piece, Piece captured, Square from, Square to, EMoveType type)
             : this(from, to)
         {
@@ -107,15 +93,9 @@ namespace Rudz.Chess.Types
         /// It contains implicit no capture piece or promotion piece.
         /// Type is implicit Quiet.
         /// </summary>
-        /// <param name="piece">
-        /// The piece to move
-        /// </param>
-        /// <param name="from">
-        /// The from square
-        /// </param>
-        /// <param name="to">
-        /// The to square
-        /// </param>
+        /// <param name="piece">The piece to move</param>
+        /// <param name="from">The from square</param>
+        /// <param name="to">The to square</param>
         public Move(Piece piece, Square from, Square to)
             : this(from, to)
         {
@@ -127,24 +107,12 @@ namespace Rudz.Chess.Types
         /// Initializes a new instance of the <see cref="Move"/> struct. 
         /// Constructor for capture+promotion moves
         /// </summary>
-        /// <param name="piece">
-        /// The moving piece
-        /// </param>
-        /// <param name="captured">
-        /// The captured piece
-        /// </param>
-        /// <param name="from">
-        /// The from square
-        /// </param>
-        /// <param name="to">
-        /// The to square
-        /// </param>
-        /// <param name="type">
-        /// The move type
-        /// </param>
-        /// <param name="promotedEPiece">
-        /// The promotion piece
-        /// </param>
+        /// <param name="piece">The moving piece</param>
+        /// <param name="captured">The captured piece</param>
+        /// <param name="from">The from square</param>
+        /// <param name="to">The to square</param>
+        /// <param name="type">The move type</param>
+        /// <param name="promotedEPiece">The promotion piece</param>
         public Move(Piece piece, Piece captured, Square from, Square to, EMoveType type, Piece promotedEPiece)
             : this(piece, captured, from, to, type) => SetPromotedPiece(promotedEPiece);
 
@@ -152,21 +120,11 @@ namespace Rudz.Chess.Types
         /// Initializes a new instance of the <see cref="Move"/> struct. 
         /// Constructor for quiet promotion moves
         /// </summary>
-        /// <param name="piece">
-        /// The moving piece
-        /// </param>
-        /// <param name="from">
-        /// The from square
-        /// </param>
-        /// <param name="to">
-        /// The to square
-        /// </param>
-        /// <param name="type">
-        /// The move type
-        /// </param>
-        /// <param name="promoted">
-        /// The promotion piece
-        /// </param>
+        /// <param name="piece">The moving piece</param>
+        /// <param name="from">The from square</param>
+        /// <param name="to">The to square</param>
+        /// <param name="type">The move type</param>
+        /// <param name="promoted">The promotion piece</param>
         public Move(Piece piece, Square from, Square to, EMoveType type, Piece promoted)
             : this(from, to)
         {

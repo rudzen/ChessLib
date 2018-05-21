@@ -33,6 +33,7 @@ namespace Rudz.Chess.Enums
     {
         None = 0,
         Short = 1,
-        Long = 2
+        Long = 2,
+        CastleNb = 3
     }
 }

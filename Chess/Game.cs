@@ -53,7 +53,7 @@ namespace Rudz.Chess
         /// [short/long, side] castle positional | array when altering castleling rights.
         /// </summary>
         [NotNull]
-        private static readonly int[,] CastlePositionalOr = { { 1, 4 }, { 2, 8 } };
+        private static readonly int[,] CastlePositionalOr;
 
         [NotNull]
         private readonly int[] _castleRightsMask = new int[64];
@@ -69,6 +69,11 @@ namespace Rudz.Chess
 
         private int _repetitionCounter;
 
+        static Game()
+        {
+            CastlePositionalOr = new[,] { { 1, 4 }, { 2, 8 } };
+        }
+        
         public Game()
             : this(null) { }
 

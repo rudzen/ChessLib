@@ -82,19 +82,11 @@ namespace Rudz.Chess.Types
         private static string ToUci(Move move, State state = null) => move.ToString();
 
         /// <summary>
-        /// <para>
-        /// Converts a move to FAN notation.
-        /// </para>
+        /// <para>Converts a move to FAN notation.</para>
         /// </summary>
-        /// <param name="move">
-        /// The move to convert
-        /// </param>
-        /// <param name="state">
-        /// The position from where the move exist
-        /// </param>
-        /// <returns>
-        /// FAN move string
-        /// </returns>
+        /// <param name="move">The move to convert</param>
+        /// <param name="state">The position from where the move exist</param>
+        /// <returns>FAN move string</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static string ToFan(Move move, State state)
         {
@@ -151,19 +143,11 @@ namespace Rudz.Chess.Types
         }
 
         /// <summary>
-        /// <para>
-        /// Converts a move to SAN notation.
-        /// </para>
+        /// <para>Converts a move to SAN notation.</para>
         /// </summary>
-        /// <param name="move">
-        /// The move to convert
-        /// </param>
-        /// <param name="state">
-        /// The position from where the move exist
-        /// </param>
-        /// <returns>
-        /// SAN move string
-        /// </returns>
+        /// <param name="move">The move to convert</param>
+        /// <param name="state">The position from where the move exist</param>
+        /// <returns>SAN move string</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static string ToSan(this Move move, State state)
         {
@@ -223,19 +207,10 @@ namespace Rudz.Chess.Types
         }
 
         /// <summary>
-        /// <para>
-        /// Converts a move to LAN notation.
-        /// </para>
-        /// </summary>
-        /// <param name="move">
-        /// The move to convert
-        /// </param>
-        /// <param name="position">
-        /// The position from where the move exist
-        /// </param>
-        /// <returns>
-        /// LAN move string
-        /// </returns>
+        /// <para>Converts a move to LAN notation.</para>
+        /// </summary><param name="move">The move to convert</param>
+        /// <param name="position">The position from where the move exist</param>
+        /// <returns>LAN move string</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static string ToLan(Move move, MoveGenerator position)
         {
@@ -282,19 +257,11 @@ namespace Rudz.Chess.Types
         }
 
         /// <summary>
-        /// <para>
-        /// Converts a move to RAN notation.
-        /// </para>
+        /// <para>Converts a move to RAN notation.</para>
         /// </summary>
-        /// <param name="move">
-        /// The move to convert
-        /// </param>
-        /// <param name="position">
-        /// The position from where the move exist
-        /// </param>
-        /// <returns>
-        /// RAN move string
-        /// </returns>
+        /// <param name="move">The move to convert</param>
+        /// <param name="position">The position from where the move exist</param>
+        /// <returns>RAN move string</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static string ToRan(Move move, MoveGenerator position)
         {

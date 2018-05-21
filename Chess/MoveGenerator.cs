@@ -242,7 +242,7 @@ namespace Rudz.Chess
         {
             Player currentSide = SideToMove;
             if (!InCheck)
-                for (ECastleling castleType = ECastleling.Short; castleType <= ECastleling.Long; castleType++) {
+                for (ECastleling castleType = ECastleling.Short; castleType < ECastleling.CastleNb; castleType++) {
                     if (CanCastle(castleType))
                         AddCastleMove(moves, ChessBoard.GetKingCastleFrom(currentSide, castleType), castleType.GetKingCastleTo(currentSide));
                 }
@@ -311,12 +311,8 @@ namespace Rudz.Chess
         /// It does not contain any checks for moves that are invalid, as the leaf methods
         /// contains implicit denial of move generation if the target bitboard is empty.
         /// </summary>
-        /// <param name="moves">
-        /// The move list to add potential moves to.
-        /// </param>
-        /// <param name="targetSquares">
-        /// The target squares to move to
-        /// </param>
+        /// <param name="moves">The move list to add potential moves to.</param>
+        /// <param name="targetSquares">The target squares to move to</param>
         private void AddMoves(ICollection<Move> moves, BitBoard targetSquares)
         {
             int offset = SideToMove << 3;
@@ -381,16 +377,13 @@ namespace Rudz.Chess
                 case ECastleling.Long:
                     return (CastlelingRights & type.GetCastleAllowedMask(SideToMove)) != 0 && IsCastleAllowed(type.GetKingCastleTo(SideToMove));
                 default:
-                    return false;
+                    throw new ArgumentException("Illegal castleling type.");
             }
         }
 
         private bool IsCastleAllowed(Square square)
         {
-            /*
-             * The complexity of this function is mainly due to the support for Chess960 variant.
-             * Although the current software does not support it per-se, it is handy in a future version.
-             */
+             // The complexity of this function is mainly due to the support for Chess960 variant.
             Square rookTo = square.GetRookCastleTo();
             Square rookFrom = ChessBoard.GetRookCastleFrom(square);
             Square kingSquare = ChessBoard.KingSquares[SideToMove.Side];

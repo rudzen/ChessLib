@@ -49,23 +49,23 @@ namespace Rudz.Chess
 
         public const ulong DarkSquares = ~LightSquares;
 
-        public static readonly BitBoard AllSquares = WhiteArea | BlackArea;
+        public const ulong PromotionRanks = RANK1 | RANK8;
 
-        public static readonly BitBoard PromotionRanks = RANK8 | RANK1;
+        public static readonly BitBoard AllSquares;
 
-        public static readonly BitBoard[] PawnAttacksBB = new BitBoard[128];
+        public static readonly BitBoard[] PawnAttacksBB;
 
-        public static BitBoard CornerA1;
+        public static readonly BitBoard CornerA1;
 
-        public static BitBoard CornerA8;
+        public static readonly BitBoard CornerA8;
 
-        public static BitBoard CornerH1;
+        public static readonly BitBoard CornerH1;
 
-        public static BitBoard CornerH8;
+        public static readonly BitBoard CornerH8;
 
-        private static readonly BitBoard[] KnightAttacksBB = new BitBoard[64];
+        private static readonly BitBoard[] KnightAttacksBB;
 
-        private static readonly BitBoard[] KingAttacksBB = new BitBoard[64];
+        private static readonly BitBoard[] KingAttacksBB;
 
         internal const ulong One = 0x1ul;
 
@@ -173,6 +173,10 @@ namespace Rudz.Chess
         static BitBoards()
         {
             BetweenBB = new BitBoard[64, 64];
+            KingAttacksBB = new BitBoard[64];
+            KnightAttacksBB = new BitBoard[64];
+            PawnAttacksBB = new BitBoard[128];
+            AllSquares = WhiteArea | BlackArea;
             PawnAttackSpanBB = new BitBoard[2, 64];
             PassedPawnMaskBB = new BitBoard[2, 64];
             ForwardRanksBB = new BitBoard[2, 64];
