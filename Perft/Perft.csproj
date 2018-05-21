@@ -49,7 +49,6 @@
     <Compile Include="Perft.cs" />
     <Compile Include="Perft.Data.cs" />
     <Compile Include="PerftPositions.cs" />
-    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
