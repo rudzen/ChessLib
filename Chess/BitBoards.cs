@@ -499,7 +499,7 @@ namespace Rudz.Chess
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private static void InitBetweenBitboards(Square from, Func<BitBoard, BitBoard> stepFunc, EDirection step)
+        private static void InitBetweenBitboards(Square from, Func<BitBoard, BitBoard> stepFunc, Direction step)
         {
             BitBoard bb = stepFunc(from.BitBoardSquare());
             Square to = from + step;
