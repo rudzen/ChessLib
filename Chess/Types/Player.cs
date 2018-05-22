@@ -52,6 +52,9 @@ namespace Rudz.Chess.Types
         public static implicit operator Player(EPlayer value) => new Player(value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static implicit operator Player(bool value) => new Player(value ? 1 : 0);
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Player operator ~(Player player) => new Player(player.Side ^ 1);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

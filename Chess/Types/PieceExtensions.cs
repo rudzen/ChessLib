@@ -35,11 +35,11 @@ namespace Rudz.Chess.Types
     {
         public static readonly Piece EmptyPiece = EPieces.NoPiece;
 
-        public static readonly EPieceValue[] PieceValues = { EPieceValue.King /* king = 0 */, EPieceValue.Pawn, EPieceValue.Knight, EPieceValue.Bishop, EPieceValue.Rook, EPieceValue.Queen, EPieceValue.King };
+        public static readonly EPieceValue[] PieceValues = { 0, EPieceValue.Pawn, EPieceValue.Knight, EPieceValue.Bishop, EPieceValue.Rook, EPieceValue.Queen, EPieceValue.King };
 
-        internal static readonly char[] PieceChars = { ' ', 'P', 'N', 'B', 'R', 'Q', 'K', ' ', '.', 'p', 'n', 'b', 'r', 'q', 'k' };
+        internal static readonly char[] PieceChars = { ' ', 'P', 'N', 'B', 'R', 'Q', 'K', ' ', ' ', 'p', 'n', 'b', 'r', 'q', 'k' };
 
-        private static readonly char[] PromotionPieceNotation = { ' ', ' ', 'n', 'b', 'r', 'q', 'k' };
+        private static readonly char[] PromotionPieceNotation = { ' ', ' ', 'n', 'b', 'r', 'q' };
 
         private static readonly string[] PieceStrings = { " ", "P", "N", "B", "R", "Q", "K", " ", " ", "p", "n", "b", "r", "q", "k" };
 
@@ -62,14 +62,14 @@ namespace Rudz.Chess.Types
  * black chess pawn 	♟ 	U+265F 	&#9823;
          */
 
-        private static readonly string[] PieceUnicode = { "\u2659", "\u2658", "\u2657", "\u2656", "\u2655", "\u2654", "    ", ".", "\u265F", "\u265E", "\u265D", "\u265C", "\u265B", "\u265A", "    ", "." };
+        private static readonly string[] PieceUnicode = { " ", "\u2659", "\u2658", "\u2657", "\u2656", "\u2655", "\u2654", " ", " ", "\u265F", "\u265E", "\u265D", "\u265C", "\u265B", "\u265A", " "};
 
-        public static readonly char[] PieceUnicodeChar = { '\u2659', '\u2658', '\u2657', '\u2656', '\u2655', '\u2654', ' ', '.', '\u265F', '\u265E', '\u265D', '\u265C', '\u265B', '\u265A', ' ', '.' };
+        private static readonly char[] PieceUnicodeChar = { ' ', '\u2659', '\u2658', '\u2657', '\u2656', '\u2655', '\u2654', ' ', ' ', '\u265F', '\u265E', '\u265D', '\u265C', '\u265B', '\u265A', ' ' };
 
-        private static readonly BitArray WhitePieces = new BitArray(new[] { true, true, true, true, true, true, true, true, false, false, false, false, false, false, false, false });
+        private static readonly BitArray WhitePieces = new BitArray(new[] { false,  true,  true,  true,  true,  true,  true, false, false, false, false, false, false, false, false, false });
 
-        private static readonly BitArray BlackPieces = new BitArray(new[] { false, false, false, false, false, false, false, false, true, true, true, true, true, true, true, true });
-
+        private static readonly BitArray BlackPieces = new BitArray(new[] { false, false, false, false, false, false, false, false, false,  true,  true,  true,  true,  true,  true, false });
+        
         // for polyglot support in the future
         private static readonly char[] BookPieceNames = { 'p', 'P', 'n', 'N', 'b', 'B', 'r', 'R', 'q', 'Q', 'k', 'K' };
 
@@ -79,9 +79,6 @@ namespace Rudz.Chess.Types
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsBlack(this Piece p) => p.ToInt().InBetween((int)EPieces.BlackPawn, (int)EPieces.BlackKing);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Player Side(this Piece p) => p.IsWhite() ? 0 : p.IsBlack() ? 1 : 2;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int ToInt(this Piece p) => (int)p.Value;
