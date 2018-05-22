@@ -28,6 +28,7 @@ namespace Rudz.Chess.Enums
 {
     public enum EDirection
     {
+        NoDirection = 0,
         North = 8,
         East  = 1,
         South = -North,            // -8
@@ -35,6 +36,9 @@ namespace Rudz.Chess.Enums
         NorthEast = North + East, //  9
         SouthEast = South + East, // -7
         SouthWest = South + West, // -9
-        NorthWest = North + West  //  7
+        NorthWest = North + West,  //  7
+
+        NorthDouble = North + North,
+        SouthDouble = South + South
     }
 }

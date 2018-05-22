@@ -258,7 +258,7 @@ namespace Rudz.Chess
         /// <param name="promoted">The promotion piece (if any, defaults to NoPiece type)</param>
         /// <param name="type">The move type</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void AddMove(ICollection<Move> moves, Piece piece, Square from, Square to, EPieces promoted = EPieces.NoPiece, EMoveType type = EMoveType.Quiet)
+        private void AddMove(ICollection<Move> moves, Piece piece, Square from, Square to, Piece promoted, EMoveType type = EMoveType.Quiet)
         {
             Move move;
 
@@ -281,7 +281,7 @@ namespace Rudz.Chess
         {
             foreach (Square to in attacks) {
                 if (ChessBoard.GetPiece(to) == EPieces.NoPiece)
-                    AddMove(moves, piece, from, to);
+                    AddMove(moves, piece, from, to, PieceExtensions.EmptyPiece);
                 else
                     AddMove(moves, piece, from, to, EPieces.NoPiece, EMoveType.Capture);
             }
@@ -296,58 +296,57 @@ namespace Rudz.Chess
         /// <param name="targetSquares">The target squares to move to</param>
         private void AddMoves(ICollection<Move> moves, BitBoard targetSquares)
         {
-            int offset = SideToMove << 3;
+            Player c = SideToMove;
             BitBoard occupied = ChessBoard.Occupied;
 
             // TODO : More generic way of adding moves?
-            Piece piece = new Piece(EPieceType.Queen, offset);
+            Piece piece = EPieceType.Queen.MakePiece(c);
             foreach (Square from in _bitboardPieces[piece.ToInt()])
                 AddMoves(moves, piece, from, from.GetAttacks(EPieceType.Queen, occupied) & targetSquares);
 
-            piece = new Piece(EPieceType.Rook, offset);
+            piece = EPieceType.Rook.MakePiece(c);
             foreach (Square from in _bitboardPieces[piece.ToInt()])
                 AddMoves(moves, piece, from, from.GetAttacks(EPieceType.Rook, occupied) & targetSquares);
 
-            piece = new Piece(EPieceType.Bishop, offset);
+            piece = EPieceType.Bishop.MakePiece(c);
             foreach (Square from in _bitboardPieces[piece.ToInt()])
                 AddMoves(moves, piece, from, from.GetAttacks(EPieceType.Bishop, occupied) & targetSquares);
 
-            piece = new Piece(EPieceType.Knight, offset);
+            piece = EPieceType.Knight.MakePiece(c);
             foreach (Square square in _bitboardPieces[piece.ToInt()])
                 AddMoves(moves, piece, square, square.GetAttacks(EPieceType.Knight) & targetSquares);
 
-            piece = new Piece(EPieceType.King, offset);
+            piece = EPieceType.King.MakePiece(c);
             foreach (Square square in _bitboardPieces[piece.ToInt()])
                 AddMoves(moves, piece, square, square.GetAttacks(EPieceType.King) & targetSquares);
         }
 
-        private void AddPawnMoves(ICollection<Move> moves, BitBoard targetSquares, int distance, EMoveType type)
+        private void AddPawnMoves(ICollection<Move> moves, BitBoard targetSquares, Direction direction, EMoveType type)
         {
             if (targetSquares.Empty())
                 return;
 
-            EPieceType pieceOffset = (EPieceType)(SideToMove << 3);
-            EPieces piece = (EPieces)(EPieceType.Pawn | pieceOffset);
+            Piece piece = EPieceType.Pawn.MakePiece(SideToMove);
 
             foreach (Square squareTo in targetSquares) {
-                Square squareFrom = squareTo - distance;
+                Square squareFrom = squareTo - direction;
                 if (!squareTo.IsPromotionRank()) {
-                    AddMove(moves, piece, squareFrom, squareTo, EPieces.NoPiece, type);
+                    AddMove(moves, piece, squareFrom, squareTo, PieceExtensions.EmptyPiece, type);
                     continue;
                 }
 
                 if ((Flags & Emgf.Queenpromotion) != 0) {
-                    AddMove(moves, piece, squareFrom, squareTo, (EPieces)(EPieceType.Queen | pieceOffset), type | EMoveType.Promotion);
+                    AddMove(moves, piece, squareFrom, squareTo, EPieceType.Queen.MakePiece(SideToMove), type | EMoveType.Promotion);
                     return;
                 }
 
                 for (EPieceType promotedPiece = EPieceType.Queen; promotedPiece >= EPieceType.Knight; promotedPiece--)
-                    AddMove(moves, piece, squareFrom, squareTo, (EPieces)(promotedPiece | pieceOffset), type | EMoveType.Promotion);
+                    AddMove(moves, piece, squareFrom, squareTo, promotedPiece.MakePiece(SideToMove), type | EMoveType.Promotion);
             }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void AddCastleMove(ICollection<Move> moves, Square from, Square to) => AddMove(moves, EPieceType.King | (EPieceType)(SideToMove << 3), from, to, EPieces.NoPiece, EMoveType.Castle);
+        private void AddCastleMove(ICollection<Move> moves, Square from, Square to) => AddMove(moves, EPieceType.King.MakePiece(SideToMove), from, to, PieceExtensions.EmptyPiece, EMoveType.Castle);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private bool CanCastle(ECastleling type)
@@ -364,10 +363,11 @@ namespace Rudz.Chess
 
         private bool IsCastleAllowed(Square square)
         {
+            Player c = SideToMove;
              // The complexity of this function is mainly due to the support for Chess960 variant.
             Square rookTo = square.GetRookCastleTo();
             Square rookFrom = ChessBoard.GetRookCastleFrom(square);
-            Square kingSquare = ChessBoard.KingSquares[SideToMove.Side];
+            Square kingSquare = ChessBoard.KingSquares[c.Side];
 
             // The pieces in question.. rook and king
             BitBoard castlePieces = rookFrom | kingSquare;
@@ -385,9 +385,11 @@ namespace Rudz.Chess
             // Check that no square between the king's initial and final squares (including the initial and final squares)
             // may be under attack by an enemy piece. Initial square was already checked a this point.
 
+            c = ~c;
+
             // ReSharper disable once LoopCanBeConvertedToQuery
             foreach (Square s in kingSquare.BitboardBetween(square) | square) {
-                if (ChessBoard.IsAttacked(s, ~SideToMove))
+                if (ChessBoard.IsAttacked(s, c))
                     return false;
             }
 

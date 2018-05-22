@@ -24,6 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using Rudz.Chess.Enums;
+
 namespace Rudz.Chess.Types
 {
     using System.Runtime.CompilerServices;
@@ -35,30 +37,15 @@ namespace Rudz.Chess.Types
 
         public static readonly Player Black = 1;
 
-        private static readonly int[] PawnPushDist =
-            {
-                8, -8
-            };
+        private static readonly Direction[] PawnPushDist = { EDirection.North, EDirection.South };
 
-        private static readonly int[] PawnDoublePushDist =
-            {
-                16, -16
-            };
+        private static readonly Direction[] PawnDoublePushDist = { EDirection.NorthDouble, EDirection.SouthDouble };
 
-        private static readonly int[] PawnWestAttackDist =
-            {
-                9, -7
-            };
+        private static readonly Direction[] PawnWestAttackDist = { EDirection.NorthEast , EDirection.SouthEast };
 
-        private static readonly int[] PawnEastAttackDist =
-            {
-                7, -9
-            };
+        private static readonly Direction[] PawnEastAttackDist = { EDirection.NorthWest, EDirection.SouthWest };
 
-        private static readonly string[] PlayerColors =
-            {
-                "White", "Black"
-            };
+        private static readonly string[] PlayerColors = { "White", "Black" };
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsLegalPlayer(this Player player) => player.Side.InBetween(White.Side, Black.Side);
@@ -73,15 +60,15 @@ namespace Rudz.Chess.Types
         public static bool IsBlack(this Player player) => player.Side != 0;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int PawnPushDistance(this Player player) => PawnPushDist[player.Side];
+        public static Direction PawnPushDistance(this Player player) => PawnPushDist[player.Side];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int PawnDoublePushDistance(this Player player) => PawnDoublePushDist[player.Side];
+        public static Direction PawnDoublePushDistance(this Player player) => PawnDoublePushDist[player.Side];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int PawnWestAttackDistance(this Player player) => PawnWestAttackDist[player.Side];
+        public static Direction PawnWestAttackDistance(this Player player) => PawnWestAttackDist[player.Side];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int PawnEastAttackDistance(this Player player) => PawnEastAttackDist[player.Side];
+        public static Direction PawnEastAttackDistance(this Player player) => PawnEastAttackDist[player.Side];
     }
 }
