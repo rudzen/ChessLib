@@ -68,11 +68,8 @@ namespace Rudz.Chess
             Clear();
         }
 
-        static ChessBoard()
-        {
-            EnPasCapturePos = new Func<BitBoard, BitBoard>[] { BitBoards.SouthOne, BitBoards.NorthOne };
-        }
-        
+        static ChessBoard() => EnPasCapturePos = new Func<BitBoard, BitBoard>[] { BitBoards.SouthOne, BitBoards.NorthOne };
+
         // TODO : redesign BoardPieces + OccupiedBySide into simple arrays
         
         [NotNull]
@@ -86,7 +83,7 @@ namespace Rudz.Chess
 
         public bool IsProbing { get; set; }
 
-        public BitBoard Occupied { get; private set; }
+        public BitBoard Occupied { get; set; }
 
         public Piece[] BoardLayout { get; }
 
@@ -246,49 +243,22 @@ namespace Rudz.Chess
         public bool IsAttacked(Square square, Player side) => AttackedBySlider(square, side) || AttackedByKnight(square, side) || AttackedByPawn(square, side) || AttackedByKing(square, side);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public BitBoard PieceAttacks(Square square, EPieceType pieceType)
-        {
-            // TODO : Re-code
-            
-            // Impossible to determin which of these types are used more often :-)
-            // ReSharper disable once SwitchStatementMissingSomeCases
-            switch (pieceType) {
-                case EPieceType.Knight:
-                    return square.KnightAttacks();
-                case EPieceType.Bishop:
-                    return square.BishopAttacks(Occupied);
-                case EPieceType.Rook:
-                    return square.RookAttacks(Occupied);
-                case EPieceType.Queen:
-                    return square.QueenAttacks(Occupied);
-                case EPieceType.King:
-                    return square.KingAttacks();
-            }
-            return BitBoards.ZeroBb;
-        }
-
-        // TODO : Re-write the piece extraction methods to mirror those of Mirage chess engine.
-        
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public BitBoard Pieces(Piece piece, Player side) => BoardPieces[(int)piece.Type() | (side << 3)];
+        public BitBoard PieceAttacks(Square square, EPieceType pieceType) => square.GetAttacks(pieceType, Occupied);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public BitBoard Pawns(Player side) => BoardPieces[(int)EPieceType.Pawn | (side << 3)];
+        public BitBoard Pieces(Player side) => OccupiedBySide[side.Side];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public BitBoard Knights(Player side) => BoardPieces[(int)EPieceType.Knight | (side << 3)];
+        public BitBoard Pieces(EPieceType type) => BoardPieces[type.MakePiece(PlayerExtensions.White).ToInt()] | BoardPieces[type.MakePiece(PlayerExtensions.Black).ToInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public BitBoard Bishops(Player side) => BoardPieces[(int)EPieceType.Bishop | (side << 3)];
+        public BitBoard Pieces(EPieceType type1, EPieceType type2) => Pieces(type1) | Pieces(type2);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public BitBoard Rooks(Player side) => BoardPieces[(int)EPieceType.Rook | (side << 3)];
+        public BitBoard Pieces(EPieceType type, Player side) => BoardPieces[type.MakePiece(side).ToInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public BitBoard Queens(Player side) => BoardPieces[(int)EPieceType.Queen | (side << 3)];
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public BitBoard King(Player side) => BoardPieces[(int)EPieceType.King | (side << 3)];
+        public BitBoard Pieces(EPieceType type1, EPieceType type2, Player side) => BoardPieces[type1.MakePiece(side).ToInt()] | BoardPieces[type2.MakePiece(side).ToInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool PieceOnFile(Square square, Player side, EPieceType pieceType) => (BoardPieces[(int)(pieceType + (side << 3))] & square) != 0;
@@ -302,7 +272,7 @@ namespace Rudz.Chess
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool PawnIsolated(Square square, Player side)
         {
-            BitBoard b = (square.PawnAttackSpan(side) | square.PawnAttackSpan(~side)) & Pawns(side);
+            BitBoard b = (square.PawnAttackSpan(side) | square.PawnAttackSpan(~side)) & Pieces(EPieceType.Pawn, side);
             return b.Empty();
         }
 
@@ -319,7 +289,7 @@ namespace Rudz.Chess
             if (pc.Type() != EPieceType.Pawn)
                 return false;
 
-            return (square.PassedPawnFrontAttackSpan(c) & Pawns(c)) == 0;
+            return (square.PassedPawnFrontAttackSpan(c) & Pieces(EPieceType.Pawn, c)) == 0;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -337,13 +307,13 @@ namespace Rudz.Chess
 
         public BitBoard AttacksTo(Square square, BitBoard occupied)
         {
-            // temporary
-            return  (square.PawnAttacks(PlayerExtensions.White)       & OccupiedBySide[PlayerExtensions.Black.Side])
-                    | (square.PawnAttacks(PlayerExtensions.Black)     & OccupiedBySide[PlayerExtensions.White.Side])
-                    | (square.GetAttacks(EPieceType.Knight)           & (Knights(PlayerExtensions.White) | Knights(1)))
-                    | (square.GetAttacks(EPieceType.Rook, occupied)   & (Rooks(0) | Rooks(1) | Queens(0) | Queens(1)))
-                    | (square.GetAttacks(EPieceType.Bishop, occupied) & (Bishops(0) | Bishops(1) | Queens(0) | Queens(1)))
-                    | (square.GetAttacks(EPieceType.King)             & (King(0) | King(1)));
+            // TODO : needs testing
+            return  (square.PawnAttack(PlayerExtensions.White)      & OccupiedBySide[PlayerExtensions.Black.Side])
+                  | (square.PawnAttack(PlayerExtensions.Black)      & OccupiedBySide[PlayerExtensions.White.Side])
+                  | (square.GetAttacks(EPieceType.Knight)           & Pieces(EPieceType.Knight))
+                  | (square.GetAttacks(EPieceType.Rook, occupied)   & Pieces(EPieceType.Rook, EPieceType.Queen))
+                  | (square.GetAttacks(EPieceType.Bishop, occupied) & Pieces(EPieceType.Bishop, EPieceType.Queen))
+                  | (square.GetAttacks(EPieceType.King)             & Pieces(EPieceType.King));
         }
 
         public BitBoard AttacksTo(Square square) => AttacksTo(square, Occupied);
@@ -351,26 +321,25 @@ namespace Rudz.Chess
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool AttackedBySlider(Square square, Player side)
         {
-            int pieceOffset = side << 3;
             BitBoard rookAttacks = square.RookAttacks(Occupied);
-            if (BoardPieces[(int)(EPieces)EPieceType.Rook + pieceOffset] & rookAttacks)
+            if (Pieces(EPieceType.Rook, side) & rookAttacks)
                 return true;
 
             BitBoard bishopAttacks = square.BishopAttacks(Occupied);
-            if (BoardPieces[(int)(EPieces)EPieceType.Bishop + pieceOffset] & bishopAttacks)
+            if (Pieces(EPieceType.Bishop, side) & bishopAttacks)
                 return true;
 
-            return (BoardPieces[(int)(EPieces)EPieceType.Queen + pieceOffset] & (bishopAttacks | rookAttacks)) != 0;
+            return (Pieces(EPieceType.Queen, side) & (bishopAttacks | rookAttacks)) != 0;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool AttackedByKnight(Square square, Player side) => (BoardPieces[(int)(EPieces)EPieceType.Knight + (side << 3)] & square.KnightAttacks()) != 0;
+        public bool AttackedByKnight(Square square, Player side) => (Pieces(EPieceType.Knight, side) & square.GetAttacks(EPieceType.Knight)) != 0;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool AttackedByPawn(Square square, Player side) => (BoardPieces[(int)(EPieces)EPieceType.Pawn | (side << 3)] & BitBoards.PawnAttacksBB[square.ToInt() | (~side << 6)]) != 0;
+        public bool AttackedByPawn(Square square, Player side) => (Pieces(EPieceType.Pawn, side) & square.PawnAttack(~side)) != 0;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool AttackedByKing(Square square, Player side) => (BoardPieces[(int)(EPieces)EPieceType.King + (side << 3)] & square.KingAttacks()) != 0;
+        public bool AttackedByKing(Square square, Player side) => (Pieces(EPieceType.King, side) & square.GetAttacks(EPieceType.King)) != 0;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Square GetRookCastleFrom(Square index) => _rookCastlesFrom[index.ToInt()];

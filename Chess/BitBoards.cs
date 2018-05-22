@@ -53,9 +53,6 @@ namespace Rudz.Chess
 
         public static readonly BitBoard AllSquares;
 
-        // TODO : merge into pseudo attacks array
-        public static readonly BitBoard[] PawnAttacksBB;
-
         public static readonly BitBoard CornerA1;
 
         public static readonly BitBoard CornerA8;
@@ -64,6 +61,11 @@ namespace Rudz.Chess
 
         public static readonly BitBoard CornerH8;
 
+        /// <summary>
+        /// PseudoAttacks are just that, full attack range for all squares for all pieces.
+        /// The pawns are a special case, as index range 0,sq are for White and 1,sq are for Black.
+        /// This is possible because index 0 is NoPiece type.
+        /// </summary>
         private static readonly BitBoard[,] PseudoAttacksBB;
 
         internal const ulong One = 0x1ul;
@@ -126,14 +128,26 @@ namespace Rudz.Chess
 
         private static readonly int[] Lsb64Table =
             {
-                63, 30, 3, 32, 59, 14, 11, 33, 60, 24, 50, 9, 55, 19, 21, 34, 61, 29, 2, 53, 51, 23, 41, 18, 56, 28, 1, 43, 46, 27, 0, 35, 62, 31, 58, 4, 5, 49, 54, 6, 15, 52, 12, 40, 7, 42, 45,
-                16, 25, 57, 48, 13, 10, 39, 8, 44, 20, 47, 38, 22, 17, 37, 36, 26
+                63, 30,  3, 32, 59, 14, 11, 33,
+                60, 24, 50,  9, 55, 19, 21, 34,
+                61, 29,  2, 53, 51, 23, 41, 18,
+                56, 28,  1, 43, 46, 27,  0, 35,
+                62, 31, 58,  4,  5, 49, 54,  6,
+                15, 52, 12, 40,  7, 42, 45, 16,
+                25, 57, 48, 13, 10, 39,  8, 44,
+                20, 47, 38, 22, 17, 37, 36, 26
             };
 
         private static readonly int[] Msb64Table =
             {
-                0, 47, 1, 56, 48, 27, 2, 60, 57, 49, 41, 37, 28, 16, 3, 61, 54, 58, 35, 52, 50, 42, 21, 44, 38, 32, 29, 23, 17, 11, 4, 62, 46, 55, 26, 59, 40, 36, 15, 53, 34, 51, 20, 43, 31, 22,
-                10, 45, 25, 39, 14, 33, 19, 30, 9, 24, 13, 18, 8, 12, 7, 6, 5, 63
+                 0, 47,  1, 56, 48, 27,  2, 60,
+                57, 49, 41, 37, 28, 16,  3, 61,
+                54, 58, 35, 52, 50, 42, 21, 44,
+                38, 32, 29, 23, 17, 11,  4, 62,
+                46, 55, 26, 59, 40, 36, 15, 53,
+                34, 51, 20, 43, 31, 22, 10, 45,
+                25, 39, 14, 33, 19, 30,  9, 24,
+                13, 18,  8, 12,  7,  6,  5, 63
             };
 
         private static readonly BitBoard[] AdjacentFilesBB = { FILEB, FILEA | FILEC, FILEB | FILED, FILEC | FILEE, FILED | FILEF, FILEE | FILEG, FILEF | FILEH, FILEG };
@@ -152,7 +166,6 @@ namespace Rudz.Chess
         {
             BetweenBB = new BitBoard[64, 64];
             PseudoAttacksBB = new BitBoard[EPieceType.PieceTypeNb.ToInt(), 64];
-            PawnAttacksBB = new BitBoard[128];
             AllSquares = ~Zero;
             PawnAttackSpanBB = new BitBoard[2, 64];
             PassedPawnMaskBB = new BitBoard[2, 64];
@@ -186,19 +199,13 @@ namespace Rudz.Chess
                 InitBetweenBitboards(s, WestOne, EDirection.West);
                 InitBetweenBitboards(s, NorthWestOne, EDirection.NorthWest);
             }
-
-            // pawn attacks
-            foreach (Square s in AllSquares) {
-                PawnAttacksBB[s.ToInt()] = (s.BitBoardSquare() & ~FILEH) << 9;
-                PawnAttacksBB[s.ToInt()] |= (s.BitBoardSquare() & ~FILEA) << 7;
-                PawnAttacksBB[s.ToInt() + 64] = (s.BitBoardSquare() & ~FILEA) >> 9;
-                PawnAttacksBB[s.ToInt() + 64] |= (s.BitBoardSquare() & ~FILEH) >> 7;
-            }
-
-            // Pseudo attacks for all pieces except pawns
+            
+            // Pseudo attacks for all pieces
             foreach (Square s in AllSquares) {
                 int sq = s.ToInt();
                 BitBoard b = s.BitBoardSquare();
+                PseudoAttacksBB[0, sq] = b.NorthEastOne() | b.NorthWestOne();
+                PseudoAttacksBB[1, sq] = b.SouthWestOne() | b.SouthEastOne();
                 
                 int pt = EPieceType.Knight.ToInt();
                 PseudoAttacksBB[pt, sq] =  (b & ~(FILEA | FILEB)) << 6;
@@ -259,9 +266,6 @@ namespace Rudz.Chess
         public static BitBoard KingAttacks(this Square square) => PseudoAttacksBB[EPieceType.King.ToInt(), square.ToInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ref BitBoard PawnAttacks(this Square square, Player side) => ref PawnAttacksBB[square | (side << 6)];
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static BitBoard GetAttacks(this Square square, EPieceType pieceType, BitBoard occupied = new BitBoard())
         {
             return pieceType == EPieceType.Knight || pieceType == EPieceType.King
@@ -275,10 +279,17 @@ namespace Rudz.Chess
                             : Zero;
         }
 
-        public static BitBoard PseudoAttack(this Square @this, EPieceType pieceType)
-        {
-            return pieceType != EPieceType.Pawn ? PseudoAttacksBB[pieceType.ToInt(), @this.ToInt()] : Zero;
-        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static ref BitBoard PseudoAttack(this Square @this, EPieceType pieceType) => ref PseudoAttacksBB[pieceType.ToInt(), @this.ToInt()];
+
+        /// <summary>
+        /// Attack for pawn.
+        /// </summary>
+        /// <param name="this">The square</param>
+        /// <param name="side">The player side</param>
+        /// <returns>ref to bitboard of attack</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static ref BitBoard PawnAttack(this Square @this, Player side) => ref PseudoAttacksBB[side.Side, @this.ToInt()];
 
         /// <summary>
         /// Returns the bitboard representation of the rank of which the square is located.

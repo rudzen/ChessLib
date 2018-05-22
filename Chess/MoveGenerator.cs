@@ -222,7 +222,7 @@ namespace Rudz.Chess
 
             AddMoves(moves, occupiedByThem);
 
-            BitBoard pawns = ChessBoard.Pawns(currentSide);
+            BitBoard pawns = ChessBoard.Pieces(EPieceType.Pawn, currentSide);
 
             AddPawnMoves(moves, _pawnPush[currentSide.Side](pawns & currentSide.Rank7()) & ~_occupied, currentSide.PawnPushDistance(), EMoveType.Quiet);
             AddPawnMoves(moves, _pawnAttacksWest[currentSide.Side](pawns) & occupiedByThem, currentSide.PawnWestAttackDistance(), EMoveType.Capture);
@@ -241,7 +241,7 @@ namespace Rudz.Chess
                 }
 
             BitBoard notOccupied = ~_occupied;
-            BitBoard pushed = _pawnPush[currentSide.Side](ChessBoard.Pawns(currentSide).Value & ~currentSide.Rank7()) & notOccupied;
+            BitBoard pushed = _pawnPush[currentSide.Side](ChessBoard.Pieces(EPieceType.Pawn, currentSide).Value & ~currentSide.Rank7()) & notOccupied;
             AddPawnMoves(moves, pushed.Value, currentSide.PawnPushDistance(), EMoveType.Quiet);
             AddPawnMoves(moves, _pawnPush[currentSide.Side](pushed.Value & currentSide.Rank3()) & notOccupied, currentSide.PawnDoublePushDistance(), EMoveType.Doublepush);
             AddMoves(moves, notOccupied);

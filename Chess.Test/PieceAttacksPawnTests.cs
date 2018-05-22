@@ -83,7 +83,7 @@ namespace ChessLibTest
 
             // white
             foreach (Square pieceLocation in PawnBands[index]) {
-                BitBoard attacks = pieceLocation.PawnAttacks(side);
+                BitBoard attacks = pieceLocation.PawnAttack(side);
                 Assert.AreEqual(PawnExpected[index], attacks.Count);
             }
 
@@ -91,7 +91,7 @@ namespace ChessLibTest
 
             // black
             foreach (Square pieceLocation in PawnBands[index]) {
-                BitBoard attacks = pieceLocation.PawnAttacks(side);
+                BitBoard attacks = pieceLocation.PawnAttack(side);
                 Assert.AreEqual(PawnExpected[index], attacks.Count);
             }
         }
@@ -104,7 +104,7 @@ namespace ChessLibTest
 
             // white
             foreach (Square pieceLocation in PawnBands[index]) {
-                BitBoard attacks = pieceLocation.PawnAttacks(side);
+                BitBoard attacks = pieceLocation.PawnAttack(side);
                 Assert.AreEqual(PawnExpected[index], attacks.Count);
             }
 
@@ -112,7 +112,7 @@ namespace ChessLibTest
 
             // black
             foreach (Square pieceLocation in PawnBands[index]) {
-                BitBoard attacks = pieceLocation.PawnAttacks(side);
+                BitBoard attacks = pieceLocation.PawnAttack(side);
                 Assert.AreEqual(PawnExpected[index], attacks.Count);
             }
         }
@@ -125,7 +125,7 @@ namespace ChessLibTest
 
             // white
             foreach (Square pieceLocation in PawnBands[index]) {
-                BitBoard attacks = pieceLocation.PawnAttacks(side);
+                BitBoard attacks = pieceLocation.PawnAttack(side);
                 Assert.AreEqual(PawnExpected[index], attacks.Count);
             }
 
@@ -133,7 +133,7 @@ namespace ChessLibTest
 
             // black
             foreach (Square pieceLocation in PawnBands[index]) {
-                BitBoard attacks = pieceLocation.PawnAttacks(side);
+                BitBoard attacks = pieceLocation.PawnAttack(side);
                 Assert.AreEqual(PawnExpected[index], attacks.Count);
             }
         }
@@ -146,7 +146,7 @@ namespace ChessLibTest
 
             // white
             foreach (Square pieceLocation in PawnBands[index]) {
-                BitBoard attacks = pieceLocation.PawnAttacks(side);
+                BitBoard attacks = pieceLocation.PawnAttack(side);
                 Assert.AreEqual(PawnExpected[index], attacks.Count);
             }
 
@@ -154,7 +154,7 @@ namespace ChessLibTest
 
             // black
             foreach (Square pieceLocation in PawnBands[index]) {
-                BitBoard attacks = pieceLocation.PawnAttacks(side);
+                BitBoard attacks = pieceLocation.PawnAttack(side);
                 Assert.AreEqual(PawnExpected[index], attacks.Count);
             }
         }
