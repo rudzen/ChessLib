@@ -79,10 +79,22 @@ namespace Rudz.Chess.Types
         public static Square operator +(Square left, int right) => left.ToInt() + right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Square operator +(Square left, Direction right) => left.ToInt() + (int)right.Value;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Square operator +(Square left, EDirection right) => left.ToInt() + (int)right;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Square operator -(Square left, Square right) => left.ToInt() - right.ToInt();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Square operator -(Square left, int right) => left.ToInt() - right;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Square operator -(Square left, Direction right) => left.ToInt() - (int)right.Value;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Square operator -(Square left, EDirection right) => left.ToInt() - (int) right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Square operator ++(Square square) => ++square.Value;

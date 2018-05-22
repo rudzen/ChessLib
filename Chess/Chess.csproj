@@ -104,6 +104,7 @@
   <ItemGroup>
     <Compile Include="BitBoards.cs" />
     <Compile Include="ChessBoard.cs" />
+    <Compile Include="Enums\EDirection.cs" />
     <Compile Include="Enums\EPieces.cs" />
     <Compile Include="Enums\EPieceType.cs" />
     <Compile Include="Enums\EPieceValue.cs" />
@@ -129,6 +130,7 @@
     <Compile Include="State.cs" />
     <Compile Include="Enums\EMoveNotation.cs" />
     <Compile Include="Enums\EMoveNotaionExtensions.cs" />
+    <Compile Include="Types\Direction.cs" />
     <Compile Include="Types\Piece.cs" />
     <Compile Include="Types\BitBoard.cs" />
     <Compile Include="Types\PieceExtensions.cs" />

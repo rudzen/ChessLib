@@ -177,14 +177,14 @@ namespace Rudz.Chess
                 foreach (Square fillSq in AllSquares)
                     BetweenBB[s.ToInt(), fillSq.ToInt()] = 0;
 
-                InitBetweenBitboards(s, NorthOne, 8);
-                InitBetweenBitboards(s, NorthEastOne, 9);
-                InitBetweenBitboards(s, EastOne, 1);
-                InitBetweenBitboards(s, SouthEastOne, -7);
-                InitBetweenBitboards(s, SouthOne, -8);
-                InitBetweenBitboards(s, SouthWestOne, -9);
-                InitBetweenBitboards(s, WestOne, -1);
-                InitBetweenBitboards(s, NorthWestOne, 7);
+                InitBetweenBitboards(s, NorthOne, EDirection.North);
+                InitBetweenBitboards(s, NorthEastOne, EDirection.NorthEast);
+                InitBetweenBitboards(s, EastOne, EDirection.East);
+                InitBetweenBitboards(s, SouthEastOne, EDirection.SouthEast);
+                InitBetweenBitboards(s, SouthOne, EDirection.South);
+                InitBetweenBitboards(s, SouthWestOne, EDirection.SouthWest);
+                InitBetweenBitboards(s, WestOne, EDirection.West);
+                InitBetweenBitboards(s, NorthWestOne, EDirection.NorthWest);
             }
 
             // pawn attacks
@@ -499,7 +499,7 @@ namespace Rudz.Chess
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private static void InitBetweenBitboards(Square from, Func<BitBoard, BitBoard> stepFunc, int step)
+        private static void InitBetweenBitboards(Square from, Func<BitBoard, BitBoard> stepFunc, Direction step)
         {
             BitBoard bb = stepFunc(from.BitBoardSquare());
             Square to = from + step;
