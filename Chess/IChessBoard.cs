@@ -53,8 +53,6 @@ namespace Rudz.Chess
 
         bool AttackedBySlider(Square square, Player side);
 
-        BitBoard Bishops(Player side);
-
         void Clear();
 
         bool Equals(object obj);
@@ -75,27 +73,15 @@ namespace Rudz.Chess
 
         bool IsPieceTypeOnSquare(Square square, EPieceType pieceType);
 
-        BitBoard King(Player side);
-
-        BitBoard Knights(Player side);
-
         void MakeMove(Move move);
 
         bool PawnIsolated(Square square, Player side);
-
-        BitBoard Pawns(Player side);
 
         BitBoard PieceAttacks(Square square, EPieceType pieceType);
 
         bool PieceOnFile(Square square, Player side, EPieceType pieceType);
 
-        BitBoard Pieces(Piece piece, Player side);
-
-        BitBoard Queens(Player side);
-
         void RemovePiece(Square square, Piece piece);
-
-        BitBoard Rooks(Player side);
 
         void SetRookCastleFrom(Square index, Square square);
 
