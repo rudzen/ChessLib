@@ -240,9 +240,9 @@ namespace Rudz.Chess
                 if (pieceIndex == -1)
                     return new FenError(-3, fen.GetIndex());
 
-                Square square = new Square(r - 1, f - 1);
+                player = char.IsLower(PieceExtensions.PieceChars[pieceIndex]);
 
-                player = PieceExtensions.IsPieceWhite(pieceIndex) ? 0 : 1;
+                Square square = new Square(r - 1, f - 1);
 
                 AddPiece(square, player, (EPieceType)pieceIndex);
 
