@@ -34,57 +34,81 @@ namespace Rudz.Chess
 
     public interface IChessBoard : IEnumerable<Piece>
     {
-        [NotNull]
-        Piece[] BoardLayout { get; }
+        BitBoard[] BoardPieces { get; }
 
-        BitBoard Occupied { get; }
+        BitBoard[] OccupiedBySide { get; }
+
+        Square[] KingSquares { get; }
+
+        bool IsProbing { get; set; }
+
+        BitBoard Occupied { get; set; }
+
+        Piece[] BoardLayout { get; }
 
         Action<Piece, Square> PieceUpdated { get; }
 
-        void AddPiece(EPieceType pieceType, Square square, Player side);
+        void Clear();
 
         void AddPiece(Piece piece, Square square);
 
-        bool AttackedByKing(Square square, Player side);
+        void AddPiece(EPieceType pieceType, Square square, Player side);
 
-        bool AttackedByKnight(Square square, Player side);
+        void MakeMove(Move move);
 
-        bool AttackedByPawn(Square square, Player side);
-
-        bool AttackedBySlider(Square square, Player side);
-
-        void Clear();
-
-        bool Equals(object obj);
-
-        int GetHashCode();
+        void TakeMove(Move move);
 
         Piece GetPiece(Square square);
 
         EPieceType GetPieceType(Square square);
 
+        bool IsPieceTypeOnSquare(Square square, EPieceType pieceType);
+
         BitBoard GetPinnedPieces(Square square, Player side);
-
-        Square GetRookCastleFrom(Square index);
-
-        bool IsAttacked(Square square, Player side);
 
         bool IsOccupied(Square square);
 
-        bool IsPieceTypeOnSquare(Square square, EPieceType pieceType);
-
-        void MakeMove(Move move);
-
-        bool PawnIsolated(Square square, Player side);
+        bool IsAttacked(Square square, Player side);
 
         BitBoard PieceAttacks(Square square, EPieceType pieceType);
 
+        BitBoard Pieces(Player side);
+
+        BitBoard Pieces(EPieceType type);
+        
+        BitBoard Pieces(EPieceType type1, EPieceType type2);
+        
+        BitBoard Pieces(EPieceType type, Player side);
+        
+        BitBoard Pieces(EPieceType type1, EPieceType type2, Player side);
+        
         bool PieceOnFile(Square square, Player side, EPieceType pieceType);
+
+        bool PawnIsolated(Square square, Player side);
+
+        bool PassedPawn(Square square);
 
         void RemovePiece(Square square, Piece piece);
 
-        void SetRookCastleFrom(Square index, Square square);
+        BitBoard AttacksTo(Square square, BitBoard occupied);
 
-        void TakeMove(Move move);
+        BitBoard AttacksTo(Square square);
+
+        bool AttackedBySlider(Square square, Player side);
+
+        bool AttackedByKnight(Square square, Player side);
+        
+        bool AttackedByPawn(Square square, Player side);
+        
+        bool AttackedByKing(Square square, Player side);
+        
+        Square GetRookCastleFrom(Square index);
+        
+        void SetRookCastleFrom(Square index, Square square);
+        
+        Square GetKingCastleFrom(Player side, ECastleling castleType);
+
+        void SetKingCastleFrom(Player side, Square square, ECastleling castleType);
+
     }
 }

@@ -68,11 +68,8 @@ namespace Rudz.Chess
             Clear();
         }
 
-        static ChessBoard()
-        {
-            EnPasCapturePos = new Func<BitBoard, BitBoard>[] { BitBoards.SouthOne, BitBoards.NorthOne };
-        }
-        
+        static ChessBoard() => EnPasCapturePos = new Func<BitBoard, BitBoard>[] { BitBoards.SouthOne, BitBoards.NorthOne };
+
         // TODO : redesign BoardPieces + OccupiedBySide into simple arrays
         
         [NotNull]
@@ -86,7 +83,7 @@ namespace Rudz.Chess
 
         public bool IsProbing { get; set; }
 
-        public BitBoard Occupied { get; private set; }
+        public BitBoard Occupied { get; set; }
 
         public Piece[] BoardLayout { get; }
 
