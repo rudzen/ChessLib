@@ -36,7 +36,6 @@ namespace Rudz.Chess.Types
     /// </summary>
     public struct Piece
     {
-        #region ctors_explicit
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Piece(int piece) => Value = (EPieces)piece;
@@ -58,13 +57,9 @@ namespace Rudz.Chess.Types
         public Piece(EPieceType pieceType, int offset)
             : this(pieceType) => Value += offset;
 
-        #endregion ctors_explicit
-
         public static Comparer<Piece> PieceComparer { get; } = new PieceRelationalComparer();
 
         public EPieces Value { get; private set; }
-
-        #region ctors_implicit
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator Piece(char value) => new Piece(GetPiece(value));
@@ -77,8 +72,6 @@ namespace Rudz.Chess.Types
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator Piece(EPieceType pieceType) => new Piece(pieceType);
-
-        #endregion ctors_implicit
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Piece operator +(Piece left, Player right) => new Piece(left.Value + (right << 3));

@@ -55,8 +55,6 @@ namespace Rudz.Chess.Types
         /// </summary>
         private int _data;
 
-        #region ctors
-
         /// <summary>
         /// Initializes a new instance of the <see cref="Move"/> struct.
         /// Neccesary extra constructor as it can sometimes be required to only created a basic move.
@@ -145,8 +143,6 @@ namespace Rudz.Chess.Types
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator Move(string value) => new Move(new Square(value[1] - '1', value[0] - 'a'), new Square(value[3] - '1', value[2] - 'a'));
 
-        #endregion ctors
-
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator ==(Move left, Move right) => left.Equals(right);
 
@@ -155,8 +151,6 @@ namespace Rudz.Chess.Types
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int GetData() => _data;
-
-        #region Squares (From/To)
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Square GetFromSquare() => new Square((_data >> MoveFromSquareOffset) & 0x3F);
@@ -170,10 +164,6 @@ namespace Rudz.Chess.Types
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetToSquare(Square square) => _data |= square.ToInt();
 
-        #endregion Squares (From/To)
-
-        #region Moving Piece
-
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Piece GetMovingPiece() => (_data >> MovePieceOffset) & 0xF;
 
@@ -182,10 +172,6 @@ namespace Rudz.Chess.Types
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public EPieceType GetMovingPieceType() => GetMovingPiece().Type();
-
-        #endregion Moving Piece
-
-        #region Captured Piece
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Piece GetCapturedPiece() => (_data >> CapturePieceOffset) & 0xF;
@@ -196,10 +182,6 @@ namespace Rudz.Chess.Types
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetCapturedPiece(Piece piece) => _data |= piece.ToInt() << CapturePieceOffset;
 
-        #endregion Captured Piece
-
-        #region Promotion
-
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Piece GetPromotedPiece() => (_data >> PromotePieceOffset) & 0xF;
 
@@ -209,19 +191,11 @@ namespace Rudz.Chess.Types
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool IsQueenPromotion() => IsPromotionMove() && GetPromotedPiece().Type() == EPieceType.Queen;
 
-        #endregion Promotion
-
-        #region Moving Side
-
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Player GetMovingSide() => new Player((_data >> MoveSideOffset) & 0x1);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int GetSideMask() => GetMovingSide() << 0x3;
-
-        #endregion Moving Side
-
-        #region Type
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public EMoveType GetMoveType() => (EMoveType)((_data >> MoveTypeOffset) & 0x3F);
@@ -247,17 +221,11 @@ namespace Rudz.Chess.Types
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool IsDoublePush() => (GetMoveType() & EMoveType.Doublepush) != 0;
 
-        #endregion Type
-
-        #region Validation
-
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool IsNullMove() => _data == 0;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool IsValidMove() => GetFromSquare().ToInt() != GetToSquare().ToInt();
-
-        #endregion Validation
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public object Clone() => new Move(_data);

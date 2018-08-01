@@ -44,8 +44,6 @@ namespace Rudz.Chess.UCI
 
         private readonly StringBuilder _output = new StringBuilder(256);
 
-        #region ctors
-
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public SearchParameters()
         {
@@ -111,8 +109,6 @@ namespace Rudz.Chess.UCI
             get => _inc[1];
             set => _inc[1] = value;
         }
-
-        #endregion ctors
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ulong Time(Player player) => _time[player.Side];
