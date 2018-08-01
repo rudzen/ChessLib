@@ -28,6 +28,9 @@ namespace Rudz.Chess.Enums
 {
     using System;
 
+    /// <summary>
+    /// Move generation flag
+    /// </summary>
     [Flags]
     public enum Emgf
     {
