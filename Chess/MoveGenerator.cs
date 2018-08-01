@@ -98,7 +98,7 @@ namespace Rudz.Chess
             Reset(MoveExtensions.EmptyMove);
 
             // this is only preparation for true engine integration (not used yet)
-            if ((Flags & Emgf.Stages) != 0)
+            if (Flags.HasFlag(Emgf.Stages))
                 return;
 
             if (Table.ContainsKey(Key) && !force) {
@@ -262,15 +262,15 @@ namespace Rudz.Chess
         {
             Move move;
 
-            if ((type & EMoveType.Capture) != 0)
+            if (type.HasFlag(EMoveType.Capture))
                 move = new Move(piece, ChessBoard.GetPiece(to), from, to, type, promoted);
-            else if ((type & EMoveType.Epcapture) != 0)
-                move = new Move(piece, (int)EPieceType.Pawn | (~SideToMove << 3), from, to, type, promoted);
+            else if (type.HasFlag(EMoveType.Epcapture))
+                move = new Move(piece, EPieceType.Pawn.MakePiece(~SideToMove), from, to, type, promoted);
             else
                 move = new Move(piece, from, to, type, promoted);
 
             // check if move is actualy a legal move if the flag is enabled
-            if ((Flags & Emgf.Legalmoves) != 0 && !IsLegal(move, piece, from, type))
+            if (Flags.HasFlag(Emgf.Legalmoves) && !IsLegal(move, piece, from, type))
                 return;
 
             moves.Add(move);
@@ -279,12 +279,13 @@ namespace Rudz.Chess
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void AddMoves(ICollection<Move> moves, Piece piece, Square from, BitBoard attacks)
         {
-            foreach (Square to in attacks) {
-                if (ChessBoard.GetPiece(to) == EPieces.NoPiece)
-                    AddMove(moves, piece, from, to, PieceExtensions.EmptyPiece);
-                else
-                    AddMove(moves, piece, from, to, EPieces.NoPiece, EMoveType.Capture);
-            }
+            BitBoard target = ChessBoard.Occupied & attacks;
+            foreach (Square to in target)
+                AddMove(moves, piece, from, to, EPieces.NoPiece, EMoveType.Capture);
+
+            target = ~ChessBoard.Occupied & attacks;
+            foreach (Square to in target)
+                AddMove(moves, piece, from, to, PieceExtensions.EmptyPiece);
         }
 
         /// <summary>
@@ -335,7 +336,7 @@ namespace Rudz.Chess
                     continue;
                 }
 
-                if ((Flags & Emgf.Queenpromotion) != 0) {
+                if (Flags.HasFlag(Emgf.Queenpromotion)) {
                     AddMove(moves, piece, squareFrom, squareTo, EPieceType.Queen.MakePiece(SideToMove), type | EMoveType.Promotion);
                     return;
                 }
@@ -375,8 +376,7 @@ namespace Rudz.Chess
             // The span between the rook and the king
             BitBoard castleSpan = castlePieces | rookTo;
             castleSpan |= square;
-            castleSpan |= kingSquare.BitboardBetween(rookFrom);
-            castleSpan |= rookFrom.BitboardBetween(rookTo);
+            castleSpan |= kingSquare.BitboardBetween(rookFrom) | rookFrom.BitboardBetween(rookTo);
 
             // check that the span AND current occupied pieces are no different that the piece themselves.
             if ((castleSpan & _occupied) != castlePieces)

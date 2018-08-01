@@ -28,6 +28,7 @@ namespace Rudz.Chess.Types
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Runtime.CompilerServices;
     using System.Text;
     using Enums;
@@ -70,12 +71,15 @@ namespace Rudz.Chess.Types
             // force position to contain the latests moves for the position moves to be searched in
             game.State.GenerateMoves();
 
-            for (int i = 0; i < game.State.Moves.Count; i++) {
-                if (move.GetFromSquare() == game.State.Moves[i].GetFromSquare() && move.GetToSquare() == game.State.Moves[i].GetToSquare())
-                    return (true, game.State.Moves[i]);
-            }
+            var element = game.State.Moves.FirstOrDefault(x => x.GetFromSquare() == move.GetFromSquare() && x.GetToSquare() == move.GetToSquare());
+            return element == null ? (false, EmptyMove) : (true, element);
 
-            return (false, EmptyMove);
+            //for (int i = 0; i < game.State.Moves.Count; i++) {
+            //    if (move.GetFromSquare() == game.State.Moves[i].GetFromSquare() && move.GetToSquare() == game.State.Moves[i].GetToSquare())
+            //        return (true, game.State.Moves[i]);
+            //}
+
+            //return (false, EmptyMove);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
