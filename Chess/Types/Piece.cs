@@ -26,9 +26,9 @@ SOFTWARE.
 
 namespace Rudz.Chess.Types
 {
+    using Enums;
     using System.Collections.Generic;
     using System.Runtime.CompilerServices;
-    using Enums;
 
     /// <summary>
     /// Piece.
@@ -36,7 +36,6 @@ namespace Rudz.Chess.Types
     /// </summary>
     public struct Piece
     {
-        #region ctors_explicit
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Piece(int piece) => Value = (EPieces)piece;
@@ -58,13 +57,9 @@ namespace Rudz.Chess.Types
         public Piece(EPieceType pieceType, int offset)
             : this(pieceType) => Value += offset;
 
-        #endregion
-
         public static Comparer<Piece> PieceComparer { get; } = new PieceRelationalComparer();
 
         public EPieces Value { get; private set; }
-
-        #region ctors_implicit
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator Piece(char value) => new Piece(GetPiece(value));
@@ -77,8 +72,6 @@ namespace Rudz.Chess.Types
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator Piece(EPieceType pieceType) => new Piece(pieceType);
-
-        #endregion
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Piece operator +(Piece left, Player right) => new Piece(left.Value + (right << 3));
@@ -136,31 +129,44 @@ namespace Rudz.Chess.Types
 
         private static Piece GetPiece(char character)
         {
-            switch (character) {
+            switch (character)
+            {
                 case 'P':
                     return EPieces.WhitePawn;
+
                 case 'N':
                     return EPieces.WhiteKnight;
+
                 case 'B':
                     return EPieces.WhiteBishop;
+
                 case 'R':
                     return EPieces.WhiteRook;
+
                 case 'Q':
                     return EPieces.WhiteQueen;
+
                 case 'K':
                     return EPieces.WhiteKing;
+
                 case 'p':
                     return EPieces.BlackPawn;
+
                 case 'n':
                     return EPieces.BlackKnight;
+
                 case 'b':
                     return EPieces.BlackBishop;
+
                 case 'r':
                     return EPieces.BlackRook;
+
                 case 'q':
                     return EPieces.BlackQueen;
+
                 case 'k':
                     return EPieces.BlackKing;
+
                 default:
                     return EPieces.NoPiece;
             }

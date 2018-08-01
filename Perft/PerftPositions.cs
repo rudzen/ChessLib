@@ -9,6 +9,7 @@
             this.fen = fen;
             this.value = value;
         }
+
         public readonly string fen;
         public IList<ulong> value;
     }

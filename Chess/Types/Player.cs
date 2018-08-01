@@ -26,8 +26,8 @@ SOFTWARE.
 
 namespace Rudz.Chess.Types
 {
-    using System.Runtime.CompilerServices;
     using Enums;
+    using System.Runtime.CompilerServices;
 
     public struct Player
     {
@@ -38,7 +38,7 @@ namespace Rudz.Chess.Types
             : this() => Side = side.Side;
 
         public Player(EPlayer side)
-            : this((int) side) { }
+            : this((int)side) { }
 
         public int Side { get; }
 
@@ -53,7 +53,7 @@ namespace Rudz.Chess.Types
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator Player(bool value) => new Player(value ? 1 : 0);
-        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Player operator ~(Player player) => new Player(player.Side ^ 1);
 

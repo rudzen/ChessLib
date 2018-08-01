@@ -42,27 +42,32 @@ namespace Rudz.Chess.UCI
 
         public int[] MovesToGo { get; set; }
 
-        public int WhiteMovesToGo {
+        public int WhiteMovesToGo
+        {
             get => MovesToGo[0];
             set => MovesToGo[0] = value;
         }
 
-        public int BlackMovesToGo {
+        public int BlackMovesToGo
+        {
             get => MovesToGo[1];
             set => MovesToGo[1] = value;
         }
 
-        public ulong WhiteTimeMilliseconds {
+        public ulong WhiteTimeMilliseconds
+        {
             get => _time[0];
             set => _time[0] = value;
         }
 
-        public ulong BlackTimeMilliseconds {
+        public ulong BlackTimeMilliseconds
+        {
             get => _time[1];
             set => _time[1] = value;
         }
 
-        public int this[Player side] {
+        public int this[Player side]
+        {
             get => MovesToGo[side.Side];
             set => MovesToGo[side.Side] = value;
         }

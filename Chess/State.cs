@@ -26,11 +26,11 @@ SOFTWARE.
 
 namespace Rudz.Chess
 {
-    using System.Linq;
-    using System.Runtime.CompilerServices;
     using Enums;
     using Extensions;
     using Properties;
+    using System.Linq;
+    using System.Runtime.CompilerServices;
     using Types;
 
     public sealed class State : MoveGenerator
@@ -118,7 +118,8 @@ namespace Rudz.Chess
                 castleType = ShredderFunc(from, to); /* look for the airballon */
 
             // part two of pillaging the castleType var, since it might have changed
-            if (castleType != ECastleling.None) {
+            if (castleType != ECastleling.None)
+            {
                 from = ChessBoard.GetKingCastleFrom(SideToMove, castleType);
                 to = castleType.GetKingCastleTo(SideToMove);
             }
@@ -126,7 +127,8 @@ namespace Rudz.Chess
             GenerateMoves();
 
             // ** untested area **
-            foreach (Move move in Moves) {
+            foreach (Move move in Moves)
+            {
                 if (move.GetFromSquare() != from || move.GetToSquare() != to)
                     continue;
                 if (castleType == ECastleling.None && move.IsCastlelingMove())
@@ -155,7 +157,8 @@ namespace Rudz.Chess
         public ECastleling IsCastleMove(string m)
         {
             // ReSharper disable once SwitchStatementMissingSomeCases
-            switch (m) {
+            switch (m)
+            {
                 case "O-O":
                 case "OO":
                 case "0-0":
@@ -163,6 +166,7 @@ namespace Rudz.Chess
                 case "e1g1" when ChessBoard.IsPieceTypeOnSquare(ESquare.e1, EPieceType.King):
                 case "e8g8" when ChessBoard.IsPieceTypeOnSquare(ESquare.e8, EPieceType.King):
                     return ECastleling.Short;
+
                 case "O-O-O":
                 case "OOO":
                 case "0-0-0":

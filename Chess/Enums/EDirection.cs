@@ -30,9 +30,9 @@ namespace Rudz.Chess.Enums
     {
         NoDirection = 0,
         North = 8,
-        East  = 1,
+        East = 1,
         South = -North,            // -8
-        West  = -East,             // -1
+        West = -East,             // -1
         NorthEast = North + East, //  9
         SouthEast = South + East, // -7
         SouthWest = South + West, // -9

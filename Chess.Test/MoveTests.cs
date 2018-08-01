@@ -26,13 +26,13 @@ SOFTWARE.
 
 namespace ChessLibTest
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Text;
     using NUnit.Framework;
     using Rudz.Chess;
     using Rudz.Chess.Enums;
     using Rudz.Chess.Types;
+    using System;
+    using System.Collections.Generic;
+    using System.Text;
 
     [TestFixture]
     public class MoveTests
@@ -41,11 +41,13 @@ namespace ChessLibTest
         public void TestSquares()
         {
             // test all squares, including invalid moves (same from and to)
-            for (int i = 0; i < 64; i++) {
+            for (int i = 0; i < 64; i++)
+            {
                 Square expectedFrom = i;
                 int actualInt = expectedFrom.ToInt();
                 Assert.AreEqual(i, actualInt);
-                for (int j = 1 /* NOTE! from 1 !! */; j < 64; j++) {
+                for (int j = 1 /* NOTE! from 1 !! */; j < 64; j++)
+                {
                     Square expectedTo = j;
 
                     // on purpose.. creating the move in this loop
@@ -126,8 +128,10 @@ namespace ChessLibTest
             StringBuilder tmp = new StringBuilder(128);
 
             // build move list and expected result
-            for (Square s1 = ESquare.a1; s1; s1++) {
-                for (Square s2 = ESquare.a2; s2; s2++) {
+            for (Square s1 = ESquare.a1; s1; s1++)
+            {
+                for (Square s2 = ESquare.a2; s2; s2++)
+                {
                     if (s1 == s2)
                         continue;
 
@@ -142,7 +146,8 @@ namespace ChessLibTest
 
             StringBuilder result = new StringBuilder(128);
 
-            for (int i = 0; i < moves.Count; i++) {
+            for (int i = 0; i < moves.Count; i++)
+            {
                 result.Clear();
                 result.Append(' ');
                 game.MoveToString(moves[i], result);
@@ -165,7 +170,8 @@ namespace ChessLibTest
             Random rngeezuz = new Random(DateTime.Now.Millisecond);
 
             // generate 256 random moves
-            for (int i = 0; i < 256; i++) {
+            for (int i = 0; i < 256; i++)
+            {
                 Square rndSquareFrom = (ESquare)rngeezuz.Next((int)ESquare.a1, (int)ESquare.h8);
                 Square rndSquareTo = (ESquare)rngeezuz.Next((int)ESquare.a1, (int)ESquare.h8);
                 moves.Add(new Move(rndSquareFrom, rndSquareTo));
@@ -176,7 +182,8 @@ namespace ChessLibTest
             }
 
             // generate a bitch string for them all.
-            foreach (Move move in moves) {
+            foreach (Move move in moves)
+            {
                 result.Append(' ');
                 game.MoveToString(move, result);
             }

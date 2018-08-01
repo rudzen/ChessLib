@@ -26,12 +26,13 @@ SOFTWARE.
 
 namespace Rudz.Chess.Types
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Runtime.CompilerServices;
-    using System.Text;
     using Enums;
     using Exceptions;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Runtime.CompilerServices;
+    using System.Text;
 
     /// <summary>
     /// Made in a hurry.
@@ -70,12 +71,15 @@ namespace Rudz.Chess.Types
             // force position to contain the latests moves for the position moves to be searched in
             game.State.GenerateMoves();
 
-            for (int i = 0; i < game.State.Moves.Count; i++) {
-                if (move.GetFromSquare() == game.State.Moves[i].GetFromSquare() && move.GetToSquare() == game.State.Moves[i].GetToSquare())
-                    return (true, game.State.Moves[i]);
-            }
+            var element = game.State.Moves.FirstOrDefault(x => x.GetFromSquare() == move.GetFromSquare() && x.GetToSquare() == move.GetToSquare());
+            return element == null ? (false, EmptyMove) : (true, element);
 
-            return (false, EmptyMove);
+            //for (int i = 0; i < game.State.Moves.Count; i++) {
+            //    if (move.GetFromSquare() == game.State.Moves[i].GetFromSquare() && move.GetToSquare() == game.State.Moves[i].GetToSquare())
+            //        return (true, game.State.Moves[i]);
+            //}
+
+            //return (false, EmptyMove);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -95,12 +99,16 @@ namespace Rudz.Chess.Types
 
             StringBuilder notation = new StringBuilder(12);
 
-            if (move.IsCastlelingMove()) {
+            if (move.IsCastlelingMove())
+            {
                 notation.Append(to < from ? "O-O-O" : "O-O");
-            } else {
+            }
+            else
+            {
                 EPieceType pt = move.GetMovingPieceType();
 
-                if (pt != EPieceType.Pawn) {
+                if (pt != EPieceType.Pawn)
+                {
                     notation.Append(move.GetMovingPiece().GetUnicodeChar());
 
                     // Disambiguation.
@@ -119,10 +127,13 @@ namespace Rudz.Chess.Types
                             notation.Append(from);
                 }
 
-                if (move.IsEnPassantMove()) {
+                if (move.IsEnPassantMove())
+                {
                     notation.Append("ep");
                     notation.Append(from.FileChar());
-                } else if (move.IsCaptureMove()) {
+                }
+                else if (move.IsCaptureMove())
+                {
                     if (pt == EPieceType.Pawn)
                         notation.Append(from.FileChar());
                     notation.Append('x');
@@ -130,7 +141,8 @@ namespace Rudz.Chess.Types
 
                 notation.Append(to);
 
-                if (move.IsPromotionMove()) {
+                if (move.IsPromotionMove())
+                {
                     notation.Append('=');
                     notation.Append(move.GetPromotedPiece().GetUnicodeChar());
                 }
@@ -156,12 +168,16 @@ namespace Rudz.Chess.Types
 
             StringBuilder notation = new StringBuilder(12);
 
-            if (move.IsCastlelingMove()) {
+            if (move.IsCastlelingMove())
+            {
                 notation.Append(to < from ? "O-O-O" : "O-O");
-            } else {
+            }
+            else
+            {
                 EPieceType pt = move.GetMovingPieceType();
 
-                if (pt != EPieceType.Pawn) {
+                if (pt != EPieceType.Pawn)
+                {
                     notation.Append(move.GetMovingPiece().GetPgnChar());
 
                     // Disambiguation.
@@ -171,7 +187,8 @@ namespace Rudz.Chess.Types
 
                     (bool ambiguousMove, bool ambiguousFile, bool ambiguousRank) = move.Ambiguity(ref simularTypeAttacks, state);
 
-                    if (ambiguousMove) {
+                    if (ambiguousMove)
+                    {
                         if (!ambiguousFile)
                             notation.Append(from.FileChar());
                         else if (!ambiguousRank)
@@ -181,10 +198,13 @@ namespace Rudz.Chess.Types
                     }
                 }
 
-                if (move.IsEnPassantMove()) {
+                if (move.IsEnPassantMove())
+                {
                     notation.Append("ep");
                     notation.Append(from.FileChar());
-                } else if (move.IsCaptureMove()) {
+                }
+                else if (move.IsCaptureMove())
+                {
                     if (pt == EPieceType.Pawn)
                         notation.Append(from.FileChar());
 
@@ -193,7 +213,8 @@ namespace Rudz.Chess.Types
 
                 notation.Append(to);
 
-                if (move.IsPromotionMove()) {
+                if (move.IsPromotionMove())
+                {
                     notation.Append('=');
                     notation.Append(move.GetPromotedPiece().GetPgnChar());
                 }
@@ -219,9 +240,12 @@ namespace Rudz.Chess.Types
 
             StringBuilder notation = new StringBuilder(12);
 
-            if (move.IsCastlelingMove()) {
+            if (move.IsCastlelingMove())
+            {
                 notation.Append(to < from ? "O-O-O" : "O-O");
-            } else {
+            }
+            else
+            {
                 EPieceType pt = move.GetMovingPieceType();
 
                 if (pt != EPieceType.Pawn)
@@ -229,21 +253,27 @@ namespace Rudz.Chess.Types
 
                 notation.Append(from);
 
-                if (move.IsEnPassantMove()) {
+                if (move.IsEnPassantMove())
+                {
                     notation.Append("ep");
                     notation.Append(from.FileChar());
-                } else if (move.IsCaptureMove()) {
+                }
+                else if (move.IsCaptureMove())
+                {
                     if (pt == EPieceType.Pawn)
                         notation.Append(from.FileChar());
 
                     notation.Append('x');
-                } else {
+                }
+                else
+                {
                     notation.Append('-');
                 }
 
                 notation.Append(to);
 
-                if (move.IsPromotionMove()) {
+                if (move.IsPromotionMove())
+                {
                     notation.Append('=');
                     notation.Append(move.GetPromotedPiece().GetUnicodeChar());
                 }
@@ -270,9 +300,12 @@ namespace Rudz.Chess.Types
 
             StringBuilder notation = new StringBuilder(12);
 
-            if (move.IsCastlelingMove()) {
+            if (move.IsCastlelingMove())
+            {
                 notation.Append(to < from ? "O-O-O" : "O-O");
-            } else {
+            }
+            else
+            {
                 EPieceType pt = move.GetMovingPieceType();
 
                 if (pt != EPieceType.Pawn)
@@ -280,22 +313,28 @@ namespace Rudz.Chess.Types
 
                 notation.Append(from);
 
-                if (move.IsEnPassantMove()) {
+                if (move.IsEnPassantMove())
+                {
                     notation.Append("ep");
                     notation.Append(from.FileChar());
-                } else if (move.IsCaptureMove()) {
+                }
+                else if (move.IsCaptureMove())
+                {
                     if (pt == EPieceType.Pawn)
                         notation.Append(from.FileChar());
 
                     notation.Append('x');
                     notation.Append(move.GetCapturedPiece().Type().GetPieceChar());
-                } else {
+                }
+                else
+                {
                     notation.Append('-');
                 }
 
                 notation.Append(to);
 
-                if (move.IsPromotionMove()) {
+                if (move.IsPromotionMove())
+                {
                     notation.Append('=');
                     notation.Append(move.GetPromotedPiece().GetUnicodeChar());
                 }
@@ -322,9 +361,10 @@ namespace Rudz.Chess.Types
             bool ambiguousFile = false;
             bool ambiguousRank = false;
 
-            foreach (Square square in simularTypeAttacks) {
+            foreach (Square square in simularTypeAttacks)
+            {
                 BitBoard pinned = moveGenerator.ChessBoard.GetPinnedPieces(square, move.GetMovingSide());
-                
+
                 if (simularTypeAttacks & pinned)
                     continue;
 
@@ -332,7 +372,8 @@ namespace Rudz.Chess.Types
                     continue;
 
                 // ReSharper disable once InvertIf
-                if (moveGenerator.ChessBoard.OccupiedBySide[move.GetMovingSide().Side] & square) {
+                if (moveGenerator.ChessBoard.OccupiedBySide[move.GetMovingSide().Side] & square)
+                {
                     if (square.File() == move.GetFromSquare().File())
                         ambiguousFile = true;
                     else if (square.RankOf() == move.GetFromSquare().RankOf())
@@ -351,12 +392,14 @@ namespace Rudz.Chess.Types
             BitBoard resultBitBoard = 0;
 
             // ReSharper disable once SwitchStatementMissingSomeCases
-            switch (move.GetMovingPieceType()) {
+            switch (move.GetMovingPieceType())
+            {
                 case EPieceType.Bishop:
                 case EPieceType.Rook:
                 case EPieceType.Queen:
                     resultBitBoard |= move.GetToSquare().GetAttacks(move.GetMovingPieceType(), position.ChessBoard.Occupied);
                     break;
+
                 case EPieceType.Knight:
                     resultBitBoard |= move.GetToSquare().GetAttacks(move.GetMovingPieceType());
                     break;

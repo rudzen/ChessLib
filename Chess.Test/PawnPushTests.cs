@@ -24,14 +24,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using Rudz.Chess;
-using Rudz.Chess.Enums;
-
 namespace ChessLibTest
 {
-    using System;
     using NUnit.Framework;
+    using Rudz.Chess;
     using Rudz.Chess.Types;
+    using System;
 
     [TestFixture]
     public class PawnPushTests
@@ -50,7 +48,8 @@ namespace ChessLibTest
 
             int expected = 8;
 
-            foreach (Square square in fullBoard) {
+            foreach (Square square in fullBoard)
+            {
                 BitBoard targetPosition = _pawnPushDel[side.Side](square.BitBoardSquare());
                 Square toSquare = targetPosition.Lsb();
                 int distance = toSquare.ToInt() - square.ToInt();
@@ -60,7 +59,8 @@ namespace ChessLibTest
             side = ~side;
             expected = -expected;
 
-            foreach (Square square in fullBoard) {
+            foreach (Square square in fullBoard)
+            {
                 BitBoard targetPosition = _pawnPushDel[side.Side](square.BitBoardSquare());
                 Square toSquare = targetPosition.Lsb();
                 int distance = toSquare.ToInt() - square.ToInt();

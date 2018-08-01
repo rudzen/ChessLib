@@ -26,8 +26,8 @@ SOFTWARE.
 
 namespace Rudz.Chess.Types
 {
-    using System.Runtime.CompilerServices;
     using Enums;
+    using System.Runtime.CompilerServices;
 
     /// <summary>
     /// Square data struct.
@@ -48,7 +48,7 @@ namespace Rudz.Chess.Types
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Square(ERank rank, EFile file)
             : this((int)rank, (int)file) { }
-        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private Square(ESquare square) => Value = square;
 
@@ -94,7 +94,7 @@ namespace Rudz.Chess.Types
         public static Square operator -(Square left, Direction right) => left.ToInt() - (int)right.Value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Square operator -(Square left, EDirection right) => left.ToInt() - (int) right;
+        public static Square operator -(Square left, EDirection right) => left.ToInt() - (int)right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Square operator ++(Square square) => ++square.Value;

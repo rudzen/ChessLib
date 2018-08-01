@@ -36,14 +36,13 @@ namespace Rudz.Chess.UCI
     /// <summary>
     /// Contains the information related to search parameters for a UCI chess engine.
     /// </summary>
-    public sealed class SearchParameters : ISearchParameters {
+    public sealed class SearchParameters : ISearchParameters
+    {
         private readonly ulong[] _time;
 
         private readonly ulong[] _inc;
 
         private readonly StringBuilder _output = new StringBuilder(256);
-
-        #region ctors
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public SearchParameters()
@@ -77,7 +76,7 @@ namespace Rudz.Chess.UCI
         public SearchParameters(ulong whiteTimeMilliseconds, ulong blackTimeMilliseconds, ulong whiteIncrementTimeMilliseconds, ulong blackIncrementTimeMilliseconds, IReadOnlyList<int> movesToGo, int moveTime)
             : this(whiteTimeMilliseconds, blackTimeMilliseconds, whiteIncrementTimeMilliseconds, blackIncrementTimeMilliseconds)
         {
-            MovesToGo = new []{ movesToGo[0], movesToGo[1] };
+            MovesToGo = new[] { movesToGo[0], movesToGo[1] };
             MoveTime = moveTime;
         }
 
@@ -87,27 +86,29 @@ namespace Rudz.Chess.UCI
 
         public int[] MovesToGo { get; set; }
 
-        public ulong WhiteTimeMilliseconds {
+        public ulong WhiteTimeMilliseconds
+        {
             get => _time[0];
             set => _time[0] = value;
         }
 
-        public ulong BlackTimeMilliseconds {
+        public ulong BlackTimeMilliseconds
+        {
             get => _time[1];
             set => _time[1] = value;
         }
 
-        public ulong WhiteIncrementTimeMilliseconds {
+        public ulong WhiteIncrementTimeMilliseconds
+        {
             get => _inc[0];
             set => _inc[0] = value;
         }
 
-        public ulong BlackIncrementTimeMilliseconds {
+        public ulong BlackIncrementTimeMilliseconds
+        {
             get => _inc[1];
             set => _inc[1] = value;
         }
-
-        #endregion
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ulong Time(Player player) => _time[player.Side];

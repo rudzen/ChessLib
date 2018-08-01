@@ -29,10 +29,10 @@ SOFTWARE.
 
 namespace Rudz.Chess.Fen
 {
+    using Properties;
     using System;
     using System.Collections.Generic;
     using System.Runtime.CompilerServices;
-    using Properties;
 
     /// <summary>
     /// FenData contains a FEN string and an index pointer to a location in the FEN string.

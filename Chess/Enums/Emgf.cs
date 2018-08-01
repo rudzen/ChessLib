@@ -28,15 +28,15 @@ namespace Rudz.Chess.Enums
 {
     using System;
 
+    /// <summary>
+    /// Move generation flag
+    /// </summary>
     [Flags]
     public enum Emgf
     {
         NoMgf = 0,
-
         Legalmoves = 1,
-
         Stages = 2,
-
         Queenpromotion = 4
     }
 }

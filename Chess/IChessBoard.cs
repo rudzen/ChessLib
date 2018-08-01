@@ -26,10 +26,9 @@ SOFTWARE.
 
 namespace Rudz.Chess
 {
+    using Enums;
     using System;
     using System.Collections.Generic;
-    using Enums;
-    using Properties;
     using Types;
 
     public interface IChessBoard : IEnumerable<Piece>
@@ -75,13 +74,13 @@ namespace Rudz.Chess
         BitBoard Pieces(Player side);
 
         BitBoard Pieces(EPieceType type);
-        
+
         BitBoard Pieces(EPieceType type1, EPieceType type2);
-        
+
         BitBoard Pieces(EPieceType type, Player side);
-        
+
         BitBoard Pieces(EPieceType type1, EPieceType type2, Player side);
-        
+
         bool PieceOnFile(Square square, Player side, EPieceType pieceType);
 
         bool PawnIsolated(Square square, Player side);
@@ -97,18 +96,17 @@ namespace Rudz.Chess
         bool AttackedBySlider(Square square, Player side);
 
         bool AttackedByKnight(Square square, Player side);
-        
+
         bool AttackedByPawn(Square square, Player side);
-        
+
         bool AttackedByKing(Square square, Player side);
-        
+
         Square GetRookCastleFrom(Square index);
-        
+
         void SetRookCastleFrom(Square index, Square square);
-        
+
         Square GetKingCastleFrom(Player side, ECastleling castleType);
 
         void SetKingCastleFrom(Player side, Square square, ECastleling castleType);
-
     }
 }

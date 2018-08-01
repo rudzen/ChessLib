@@ -26,10 +26,10 @@ SOFTWARE.
 
 namespace Rudz.Chess.Types
 {
-    using System;
-    using System.Runtime.CompilerServices;
     using Enums;
     using Extensions;
+    using System;
+    using System.Runtime.CompilerServices;
 
     public static class SquareExtensions
     {
@@ -66,14 +66,16 @@ namespace Rudz.Chess.Types
         static SquareExtensions()
         {
             // generate square flipping array for both sides
-            foreach (Square square in BitBoards.AllSquares) {
+            foreach (Square square in BitBoards.AllSquares)
+            {
                 int file = square.File();
                 ERank rank = square.RankOf();
                 Flip[0, square.ToInt()] = file + ((7 - (int)rank) << 3);
                 Flip[1, square.ToInt()] = file + ((int)rank << 3);
 
                 // distance computation
-                foreach (Square distSquare in BitBoards.AllSquares) {
+                foreach (Square distSquare in BitBoards.AllSquares)
+                {
                     int ranks = Math.Abs(rank - distSquare.RankOf());
                     int files = Math.Abs((int)rank - distSquare.File());
                     Distance[square.ToInt(), distSquare.ToInt()] = ranks.Max(files);
@@ -100,13 +102,13 @@ namespace Rudz.Chess.Types
         public static int ToInt(this Square s) => (int)s.Value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ERank RankOf(this Square s) => (ERank) (s.ToInt() >> 3);
+        public static ERank RankOf(this Square s) => (ERank)(s.ToInt() >> 3);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static char RankOfChar(this Square s) => RankChars[(int) s.RankOf()];
+        public static char RankOfChar(this Square s) => RankChars[(int)s.RankOf()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ERank RelativeRank(this ERank rank, Player color) => (ERank) ((int)rank ^ (color.Side * 7));
+        public static ERank RelativeRank(this ERank rank, Player color) => (ERank)((int)rank ^ (color.Side * 7));
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ERank RelativeRank(this Square s, Player color) => s.RankOf().RelativeRank(color);
@@ -123,7 +125,7 @@ namespace Rudz.Chess.Types
             int s = @this.ToInt() ^ other.ToInt();
             return (((s >> 3) ^ s) & 1) != 0;
         }
-        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ref string GetSquareString(this Square s) => ref SquareStrings[s.ToInt()];
 

@@ -24,7 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Enums {
+namespace Rudz.Chess.Enums
+{
     // TODO : implement Crn/Smith/Descriptive/Coordinate/ICCF notations
 
     using System;
@@ -79,6 +80,5 @@ namespace Rudz.Chess.Enums {
         /// Universal chess interface notation
         /// </summary>
         Uci = 256
-
     }
 }

@@ -35,7 +35,6 @@ namespace ChessLibTest
     [TestFixture]
     public class BitboardTests
     {
-
         [Test]
         public void MakeBitBoardTest()
         {
@@ -43,12 +42,11 @@ namespace ChessLibTest
             BitBoard b1 = BitBoards.MakeBitboard(ESquare.a1, ESquare.b1, ESquare.a2, ESquare.b2);
             BitBoard b2 = ESquare.a1.BitBoardSquare() | ESquare.b1.BitBoardSquare() | ESquare.a2.BitBoardSquare() | ESquare.b2.BitBoardSquare();
             Assert.AreEqual(b1, b2);
-            
+
             // a single square (not needed, but still has to work in case of list of squares etc)
             BitBoard b3 = BitBoards.MakeBitboard(ESquare.h3);
             BitBoard b4 = ESquare.h3.BitBoardSquare();
             Assert.AreEqual(b3, b4);
         }
-        
     }
 }

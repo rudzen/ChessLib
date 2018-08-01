@@ -26,10 +26,10 @@ SOFTWARE.
 
 namespace Rudz.Chess.Types
 {
-    using System.Collections;
-    using System.Runtime.CompilerServices;
     using Enums;
     using Extensions;
+    using System.Collections;
+    using System.Runtime.CompilerServices;
 
     public static class PieceExtensions
     {
@@ -62,14 +62,14 @@ namespace Rudz.Chess.Types
  * black chess pawn 	♟ 	U+265F 	&#9823;
          */
 
-        private static readonly string[] PieceUnicode = { " ", "\u2659", "\u2658", "\u2657", "\u2656", "\u2655", "\u2654", " ", " ", "\u265F", "\u265E", "\u265D", "\u265C", "\u265B", "\u265A", " "};
+        private static readonly string[] PieceUnicode = { " ", "\u2659", "\u2658", "\u2657", "\u2656", "\u2655", "\u2654", " ", " ", "\u265F", "\u265E", "\u265D", "\u265C", "\u265B", "\u265A", " " };
 
         private static readonly char[] PieceUnicodeChar = { ' ', '\u2659', '\u2658', '\u2657', '\u2656', '\u2655', '\u2654', ' ', ' ', '\u265F', '\u265E', '\u265D', '\u265C', '\u265B', '\u265A', ' ' };
 
-        private static readonly BitArray WhitePieces = new BitArray(new[] { false,  true,  true,  true,  true,  true,  true, false, false, false, false, false, false, false, false, false });
+        private static readonly BitArray WhitePieces = new BitArray(new[] { false, true, true, true, true, true, true, false, false, false, false, false, false, false, false, false });
 
-        private static readonly BitArray BlackPieces = new BitArray(new[] { false, false, false, false, false, false, false, false, false,  true,  true,  true,  true,  true,  true, false });
-        
+        private static readonly BitArray BlackPieces = new BitArray(new[] { false, false, false, false, false, false, false, false, false, true, true, true, true, true, true, false });
+
         // for polyglot support in the future
         private static readonly char[] BookPieceNames = { 'p', 'P', 'n', 'N', 'b', 'B', 'r', 'R', 'q', 'Q', 'k', 'K' };
 
@@ -91,7 +91,7 @@ namespace Rudz.Chess.Types
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Piece MakePiece(this EPieceType @this, Player side) => @this + (side.Side << 3);
-        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsNoPiece(this Piece p) => p == EPieces.NoPiece;
 

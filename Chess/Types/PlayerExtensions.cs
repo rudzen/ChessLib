@@ -28,8 +28,8 @@ using Rudz.Chess.Enums;
 
 namespace Rudz.Chess.Types
 {
-    using System.Runtime.CompilerServices;
     using Extensions;
+    using System.Runtime.CompilerServices;
 
     public static class PlayerExtensions
     {
@@ -41,7 +41,7 @@ namespace Rudz.Chess.Types
 
         private static readonly Direction[] PawnDoublePushDist = { EDirection.NorthDouble, EDirection.SouthDouble };
 
-        private static readonly Direction[] PawnWestAttackDist = { EDirection.NorthEast , EDirection.SouthEast };
+        private static readonly Direction[] PawnWestAttackDist = { EDirection.NorthEast, EDirection.SouthEast };
 
         private static readonly Direction[] PawnEastAttackDist = { EDirection.NorthWest, EDirection.SouthWest };
 

@@ -26,12 +26,12 @@ SOFTWARE.
 
 namespace Rudz.Chess.Fen
 {
-    using System.Runtime.CompilerServices;
-    using System.Text;
-    using System.Text.RegularExpressions;
     using Enums;
     using Extensions;
     using Properties;
+    using System.Runtime.CompilerServices;
+    using System.Text;
+    using System.Text.RegularExpressions;
     using Types;
 
     public static class Fen
@@ -71,19 +71,23 @@ namespace Rudz.Chess.Fen
         {
             StringBuilder sv = new StringBuilder(MaxFenLen);
 
-            for (ERank rank = ERank.Rank8; rank >= ERank.Rank1; rank--) {
+            for (ERank rank = ERank.Rank8; rank >= ERank.Rank1; rank--)
+            {
                 int empty = 0;
 
-                for (EFile file = EFile.FileA; file <= EFile.FileH; file++) {
+                for (EFile file = EFile.FileA; file <= EFile.FileH; file++)
+                {
                     Square square = new Square(rank, file);
                     Piece piece = state.ChessBoard.BoardLayout[square.ToInt()];
 
-                    if (piece.IsNoPiece()) {
+                    if (piece.IsNoPiece())
+                    {
                         empty++;
                         continue;
                     }
 
-                    if (empty != 0) {
+                    if (empty != 0)
+                    {
                         sv.Append(empty);
                         empty = 0;
                     }
@@ -102,7 +106,8 @@ namespace Rudz.Chess.Fen
 
             int castleRights = state.CastlelingRights;
 
-            if (castleRights != 0) {
+            if (castleRights != 0)
+            {
                 if ((castleRights & 1) != 0)
                     sv.Append('K');
 
@@ -114,7 +119,9 @@ namespace Rudz.Chess.Fen
 
                 if ((castleRights & 8) != 0)
                     sv.Append('q');
-            } else {
+            }
+            else
+            {
                 sv.Append('-');
             }
 
@@ -155,19 +162,6 @@ namespace Rudz.Chess.Fen
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsDelimiter(char c) => c == Space;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Player GetSideToMove(char c)
-        {
-            switch (c) {
-                case 'w':
-                    return 0;
-                case 'b':
-                    return 1;
-                default:
-                    return -1;
-            }
-        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ESquare GetEpSquare(this FenData fen)
@@ -212,52 +206,62 @@ namespace Rudz.Chess.Fen
                         if (++whitePawnCount > 8 && whiteRookCount + whitePawnCount + whiteBishopCount + whiteKnightCount + whiteQueenCount < 15)
                             return false;
                         break;
+
                     case 'r':
                         if (++whiteRookCount > 10 && whiteRookCount + whitePawnCount + whiteBishopCount + whiteKnightCount + whiteQueenCount < 15)
                             return false;
                         break;
+
                     case 'q':
                         if (++whiteQueenCount > 9)
                             return false;
                         break;
+
                     case 'n':
                         if (++whiteKnightCount > 10 && whiteRookCount + whitePawnCount + whiteBishopCount + whiteKnightCount + whiteQueenCount < 15)
                             return false;
                         break;
+
                     case 'k':
                         if (++whiteKingCount > 1)
                             return false;
                         break;
+
                     case 'b':
                         if (++whiteBishopCount > 10 && whiteRookCount + whitePawnCount + whiteBishopCount + whiteKnightCount + whiteQueenCount < 15)
                             return false;
                         break;
+
                     case 'P':
                         if (++blackPawnCount > 8 && blackRookCount + blackPawnCount + blackBishopCount + blackKnightCount + blackQueenCount < 16)
                             return false;
                         break;
+
                     case 'R':
                         if (++blackRookCount > 10 && blackRookCount + blackPawnCount + blackBishopCount + blackKnightCount + blackQueenCount < 16)
                             return false;
                         break;
+
                     case 'Q':
                         if (++blackQueenCount > 9 && blackRookCount + blackPawnCount + blackBishopCount + blackKnightCount + blackQueenCount < 16)
                             return false;
                         break;
+
                     case 'N':
                         if (++blackKnightCount > 10 && blackRookCount + blackPawnCount + blackBishopCount + blackKnightCount + blackQueenCount < 16)
                             return false;
                         break;
+
                     case 'K':
                         if (++blackKingCount > 1)
                             return false;
                         break;
+
                     case 'B':
                         if (++blackBishopCount > 10 && blackRookCount + blackPawnCount + blackBishopCount + blackKnightCount + blackQueenCount < 16)
                             return false;
                         break;
                 }
-                
             }
             return int.Parse(testArray[testArray.Length - 1]) <= 2048;
         }
@@ -273,9 +277,11 @@ namespace Rudz.Chess.Fen
         {
             int spaceCount = 0;
             int seperatorCount = 0;
-            foreach (char c in str) {
+            foreach (char c in str)
+            {
                 // ReSharper disable once SwitchStatementMissingSomeCases
-                switch (c) {
+                switch (c)
+                {
                     case Seperator:
                         seperatorCount++;
                         continue;

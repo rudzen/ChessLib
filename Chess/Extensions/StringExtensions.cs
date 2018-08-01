@@ -42,15 +42,18 @@ namespace Rudz.Chess.Extensions
         {
             int startIndex = 0;
             bool inToken = false;
-            for (int index = 0; index < command.Length; index++) {
+            for (int index = 0; index < command.Length; index++)
+            {
                 char character = command[index];
-                if (index == command.Length - 1) {
+                if (index == command.Length - 1)
+                {
                     // return last token.
                     yield return command.Substring(startIndex, index - startIndex + 1).TrimEnd(tokenizer);
                     break;
                 }
 
-                if (character == separator) {
+                if (character == separator)
+                {
                     // Skip if present.
                     if (inToken)
                         continue;
@@ -58,7 +61,9 @@ namespace Rudz.Chess.Extensions
                     // return token
                     yield return command.Substring(startIndex, index - startIndex).TrimEnd(tokenizer);
                     startIndex = index + 1;
-                } else if (character == tokenizer) {
+                }
+                else if (character == tokenizer)
+                {
                     inToken ^= true;
                     startIndex = index + 1;
                 }

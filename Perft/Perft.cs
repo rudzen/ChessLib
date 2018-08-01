@@ -1,13 +1,12 @@
 ﻿namespace Perft
 {
+    using Rudz.Chess;
+    using Rudz.Chess.Extensions;
     using System;
     using System.Diagnostics;
-    using Rudz.Chess.Extensions;
-    using Rudz.Chess;
 
     public partial class Perft
     {
-
         public static void Main(string[] args)
         {
             Console.WriteLine("ChessLib Perft test program v0.1.");
@@ -18,7 +17,7 @@
 
             if (!depth.InBetween(1, 6))
                 depth = 5;
-            
+
             Console.WriteLine($"Running perft test with depth {depth}.");
             if (depth == 6)
                 Console.WriteLine("Brace yourself, this could take a little while.");
@@ -29,7 +28,7 @@
             Stopwatch watch = Stopwatch.StartNew();
             ulong result = p.DoPerft();
             long elapsedMs = watch.ElapsedMilliseconds;
-            
+
             Console.WriteLine($"Time (ms)  : {elapsedMs}");
             Console.WriteLine($"Nps        : {1000 * result / (ulong)elapsedMs}");
             Console.WriteLine(Positions[0].value[depth - 1] == result
@@ -53,7 +52,8 @@
         {
             Game game = new Game();
             ulong total = 0;
-            foreach (PerftPositions perftPositions in Positions) {
+            foreach (PerftPositions perftPositions in Positions)
+            {
                 game.SetFen(perftPositions.fen);
                 ulong res = game.Perft(_perftLimit);
                 total += res;
