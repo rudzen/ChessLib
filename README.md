@@ -1,6 +1,8 @@
 # ChessLib
 A C# chess data library with complete move generation and all needed custom types.
 
+[![Build status](https://ci.appveyor.com/api/projects/status/6dksl8dsq5s1n2uv?svg=true)](https://ci.appveyor.com/project/rudzen/chesslib)
+
 ## What is this for?
 
 This library contains all the data, types and structures for which to create a piece of
