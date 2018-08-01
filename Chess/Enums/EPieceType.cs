@@ -32,19 +32,12 @@ namespace Rudz.Chess.Enums
     public enum EPieceType
     {
         AllPieces = 0,
-        
         Pawn = 1,
-
         Knight = 2,
-
         Bishop = 3,
-
         Rook = 4,
-
         Queen = 5,
-
         King = 6,
-
         PieceTypeNb = 7
     }
 }

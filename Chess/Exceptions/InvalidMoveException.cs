@@ -31,7 +31,9 @@ namespace Rudz.Chess.Exceptions
 
     public class InvalidMoveException : InvalidOperationException
     {
-        public InvalidMoveException() { }
+        public InvalidMoveException()
+        {
+        }
 
         public InvalidMoveException(string message)
             : base(message) { }

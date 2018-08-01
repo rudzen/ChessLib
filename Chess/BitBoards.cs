@@ -1,4 +1,4 @@
-﻿﻿/*
+﻿/*
 ChessLib, a chess data structure library
 
 MIT License
@@ -28,17 +28,17 @@ SOFTWARE.
 
 namespace Rudz.Chess
 {
+    using Enums;
     using System;
     using System.IO;
     using System.Runtime.CompilerServices;
     using System.Text;
-    using Enums;
     using Types;
 
     public static class BitBoards
     {
         // TODO : Redesign some of these arrays for better memory and/or cacheline use.
-        
+
         public const int Zero = 0x0;
 
         public const ulong ZeroBb = 0x0u;
@@ -151,7 +151,7 @@ namespace Rudz.Chess
             };
 
         private static readonly BitBoard[] AdjacentFilesBB = { FILEB, FILEA | FILEC, FILEB | FILED, FILEC | FILEE, FILED | FILEF, FILEE | FILEG, FILEF | FILEH, FILEG };
-        
+
         private static readonly BitBoard[,] BetweenBB;
 
         private static readonly BitBoard[,] PawnAttackSpanBB;
@@ -159,7 +159,7 @@ namespace Rudz.Chess
         private static readonly BitBoard[,] PassedPawnMaskBB;
 
         private static readonly BitBoard[,] ForwardRanksBB;
-        
+
         private static readonly BitBoard[,] ForwardFileBB;
 
         static BitBoards()
@@ -175,18 +175,21 @@ namespace Rudz.Chess
             // ForwardRanksBB population loop idea from sf
             for (ERank r = ERank.Rank1; r < ERank.RankNb; ++r)
                 ForwardRanksBB[0, (int)r] = ~(ForwardRanksBB[1, (int)r + 1] = ForwardRanksBB[1, (int)r] | RankBB[(int)r]);
-            
-            for (EPlayer side = EPlayer.White; side < EPlayer.PlayerNb; ++side) {
-                int c = (int) side;
-                foreach (Square square in AllSquares) {
+
+            for (EPlayer side = EPlayer.White; side < EPlayer.PlayerNb; ++side)
+            {
+                int c = (int)side;
+                foreach (Square square in AllSquares)
+                {
                     int s = square.ToInt();
-                    ForwardFileBB[c, s]    = ForwardRanksBB[c, (int)square.RankOf()] & FileBB[square.File()];
+                    ForwardFileBB[c, s] = ForwardRanksBB[c, (int)square.RankOf()] & FileBB[square.File()];
                     PawnAttackSpanBB[c, s] = ForwardRanksBB[c, (int)square.RankOf()] & AdjacentFilesBB[square.File()];
-                    PassedPawnMaskBB[c, s] = ForwardFileBB [c, s] | PawnAttackSpanBB[c, s];
+                    PassedPawnMaskBB[c, s] = ForwardFileBB[c, s] | PawnAttackSpanBB[c, s];
                 }
             }
 
-            foreach (Square s in AllSquares) {
+            foreach (Square s in AllSquares)
+            {
                 foreach (Square fillSq in AllSquares)
                     BetweenBB[s.ToInt(), fillSq.ToInt()] = 0;
 
@@ -199,16 +202,17 @@ namespace Rudz.Chess
                 InitBetweenBitboards(s, WestOne, EDirection.West);
                 InitBetweenBitboards(s, NorthWestOne, EDirection.NorthWest);
             }
-            
+
             // Pseudo attacks for all pieces
-            foreach (Square s in AllSquares) {
+            foreach (Square s in AllSquares)
+            {
                 int sq = s.ToInt();
                 BitBoard b = s.BitBoardSquare();
                 PseudoAttacksBB[0, sq] = b.NorthEastOne() | b.NorthWestOne();
                 PseudoAttacksBB[1, sq] = b.SouthWestOne() | b.SouthEastOne();
-                
+
                 int pt = EPieceType.Knight.ToInt();
-                PseudoAttacksBB[pt, sq] =  (b & ~(FILEA | FILEB)) << 6;
+                PseudoAttacksBB[pt, sq] = (b & ~(FILEA | FILEB)) << 6;
                 PseudoAttacksBB[pt, sq] |= (b & ~FILEA) << 15;
                 PseudoAttacksBB[pt, sq] |= (b & ~FILEH) << 17;
                 PseudoAttacksBB[pt, sq] |= (b & ~(FILEG | FILEH)) << 10;
@@ -225,7 +229,7 @@ namespace Rudz.Chess
 
                 pt = EPieceType.Queen.ToInt();
                 PseudoAttacksBB[pt, sq] = s.QueenAttacks(Zero);
-                
+
                 pt = EPieceType.King.ToInt();
                 PseudoAttacksBB[pt, sq] = (b & ~FILEA) >> 1;
                 PseudoAttacksBB[pt, sq] |= (b & ~FILEA) << 7;
@@ -337,7 +341,7 @@ namespace Rudz.Chess
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static BitBoard ForwardRanks(this Square @this, Player side) => ForwardRanksBB[side.Side, @this.ToInt()];
-        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static BitBoard BitboardBetween(this Square firstSquare, Square secondSquare) => BetweenBB[firstSquare.ToInt(), secondSquare.ToInt()];
 
@@ -359,9 +363,12 @@ namespace Rudz.Chess
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void ToString(this BitBoard bb, TextWriter outputWriter)
         {
-            try {
+            try
+            {
                 outputWriter.WriteLine(bb);
-            } catch (IOException ioException) {
+            }
+            catch (IOException ioException)
+            {
                 throw new IOException("Writer is not available.", ioException);
             }
         }
@@ -370,10 +377,12 @@ namespace Rudz.Chess
         {
             StringBuilder s = new StringBuilder(title, 128);
             s.Append("\n+---+---+---+---+---+---+---+---+\n");
-            for (int r = 7; r >= 0; r--) {
+            for (int r = 7; r >= 0; r--)
+            {
                 s.Append(r + 1);
                 s.Append(' ');
-                for (int f = 0; f <= 7; f++) {
+                for (int f = 0; f <= 7; f++)
+                {
                     s.Append(b & BbSquares[(r << 3) + f] ? " 1 " : " . ");
                     s.Append(' ');
                 }
@@ -481,7 +490,8 @@ namespace Rudz.Chess
         public static int PopCount(BitBoard bb)
         {
             int y = 0;
-            while (bb) {
+            while (bb)
+            {
                 y++;
                 ResetLsb(ref bb);
             }

@@ -39,7 +39,8 @@ namespace ChessLibTest
             const int attackIndex = 1;
             const ulong narrowLocations = 0x4281000000008142;
 
-            foreach (Square pieceLocation in Bands[index]) {
+            foreach (Square pieceLocation in Bands[index])
+            {
                 BitBoard attacks = RegAttacks[attackIndex](pieceLocation);
                 int expected = (BoardCorners & pieceLocation) != 0 ? KnightExpected[index] >> 1 /* for corners */ : (narrowLocations & pieceLocation) != 0 ? KnightExpected[index] - 1 /* narrowLocations */ : KnightExpected[index];
                 Assert.AreEqual(expected, attacks.Count);
@@ -53,7 +54,8 @@ namespace ChessLibTest
             const int attackIndex = 1;
             const ulong narrowLocations = 0x42000000004200;
 
-            foreach (Square pieceLocation in Bands[index]) {
+            foreach (Square pieceLocation in Bands[index])
+            {
                 BitBoard attacks = RegAttacks[attackIndex](pieceLocation);
                 int expected = (narrowLocations & pieceLocation) != 0 ? KnightExpected[index] - 2 : KnightExpected[index];
                 Assert.AreEqual(expected, attacks.Count);
@@ -66,7 +68,8 @@ namespace ChessLibTest
             const int index = (int)EBands.Gamma;
             const int attackIndex = 1;
 
-            foreach (Square pieceLocation in Bands[index]) {
+            foreach (Square pieceLocation in Bands[index])
+            {
                 BitBoard attacks = RegAttacks[attackIndex](pieceLocation);
                 Assert.AreEqual(KnightExpected[index], attacks.Count);
             }
@@ -78,7 +81,8 @@ namespace ChessLibTest
             const int index = (int)EBands.Delta;
             const int attackIndex = 1;
 
-            foreach (Square pieceLocation in Bands[index]) {
+            foreach (Square pieceLocation in Bands[index])
+            {
                 BitBoard attacks = RegAttacks[attackIndex](pieceLocation);
                 Assert.AreEqual(KnightExpected[index], attacks.Count);
             }

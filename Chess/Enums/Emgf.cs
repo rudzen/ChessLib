@@ -32,11 +32,8 @@ namespace Rudz.Chess.Enums
     public enum Emgf
     {
         NoMgf = 0,
-
         Legalmoves = 1,
-
         Stages = 2,
-
         Queenpromotion = 4
     }
 }

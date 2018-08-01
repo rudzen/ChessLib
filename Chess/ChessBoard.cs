@@ -1,4 +1,4 @@
-﻿﻿/*
+﻿/*
 ChessLib, a chess data structure library
 
 MIT License
@@ -26,13 +26,13 @@ SOFTWARE.
 
 namespace Rudz.Chess
 {
+    using Enums;
+    using Extensions;
+    using Properties;
     using System;
     using System.Collections;
     using System.Collections.Generic;
     using System.Runtime.CompilerServices;
-    using Enums;
-    using Extensions;
-    using Properties;
     using Types;
 
     /// <summary>
@@ -71,7 +71,7 @@ namespace Rudz.Chess
         static ChessBoard() => EnPasCapturePos = new Func<BitBoard, BitBoard>[] { BitBoards.SouthOne, BitBoards.NorthOne };
 
         // TODO : redesign BoardPieces + OccupiedBySide into simple arrays
-        
+
         [NotNull]
         public BitBoard[] BoardPieces { get; }
 
@@ -138,7 +138,8 @@ namespace Rudz.Chess
         {
             Square toSquare = move.GetToSquare();
 
-            if (move.IsCastlelingMove()) {
+            if (move.IsCastlelingMove())
+            {
                 Piece rook = (int)EPieceType.Rook + move.GetSideMask();
                 Piece king = move.GetMovingPiece();
                 RemovePiece(_rookCastlesFrom[toSquare.ToInt()], rook);
@@ -151,11 +152,14 @@ namespace Rudz.Chess
 
             RemovePiece(move.GetFromSquare(), move.GetMovingPiece());
 
-            if (move.IsEnPassantMove()) {
+            if (move.IsEnPassantMove())
+            {
                 BitBoard targetSquare = toSquare;
                 Square t = EnPasCapturePos[move.GetMovingSide().Side](targetSquare).First();
                 RemovePiece(t, move.GetCapturedPiece());
-            } else if (move.IsCaptureMove()) {
+            }
+            else if (move.IsCaptureMove())
+            {
                 RemovePiece(toSquare, move.GetCapturedPiece());
             }
 
@@ -169,7 +173,8 @@ namespace Rudz.Chess
         {
             Square toSquare = move.GetToSquare();
 
-            if (move.IsCastlelingMove()) {
+            if (move.IsCastlelingMove())
+            {
                 Piece rook = (int)EPieceType.Rook + move.GetSideMask();
                 Piece king = move.GetMovingPiece();
                 RemovePiece(toSquare, king);
@@ -182,11 +187,14 @@ namespace Rudz.Chess
 
             RemovePiece(toSquare, move.IsPromotionMove() ? move.GetPromotedPiece() : move.GetMovingPiece());
 
-            if (move.IsEnPassantMove()) {
+            if (move.IsEnPassantMove())
+            {
                 BitBoard targetSquare = toSquare;
                 Square t = EnPasCapturePos[move.GetMovingSide().Side](targetSquare).First();
                 AddPiece(move.GetCapturedPiece(), t);
-            } else if (move.IsCaptureMove()) {
+            }
+            else if (move.IsCaptureMove())
+            {
                 AddPiece(move.GetCapturedPiece(), toSquare);
             }
 
@@ -216,19 +224,21 @@ namespace Rudz.Chess
         public BitBoard GetPinnedPieces(Square square, Player side)
         {
             // TODO : Move into state data structure instead of real-time calculation
-            
+
             BitBoard pinnedPieces = 0;
             int oppShift = ~side << 3;
             BitBoard pinners = square.XrayBishopAttacks(Occupied, OccupiedBySide[side.Side]) & (BoardPieces[(int)EPieceType.Bishop + oppShift] | BoardPieces[(int)EPieceType.Queen | oppShift]);
 
-            while (pinners) {
+            while (pinners)
+            {
                 pinnedPieces |= pinners.Lsb().BitboardBetween(square) & OccupiedBySide[side.Side];
                 pinners--;
             }
 
             pinners = square.XrayRookAttacks(Occupied, OccupiedBySide[side.Side]) & (BoardPieces[(int)EPieceType.Rook + oppShift] | BoardPieces[(int)EPieceType.Queen | oppShift]);
 
-            while (pinners) {
+            while (pinners)
+            {
                 pinnedPieces |= pinners.Lsb().BitboardBetween(square) & OccupiedBySide[side.Side];
                 pinners--;
             }
@@ -308,12 +318,12 @@ namespace Rudz.Chess
         public BitBoard AttacksTo(Square square, BitBoard occupied)
         {
             // TODO : needs testing
-            return  (square.PawnAttack(PlayerExtensions.White)      & OccupiedBySide[PlayerExtensions.Black.Side])
-                  | (square.PawnAttack(PlayerExtensions.Black)      & OccupiedBySide[PlayerExtensions.White.Side])
-                  | (square.GetAttacks(EPieceType.Knight)           & Pieces(EPieceType.Knight))
-                  | (square.GetAttacks(EPieceType.Rook, occupied)   & Pieces(EPieceType.Rook, EPieceType.Queen))
+            return (square.PawnAttack(PlayerExtensions.White) & OccupiedBySide[PlayerExtensions.Black.Side])
+                  | (square.PawnAttack(PlayerExtensions.Black) & OccupiedBySide[PlayerExtensions.White.Side])
+                  | (square.GetAttacks(EPieceType.Knight) & Pieces(EPieceType.Knight))
+                  | (square.GetAttacks(EPieceType.Rook, occupied) & Pieces(EPieceType.Rook, EPieceType.Queen))
                   | (square.GetAttacks(EPieceType.Bishop, occupied) & Pieces(EPieceType.Bishop, EPieceType.Queen))
-                  | (square.GetAttacks(EPieceType.King)             & Pieces(EPieceType.King));
+                  | (square.GetAttacks(EPieceType.King) & Pieces(EPieceType.King));
         }
 
         public BitBoard AttacksTo(Square square) => AttacksTo(square, Occupied);
@@ -351,11 +361,14 @@ namespace Rudz.Chess
         public Square GetKingCastleFrom(Player side, ECastleling castleType)
         {
             // ReSharper disable once SwitchStatementMissingSomeCases
-            switch (castleType) {
+            switch (castleType)
+            {
                 case ECastleling.Short:
                     return _castleShortKingFrom[side.Side];
+
                 case ECastleling.Long:
                     return _castleLongKingFrom[side.Side];
+
                 default:
                     throw new ArgumentOutOfRangeException(nameof(castleType), castleType, null);
             }
@@ -365,13 +378,16 @@ namespace Rudz.Chess
         public void SetKingCastleFrom(Player side, Square square, ECastleling castleType)
         {
             // ReSharper disable once SwitchStatementMissingSomeCases
-            switch (castleType) {
+            switch (castleType)
+            {
                 case ECastleling.Short:
                     _castleShortKingFrom[side.Side] = square;
                     break;
+
                 case ECastleling.Long:
                     _castleLongKingFrom[side.Side] = square;
                     break;
+
                 default:
                     throw new ArgumentOutOfRangeException(nameof(castleType), castleType, null);
             }

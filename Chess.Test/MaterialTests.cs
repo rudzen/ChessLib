@@ -29,8 +29,8 @@ namespace ChessLibTest
     using NUnit.Framework;
 
     [TestFixture]
-    public class MaterialTests {
-
+    public class MaterialTests
+    {
         //TODO : Implement the RIGHT way
 
         //[Test]

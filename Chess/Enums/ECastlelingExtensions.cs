@@ -44,11 +44,14 @@ namespace Rudz.Chess.Enums
         public static Square GetKingCastleTo(this ECastleling castleType, Player side)
         {
             // ReSharper disable once SwitchStatementMissingSomeCases
-            switch (castleType) {
+            switch (castleType)
+            {
                 case ECastleling.Short:
                     return OoKingTo[side.Side];
+
                 case ECastleling.Long:
                     return OooKingTo[side.Side];
+
                 default:
                     throw new ArgumentOutOfRangeException(nameof(castleType), castleType, null);
             }
@@ -58,11 +61,14 @@ namespace Rudz.Chess.Enums
         internal static int GetCastleAllowedMask(this ECastleling castleType, Player side)
         {
             // ReSharper disable once SwitchStatementMissingSomeCases
-            switch (castleType) {
+            switch (castleType)
+            {
                 case ECastleling.Short:
                     return OoAllowedMask[side.Side];
+
                 case ECastleling.Long:
                     return OooAllowedMask[side.Side];
+
                 default:
                     throw new ArgumentOutOfRangeException(nameof(castleType), castleType, null);
             }

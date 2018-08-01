@@ -32,7 +32,6 @@ namespace Rudz.Chess.Enums
     public enum EPlayerType
     {
         Human = 1,
-
         Engine = 0
     }
 }

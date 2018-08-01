@@ -31,8 +31,8 @@ namespace Rudz.Chess.Enums
     {
         // ReSharper disable InconsistentNaming
         // ReSharper disable UnusedMember.Global
-        a1 =  0, b1 =  1, c1 =  2, d1 =  3, e1 =  4, f1 =  5, g1 =  6, h1 =  7,
-        a2 =  8, b2 =  9, c2 = 10, d2 = 11, e2 = 12, f2 = 13, g2 = 14, h2 = 15,
+        a1 = 0, b1 = 1, c1 = 2, d1 = 3, e1 = 4, f1 = 5, g1 = 6, h1 = 7,
+        a2 = 8, b2 = 9, c2 = 10, d2 = 11, e2 = 12, f2 = 13, g2 = 14, h2 = 15,
         a3 = 16, b3 = 17, c3 = 18, d3 = 19, e3 = 20, f3 = 21, g3 = 22, h3 = 23,
         a4 = 24, b4 = 25, c4 = 26, d4 = 27, e4 = 28, f4 = 29, g4 = 30, h4 = 31,
         a5 = 32, b5 = 33, c5 = 34, d5 = 35, e5 = 36, f5 = 37, g5 = 38, h5 = 39,

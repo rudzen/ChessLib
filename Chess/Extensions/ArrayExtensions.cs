@@ -26,8 +26,8 @@ SOFTWARE.
 
 namespace Rudz.Chess.Extensions
 {
-    using System.Runtime.CompilerServices;
     using Properties;
+    using System.Runtime.CompilerServices;
 
     public static class ArrayExtensions
     {

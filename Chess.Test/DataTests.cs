@@ -26,10 +26,10 @@ SOFTWARE.
 
 namespace ChessLibTest
 {
-    using System.Text;
     using NUnit.Framework;
     using Rudz.Chess.Enums;
     using Rudz.Chess.Types;
+    using System.Text;
 
     [TestFixture]
     public class DataTests
@@ -40,7 +40,8 @@ namespace ChessLibTest
             StringBuilder chars = new StringBuilder(1024);
             StringBuilder strings = new StringBuilder(1024);
 
-            for (Square sq = ESquare.a1; sq; ++sq) {
+            for (Square sq = ESquare.a1; sq; ++sq)
+            {
                 chars.Clear();
                 strings.Clear();
                 chars.Append(sq.FileChar());

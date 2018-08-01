@@ -26,10 +26,10 @@ SOFTWARE.
 
 namespace Rudz.Chess.Extensions
 {
+    using Properties;
     using System;
     using System.Diagnostics.CodeAnalysis;
     using System.Runtime.CompilerServices;
-    using Properties;
     using Types;
 
     public static class MathExtensions
@@ -74,12 +74,14 @@ namespace Rudz.Chess.Extensions
             bool neg = false;
             int pos = 0;
             int max = str.Length - 1;
-            if (str[pos] == '-') {
+            if (str[pos] == '-')
+            {
                 neg = true;
                 pos++;
             }
 
-            while (pos <= max && InBetween(str[pos], '0', '9')) {
+            while (pos <= max && InBetween(str[pos], '0', '9'))
+            {
                 x = x * 10 + (str[pos] - '0');
                 pos++;
             }
@@ -89,7 +91,8 @@ namespace Rudz.Chess.Extensions
 
         public static bool ToIntegral([CanBeNull] this string str, out int result)
         {
-            if (string.IsNullOrWhiteSpace(str)) {
+            if (string.IsNullOrWhiteSpace(str))
+            {
                 result = 0;
                 return false;
             }
@@ -98,12 +101,14 @@ namespace Rudz.Chess.Extensions
             bool neg = false;
             int pos = 0;
             int max = str.Length - 1;
-            if (str[pos] == '-') {
+            if (str[pos] == '-')
+            {
                 neg = true;
                 pos++;
             }
 
-            while (pos <= max && InBetween(str[pos], '0', '9')) {
+            while (pos <= max && InBetween(str[pos], '0', '9'))
+            {
                 x = x * 10 + (str[pos] - '0');
                 pos++;
             }
@@ -112,11 +117,11 @@ namespace Rudz.Chess.Extensions
             return true;
         }
 
-
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool ToIntegral([CanBeNull] this string str, out ulong result)
         {
-            if (string.IsNullOrWhiteSpace(str)) {
+            if (string.IsNullOrWhiteSpace(str))
+            {
                 result = 0;
                 return false;
             }
@@ -124,7 +129,8 @@ namespace Rudz.Chess.Extensions
             ulong x = 0;
             int pos = 0;
             int max = str.Length - 1;
-            while (pos <= max && InBetween(str[pos], '0', '9')) {
+            while (pos <= max && InBetween(str[pos], '0', '9'))
+            {
                 x = x * 10 + (ulong)(str[pos] - '0');
                 pos++;
             }

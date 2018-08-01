@@ -26,10 +26,9 @@ SOFTWARE.
 
 namespace Rudz.Chess
 {
-    using System;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Runtime.CompilerServices;
     using Enums;
+    using System;
+    using System.Runtime.CompilerServices;
     using Types;
 
     public sealed class Material /*Girl*/
@@ -56,7 +55,7 @@ namespace Rudz.Chess
             MaxValue = (int)(MaxValueWithoutPawns + 2 * 8 * (int)PieceExtensions.PieceValues[0]);
             PieceBitShift = new[] { 0, 4, 8, 12, 16, 20 };
         }
-        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Add(Piece piece)
         {
@@ -90,7 +89,7 @@ namespace Rudz.Chess
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int Count(Player side, EPieceType pieceType) => (int)((_key[side.Side] >> PieceBitShift[(int)pieceType]) & 15u);
-        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Clear()
         {

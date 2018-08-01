@@ -41,7 +41,8 @@ namespace ChessLibTest
             const int index = (int)EBands.Alpha;
             const int sliderIndex = 1;
 
-            foreach (Square pieceLocation in Bands[index]) {
+            foreach (Square pieceLocation in Bands[index])
+            {
                 BitBoard attacks = SlideAttacks[sliderIndex](pieceLocation, EmptyBoard);
                 Assert.AreEqual(RookExpected[index], attacks.Count);
             }
@@ -53,7 +54,8 @@ namespace ChessLibTest
             const int index = (int)EBands.Beta;
             const int sliderIndex = 1;
 
-            foreach (Square pieceLocation in Bands[index]) {
+            foreach (Square pieceLocation in Bands[index])
+            {
                 BitBoard attacks = SlideAttacks[sliderIndex](pieceLocation, EmptyBoard);
                 Assert.AreEqual(RookExpected[index], attacks.Count);
             }
@@ -65,7 +67,8 @@ namespace ChessLibTest
             const int index = (int)EBands.Gamma;
             const int sliderIndex = 1;
 
-            foreach (Square pieceLocation in Bands[index]) {
+            foreach (Square pieceLocation in Bands[index])
+            {
                 BitBoard attacks = SlideAttacks[sliderIndex](pieceLocation, EmptyBoard);
                 Assert.AreEqual(RookExpected[index], attacks.Count);
             }
@@ -77,7 +80,8 @@ namespace ChessLibTest
             const int index = (int)EBands.Delta;
             const int sliderIndex = 1;
 
-            foreach (Square pieceLocation in Bands[index]) {
+            foreach (Square pieceLocation in Bands[index])
+            {
                 BitBoard attacks = SlideAttacks[sliderIndex](pieceLocation, EmptyBoard);
                 Assert.AreEqual(RookExpected[index], attacks.Count);
             }
@@ -101,7 +105,7 @@ namespace ChessLibTest
 
             /*
              * borderInner (X = set bit) :
-             * 
+             *
              * 0 0 0 0 0 0 0 0
              * 0 X X X X X X 0
              * 0 X 0 0 0 0 X 0
@@ -110,9 +114,10 @@ namespace ChessLibTest
              * 0 X 0 0 0 0 X 0
              * 0 X X X X X X 0
              * 0 0 0 0 0 0 0 0
-             * 
+             *
              */
-            foreach (Square square in border) {
+            foreach (Square square in border)
+            {
                 BitBoard attacks = square.GetAttacks(EPieceType.Rook, borderInner);
                 Assert.IsFalse(attacks.Empty());
                 Assert.AreEqual(corners & square ? expectedCorner : expectedSide, attacks.Count);

@@ -26,11 +26,11 @@ SOFTWARE.
 
 namespace Rudz.Chess.UCI
 {
+    using Properties;
     using System;
     using System.Diagnostics;
     using System.Threading;
     using System.Threading.Tasks;
-    using Properties;
     using Types;
 
     /// <summary>
@@ -62,7 +62,10 @@ namespace Rudz.Chess.UCI
             Id = id;
         }
 
-        ~HiResTimer() { Dispose(false); }
+        ~HiResTimer()
+        {
+            Dispose(false);
+        }
 
         /// <summary>
         /// Invoked when the timer is elapsed
@@ -73,13 +76,16 @@ namespace Rudz.Chess.UCI
 
         public int Id { get; set; }
 
-        public float Interval {
-            get {
+        public float Interval
+        {
+            get
+            {
                 lock (_intervalLock)
                     return _interval;
             }
 
-            set {
+            set
+            {
                 if (value < 0f || float.IsNaN(value))
                     throw new ArgumentOutOfRangeException(nameof(value));
                 lock (_intervalLock)
@@ -128,12 +134,17 @@ namespace Rudz.Chess.UCI
             if (_executer.IsCanceled || _executer.IsCompleted)
                 return;
 
-            try {
+            try
+            {
                 _executer.Wait(500);
                 Debug.WriteLine("Timer Stop called ");
-            } catch (AggregateException ae) {
+            }
+            catch (AggregateException ae)
+            {
                 Debug.Print(ae.Message);
-            } catch (ObjectDisposedException ode) {
+            }
+            catch (ObjectDisposedException ode)
+            {
                 Debug.Print(ode.Message);
             }
         }
@@ -168,11 +179,13 @@ namespace Rudz.Chess.UCI
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            while (!cancellationToken.IsCancellationRequested) {
+            while (!cancellationToken.IsCancellationRequested)
+            {
                 nextTrigger += Interval;
                 double elapsed;
 
-                while (true) {
+                while (true)
+                {
                     elapsed = ElapsedHiRes(stopwatch);
                     double diff = nextTrigger - elapsed;
                     if (diff <= 0f)

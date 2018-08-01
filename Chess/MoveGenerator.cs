@@ -26,13 +26,13 @@ SOFTWARE.
 
 namespace Rudz.Chess
 {
+    using Enums;
+    using Properties;
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Runtime;
     using System.Runtime.CompilerServices;
-    using Enums;
-    using Properties;
     using Types;
 
     public class MoveGenerator : IMoveGenerator
@@ -59,7 +59,7 @@ namespace Rudz.Chess
         static MoveGenerator()
         {
             Table = new ConcurrentDictionary<ulong, List<Move>>();
-            
+
             // Force cleaning when process exists
             AppDomain.CurrentDomain.ProcessExit += Clean;
         }
@@ -86,7 +86,7 @@ namespace Rudz.Chess
         public Emgf Flags { get; set; } = Emgf.Legalmoves;
 
         public IList<Move> Moves { get; private set; }
-        
+
         public static void ClearMoveCache()
         {
             Table.Clear();
@@ -101,9 +101,12 @@ namespace Rudz.Chess
             if (Flags.HasFlag(Emgf.Stages))
                 return;
 
-            if (Table.ContainsKey(Key) && !force) {
+            if (Table.ContainsKey(Key) && !force)
+            {
                 Moves = Table[Key];
-            } else {
+            }
+            else
+            {
                 List<Move> moves = new List<Move>(256);
 
                 // relax the gc while generating moves.
@@ -151,25 +154,33 @@ namespace Rudz.Chess
 
             Square to = move.GetToSquare();
 
-            if (move.IsCastlelingMove()) {
+            if (move.IsCastlelingMove())
+            {
                 // TODO : Basic castleling verification
-            } else if (move.IsEnPassantMove()) {
+            }
+            else if (move.IsEnPassantMove())
+            {
                 Player opponent = ~move.GetMovingSide();
 
                 // TODO : En-passant here
-            } else if (move.IsCaptureMove()) {
+            }
+            else if (move.IsCaptureMove())
+            {
                 Player opponent = ~move.GetMovingSide();
                 if ((_occupiedBySide[opponent.Side] & to).Empty())
                     return false;
 
                 if ((_bitboardPieces[move.GetCapturedPiece().ToInt()] & to).Empty())
                     return false;
-            } else if ((_occupied & to) != 0) {
+            }
+            else if ((_occupied & to) != 0)
+            {
                 return false;
             }
 
             // ReSharper disable once SwitchStatementMissingSomeCases
-            switch (move.GetMovingPiece().Type()) {
+            switch (move.GetMovingPiece().Type())
+            {
                 case EPieceType.Bishop:
                 case EPieceType.Rook:
                 case EPieceType.Queen:
@@ -191,7 +202,7 @@ namespace Rudz.Chess
         {
             ClearMoveCache();
         }
-        
+
         /// <summary>
         /// Aligns the current positional data to the chessboards data.
         /// </summary>
@@ -235,7 +246,8 @@ namespace Rudz.Chess
         {
             Player currentSide = SideToMove;
             if (!InCheck)
-                for (ECastleling castleType = ECastleling.Short; castleType < ECastleling.CastleNb; castleType++) {
+                for (ECastleling castleType = ECastleling.Short; castleType < ECastleling.CastleNb; castleType++)
+                {
                     if (CanCastle(castleType))
                         AddCastleMove(moves, ChessBoard.GetKingCastleFrom(currentSide, castleType), castleType.GetKingCastleTo(currentSide));
                 }
@@ -329,14 +341,17 @@ namespace Rudz.Chess
 
             Piece piece = EPieceType.Pawn.MakePiece(SideToMove);
 
-            foreach (Square squareTo in targetSquares) {
+            foreach (Square squareTo in targetSquares)
+            {
                 Square squareFrom = squareTo - direction;
-                if (!squareTo.IsPromotionRank()) {
+                if (!squareTo.IsPromotionRank())
+                {
                     AddMove(moves, piece, squareFrom, squareTo, PieceExtensions.EmptyPiece, type);
                     continue;
                 }
 
-                if (Flags.HasFlag(Emgf.Queenpromotion)) {
+                if (Flags.HasFlag(Emgf.Queenpromotion))
+                {
                     AddMove(moves, piece, squareFrom, squareTo, EPieceType.Queen.MakePiece(SideToMove), type | EMoveType.Promotion);
                     return;
                 }
@@ -353,10 +368,12 @@ namespace Rudz.Chess
         private bool CanCastle(ECastleling type)
         {
             // ReSharper disable once SwitchStatementMissingSomeCases
-            switch (type) {
+            switch (type)
+            {
                 case ECastleling.Short:
                 case ECastleling.Long:
                     return (CastlelingRights & type.GetCastleAllowedMask(SideToMove)) != 0 && IsCastleAllowed(type.GetKingCastleTo(SideToMove));
+
                 default:
                     throw new ArgumentException("Illegal castleling type.");
             }
@@ -365,7 +382,7 @@ namespace Rudz.Chess
         private bool IsCastleAllowed(Square square)
         {
             Player c = SideToMove;
-             // The complexity of this function is mainly due to the support for Chess960 variant.
+            // The complexity of this function is mainly due to the support for Chess960 variant.
             Square rookTo = square.GetRookCastleTo();
             Square rookFrom = ChessBoard.GetRookCastleFrom(square);
             Square kingSquare = ChessBoard.KingSquares[c.Side];
@@ -388,7 +405,8 @@ namespace Rudz.Chess
             c = ~c;
 
             // ReSharper disable once LoopCanBeConvertedToQuery
-            foreach (Square s in kingSquare.BitboardBetween(square) | square) {
+            foreach (Square s in kingSquare.BitboardBetween(square) | square)
+            {
                 if (ChessBoard.IsAttacked(s, c))
                     return false;
             }

@@ -27,29 +27,29 @@ SOFTWARE.
 // ReSharper disable NotAccessedField.Local
 namespace Rudz.Chess.Data
 {
+    using Enums;
     using System;
     using System.Runtime.CompilerServices;
-    using Enums;
     using Types;
     using Util;
-    
+
     /// <summary>
     /// Class resposible for keeping random values for use with Zobrist hashing.
     /// The zobrist key for which this class helps generate, is a "unique" representation of
     /// a complete chess board, including its status.
-    /// 
+    ///
     /// ------------ |----------:|----------:|----------:|
     ///       Method |      Mean |     Error |    StdDev |
     /// ------------ |----------:|----------:|----------:|
     ///     ULongRnd | 77.335 ns | 1.0416 ns | 0.9743 ns |
     ///  RKissRandom |  4.369 ns | 0.0665 ns | 0.0622 ns |
     /// ------------ |----------:|----------:|----------:|
-    /// 
+    ///
     /// Collisions:
     /// Key collisions or type-1 errors are inherent in using Zobrist keys with far less bits than required to encode all reachable chess positions.
     /// This representaion is using a 64 bit key, thus it could be expected to get a collision after about 2 ^ 32 or 4 billion positions.
-    /// 
-    /// Collision information from 
+    ///
+    /// Collision information from
     /// https://chessprogramming.wikispaces.com/Zobrist+Hashing
     /// </summary>
     public static class Zobrist
@@ -78,13 +78,15 @@ namespace Rudz.Chess.Data
         /// To use as base for pawn hash table
         /// </summary>
         private static readonly ulong ZobristNoPawn;
-        
+
         static Zobrist()
         {
             RKiss rnd = (ulong)DateTime.Now.Ticks;
 
-            for (EPlayer side = EPlayer.White; side < EPlayer.PlayerNb; ++side) {
-                for (EPieceType pieceType = EPieceType.Pawn; pieceType < EPieceType.PieceTypeNb; pieceType++) {
+            for (EPlayer side = EPlayer.White; side < EPlayer.PlayerNb; ++side)
+            {
+                for (EPieceType pieceType = EPieceType.Pawn; pieceType < EPieceType.PieceTypeNb; ++pieceType)
+                {
                     Piece piece = pieceType.MakePiece(side);
                     for (ESquare square = ESquare.a1; square <= ESquare.h8; square++)
                         ZobristPst[piece.ToInt(), (int)square] = rnd.Rand();

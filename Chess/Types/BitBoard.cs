@@ -26,16 +26,16 @@ SOFTWARE.
 
 namespace Rudz.Chess.Types
 {
+    using Enums;
     using System;
     using System.Collections;
     using System.Collections.Generic;
     using System.Runtime.CompilerServices;
     using System.Text;
-    using Enums;
 
     /*
          * In general, the bitboard layout of a chess board matches that of a real chess board.
-         *  
+         *
             56	57	58	59	60	61	62	63      (RANK 8)
             48	49	50	51	52	53	54	55      (RANK 7)
             40	41	42	43	44	45	46	47      (RANK 6)
@@ -44,9 +44,9 @@ namespace Rudz.Chess.Types
             16	17	18	19	20	21	22	23
             08	09	10	11	12	13	14	15
             00	01	02	03	04	05	06	07
-         *  
+         *
          *   A   B   C   D   E   F   G   H
-         *   
+         *
          *  Direction of bits --->
          */
 
@@ -86,7 +86,8 @@ namespace Rudz.Chess.Types
         /// </summary>
         /// <param name="index">the damn index</param>
         /// <returns>the Bit object if assigning</returns>
-        public BitBoard this[int index] {
+        public BitBoard this[int index]
+        {
             get => this.Get(index);
             set => Set(index); // TODO : Untested
         }
@@ -191,7 +192,7 @@ namespace Rudz.Chess.Types
             for (int i = 0; i < bbs.Length; ++i)
                 Value |= bbs[i].Value;
         }
-        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public IEnumerator<Square> GetEnumerator()
         {
@@ -208,10 +209,12 @@ namespace Rudz.Chess.Types
             const string seperator = "\n  +BB-+---+---+---+---+---+---+---+\n";
             const char splitter = '|';
             output.Append(seperator);
-            for (ERank rank = ERank.Rank8; rank >= ERank.Rank1; rank--) {
+            for (ERank rank = ERank.Rank8; rank >= ERank.Rank1; rank--)
+            {
                 output.Append((int)rank + 1);
                 output.Append(' ');
-                for (EFile file = EFile.FileA; file <= EFile.FileH; file++) {
+                for (EFile file = EFile.FileA; file <= EFile.FileH; file++)
+                {
                     output.Append(splitter);
                     output.Append(' ');
                     output.Append((Value & new Square(rank, file)) != 0 ? " 1 " : " . ");

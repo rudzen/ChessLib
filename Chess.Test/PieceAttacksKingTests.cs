@@ -39,7 +39,8 @@ namespace ChessLibTest
             const int attackIndex = 2;
 
             // special case, as the expected values vary depending on the kings location on the outer rim
-            foreach (Square pieceLocation in Bands[index]) {
+            foreach (Square pieceLocation in Bands[index])
+            {
                 BitBoard attacks = RegAttacks[attackIndex](pieceLocation);
                 int expected = (BoardCorners & pieceLocation) != 0 ? KingExpected[index] - 2 /* for corners */ : KingExpected[index];
                 Assert.AreEqual(expected, attacks.Count);
@@ -52,7 +53,8 @@ namespace ChessLibTest
             const int index = (int)EBands.Beta;
             const int attackIndex = 2;
 
-            foreach (Square pieceLocation in Bands[index]) {
+            foreach (Square pieceLocation in Bands[index])
+            {
                 BitBoard attacks = RegAttacks[attackIndex](pieceLocation);
                 Assert.AreEqual(KingExpected[index], attacks.Count);
             }
@@ -64,7 +66,8 @@ namespace ChessLibTest
             const int index = (int)EBands.Gamma;
             const int attackIndex = 2;
 
-            foreach (Square pieceLocation in Bands[index]) {
+            foreach (Square pieceLocation in Bands[index])
+            {
                 BitBoard attacks = RegAttacks[attackIndex](pieceLocation);
                 Assert.AreEqual(KingExpected[index], attacks.Count);
             }
@@ -76,7 +79,8 @@ namespace ChessLibTest
             const int index = (int)EBands.Delta;
             const int attackIndex = 2;
 
-            foreach (Square pieceLocation in Bands[index]) {
+            foreach (Square pieceLocation in Bands[index])
+            {
                 BitBoard attacks = RegAttacks[attackIndex](pieceLocation);
                 Assert.AreEqual(KingExpected[index], attacks.Count);
             }

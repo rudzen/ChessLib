@@ -26,9 +26,9 @@ SOFTWARE.
 
 namespace ChessLibTest
 {
-    using System;
     using Rudz.Chess;
     using Rudz.Chess.Types;
+    using System;
 
     public abstract class PieceAttacksSliders : PieceAttacks
     {

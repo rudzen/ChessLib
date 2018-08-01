@@ -31,7 +31,9 @@ namespace Rudz.Chess.Exceptions
 
     public class InvalidSquareException : InvalidOperationException
     {
-        public InvalidSquareException() { }
+        public InvalidSquareException()
+        {
+        }
 
         public InvalidSquareException(string message)
             : base(message) { }

@@ -1,4 +1,4 @@
-﻿﻿/*
+﻿/*
 ChessLib, a chess data structure library
 
 MIT License
@@ -26,10 +26,10 @@ SOFTWARE.
 
 namespace ChessLibTest
 {
-    using System;
     using NUnit.Framework;
     using Rudz.Chess;
     using Rudz.Chess.Types;
+    using System;
 
     [TestFixture]
     public abstract class PieceAttacksRegular : PieceAttacks

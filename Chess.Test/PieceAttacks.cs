@@ -50,7 +50,7 @@ namespace ChessLibTest
 
         /*
          * Patterns
-         * 
+         *
          * Alpha:               Beta:
          * X X X X X X X X      0 0 0 0 0 0 0 0
          * X 0 0 0 0 0 0 X      0 X X X X X X 0
@@ -60,7 +60,7 @@ namespace ChessLibTest
          * X 0 0 0 0 0 0 X      0 X 0 0 0 0 X 0
          * X 0 0 0 0 0 0 X      0 X X X X X X 0
          * X X X X X X X X      0 0 0 0 0 0 0 0
-         * 
+         *
          * Gamma:               Delta:
          * 0 0 0 0 0 0 0 0      0 0 0 0 0 0 0 0
          * 0 0 0 0 0 0 0 0      0 0 0 0 0 0 0 0
@@ -70,8 +70,9 @@ namespace ChessLibTest
          * 0 0 X X X X 0 0      0 0 0 0 0 0 0 0
          * 0 0 0 0 0 0 0 0      0 0 0 0 0 0 0 0
          * 0 0 0 0 0 0 0 0      0 0 0 0 0 0 0 0
-         * 
+         *
          */
+
         protected static readonly BitBoard[] Bands =
             {
                 0xff818181818181ff, 0x7e424242427e00, 0x3c24243c0000, 0x1818000000

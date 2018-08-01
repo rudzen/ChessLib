@@ -26,15 +26,15 @@ SOFTWARE.
 
 namespace ChessLibTest
 {
-    using System.Collections.Generic;
     using NUnit.Framework;
     using Rudz.Chess;
     using Rudz.Chess.Enums;
     using Rudz.Chess.Types;
+    using System.Collections.Generic;
 
     [TestFixture]
-    public class FoolsCheckMateTests {
-        
+    public class FoolsCheckMateTests
+    {
         [Test]
         public void FoolsCheckMateTest()
         {

@@ -32,15 +32,10 @@ namespace Rudz.Chess.Enums
     public enum EPieceValue
     {
         Pawn = 100,
-
         Knight = 300,
-
         Bishop = 300,
-
         Rook = 500,
-
         Queen = 1000,
-
         King = 0
     }
 }

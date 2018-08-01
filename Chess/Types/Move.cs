@@ -26,9 +26,9 @@ SOFTWARE.
 
 namespace Rudz.Chess.Types
 {
+    using Enums;
     using System;
     using System.Runtime.CompilerServices;
-    using Enums;
 
     /// <summary>
     /// Move struct. Contains a single int for move related information.
@@ -58,7 +58,7 @@ namespace Rudz.Chess.Types
         #region ctors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Move"/> struct. 
+        /// Initializes a new instance of the <see cref="Move"/> struct.
         /// Neccesary extra constructor as it can sometimes be required to only created a basic move.
         /// </summary>
         /// <param name="from">The from square/// </param>
@@ -71,7 +71,7 @@ namespace Rudz.Chess.Types
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Move"/> struct. 
+        /// Initializes a new instance of the <see cref="Move"/> struct.
         /// Constructor for capture moves
         /// </summary>
         /// <param name="piece">The moving piece</param>
@@ -88,7 +88,7 @@ namespace Rudz.Chess.Types
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Move"/> struct. 
+        /// Initializes a new instance of the <see cref="Move"/> struct.
         /// Constructor mainly for use with UI quiet move generation.
         /// It contains implicit no capture piece or promotion piece.
         /// Type is implicit Quiet.
@@ -104,7 +104,7 @@ namespace Rudz.Chess.Types
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Move"/> struct. 
+        /// Initializes a new instance of the <see cref="Move"/> struct.
         /// Constructor for capture+promotion moves
         /// </summary>
         /// <param name="piece">The moving piece</param>
@@ -117,7 +117,7 @@ namespace Rudz.Chess.Types
             : this(piece, captured, from, to, type) => SetPromotedPiece(promotedEPiece);
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Move"/> struct. 
+        /// Initializes a new instance of the <see cref="Move"/> struct.
         /// Constructor for quiet promotion moves
         /// </summary>
         /// <param name="piece">The moving piece</param>
@@ -136,7 +136,8 @@ namespace Rudz.Chess.Types
         private Move(int data) => _data = data;
 
         // ReSharper disable once ConvertToAutoPropertyWhenPossible
-        public int Data {
+        public int Data
+        {
             get => _data;
             set => _data = value;
         }
@@ -144,7 +145,7 @@ namespace Rudz.Chess.Types
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator Move(string value) => new Move(new Square(value[1] - '1', value[0] - 'a'), new Square(value[3] - '1', value[2] - 'a'));
 
-        #endregion
+        #endregion ctors
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator ==(Move left, Move right) => left.Equals(right);
@@ -169,7 +170,7 @@ namespace Rudz.Chess.Types
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetToSquare(Square square) => _data |= square.ToInt();
 
-        #endregion
+        #endregion Squares (From/To)
 
         #region Moving Piece
 
@@ -182,7 +183,7 @@ namespace Rudz.Chess.Types
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public EPieceType GetMovingPieceType() => GetMovingPiece().Type();
 
-        #endregion
+        #endregion Moving Piece
 
         #region Captured Piece
 
@@ -195,7 +196,7 @@ namespace Rudz.Chess.Types
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetCapturedPiece(Piece piece) => _data |= piece.ToInt() << CapturePieceOffset;
 
-        #endregion
+        #endregion Captured Piece
 
         #region Promotion
 
@@ -208,7 +209,7 @@ namespace Rudz.Chess.Types
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool IsQueenPromotion() => IsPromotionMove() && GetPromotedPiece().Type() == EPieceType.Queen;
 
-        #endregion
+        #endregion Promotion
 
         #region Moving Side
 
@@ -218,7 +219,7 @@ namespace Rudz.Chess.Types
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int GetSideMask() => GetMovingSide() << 0x3;
 
-        #endregion
+        #endregion Moving Side
 
         #region Type
 
@@ -246,7 +247,7 @@ namespace Rudz.Chess.Types
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool IsDoublePush() => (GetMoveType() & EMoveType.Doublepush) != 0;
 
-        #endregion
+        #endregion Type
 
         #region Validation
 
@@ -256,7 +257,7 @@ namespace Rudz.Chess.Types
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool IsValidMove() => GetFromSquare().ToInt() != GetToSquare().ToInt();
 
-        #endregion
+        #endregion Validation
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public object Clone() => new Move(_data);

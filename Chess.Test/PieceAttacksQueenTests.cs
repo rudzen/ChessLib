@@ -38,7 +38,8 @@ namespace ChessLibTest
             const int index = (int)EBands.Alpha;
             const int sliderIndex = 2;
 
-            foreach (Square pieceLocation in Bands[index]) {
+            foreach (Square pieceLocation in Bands[index])
+            {
                 BitBoard attacks = SlideAttacks[sliderIndex](pieceLocation, EmptyBoard);
                 Assert.AreEqual(BishopExpected[index] + RookExpected[index], attacks.Count);
             }
@@ -50,7 +51,8 @@ namespace ChessLibTest
             const int index = (int)EBands.Beta;
             const int sliderIndex = 2;
 
-            foreach (Square pieceLocation in Bands[index]) {
+            foreach (Square pieceLocation in Bands[index])
+            {
                 BitBoard attacks = SlideAttacks[sliderIndex](pieceLocation, EmptyBoard);
                 Assert.AreEqual(BishopExpected[index] + RookExpected[index], attacks.Count);
             }
@@ -62,7 +64,8 @@ namespace ChessLibTest
             const int index = (int)EBands.Gamma;
             const int sliderIndex = 2;
 
-            foreach (Square pieceLocation in Bands[index]) {
+            foreach (Square pieceLocation in Bands[index])
+            {
                 BitBoard attacks = SlideAttacks[sliderIndex](pieceLocation, EmptyBoard);
                 Assert.AreEqual(BishopExpected[index] + RookExpected[index], attacks.Count);
             }
@@ -73,7 +76,8 @@ namespace ChessLibTest
         {
             const int index = (int)EBands.Delta;
             const int sliderIndex = 2;
-            foreach (Square pieceLocation in Bands[index]) {
+            foreach (Square pieceLocation in Bands[index])
+            {
                 BitBoard attacks = SlideAttacks[sliderIndex](pieceLocation, EmptyBoard);
                 Assert.AreEqual(BishopExpected[index] + RookExpected[index], attacks.Count);
             }

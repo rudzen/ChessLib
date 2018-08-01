@@ -18,6 +18,5 @@
             vals.Add(119060324);
             Positions.Add(new PerftPositions("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", vals));
         }
-
     }
 }
