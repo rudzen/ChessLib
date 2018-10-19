@@ -29,6 +29,7 @@ namespace Rudz.Chess.Fen
     using Enums;
     using Extensions;
     using Properties;
+    using System;
     using System.Runtime.CompilerServices;
     using System.Text;
     using System.Text.RegularExpressions;
@@ -50,9 +51,9 @@ namespace Rudz.Chess.Fen
 
         private const int SeperatorCount = 7;
 
-        private static readonly Regex ValidFenRegex = new Regex(
-            string.Format(@"^ \s* {0}/{0}/{0}/{0}/{0}/{0}/{0}/{0} \s+ (?:w|b) \s+ (?:[KkQq]+|\-) \s+ (?:[a-h][1-8]|\-) \s+ \d+ \s+ \d+ \s* $", FenRankRegexSnippet),
-            RegexOptions.Compiled | RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline);
+        private static readonly Lazy<Regex> ValidFenRegex = new Lazy<Regex>(() => new Regex(
+           string.Format(@"^ \s* {0}/{0}/{0}/{0}/{0}/{0}/{0}/{0} \s+ (?:w|b) \s+ (?:[KkQq]+|\-) \s+ (?:[a-h][1-8]|\-) \s+ \d+ \s+ \d+ \s* $", FenRankRegexSnippet),
+           RegexOptions.Compiled | RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline));
 
         /// <summary>
         /// Parses the board layout to a FEN representaion..
@@ -157,7 +158,7 @@ namespace Rudz.Chess.Fen
 
             string f = fen.Trim();
 
-            return f.Length <= MaxFenLen && CountValidity(f) && ValidFenRegex.IsMatch(fen) && CountPieceValidity(f);
+            return f.Length <= MaxFenLen && CountValidity(f) && ValidFenRegex.Value.IsMatch(fen) && CountPieceValidity(f);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
