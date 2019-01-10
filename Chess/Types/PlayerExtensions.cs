@@ -24,6 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using System;
+
 namespace Rudz.Chess.Types
 {
     using Enums;
@@ -46,6 +48,8 @@ namespace Rudz.Chess.Types
 
         private static readonly string[] PlayerColors;
 
+        private static readonly Func<BitBoard, BitBoard>[] PawnPushModifiers;
+
         static PlayerExtensions()
         {
             White = 0;
@@ -55,6 +59,7 @@ namespace Rudz.Chess.Types
             PawnWestAttackDist = new Direction[] { EDirection.NorthEast, EDirection.SouthEast };
             PawnEastAttackDist = new Direction[] { EDirection.NorthWest, EDirection.SouthWest };
             PlayerColors = new[] { "White", "Black" };
+            PawnPushModifiers = new Func<BitBoard, BitBoard>[] { BitBoards.NorthOne, BitBoards.SouthOne };
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -80,5 +85,8 @@ namespace Rudz.Chess.Types
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Direction PawnEastAttackDistance(this Player player) => PawnEastAttackDist[player.Side];
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static BitBoard PawnPush(this Player player, BitBoard bitBoard) => PawnPushModifiers[player.Side](bitBoard);
     }
 }

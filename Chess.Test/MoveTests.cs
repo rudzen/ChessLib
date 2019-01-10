@@ -118,8 +118,8 @@ namespace Chess.Tests
         {
             StringBuilder sb = new StringBuilder(256);
 
-            IList<Move> moves = new List<Move>(128);
-            IList<Movestrings> movesString = new List<Movestrings>(128);
+            List<Move> moves = new List<Move>(128);
+            List<Movestrings> movesString = new List<Movestrings>(128);
 
             Game game = new Game();
 
@@ -165,7 +165,7 @@ namespace Chess.Tests
             StringBuilder result = new StringBuilder(1024 * 16);
             StringBuilder expected = new StringBuilder(1024 * 16);
 
-            IList<Move> moves = new List<Move>(256);
+            List<Move> moves = new List<Move>(256);
 
             Random rngeezuz = new Random(DateTime.Now.Millisecond);
 

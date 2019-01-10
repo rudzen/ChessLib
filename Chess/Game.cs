@@ -281,10 +281,10 @@ namespace Rudz.Chess
             string first = string.Empty;
             string second = string.Empty;
 
-            IList<string> moveCounters = fen.Fen.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            var moveCounters = fen.Fen.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
-            first = moveCounters[moveCounters.Count - 2];
-            second = moveCounters[moveCounters.Count - 1];
+            first = moveCounters[moveCounters.Length - 2];
+            second = moveCounters[moveCounters.Length - 1];
 
             second.ToIntegral(out int number);
 
@@ -569,7 +569,7 @@ namespace Rudz.Chess
             }
 
             // List to gather functions for castleling rights addition.
-            IList<Action> castleFunctions = new List<Action>(4);
+            List<Action> castleFunctions = new List<Action>(4);
 
             while (fen.Get() != 0 && fen.Get() != ' ')
             {

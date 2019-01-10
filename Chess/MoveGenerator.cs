@@ -38,8 +38,6 @@ namespace Rudz.Chess
     {
         private static readonly ConcurrentDictionary<ulong, List<Move>> Table;
 
-        private readonly Func<BitBoard, BitBoard>[] _pawnPush = { BitBoards.NorthOne, BitBoards.SouthOne };
-
         // to be replaced
         private readonly Func<BitBoard, BitBoard>[] _pawnAttacksWest = { BitBoards.NorthEastOne, BitBoards.SouthEastOne };
 
@@ -111,9 +109,9 @@ namespace Rudz.Chess
                 GCSettings.LatencyMode = GCLatencyMode.LowLatency;
                 GenerateCapturesAndPromotions(moves);
                 GenerateQuietMoves(moves);
-                GCSettings.LatencyMode = GCLatencyMode.Interactive;
                 Moves = moves;
                 Table.TryAdd(Key, moves);
+                GCSettings.LatencyMode = GCLatencyMode.Interactive;
             }
         }
 
@@ -246,7 +244,7 @@ namespace Rudz.Chess
 
             BitBoard pawns = Position.Pieces(EPieceType.Pawn, currentSide);
 
-            AddPawnMoves(moves, _pawnPush[currentSide.Side](pawns & currentSide.Rank7()) & ~_occupied, currentSide.PawnPushDistance(), EMoveType.Quiet);
+            AddPawnMoves(moves, currentSide.PawnPush(pawns & currentSide.Rank7()) & ~_occupied, currentSide.PawnPushDistance(), EMoveType.Quiet);
             AddPawnMoves(moves, _pawnAttacksWest[currentSide.Side](pawns) & occupiedByThem, currentSide.PawnWestAttackDistance(), EMoveType.Capture);
             AddPawnMoves(moves, _pawnAttacksEast[currentSide.Side](pawns) & occupiedByThem, currentSide.PawnEastAttackDistance(), EMoveType.Capture);
             AddPawnMoves(moves, _pawnAttacksWest[currentSide.Side](pawns) & EnPassantSquare, currentSide.PawnWestAttackDistance(), EMoveType.Epcapture);
@@ -264,9 +262,9 @@ namespace Rudz.Chess
                 }
 
             BitBoard notOccupied = ~_occupied;
-            BitBoard pushed = _pawnPush[currentSide.Side](Position.Pieces(EPieceType.Pawn, currentSide).Value & ~currentSide.Rank7()) & notOccupied;
+            BitBoard pushed = currentSide.PawnPush(Position.Pieces(EPieceType.Pawn, currentSide).Value & ~currentSide.Rank7()) & notOccupied;
             AddPawnMoves(moves, pushed.Value, currentSide.PawnPushDistance(), EMoveType.Quiet);
-            AddPawnMoves(moves, _pawnPush[currentSide.Side](pushed.Value & currentSide.Rank3()) & notOccupied, currentSide.PawnDoublePushDistance(), EMoveType.Doublepush);
+            AddPawnMoves(moves,  currentSide.PawnPush(pushed.Value & currentSide.Rank3()) & notOccupied, currentSide.PawnDoublePushDistance(), EMoveType.Doublepush);
             AddMoves(moves, notOccupied);
         }
 
