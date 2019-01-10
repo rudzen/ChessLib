@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2018 Rudy Alex Kohn
+Copyright (c) 2017-2019 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -40,18 +40,22 @@ namespace Rudz.Chess.Types
     /// </summary>
     public static class MoveExtensions
     {
-        public static readonly Move EmptyMove = new Move();
+        public static readonly Move EmptyMove;
 
-        private static readonly Dictionary<EMoveNotation, Func<Move, State, string>> NotationFuncs;
+        private static readonly Dictionary<EMoveNotation, Func<Move, MoveGenerator, string>> NotationFuncs;
 
-        static MoveExtensions() => NotationFuncs = new Dictionary<EMoveNotation, Func<Move, State, string>>
-                                                       {
-                                                           { EMoveNotation.Fan, ToFan },
-                                                           { EMoveNotation.San, ToSan },
-                                                           { EMoveNotation.Lan, ToLan },
-                                                           { EMoveNotation.Ran, ToRan },
-                                                           { EMoveNotation.Uci, ToUci }
-                                                       };
+        static MoveExtensions()
+        {
+            EmptyMove = new Move();
+            NotationFuncs = new Dictionary<EMoveNotation, Func<Move, MoveGenerator, string>>
+            {
+                {EMoveNotation.Fan, ToFan},
+                {EMoveNotation.San, ToSan},
+                {EMoveNotation.Lan, ToLan},
+                {EMoveNotation.Ran, ToRan},
+                {EMoveNotation.Uci, ToUci}
+            };
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string ToNotation(this Move move, State state, EMoveNotation notation = EMoveNotation.Fan)
@@ -59,7 +63,7 @@ namespace Rudz.Chess.Types
             if (move.IsNullMove())
                 return "(none)";
 
-            if (!NotationFuncs.TryGetValue(notation, out Func<Move, State, string> func))
+            if (!NotationFuncs.TryGetValue(notation, out Func<Move, MoveGenerator, string> func))
                 throw new InvalidMoveException("Invalid move notation detected.");
 
             return func(move, state);
@@ -68,7 +72,7 @@ namespace Rudz.Chess.Types
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static (bool, Move) Locate(this Move move, Game game)
         {
-            // force position to contain the latests moves for the position moves to be searched in
+            // force position to contain the latest moves for the position moves to be searched in
             game.State.GenerateMoves();
 
             var element = game.State.Moves.FirstOrDefault(x => x.GetFromSquare() == move.GetFromSquare() && x.GetToSquare() == move.GetToSquare());
@@ -83,16 +87,16 @@ namespace Rudz.Chess.Types
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static string ToUci(Move move, State state = null) => move.ToString();
+        private static string ToUci(Move move, MoveGenerator moveGenerator = null) => move.ToString();
 
         /// <summary>
         /// <para>Converts a move to FAN notation.</para>
         /// </summary>
         /// <param name="move">The move to convert</param>
-        /// <param name="state">The position from where the move exist</param>
+        /// <param name="moveGenerator"></param>
         /// <returns>FAN move string</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static string ToFan(Move move, State state)
+        private static string ToFan(Move move, MoveGenerator moveGenerator)
         {
             Square from = move.GetFromSquare();
             Square to = move.GetToSquare();
@@ -101,7 +105,7 @@ namespace Rudz.Chess.Types
 
             if (move.IsCastlelingMove())
             {
-                notation.Append(to < from ? "O-O-O" : "O-O");
+                notation.Append(CastlelingExtensions.GetCastlelingString(to, from));
             }
             else
             {
@@ -114,9 +118,9 @@ namespace Rudz.Chess.Types
                     // Disambiguation.
                     // if we have more then one piece with destination 'to'
                     // note that for pawns is not needed because starting file is explicit.
-                    BitBoard simularTypeAttacks = move.GetSimularAttacks(state);
+                    BitBoard similarTypeAttacks = move.GetSimilarAttacks(moveGenerator.Position);
 
-                    (bool ambiguousMove, bool ambiguousFile, bool ambiguousRank) = move.Ambiguity(ref simularTypeAttacks, state);
+                    (bool ambiguousMove, bool ambiguousFile, bool ambiguousRank) = move.Ambiguity(ref similarTypeAttacks, moveGenerator.Position);
 
                     if (ambiguousMove)
                         if (!ambiguousFile)
@@ -124,7 +128,7 @@ namespace Rudz.Chess.Types
                         else if (!ambiguousRank)
                             notation.Append(from.RankOfChar());
                         else
-                            notation.Append(from);
+                            notation.Append(from.ToString());
                 }
 
                 if (move.IsEnPassantMove())
@@ -139,7 +143,7 @@ namespace Rudz.Chess.Types
                     notation.Append('x');
                 }
 
-                notation.Append(to);
+                notation.Append(to.ToString());
 
                 if (move.IsPromotionMove())
                 {
@@ -148,9 +152,9 @@ namespace Rudz.Chess.Types
                 }
             }
 
-            if (!state.InCheck) return notation.ToString();
+            if (!moveGenerator.InCheck) return notation.ToString();
 
-            notation.Append(state.GetCheckChar());
+            notation.Append(moveGenerator.GetCheckChar());
             return notation.ToString();
         }
 
@@ -161,7 +165,7 @@ namespace Rudz.Chess.Types
         /// <param name="state">The position from where the move exist</param>
         /// <returns>SAN move string</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static string ToSan(this Move move, State state)
+        private static string ToSan(this Move move, MoveGenerator moveGenerator)
         {
             Square from = move.GetFromSquare();
             Square to = move.GetToSquare();
@@ -170,7 +174,7 @@ namespace Rudz.Chess.Types
 
             if (move.IsCastlelingMove())
             {
-                notation.Append(to < from ? "O-O-O" : "O-O");
+                notation.Append(CastlelingExtensions.GetCastlelingString(to, from));
             }
             else
             {
@@ -183,9 +187,9 @@ namespace Rudz.Chess.Types
                     // Disambiguation.
                     // if we have more then one piece with destination 'to'
                     // note that for pawns is not needed because starting file is explicit.
-                    BitBoard simularTypeAttacks = move.GetSimularAttacks(state);
+                    BitBoard simularTypeAttacks = move.GetSimilarAttacks(moveGenerator.Position);
 
-                    (bool ambiguousMove, bool ambiguousFile, bool ambiguousRank) = move.Ambiguity(ref simularTypeAttacks, state);
+                    (bool ambiguousMove, bool ambiguousFile, bool ambiguousRank) = move.Ambiguity(ref simularTypeAttacks, moveGenerator.Position);
 
                     if (ambiguousMove)
                     {
@@ -194,7 +198,7 @@ namespace Rudz.Chess.Types
                         else if (!ambiguousRank)
                             notation.Append(from.RankOfChar());
                         else
-                            notation.Append(from);
+                            notation.Append(from.ToString());
                     }
                 }
 
@@ -211,7 +215,7 @@ namespace Rudz.Chess.Types
                     notation.Append('x');
                 }
 
-                notation.Append(to);
+                notation.Append(to.ToString());
 
                 if (move.IsPromotionMove())
                 {
@@ -220,20 +224,20 @@ namespace Rudz.Chess.Types
                 }
             }
 
-            if (!state.InCheck)
+            if (!moveGenerator.InCheck)
                 return notation.ToString();
 
-            notation.Append(state.GetCheckChar());
+            notation.Append(moveGenerator.GetCheckChar());
             return notation.ToString();
         }
 
         /// <summary>
         /// <para>Converts a move to LAN notation.</para>
         /// </summary><param name="move">The move to convert</param>
-        /// <param name="position">The position from where the move exist</param>
+        /// <param name="moveGenerator"></param>
         /// <returns>LAN move string</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static string ToLan(Move move, MoveGenerator position)
+        private static string ToLan(Move move, MoveGenerator moveGenerator)
         {
             Square from = move.GetFromSquare();
             Square to = move.GetToSquare();
@@ -242,7 +246,7 @@ namespace Rudz.Chess.Types
 
             if (move.IsCastlelingMove())
             {
-                notation.Append(to < from ? "O-O-O" : "O-O");
+                notation.Append(CastlelingExtensions.GetCastlelingString(to, from));
             }
             else
             {
@@ -251,7 +255,7 @@ namespace Rudz.Chess.Types
                 if (pt != EPieceType.Pawn)
                     notation.Append(pt.GetPieceChar());
 
-                notation.Append(from);
+                notation.Append(from.ToString());
 
                 if (move.IsEnPassantMove())
                 {
@@ -270,7 +274,7 @@ namespace Rudz.Chess.Types
                     notation.Append('-');
                 }
 
-                notation.Append(to);
+                notation.Append(to.ToString());
 
                 if (move.IsPromotionMove())
                 {
@@ -279,10 +283,10 @@ namespace Rudz.Chess.Types
                 }
             }
 
-            if (!position.InCheck)
+            if (!moveGenerator.InCheck)
                 return notation.ToString();
 
-            notation.Append(position.GetCheckChar());
+            notation.Append(moveGenerator.GetCheckChar());
             return notation.ToString();
         }
 
@@ -290,10 +294,10 @@ namespace Rudz.Chess.Types
         /// <para>Converts a move to RAN notation.</para>
         /// </summary>
         /// <param name="move">The move to convert</param>
-        /// <param name="position">The position from where the move exist</param>
+        /// <param name="moveGenerator">The position from where the move exist</param>
         /// <returns>RAN move string</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static string ToRan(Move move, MoveGenerator position)
+        private static string ToRan(Move move, MoveGenerator moveGenerator)
         {
             Square from = move.GetFromSquare();
             Square to = move.GetToSquare();
@@ -302,7 +306,7 @@ namespace Rudz.Chess.Types
 
             if (move.IsCastlelingMove())
             {
-                notation.Append(to < from ? "O-O-O" : "O-O");
+                notation.Append(CastlelingExtensions.GetCastlelingString(to, from));
             }
             else
             {
@@ -311,7 +315,7 @@ namespace Rudz.Chess.Types
                 if (pt != EPieceType.Pawn)
                     notation.Append(pt.GetPieceChar());
 
-                notation.Append(from);
+                notation.Append(from.ToString());
 
                 if (move.IsEnPassantMove())
                 {
@@ -331,7 +335,7 @@ namespace Rudz.Chess.Types
                     notation.Append('-');
                 }
 
-                notation.Append(to);
+                notation.Append(to.ToString());
 
                 if (move.IsPromotionMove())
                 {
@@ -340,10 +344,10 @@ namespace Rudz.Chess.Types
                 }
             }
 
-            if (!position.InCheck)
+            if (!moveGenerator.InCheck)
                 return notation.ToString();
 
-            notation.Append(position.GetCheckChar());
+            notation.Append(moveGenerator.GetCheckChar());
             return notation.ToString();
         }
 
@@ -355,24 +359,24 @@ namespace Rudz.Chess.Types
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static (bool, bool, bool) Ambiguity(this Move move, ref BitBoard simularTypeAttacks, MoveGenerator moveGenerator)
+        private static (bool, bool, bool) Ambiguity(this Move move, ref BitBoard similarTypeAttacks, IPosition position)
         {
             bool ambiguousMove = false;
             bool ambiguousFile = false;
             bool ambiguousRank = false;
 
-            foreach (Square square in simularTypeAttacks)
+            foreach (Square square in similarTypeAttacks)
             {
-                BitBoard pinned = moveGenerator.ChessBoard.GetPinnedPieces(square, move.GetMovingSide());
+                BitBoard pinned = position.GetPinnedPieces(square, move.GetMovingSide());
 
-                if (simularTypeAttacks & pinned)
+                if (similarTypeAttacks & pinned)
                     continue;
 
-                if (move.GetMovingPieceType() != moveGenerator.ChessBoard.GetPieceType(square))
+                if (move.GetMovingPieceType() != position.GetPieceType(square))
                     continue;
 
                 // ReSharper disable once InvertIf
-                if (moveGenerator.ChessBoard.OccupiedBySide[move.GetMovingSide().Side] & square)
+                if (position.OccupiedBySide[move.GetMovingSide().Side] & square)
                 {
                     if (square.File() == move.GetFromSquare().File())
                         ambiguousFile = true;
@@ -387,7 +391,7 @@ namespace Rudz.Chess.Types
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static BitBoard GetSimularAttacks(this Move move, MoveGenerator position)
+        private static BitBoard GetSimilarAttacks(this Move move, Position position)
         {
             BitBoard resultBitBoard = 0;
 
@@ -397,7 +401,7 @@ namespace Rudz.Chess.Types
                 case EPieceType.Bishop:
                 case EPieceType.Rook:
                 case EPieceType.Queen:
-                    resultBitBoard |= move.GetToSquare().GetAttacks(move.GetMovingPieceType(), position.ChessBoard.Occupied);
+                    resultBitBoard |= move.GetToSquare().GetAttacks(move.GetMovingPieceType(), position.Occupied);
                     break;
 
                 case EPieceType.Knight:

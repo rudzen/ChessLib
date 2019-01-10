@@ -1,10 +1,12 @@
-﻿namespace Perft
-{
-    using Rudz.Chess;
-    using Rudz.Chess.Extensions;
-    using System;
-    using System.Diagnostics;
+﻿
+using System;
+using System.Diagnostics;
+using Perft;
+using Rudz.Chess;
+using Rudz.Chess.Extensions;
 
+namespace PerftCore
+{
     public partial class Perft
     {
         public static void Main(string[] args)
@@ -31,9 +33,12 @@
 
             Console.WriteLine($"Time (ms)  : {elapsedMs}");
             Console.WriteLine($"Nps        : {1000 * result / (ulong)elapsedMs}");
-            Console.WriteLine(Positions[0].value[depth - 1] == result
+            Console.WriteLine(global::Perft.Perft.Positions[0].value[depth - 1] == result
                 ? "Move count matches!"
                 : "Move count failed!");
+
+            Console.WriteLine("Press any key to exit.");
+            Console.ReadKey();
         }
 
         private Perft(int depth) => _perftLimit = depth;
@@ -52,7 +57,7 @@
         {
             Game game = new Game();
             ulong total = 0;
-            foreach (PerftPositions perftPositions in Positions)
+            foreach (PerftPositions perftPositions in global::Perft.Perft.Positions)
             {
                 game.SetFen(perftPositions.fen);
                 ulong res = game.Perft(_perftLimit);

@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2018 Rudy Alex Kohn
+Copyright (c) 2017-2019 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,20 +24,20 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace ChessLibTest
+using Rudz.Chess;
+using Rudz.Chess.Enums;
+using Rudz.Chess.Types;
+
+namespace Chess.Tests
 {
-    using NUnit.Framework;
-    using Rudz.Chess;
-    using Rudz.Chess.Enums;
-    using Rudz.Chess.Types;
     using System;
     using System.Collections.Generic;
     using System.Text;
+    using Xunit;
 
-    [TestFixture]
     public class MoveTests
     {
-        [Test]
+        [Fact]
         public void TestSquares()
         {
             // test all squares, including invalid moves (same from and to)
@@ -45,7 +45,7 @@ namespace ChessLibTest
             {
                 Square expectedFrom = i;
                 int actualInt = expectedFrom.ToInt();
-                Assert.AreEqual(i, actualInt);
+                Assert.Equal(i, actualInt);
                 for (int j = 1 /* NOTE! from 1 !! */; j < 64; j++)
                 {
                     Square expectedTo = j;
@@ -53,24 +53,24 @@ namespace ChessLibTest
                     // on purpose.. creating the move in this loop
                     Move move = new Move(expectedFrom, expectedTo);
 
-                    Assert.IsFalse(move.IsNullMove());
+                    Assert.False(move.IsNullMove());
 
                     Square actualFrom = move.GetFromSquare();
                     Square actualTo = move.GetToSquare();
 
-                    Assert.AreEqual(expectedFrom, actualFrom);
-                    Assert.AreEqual(expectedTo, actualTo);
+                    Assert.Equal(expectedFrom, actualFrom);
+                    Assert.Equal(expectedTo, actualTo);
 
                     // valid move check, if from and to are the same, the move is "invalid"
                     if (i == j)
-                        Assert.IsFalse(move.IsValidMove());
+                        Assert.False(move.IsValidMove());
                     else
-                        Assert.IsTrue(move.IsValidMove());
+                        Assert.True(move.IsValidMove());
                 }
             }
         }
 
-        [Test]
+        [Fact]
         public void TestAllBasicMove()
         {
             Square expectedFrom = ESquare.a2;
@@ -93,27 +93,27 @@ namespace ChessLibTest
             EMoveType actualEMoveType = move.GetMoveType();
 
             // test promotion status
-            Assert.IsTrue(move.IsPromotionMove());
-            Assert.IsTrue(move.IsQueenPromotion());
+            Assert.True(move.IsPromotionMove());
+            Assert.True(move.IsQueenPromotion());
 
             // test squares
-            Assert.AreEqual(expectedFrom, actualFrom);
-            Assert.AreEqual(expectedTo, actualTo);
+            Assert.Equal(expectedFrom, actualFrom);
+            Assert.Equal(expectedTo, actualTo);
 
             // test pieces
-            Assert.AreEqual(expectedMovingPieceType, actualMovingEPieceType);
-            Assert.AreEqual(expectedMovingPiece, actualMovingPiece);
-            Assert.AreEqual(expectedCapturedPiece, actualCapturedPiece);
-            Assert.AreEqual(expectedPromotionPiece, actualPromotionPiece);
+            Assert.Equal(expectedMovingPieceType, actualMovingEPieceType);
+            Assert.Equal(expectedMovingPiece, actualMovingPiece);
+            Assert.Equal(expectedCapturedPiece, actualCapturedPiece);
+            Assert.Equal(expectedPromotionPiece, actualPromotionPiece);
 
             // move type
-            Assert.AreEqual(expectedMoveType, actualEMoveType);
-            Assert.IsFalse(move.IsCastlelingMove());
-            Assert.IsFalse(move.IsDoublePush());
-            Assert.IsFalse(move.IsEnPassantMove());
+            Assert.Equal(expectedMoveType, actualEMoveType);
+            Assert.False(move.IsCastlelingMove());
+            Assert.False(move.IsDoublePush());
+            Assert.False(move.IsEnPassantMove());
         }
 
-        [Test]
+        [Fact]
         public void MoveToStringTest()
         {
             StringBuilder sb = new StringBuilder(256);
@@ -138,8 +138,8 @@ namespace ChessLibTest
                     moves.Add(new Move(s1, s2));
                     tmp.Clear();
                     tmp.Append(' ');
-                    tmp.Append(s1);
-                    tmp.Append(s2);
+                    tmp.Append(s1.ToString());
+                    tmp.Append(s2.ToString());
                     movesString.Add(new Movestrings(tmp.ToString()));
                 }
             }
@@ -151,11 +151,11 @@ namespace ChessLibTest
                 result.Clear();
                 result.Append(' ');
                 game.MoveToString(moves[i], result);
-                Assert.AreEqual(result.ToString(), movesString[i].ToString());
+                Assert.Equal(result.ToString(), movesString[i].ToString());
             }
         }
 
-        [Test]
+        [Fact]
         public void MoveListToStringTest()
         {
             Game game = new Game();
@@ -177,8 +177,8 @@ namespace ChessLibTest
                 moves.Add(new Move(rndSquareFrom, rndSquareTo));
 
                 expected.Append(' ');
-                expected.Append(rndSquareFrom);
-                expected.Append(rndSquareTo);
+                expected.Append(rndSquareFrom.ToString());
+                expected.Append(rndSquareTo.ToString());
             }
 
             // generate a bitch string for them all.
@@ -188,7 +188,7 @@ namespace ChessLibTest
                 game.MoveToString(move, result);
             }
 
-            Assert.AreEqual(expected.ToString(), result.ToString());
+            Assert.Equal(expected.ToString(), result.ToString());
         }
 
         private struct Movestrings

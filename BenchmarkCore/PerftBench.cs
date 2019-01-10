@@ -1,7 +1,6 @@
 ﻿namespace BenchmarkCore
 {
     using BenchmarkDotNet.Attributes;
-    using Perft;
 
     [ClrJob(baseline: true), CoreJob, CoreRtJob]
     [RPlotExporter, RankColumn]

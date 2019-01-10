@@ -4,7 +4,7 @@
 
     public partial class Perft
     {
-        private static readonly IList<PerftPositions> Positions;
+        internal static readonly List<PerftPositions> Positions;
 
         static Perft()
         {

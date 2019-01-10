@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2018 Rudy Alex Kohn
+Copyright (c) 2017-2019 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,17 +24,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace ChessLibTest
-{
-    using NUnit.Framework;
-    using Rudz.Chess.Enums;
-    using Rudz.Chess.Types;
-    using System.Text;
 
-    [TestFixture]
+using Rudz.Chess.Enums;
+using Rudz.Chess.Types;
+
+namespace Chess.Tests
+{
+    using System.Text;
+    using Xunit;
+
     public class DataTests
     {
-        [Test]
+        [Fact]
         public void TestSquareChars()
         {
             StringBuilder chars = new StringBuilder(1024);
@@ -46,8 +47,8 @@ namespace ChessLibTest
                 strings.Clear();
                 chars.Append(sq.FileChar());
                 chars.Append(sq.RankOfChar());
-                strings.Append(sq);
-                Assert.AreEqual(chars.ToString(), strings.ToString());
+                strings.Append(sq.ToString());
+                Assert.Equal(chars.ToString(), strings.ToString());
             }
         }
     }

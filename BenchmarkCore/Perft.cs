@@ -1,13 +1,10 @@
-﻿using BenchmarkCore;
+﻿using System;
 using BenchmarkDotNet.Running;
+using Perft;
+using Rudz.Chess;
 
-namespace Perft
+namespace BenchmarkCore
 {
-    using Rudz.Chess;
-    using Rudz.Chess.Extensions;
-    using System;
-    using System.Diagnostics;
-
     public partial class Perft
     {
         public static void Main(string[] args)
@@ -55,9 +52,9 @@ namespace Perft
 
         public ulong DoPerft()
         {
-            Game game = new Game();
+            Rudz.Chess.Game game = new Game();
             ulong total = 0;
-            foreach (PerftPositions perftPositions in Positions)
+            foreach (PerftPositions perftPositions in global::Perft.Perft.Positions)
             {
                 game.SetFen(perftPositions.fen);
                 ulong res = game.Perft(_perftLimit);

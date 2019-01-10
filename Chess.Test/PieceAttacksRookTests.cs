@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2018 Rudy Alex Kohn
+Copyright (c) 2017-2019 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -25,17 +25,15 @@ SOFTWARE.
 */
 
 using Rudz.Chess.Enums;
+using Rudz.Chess.Types;
 
-namespace ChessLibTest
+namespace Chess.Tests
 {
-    using NUnit.Framework;
-    using Rudz.Chess;
-    using Rudz.Chess.Types;
+    using Xunit;
 
-    [TestFixture]
     public class PieceAttacksRookTests : PieceAttacksSliders
     {
-        [Test]
+        [Fact]
         public override void AlphaPattern()
         {
             const int index = (int)EBands.Alpha;
@@ -44,11 +42,11 @@ namespace ChessLibTest
             foreach (Square pieceLocation in Bands[index])
             {
                 BitBoard attacks = SlideAttacks[sliderIndex](pieceLocation, EmptyBoard);
-                Assert.AreEqual(RookExpected[index], attacks.Count);
+                Assert.Equal(RookExpected[index], attacks.Count);
             }
         }
 
-        [Test]
+        [Fact]
         public override void BetaPattern()
         {
             const int index = (int)EBands.Beta;
@@ -57,11 +55,11 @@ namespace ChessLibTest
             foreach (Square pieceLocation in Bands[index])
             {
                 BitBoard attacks = SlideAttacks[sliderIndex](pieceLocation, EmptyBoard);
-                Assert.AreEqual(RookExpected[index], attacks.Count);
+                Assert.Equal(RookExpected[index], attacks.Count);
             }
         }
 
-        [Test]
+        [Fact]
         public override void GammaPattern()
         {
             const int index = (int)EBands.Gamma;
@@ -70,11 +68,11 @@ namespace ChessLibTest
             foreach (Square pieceLocation in Bands[index])
             {
                 BitBoard attacks = SlideAttacks[sliderIndex](pieceLocation, EmptyBoard);
-                Assert.AreEqual(RookExpected[index], attacks.Count);
+                Assert.Equal(RookExpected[index], attacks.Count);
             }
         }
 
-        [Test]
+        [Fact]
         public override void DeltaPattern()
         {
             const int index = (int)EBands.Delta;
@@ -83,14 +81,14 @@ namespace ChessLibTest
             foreach (Square pieceLocation in Bands[index])
             {
                 BitBoard attacks = SlideAttacks[sliderIndex](pieceLocation, EmptyBoard);
-                Assert.AreEqual(RookExpected[index], attacks.Count);
+                Assert.Equal(RookExpected[index], attacks.Count);
             }
         }
 
         /// <summary>
         /// Testing results of blocked rook attacks, they should always return 7 on the sides, and 14 in the corner
         /// </summary>
-        [Test]
+        [Fact]
         public void RookBorderBlocked()
         {
             /*
@@ -119,8 +117,8 @@ namespace ChessLibTest
             foreach (Square square in border)
             {
                 BitBoard attacks = square.GetAttacks(EPieceType.Rook, borderInner);
-                Assert.IsFalse(attacks.Empty());
-                Assert.AreEqual(corners & square ? expectedCorner : expectedSide, attacks.Count);
+                Assert.False(attacks.Empty());
+                Assert.Equal(corners & square ? expectedCorner : expectedSide, attacks.Count);
             }
         }
     }

@@ -1,15 +1,15 @@
-﻿using System.Collections.Generic;
-
-namespace BenchmarkFramework
+﻿namespace BenchmarkFramework
 {
+    using System.Collections.Generic;
+
     public partial class Perft
     {
-        private static readonly IList<PerftPositions> Positions;
+        private static readonly List<PerftPositions> Positions;
 
         static Perft()
         {
             Positions = new List<PerftPositions>();
-            IList<ulong> vals = new List<ulong>(6);
+            List<ulong> vals = new List<ulong>(6);
             vals.Add(20);
             vals.Add(400);
             vals.Add(8902);

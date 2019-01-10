@@ -1,7 +1,8 @@
-﻿namespace Perft
+﻿using Rudz.Chess;
+using Rudz.Chess.Extensions;
+
+namespace Perft
 {
-    using Rudz.Chess;
-    using Rudz.Chess.Extensions;
     using System;
     using System.Diagnostics;
 
@@ -34,6 +35,9 @@
             Console.WriteLine(Positions[0].value[depth - 1] == result
                 ? "Move count matches!"
                 : "Move count failed!");
+
+            Console.WriteLine("Press any key to exit.");
+            Console.ReadKey();
         }
 
         private Perft(int depth) => _perftLimit = depth;

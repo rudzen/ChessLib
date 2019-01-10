@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2018 Rudy Alex Kohn
+Copyright (c) 2017-2019 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,28 +24,38 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using Rudz.Chess.Enums;
-
 namespace Rudz.Chess.Types
 {
+    using Enums;
     using Extensions;
     using System.Runtime.CompilerServices;
 
     public static class PlayerExtensions
     {
-        public static readonly Player White = 0;
+        public static readonly Player White;
 
-        public static readonly Player Black = 1;
+        public static readonly Player Black;
 
-        private static readonly Direction[] PawnPushDist = { EDirection.North, EDirection.South };
+        private static readonly Direction[] PawnPushDist;
 
-        private static readonly Direction[] PawnDoublePushDist = { EDirection.NorthDouble, EDirection.SouthDouble };
+        private static readonly Direction[] PawnDoublePushDist;
 
-        private static readonly Direction[] PawnWestAttackDist = { EDirection.NorthEast, EDirection.SouthEast };
+        private static readonly Direction[] PawnWestAttackDist;
 
-        private static readonly Direction[] PawnEastAttackDist = { EDirection.NorthWest, EDirection.SouthWest };
+        private static readonly Direction[] PawnEastAttackDist;
 
-        private static readonly string[] PlayerColors = { "White", "Black" };
+        private static readonly string[] PlayerColors;
+
+        static PlayerExtensions()
+        {
+            White = 0;
+            Black = 1;
+            PawnPushDist = new Direction[] { EDirection.North, EDirection.South };
+            PawnDoublePushDist = new Direction[] { EDirection.NorthDouble, EDirection.SouthDouble };
+            PawnWestAttackDist = new Direction[] { EDirection.NorthEast, EDirection.SouthEast };
+            PawnEastAttackDist = new Direction[] { EDirection.NorthWest, EDirection.SouthWest };
+            PlayerColors = new[] { "White", "Black" };
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsLegalPlayer(this Player player) => player.Side.InBetween(White.Side, Black.Side);

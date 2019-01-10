@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2018 Rudy Alex Kohn
+Copyright (c) 2017-2019 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -34,19 +34,26 @@ namespace Rudz.Chess.Types
     public static class SquareExtensions
     {
         // TODO : Add distance for files/ranks as well
-        private static readonly int[,] Distance = new int[64, 64]; // chebyshev distance
+        private static readonly int[,] Distance; // chebyshev distance
 
-        private static readonly char[] RankChars =
-            {
-                '1', '2', '3', '4', '5', '6', '7', '8'
-            };
+        private static readonly char[] RankChars;
 
-        private static readonly char[] FileChars =
-            {
-                'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'
-            };
+        private static readonly char[] FileChars;
 
-        private static readonly string[] SquareStrings =
+        private static readonly string[] SquareStrings;
+
+        // TODO : Replace with relative methods
+        private static readonly Square[,] Flip;
+
+        private static readonly Square[] RookCastlesTo; // indexed by position of the king
+
+        static SquareExtensions()
+        {
+            // Initialize arrays
+            Distance = new int[64, 64];
+            RankChars = new[] { '1', '2', '3', '4', '5', '6', '7', '8' };
+            FileChars = new[] { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' };
+            SquareStrings = new[]
             {
                 "a1", "b1", "c1", "d1", "e1", "f1", "g1", "h1",
                 "a2", "b2", "c2", "d2", "e2", "f2", "g2", "h2",
@@ -57,14 +64,9 @@ namespace Rudz.Chess.Types
                 "a7", "b7", "c7", "d7", "e7", "f7", "g7", "h7",
                 "a8", "b8", "c8", "d8", "e8", "f8", "g8", "h8"
             };
+            Flip = new Square[2, 64];
+            RookCastlesTo = new Square[64];
 
-        // TODO : Replace with relative methods
-        private static readonly Square[,] Flip = new Square[2, 64];
-
-        private static readonly Square[] RookCastlesTo = new Square[64]; // indexed by position of the king
-
-        static SquareExtensions()
-        {
             // generate square flipping array for both sides
             foreach (Square square in BitBoards.AllSquares)
             {

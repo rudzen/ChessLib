@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2018 Rudy Alex Kohn
+Copyright (c) 2017-2019 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,17 +24,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using System;
+using System.Runtime.CompilerServices;
+using System.Text;
+using System.Text.RegularExpressions;
+using Rudz.Chess.Enums;
+using Rudz.Chess.Extensions;
+using Rudz.Chess.Properties;
+using Rudz.Chess.Types;
+
 namespace Rudz.Chess.Fen
 {
-    using Enums;
-    using Extensions;
-    using Properties;
-    using System;
-    using System.Runtime.CompilerServices;
-    using System.Text;
-    using System.Text.RegularExpressions;
-    using Types;
-
     public static class Fen
     {
         public const string StartPositionFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
@@ -62,13 +62,14 @@ namespace Rudz.Chess.Fen
         /// <param name="state">
         /// The position class which contains relevant information about the status of the board.
         /// </param>
+        /// <param name="boardLayout"></param>
         /// <param name="halfMoveCount">
         /// The half Move Count.
         /// </param>
         /// <returns>
         /// The FenData which contains the fen string that was generated.
         /// </returns>
-        public static FenData GenerateFen([NotNull] this State state, int halfMoveCount)
+        public static FenData GenerateFen([NotNull] this State state, Piece[] boardLayout, int halfMoveCount)
         {
             StringBuilder sv = new StringBuilder(MaxFenLen);
 
@@ -76,10 +77,10 @@ namespace Rudz.Chess.Fen
             {
                 int empty = 0;
 
-                for (EFile file = EFile.FileA; file <= EFile.FileH; file++)
+                for (EFile file = EFile.FileA; file < EFile.FileNb; file++)
                 {
                     Square square = new Square(rank, file);
-                    Piece piece = state.ChessBoard.BoardLayout[square.ToInt()];
+                    Piece piece = boardLayout[square.ToInt()];
 
                     if (piece.IsNoPiece())
                     {
@@ -131,7 +132,7 @@ namespace Rudz.Chess.Fen
             if (state.EnPassantSquare.Empty())
                 sv.Append('-');
             else
-                sv.Append(state.EnPassantSquare.First());
+                sv.Append(state.EnPassantSquare.First().ToString());
 
             sv.Append(' ');
 

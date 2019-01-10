@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2018 Rudy Alex Kohn
+Copyright (c) 2017-2019 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,17 +24,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+
+using Rudz.Chess;
 using Rudz.Chess.Fen;
 
-namespace ChessLibTest
+namespace Chess.Tests
 {
-    using NUnit.Framework;
-    using Rudz.Chess;
+    using Xunit;
 
-    [TestFixture]
     public class FenTests
     {
-        [Test]
+        [Fact]
         public void SetFenTest()
         {
             FenError expected = new FenError(0, 0);
@@ -43,10 +43,10 @@ namespace ChessLibTest
 
             FenError actual = game.NewGame();
 
-            Assert.AreEqual(expected, actual);
+            Assert.Equal(expected, actual);
         }
 
-        [Test]
+        [Fact]
         public void GetFenTest()
         {
             Game game = new Game();
@@ -56,13 +56,13 @@ namespace ChessLibTest
             FenError actualError = game.NewGame();
 
             // verify no errors given (same as SetFen test)
-            Assert.AreEqual(expectedError, actualError);
+            Assert.Equal(expectedError, actualError);
 
             FenData expectedFen = new FenData(Fen.StartPositionFen);
 
             FenData actualFen = game.GetFen();
 
-            Assert.AreEqual(expectedFen, actualFen);
+            Assert.Equal(expectedFen, actualFen);
         }
     }
 }

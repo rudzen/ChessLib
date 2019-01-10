@@ -1,7 +1,7 @@
-﻿using BenchmarkDotNet.Attributes;
-
-namespace BenchmarkFramework
+﻿namespace BenchmarkFramework
 {
+    using BenchmarkDotNet.Attributes;
+
     //[ClrJob(baseline: true), CoreJob, CoreRtJob]
     [RPlotExporter, RankColumn]
     public class PerftBench

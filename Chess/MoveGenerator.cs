@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2018 Rudy Alex Kohn
+Copyright (c) 2017-2019 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -27,7 +27,6 @@ SOFTWARE.
 namespace Rudz.Chess
 {
     using Enums;
-    using Properties;
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
@@ -35,11 +34,8 @@ namespace Rudz.Chess
     using System.Runtime.CompilerServices;
     using Types;
 
-    public class MoveGenerator : IMoveGenerator
+    public class MoveGenerator
     {
-        [NotNull]
-        public readonly ChessBoard ChessBoard;
-
         private static readonly ConcurrentDictionary<ulong, List<Move>> Table;
 
         private readonly Func<BitBoard, BitBoard>[] _pawnPush = { BitBoards.NorthOne, BitBoards.SouthOne };
@@ -64,11 +60,11 @@ namespace Rudz.Chess
             AppDomain.CurrentDomain.ProcessExit += Clean;
         }
 
-        protected MoveGenerator(ChessBoard chessBoard)
+        protected internal MoveGenerator(Position position)
         {
-            ChessBoard = chessBoard;
-            _bitboardPieces = chessBoard.BoardPieces;
-            _occupiedBySide = chessBoard.OccupiedBySide;
+            Position = position;
+            _bitboardPieces = position.BoardPieces;
+            _occupiedBySide = position.OccupiedBySide;
         }
 
         public int CastlelingRights { get; set; }
@@ -85,7 +81,9 @@ namespace Rudz.Chess
 
         public Emgf Flags { get; set; } = Emgf.Legalmoves;
 
-        public IList<Move> Moves { get; private set; }
+        public List<Move> Moves { get; private set; }
+
+        public Position Position { get; set; }
 
         public static void ClearMoveCache()
         {
@@ -94,11 +92,11 @@ namespace Rudz.Chess
 
         public void GenerateMoves(bool force = false)
         {
-            // Align current structure to chessboard.
+            // Align current structure to position.
             Reset(MoveExtensions.EmptyMove);
 
             // this is only preparation for true engine integration (not used yet)
-            if (Flags.HasFlag(Emgf.Stages))
+            if ((Flags & Emgf.Stages) != 0)
                 return;
 
             if (Table.ContainsKey(Key) && !force)
@@ -132,13 +130,15 @@ namespace Rudz.Chess
             if (!InCheck && piece.Type() != EPieceType.King && (Pinned & from).Empty() && (type & EMoveType.Epcapture) == 0)
                 return true;
 
-            ChessBoard.IsProbing = true;
-            ChessBoard.MakeMove(move);
-            bool opponentAttacking = ChessBoard.IsAttacked(ChessBoard.KingSquares[SideToMove.Side], ~SideToMove);
-            ChessBoard.TakeMove(move);
-            ChessBoard.IsProbing = false;
+            Position.IsProbing = true;
+            Position.MakeMove(move);
+            bool opponentAttacking = Position.IsAttacked(Position.KingSquares[SideToMove.Side], ~SideToMove);
+            Position.TakeMove(move);
+            Position.IsProbing = false;
             return !opponentAttacking;
         }
+
+        public bool IsLegal(Move move) => IsLegal(move, move.GetMovingPiece(), move.GetFromSquare(), move.GetMoveType());
 
         /// <summary>
         /// <para>"Validates" a move basic on simple logic. For example if a piece actually exists thats being moves etc.</para>
@@ -157,12 +157,23 @@ namespace Rudz.Chess
             if (move.IsCastlelingMove())
             {
                 // TODO : Basic castleling verification
+                if (CanCastle(move.GetFromSquare() < to ? ECastleling.Short : ECastleling.Long))
+                {
+                    return true;
+                }
+                MoveGenerator mg = new MoveGenerator(Position);
+                mg.GenerateMoves();
+                return mg.Moves.Contains(move);
             }
             else if (move.IsEnPassantMove())
             {
-                Player opponent = ~move.GetMovingSide();
-
                 // TODO : En-passant here
+
+                // TODO : Test with unit test
+                Player opponent = ~move.GetMovingSide();
+                var esq = EnPassantSquare.First();
+                if (esq.PawnAttack(opponent) & Position.Pieces(EPieceType.Pawn, opponent))
+                    return true;
             }
             else if (move.IsCaptureMove())
             {
@@ -204,7 +215,7 @@ namespace Rudz.Chess
         }
 
         /// <summary>
-        /// Aligns the current positional data to the chessboards data.
+        /// Aligns the current positional data to the position data.
         /// </summary>
         /// <param name="move">Not used atm, but for future library completion</param>
         private void Reset(Move move)
@@ -216,11 +227,11 @@ namespace Rudz.Chess
                 flags &= ~Emgf.Stages;
 
             if ((flags & Emgf.Legalmoves) != 0)
-                Pinned = ChessBoard.GetPinnedPieces(ChessBoard.KingSquares[SideToMove.Side], SideToMove);
+                Pinned = Position.GetPinnedPieces(Position.KingSquares[SideToMove.Side], SideToMove);
 
-            _occupied = ChessBoard.Occupied;
-            _occupiedBySide = ChessBoard.OccupiedBySide;
-            _bitboardPieces = ChessBoard.BoardPieces;
+            _occupied = Position.Occupied;
+            _occupiedBySide = Position.OccupiedBySide;
+            _bitboardPieces = Position.BoardPieces;
 
             Flags = flags;
         }
@@ -233,7 +244,7 @@ namespace Rudz.Chess
 
             AddMoves(moves, occupiedByThem);
 
-            BitBoard pawns = ChessBoard.Pieces(EPieceType.Pawn, currentSide);
+            BitBoard pawns = Position.Pieces(EPieceType.Pawn, currentSide);
 
             AddPawnMoves(moves, _pawnPush[currentSide.Side](pawns & currentSide.Rank7()) & ~_occupied, currentSide.PawnPushDistance(), EMoveType.Quiet);
             AddPawnMoves(moves, _pawnAttacksWest[currentSide.Side](pawns) & occupiedByThem, currentSide.PawnWestAttackDistance(), EMoveType.Capture);
@@ -249,11 +260,11 @@ namespace Rudz.Chess
                 for (ECastleling castleType = ECastleling.Short; castleType < ECastleling.CastleNb; castleType++)
                 {
                     if (CanCastle(castleType))
-                        AddCastleMove(moves, ChessBoard.GetKingCastleFrom(currentSide, castleType), castleType.GetKingCastleTo(currentSide));
+                        AddCastleMove(moves, Position.GetKingCastleFrom(currentSide, castleType), castleType.GetKingCastleTo(currentSide));
                 }
 
             BitBoard notOccupied = ~_occupied;
-            BitBoard pushed = _pawnPush[currentSide.Side](ChessBoard.Pieces(EPieceType.Pawn, currentSide).Value & ~currentSide.Rank7()) & notOccupied;
+            BitBoard pushed = _pawnPush[currentSide.Side](Position.Pieces(EPieceType.Pawn, currentSide).Value & ~currentSide.Rank7()) & notOccupied;
             AddPawnMoves(moves, pushed.Value, currentSide.PawnPushDistance(), EMoveType.Quiet);
             AddPawnMoves(moves, _pawnPush[currentSide.Side](pushed.Value & currentSide.Rank3()) & notOccupied, currentSide.PawnDoublePushDistance(), EMoveType.Doublepush);
             AddMoves(moves, notOccupied);
@@ -274,15 +285,15 @@ namespace Rudz.Chess
         {
             Move move;
 
-            if (type.HasFlag(EMoveType.Capture))
-                move = new Move(piece, ChessBoard.GetPiece(to), from, to, type, promoted);
-            else if (type.HasFlag(EMoveType.Epcapture))
+            if ((type & EMoveType.Capture) != 0)
+                move = new Move(piece, Position.GetPiece(to), from, to, type, promoted);
+            else if ((type & EMoveType.Epcapture) != 0)
                 move = new Move(piece, EPieceType.Pawn.MakePiece(~SideToMove), from, to, type, promoted);
             else
                 move = new Move(piece, from, to, type, promoted);
 
             // check if move is actualy a legal move if the flag is enabled
-            if (Flags.HasFlag(Emgf.Legalmoves) && !IsLegal(move, piece, from, type))
+            if ((Flags & Emgf.Legalmoves) != 0 && !IsLegal(move, piece, from, type))
                 return;
 
             moves.Add(move);
@@ -291,11 +302,11 @@ namespace Rudz.Chess
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void AddMoves(ICollection<Move> moves, Piece piece, Square from, BitBoard attacks)
         {
-            BitBoard target = ChessBoard.Occupied & attacks;
+            BitBoard target = Position.Occupied & attacks;
             foreach (Square to in target)
                 AddMove(moves, piece, from, to, EPieces.NoPiece, EMoveType.Capture);
 
-            target = ~ChessBoard.Occupied & attacks;
+            target = ~Position.Occupied & attacks;
             foreach (Square to in target)
                 AddMove(moves, piece, from, to, PieceExtensions.EmptyPiece);
         }
@@ -310,7 +321,7 @@ namespace Rudz.Chess
         private void AddMoves(ICollection<Move> moves, BitBoard targetSquares)
         {
             Player c = SideToMove;
-            BitBoard occupied = ChessBoard.Occupied;
+            BitBoard occupied = Position.Occupied;
 
             // TODO : More generic way of adding moves?
             Piece piece = EPieceType.Queen.MakePiece(c);
@@ -350,7 +361,7 @@ namespace Rudz.Chess
                     continue;
                 }
 
-                if (Flags.HasFlag(Emgf.Queenpromotion))
+                if ((Flags & Emgf.Queenpromotion) != 0)
                 {
                     AddMove(moves, piece, squareFrom, squareTo, EPieceType.Queen.MakePiece(SideToMove), type | EMoveType.Promotion);
                     return;
@@ -384,8 +395,8 @@ namespace Rudz.Chess
             Player c = SideToMove;
             // The complexity of this function is mainly due to the support for Chess960 variant.
             Square rookTo = square.GetRookCastleTo();
-            Square rookFrom = ChessBoard.GetRookCastleFrom(square);
-            Square kingSquare = ChessBoard.KingSquares[c.Side];
+            Square rookFrom = Position.GetRookCastleFrom(square);
+            Square kingSquare = Position.KingSquares[c.Side];
 
             // The pieces in question.. rook and king
             BitBoard castlePieces = rookFrom | kingSquare;
@@ -407,7 +418,7 @@ namespace Rudz.Chess
             // ReSharper disable once LoopCanBeConvertedToQuery
             foreach (Square s in kingSquare.BitboardBetween(square) | square)
             {
-                if (ChessBoard.IsAttacked(s, c))
+                if (Position.IsAttacked(s, c))
                     return false;
             }
 
