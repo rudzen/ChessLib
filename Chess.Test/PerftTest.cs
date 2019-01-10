@@ -1,5 +1,5 @@
 ﻿/*
-ChessLib - A complete chess data structure library
+ChessLib, a chess data structure library
 
 MIT License
 

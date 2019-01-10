@@ -105,7 +105,7 @@ namespace Rudz.Chess.Types
 
             if (move.IsCastlelingMove())
             {
-                notation.Append(CastlelingExtensions.GetCastlelingString(to, from));
+                notation.Append(ECastlelingExtensions.GetCastlelingString(to, from));
             }
             else
             {
@@ -162,7 +162,7 @@ namespace Rudz.Chess.Types
         /// <para>Converts a move to SAN notation.</para>
         /// </summary>
         /// <param name="move">The move to convert</param>
-        /// <param name="state">The position from where the move exist</param>
+        /// <param name="moveGenerator"></param>
         /// <returns>SAN move string</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static string ToSan(this Move move, MoveGenerator moveGenerator)
@@ -174,7 +174,7 @@ namespace Rudz.Chess.Types
 
             if (move.IsCastlelingMove())
             {
-                notation.Append(CastlelingExtensions.GetCastlelingString(to, from));
+                notation.Append(ECastlelingExtensions.GetCastlelingString(to, from));
             }
             else
             {
@@ -246,7 +246,7 @@ namespace Rudz.Chess.Types
 
             if (move.IsCastlelingMove())
             {
-                notation.Append(CastlelingExtensions.GetCastlelingString(to, from));
+                notation.Append(ECastlelingExtensions.GetCastlelingString(to, from));
             }
             else
             {
@@ -306,7 +306,7 @@ namespace Rudz.Chess.Types
 
             if (move.IsCastlelingMove())
             {
-                notation.Append(CastlelingExtensions.GetCastlelingString(to, from));
+                notation.Append(ECastlelingExtensions.GetCastlelingString(to, from));
             }
             else
             {

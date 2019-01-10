@@ -38,30 +38,4 @@ namespace Rudz.Chess.Enums
         Long = 2,
         CastleNb = 3
     }
-
-    public static class CastlelingExtensions
-    {
-        public static string GetCastlelingString(this ECastleling @this)
-        {
-            switch (@this)
-            {
-                case ECastleling.None:
-                    return string.Empty;
-                case ECastleling.Short:
-                    return "O-O";
-                case ECastleling.Long:
-                    return "O-O-O";
-                case ECastleling.CastleNb:
-                    return string.Empty;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(@this), @this, null);
-            }
-        }
-
-        public static string GetCastlelingString(Square toSquare, Square fromSquare)
-        {
-            return toSquare < fromSquare ? "O-O-O" : "O-O";
-        }
-
-    }
 }
