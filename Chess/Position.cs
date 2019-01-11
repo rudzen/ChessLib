@@ -267,7 +267,7 @@ namespace Rudz.Chess
         public bool PieceOnFile(Square square, Player side, EPieceType pieceType) => (BoardPieces[(int)(pieceType + (side << 3))] & square) != 0;
 
         /// <summary>
-        /// Determine if a pawn is isolated e.i. no own pawns on either neighboor files
+        /// Determine if a pawn is isolated e.i. no own pawns on either of it's neighboring files
         /// </summary>
         /// <param name="square"></param>
         /// <param name="side"></param>

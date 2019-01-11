@@ -136,15 +136,14 @@ namespace Rudz.Chess
             State.NullMovesInRow = 0;
 
             // compute reversible half move count
-            if (move.IsCaptureMove() || move.GetMovingPieceType() == EPieceType.Pawn)
-                State.ReversibleHalfMoveCount = 0;
-            else
-                State.ReversibleHalfMoveCount = previous.ReversibleHalfMoveCount + 1;
+            State.ReversibleHalfMoveCount = move.IsCaptureMove() || move.GetMovingPieceType() == EPieceType.Pawn
+                ? 0
+                : previous.ReversibleHalfMoveCount + 1;
 
             // compute en-passant if present
             State.EnPassantSquare = move.IsDoublePush()
-                                  ? (BitBoard)(BitBoards.First(move.GetToSquare().BitBoardSquare()) + State.SideToMove.PawnPushDistance())
-                                  : 0ul;
+                ? (BitBoard)(move.GetToSquare().BitBoardSquare().First() + State.SideToMove.PawnPushDistance())
+                : 0ul;
 
             State.Key = previous.Key;
             State.PawnStructureKey = previous.PawnStructureKey;
@@ -174,7 +173,7 @@ namespace Rudz.Chess
         /// Apply a FEN string board setup to the board structure.
         /// *EXCEPTION FREE FUNCTION*
         /// </summary>
-        /// <param name="fenString">Da mutafucking string to set</param>
+        /// <param name="fenString">The string to set</param>
         /// <param name="validate">If true, the fen string is validated, otherwise not</param>
         /// <returns>
         /// 0 = all ok.
@@ -472,6 +471,8 @@ namespace Rudz.Chess
         /// <param name="move">The move the hashkey is depending on</param>
         private void UpdateKey(Move move)
         {
+            // TODO : Merge with MakeMove to avoid duplicate ifs
+
             ulong pawnKey = State.PawnStructureKey;
             ulong key = State.Key ^ pawnKey;
             pawnKey ^= Zobrist.GetZobristSide();

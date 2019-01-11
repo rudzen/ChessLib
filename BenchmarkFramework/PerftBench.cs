@@ -3,13 +3,13 @@
     using BenchmarkDotNet.Attributes;
 
     //[ClrJob(baseline: true), CoreJob, CoreRtJob]
-    [RPlotExporter, RankColumn]
+    //[RPlotExporter, RankColumn]
     public class PerftBench
     {
 
         private Perft _perft;
 
-        [Params(1, 7)]
+        [Params(1, 6)]
         public int N;
 
         [GlobalSetup]
