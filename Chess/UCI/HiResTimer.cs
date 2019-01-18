@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2018 Rudy Alex Kohn
+Copyright (c) 2017-2019 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -116,7 +116,7 @@ namespace Rudz.Chess.UCI
             if (IsRunning)
                 Stop();
 
-            Debug.Print("Timer Start on thread " + Thread.CurrentThread.ManagedThreadId);
+            Debug.Print($"Timer Start on thread {Thread.CurrentThread.ManagedThreadId}");
 
             _cancellationTokenSource = new CancellationTokenSource();
             _cancellationTokenSource.Token.ThrowIfCancellationRequested();
@@ -130,7 +130,7 @@ namespace Rudz.Chess.UCI
             if (!IsRunning)
                 return;
 
-            Debug.WriteLine("Timer Stop on thread " + Thread.CurrentThread.ManagedThreadId);
+            Debug.WriteLine($"Timer Stop on thread {Thread.CurrentThread.ManagedThreadId}");
             if (_executer.IsCanceled || _executer.IsCompleted)
                 return;
 
@@ -172,7 +172,7 @@ namespace Rudz.Chess.UCI
 
         private void ExecuteTimer(CancellationToken cancellationToken)
         {
-            Debug.Print("Timer ExecuteTimer on thread " + Thread.CurrentThread.ManagedThreadId);
+            Debug.Print($"Timer ExecuteTimer on thread {Thread.CurrentThread.ManagedThreadId}");
 
             float nextTrigger = 0f;
 
@@ -230,7 +230,7 @@ namespace Rudz.Chess.UCI
             ReleaseUnmanagedResources();
             if (!disposing)
                 return;
-            Debug.Print($"Timer with ID {Id} disposed.");
+            Debug.Print($"Timer with ID {Id.ToString()} disposed.");
             _executer?.Dispose();
         }
     }

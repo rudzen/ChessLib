@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2018 Rudy Alex Kohn
+Copyright (c) 2017-2019 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,55 +24,55 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace ChessLibTest
+namespace Chess.Tests
 {
-    using NUnit.Framework;
+    using Xunit;
 
-    [TestFixture]
     public class MaterialTests
     {
         //TODO : Implement the RIGHT way
 
-        //[Test]
-        //public void MaterialValueTest()
-        //{
-        //    Game game = new Game();
-        //    game.NewGame();
+        [Fact]
+        public void MaterialValueTest()
+        {
+            Assert.True(true);
+            //Game game = new Game();
+            //game.NewGame();
 
-        //    int startMaterial = game.Position.Material.MaterialValueTotal;
+            //int startMaterial = game.State.Material.MaterialValueTotal;
 
-        //    // generate moves
-        //    IList<Move> moves = new List<Move>(12) {
-        //                                              new Move(EPieces.WhitePawn, ESquare.f2, ESquare.f4, EMoveType.Doublepush, EPieces.WhiteNoPiece),
-        //                                              new Move(EPieces.BlackPawn, ESquare.e7, ESquare.e5, EMoveType.Doublepush, EPieces.WhiteNoPiece),
-        //                                              new Move(EPieces.WhitePawn, EPieces.BlackPawn, ESquare.f4, ESquare.e5, EMoveType.Capture),
-        //                                              new Move(EPieces.BlackPawn, ESquare.d7, ESquare.d5, EMoveType.Doublepush, EPieces.WhiteNoPiece),
-        //                                              new Move(EPieces.WhitePawn, ESquare.f5, ESquare.d6, EMoveType.Epcapture, EPieces.WhiteNoPiece)
+            //// generate moves
+            //IList<Move> moves = new List<Move>(12) {
+            //                                          new Move(EPieces.WhitePawn, ESquare.f2, ESquare.f4, EMoveType.Doublepush, EPieces.NoPiece),
+            //                                          new Move(EPieces.BlackPawn, ESquare.e7, ESquare.e5, EMoveType.Doublepush, EPieces.NoPiece),
+            //                                          new Move(EPieces.WhitePawn, EPieces.BlackPawn, ESquare.f4, ESquare.e5, EMoveType.Capture),
+            //                                          new Move(EPieces.BlackPawn, ESquare.d7, ESquare.d5, EMoveType.Doublepush, EPieces.NoPiece),
+            //                                          new Move(EPieces.WhitePawn, ESquare.f5, ESquare.d6, EMoveType.Epcapture, EPieces.NoPiece)
+            //                                      };
 
-        //                                          };
+            //IList<int> lostMaterial = new List<int>(12)
+            //{
+            //    0,
+            //    0,
+            //    100,
+            //    100,
+            //    200
+            //};
 
-        //    IList<int> lostMaterial = new List<int>(12)
-        //    {
-        //        0,
-        //        0,
-        //        100,
-        //        100,
-        //        200
-        //    };
+            //IList<int> stepMaterial = new List<int>(12)
+            //{
+            //    startMaterial,
+            //    startMaterial,
+            //    startMaterial - 100,
+            //    startMaterial - 100,
+            //    startMaterial - 200
+            //};
 
-        //    IList<int> stepMaterial = new List<int>(12)
-        //    {
-        //        startMaterial,
-        //        startMaterial,
-        //        startMaterial - 100,
-        //        startMaterial - 100,
-        //        startMaterial - 200
-        //    };
-
-        //    for (int i = 0; i < moves.Count; i++) {
-        //        Assert.IsTrue(game.MakeMove(moves[i]));
-        //        Assert.AreEqual(lostMaterial[i], Math.Abs(game.Position.Material.MaterialValueTotal));
-        //    }
-        //}
+            //for (int i = 0; i < moves.Count; i++)
+            //{
+            //    Assert.True(game.MakeMove(moves[i]));
+            //    Assert.Equal(lostMaterial[i], Math.Abs(game.State.Material.MaterialValueTotal));
+            //}
+        }
     }
 }

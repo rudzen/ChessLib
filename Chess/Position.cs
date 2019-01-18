@@ -40,7 +40,7 @@ namespace Rudz.Chess
     /// It stores all the information about the current board in a simple structure.
     /// It also serves the purpose of being able to give the UI controller feedback on various things on the board
     /// </summary>
-    public sealed class ChessBoard : IChessBoard
+    public sealed class Position : IPosition
     {
         private const ulong Zero = 0;
 
@@ -55,7 +55,7 @@ namespace Rudz.Chess
         [NotNull]
         private readonly Square[] _castleLongKingFrom;
 
-        public ChessBoard(Action<Piece, Square> pieceUpdateCallback)
+        public Position(Action<Piece, Square> pieceUpdateCallback)
         {
             PieceUpdated = pieceUpdateCallback;
             _castleLongKingFrom = new Square[2];
@@ -68,7 +68,7 @@ namespace Rudz.Chess
             Clear();
         }
 
-        static ChessBoard() => EnPasCapturePos = new Func<BitBoard, BitBoard>[] { BitBoards.SouthOne, BitBoards.NorthOne };
+        static Position() => EnPasCapturePos = new Func<BitBoard, BitBoard>[] { BitBoards.SouthOne, BitBoards.NorthOne };
 
         // TODO : redesign BoardPieces + OccupiedBySide into simple arrays
 
@@ -227,15 +227,8 @@ namespace Rudz.Chess
 
             BitBoard pinnedPieces = 0;
             int oppShift = ~side << 3;
-            BitBoard pinners = square.XrayBishopAttacks(Occupied, OccupiedBySide[side.Side]) & (BoardPieces[(int)EPieceType.Bishop + oppShift] | BoardPieces[(int)EPieceType.Queen | oppShift]);
-
-            while (pinners)
-            {
-                pinnedPieces |= pinners.Lsb().BitboardBetween(square) & OccupiedBySide[side.Side];
-                pinners--;
-            }
-
-            pinners = square.XrayRookAttacks(Occupied, OccupiedBySide[side.Side]) & (BoardPieces[(int)EPieceType.Rook + oppShift] | BoardPieces[(int)EPieceType.Queen | oppShift]);
+            BitBoard pinners = square.XrayBishopAttacks(Occupied, OccupiedBySide[side.Side]) & (BoardPieces[(int)EPieceType.Bishop | oppShift] | BoardPieces[(int)EPieceType.Queen | oppShift]);
+            pinners |= square.XrayRookAttacks(Occupied, OccupiedBySide[side.Side]) & (BoardPieces[(int)EPieceType.Rook | oppShift] | BoardPieces[(int)EPieceType.Queen | oppShift]);
 
             while (pinners)
             {
@@ -274,7 +267,7 @@ namespace Rudz.Chess
         public bool PieceOnFile(Square square, Player side, EPieceType pieceType) => (BoardPieces[(int)(pieceType + (side << 3))] & square) != 0;
 
         /// <summary>
-        /// Determin if a pawn is isolated e.i. no own pawns on either neighboor files
+        /// Determine if a pawn is isolated e.i. no own pawns on either of it's neighboring files
         /// </summary>
         /// <param name="square"></param>
         /// <param name="side"></param>
@@ -287,7 +280,7 @@ namespace Rudz.Chess
         }
 
         /// <summary>
-        /// Determin if a specific square is a passed pawn
+        /// Determine if a specific square is a passed pawn
         /// </summary>
         /// <param name="square"></param>
         /// <returns></returns>
@@ -295,9 +288,11 @@ namespace Rudz.Chess
         public bool PassedPawn(Square square)
         {
             Piece pc = BoardLayout[square.ToInt()];
-            Player c = pc.ColorOf();
+
             if (pc.Type() != EPieceType.Pawn)
                 return false;
+
+            Player c = pc.ColorOf();
 
             return (square.PassedPawnFrontAttackSpan(c) & Pieces(EPieceType.Pawn, c)) == 0;
         }
@@ -391,6 +386,41 @@ namespace Rudz.Chess
                 default:
                     throw new ArgumentOutOfRangeException(nameof(castleType), castleType, null);
             }
+        }
+
+        /// <summary>
+        /// Checks from a string if the move actually is a castle move.
+        /// Note:
+        /// - The unique cases with amended piece location check
+        ///   is a *shallow* detection, it should be the sender
+        ///   that guarantee that it's a real move.
+        /// </summary>
+        /// <param name="m">The string containing the move</param>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ECastleling IsCastleMove(string m)
+        {
+            // ReSharper disable once SwitchStatementMissingSomeCases
+            switch (m)
+            {
+                case "O-O":
+                case "OO":
+                case "0-0":
+                case "00":
+                case "e1g1" when IsPieceTypeOnSquare(ESquare.e1, EPieceType.King):
+                case "e8g8" when IsPieceTypeOnSquare(ESquare.e8, EPieceType.King):
+                    return ECastleling.Short;
+
+                case "O-O-O":
+                case "OOO":
+                case "0-0-0":
+                case "000":
+                case "e1c1" when IsPieceTypeOnSquare(ESquare.e1, EPieceType.King):
+                case "e8c8" when IsPieceTypeOnSquare(ESquare.e8, EPieceType.King):
+                    return ECastleling.Long;
+            }
+
+            return ECastleling.None;
         }
 
         public IEnumerator<Piece> GetEnumerator()

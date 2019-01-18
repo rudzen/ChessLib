@@ -123,7 +123,7 @@ namespace Rudz.Chess
                 }
             }
 
-            Array.Clear(squares, 0, 64);
+            Array.Clear(squares, 0, squares.Length);
 
             for (int i = 0; i < squares.Length; ++i)
             {

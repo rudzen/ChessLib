@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2018 Rudy Alex Kohn
+Copyright (c) 2017-2019 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -26,14 +26,13 @@ SOFTWARE.
 
 // ReSharper disable InconsistentNaming
 
-namespace Rudz.Chess
+namespace Rudz.Chess.Types
 {
     using Enums;
     using System;
     using System.IO;
     using System.Runtime.CompilerServices;
     using System.Text;
-    using Types;
 
     public static class BitBoards
     {
@@ -174,7 +173,10 @@ namespace Rudz.Chess
 
             // ForwardRanksBB population loop idea from sf
             for (ERank r = ERank.Rank1; r < ERank.RankNb; ++r)
-                ForwardRanksBB[0, (int)r] = ~(ForwardRanksBB[1, (int)r + 1] = ForwardRanksBB[1, (int)r] | RankBB[(int)r]);
+            {
+                int rank = (int)r;
+                ForwardRanksBB[0, rank] = ~(ForwardRanksBB[1, rank + 1] = ForwardRanksBB[1, rank] | RankBB[rank]);
+            }
 
             for (EPlayer side = EPlayer.White; side < EPlayer.PlayerNb; ++side)
             {

@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2018 Rudy Alex Kohn
+Copyright (c) 2017-2019 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -31,7 +31,7 @@ namespace Rudz.Chess
     using System.Collections.Generic;
     using Types;
 
-    public interface IChessBoard : IEnumerable<Piece>
+    public interface IPosition : IEnumerable<Piece>
     {
         BitBoard[] BoardPieces { get; }
 
@@ -108,5 +108,7 @@ namespace Rudz.Chess
         Square GetKingCastleFrom(Player side, ECastleling castleType);
 
         void SetKingCastleFrom(Player side, Square square, ECastleling castleType);
+
+        ECastleling IsCastleMove(string m);
     }
 }

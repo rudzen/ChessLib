@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2018 Rudy Alex Kohn
+Copyright (c) 2017-2019 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -37,7 +37,7 @@ namespace Rudz.Chess
     {
         public Move LastMove { get; set; }
 
-        public Material Material;
+        public IMaterial Material;
 
         public ulong PawnStructureKey;
 
@@ -47,15 +47,15 @@ namespace Rudz.Chess
 
         public int FiftyMoveRuleCounter { get; set; }
 
-        public State([NotNull] ChessBoard chessBoard)
-            : base(chessBoard)
+        public State([NotNull] Position position)
+            : base(position)
         {
             Material = new Material();
             Clear();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsMate() => !Moves.Any(move => IsLegal(move, move.GetMovingPiece(), move.GetFromSquare(), move.GetMoveType()));
+        public bool IsMate() => !Moves.Any(IsLegal);
 
         public void Clear()
         {
@@ -87,27 +87,26 @@ namespace Rudz.Chess
             if (m.Equals(@"\"))
                 return MoveExtensions.EmptyMove;
 
-            // only lenghts of 4 and 5 are acceptable.
+            // only lengths of 4 and 5 are acceptable.
             if (!m.Length.InBetween(4, 5))
                 return MoveExtensions.EmptyMove;
 
-            ECastleling castleType = IsCastleMove(m);
+            ECastleling castleType = Position.IsCastleMove(m);
 
             if (castleType == ECastleling.None && (!m[0].InBetween('a', 'h') || !m[1].InBetween('1', '8') || !m[2].InBetween('a', 'h') || !m[3].InBetween('1', '8')))
                 return MoveExtensions.EmptyMove;
 
             /*
              * Needs to be assigned here.
-             * Otherwise it won't compile because of later split check using both two independant IF and optional reassignment through local method.
-             * (bug in VS!?)
+             * Otherwise it won't compile because of later split check using both two independent IF and optional reassignment through local method.
              */
             Square from = new Square(m[1] - '1', m[0] - 'a');
             Square to = new Square(m[3] - '1', m[2] - 'a');
 
             // local function to determin if the move is actually a castleling move by looking at the piece location of the squares
             ECastleling ShredderFunc(Square fromSquare, Square toSquare) =>
-                ChessBoard.GetPiece(fromSquare).Value == EPieces.WhiteKing && ChessBoard.GetPiece(toSquare).Value == EPieces.WhiteRook
-                || ChessBoard.GetPiece(fromSquare).Value == EPieces.BlackKing && ChessBoard.GetPiece(toSquare).Value == EPieces.BlackRook
+                Position.GetPiece(fromSquare).Value == EPieces.WhiteKing && Position.GetPiece(toSquare).Value == EPieces.WhiteRook
+                || Position.GetPiece(fromSquare).Value == EPieces.BlackKing && Position.GetPiece(toSquare).Value == EPieces.BlackRook
                     ? toSquare > fromSquare
                           ? ECastleling.Short
                           : ECastleling.Long
@@ -115,12 +114,12 @@ namespace Rudz.Chess
 
             // part one of pillaging the castleType.. detection of chess 960 - shredder fen
             if (castleType == ECastleling.None)
-                castleType = ShredderFunc(from, to); /* look for the airballon */
+                castleType = ShredderFunc(from, to); /* look for the air balloon */
 
             // part two of pillaging the castleType var, since it might have changed
             if (castleType != ECastleling.None)
             {
-                from = ChessBoard.GetKingCastleFrom(SideToMove, castleType);
+                from = Position.GetKingCastleFrom(SideToMove, castleType);
                 to = castleType.GetKingCastleTo(SideToMove);
             }
 
@@ -144,39 +143,5 @@ namespace Rudz.Chess
             return MoveExtensions.EmptyMove;
         }
 
-        /// <summary>
-        /// Checks from a string if the move actually is a castle move.
-        /// Note:
-        /// - The unique cases with ammended piece location check
-        ///   is a *shallow* detection, it should be the sender
-        ///   that guarentee that it's a real move.
-        /// </summary>
-        /// <param name="m">The string containing the move</param>
-        /// <returns></returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ECastleling IsCastleMove(string m)
-        {
-            // ReSharper disable once SwitchStatementMissingSomeCases
-            switch (m)
-            {
-                case "O-O":
-                case "OO":
-                case "0-0":
-                case "00":
-                case "e1g1" when ChessBoard.IsPieceTypeOnSquare(ESquare.e1, EPieceType.King):
-                case "e8g8" when ChessBoard.IsPieceTypeOnSquare(ESquare.e8, EPieceType.King):
-                    return ECastleling.Short;
-
-                case "O-O-O":
-                case "OOO":
-                case "0-0-0":
-                case "000":
-                case "e1c1" when ChessBoard.IsPieceTypeOnSquare(ESquare.e1, EPieceType.King):
-                case "e8c8" when ChessBoard.IsPieceTypeOnSquare(ESquare.e8, EPieceType.King):
-                    return ECastleling.Long;
-            }
-
-            return ECastleling.None;
-        }
     }
 }

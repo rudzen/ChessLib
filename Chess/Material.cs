@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2018 Rudy Alex Kohn
+Copyright (c) 2017-2019 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -31,7 +31,7 @@ namespace Rudz.Chess
     using System.Runtime.CompilerServices;
     using Types;
 
-    public sealed class Material /*Girl*/
+    public sealed class Material : IMaterial
     {
         public static readonly double MaxValueWithoutPawns;
 

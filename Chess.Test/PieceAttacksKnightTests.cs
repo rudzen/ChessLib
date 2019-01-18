@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2018 Rudy Alex Kohn
+Copyright (c) 2017-2019 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,15 +24,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace ChessLibTest
-{
-    using NUnit.Framework;
-    using Rudz.Chess.Types;
+using Rudz.Chess.Types;
 
-    [TestFixture]
+namespace Chess.Tests
+{
+    using Xunit;
+
     public class PieceAttacksKnightTests : PieceAttacksRegular
     {
-        [Test]
+        [Fact]
         public override void AlphaPattern()
         {
             const int index = (int)EBands.Alpha;
@@ -43,11 +43,11 @@ namespace ChessLibTest
             {
                 BitBoard attacks = RegAttacks[attackIndex](pieceLocation);
                 int expected = (BoardCorners & pieceLocation) != 0 ? KnightExpected[index] >> 1 /* for corners */ : (narrowLocations & pieceLocation) != 0 ? KnightExpected[index] - 1 /* narrowLocations */ : KnightExpected[index];
-                Assert.AreEqual(expected, attacks.Count);
+                Assert.Equal(expected, attacks.Count);
             }
         }
 
-        [Test]
+        [Fact]
         public override void BetaPattern()
         {
             const int index = (int)EBands.Beta;
@@ -58,11 +58,11 @@ namespace ChessLibTest
             {
                 BitBoard attacks = RegAttacks[attackIndex](pieceLocation);
                 int expected = (narrowLocations & pieceLocation) != 0 ? KnightExpected[index] - 2 : KnightExpected[index];
-                Assert.AreEqual(expected, attacks.Count);
+                Assert.Equal(expected, attacks.Count);
             }
         }
 
-        [Test]
+        [Fact]
         public override void GammaPattern()
         {
             const int index = (int)EBands.Gamma;
@@ -71,11 +71,11 @@ namespace ChessLibTest
             foreach (Square pieceLocation in Bands[index])
             {
                 BitBoard attacks = RegAttacks[attackIndex](pieceLocation);
-                Assert.AreEqual(KnightExpected[index], attacks.Count);
+                Assert.Equal(KnightExpected[index], attacks.Count);
             }
         }
 
-        [Test]
+        [Fact]
         public override void DeltaPattern()
         {
             const int index = (int)EBands.Delta;
@@ -84,7 +84,7 @@ namespace ChessLibTest
             foreach (Square pieceLocation in Bands[index])
             {
                 BitBoard attacks = RegAttacks[attackIndex](pieceLocation);
-                Assert.AreEqual(KnightExpected[index], attacks.Count);
+                Assert.Equal(KnightExpected[index], attacks.Count);
             }
         }
     }

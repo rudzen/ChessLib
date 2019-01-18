@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2018 Rudy Alex Kohn
+Copyright (c) 2017-2019 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,22 +24,22 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace ChessLibTest
-{
-    using NUnit.Framework;
-    using Rudz.Chess;
-    using Rudz.Chess.Enums;
-    using Rudz.Chess.Types;
-    using System.Collections.Generic;
+using Rudz.Chess;
+using Rudz.Chess.Enums;
+using Rudz.Chess.Types;
 
-    [TestFixture]
+namespace Chess.Tests
+{
+    using System.Collections.Generic;
+    using Xunit;
+
     public class FoolsCheckMateTests
     {
-        [Test]
+        [Fact]
         public void FoolsCheckMateTest()
         {
             // generate moves
-            IList<Move> moves = new List<Move>(4) {
+            List<Move> moves = new List<Move>(4) {
                                                       new Move(EPieces.WhitePawn, ESquare.f2, ESquare.f3),
                                                       new Move(EPieces.BlackPawn, ESquare.e7, ESquare.e5, EMoveType.Doublepush, EPieces.NoPiece),
                                                       new Move(EPieces.WhitePawn, ESquare.g2, ESquare.g4, EMoveType.Doublepush, EPieces.NoPiece),
@@ -50,12 +50,12 @@ namespace ChessLibTest
             Game game = new Game();
             game.NewGame();
 
-            // make the moves neccesary to create a mate
+            // make the moves necessary to create a mate
             foreach (Move move in moves)
-                Assert.IsTrue(game.MakeMove(move));
+                Assert.True(game.MakeMove(move));
 
             // verify in check is actually true
-            Assert.IsTrue(game.State.InCheck);
+            Assert.True(game.State.InCheck);
 
             game.State.Flags = Emgf.Legalmoves;
 
@@ -63,7 +63,7 @@ namespace ChessLibTest
             game.State.GenerateMoves(true);
 
             // verify that no legal moves actually exists.
-            Assert.Zero(game.State.Moves.Count);
+            Assert.Empty(game.State.Moves);
         }
     }
 }

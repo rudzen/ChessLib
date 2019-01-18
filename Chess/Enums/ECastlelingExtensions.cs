@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2018 Rudy Alex Kohn
+Copyright (c) 2017-2019 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -72,6 +72,32 @@ namespace Rudz.Chess.Enums
                 default:
                     throw new ArgumentOutOfRangeException(nameof(castleType), castleType, null);
             }
+        }
+
+        public static string GetCastlelingString(this ECastleling @this)
+        {
+            switch (@this)
+            {
+                case ECastleling.None:
+                    return string.Empty;
+
+                case ECastleling.Short:
+                    return "O-O";
+
+                case ECastleling.Long:
+                    return "O-O-O";
+
+                case ECastleling.CastleNb:
+                    return string.Empty;
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(@this), @this, null);
+            }
+        }
+
+        public static string GetCastlelingString(Square toSquare, Square fromSquare)
+        {
+            return toSquare < fromSquare ? "O-O-O" : "O-O";
         }
     }
 }

@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2018 Rudy Alex Kohn
+Copyright (c) 2017-2019 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,15 +24,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace ChessLibTest
-{
-    using NUnit.Framework;
-    using Rudz.Chess.Types;
+using Rudz.Chess.Types;
 
-    [TestFixture]
+namespace Chess.Tests
+{
+    using Xunit;
+
     public class PieceAttacksQueenTests : PieceAttacksSliders
     {
-        [Test]
+        [Fact]
         public override void AlphaPattern()
         {
             const int index = (int)EBands.Alpha;
@@ -41,11 +41,11 @@ namespace ChessLibTest
             foreach (Square pieceLocation in Bands[index])
             {
                 BitBoard attacks = SlideAttacks[sliderIndex](pieceLocation, EmptyBoard);
-                Assert.AreEqual(BishopExpected[index] + RookExpected[index], attacks.Count);
+                Assert.Equal(BishopExpected[index] + RookExpected[index], attacks.Count);
             }
         }
 
-        [Test]
+        [Fact]
         public override void BetaPattern()
         {
             const int index = (int)EBands.Beta;
@@ -54,11 +54,11 @@ namespace ChessLibTest
             foreach (Square pieceLocation in Bands[index])
             {
                 BitBoard attacks = SlideAttacks[sliderIndex](pieceLocation, EmptyBoard);
-                Assert.AreEqual(BishopExpected[index] + RookExpected[index], attacks.Count);
+                Assert.Equal(BishopExpected[index] + RookExpected[index], attacks.Count);
             }
         }
 
-        [Test]
+        [Fact]
         public override void GammaPattern()
         {
             const int index = (int)EBands.Gamma;
@@ -67,11 +67,11 @@ namespace ChessLibTest
             foreach (Square pieceLocation in Bands[index])
             {
                 BitBoard attacks = SlideAttacks[sliderIndex](pieceLocation, EmptyBoard);
-                Assert.AreEqual(BishopExpected[index] + RookExpected[index], attacks.Count);
+                Assert.Equal(BishopExpected[index] + RookExpected[index], attacks.Count);
             }
         }
 
-        [Test]
+        [Fact]
         public override void DeltaPattern()
         {
             const int index = (int)EBands.Delta;
@@ -79,7 +79,7 @@ namespace ChessLibTest
             foreach (Square pieceLocation in Bands[index])
             {
                 BitBoard attacks = SlideAttacks[sliderIndex](pieceLocation, EmptyBoard);
-                Assert.AreEqual(BishopExpected[index] + RookExpected[index], attacks.Count);
+                Assert.Equal(BishopExpected[index] + RookExpected[index], attacks.Count);
             }
         }
     }

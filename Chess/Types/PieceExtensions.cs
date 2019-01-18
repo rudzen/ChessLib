@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2018 Rudy Alex Kohn
+Copyright (c) 2017-2019 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -28,24 +28,30 @@ namespace Rudz.Chess.Types
 {
     using Enums;
     using Extensions;
-    using System.Collections;
     using System.Runtime.CompilerServices;
 
     public static class PieceExtensions
     {
-        public static readonly Piece EmptyPiece = EPieces.NoPiece;
+        private const string PgnPieceChars = " PNBRQK";
 
-        public static readonly EPieceValue[] PieceValues = { 0, EPieceValue.Pawn, EPieceValue.Knight, EPieceValue.Bishop, EPieceValue.Rook, EPieceValue.Queen, EPieceValue.King };
+        internal const string PieceChars = PgnPieceChars + "  pnbrqk";
 
-        internal static readonly char[] PieceChars = { ' ', 'P', 'N', 'B', 'R', 'Q', 'K', ' ', ' ', 'p', 'n', 'b', 'r', 'q', 'k' };
+        private const string PromotionPieceNotation = "  nbrq";
 
-        private static readonly char[] PromotionPieceNotation = { ' ', ' ', 'n', 'b', 'r', 'q' };
+        // for polyglot support in the future
+        private const string BookPieceNames = "pPnNbBrRqQkK";
 
-        private static readonly string[] PieceStrings = { " ", "P", "N", "B", "R", "Q", "K", " ", " ", "p", "n", "b", "r", "q", "k" };
+        private const ushort WhitePieces = 126;
 
-        private static readonly char[] PgnPieceChars = { ' ', 'P', 'N', 'B', 'R', 'Q', 'K' };
+        private const ushort BlackPieces = 32256;
 
-        private static readonly string[] PieceNames = { "None", "Pawn", "Knight", "Bishop", "Rook", "Queen", "King" };
+        public static readonly Piece EmptyPiece;
+
+        public static readonly EPieceValue[] PieceValues;
+
+        private static readonly string[] PieceStrings;
+
+        private static readonly string[] PieceNames;
 
         /*
  * white chess king 	♔ 	U+2654 	&#9812;
@@ -66,12 +72,13 @@ namespace Rudz.Chess.Types
 
         private static readonly char[] PieceUnicodeChar = { ' ', '\u2659', '\u2658', '\u2657', '\u2656', '\u2655', '\u2654', ' ', ' ', '\u265F', '\u265E', '\u265D', '\u265C', '\u265B', '\u265A', ' ' };
 
-        private static readonly BitArray WhitePieces = new BitArray(new[] { false, true, true, true, true, true, true, false, false, false, false, false, false, false, false, false });
-
-        private static readonly BitArray BlackPieces = new BitArray(new[] { false, false, false, false, false, false, false, false, false, true, true, true, true, true, true, false });
-
-        // for polyglot support in the future
-        private static readonly char[] BookPieceNames = { 'p', 'P', 'n', 'N', 'b', 'B', 'r', 'R', 'q', 'Q', 'k', 'K' };
+        static PieceExtensions()
+        {
+            EmptyPiece = EPieces.NoPiece;
+            PieceValues = new EPieceValue[] { 0, EPieceValue.Pawn, EPieceValue.Knight, EPieceValue.Bishop, EPieceValue.Rook, EPieceValue.Queen, EPieceValue.King };
+            PieceStrings = new[] { " ", "P", "N", "B", "R", "Q", "K", " ", " ", "p", "n", "b", "r", "q", "k" };
+            PieceNames = new[] { "None", "Pawn", "Knight", "Bishop", "Rook", "Queen", "King" };
+        }
 
         // Generic helper functions
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -105,10 +112,9 @@ namespace Rudz.Chess.Types
         public static string GetPieceString(this Piece p) => PieceStrings[p.ToInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static char GetPieceCharUnicode(this Piece p) => PieceUnicodeChar[p.ToInt()];
+        public static bool IsPieceWhite(int code) => (WhitePieces & code) != 0;
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsPieceWhite(int code) => WhitePieces[code];
+        public static bool IsPieceBlack(int code) => (BlackPieces & code) != 0;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static EPieceValue PieceValue(this Piece p) => PieceValues[(int)p.Type()];

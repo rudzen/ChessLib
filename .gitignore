@@ -18,3 +18,21 @@ Chess/obj/
 Chess/Diagrams/
 
 \.vs/
+
+/BenchmarkCore/bin/Release/netcoreapp2.1
+/BenchmarkCore/obj
+/BenchmarkFramework/bin/Release
+/BenchmarkFramework/obj/Release
+/BenchmarkFramework/bin/x64
+/PerftCore/bin
+/PerftCore/obj
+/PerftFramework/bin/Release
+/PerftFramework/bin/x64/Release/
+/PerftFramework/obj/Release
+/BenchmarkCore/bin
+/BenchmarkFramework/bin/x64
+/BenchmarkFramework/obj
+
+Chess\.Tests/obj/
+Chess\.Tests/bin/
+

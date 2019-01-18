@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2018 Rudy Alex Kohn
+Copyright (c) 2017-2019 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -27,13 +27,13 @@ SOFTWARE.
 // ReSharper disable PossibleNullReferenceException
 // ReSharper disable ExceptionNotDocumentedOptional
 
+using System;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using Rudz.Chess.Properties;
+
 namespace Rudz.Chess.Fen
 {
-    using Properties;
-    using System;
-    using System.Collections.Generic;
-    using System.Runtime.CompilerServices;
-
     /// <summary>
     /// FenData contains a FEN string and an index pointer to a location in the FEN string.
     /// For more information about the format, see

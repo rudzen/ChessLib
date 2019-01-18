@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2018 Rudy Alex Kohn
+Copyright (c) 2017-2019 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,17 +24,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace ChessLibTest
+
+using Rudz.Chess;
+using Rudz.Chess.Types;
+
+namespace Chess.Tests
 {
-    using NUnit.Framework;
-    using Rudz.Chess;
-    using Rudz.Chess.Types;
+    using Xunit;
 
     /// <inheritdoc />
-    [TestFixture]
     public class PieceAttacksBishopTests : PieceAttacksSliders
     {
-        [Test]
+        [Fact]
         public override void AlphaPattern()
         {
             const int index = (int)EBands.Alpha;
@@ -43,11 +44,11 @@ namespace ChessLibTest
             foreach (Square pieceLocation in Bands[index])
             {
                 BitBoard attacks = SlideAttacks[sliderIndex](pieceLocation, EmptyBoard);
-                Assert.AreEqual(BishopExpected[index], attacks.Count);
+                Assert.Equal(BishopExpected[index], attacks.Count);
             }
         }
 
-        [Test]
+        [Fact]
         public override void BetaPattern()
         {
             const int index = (int)EBands.Beta;
@@ -56,11 +57,11 @@ namespace ChessLibTest
             foreach (Square pieceLocation in Bands[index])
             {
                 BitBoard attacks = SlideAttacks[sliderIndex](pieceLocation, EmptyBoard);
-                Assert.AreEqual(BishopExpected[index], attacks.Count);
+                Assert.Equal(BishopExpected[index], attacks.Count);
             }
         }
 
-        [Test]
+        [Fact]
         public override void GammaPattern()
         {
             const int index = (int)EBands.Gamma;
@@ -69,11 +70,11 @@ namespace ChessLibTest
             foreach (Square pieceLocation in Bands[index])
             {
                 BitBoard attacks = SlideAttacks[sliderIndex](pieceLocation, EmptyBoard);
-                Assert.AreEqual(BishopExpected[index], attacks.Count);
+                Assert.Equal(BishopExpected[index], attacks.Count);
             }
         }
 
-        [Test]
+        [Fact]
         public override void DeltaPattern()
         {
             const int index = (int)EBands.Delta;
@@ -82,14 +83,14 @@ namespace ChessLibTest
             foreach (Square pieceLocation in Bands[index])
             {
                 BitBoard attacks = SlideAttacks[sliderIndex](pieceLocation, EmptyBoard);
-                Assert.AreEqual(BishopExpected[index], attacks.Count);
+                Assert.Equal(BishopExpected[index], attacks.Count);
             }
         }
 
         /// <summary>
         /// Testing results of blocked bishop attacks, they should always return 2 on the sides, and 1 in the corner
         /// </summary>
-        [Test]
+        [Fact]
         public void BishopBorderBlocked()
         {
             BitBoard border = 0xff818181818181ff;
@@ -115,8 +116,8 @@ namespace ChessLibTest
             foreach (Square square in border)
             {
                 BitBoard attacks = square.BishopAttacks(borderInner);
-                Assert.IsFalse(attacks.Empty());
-                Assert.AreEqual(corners & square ? expectedCorner : expectedSide, attacks.Count);
+                Assert.False(attacks.Empty());
+                Assert.Equal(corners & square ? expectedCorner : expectedSide, attacks.Count);
             }
         }
     }

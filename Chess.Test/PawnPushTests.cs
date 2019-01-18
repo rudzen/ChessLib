@@ -3,7 +3,7 @@ ChessLib - A complete chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2018 Rudy Alex Kohn
+Copyright (c) 2017-2019 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,14 +24,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace ChessLibTest
-{
-    using NUnit.Framework;
-    using Rudz.Chess;
-    using Rudz.Chess.Types;
-    using System;
+using Rudz.Chess.Types;
 
-    [TestFixture]
+namespace Chess.Tests
+{
+    using System;
+    using Xunit;
+
     public class PawnPushTests
     {
         private readonly Func<BitBoard, BitBoard>[] _pawnPushDel =
@@ -39,7 +38,7 @@ namespace ChessLibTest
                 BitBoards.NorthOne, BitBoards.SouthOne
             };
 
-        [Test]
+        [Fact]
         public void PawnPush()
         {
             BitBoard fullBoard = 0xffffffffffff00;
@@ -53,7 +52,7 @@ namespace ChessLibTest
                 BitBoard targetPosition = _pawnPushDel[side.Side](square.BitBoardSquare());
                 Square toSquare = targetPosition.Lsb();
                 int distance = toSquare.ToInt() - square.ToInt();
-                Assert.AreEqual(expected, distance);
+                Assert.Equal(expected, distance);
             }
 
             side = ~side;
@@ -64,7 +63,7 @@ namespace ChessLibTest
                 BitBoard targetPosition = _pawnPushDel[side.Side](square.BitBoardSquare());
                 Square toSquare = targetPosition.Lsb();
                 int distance = toSquare.ToInt() - square.ToInt();
-                Assert.AreEqual(expected, distance);
+                Assert.Equal(expected, distance);
             }
         }
     }

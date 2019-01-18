@@ -1,9 +1,9 @@
 ﻿/*
-ChessLib - A complete chess data structure library
+ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2018 Rudy Alex Kohn
+Copyright (c) 2017-2019 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,15 +24,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace ChessLibTest
+using Rudz.Chess;
+using Rudz.Chess.Fen;
+
+namespace Chess.Tests
 {
-    using NUnit.Framework;
-    using Rudz.Chess;
-    using Rudz.Chess.Fen;
     using System;
     using System.Runtime.CompilerServices;
+    using Xunit;
 
-    [TestFixture]
     public class PerftTest
     {
         private const int ShortCount = 2;
@@ -51,48 +51,50 @@ namespace ChessLibTest
             positions[4] = new Tuple<string, ulong[]>("r4rk1/1pp1qppp/p1np1n2/2b1p1B1/2B1P1b1/P1NP1N2/1PP1QPPP/R4RK1 w - - 0 10", new ulong[] { 46, 2079, 89890, 3894594, 164075551, 6923051137 });
         }
 
-        [Test]
+        [Fact]
         public void PerftShort()
         {
             Game game = new Game();
-            foreach (Tuple<string, ulong[]> tuple in positions)
+            foreach (var (item1, item2) in positions)
             {
                 for (int i = 0; i < ShortCount; ++i)
                 {
-                    ulong res = DoPerft(ref game, tuple.Item1, i + 1);
-                    Assert.AreEqual(tuple.Item2[i], res);
+                    ulong res = DoPerft(game, item1, i + 1);
+                    Assert.Equal(item2[i], res);
                 }
             }
         }
 
-        [Test]
+        [Fact]
         public void PerftMedium()
         {
             Game game = new Game();
-            foreach (Tuple<string, ulong[]> tuple in positions)
+            foreach (Tuple<string, ulong[]> position in positions)
             {
                 for (int i = 0; i < MediumCount; ++i)
                 {
-                    ulong res = DoPerft(ref game, tuple.Item1, i + 1);
-                    Assert.AreEqual(tuple.Item2[i], res);
+                    ulong res = DoPerft(game, position.Item1, i + 1);
+                    Assert.Equal(position.Item2[i], res);
                 }
             }
         }
 
-        //        [Test]
-        //        public void PerftFull()
+        //[Fact]
+        //public void PerftFull()
+        //{
+        //    Game game = new Game();
+        //    foreach (Tuple<string, ulong[]> tuple in positions)
+        //    {
+        //        for (int i = 0; i < tuple.Item2.Length; ++i)
         //        {
-        //            Game game = new Game();
-        //            foreach (Tuple<string,ulong[]> tuple in positions) {
-        //                for (int i = 0; i < tuple.Item2.Length; ++i) {
-        //                    ulong res = DoPerft(ref game, tuple.Item1, i + 1);
-        //                    Assert.AreEqual(tuple.Item2[i], res);
-        //                }
-        //            }
+        //            ulong res = DoPerft(ref game, tuple.Item1, i + 1);
+        //            Assert.Equal(tuple.Item2[i], res);
         //        }
+        //    }
+        //}
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static ulong DoPerft(ref Game game, string fen, int depth)
+        private static ulong DoPerft(Game game, string fen, int depth)
         {
             game.SetFen(fen);
             return game.Perft(depth);
