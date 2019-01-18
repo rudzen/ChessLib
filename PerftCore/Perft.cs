@@ -1,12 +1,12 @@
-﻿
-using System;
-using System.Diagnostics;
-using Perft;
-using Rudz.Chess;
-using Rudz.Chess.Extensions;
+﻿using Perft;
 
 namespace PerftCore
 {
+    using Rudz.Chess;
+    using Rudz.Chess.Extensions;
+    using System;
+    using System.Diagnostics;
+
     public partial class Perft
     {
         public static void Main(string[] args)

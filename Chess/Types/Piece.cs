@@ -24,6 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using Rudz.Chess.Extensions;
+
 namespace Rudz.Chess.Types
 {
     using Enums;
@@ -115,13 +117,22 @@ namespace Rudz.Chess.Types
         public int ColorOf() => (int)Value >> 3;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public int ToInt() => (int)Value;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool IsWhite() => ToInt().InBetween((int)EPieces.WhitePawn, (int)EPieces.WhiteKing);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool IsBlack() => ToInt().InBetween((int)EPieces.BlackPawn, (int)EPieces.BlackKing);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals(Piece other) => Value == other.Value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override bool Equals(object obj) => obj is Piece piece && Equals(piece);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public override int GetHashCode() => (int)Value << 16;
+        public override int GetHashCode() => ToInt() << 16;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override string ToString() => this.GetPieceString();

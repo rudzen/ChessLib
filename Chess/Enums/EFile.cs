@@ -29,7 +29,7 @@ namespace Rudz.Chess.Enums
     using System;
 
     [Flags]
-    public enum EFile
+    public enum EFile : byte
     {
         FileA = 0,
         FileB = 1,

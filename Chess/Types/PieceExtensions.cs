@@ -81,14 +81,6 @@ namespace Rudz.Chess.Types
         }
 
         // Generic helper functions
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsWhite(this Piece p) => p.ToInt().InBetween((int)EPieces.WhitePawn, (int)EPieces.WhiteKing);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsBlack(this Piece p) => p.ToInt().InBetween((int)EPieces.BlackPawn, (int)EPieces.BlackKing);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int ToInt(this Piece p) => (int)p.Value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int ToInt(this EPieceType p) => (int)p;

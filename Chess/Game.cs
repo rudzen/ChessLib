@@ -665,16 +665,18 @@ namespace Rudz.Chess
                 return;
             }
 
-            State.CastlelingRights |= CastlePositionalOr[0, side.Side];
-            Player them = ~side;
-            int castlelingMask = ECastleling.Short.GetCastleAllowedMask(side);
-            _castleRightsMask[SquareExtensions.GetFlip(rookFile, them).ToInt()] -= castlelingMask;
-            _castleRightsMask[SquareExtensions.GetFlip(Position.KingSquares[side.Side].File(), them).ToInt()] -= castlelingMask;
-            Position.SetRookCastleFrom(SquareExtensions.GetFlip((int)ESquare.g1, them), SquareExtensions.GetFlip(rookFile, them));
-            Position.SetKingCastleFrom(side, Position.KingSquares[side.Side], ECastleling.Short);
+            UpdateCastlelingData(rookFile, ECastleling.Short, side, EFile.FileE, EFile.FileH);
 
-            if (Position.KingSquares[side.Side].File() != 4 || rookFile != 7)
-                _chess960 = true;
+            //State.CastlelingRights |= CastlePositionalOr[0, side.Side];
+            //Player them = ~side;
+            //int castlelingMask = ECastleling.Short.GetCastleAllowedMask(side);
+            //_castleRightsMask[SquareExtensions.GetFlip(rookFile, them).ToInt()] -= castlelingMask;
+            //_castleRightsMask[SquareExtensions.GetFlip(Position.KingSquares[side.Side].File(), them).ToInt()] -= castlelingMask;
+            //Position.SetRookCastleFrom(SquareExtensions.GetFlip((int)ESquare.g1, them), SquareExtensions.GetFlip(rookFile, them));
+            //Position.SetKingCastleFrom(side, Position.KingSquares[side.Side], ECastleling.Short);
+
+            //if (Position.KingSquares[side.Side].File() != 4 || rookFile != 7)
+            //    _chess960 = true;
         }
 
         private void AddLongCastleRights(int rookFile, Player side)
@@ -683,7 +685,7 @@ namespace Rudz.Chess
             {
                 for (EFile file = EFile.FileA; file <= EFile.FileH; file++)
                 {
-                    if (!Position.IsPieceTypeOnSquare((ESquare)(int)(file + side.Side * 56), EPieceType.Rook))
+                    if (!Position.IsPieceTypeOnSquare((ESquare)(int)(file + (byte) (side.Side * 56)), EPieceType.Rook))
                         continue;
                     rookFile = (int)file; // left outermost rook for side
                     break;
@@ -699,15 +701,37 @@ namespace Rudz.Chess
                 return;
             }
 
-            State.CastlelingRights |= CastlePositionalOr[1, side.Side];
+            UpdateCastlelingData(rookFile, ECastleling.Long, side, EFile.FileE, EFile.FileA);
+
+            //State.CastlelingRights |= CastlePositionalOr[1, side.Side];
+            //Player them = ~side;
+            //int castlelingMask = ECastleling.Long.GetCastleAllowedMask(side);
+            //_castleRightsMask[SquareExtensions.GetFlip(rookFile, them).ToInt()] -= castlelingMask;
+            //_castleRightsMask[SquareExtensions.GetFlip(Position.KingSquares[side.Side].File(), them).ToInt()] -= castlelingMask;
+            //Position.SetRookCastleFrom(SquareExtensions.GetFlip((int)ESquare.c1, them), SquareExtensions.GetFlip(rookFile, them));
+            //Position.SetKingCastleFrom(side, Position.KingSquares[side.Side], ECastleling.Long);
+
+            //if (Position.KingSquares[side.Side].File() != 4 || rookFile != 0)
+            //    _chess960 = true;
+        }
+
+        private void UpdateCastlelingData(int rookFile, ECastleling castleling, Player side, EFile kingChess960File, EFile rookChess960File)
+        {
+            int castlelingIndex = (int) castleling - 1;
+            State.CastlelingRights |= CastlePositionalOr[castlelingIndex, side.Side];
+
+            int castlelingMask = castleling.GetCastleAllowedMask(side);
             Player them = ~side;
-            int castlelingMask = ECastleling.Long.GetCastleAllowedMask(side);
+
             _castleRightsMask[SquareExtensions.GetFlip(rookFile, them).ToInt()] -= castlelingMask;
             _castleRightsMask[SquareExtensions.GetFlip(Position.KingSquares[side.Side].File(), them).ToInt()] -= castlelingMask;
-            Position.SetRookCastleFrom(SquareExtensions.GetFlip((int)ESquare.c1, them), SquareExtensions.GetFlip(rookFile, them));
-            Position.SetKingCastleFrom(side, Position.KingSquares[side.Side], ECastleling.Long);
 
-            if (Position.KingSquares[side.Side].File() != 4 || rookFile != 0)
+            int rookFromFileIndex = (int)(castleling == ECastleling.Short ? ESquare.g1 : ESquare.c1);
+
+            Position.SetRookCastleFrom(SquareExtensions.GetFlip(rookFromFileIndex, them), SquareExtensions.GetFlip(rookFile, them));
+            Position.SetKingCastleFrom(side, Position.KingSquares[side.Side], castleling);
+
+            if (Position.KingSquares[side.Side].File() != 4 || rookFile != 7)
                 _chess960 = true;
         }
 

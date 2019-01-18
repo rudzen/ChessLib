@@ -27,14 +27,13 @@ SOFTWARE.
 namespace Rudz.Chess.Types
 {
     using Enums;
-    using System;
     using System.Runtime.CompilerServices;
 
     /// <summary>
     /// Move struct. Contains a single int for move related information.
     /// Also includes set and get functions for the relevant data stored in the int bits.
     /// </summary>
-    public struct Move : ICloneable
+    public struct Move
     {
         // offsets for bit positions in move data
         private const int MoveSideOffset = 29;
@@ -57,7 +56,7 @@ namespace Rudz.Chess.Types
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Move"/> struct.
-        /// Neccesary extra constructor as it can sometimes be required to only created a basic move.
+        /// Necessary extra constructor as it can sometimes be required to only created a basic move.
         /// </summary>
         /// <param name="from">The from square/// </param>
         /// <param name="to">The to square</param>
@@ -226,9 +225,6 @@ namespace Rudz.Chess.Types
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool IsValidMove() => GetFromSquare().ToInt() != GetToSquare().ToInt();
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public object Clone() => new Move(_data);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals(Move other) => _data == other._data;

@@ -92,41 +92,10 @@ namespace Rudz.Chess.Types
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsValid(this Square s) => s.Value <= ESquare.h8;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsValidEp(this Square s) => s.RankOf() == ERank.Rank3 || s.RankOf() == ERank.Rank6;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsDark(this Square s) => (s & BitBoards.DarkSquares) != 0;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int ToInt(this Square s) => (int)s.Value;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ERank RankOf(this Square s) => (ERank)(s.ToInt() >> 3);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static char RankOfChar(this Square s) => RankChars[(int)s.RankOf()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ERank RelativeRank(this ERank rank, Player color) => (ERank)((int)rank ^ (color.Side * 7));
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ERank RelativeRank(this Square s, Player color) => s.RankOf().RelativeRank(color);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int File(this Square s) => s.ToInt() & 7;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static char FileChar(this Square s) => FileChars[s.File()];
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsOppositeOf(this Square @this, Square other)
-        {
-            int s = @this.ToInt() ^ other.ToInt();
-            return (((s >> 3) ^ s) & 1) != 0;
-        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ref string GetSquareString(this Square s) => ref SquareStrings[s.ToInt()];
@@ -143,6 +112,11 @@ namespace Rudz.Chess.Types
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static BitBoard BitBoardSquare(this ESquare sq) => BitBoards.BbSquares[(int)sq];
 
+        public static EFile FlipFile(this EFile file)
+        {
+            return ~file;
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static Square GetRookCastleTo(this Square square) => RookCastlesTo[square.ToInt()];
 
@@ -153,6 +127,16 @@ namespace Rudz.Chess.Types
         /// <param name="player">The player</param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static Square GetFlip(int fileIndex, Player player) => Flip[player.Side, fileIndex];
+        internal static Square GetFlip(int fileIndex, Player player)
+        {
+            return Flip[player.Side, fileIndex];
+        }
+
+        //internal static Square GetFlip(this Square square, Player player)
+        //{
+
+        //    return Flip[player.Side, fileIndex];
+        //}
+
     }
 }

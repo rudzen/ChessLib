@@ -133,6 +133,37 @@ namespace Rudz.Chess.Types
         public static bool operator false(Square sq) => !sq.IsValid();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public int ToInt() => (int)Value;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool IsOppositeColorOf(Square other)
+        {
+            int s = this.ToInt() ^ other.ToInt();
+            return (((s >> 3) ^ s) & 1) != 0;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public int File() => ToInt() & 7;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ERank RankOf() => (ERank)(ToInt() >> 3);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool IsDark() => (this & BitBoards.DarkSquares) != 0;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool IsValid() => Value <= ESquare.h8;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool IsValidEp() => RankOf() == ERank.Rank3 || RankOf() == ERank.Rank6;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ERank RelativeRank(Player color) => RankOf().RelativeRank(color);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Square GetRelativeSquare(Player player) => (int)Value ^ (player.Side * 56);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override string ToString() => this.GetSquareString();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

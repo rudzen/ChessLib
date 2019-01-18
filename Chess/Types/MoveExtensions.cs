@@ -187,9 +187,9 @@ namespace Rudz.Chess.Types
                     // Disambiguation.
                     // if we have more then one piece with destination 'to'
                     // note that for pawns is not needed because starting file is explicit.
-                    BitBoard simularTypeAttacks = move.GetSimilarAttacks(moveGenerator.Position);
+                    BitBoard similarAttacks = move.GetSimilarAttacks(moveGenerator.Position);
 
-                    (bool ambiguousMove, bool ambiguousFile, bool ambiguousRank) = move.Ambiguity(ref simularTypeAttacks, moveGenerator.Position);
+                    (bool ambiguousMove, bool ambiguousFile, bool ambiguousRank) = move.Ambiguity(ref similarAttacks, moveGenerator.Position);
 
                     if (ambiguousMove)
                     {
@@ -391,7 +391,7 @@ namespace Rudz.Chess.Types
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static BitBoard GetSimilarAttacks(this Move move, Position position)
+        private static BitBoard GetSimilarAttacks(this Move move, IPosition position)
         {
             BitBoard resultBitBoard = 0;
 
