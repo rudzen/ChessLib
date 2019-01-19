@@ -31,7 +31,7 @@ namespace Rudz.Chess.Util
 {
     using System.Runtime.CompilerServices;
 
-    public class RKiss
+    public sealed class RKiss
     {
         private ulong _s;
 

@@ -31,7 +31,7 @@ namespace Chess.Tests
 {
     using Xunit;
 
-    public class BitboardTests
+    public sealed class BitboardTests
     {
         [Fact]
         public void MakeBitBoardTest()

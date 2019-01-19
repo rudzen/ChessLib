@@ -96,13 +96,6 @@ namespace Rudz.Chess
             if (castleType == ECastleling.None && (!m[0].InBetween('a', 'h') || !m[1].InBetween('1', '8') || !m[2].InBetween('a', 'h') || !m[3].InBetween('1', '8')))
                 return MoveExtensions.EmptyMove;
 
-            /*
-             * Needs to be assigned here.
-             * Otherwise it won't compile because of later split check using both two independent IF and optional reassignment through local method.
-             */
-            Square from = new Square(m[1] - '1', m[0] - 'a');
-            Square to = new Square(m[3] - '1', m[2] - 'a');
-
             // local function to determin if the move is actually a castleling move by looking at the piece location of the squares
             ECastleling ShredderFunc(Square fromSquare, Square toSquare) =>
                 Position.GetPiece(fromSquare).Value == EPieces.WhiteKing && Position.GetPiece(toSquare).Value == EPieces.WhiteRook
@@ -111,6 +104,9 @@ namespace Rudz.Chess
                           ? ECastleling.Short
                           : ECastleling.Long
                     : ECastleling.None;
+
+            Square from = new Square(m[1] - '1', m[0] - 'a');
+            Square to = new Square(m[3] - '1', m[2] - 'a');
 
             // part one of pillaging the castleType.. detection of chess 960 - shredder fen
             if (castleType == ECastleling.None)

@@ -24,15 +24,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using Rudz.Chess.Enums;
-using Rudz.Chess.Types;
-
 namespace Chess.Tests
 {
+    using Rudz.Chess.Enums;
+    using Rudz.Chess.Types;
     using System.Text;
     using Xunit;
 
-    public class DataTests
+    public sealed class DataTests
     {
         [Fact]
         public void TestSquareChars()
