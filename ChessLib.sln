@@ -13,8 +13,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chess.Test", "Chess.Test\Ch
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BenchmarkCore", "BenchmarkCore\BenchmarkCore.csproj", "{BF9E9B6E-947E-40E3-956F-AE6A82D5C237}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BenchmarkFramework", "BenchmarkFramework\BenchmarkFramework.csproj", "{26416A36-942E-4ABE-8CED-AB2EEE8E3360}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
