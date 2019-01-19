@@ -184,8 +184,9 @@ namespace Rudz.Chess.Types
                 foreach (Square square in AllSquares)
                 {
                     int s = square.ToInt();
-                    ForwardFileBB[c, s] = ForwardRanksBB[c, (int)square.RankOf()] & FileBB[square.File()];
-                    PawnAttackSpanBB[c, s] = ForwardRanksBB[c, (int)square.RankOf()] & AdjacentFilesBB[square.File()];
+                    int file = (int)square.File();
+                    ForwardFileBB[c, s] = ForwardRanksBB[c, (int)square.RankOf()] & FileBB[file];
+                    PawnAttackSpanBB[c, s] = ForwardRanksBB[c, (int)square.RankOf()] & AdjacentFilesBB[file];
                     PassedPawnMaskBB[c, s] = ForwardFileBB[c, s] | PawnAttackSpanBB[c, s];
                 }
             }
@@ -311,7 +312,7 @@ namespace Rudz.Chess.Types
         /// <param name="this">The square</param>
         /// <returns>The bitboard of square file</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static BitBoard BitBoardFile(this Square @this) => FileBB[@this.File()];
+        public static BitBoard BitBoardFile(this Square @this) => FileBB[(int)@this.File()];
 
         /// <summary>
         /// Returns all squares in front of the square in the same file as bitboard

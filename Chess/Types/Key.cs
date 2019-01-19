@@ -41,12 +41,12 @@ namespace Rudz.Chess.Types
 
         public uint GetLast32Bits() => (uint)(Value >> 32);
 
-        public void Hash(ECastleling castleling, ERank rank) => Value ^= Zobrist.GetZobristCastleling((int) rank);
+        public void Hash(ECastleling castleling, ERank rank) => Value ^= Zobrist.GetZobristCastleling((ECastlelingRights) rank);
 
         public void Hash(Piece piece, Square square) => Value ^= Zobrist.GetZobristPst(piece, square);
 
         public void HashSide() => Value ^= Zobrist.GetZobristSide();
 
-        public void Hash(int enPassantFile) => Value ^= Zobrist.GetZobristEnPessant(enPassantFile);
+        public void Hash(EFile enPassantFile) => Value ^= Zobrist.GetZobristEnPessant(enPassantFile);
     }
 }

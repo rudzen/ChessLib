@@ -24,24 +24,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Exceptions
+namespace Rudz.Chess.Enums
 {
-    using System;
-    using System.Runtime.Serialization;
-
-    public sealed class InvalidMoveException : InvalidOperationException
+    public static class ECastlelingRightsExtensions
     {
-        public InvalidMoveException()
-        {
-        }
-
-        public InvalidMoveException(string message)
-            : base(message) { }
-
-        public InvalidMoveException(string message, Exception innerException)
-            : base(message, innerException) { }
-
-        protected InvalidMoveException(SerializationInfo info, StreamingContext context)
-            : base(info, context) { }
+        public static bool HasFlagFast(this ECastlelingRights value, ECastlelingRights flag) => (value & flag) != 0;
     }
 }

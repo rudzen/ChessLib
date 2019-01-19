@@ -1,4 +1,6 @@
-﻿namespace BenchmarkCore
+﻿using System.Threading.Tasks;
+
+namespace BenchmarkCore
 {
     using System;
     using BenchmarkDotNet.Running;
@@ -50,9 +52,9 @@ Intel Core i7-8086K CPU 4.00GHz (Coffee Lake), 1 CPU, 12 logical and 6 physical 
             foreach (PerftPositions perftPositions in global::BenchmarkCore.Perft.Positions)
             {
                 game.SetFen(perftPositions.fen);
-                ulong res = game.Perft(_perftLimit);
-                total += res;
-                CallBack?.Invoke(perftPositions.fen, res);
+                var res = game.Perft(_perftLimit);
+                total += res.Result;
+                CallBack?.Invoke(perftPositions.fen, res.Result);
             }
 
             return total;

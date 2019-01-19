@@ -24,15 +24,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Extensions
+namespace Rudz.Chess.Enums
 {
-    public static class EnumExtensions
+    using System;
+
+    [Flags]
+    public enum ECastlelingRights : byte
     {
-        public static bool HasFlagSet<T>(this T e, T flag) where T : struct
-        {
-            var intValue = (int)(object)e;
-            var intLookingForFlag = (int)(object)flag;
-            return ((intValue & intLookingForFlag) != 0);
-        }
+        None = 0,
+        WhiteKing = 1,
+        WhiteQueen = 2,
+        BlackKing = 4,
+        BlackQueen = 8,
+        All = WhiteKing | WhiteQueen | BlackKing | BlackQueen
     }
 }

@@ -36,3 +36,5 @@ Chess/Diagrams/
 Chess\.Tests/obj/
 Chess\.Tests/bin/
 
+
+PerftFramework/obj/x64/Release/

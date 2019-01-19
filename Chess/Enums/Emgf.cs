@@ -34,7 +34,7 @@ namespace Rudz.Chess.Enums
     /// Move generation flag
     /// </summary>
     [Flags]
-    public enum Emgf
+    public enum Emgf : byte
     {
         NoMgf = 0,
         Legalmoves = 1,

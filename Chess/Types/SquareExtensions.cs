@@ -70,7 +70,7 @@ namespace Rudz.Chess.Types
             // generate square flipping array for both sides
             foreach (Square square in BitBoards.AllSquares)
             {
-                int file = square.File();
+                int file = (int)square.File();
                 ERank rank = square.RankOf();
                 Flip[0, square.ToInt()] = file + ((7 - (int)rank) << 3);
                 Flip[1, square.ToInt()] = file + ((int)rank << 3);
@@ -79,7 +79,7 @@ namespace Rudz.Chess.Types
                 foreach (Square distSquare in BitBoards.AllSquares)
                 {
                     int ranks = Math.Abs(rank - distSquare.RankOf());
-                    int files = Math.Abs((int)rank - distSquare.File());
+                    int files = Math.Abs((int)rank - (int)distSquare.File());
                     Distance[square.ToInt(), distSquare.ToInt()] = ranks.Max(files);
                 }
             }
@@ -95,7 +95,7 @@ namespace Rudz.Chess.Types
         public static char RankOfChar(this Square s) => RankChars[(int)s.RankOf()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static char FileChar(this Square s) => FileChars[s.File()];
+        public static char FileChar(this Square s) => FileChars[(int)s.File()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ref string GetSquareString(this Square s) => ref SquareStrings[s.ToInt()];
@@ -112,10 +112,8 @@ namespace Rudz.Chess.Types
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static BitBoard BitBoardSquare(this ESquare sq) => BitBoards.BbSquares[(int)sq];
 
-        public static EFile FlipFile(this EFile file)
-        {
-            return ~file;
-        }
+        // TODO : needs unit test
+        public static EFile FlipFile(this EFile file) => ~file;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static Square GetRookCastleTo(this Square square) => RookCastlesTo[square.ToInt()];
@@ -127,16 +125,6 @@ namespace Rudz.Chess.Types
         /// <param name="player">The player</param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static Square GetFlip(int fileIndex, Player player)
-        {
-            return Flip[player.Side, fileIndex];
-        }
-
-        //internal static Square GetFlip(this Square square, Player player)
-        //{
-
-        //    return Flip[player.Side, fileIndex];
-        //}
-
+        internal static Square GetFlip(EFile fileIndex, Player player) => Flip[player.Side, (int)fileIndex];
     }
 }

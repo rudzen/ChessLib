@@ -206,19 +206,19 @@ namespace Rudz.Chess.Types
         public bool IsType(EMoveType moveType) => GetMoveType() == moveType;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsCaptureMove() => (GetMoveType() & (EMoveType.Epcapture | EMoveType.Capture)) != 0;
+        public bool IsCaptureMove() => GetMoveType().HasFlagFast(EMoveType.Epcapture | EMoveType.Capture);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsEnPassantMove() => (GetMoveType() & EMoveType.Epcapture) != 0;
+        public bool IsEnPassantMove() => GetMoveType().HasFlagFast(EMoveType.Epcapture);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsCastlelingMove() => (GetMoveType() & EMoveType.Castle) != 0;
+        public bool IsCastlelingMove() => GetMoveType().HasFlagFast(EMoveType.Castle);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsPromotionMove() => (GetMoveType() & EMoveType.Promotion) != 0;
+        public bool IsPromotionMove() => GetMoveType().HasFlagFast(EMoveType.Promotion);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsDoublePush() => (GetMoveType() & EMoveType.Doublepush) != 0;
+        public bool IsDoublePush() => GetMoveType().HasFlagFast(EMoveType.Doublepush);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool IsNullMove() => _data == 0;

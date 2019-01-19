@@ -40,7 +40,8 @@ namespace Rudz.Chess.Enums
         a7 = 48, b7 = 49, c7 = 50, d7 = 51, e7 = 52, f7 = 53, g7 = 54, h7 = 55,
         a8 = 56, b8 = 57, c8 = 58, d8 = 59, e8 = 60, f8 = 61, g8 = 62, h8 = 63,
         none = 64,
-        fail = 65
+        fail = 65,
+        Nb = 64
         // ReSharper restore InconsistentNaming
         // ReSharper restore UnusedMember.Global
     }

@@ -33,7 +33,7 @@ namespace Rudz.Chess.Data
     /// Model for data transfer of piece and square
     /// Used for notification when a piece is updated in the chess structure
     /// </summary>
-    public class PieceSquare : EventArgs, IPieceSquare
+    public sealed class PieceSquare : EventArgs, IPieceSquare
     {
         public PieceSquare(Piece piece, Square square)
         {

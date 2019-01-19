@@ -29,7 +29,7 @@ namespace Rudz.Chess.Enums
     using System;
 
     [Flags]
-    public enum ERank
+    public enum ERank : byte
     {
         Rank1 = 0,
         Rank2 = 1,

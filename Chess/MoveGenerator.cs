@@ -65,7 +65,7 @@ namespace Rudz.Chess
             _occupiedBySide = position.OccupiedBySide;
         }
 
-        public int CastlelingRights { get; set; }
+        public ECastlelingRights CastlelingRights { get; set; }
 
         public bool InCheck { get; set; }
 
@@ -125,7 +125,7 @@ namespace Rudz.Chess
         /// <returns>true if legal, otherwise false</returns>
         public bool IsLegal(Move move, Piece piece, Square from, EMoveType type)
         {
-            if (!InCheck && piece.Type() != EPieceType.King && (Pinned & from).Empty() && (type & EMoveType.Epcapture) == 0)
+            if (!InCheck && piece.Type() != EPieceType.King && (Pinned & from).Empty() && !type.HasFlagFast(EMoveType.Epcapture))
                 return true;
 
             Position.IsProbing = true;
@@ -283,15 +283,15 @@ namespace Rudz.Chess
         {
             Move move;
 
-            if ((type & EMoveType.Capture) != 0)
+            if (type.HasFlagFast(EMoveType.Capture))
                 move = new Move(piece, Position.GetPiece(to), from, to, type, promoted);
-            else if ((type & EMoveType.Epcapture) != 0)
+            else if (type.HasFlagFast(EMoveType.Epcapture))
                 move = new Move(piece, EPieceType.Pawn.MakePiece(~SideToMove), from, to, type, promoted);
             else
                 move = new Move(piece, from, to, type, promoted);
 
             // check if move is actualy a legal move if the flag is enabled
-            if ((Flags & Emgf.Legalmoves) != 0 && !IsLegal(move, piece, from, type))
+            if (Flags.HasFlagFast(Emgf.Legalmoves) && !IsLegal(move, piece, from, type))
                 return;
 
             moves.Add(move);
@@ -320,6 +320,13 @@ namespace Rudz.Chess
         {
             Player c = SideToMove;
             BitBoard occupied = Position.Occupied;
+
+            //for (EPieceType pieceType = EPieceType.Queen; pieceType >= EPieceType.Bishop; --pieceType)
+            //{
+            //    Piece p = pieceType.MakePiece(c);
+            //    foreach (var sq in _bitboardPieces[p.ToInt()])
+            //        AddMoves(moves, p, sq, sq.GetAttacks(pieceType, occupied) & targetSquares);
+            //}
 
             // TODO : More generic way of adding moves?
             Piece piece = EPieceType.Queen.MakePiece(c);
@@ -359,7 +366,7 @@ namespace Rudz.Chess
                     continue;
                 }
 
-                if ((Flags & Emgf.Queenpromotion) != 0)
+                if (Flags.HasFlagFast(Emgf.Queenpromotion))
                 {
                     AddMove(moves, piece, squareFrom, squareTo, EPieceType.Queen.MakePiece(SideToMove), type | EMoveType.Promotion);
                     return;

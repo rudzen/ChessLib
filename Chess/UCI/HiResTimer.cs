@@ -36,7 +36,7 @@ namespace Rudz.Chess.UCI
     /// <summary>
     /// Idea From https://stackoverflow.com/a/41697139/548894
     /// </summary>
-    public sealed class HiResTimer : IHiResTimer, IDisposable
+    public sealed class HiResTimer : IHiResTimer
     {
         public static readonly double TickLength = 1000f / Stopwatch.Frequency; // ms
 
@@ -53,13 +53,14 @@ namespace Rudz.Chess.UCI
         public HiResTimer() => _intervalLock = new object();
 
         public HiResTimer(int id)
-            : this(1f, id) { }
+            : this(1f, id, null) { }
 
-        public HiResTimer(float interval, int id)
+        public HiResTimer(float interval, int id, Action<HiResTimerArgs> callback)
         {
             _intervalLock = new object();
             Interval = interval;
             Id = id;
+            Elapsed = callback;
         }
 
         ~HiResTimer()
@@ -70,7 +71,7 @@ namespace Rudz.Chess.UCI
         /// <summary>
         /// Invoked when the timer is elapsed
         /// </summary>
-        public event EventHandler<HiResTimerArgs> Elapsed;
+        public Action<HiResTimerArgs> Elapsed { get; set; }
 
         public static bool IsHighResolution => Stopwatch.IsHighResolution;
 
@@ -205,7 +206,7 @@ namespace Rudz.Chess.UCI
                 }
 
                 double delay = elapsed - nextTrigger;
-                Elapsed?.Invoke(this, new HiResTimerArgs(delay));
+                Elapsed?.Invoke(new HiResTimerArgs(delay, Id));
 
                 if (cancellationToken.IsCancellationRequested)
                     return;
@@ -233,13 +234,5 @@ namespace Rudz.Chess.UCI
             Debug.Print($"Timer with ID {Id.ToString()} disposed.");
             _executer?.Dispose();
         }
-    }
-
-    // ReSharper disable once StyleCop.SA1402
-    public class HiResTimerArgs : EventArgs, IHiResTimerArgs
-    {
-        internal HiResTimerArgs(double delay) => Delay = delay;
-
-        public double Delay { get; }
     }
 }

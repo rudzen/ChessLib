@@ -24,6 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using System.Threading.Tasks;
 using Rudz.Chess;
 using Rudz.Chess.Fen;
 
@@ -52,28 +53,28 @@ namespace Chess.Tests
         }
 
         [Fact]
-        public void PerftShort()
+        public async void PerftShort()
         {
             Game game = new Game();
             foreach (var (item1, item2) in positions)
             {
                 for (int i = 0; i < ShortCount; ++i)
                 {
-                    ulong res = DoPerft(game, item1, i + 1);
+                    var res = await DoPerft(game, item1, i + 1).ConfigureAwait(false);
                     Assert.Equal(item2[i], res);
                 }
             }
         }
 
         [Fact]
-        public void PerftMedium()
+        public async void PerftMedium()
         {
             Game game = new Game();
             foreach (Tuple<string, ulong[]> position in positions)
             {
                 for (int i = 0; i < MediumCount; ++i)
                 {
-                    ulong res = DoPerft(game, position.Item1, i + 1);
+                    var res = await DoPerft(game, position.Item1, i + 1).ConfigureAwait(false);
                     Assert.Equal(position.Item2[i], res);
                 }
             }
@@ -94,7 +95,7 @@ namespace Chess.Tests
         //}
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static ulong DoPerft(Game game, string fen, int depth)
+        private static Task<ulong> DoPerft(Game game, string fen, int depth)
         {
             game.SetFen(fen);
             return game.Perft(depth);

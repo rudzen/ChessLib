@@ -89,7 +89,7 @@ namespace Rudz.Chess.Data
                 for (EPieceType pieceType = EPieceType.Pawn; pieceType < EPieceType.PieceTypeNb; ++pieceType)
                 {
                     Piece piece = pieceType.MakePiece(side);
-                    for (ESquare square = ESquare.a1; square <= ESquare.h8; square++)
+                    for (ESquare square = ESquare.a1; square < ESquare.Nb; square++)
                         ZobristPst[piece.ToInt(), (int)square] = rnd.Rand();
                 }
             }
@@ -108,12 +108,12 @@ namespace Rudz.Chess.Data
         public static ulong GetZobristPst(Piece piece, Square square) => ZobristPst[piece.ToInt(), square.ToInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ulong GetZobristCastleling(int index) => ZobristCastling[index];
+        public static ulong GetZobristCastleling(ECastlelingRights index) => ZobristCastling[(int)index];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ulong GetZobristSide() => ZobristSide;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ulong GetZobristEnPessant(int file) => ZobristEpFile[file];
+        public static ulong GetZobristEnPessant(EFile file) => ZobristEpFile[(int)file];
     }
 }

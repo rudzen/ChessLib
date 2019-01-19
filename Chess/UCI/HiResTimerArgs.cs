@@ -24,24 +24,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Exceptions
+namespace Rudz.Chess.UCI
 {
-    using System;
-    using System.Runtime.Serialization;
-
-    public sealed class InvalidMoveException : InvalidOperationException
+    public struct HiResTimerArgs
     {
-        public InvalidMoveException()
+        internal HiResTimerArgs(double delay, int sourceId)
         {
+            Delay = delay;
+            SourceId = sourceId;
         }
 
-        public InvalidMoveException(string message)
-            : base(message) { }
+        public double Delay;
 
-        public InvalidMoveException(string message, Exception innerException)
-            : base(message, innerException) { }
-
-        protected InvalidMoveException(SerializationInfo info, StreamingContext context)
-            : base(info, context) { }
+        public int SourceId;
     }
 }

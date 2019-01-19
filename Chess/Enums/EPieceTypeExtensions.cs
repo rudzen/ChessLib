@@ -24,24 +24,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Exceptions
+namespace Rudz.Chess.Enums
 {
-    using System;
-    using System.Runtime.Serialization;
+    using System.Runtime.CompilerServices;
+    using Types;
 
-    public sealed class InvalidMoveException : InvalidOperationException
+    public static class EPieceTypeExtensions
     {
-        public InvalidMoveException()
-        {
-        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Piece MakePiece(this EPieceType @this, Player side) => @this + (side.Side << 3);
 
-        public InvalidMoveException(string message)
-            : base(message) { }
-
-        public InvalidMoveException(string message, Exception innerException)
-            : base(message, innerException) { }
-
-        protected InvalidMoveException(SerializationInfo info, StreamingContext context)
-            : base(info, context) { }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int ToInt(this EPieceType p) => (int)p;
     }
 }

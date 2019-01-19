@@ -83,18 +83,6 @@ namespace Rudz.Chess.Types
         // Generic helper functions
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int ToInt(this EPieceType p) => (int)p;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static EPieceType Type(this Piece p) => (EPieceType)(p.ToInt() & 0x7);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Piece MakePiece(this EPieceType @this, Player side) => @this + (side.Side << 3);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsNoPiece(this Piece p) => p == EPieces.NoPiece;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static char GetPieceChar(this Piece p) => PieceChars[p.ToInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

@@ -1,4 +1,5 @@
-﻿using Perft;
+﻿using System.Threading.Tasks;
+using Perft;
 
 namespace PerftCore
 {
@@ -60,9 +61,9 @@ namespace PerftCore
             foreach (PerftPositions perftPositions in global::Perft.Perft.Positions)
             {
                 game.SetFen(perftPositions.fen);
-                ulong res = game.Perft(_perftLimit);
-                total += res;
-                CallBack?.Invoke(perftPositions.fen, res);
+                Task<ulong> res = game.Perft(_perftLimit);
+                total += res.Result;
+                CallBack?.Invoke(perftPositions.fen, res.Result);
             }
 
             return total;

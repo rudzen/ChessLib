@@ -29,7 +29,7 @@ namespace Rudz.Chess.Exceptions
     using System;
     using System.Runtime.Serialization;
 
-    public class InvalidSquareException : InvalidOperationException
+    public sealed class InvalidSquareException : InvalidOperationException
     {
         public InvalidSquareException()
         {

@@ -32,9 +32,9 @@ namespace Rudz.Chess.Enums
 
     public static class ECastlelingExtensions
     {
-        private static readonly int[] OoAllowedMask = { 1, 4 };
+        private static readonly ECastlelingRights[] OoAllowedMask = { ECastlelingRights.WhiteKing, ECastlelingRights.BlackKing };
 
-        private static readonly int[] OooAllowedMask = { 2, 8 };
+        private static readonly ECastlelingRights[] OooAllowedMask = { ECastlelingRights.WhiteQueen, ECastlelingRights.BlackQueen };
 
         private static readonly Square[] OoKingTo = { ESquare.g1, ESquare.g8 };
 
@@ -58,7 +58,7 @@ namespace Rudz.Chess.Enums
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static int GetCastleAllowedMask(this ECastleling castleType, Player side)
+        internal static ECastlelingRights GetCastleAllowedMask(this ECastleling castleType, Player side)
         {
             // ReSharper disable once SwitchStatementMissingSomeCases
             switch (castleType)
@@ -73,6 +73,29 @@ namespace Rudz.Chess.Enums
                     throw new ArgumentOutOfRangeException(nameof(castleType), castleType, null);
             }
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal static ECastlelingRights GetCastleAllowedMask(this Player side)
+        {
+            return OoAllowedMask[side.Side] | OooAllowedMask[side.Side];
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal static ECastlelingRights GetCastleAllowedMask(this ECastleling castleType)
+        {
+            switch (castleType)
+            {
+                case ECastleling.None:
+                    return ECastlelingRights.None;
+                case ECastleling.Short:
+                    return OoAllowedMask[0] | OoAllowedMask[1];
+                case ECastleling.Long:
+                    return OooAllowedMask[0] | OooAllowedMask[1];
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(castleType), castleType, null);
+            }
+        }
+
 
         public static string GetCastlelingString(this ECastleling @this)
         {

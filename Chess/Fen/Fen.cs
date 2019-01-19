@@ -106,20 +106,20 @@ namespace Rudz.Chess.Fen
 
             sv.Append(state.SideToMove.IsWhite() ? " w " : " b ");
 
-            int castleRights = state.CastlelingRights;
+            ECastlelingRights castleRights = state.CastlelingRights;
 
-            if (castleRights != 0)
+            if (castleRights != ECastlelingRights.None)
             {
-                if ((castleRights & 1) != 0)
+                if (castleRights.HasFlagFast(ECastlelingRights.WhiteKing))
                     sv.Append('K');
 
-                if ((castleRights & 2) != 0)
+                if (castleRights.HasFlagFast(ECastlelingRights.WhiteQueen))
                     sv.Append('Q');
 
-                if ((castleRights & 4) != 0)
+                if (castleRights.HasFlagFast(ECastlelingRights.BlackKing))
                     sv.Append('k');
 
-                if ((castleRights & 8) != 0)
+                if (castleRights.HasFlagFast(ECastlelingRights.BlackQueen))
                     sv.Append('q');
             }
             else

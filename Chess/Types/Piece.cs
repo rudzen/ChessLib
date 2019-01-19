@@ -126,6 +126,12 @@ namespace Rudz.Chess.Types
         public bool IsBlack() => ToInt().InBetween((int)EPieces.BlackPawn, (int)EPieces.BlackKing);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public EPieceType Type() => (EPieceType)(ToInt() & 0x7);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool IsNoPiece() => Value == EPieces.NoPiece;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals(Piece other) => Value == other.Value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

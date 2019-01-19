@@ -1,4 +1,5 @@
-﻿using Rudz.Chess;
+﻿using System.Threading.Tasks;
+using Rudz.Chess;
 using Rudz.Chess.Extensions;
 
 namespace Perft
@@ -27,12 +28,13 @@ namespace Perft
 
             Perft p = new Perft(depth) { CallBack = Callback };
             Stopwatch watch = Stopwatch.StartNew();
-            ulong result = p.DoPerft();
+            var result = p.DoPerftAsync();
+            Task.WaitAll(result);
             long elapsedMs = watch.ElapsedMilliseconds;
 
+            Console.WriteLine($"Nps        : {1000 * result.Result / (ulong)elapsedMs}");
             Console.WriteLine($"Time (ms)  : {elapsedMs}");
-            Console.WriteLine($"Nps        : {1000 * result / (ulong)elapsedMs}");
-            Console.WriteLine(Positions[0].value[depth - 1] == result
+            Console.WriteLine(Positions[0].value[depth - 1] == result.Result
                 ? "Move count matches!"
                 : "Move count failed!");
 
@@ -52,6 +54,11 @@ namespace Perft
         /// </summary>
         private Action<string, ulong> CallBack { get; set; }
 
+        private Task<ulong> DoPerftAsync()
+        {
+            return Task.FromResult(DoPerft());
+        }
+
         private ulong DoPerft()
         {
             Game game = new Game();
@@ -59,9 +66,9 @@ namespace Perft
             foreach (PerftPositions perftPositions in Positions)
             {
                 game.SetFen(perftPositions.fen);
-                ulong res = game.Perft(_perftLimit);
-                total += res;
-                CallBack?.Invoke(perftPositions.fen, res);
+                var res = game.Perft(_perftLimit);
+                total += res.Result;
+                CallBack?.Invoke(perftPositions.fen, res.Result);
             }
 
             return total;

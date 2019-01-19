@@ -26,8 +26,12 @@ SOFTWARE.
 
 namespace Rudz.Chess.UCI
 {
-    public interface IHiResTimer
+    using System;
+
+    public interface IHiResTimer : IDisposable
     {
+        Action<HiResTimerArgs> Elapsed { get; set; }
+
         float Interval { get; set; }
 
         bool IsRunning { get; }

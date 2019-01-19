@@ -143,7 +143,7 @@ namespace Rudz.Chess.Types
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int File() => ToInt() & 7;
+        public EFile File() => (EFile) (ToInt() & 7);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ERank RankOf() => (ERank)(ToInt() >> 3);
