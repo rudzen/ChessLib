@@ -326,7 +326,7 @@ namespace Rudz.Chess
             State.Key ^= Zobrist.GetZobristCastleling(State.CastlelingRights);
 
             if (State.EnPassantSquare)
-                State.Key ^= Zobrist.GetZobristEnPessant(BitBoards.First(State.EnPassantSquare).File());
+                State.Key ^= Zobrist.GetZobristEnPessant(State.EnPassantSquare.First().File());
 
             State.InCheck = Position.IsAttacked(Position.KingSquares[player.Side], ~State.SideToMove);
 
