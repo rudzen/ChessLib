@@ -38,3 +38,5 @@ Chess\.Tests/bin/
 
 
 PerftFramework/obj/x64/Release/
+
+PerftFramework/obj/x64/Debug/

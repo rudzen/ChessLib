@@ -125,6 +125,10 @@ namespace Rudz.Chess.Types
 
         private static readonly ulong[] Rank7And8 = { RANK7 | RANK8, RANK1 | RANK2 };
 
+        private static readonly Func<BitBoard, BitBoard>[] _pawnAttacksWest = { NorthEastOne, SouthEastOne };
+
+        private static readonly Func<BitBoard, BitBoard>[] _pawnAttacksEast = { NorthWestOne, SouthWestOne };
+
         private static readonly int[] Lsb64Table =
             {
                 63, 30,  3, 32, 59, 14, 11, 33,
@@ -285,6 +289,19 @@ namespace Rudz.Chess.Types
                             ? square.QueenAttacks(occupied)
                             : Zero;
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static BitBoard GetPawnAttacks(this BitBoard pawns, Player c)
+        {
+            return _pawnAttacksEast[c.Side](pawns) | _pawnAttacksWest[c.Side](pawns);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static BitBoard GetPawnAttacks(this Square square, Player c)
+        {
+            return GetPawnAttacks(new BitBoard(square), c);
+        }
+
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ref BitBoard PseudoAttack(this Square @this, EPieceType pieceType) => ref PseudoAttacksBB[pieceType.ToInt(), @this.ToInt()];

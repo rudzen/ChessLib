@@ -30,6 +30,7 @@ namespace Rudz.Chess
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Runtime;
     using System.Runtime.CompilerServices;
     using Types;
@@ -44,12 +45,6 @@ namespace Rudz.Chess
         // to be replaced
         private readonly Func<BitBoard, BitBoard>[] _pawnAttacksEast = { BitBoards.NorthWestOne, BitBoards.SouthWestOne };
 
-        private BitBoard[] _bitboardPieces;
-
-        private BitBoard[] _occupiedBySide;
-
-        private BitBoard _occupied;
-
         static MoveGenerator()
         {
             Table = new ConcurrentDictionary<ulong, List<Move>>();
@@ -61,8 +56,6 @@ namespace Rudz.Chess
         protected internal MoveGenerator(Position position)
         {
             Position = position;
-            _bitboardPieces = position.BoardPieces;
-            _occupiedBySide = position.OccupiedBySide;
         }
 
         public ECastlelingRights CastlelingRights { get; set; }
@@ -145,7 +138,7 @@ namespace Rudz.Chess
         public bool IsPseudoLegal(Move move)
         {
             // Verify that the piece actually exists on the board at the location defined by the move struct
-            if ((_bitboardPieces[move.GetMovingPiece().ToInt()] & move.GetFromSquare()).Empty())
+            if ((Position.BoardPieces[move.GetMovingPiece().ToInt()] & move.GetFromSquare()).Empty())
                 return false;
 
             Square to = move.GetToSquare();
@@ -174,13 +167,13 @@ namespace Rudz.Chess
             else if (move.IsCaptureMove())
             {
                 Player opponent = ~move.GetMovingSide();
-                if ((_occupiedBySide[opponent.Side] & to).Empty())
+                if ((Position.OccupiedBySide[opponent.Side] & to).Empty())
                     return false;
 
-                if ((_bitboardPieces[move.GetCapturedPiece().ToInt()] & to).Empty())
+                if ((Position.BoardPieces[move.GetCapturedPiece().ToInt()] & to).Empty())
                     return false;
             }
-            else if (!(_occupied & to).Empty())
+            else if (!(Position.Occupied & to).Empty())
             {
                 return false;
             }
@@ -191,7 +184,7 @@ namespace Rudz.Chess
                 case EPieceType.Bishop:
                 case EPieceType.Rook:
                 case EPieceType.Queen:
-                    if (move.GetFromSquare().BitboardBetween(to) & _occupied)
+                    if (move.GetFromSquare().BitboardBetween(to) & Position.Occupied)
                         return false;
 
                     break;
@@ -225,10 +218,6 @@ namespace Rudz.Chess
             if (flags.HasFlagFast(Emgf.Legalmoves))
                 Pinned = Position.GetPinnedPieces(Position.KingSquares[SideToMove.Side], SideToMove);
 
-            _occupied = Position.Occupied;
-            _occupiedBySide = Position.OccupiedBySide;
-            _bitboardPieces = Position.BoardPieces;
-
             Flags = flags;
         }
 
@@ -236,13 +225,13 @@ namespace Rudz.Chess
         {
             Player us = SideToMove;
             Player them = ~us;
-            BitBoard occupiedByThem = _occupiedBySide[them.Side];
+            BitBoard occupiedByThem = Position.OccupiedBySide[them.Side];
 
             AddMoves(moves, occupiedByThem);
 
             BitBoard pawns = Position.Pieces(EPieceType.Pawn, us);
 
-            AddPawnMoves(moves, us.PawnPush(pawns & us.Rank7()) & ~_occupied, us.PawnPushDistance(), EMoveType.Quiet);
+            AddPawnMoves(moves, us.PawnPush(pawns & us.Rank7()) & ~Position.Occupied, us.PawnPushDistance(), EMoveType.Quiet);
             AddPawnMoves(moves, _pawnAttacksWest[us.Side](pawns) & occupiedByThem, us.PawnWestAttackDistance(), EMoveType.Capture);
             AddPawnMoves(moves, _pawnAttacksEast[us.Side](pawns) & occupiedByThem, us.PawnEastAttackDistance(), EMoveType.Capture);
             AddPawnMoves(moves, _pawnAttacksWest[us.Side](pawns) & EnPassantSquare, us.PawnWestAttackDistance(), EMoveType.Epcapture);
@@ -259,10 +248,10 @@ namespace Rudz.Chess
                         AddCastleMove(moves, Position.GetKingCastleFrom(us, castleType), castleType.GetKingCastleTo(us));
                 }
 
-            BitBoard notOccupied = ~_occupied;
+            BitBoard notOccupied = ~Position.Occupied;
             BitBoard pushed = us.PawnPush(Position.Pieces(EPieceType.Pawn, us).Value & ~us.Rank7()) & notOccupied;
             AddPawnMoves(moves, pushed.Value, us.PawnPushDistance(), EMoveType.Quiet);
-            AddPawnMoves(moves,  us.PawnPush(pushed.Value & us.Rank3()) & notOccupied, us.PawnDoublePushDistance(), EMoveType.Doublepush);
+            AddPawnMoves(moves, us.PawnPush(pushed.Value & us.Rank3()) & notOccupied, us.PawnDoublePushDistance(), EMoveType.Doublepush);
             AddMoves(moves, notOccupied);
         }
 
@@ -322,7 +311,7 @@ namespace Rudz.Chess
             for (EPieceType pieceType = EPieceType.Queen; pieceType >= EPieceType.Bishop; --pieceType)
             {
                 Piece p = pieceType.MakePiece(us);
-                foreach (Square sq in _bitboardPieces[p.ToInt()])
+                foreach (Square sq in Position.BoardPieces[p.ToInt()])
                     AddMoves(moves, p, sq, sq.GetAttacks(pieceType, occupied) & targetSquares);
             }
 
@@ -340,12 +329,114 @@ namespace Rudz.Chess
             //    AddMoves(moves, piece, from, from.GetAttacks(EPieceType.Bishop, occupied) & targetSquares);
 
             Piece piece = EPieceType.Knight.MakePiece(us);
-            foreach (Square square in _bitboardPieces[piece.ToInt()])
+            foreach (Square square in Position.BoardPieces[piece.ToInt()])
                 AddMoves(moves, piece, square, square.GetAttacks(EPieceType.Knight) & targetSquares);
 
             piece = EPieceType.King.MakePiece(us);
-            foreach (Square square in _bitboardPieces[piece.ToInt()])
+            foreach (Square square in Position.BoardPieces[piece.ToInt()])
                 AddMoves(moves, piece, square, square.GetAttacks(EPieceType.King) & targetSquares);
+        }
+
+        private void AddPawnAttackMoves(ICollection<Move> moves, BitBoard pawns)
+        {
+            Player us = SideToMove;
+            Piece p = EPieceType.Pawn.MakePiece(us);
+
+            const EMoveType capture = EMoveType.Capture;
+
+            foreach (Square fromSq in pawns)
+            {
+                BitBoard targets = fromSq.GetPawnAttacks(us);
+
+                foreach (Square toSq in targets)
+                {
+                    if (!toSq.IsPromotionRank())
+                    {
+                        AddMove(moves, p, fromSq, toSq, PieceExtensions.EmptyPiece, capture);
+                        continue;
+                    }
+
+                    if (Flags.HasFlagFast(Emgf.Queenpromotion))
+                    {
+                        AddMove(moves, p, fromSq, toSq, EPieceType.Queen.MakePiece(us), capture | EMoveType.Promotion);
+                        return;
+                    }
+
+                    for (EPieceType promotedPiece = EPieceType.Queen; promotedPiece >= EPieceType.Knight; promotedPiece--)
+                        AddMove(moves, p, fromSq, toSq, promotedPiece.MakePiece(SideToMove), capture | EMoveType.Promotion);
+                }
+            }
+
+            BitBoard enPassantAttacks = pawns.GetPawnAttacks(us) & EnPassantSquare;
+
+            // en-passant
+            if (!enPassantAttacks.Empty())
+            {
+                BitBoard fromSquares = enPassantAttacks.GetPawnAttacks(~us) & pawns;
+                foreach (Square fromSq in fromSquares)
+                {
+                    AddMove(moves, p, fromSq, EnPassantSquare.First(), PieceExtensions.EmptyPiece, EMoveType.Epcapture);
+                }
+            }
+        }
+
+        private void AddPawnQuiteMoves(ICollection<Move> moves, BitBoard pawns)
+        {
+            Player us = SideToMove;
+            Piece p = EPieceType.Pawn.MakePiece(us);
+
+            const EMoveType quiet = EMoveType.Quiet;
+
+            foreach (Square fromSq in pawns)
+            {
+                Square toSq = fromSq + us.PawnPushDistance();
+
+                if (!toSq.IsPromotionRank())
+                {
+                    AddMove(moves, p, fromSq, toSq, PieceExtensions.EmptyPiece);
+                    continue;
+                }
+
+                if (Flags.HasFlagFast(Emgf.Queenpromotion))
+                {
+                    AddMove(moves, p, fromSq, toSq, EPieceType.Queen.MakePiece(us), quiet | EMoveType.Promotion);
+                    return;
+                }
+
+                for (EPieceType promotedPiece = EPieceType.Queen; promotedPiece >= EPieceType.Knight; promotedPiece--)
+                    AddMove(moves, p, fromSq, toSq, promotedPiece.MakePiece(SideToMove), quiet | EMoveType.Promotion);
+            }
+        }
+
+        private void AddPawnMoves(ICollection<Move> moves, BitBoard pawns, BitBoard attackSquares, EMoveType type)
+        {
+            if (attackSquares.Empty())
+                return;
+
+            Piece pawn = EPieceType.Pawn.MakePiece(SideToMove);
+
+            foreach (var fromSquare in pawns)
+            {
+                BitBoard targets = fromSquare.GetPawnAttacks(SideToMove);
+
+                foreach (var toSquare in targets)
+                {
+                    if (!toSquare.IsPromotionRank())
+                    {
+                        AddMove(moves, pawn, fromSquare, toSquare, PieceExtensions.EmptyPiece, type);
+                        continue;
+                    }
+
+                    if (Flags.HasFlagFast(Emgf.Queenpromotion))
+                    {
+                        AddMove(moves, pawn, fromSquare, toSquare, EPieceType.Queen.MakePiece(SideToMove), type | EMoveType.Promotion);
+                        return;
+                    }
+
+                    for (EPieceType promotedPiece = EPieceType.Queen; promotedPiece >= EPieceType.Knight; promotedPiece--)
+                        AddMove(moves, pawn, fromSquare, toSquare, promotedPiece.MakePiece(SideToMove), type | EMoveType.Promotion);
+                }
+            }
         }
 
         private void AddPawnMoves(ICollection<Move> moves, BitBoard targetSquares, Direction direction, EMoveType type)
@@ -410,11 +501,11 @@ namespace Rudz.Chess
             castleSpan |= kingSquare.BitboardBetween(rookFrom) | rookFrom.BitboardBetween(rookTo);
 
             // check that the span AND current occupied pieces are no different that the piece themselves.
-            if ((castleSpan & _occupied) != castlePieces)
+            if ((castleSpan & Position.Occupied) != castlePieces)
                 return false;
 
             // Check that no square between the king's initial and final squares (including the initial and final squares)
-            // may be under attack by an enemy piece. Initial square was already checked a this point.
+            // may be under attack by an enemy piece(s). Initial square was already checked a this point.
 
             us = ~us;
 
