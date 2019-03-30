@@ -40,11 +40,11 @@ namespace Rudz.Chess.Extensions
         /// <returns></returns>
         public static IEnumerable<string> Parse(this string command, char separator, char tokenizer)
         {
-            int startIndex = 0;
-            bool inToken = false;
-            for (int index = 0; index < command.Length; index++)
+            var startIndex = 0;
+            var inToken = false;
+            for (var index = 0; index < command.Length; index++)
             {
-                char character = command[index];
+                var character = command[index];
                 if (index == command.Length - 1)
                 {
                     // return last token.

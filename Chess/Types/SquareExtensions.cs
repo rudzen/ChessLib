@@ -68,7 +68,7 @@ namespace Rudz.Chess.Types
             RookCastlesTo = new Square[64];
 
             // generate square flipping array for both sides
-            foreach (Square square in BitBoards.AllSquares)
+            foreach (var square in BitBoards.AllSquares)
             {
                 int file = square.File();
                 ERank rank = square.RankOf();
@@ -76,10 +76,10 @@ namespace Rudz.Chess.Types
                 Flip[1, square.ToInt()] = file + ((int)rank << 3);
 
                 // distance computation
-                foreach (Square distSquare in BitBoards.AllSquares)
+                foreach (var distSquare in BitBoards.AllSquares)
                 {
-                    int ranks = Math.Abs(rank - distSquare.RankOf());
-                    int files = Math.Abs((int)rank - distSquare.File());
+                    var ranks = Math.Abs(rank - distSquare.RankOf());
+                    var files = Math.Abs((int)rank - distSquare.File());
                     Distance[square.ToInt(), distSquare.ToInt()] = ranks.Max(files);
                 }
             }
@@ -122,11 +122,7 @@ namespace Rudz.Chess.Types
         public static char FileChar(this Square s) => FileChars[s.File()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsOppositeOf(this Square @this, Square other)
-        {
-            int s = @this.ToInt() ^ other.ToInt();
-            return (((s >> 3) ^ s) & 1) != 0;
-        }
+        public static bool IsOppositeOf(this Square @this, Square other) => ((BitBoards.DarkSquares & @this) != 0) != ((BitBoards.DarkSquares & other) != 0);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ref string GetSquareString(this Square s) => ref SquareStrings[s.ToInt()];

@@ -74,18 +74,19 @@ namespace Rudz.Chess.Enums
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string GetCastlelingString(this ECastleling @this)
         {
             switch (@this)
             {
-                case ECastleling.None:
-                    return string.Empty;
-
                 case ECastleling.Short:
                     return "O-O";
 
                 case ECastleling.Long:
                     return "O-O-O";
+
+                case ECastleling.None:
+                    return string.Empty;
 
                 case ECastleling.CastleNb:
                     return string.Empty;
@@ -95,6 +96,7 @@ namespace Rudz.Chess.Enums
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string GetCastlelingString(Square toSquare, Square fromSquare)
         {
             return toSquare < fromSquare ? "O-O-O" : "O-O";

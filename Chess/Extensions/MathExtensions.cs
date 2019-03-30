@@ -70,10 +70,10 @@ namespace Rudz.Chess.Extensions
             if (string.IsNullOrWhiteSpace(str))
                 return 0;
 
-            int x = 0;
-            bool neg = false;
-            int pos = 0;
-            int max = str.Length - 1;
+            var x = 0;
+            var neg = false;
+            var pos = 0;
+            var max = str.Length - 1;
             if (str[pos] == '-')
             {
                 neg = true;
@@ -97,10 +97,10 @@ namespace Rudz.Chess.Extensions
                 return false;
             }
 
-            int x = 0;
-            bool neg = false;
-            int pos = 0;
-            int max = str.Length - 1;
+            var x = 0;
+            var neg = false;
+            var pos = 0;
+            var max = str.Length - 1;
             if (str[pos] == '-')
             {
                 neg = true;
@@ -127,8 +127,8 @@ namespace Rudz.Chess.Extensions
             }
 
             ulong x = 0;
-            int pos = 0;
-            int max = str.Length - 1;
+            var pos = 0;
+            var max = str.Length - 1;
             while (pos <= max && InBetween(str[pos], '0', '9'))
             {
                 x = x * 10 + (ulong)(str[pos] - '0');
