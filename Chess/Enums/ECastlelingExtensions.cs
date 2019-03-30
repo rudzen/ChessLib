@@ -97,9 +97,12 @@ namespace Rudz.Chess.Enums
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string GetCastlelingString(Square toSquare, Square fromSquare)
-        {
-            return toSquare < fromSquare ? "O-O-O" : "O-O";
-        }
+        public static string GetCastlelingString(Square toSquare, Square fromSquare) => toSquare < fromSquare ? "O-O-O" : "O-O";
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool HasFlagFast(this ECastleling value, ECastleling flag) => (value & flag) != 0;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool HasFlagFast(this ECastlelingRights value, ECastlelingRights flag) => (value & flag) != 0;
     }
 }

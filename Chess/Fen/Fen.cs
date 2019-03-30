@@ -71,16 +71,16 @@ namespace Rudz.Chess.Fen
         /// </returns>
         public static FenData GenerateFen([NotNull] this State state, Piece[] boardLayout, int halfMoveCount)
         {
-            StringBuilder sv = new StringBuilder(MaxFenLen);
+            var sv = new StringBuilder(MaxFenLen);
 
-            for (ERank rank = ERank.Rank8; rank >= ERank.Rank1; rank--)
+            for (var rank = ERank.Rank8; rank >= ERank.Rank1; rank--)
             {
-                int empty = 0;
+                var empty = 0;
 
-                for (EFile file = EFile.FileA; file < EFile.FileNb; file++)
+                for (var file = EFile.FileA; file < EFile.FileNb; file++)
                 {
-                    Square square = new Square(rank, file);
-                    Piece piece = boardLayout[square.ToInt()];
+                    var square = new Square(rank, file);
+                    var piece = boardLayout[square.ToInt()];
 
                     if (piece.IsNoPiece())
                     {
@@ -106,7 +106,7 @@ namespace Rudz.Chess.Fen
 
             sv.Append(state.SideToMove.IsWhite() ? " w " : " b ");
 
-            int castleRights = state.CastlelingRights;
+            var castleRights = state.CastlelingRights;
 
             if (castleRights != 0)
             {
@@ -154,12 +154,12 @@ namespace Rudz.Chess.Fen
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Validate([CanBeNull] string fen)
         {
-            if (fen == null)
+            if (string.IsNullOrWhiteSpace(fen))
                 return false;
 
-            string f = fen.Trim();
+            var f = fen.Trim();
 
-            return f.Length <= MaxFenLen && CountValidity(f) && ValidFenRegex.Value.IsMatch(fen) && CountPieceValidity(f);
+            return f.Length <= MaxFenLen && CountValidity(f.AsSpan()) && ValidFenRegex.Value.IsMatch(fen) && CountPieceValidity(f);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -168,7 +168,7 @@ namespace Rudz.Chess.Fen
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ESquare GetEpSquare(this FenData fen)
         {
-            char c = fen.GetAdvance();
+            var c = fen.GetAdvance();
 
             if (c == '-')
                 return ESquare.none;
@@ -176,7 +176,7 @@ namespace Rudz.Chess.Fen
             if (!c.InBetween('a', 'h'))
                 return ESquare.fail;
 
-            char c2 = fen.GetAdvance();
+            var c2 = fen.GetAdvance();
 
             return c.InBetween('3', '6') ? ESquare.fail : new Square(c2 - '1', c - 'a').Value;
         }
@@ -184,7 +184,7 @@ namespace Rudz.Chess.Fen
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static bool CountPieceValidity([NotNull] string str)
         {
-            string[] testArray = str.Split();
+            var testArray = str.Split();
             short whitePawnCount = 0;
             short whiteRookCount = 0;
             short whiteQueenCount = 0;
@@ -199,7 +199,7 @@ namespace Rudz.Chess.Fen
             short blackKingCount = 0;
             short blackBishopCount = 0;
 
-            foreach (char c in testArray[0])
+            foreach (var c in testArray[0])
             {
                 // ReSharper disable once SwitchStatementMissingSomeCases
                 switch (c)
@@ -275,14 +275,16 @@ namespace Rudz.Chess.Fen
         /// <param name="str">The fen string to check</param>
         /// <returns>true if format seems ok, otherwise false</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static bool CountValidity([NotNull] string str)
+        private static bool CountValidity(ReadOnlySpan<char> str)
         {
-            int spaceCount = 0;
-            int seperatorCount = 0;
-            foreach (char c in str)
+            var spaceCount = 0;
+            var seperatorCount = 0;
+
+            // ReSharper disable once ForCanBeConvertedToForeach
+            for (var index = 0; index < str.Length; index++)
             {
-                // ReSharper disable once SwitchStatementMissingSomeCases
-                switch (c)
+// ReSharper disable once SwitchStatementMissingSomeCases
+                switch (str[index])
                 {
                     case Seperator:
                         seperatorCount++;

@@ -233,9 +233,7 @@ namespace Rudz.Chess.Types
                     notation.Append('x');
                 }
                 else
-                {
                     notation.Append('-');
-                }
 
                 notation.Append(to.ToString());
 
