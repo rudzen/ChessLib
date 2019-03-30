@@ -91,7 +91,6 @@ namespace Rudz.Chess.Types
 
         /// <summary>
         /// <para>Converts a move to FAN notation.</para>
-        /// TODO : Make unit test
         /// </summary>
         /// <param name="move">The move to convert</param>
         /// <param name="moveGenerator"></param>
@@ -119,12 +118,12 @@ namespace Rudz.Chess.Types
                     // note that for pawns is not needed because starting file is explicit.
                     var similarTypeAttacks = move.GetSimilarAttacks(moveGenerator.Position);
 
-                    var ambiguity = move.Ambiguity(similarTypeAttacks, moveGenerator.Position);
+                    var (ambiguousMove, ambiguousFile, ambiguousRank) = move.Ambiguity(similarTypeAttacks, moveGenerator.Position);
 
-                    if (ambiguity != EMoveAmbiguity.None)
-                        if (!ambiguity.HasFlagFast(EMoveAmbiguity.File))
+                    if (ambiguousMove)
+                        if (!ambiguousFile)
                             notation.Append(from.FileChar());
-                        else if (!ambiguity.HasFlagFast(EMoveAmbiguity.Rank))
+                        else if (!ambiguousRank)
                             notation.Append(from.RankOfChar());
                         else
                             notation.Append(from.ToString());
@@ -151,15 +150,14 @@ namespace Rudz.Chess.Types
                 }
             }
 
-            if (!moveGenerator.InCheck) return notation.ToString();
+            if (moveGenerator.InCheck)
+                notation.Append(moveGenerator.GetCheckChar());
 
-            notation.Append(moveGenerator.GetCheckChar());
             return notation.ToString();
         }
 
         /// <summary>
         /// <para>Converts a move to SAN notation.</para>
-        /// TODO : Make unit test
         /// </summary>
         /// <param name="move">The move to convert</param>
         /// <param name="moveGenerator"></param>
@@ -187,13 +185,13 @@ namespace Rudz.Chess.Types
                     // note that for pawns is not needed because starting file is explicit.
                     var simularTypeAttacks = move.GetSimilarAttacks(moveGenerator.Position);
 
-                    var ambiguity = move.Ambiguity(simularTypeAttacks, moveGenerator.Position);
+                    var (ambiguousMove, ambiguousFile, ambiguousRank) = move.Ambiguity(simularTypeAttacks, moveGenerator.Position);
 
-                    if (ambiguity != EMoveAmbiguity.None)
+                    if (ambiguousMove)
                     {
-                        if (!ambiguity.HasFlagFast(EMoveAmbiguity.File))
+                        if (!ambiguousFile)
                             notation.Append(from.FileChar());
-                        else if (!ambiguity.HasFlagFast(EMoveAmbiguity.Rank))
+                        else if (!ambiguousRank)
                             notation.Append(from.RankOfChar());
                         else
                             notation.Append(from.ToString());
@@ -222,10 +220,9 @@ namespace Rudz.Chess.Types
                 }
             }
 
-            if (!moveGenerator.InCheck)
-                return notation.ToString();
+            if (moveGenerator.InCheck)
+                notation.Append(moveGenerator.GetCheckChar());
 
-            notation.Append(moveGenerator.GetCheckChar());
             return notation.ToString();
         }
 
@@ -266,7 +263,9 @@ namespace Rudz.Chess.Types
                     notation.Append('x');
                 }
                 else
+                {
                     notation.Append('-');
+                }
 
                 notation.Append(to.ToString());
 
@@ -277,10 +276,9 @@ namespace Rudz.Chess.Types
                 }
             }
 
-            if (!moveGenerator.InCheck)
-                return notation.ToString();
+            if (moveGenerator.InCheck)
+                notation.Append(moveGenerator.GetCheckChar());
 
-            notation.Append(moveGenerator.GetCheckChar());
             return notation.ToString();
         }
 
@@ -336,10 +334,9 @@ namespace Rudz.Chess.Types
                 }
             }
 
-            if (!moveGenerator.InCheck)
-                return notation.ToString();
+            if (moveGenerator.InCheck)
+                notation.Append(moveGenerator.GetCheckChar());
 
-            notation.Append(moveGenerator.GetCheckChar());
             return notation.ToString();
         }
 
@@ -351,9 +348,11 @@ namespace Rudz.Chess.Types
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static EMoveAmbiguity Ambiguity(this Move move, BitBoard similarTypeAttacks, IPosition position)
+        private static (bool, bool, bool) Ambiguity(this Move move, BitBoard similarTypeAttacks, IPosition position)
         {
-            var ambiguity = EMoveAmbiguity.None;
+            var ambiguousMove = false;
+            var ambiguousFile = false;
+            var ambiguousRank = false;
 
             foreach (var square in similarTypeAttacks)
             {
@@ -369,13 +368,15 @@ namespace Rudz.Chess.Types
                 if (position.OccupiedBySide[move.GetMovingSide().Side] & square)
                 {
                     if (square.File() == move.GetFromSquare().File())
-                        ambiguity |= EMoveAmbiguity.File;
+                        ambiguousFile = true;
                     else if (square.RankOf() == move.GetFromSquare().RankOf())
-                        ambiguity |= EMoveAmbiguity.Rank;
+                        ambiguousRank = true;
+
+                    ambiguousMove = true;
                 }
             }
 
-            return ambiguity;
+            return (ambiguousMove, ambiguousFile, ambiguousRank);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
