@@ -50,6 +50,8 @@ namespace Rudz.Chess.Types
 
         public const ulong PromotionRanks = RANK1 | RANK8;
 
+        public static readonly BitBoard EmptyBitBoard;
+
         public static readonly BitBoard AllSquares;
 
         public static readonly BitBoard CornerA1;
@@ -95,17 +97,17 @@ namespace Rudz.Chess.Types
 
         private const ulong RANK1 = 0x00000000000000ff;
 
-        private const ulong RANK2 = 0x000000000000ff00;
+        public const ulong RANK2 = 0x000000000000ff00;
 
-        private const ulong RANK3 = 0x0000000000ff0000;
+        public const ulong RANK3 = 0x0000000000ff0000;
 
         private const ulong RANK4 = 0x00000000ff000000;
 
         private const ulong RANK5 = 0x000000ff00000000;
 
-        private const ulong RANK6 = 0x0000ff0000000000;
+        public const ulong RANK6 = 0x0000ff0000000000;
 
-        private const ulong RANK7 = 0x00ff000000000000;
+        public const ulong RANK7 = 0x00ff000000000000;
 
         private const ulong RANK8 = 0xff00000000000000;
 
@@ -165,6 +167,7 @@ namespace Rudz.Chess.Types
         {
             BetweenBB = new BitBoard[64, 64];
             PseudoAttacksBB = new BitBoard[EPieceType.PieceTypeNb.ToInt(), 64];
+            EmptyBitBoard = new BitBoard(ZeroBb);
             AllSquares = ~Zero;
             PawnAttackSpanBB = new BitBoard[2, 64];
             PassedPawnMaskBB = new BitBoard[2, 64];
@@ -473,6 +476,9 @@ namespace Rudz.Chess.Types
         /// <returns>Filled bitboard</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static BitBoard Fill(this BitBoard bb, Player side) => side == EPlayer.White ? bb.NorthFill() : bb.SouthFill();
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static BitBoard Shift(this BitBoard bb, Direction direction) => direction.Value == EDirection.North ? bb.NorthOne() : bb.SouthOne();
 
         /* non extension methods */
 
