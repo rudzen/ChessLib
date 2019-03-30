@@ -29,6 +29,7 @@ SOFTWARE.
 namespace Rudz.Chess.Enums
 {
     using System;
+    using System.Runtime.CompilerServices;
 
     /// <summary>
     /// Move generation flag
@@ -40,5 +41,11 @@ namespace Rudz.Chess.Enums
         Legalmoves = 1,
         Stages = 2,
         Queenpromotion = 4
+    }
+
+    public static class EmgfExtensions
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool HasFlagFast(this Emgf value, Emgf flag) => (value & flag) != 0;
     }
 }

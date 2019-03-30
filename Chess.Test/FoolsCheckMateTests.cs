@@ -39,7 +39,7 @@ namespace Chess.Tests
         public void FoolsCheckMateTest()
         {
             // generate moves
-            List<Move> moves = new List<Move>(4) {
+            var moves = new List<Move>(4) {
                                                       new Move(EPieces.WhitePawn, ESquare.f2, ESquare.f3),
                                                       new Move(EPieces.BlackPawn, ESquare.e7, ESquare.e5, EMoveType.Doublepush, EPieces.NoPiece),
                                                       new Move(EPieces.WhitePawn, ESquare.g2, ESquare.g4, EMoveType.Doublepush, EPieces.NoPiece),
@@ -47,11 +47,11 @@ namespace Chess.Tests
                                                   };
 
             // construct game and start a new game
-            Game game = new Game();
+            var game = new Game();
             game.NewGame();
 
             // make the moves necessary to create a mate
-            foreach (Move move in moves)
+            foreach (var move in moves)
                 Assert.True(game.MakeMove(move));
 
             // verify in check is actually true
