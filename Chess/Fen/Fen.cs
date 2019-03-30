@@ -24,17 +24,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Text.RegularExpressions;
-using Rudz.Chess.Enums;
-using Rudz.Chess.Extensions;
-using Rudz.Chess.Properties;
-using Rudz.Chess.Types;
-
 namespace Rudz.Chess.Fen
 {
+    using System;
+    using System.Runtime.CompilerServices;
+    using System.Text;
+    using System.Text.RegularExpressions;
+    using Enums;
+    using Extensions;
+    using Properties;
+    using Types;
+
     public static class Fen
     {
         public const string StartPositionFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
@@ -123,9 +123,7 @@ namespace Rudz.Chess.Fen
                     sv.Append('q');
             }
             else
-            {
                 sv.Append('-');
-            }
 
             sv.Append(' ');
 
