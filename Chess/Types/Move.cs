@@ -57,7 +57,7 @@ namespace Rudz.Chess.Types
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Move"/> struct.
-        /// Neccesary extra constructor as it can sometimes be required to only created a basic move.
+        /// Necessary extra constructor as it can sometimes be required to only created a basic move.
         /// </summary>
         /// <param name="from">The from square/// </param>
         /// <param name="to">The to square</param>

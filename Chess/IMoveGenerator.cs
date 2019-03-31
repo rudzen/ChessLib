@@ -26,7 +26,7 @@
         bool IsLegal(Move move);
 
         /// <summary>
-        /// <para>"Validates" a move basic on simple logic. For example if a piece actually exists thats being moves etc.</para>
+        /// <para>"Validates" a move basic on simple logic. For example if the piece being moved actually exists etc.</para>
         /// <para>This is basically only useful while developing and/or debugging</para>
         /// </summary>
         /// <param name="move">The move to check for logical errors</param>

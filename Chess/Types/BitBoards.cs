@@ -36,7 +36,7 @@ namespace Rudz.Chess.Types
 
     public static class BitBoards
     {
-        // TODO : Redesign some of these arrays for better memory and/or cacheline use.
+        // TODO : Redesign some of these arrays for better memory and/or cache line use.
 
         public const int Zero = 0x0;
 
@@ -309,7 +309,7 @@ namespace Rudz.Chess.Types
         public static BitBoard BitBoardRank(this Square sq) => RankBB[(int)sq.RankOf()];
 
         /// <summary>
-        /// Returns the bitboard representaion of the file of which the square is located.
+        /// Returns the bitboard representation of the file of which the square is located.
         /// </summary>
         /// <param name="this">The square</param>
         /// <returns>The bitboard of square file</returns>
@@ -490,7 +490,7 @@ namespace Rudz.Chess.Types
         public static void ResetLsb(ref BitBoard bb) => bb &= bb - 1;
 
         /// <summary>
-        /// Counts bit set in a specificed ulong
+        /// Counts bit set in a specified ulong
         /// </summary>
         /// <param name="bb">The ulong bit representation to count</param>
         /// <returns>The number of bits found</returns>

@@ -43,7 +43,7 @@ namespace Rudz.Chess.Enums
         Fan = 1,
 
         /// <summary>
-        /// The Long algebraic Notaion [almost implemented]
+        /// The Long algebraic Notation [almost implemented]
         /// </summary>
         Lan = 2,
 

@@ -66,12 +66,12 @@ namespace Rudz.Chess.Data
         private static readonly ulong[] ZobristCastling = new ulong[16];
 
         /// <summary>
-        /// En-Passant is only required to have 8 entries, one for each possible file where the En-Passant square can occour.
+        /// En-Passant is only required to have 8 entries, one for each possible file where the En-Passant square can occur.
         /// </summary>
         private static readonly ulong[] ZobristEpFile = new ulong[8];
 
         /// <summary>
-        /// This is used if the side to move is black, if the side is white, no hashing will occour.
+        /// This is used if the side to move is black, if the side is white, no hashing will occur.
         /// </summary>
         private static readonly ulong ZobristSide;
 

@@ -183,7 +183,7 @@ namespace Rudz.Chess
         /// -4 = Error while parsing moving side
         /// -5 = Error while parsing castleling
         /// -6 = Error while parsing en-passant square
-        /// -9 = FEN lenght exceeding maximum
+        /// -9 = FEN length exceeding maximum
         /// </returns>
         public FenError SetFen([CanBeNull] string fenString, bool validate = false)
         {

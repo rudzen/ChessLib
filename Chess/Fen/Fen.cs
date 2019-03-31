@@ -56,7 +56,7 @@ namespace Rudz.Chess.Fen
            RegexOptions.Compiled | RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline));
 
         /// <summary>
-        /// Parses the board layout to a FEN representaion..
+        /// Parses the board layout to a FEN representation..
         /// Beware, goblins are a foot.
         /// </summary>
         /// <param name="state">

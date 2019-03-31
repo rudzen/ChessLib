@@ -69,11 +69,11 @@ namespace Rudz.Chess
         }
 
         /// <summary>
-        /// TODO : This method is incomplete, and is not ment to be used atm.
+        /// TODO : This method is incomplete, and is not meant to be used atm.
         /// Parse a string and convert to a valid move. If the move is not valid.. hell breaks loose.
         /// * NO EXCEPTIONS IS ALLOWED IN THIS FUNCTION *
         /// </summary>
-        /// <param name="m">string representaion of the move to parse</param>
+        /// <param name="m">string representation of the move to parse</param>
         /// <returns>
         /// On fail : Move containing from and to squares as ESquare.none (empty move)
         /// On Ok   : The move!
@@ -103,7 +103,7 @@ namespace Rudz.Chess
             var from = new Square(m[1] - '1', m[0] - 'a');
             var to = new Square(m[3] - '1', m[2] - 'a');
 
-            // local function to determin if the move is actually a castleling move by looking at the piece location of the squares
+            // local function to determine if the move is actually a castleling move by looking at the piece location of the squares
             ECastleling ShredderFunc(Square fromSquare, Square toSquare) =>
                 Position.GetPiece(fromSquare).Value == EPieces.WhiteKing && Position.GetPiece(toSquare).Value == EPieces.WhiteRook
                 || Position.GetPiece(fromSquare).Value == EPieces.BlackKing && Position.GetPiece(toSquare).Value == EPieces.BlackRook

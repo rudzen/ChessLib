@@ -19,7 +19,7 @@
 *
 * -------------------------------------------------------------------------
 * Converted from C to C# code by Rudy Alex Kohn, 2017 - for use in MUCI.
-* The same conditions as descriped above is *STILL* in effect.
+* The same conditions as described above is *STILL* in effect.
 *
 * Original files: magicmoves.c and magicmoves.h
 * Conditional compile paths were removed.

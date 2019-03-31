@@ -45,7 +45,7 @@ namespace Chess.Test.Position
             var piece = position.GetPiece(square);
             Assert.Equal(EPieces.WhiteKing, piece.Value);
 
-            // Test piecetype overload
+            // Test piece type overload
 
             position = new Position(null);
 

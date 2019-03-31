@@ -60,10 +60,10 @@ namespace Rudz.Chess.Extensions
 
         /// <summary>
         /// Converts a string to an int.
-        /// Approx. 17 times faster than ints own Parse.
+        /// Approx. 17 times faster than int.Parse.
         /// </summary>
-        /// <param name="str">The frakking string</param>
-        /// <returns>The frakking string as int</returns>
+        /// <param name="str">The string to convert</param>
+        /// <returns>The resulting number</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int ToIntegral([CanBeNull] this string str)
         {
@@ -140,7 +140,7 @@ namespace Rudz.Chess.Extensions
         }
 
         /// <summary>
-        /// Modulos for pow^2 values...
+        /// Modulo for pow^2 values...
         /// </summary>
         [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1615:ElementReturnValueMustBeDocumented", Justification = "Reviewed. Suppression is OK here.")]
         [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1611:ElementParametersMustBeDocumented", Justification = "Reviewed. Suppression is OK here.")]
