@@ -175,27 +175,27 @@ namespace Rudz.Chess.Types
             ForwardFileBB = new BitBoard[2, 64];
 
             // ForwardRanksBB population loop idea from sf
-            for (ERank r = ERank.Rank1; r < ERank.RankNb; ++r)
+            for (var r = ERank.Rank1; r < ERank.RankNb; ++r)
             {
-                int rank = (int)r;
+                var rank = (int)r;
                 ForwardRanksBB[0, rank] = ~(ForwardRanksBB[1, rank + 1] = ForwardRanksBB[1, rank] | RankBB[rank]);
             }
 
-            for (EPlayer side = EPlayer.White; side < EPlayer.PlayerNb; ++side)
+            for (var side = EPlayer.White; side < EPlayer.PlayerNb; ++side)
             {
-                int c = (int)side;
-                foreach (Square square in AllSquares)
+                var c = (int)side;
+                foreach (var square in AllSquares)
                 {
-                    int s = square.ToInt();
+                    var s = square.ToInt();
                     ForwardFileBB[c, s] = ForwardRanksBB[c, (int)square.RankOf()] & FileBB[square.File()];
                     PawnAttackSpanBB[c, s] = ForwardRanksBB[c, (int)square.RankOf()] & AdjacentFilesBB[square.File()];
                     PassedPawnMaskBB[c, s] = ForwardFileBB[c, s] | PawnAttackSpanBB[c, s];
                 }
             }
 
-            foreach (Square s in AllSquares)
+            foreach (var s in AllSquares)
             {
-                foreach (Square fillSq in AllSquares)
+                foreach (var fillSq in AllSquares)
                     BetweenBB[s.ToInt(), fillSq.ToInt()] = 0;
 
                 InitBetweenBitboards(s, NorthOne, EDirection.North);
@@ -209,14 +209,14 @@ namespace Rudz.Chess.Types
             }
 
             // Pseudo attacks for all pieces
-            foreach (Square s in AllSquares)
+            foreach (var s in AllSquares)
             {
-                int sq = s.ToInt();
-                BitBoard b = s.BitBoardSquare();
+                var sq = s.ToInt();
+                var b = s.BitBoardSquare();
                 PseudoAttacksBB[0, sq] = b.NorthEastOne() | b.NorthWestOne();
                 PseudoAttacksBB[1, sq] = b.SouthWestOne() | b.SouthEastOne();
 
-                int pt = EPieceType.Knight.ToInt();
+                var pt = EPieceType.Knight.ToInt();
                 PseudoAttacksBB[pt, sq] = (b & ~(FILEA | FILEB)) << 6;
                 PseudoAttacksBB[pt, sq] |= (b & ~FILEA) << 15;
                 PseudoAttacksBB[pt, sq] |= (b & ~FILEH) << 17;
@@ -255,7 +255,7 @@ namespace Rudz.Chess.Types
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static BitBoard XrayBishopAttacks(this Square square, BitBoard occupied, BitBoard blockers)
         {
-            BitBoard attacks = square.BishopAttacks(occupied);
+            var attacks = square.BishopAttacks(occupied);
             blockers &= attacks;
             return attacks ^ square.BishopAttacks(occupied ^ blockers);
         }
@@ -263,7 +263,7 @@ namespace Rudz.Chess.Types
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static BitBoard XrayRookAttacks(this Square square, BitBoard occupied, BitBoard blockers)
         {
-            BitBoard attacks = square.RookAttacks(occupied);
+            var attacks = square.RookAttacks(occupied);
             blockers &= attacks;
             return attacks ^ square.RookAttacks(occupied ^ blockers);
         }
@@ -380,13 +380,13 @@ namespace Rudz.Chess.Types
 
         public static string PrintBitBoard(BitBoard b, string title = "")
         {
-            StringBuilder s = new StringBuilder(title, 128);
+            var s = new StringBuilder(title, 128);
             s.Append("\n+---+---+---+---+---+---+---+---+\n");
-            for (int r = 7; r >= 0; r--)
+            for (var r = 7; r >= 0; r--)
             {
                 s.Append(r + 1);
                 s.Append(' ');
-                for (int f = 0; f <= 7; f++)
+                for (var f = 0; f <= 7; f++)
                 {
                     s.Append(b & BbSquares[(r << 3) + f] ? " 1 " : " . ");
                     s.Append(' ');
@@ -409,7 +409,7 @@ namespace Rudz.Chess.Types
         {
             // @ C author Matt Taylor (2003)
             bb ^= bb - 1;
-            uint folded = (uint)(bb ^ (bb >> 32));
+            var folded = (uint)(bb ^ (bb >> 32));
             return Lsb64Table[folded * 0x78291ACF >> 26];
         }
 
@@ -497,7 +497,7 @@ namespace Rudz.Chess.Types
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int PopCount(BitBoard bb)
         {
-            int y = 0;
+            var y = 0;
             while (bb)
             {
                 y++;
@@ -522,7 +522,7 @@ namespace Rudz.Chess.Types
         public static BitBoard MakeBitboard(params Square[] squares)
         {
             BitBoard b = squares[0];
-            for (int i = 1; i < squares.Length; ++i)
+            for (var i = 1; i < squares.Length; ++i)
                 b |= squares[i];
             return b;
         }
@@ -530,8 +530,8 @@ namespace Rudz.Chess.Types
         [MethodImpl(MethodImplOptions.NoInlining)]
         private static void InitBetweenBitboards(Square from, Func<BitBoard, BitBoard> stepFunc, Direction step)
         {
-            BitBoard bb = stepFunc(from.BitBoardSquare());
-            Square to = from + step;
+            var bb = stepFunc(from.BitBoardSquare());
+            var to = from + step;
             BitBoard between = 0;
             while (bb)
             {

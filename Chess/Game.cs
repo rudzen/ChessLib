@@ -79,7 +79,7 @@ namespace Rudz.Chess
             Position = new Position(pieceUpdateCallback);
             _stateList = new State[MaxPositions];
 
-            for (int i = 0; i < _stateList.Length; i++)
+            for (var i = 0; i < _stateList.Length; i++)
                 _stateList[i] = new State(Position);
 
             PositionIndex = 0;
@@ -124,7 +124,7 @@ namespace Rudz.Chess
             }
 
             // advances the position
-            State previous = _stateList[PositionIndex++];
+            var previous = _stateList[PositionIndex++];
             State = _stateList[PositionIndex];
             State.SideToMove = ~previous.SideToMove;
             State.Material = previous.Material;
@@ -193,22 +193,22 @@ namespace Rudz.Chess
             if (validate && !Fen.Fen.Validate(fenString))
                 return new FenError(-9, 0);
 
-            foreach (Square square in Occupied)
+            foreach (var square in Occupied)
                 Position.RemovePiece(square, Position.BoardLayout[square.ToInt()]);
 
-            for (int i = 0; i <= PositionIndex; i++)
+            for (var i = 0; i <= PositionIndex; i++)
                 _stateList[i].Clear();
 
             Position.Clear();
 
             // ReSharper disable once AssignNullToNotNullAttribute
-            FenData fen = new FenData(fenString);
+            var fen = new FenData(fenString);
 
             Player player;
-            char c = fen.GetAdvance();
+            var c = fen.GetAdvance();
 
-            int f = 1; // file (column)
-            int r = 8; // rank (row)
+            var f = 1; // file (column)
+            var r = 8; // rank (row)
 
             // map pieces to data structure
             while (c != 0 && !(f == 9 && r == 1))
@@ -236,14 +236,14 @@ namespace Rudz.Chess
                         continue;
                 }
 
-                int pieceIndex = PieceExtensions.PieceChars.IndexOf(c);
+                var pieceIndex = PieceExtensions.PieceChars.IndexOf(c);
 
                 if (pieceIndex == -1)
                     return new FenError(-3, fen.GetIndex());
 
                 player = char.IsLower(PieceExtensions.PieceChars[pieceIndex]);
 
-                Square square = new Square(r - 1, f - 1);
+                var square = new Square(r - 1, f - 1);
 
                 AddPiece(square, player, (EPieceType)pieceIndex);
 
@@ -277,8 +277,8 @@ namespace Rudz.Chess
                 return new FenError(-6, fen.GetIndex());
 
             // temporary.. the whole method should be using this, but this will do for now.
-            string first = string.Empty;
-            string second = string.Empty;
+            var first = string.Empty;
+            var second = string.Empty;
 
             var moveCounters = fen.Fen.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
@@ -375,7 +375,7 @@ namespace Rudz.Chess
 
         public void UpdateDrawTypes()
         {
-            EGameEndType gameEndType = EGameEndType.None;
+            var gameEndType = EGameEndType.None;
             if (!State.Moves.Any(move => State.IsLegal(move)))
                 gameEndType |= EGameEndType.Pat;
             if (IsRepetition())
@@ -394,14 +394,14 @@ namespace Rudz.Chess
             const char space = ' ';
             _output.Clear();
             _output.Append(seperator);
-            for (ERank rank = ERank.Rank8; rank >= ERank.Rank1; rank--)
+            for (var rank = ERank.Rank8; rank >= ERank.Rank1; rank--)
             {
                 _output.Append((int)rank + 1);
                 _output.Append(space);
-                for (EFile file = EFile.FileA; file <= EFile.FileH; file++)
+                for (var file = EFile.FileA; file <= EFile.FileH; file++)
                 {
                     _output.Append(splitter);
-                    Piece piece = Position.GetPiece(new Square((int)file, (int)rank));
+                    var piece = Position.GetPiece(new Square((int)file, (int)rank));
                     _output.Append(space);
                     _output.Append(piece.GetPieceChar());
                     _output.Append(space);
@@ -435,7 +435,7 @@ namespace Rudz.Chess
 
             ulong tot = 0;
 
-            foreach (Move move in State.Moves)
+            foreach (var move in State.Moves)
             {
                 MakeMove(move);
                 tot += Perft(depth - 1);
@@ -473,8 +473,8 @@ namespace Rudz.Chess
         {
             // TODO : Merge with MakeMove to avoid duplicate ifs
 
-            ulong pawnKey = State.PawnStructureKey;
-            ulong key = State.Key ^ pawnKey;
+            var pawnKey = State.PawnStructureKey;
+            var key = State.Key ^ pawnKey;
             pawnKey ^= Zobrist.GetZobristSide();
 
             if (_stateList[PositionIndex - 1].EnPassantSquare)
@@ -491,14 +491,14 @@ namespace Rudz.Chess
                 return;
             }
 
-            bool pawnPiece = move.GetMovingPieceType() == EPieceType.Pawn;
+            var pawnPiece = move.GetMovingPieceType() == EPieceType.Pawn;
 
             if (pawnPiece)
                 pawnKey ^= Zobrist.GetZobristPst(move.GetMovingPiece(), move.GetFromSquare());
             else
                 key ^= Zobrist.GetZobristPst(move.GetMovingPiece(), move.GetFromSquare());
 
-            Square squareTo = move.GetToSquare();
+            var squareTo = move.GetToSquare();
 
             if (move.IsPromotionMove())
             {
@@ -525,7 +525,7 @@ namespace Rudz.Chess
             }
             else if (move.IsCastlelingMove())
             {
-                EPieces piece = (EPieces)(EPieceType.Rook + move.GetSideMask());
+                var piece = (EPieces)(EPieceType.Rook + move.GetSideMask());
                 key ^= Zobrist.GetZobristPst(piece, Position.GetRookCastleFrom(squareTo));
                 key ^= Zobrist.GetZobristPst(piece, squareTo.GetRookCastleTo());
             }
@@ -546,7 +546,7 @@ namespace Rudz.Chess
         private bool IsRepetition()
         {
             _repetitionCounter = 1;
-            int backPosition = PositionIndex;
+            var backPosition = PositionIndex;
             while ((backPosition -= 2) >= 0)
             {
                 if (_stateList[backPosition].Key != State.Key)
@@ -570,11 +570,11 @@ namespace Rudz.Chess
             }
 
             // List to gather functions for castleling rights addition.
-            List<Action> castleFunctions = new List<Action>(4);
+            var castleFunctions = new List<Action>(4);
 
             while (fen.Get() != 0 && fen.Get() != ' ')
             {
-                char c = fen.Get();
+                var c = fen.Get();
 
                 if (c.InBetween('A', 'H'))
                 {
@@ -582,7 +582,7 @@ namespace Rudz.Chess
                     _xfen = false;
 
                     // ReSharper disable once HeapView.ClosureAllocation
-                    int rookFile = c - 'A';
+                    var rookFile = c - 'A';
 
                     if (rookFile > Position.KingSquares[0].File())
                         castleFunctions.Add(() => AddShortCastleRights(rookFile, PlayerExtensions.White));
@@ -595,7 +595,7 @@ namespace Rudz.Chess
                     _xfen = false;
 
                     // ReSharper disable once HeapView.ClosureAllocation
-                    int rookFile = c - 'a';
+                    var rookFile = c - 'a';
 
                     if (rookFile > Position.KingSquares[1].File())
                         castleFunctions.Add(() => AddShortCastleRights(rookFile, PlayerExtensions.Black));
@@ -636,7 +636,7 @@ namespace Rudz.Chess
             if (castleFunctions.Count != 0)
             {
                 // invoke the gathered castleling configure functions
-                foreach (Action castleFunction in castleFunctions)
+                foreach (var castleFunction in castleFunctions)
                     castleFunction();
             }
 
@@ -647,7 +647,7 @@ namespace Rudz.Chess
         {
             if (rookFile == -1)
             {
-                for (EFile file = EFile.FileH; file >= EFile.FileA; file--)
+                for (var file = EFile.FileH; file >= EFile.FileA; file--)
                 {
                     if (!Position.IsPieceTypeOnSquare((ESquare)((int)file + side.Side * 56), EPieceType.Rook))
                         continue;
@@ -666,8 +666,8 @@ namespace Rudz.Chess
             }
 
             State.CastlelingRights |= CastlePositionalOr[0, side.Side];
-            Player them = ~side;
-            int castlelingMask = ECastleling.Short.GetCastleAllowedMask(side);
+            var them = ~side;
+            var castlelingMask = ECastleling.Short.GetCastleAllowedMask(side);
             _castleRightsMask[SquareExtensions.GetFlip(rookFile, them).ToInt()] -= castlelingMask;
             _castleRightsMask[SquareExtensions.GetFlip(Position.KingSquares[side.Side].File(), them).ToInt()] -= castlelingMask;
             Position.SetRookCastleFrom(SquareExtensions.GetFlip((int)ESquare.g1, them), SquareExtensions.GetFlip(rookFile, them));
@@ -681,7 +681,7 @@ namespace Rudz.Chess
         {
             if (rookFile == -1)
             {
-                for (EFile file = EFile.FileA; file <= EFile.FileH; file++)
+                for (var file = EFile.FileA; file <= EFile.FileH; file++)
                 {
                     if (!Position.IsPieceTypeOnSquare((ESquare)(int)(file + side.Side * 56), EPieceType.Rook))
                         continue;
@@ -700,8 +700,8 @@ namespace Rudz.Chess
             }
 
             State.CastlelingRights |= CastlePositionalOr[1, side.Side];
-            Player them = ~side;
-            int castlelingMask = ECastleling.Long.GetCastleAllowedMask(side);
+            var them = ~side;
+            var castlelingMask = ECastleling.Long.GetCastleAllowedMask(side);
             _castleRightsMask[SquareExtensions.GetFlip(rookFile, them).ToInt()] -= castlelingMask;
             _castleRightsMask[SquareExtensions.GetFlip(Position.KingSquares[side.Side].File(), them).ToInt()] -= castlelingMask;
             Position.SetRookCastleFrom(SquareExtensions.GetFlip((int)ESquare.c1, them), SquareExtensions.GetFlip(rookFile, them));

@@ -137,8 +137,8 @@ namespace Rudz.Chess
         public bool IsLegal(Move move) => IsLegal(move, move.GetMovingPiece(), move.GetFromSquare(), move.GetMoveType());
 
         /// <summary>
-        /// <para>"Validates" a move basic on simple logic. For example if a piece actually exists thats being moves etc.</para>
-        /// <para>This is basicly only useful while developing and/or debugging</para>
+        /// <para>"Validates" a move using simple logic. For example that the piece actually being moved exists etc.</para>
+        /// <para>This is basically only useful while developing and/or debugging</para>
         /// </summary>
         /// <param name="move">The move to check for logical errors</param>
         /// <returns>True if move "appears" to be legal, otherwise false</returns>

@@ -69,7 +69,7 @@ namespace Rudz.Chess
             if (pieceType == EPieceType.King)
                 return;
 
-            int x = Count(side, pieceType) + delta;
+            var x = Count(side, pieceType) + delta;
 
             _key[side.Side] &= ~(15u << PieceBitShift[(int)pieceType]);
             _key[side.Side] |= (uint)(x << PieceBitShift[(int)pieceType]);

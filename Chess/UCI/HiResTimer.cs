@@ -174,9 +174,9 @@ namespace Rudz.Chess.UCI
         {
             Debug.Print($"Timer ExecuteTimer on thread {Thread.CurrentThread.ManagedThreadId}");
 
-            float nextTrigger = 0f;
+            var nextTrigger = 0f;
 
-            Stopwatch stopwatch = new Stopwatch();
+            var stopwatch = new Stopwatch();
             stopwatch.Start();
 
             while (!cancellationToken.IsCancellationRequested)
@@ -187,7 +187,7 @@ namespace Rudz.Chess.UCI
                 while (true)
                 {
                     elapsed = ElapsedHiRes(stopwatch);
-                    double diff = nextTrigger - elapsed;
+                    var diff = nextTrigger - elapsed;
                     if (diff <= 0f)
                         break;
 
@@ -204,7 +204,7 @@ namespace Rudz.Chess.UCI
                         return;
                 }
 
-                double delay = elapsed - nextTrigger;
+                var delay = elapsed - nextTrigger;
                 Elapsed?.Invoke(this, new HiResTimerArgs(delay));
 
                 if (cancellationToken.IsCancellationRequested)

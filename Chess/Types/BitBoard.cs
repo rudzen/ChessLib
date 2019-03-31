@@ -189,7 +189,7 @@ namespace Rudz.Chess.Types
         public void OrAll(params BitBoard[] bbs)
         {
             // ReSharper disable once ForCanBeConvertedToForeach
-            for (int i = 0; i < bbs.Length; ++i)
+            for (var i = 0; i < bbs.Length; ++i)
                 Value |= bbs[i].Value;
         }
 
@@ -205,15 +205,15 @@ namespace Rudz.Chess.Types
 
         public override string ToString()
         {
-            StringBuilder output = new StringBuilder(512);
+            var output = new StringBuilder(512);
             const string seperator = "\n  +BB-+---+---+---+---+---+---+---+\n";
             const char splitter = '|';
             output.Append(seperator);
-            for (ERank rank = ERank.Rank8; rank >= ERank.Rank1; rank--)
+            for (var rank = ERank.Rank8; rank >= ERank.Rank1; rank--)
             {
                 output.Append((int)rank + 1);
                 output.Append(' ');
-                for (EFile file = EFile.FileA; file <= EFile.FileH; file++)
+                for (var file = EFile.FileA; file <= EFile.FileH; file++)
                 {
                     output.Append(splitter);
                     output.Append(' ');

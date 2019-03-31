@@ -42,7 +42,7 @@
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public IEnumerator<Move> GetEnumerator()
         {
-            for (int i = 0; i < _moveIndex; ++i)
+            for (var i = 0; i < _moveIndex; ++i)
                 yield return _moves[i];
         }
 

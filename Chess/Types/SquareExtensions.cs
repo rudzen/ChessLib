@@ -70,8 +70,8 @@ namespace Rudz.Chess.Types
             // generate square flipping array for both sides
             foreach (var square in BitBoards.AllSquares)
             {
-                int file = square.File();
-                ERank rank = square.RankOf();
+                var file = square.File();
+                var rank = square.RankOf();
                 Flip[0, square.ToInt()] = file + ((7 - (int)rank) << 3);
                 Flip[1, square.ToInt()] = file + ((int)rank << 3);
 

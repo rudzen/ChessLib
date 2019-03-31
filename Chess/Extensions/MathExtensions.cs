@@ -126,7 +126,7 @@ namespace Rudz.Chess.Extensions
                 return false;
             }
 
-            ulong x = 0;
+            var x = 0ul;
             var pos = 0;
             var max = str.Length - 1;
             while (pos <= max && InBetween(str[pos], '0', '9'))
