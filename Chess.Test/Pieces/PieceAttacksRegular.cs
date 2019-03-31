@@ -24,28 +24,37 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using Rudz.Chess;
-using Rudz.Chess.Types;
-
-namespace Chess.Tests
+namespace Chess.Test.Pieces
 {
     using System;
+    using Rudz.Chess.Types;
 
-    public abstract class PieceAttacksSliders : PieceAttacks
+    public abstract class PieceAttacksRegular : PieceAttacks
     {
-        protected static readonly int[] BishopExpected =
+        // care is taken to avoid mistakes, the pawn is not "as is"
+        protected static readonly int[] PawnExpected =
             {
-                7, 9, 11, 13
+                1, 2, 2, 2
             };
 
-        protected static readonly int[] RookExpected =
+        // special case with alpha and beta bands in the corners are taken care of
+        protected static readonly int[] KnightExpected =
             {
-                14, 14, 14, 14
-            }; // rooks always 14 :>
+                4, 6, 8, 8
+            };
 
-        protected readonly Func<Square, BitBoard, BitBoard>[] SlideAttacks =
+        // special case with alpha band is taken care of
+        protected static readonly int[] KingExpected =
             {
-                MagicBB.BishopAttacks, MagicBB.RookAttacks, MagicBB.QueenAttacks
+                5, 8, 8, 8
+            };
+
+        protected static readonly ulong BoardCorners = 0x1u | 0x80u | 0x100000000000000u | 0x8000000000000000u;
+
+        // pawn = 0 (N/A for now), knight = 1, king = 2
+        protected readonly Func<Square, BitBoard>[] RegAttacks =
+            {
+                BitBoards.KnightAttacks, BitBoards.KnightAttacks, BitBoards.KingAttacks
             };
 
         public abstract override void AlphaPattern();

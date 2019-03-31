@@ -24,10 +24,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using Rudz.Chess.Types;
-
-namespace Chess.Tests
+namespace Chess.Test.Pieces
 {
+    using Rudz.Chess.Types;
+
     /// <summary>
     /// Position indication is as follows:
     /// Alpha = Outer band (edge)

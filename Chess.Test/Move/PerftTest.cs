@@ -24,15 +24,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Tests
+namespace Chess.Test.Move
 {
-    using Rudz.Chess;
-    using Rudz.Chess.Fen;
     using System.Collections.Generic;
     using System.Runtime.CompilerServices;
+    using Rudz.Chess;
+    using Rudz.Chess.Fen;
     using Xunit;
 
-    public class PerftTest
+    public sealed class PerftTest
     {
         private const int ShortCount = 2;
 

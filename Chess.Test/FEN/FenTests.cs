@@ -24,31 +24,43 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using Rudz.Chess.Enums;
-using Rudz.Chess.Types;
-
-namespace Chess.Tests
+namespace Chess.Test.FEN
 {
-    using System.Text;
+    using Rudz.Chess;
+    using Rudz.Chess.Fen;
     using Xunit;
 
-    public class DataTests
+    public sealed class FenTests
     {
         [Fact]
-        public void TestSquareChars()
+        public void SetFenTest()
         {
-            StringBuilder chars = new StringBuilder(1024);
-            StringBuilder strings = new StringBuilder(1024);
+            FenError expected = new FenError(0, 0);
 
-            for (Square sq = ESquare.a1; sq; ++sq)
-            {
-                chars.Clear();
-                strings.Clear();
-                chars.Append(sq.FileChar());
-                chars.Append(sq.RankOfChar());
-                strings.Append(sq.ToString());
-                Assert.Equal(chars.ToString(), strings.ToString());
-            }
+            Game game = new Game();
+
+            FenError actual = game.NewGame();
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void GetFenTest()
+        {
+            Game game = new Game();
+
+            FenError expectedError = new FenError(0, 0);
+
+            FenError actualError = game.NewGame();
+
+            // verify no errors given (same as SetFen test)
+            Assert.Equal(expectedError, actualError);
+
+            FenData expectedFen = new FenData(Fen.StartPositionFen);
+
+            FenData actualFen = game.GetFen();
+
+            Assert.Equal(expectedFen, actualFen);
         }
     }
 }

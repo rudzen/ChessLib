@@ -24,27 +24,30 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using Rudz.Chess.Enums;
-using Rudz.Chess.Types;
-
-namespace Chess.Tests
+namespace Chess.Test.Data
 {
+    using System.Text;
+    using Rudz.Chess.Enums;
+    using Rudz.Chess.Types;
     using Xunit;
 
-    public class BitboardTests
+    public sealed class DataTests
     {
         [Fact]
-        public void MakeBitBoardTest()
+        public void TestSquareChars()
         {
-            // a few squares
-            BitBoard b1 = BitBoards.MakeBitboard(ESquare.a1, ESquare.b1, ESquare.a2, ESquare.b2);
-            BitBoard b2 = ESquare.a1.BitBoardSquare() | ESquare.b1.BitBoardSquare() | ESquare.a2.BitBoardSquare() | ESquare.b2.BitBoardSquare();
-            Assert.Equal(b1, b2);
+            StringBuilder chars = new StringBuilder(1024);
+            StringBuilder strings = new StringBuilder(1024);
 
-            // a single square (not needed, but still has to work in case of list of squares etc)
-            BitBoard b3 = BitBoards.MakeBitboard(ESquare.h3);
-            BitBoard b4 = ESquare.h3.BitBoardSquare();
-            Assert.Equal(b3, b4);
+            for (Square sq = ESquare.a1; sq; ++sq)
+            {
+                chars.Clear();
+                strings.Clear();
+                chars.Append(sq.FileChar());
+                chars.Append(sq.RankOfChar());
+                strings.Append(sq.ToString());
+                Assert.Equal(chars.ToString(), strings.ToString());
+            }
         }
     }
 }

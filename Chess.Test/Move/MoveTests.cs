@@ -24,39 +24,38 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using Rudz.Chess;
-using Rudz.Chess.Enums;
-using Rudz.Chess.Types;
-
-namespace Chess.Tests
+namespace Chess.Test.Move
 {
     using System;
     using System.Collections.Generic;
     using System.Text;
+    using Rudz.Chess;
+    using Rudz.Chess.Enums;
+    using Rudz.Chess.Types;
     using Xunit;
 
-    public class MoveTests
+    public sealed class MoveTests
     {
         [Fact]
         public void TestSquares()
         {
             // test all squares, including invalid moves (same from and to)
-            for (int i = 0; i < 64; i++)
+            for (var i = 0; i < 64; i++)
             {
                 Square expectedFrom = i;
-                int actualInt = expectedFrom.ToInt();
+                var actualInt = expectedFrom.ToInt();
                 Assert.Equal(i, actualInt);
-                for (int j = 1 /* NOTE! from 1 !! */; j < 64; j++)
+                for (var j = 1 /* NOTE! from 1 !! */; j < 64; j++)
                 {
                     Square expectedTo = j;
 
                     // on purpose.. creating the move in this loop
-                    Move move = new Move(expectedFrom, expectedTo);
+                    var move = new Rudz.Chess.Types.Move(expectedFrom, expectedTo);
 
                     Assert.False(move.IsNullMove());
 
-                    Square actualFrom = move.GetFromSquare();
-                    Square actualTo = move.GetToSquare();
+                    var actualFrom = move.GetFromSquare();
+                    var actualTo = move.GetToSquare();
 
                     Assert.Equal(expectedFrom, actualFrom);
                     Assert.Equal(expectedTo, actualTo);
@@ -82,15 +81,15 @@ namespace Chess.Tests
             const EMoveType expectedMoveType = EMoveType.Promotion;
 
             // full move spectrum
-            Move move = new Move(expectedMovingPiece, expectedCapturedPiece, expectedFrom, expectedTo, expectedMoveType, expectedPromotionPiece);
+            var move = new Rudz.Chess.Types.Move(expectedMovingPiece, expectedCapturedPiece, expectedFrom, expectedTo, expectedMoveType, expectedPromotionPiece);
 
-            Square actualFrom = move.GetFromSquare();
-            Square actualTo = move.GetToSquare();
-            EPieceType actualMovingEPieceType = move.GetMovingPieceType();
-            Piece actualMovingPiece = move.GetMovingPiece();
-            Piece actualCapturedPiece = move.GetCapturedPiece();
-            Piece actualPromotionPiece = move.GetPromotedPiece();
-            EMoveType actualEMoveType = move.GetMoveType();
+            var actualFrom = move.GetFromSquare();
+            var actualTo = move.GetToSquare();
+            var actualMovingEPieceType = move.GetMovingPieceType();
+            var actualMovingPiece = move.GetMovingPiece();
+            var actualCapturedPiece = move.GetCapturedPiece();
+            var actualPromotionPiece = move.GetPromotedPiece();
+            var actualEMoveType = move.GetMoveType();
 
             // test promotion status
             Assert.True(move.IsPromotionMove());
@@ -116,16 +115,16 @@ namespace Chess.Tests
         [Fact]
         public void MoveToStringTest()
         {
-            StringBuilder sb = new StringBuilder(256);
+            var sb = new StringBuilder(256);
 
-            List<Move> moves = new List<Move>(128);
-            List<Movestrings> movesString = new List<Movestrings>(128);
+            var moves = new List<Rudz.Chess.Types.Move>(128);
+            var movesString = new List<Movestrings>(128);
 
-            Game game = new Game();
+            var game = new Game();
 
             game.NewGame();
 
-            StringBuilder tmp = new StringBuilder(128);
+            var tmp = new StringBuilder(128);
 
             // build move list and expected result
             for (Square s1 = ESquare.a1; s1; s1++)
@@ -135,7 +134,7 @@ namespace Chess.Tests
                     if (s1 == s2)
                         continue;
 
-                    moves.Add(new Move(s1, s2));
+                    moves.Add(new Rudz.Chess.Types.Move(s1, s2));
                     tmp.Clear();
                     tmp.Append(' ');
                     tmp.Append(s1.ToString());
@@ -144,9 +143,9 @@ namespace Chess.Tests
                 }
             }
 
-            StringBuilder result = new StringBuilder(128);
+            var result = new StringBuilder(128);
 
-            for (int i = 0; i < moves.Count; i++)
+            for (var i = 0; i < moves.Count; i++)
             {
                 result.Clear();
                 result.Append(' ');
@@ -158,23 +157,23 @@ namespace Chess.Tests
         [Fact]
         public void MoveListToStringTest()
         {
-            Game game = new Game();
+            var game = new Game();
 
             game.NewGame();
 
-            StringBuilder result = new StringBuilder(1024 * 16);
-            StringBuilder expected = new StringBuilder(1024 * 16);
+            var result = new StringBuilder(1024 * 16);
+            var expected = new StringBuilder(1024 * 16);
 
-            List<Move> moves = new List<Move>(256);
+            var moves = new List<Rudz.Chess.Types.Move>(256);
 
-            Random rngeezuz = new Random(DateTime.Now.Millisecond);
+            var rngeezuz = new Random(DateTime.Now.Millisecond);
 
             // generate 256 random moves
-            for (int i = 0; i < 256; i++)
+            for (var i = 0; i < 256; i++)
             {
                 Square rndSquareFrom = (ESquare)rngeezuz.Next((int)ESquare.a1, (int)ESquare.h8);
                 Square rndSquareTo = (ESquare)rngeezuz.Next((int)ESquare.a1, (int)ESquare.h8);
-                moves.Add(new Move(rndSquareFrom, rndSquareTo));
+                moves.Add(new Rudz.Chess.Types.Move(rndSquareFrom, rndSquareTo));
 
                 expected.Append(' ');
                 expected.Append(rndSquareFrom.ToString());
@@ -182,7 +181,7 @@ namespace Chess.Tests
             }
 
             // generate a bitch string for them all.
-            foreach (Move move in moves)
+            foreach (var move in moves)
             {
                 result.Append(' ');
                 game.MoveToString(move, result);

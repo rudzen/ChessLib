@@ -24,27 +24,25 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-
-using Rudz.Chess;
-using Rudz.Chess.Enums;
-using Rudz.Chess.Types;
-
-namespace Chess.Tests
+namespace Chess.Test.Position
 {
+    using Rudz.Chess;
+    using Rudz.Chess.Enums;
+    using Rudz.Chess.Types;
     using Xunit;
 
-    public class PositionTests
+    public sealed class PositionTests
     {
         [Fact]
         public void AddPieceTest()
         {
-            Position position = new Position(null);
+            var position = new Position(null);
 
             position.AddPiece(EPieces.WhiteKing, ESquare.a7);
-            Square square = position.Occupied.Lsb();
+            var square = position.Occupied.Lsb();
             Assert.Equal(ESquare.a7, square.Value);
 
-            Piece piece = position.GetPiece(square);
+            var piece = position.GetPiece(square);
             Assert.Equal(EPieces.WhiteKing, piece.Value);
 
             // Test piecetype overload
@@ -62,7 +60,7 @@ namespace Chess.Tests
         [Fact]
         public void PinnedPiecesTest()
         {
-            Position cb = new Position(null);
+            var cb = new Position(null);
 
             cb.AddPiece(EPieces.WhiteKing, ESquare.a6);
             cb.AddPiece(EPieces.WhiteBishop, ESquare.d5);
@@ -70,15 +68,15 @@ namespace Chess.Tests
             cb.AddPiece(EPieces.BlackKing, ESquare.b3);
             cb.AddPiece(EPieces.BlackPawn, ESquare.c4); // this is a pinned pieces
 
-            BitBoard b = cb.GetPinnedPieces(ESquare.b3, PlayerExtensions.Black);
+            var b = cb.GetPinnedPieces(ESquare.b3, PlayerExtensions.Black);
 
             // b must contain one square at this point
-            int pinnedCount = b.Count;
+            var pinnedCount = b.Count;
 
             Assert.Equal(1, pinnedCount);
 
             // test it's the correct square
-            Square pinnedSquare = b.Lsb();
+            var pinnedSquare = b.Lsb();
 
             Assert.Equal(ESquare.c4, pinnedSquare.Value);
         }

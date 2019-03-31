@@ -24,11 +24,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Tests
+namespace Chess.Test.Material
 {
     using Xunit;
 
-    public class MaterialTests
+    public sealed class MaterialTests
     {
         //TODO : Implement the RIGHT way
 

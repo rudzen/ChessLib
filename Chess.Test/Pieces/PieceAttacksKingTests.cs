@@ -24,25 +24,23 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using Rudz.Chess.Types;
-
-namespace Chess.Tests
+namespace Chess.Test.Pieces
 {
     using Xunit;
 
-    public class PieceAttacksKnightTests : PieceAttacksRegular
+    public sealed class PieceAttacksKingTests : PieceAttacksRegular
     {
         [Fact]
         public override void AlphaPattern()
         {
             const int index = (int)EBands.Alpha;
-            const int attackIndex = 1;
-            const ulong narrowLocations = 0x4281000000008142;
+            const int attackIndex = 2;
 
-            foreach (Square pieceLocation in Bands[index])
+            // special case, as the expected values vary depending on the kings location on the outer rim
+            foreach (var pieceLocation in Bands[index])
             {
-                BitBoard attacks = RegAttacks[attackIndex](pieceLocation);
-                int expected = (BoardCorners & pieceLocation) != 0 ? KnightExpected[index] >> 1 /* for corners */ : (narrowLocations & pieceLocation) != 0 ? KnightExpected[index] - 1 /* narrowLocations */ : KnightExpected[index];
+                var attacks = RegAttacks[attackIndex](pieceLocation);
+                var expected = (BoardCorners & pieceLocation) != 0 ? KingExpected[index] - 2 /* for corners */ : KingExpected[index];
                 Assert.Equal(expected, attacks.Count);
             }
         }
@@ -51,14 +49,12 @@ namespace Chess.Tests
         public override void BetaPattern()
         {
             const int index = (int)EBands.Beta;
-            const int attackIndex = 1;
-            const ulong narrowLocations = 0x42000000004200;
+            const int attackIndex = 2;
 
-            foreach (Square pieceLocation in Bands[index])
+            foreach (var pieceLocation in Bands[index])
             {
-                BitBoard attacks = RegAttacks[attackIndex](pieceLocation);
-                int expected = (narrowLocations & pieceLocation) != 0 ? KnightExpected[index] - 2 : KnightExpected[index];
-                Assert.Equal(expected, attacks.Count);
+                var attacks = RegAttacks[attackIndex](pieceLocation);
+                Assert.Equal(KingExpected[index], attacks.Count);
             }
         }
 
@@ -66,12 +62,12 @@ namespace Chess.Tests
         public override void GammaPattern()
         {
             const int index = (int)EBands.Gamma;
-            const int attackIndex = 1;
+            const int attackIndex = 2;
 
-            foreach (Square pieceLocation in Bands[index])
+            foreach (var pieceLocation in Bands[index])
             {
-                BitBoard attacks = RegAttacks[attackIndex](pieceLocation);
-                Assert.Equal(KnightExpected[index], attacks.Count);
+                var attacks = RegAttacks[attackIndex](pieceLocation);
+                Assert.Equal(KingExpected[index], attacks.Count);
             }
         }
 
@@ -79,12 +75,12 @@ namespace Chess.Tests
         public override void DeltaPattern()
         {
             const int index = (int)EBands.Delta;
-            const int attackIndex = 1;
+            const int attackIndex = 2;
 
-            foreach (Square pieceLocation in Bands[index])
+            foreach (var pieceLocation in Bands[index])
             {
-                BitBoard attacks = RegAttacks[attackIndex](pieceLocation);
-                Assert.Equal(KnightExpected[index], attacks.Count);
+                var attacks = RegAttacks[attackIndex](pieceLocation);
+                Assert.Equal(KingExpected[index], attacks.Count);
             }
         }
     }

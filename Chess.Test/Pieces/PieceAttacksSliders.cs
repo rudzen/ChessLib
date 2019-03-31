@@ -24,47 +24,35 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using Rudz.Chess.Types;
-
-namespace Chess.Tests
+namespace Chess.Test.Pieces
 {
     using System;
-    using Xunit;
+    using Rudz.Chess;
+    using Rudz.Chess.Types;
 
-    public class PawnPushTests
+    public abstract class PieceAttacksSliders : PieceAttacks
     {
-        private readonly Func<BitBoard, BitBoard>[] _pawnPushDel =
+        protected static readonly int[] BishopExpected =
             {
-                BitBoards.NorthOne, BitBoards.SouthOne
+                7, 9, 11, 13
             };
 
-        [Fact]
-        public void PawnPush()
-        {
-            BitBoard fullBoard = 0xffffffffffff00;
-
-            Player side = 0;
-
-            int expected = 8;
-
-            foreach (Square square in fullBoard)
+        protected static readonly int[] RookExpected =
             {
-                BitBoard targetPosition = _pawnPushDel[side.Side](square.BitBoardSquare());
-                Square toSquare = targetPosition.Lsb();
-                int distance = toSquare.ToInt() - square.ToInt();
-                Assert.Equal(expected, distance);
-            }
+                14, 14, 14, 14
+            }; // rooks always 14 :>
 
-            side = ~side;
-            expected = -expected;
-
-            foreach (Square square in fullBoard)
+        protected readonly Func<Square, BitBoard, BitBoard>[] SlideAttacks =
             {
-                BitBoard targetPosition = _pawnPushDel[side.Side](square.BitBoardSquare());
-                Square toSquare = targetPosition.Lsb();
-                int distance = toSquare.ToInt() - square.ToInt();
-                Assert.Equal(expected, distance);
-            }
-        }
+                MagicBB.BishopAttacks, MagicBB.RookAttacks, MagicBB.QueenAttacks
+            };
+
+        public abstract override void AlphaPattern();
+
+        public abstract override void BetaPattern();
+
+        public abstract override void GammaPattern();
+
+        public abstract override void DeltaPattern();
     }
 }

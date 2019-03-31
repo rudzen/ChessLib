@@ -24,39 +24,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Tests
+namespace Chess.Test.Pieces
 {
-    using Rudz.Chess.Enums;
-    using Rudz.Chess.Types;
-    using Xunit;
-
-    public sealed class SquareTests
+    public interface IPieceAttacks
     {
-        [Fact]
-        public void SquareOppositeColorPositiveTest()
-        {
-            const bool expected = true;
+        void AlphaPattern();
 
-            var sq1 = new Square(ESquare.a1);
-            var sq2 = new Square(ESquare.a2);
+        void BetaPattern();
 
-            var actual = sq1.IsOppositeColor(sq2);
+        void GammaPattern();
 
-            Assert.Equal(expected, actual);
-        }
-
-        [Fact]
-        public void SquareOppositeColorNegativeTest()
-        {
-            const bool expected = false;
-
-            var sq1 = new Square(ESquare.a1);
-            var sq2 = new Square(ESquare.a3);
-
-            var actual = sq1.IsOppositeColor(sq2);
-
-            Assert.Equal(expected, actual);
-        }
-
+        void DeltaPattern();
     }
 }

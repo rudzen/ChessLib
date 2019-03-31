@@ -24,16 +24,43 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using Xunit;
-
-namespace Chess.Tests
+namespace Chess.Test.Pieces
 {
-    public class MoveGeneratorTests
+    using Rudz.Chess.Types;
+    using System;
+    using Xunit;
+
+    public sealed class PawnPushTests
     {
+        private static readonly Func<BitBoard, BitBoard>[] PawnPushDel ={ BitBoards.NorthOne, BitBoards.SouthOne };
+
         [Fact]
-        public void IsPseudoLegalTest()
+        public void PawnPush()
         {
-            Assert.True(true);
+            BitBoard fullBoard = 0xffffffffffff00;
+
+            Player side = 0;
+
+            var expected = 8;
+
+            foreach (var square in fullBoard)
+            {
+                var targetPosition = PawnPushDel[side.Side](square.BitBoardSquare());
+                var toSquare = targetPosition.Lsb();
+                var distance = toSquare.ToInt() - square.ToInt();
+                Assert.Equal(expected, distance);
+            }
+
+            side = ~side;
+            expected = -expected;
+
+            foreach (var square in fullBoard)
+            {
+                var targetPosition = PawnPushDel[side.Side](square.BitBoardSquare());
+                var toSquare = targetPosition.Lsb();
+                var distance = toSquare.ToInt() - square.ToInt();
+                Assert.Equal(expected, distance);
+            }
         }
     }
 }

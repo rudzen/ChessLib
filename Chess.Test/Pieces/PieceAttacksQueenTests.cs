@@ -24,13 +24,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using Rudz.Chess.Types;
-
-namespace Chess.Tests
+namespace Chess.Test.Pieces
 {
     using Xunit;
 
-    public class PieceAttacksQueenTests : PieceAttacksSliders
+    public sealed class PieceAttacksQueenTests : PieceAttacksSliders
     {
         [Fact]
         public override void AlphaPattern()
@@ -38,9 +36,9 @@ namespace Chess.Tests
             const int index = (int)EBands.Alpha;
             const int sliderIndex = 2;
 
-            foreach (Square pieceLocation in Bands[index])
+            foreach (var pieceLocation in Bands[index])
             {
-                BitBoard attacks = SlideAttacks[sliderIndex](pieceLocation, EmptyBoard);
+                var attacks = SlideAttacks[sliderIndex](pieceLocation, EmptyBoard);
                 Assert.Equal(BishopExpected[index] + RookExpected[index], attacks.Count);
             }
         }
@@ -51,9 +49,9 @@ namespace Chess.Tests
             const int index = (int)EBands.Beta;
             const int sliderIndex = 2;
 
-            foreach (Square pieceLocation in Bands[index])
+            foreach (var pieceLocation in Bands[index])
             {
-                BitBoard attacks = SlideAttacks[sliderIndex](pieceLocation, EmptyBoard);
+                var attacks = SlideAttacks[sliderIndex](pieceLocation, EmptyBoard);
                 Assert.Equal(BishopExpected[index] + RookExpected[index], attacks.Count);
             }
         }
@@ -64,9 +62,9 @@ namespace Chess.Tests
             const int index = (int)EBands.Gamma;
             const int sliderIndex = 2;
 
-            foreach (Square pieceLocation in Bands[index])
+            foreach (var pieceLocation in Bands[index])
             {
-                BitBoard attacks = SlideAttacks[sliderIndex](pieceLocation, EmptyBoard);
+                var attacks = SlideAttacks[sliderIndex](pieceLocation, EmptyBoard);
                 Assert.Equal(BishopExpected[index] + RookExpected[index], attacks.Count);
             }
         }
@@ -76,9 +74,9 @@ namespace Chess.Tests
         {
             const int index = (int)EBands.Delta;
             const int sliderIndex = 2;
-            foreach (Square pieceLocation in Bands[index])
+            foreach (var pieceLocation in Bands[index])
             {
-                BitBoard attacks = SlideAttacks[sliderIndex](pieceLocation, EmptyBoard);
+                var attacks = SlideAttacks[sliderIndex](pieceLocation, EmptyBoard);
                 Assert.Equal(BishopExpected[index] + RookExpected[index], attacks.Count);
             }
         }

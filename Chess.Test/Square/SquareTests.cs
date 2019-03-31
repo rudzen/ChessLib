@@ -24,44 +24,39 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using Rudz.Chess;
-using Rudz.Chess.Fen;
-
-namespace Chess.Tests
+namespace Chess.Test.Square
 {
+    using Rudz.Chess.Enums;
+    using Rudz.Chess.Types;
     using Xunit;
 
-    public class FenTests
+    public sealed class SquareTests
     {
         [Fact]
-        public void SetFenTest()
+        public void SquareOppositeColorPositiveTest()
         {
-            FenError expected = new FenError(0, 0);
+            const bool expected = true;
 
-            Game game = new Game();
+            var sq1 = new Square(ESquare.a1);
+            var sq2 = new Square(ESquare.a2);
 
-            FenError actual = game.NewGame();
+            var actual = sq1.IsOppositeColor(sq2);
 
             Assert.Equal(expected, actual);
         }
 
         [Fact]
-        public void GetFenTest()
+        public void SquareOppositeColorNegativeTest()
         {
-            Game game = new Game();
+            const bool expected = false;
 
-            FenError expectedError = new FenError(0, 0);
+            var sq1 = new Square(ESquare.a1);
+            var sq2 = new Square(ESquare.a3);
 
-            FenError actualError = game.NewGame();
+            var actual = sq1.IsOppositeColor(sq2);
 
-            // verify no errors given (same as SetFen test)
-            Assert.Equal(expectedError, actualError);
-
-            FenData expectedFen = new FenData(Fen.StartPositionFen);
-
-            FenData actualFen = game.GetFen();
-
-            Assert.Equal(expectedFen, actualFen);
+            Assert.Equal(expected, actual);
         }
+
     }
 }

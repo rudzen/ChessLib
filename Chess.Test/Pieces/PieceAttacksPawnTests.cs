@@ -24,13 +24,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using Rudz.Chess.Types;
-
-namespace Chess.Tests
+namespace Chess.Test.Pieces
 {
+    using Rudz.Chess.Types;
     using Xunit;
 
-    public class PieceAttacksPawnTests : PieceAttacks
+    public sealed class PieceAttacksPawnTests : PieceAttacks
     {
         /*
          * Pawn attack test information.
@@ -83,18 +82,18 @@ namespace Chess.Tests
             Player side = 0;
 
             // white
-            foreach (Square pieceLocation in PawnBands[index])
+            foreach (var pieceLocation in PawnBands[index])
             {
-                BitBoard attacks = pieceLocation.PawnAttack(side);
+                var attacks = pieceLocation.PawnAttack(side);
                 Assert.Equal(PawnExpected[index], attacks.Count);
             }
 
             side = ~side;
 
             // black
-            foreach (Square pieceLocation in PawnBands[index])
+            foreach (var pieceLocation in PawnBands[index])
             {
-                BitBoard attacks = pieceLocation.PawnAttack(side);
+                var attacks = pieceLocation.PawnAttack(side);
                 Assert.Equal(PawnExpected[index], attacks.Count);
             }
         }
@@ -106,18 +105,18 @@ namespace Chess.Tests
             Player side = 0;
 
             // white
-            foreach (Square pieceLocation in PawnBands[index])
+            foreach (var pieceLocation in PawnBands[index])
             {
-                BitBoard attacks = pieceLocation.PawnAttack(side);
+                var attacks = pieceLocation.PawnAttack(side);
                 Assert.Equal(PawnExpected[index], attacks.Count);
             }
 
             side = ~side;
 
             // black
-            foreach (Square pieceLocation in PawnBands[index])
+            foreach (var pieceLocation in PawnBands[index])
             {
-                BitBoard attacks = pieceLocation.PawnAttack(side);
+                var attacks = pieceLocation.PawnAttack(side);
                 Assert.Equal(PawnExpected[index], attacks.Count);
             }
         }
@@ -129,18 +128,18 @@ namespace Chess.Tests
             Player side = 0;
 
             // white
-            foreach (Square pieceLocation in PawnBands[index])
+            foreach (var pieceLocation in PawnBands[index])
             {
-                BitBoard attacks = pieceLocation.PawnAttack(side);
+                var attacks = pieceLocation.PawnAttack(side);
                 Assert.Equal(PawnExpected[index], attacks.Count);
             }
 
             side = ~side;
 
             // black
-            foreach (Square pieceLocation in PawnBands[index])
+            foreach (var pieceLocation in PawnBands[index])
             {
-                BitBoard attacks = pieceLocation.PawnAttack(side);
+                var attacks = pieceLocation.PawnAttack(side);
                 Assert.Equal(PawnExpected[index], attacks.Count);
             }
         }
@@ -152,18 +151,18 @@ namespace Chess.Tests
             Player side = 0;
 
             // white
-            foreach (Square pieceLocation in PawnBands[index])
+            foreach (var pieceLocation in PawnBands[index])
             {
-                BitBoard attacks = pieceLocation.PawnAttack(side);
+                var attacks = pieceLocation.PawnAttack(side);
                 Assert.Equal(PawnExpected[index], attacks.Count);
             }
 
             side = ~side;
 
             // black
-            foreach (Square pieceLocation in PawnBands[index])
+            foreach (var pieceLocation in PawnBands[index])
             {
-                BitBoard attacks = pieceLocation.PawnAttack(side);
+                var attacks = pieceLocation.PawnAttack(side);
                 Assert.Equal(PawnExpected[index], attacks.Count);
             }
         }
