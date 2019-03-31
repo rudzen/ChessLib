@@ -122,7 +122,7 @@ namespace Rudz.Chess.Types
         public static char FileChar(this Square s) => FileChars[s.File()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsOppositeOf(this Square @this, Square other) => ((BitBoards.DarkSquares & @this) != 0) != ((BitBoards.DarkSquares & other) != 0);
+        public static bool IsOppositeColor(this Square @this, Square other) => ((BitBoards.DarkSquares & @this) != 0) != ((BitBoards.DarkSquares & other) != 0);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ref string GetSquareString(this Square s) => ref SquareStrings[s.ToInt()];

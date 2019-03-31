@@ -24,47 +24,39 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using Rudz.Chess.Types;
-
 namespace Chess.Tests
 {
-    using System;
+    using Rudz.Chess.Enums;
+    using Rudz.Chess.Types;
     using Xunit;
 
-    public class PawnPushTests
+    public sealed class SquareTests
     {
-        private readonly Func<BitBoard, BitBoard>[] _pawnPushDel =
-            {
-                BitBoards.NorthOne, BitBoards.SouthOne
-            };
+        [Fact]
+        public void SquareOppositeColorPositiveTest()
+        {
+            const bool expected = true;
+
+            var sq1 = new Square(ESquare.a1);
+            var sq2 = new Square(ESquare.a2);
+
+            var actual = sq1.IsOppositeColor(sq2);
+
+            Assert.Equal(expected, actual);
+        }
 
         [Fact]
-        public void PawnPush()
+        public void SquareOppositeColorNegativeTest()
         {
-            BitBoard fullBoard = 0xffffffffffff00;
+            const bool expected = false;
 
-            Player side = 0;
+            var sq1 = new Square(ESquare.a1);
+            var sq2 = new Square(ESquare.a3);
 
-            int expected = 8;
+            var actual = sq1.IsOppositeColor(sq2);
 
-            foreach (Square square in fullBoard)
-            {
-                BitBoard targetPosition = _pawnPushDel[side.Side](square.BitBoardSquare());
-                Square toSquare = targetPosition.Lsb();
-                int distance = toSquare.ToInt() - square.ToInt();
-                Assert.Equal(expected, distance);
-            }
-
-            side = ~side;
-            expected = -expected;
-
-            foreach (Square square in fullBoard)
-            {
-                BitBoard targetPosition = _pawnPushDel[side.Side](square.BitBoardSquare());
-                Square toSquare = targetPosition.Lsb();
-                int distance = toSquare.ToInt() - square.ToInt();
-                Assert.Equal(expected, distance);
-            }
+            Assert.Equal(expected, actual);
         }
+
     }
 }
