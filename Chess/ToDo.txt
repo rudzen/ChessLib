@@ -25,7 +25,7 @@ SOFTWARE.
 Types for:
 - Zobrist key
 - CastlelingRights
-- Movelist
+- Movelist (done, not tested)
 - Piece value
 - Score value
 - Move value
