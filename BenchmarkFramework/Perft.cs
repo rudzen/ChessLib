@@ -25,12 +25,12 @@
 
         public ulong DoPerft()
         {
-            Game game = new Game();
+            var game = new Game();
             ulong total = 0;
-            foreach (PerftPositions perftPositions in Positions)
+            foreach (var perftPositions in Positions)
             {
                 game.SetFen(perftPositions.fen);
-                ulong res = game.Perft(_perftLimit);
+                var res = game.Perft(_perftLimit);
                 total += res;
                 CallBack?.Invoke(perftPositions.fen, res);
             }

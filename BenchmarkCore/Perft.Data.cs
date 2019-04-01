@@ -9,7 +9,7 @@
         static Perft()
         {
             Positions = new List<PerftPositions>();
-            List<ulong> vals = new List<ulong>(6)
+            var vals = new List<ulong>(6)
             {
                 20,
                 400,

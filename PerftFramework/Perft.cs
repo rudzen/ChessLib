@@ -12,7 +12,7 @@ namespace Perft
         {
             Console.WriteLine("ChessLib Perft test program v0.1.");
             Console.WriteLine("Use Perft.exe <depth> to set depth (1-6), default is 5.");
-            int depth = 0;
+            var depth = 0;
             if (args.Length > 0)
                 depth = args[0].ToIntegral();
 
@@ -25,10 +25,10 @@ namespace Perft
 
             void Callback(string s, ulong v) { Console.WriteLine($"Position   : {s}\nMove Count : {v}"); }
 
-            Perft p = new Perft(depth) { CallBack = Callback };
-            Stopwatch watch = Stopwatch.StartNew();
-            ulong result = p.DoPerft();
-            long elapsedMs = watch.ElapsedMilliseconds;
+            var p = new Perft(depth) { CallBack = Callback };
+            var watch = Stopwatch.StartNew();
+            var result = p.DoPerft();
+            var elapsedMs = watch.ElapsedMilliseconds;
 
             Console.WriteLine($"Time (ms)  : {elapsedMs}");
             Console.WriteLine($"Nps        : {1000 * result / (ulong)elapsedMs}");
@@ -54,12 +54,12 @@ namespace Perft
 
         private ulong DoPerft()
         {
-            Game game = new Game();
+            var game = new Game();
             ulong total = 0;
-            foreach (PerftPositions perftPositions in Positions)
+            foreach (var perftPositions in Positions)
             {
                 game.SetFen(perftPositions.fen);
-                ulong res = game.Perft(_perftLimit);
+                var res = game.Perft(_perftLimit);
                 total += res;
                 CallBack?.Invoke(perftPositions.fen, res);
             }
