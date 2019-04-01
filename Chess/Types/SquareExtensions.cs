@@ -34,7 +34,7 @@ namespace Rudz.Chess.Types
     public static class SquareExtensions
     {
         // TODO : Add distance for files/ranks as well
-        private static readonly int[,] Distance; // chebyshev distance
+        private static readonly byte[,] Distance; // chebyshev distance
 
         private static readonly char[] RankChars;
 
@@ -50,7 +50,7 @@ namespace Rudz.Chess.Types
         static SquareExtensions()
         {
             // Initialize arrays
-            Distance = new int[64, 64];
+            Distance = new byte[64, 64];
             RankChars = new[] { '1', '2', '3', '4', '5', '6', '7', '8' };
             FileChars = new[] { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' };
             SquareStrings = new[]
@@ -80,7 +80,7 @@ namespace Rudz.Chess.Types
                 {
                     var ranks = Math.Abs(rank - distSquare.RankOf());
                     var files = Math.Abs((int)rank - distSquare.File());
-                    Distance[square.ToInt(), distSquare.ToInt()] = ranks.Max(files);
+                    Distance[square.ToInt(), distSquare.ToInt()] = (byte)ranks.Max(files);
                 }
             }
 
