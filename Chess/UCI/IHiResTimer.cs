@@ -34,7 +34,7 @@ namespace Rudz.Chess.UCI
 
         bool UseHighPriorityThread { get; set; }
 
-        int Id { get; set; }
+        int Id { get; }
 
         bool Equals(object obj);
 
