@@ -35,11 +35,11 @@ namespace Chess.Test.FEN
         [Fact]
         public void SetFenTest()
         {
-            FenError expected = new FenError(0, 0);
+            var expected = new FenError(0, 0);
 
-            Game game = new Game();
+            var game = new Game();
 
-            FenError actual = game.NewGame();
+            var actual = game.NewGame();
 
             Assert.Equal(expected, actual);
         }
@@ -47,18 +47,18 @@ namespace Chess.Test.FEN
         [Fact]
         public void GetFenTest()
         {
-            Game game = new Game();
+            var game = new Game();
 
-            FenError expectedError = new FenError(0, 0);
+            var expectedError = new FenError(0, 0);
 
-            FenError actualError = game.NewGame();
+            var actualError = game.NewGame();
 
             // verify no errors given (same as SetFen test)
             Assert.Equal(expectedError, actualError);
 
-            FenData expectedFen = new FenData(Fen.StartPositionFen);
+            var expectedFen = new FenData(Fen.StartPositionFen);
 
-            FenData actualFen = game.GetFen();
+            var actualFen = game.GetFen();
 
             Assert.Equal(expectedFen, actualFen);
         }

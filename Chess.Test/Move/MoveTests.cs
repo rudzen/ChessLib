@@ -50,7 +50,7 @@ namespace Chess.Test.Move
                     Square expectedTo = j;
 
                     // on purpose.. creating the move in this loop
-                    var move = new Rudz.Chess.Types.Move(expectedFrom, expectedTo);
+                    var move = new Move(expectedFrom, expectedTo);
 
                     Assert.False(move.IsNullMove());
 
@@ -81,7 +81,7 @@ namespace Chess.Test.Move
             const EMoveType expectedMoveType = EMoveType.Promotion;
 
             // full move spectrum
-            var move = new Rudz.Chess.Types.Move(expectedMovingPiece, expectedCapturedPiece, expectedFrom, expectedTo, expectedMoveType, expectedPromotionPiece);
+            var move = new Move(expectedMovingPiece, expectedCapturedPiece, expectedFrom, expectedTo, expectedMoveType, expectedPromotionPiece);
 
             var actualFrom = move.GetFromSquare();
             var actualTo = move.GetToSquare();
@@ -117,7 +117,7 @@ namespace Chess.Test.Move
         {
             var sb = new StringBuilder(256);
 
-            var moves = new List<Rudz.Chess.Types.Move>(128);
+            var moves = new List<Move>(128);
             var movesString = new List<Movestrings>(128);
 
             var game = new Game();
@@ -134,7 +134,7 @@ namespace Chess.Test.Move
                     if (s1 == s2)
                         continue;
 
-                    moves.Add(new Rudz.Chess.Types.Move(s1, s2));
+                    moves.Add(new Move(s1, s2));
                     tmp.Clear();
                     tmp.Append(' ');
                     tmp.Append(s1.ToString());
@@ -164,7 +164,7 @@ namespace Chess.Test.Move
             var result = new StringBuilder(1024 * 16);
             var expected = new StringBuilder(1024 * 16);
 
-            var moves = new List<Rudz.Chess.Types.Move>(256);
+            var moves = new List<Move>(256);
 
             var rngeezuz = new Random(DateTime.Now.Millisecond);
 
@@ -173,7 +173,7 @@ namespace Chess.Test.Move
             {
                 Square rndSquareFrom = (ESquare)rngeezuz.Next((int)ESquare.a1, (int)ESquare.h8);
                 Square rndSquareTo = (ESquare)rngeezuz.Next((int)ESquare.a1, (int)ESquare.h8);
-                moves.Add(new Rudz.Chess.Types.Move(rndSquareFrom, rndSquareTo));
+                moves.Add(new Move(rndSquareFrom, rndSquareTo));
 
                 expected.Append(' ');
                 expected.Append(rndSquareFrom.ToString());

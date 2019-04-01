@@ -55,8 +55,8 @@ namespace Chess.Test.Move
             var g = new Game();
             g.NewGame(fen);
 
-            var w1 = new Rudz.Chess.Types.Move(movingPiece, fromOneSquare, toSquare);
-            var w2 = new Rudz.Chess.Types.Move(movingPiece, fromTwoSquare, toSquare);
+            var w1 = new Move(movingPiece, fromOneSquare, toSquare);
+            var w2 = new Move(movingPiece, fromTwoSquare, toSquare);
 
             var actualPrimary = w1.ToNotation(g.State, notation);
             var actualSecondary = w2.ToNotation(g.State, notation);
@@ -87,8 +87,8 @@ namespace Chess.Test.Move
             var g = new Game();
             g.NewGame(fen);
 
-            var w1 = new Rudz.Chess.Types.Move(movingPiece, fromOneSquare, toSquare);
-            var w2 = new Rudz.Chess.Types.Move(movingPiece, fromTwoSquare, toSquare);
+            var w1 = new Move(movingPiece, fromOneSquare, toSquare);
+            var w2 = new Move(movingPiece, fromTwoSquare, toSquare);
 
             var actualPrimary = w1.ToNotation(g.State, notation);
             var actualSecondary = w2.ToNotation(g.State, notation);
@@ -119,8 +119,8 @@ namespace Chess.Test.Move
             var g = new Game();
             g.NewGame(fen);
 
-            var w1 = new Rudz.Chess.Types.Move(movingPiece, fromOneSquare, toSquare);
-            var w2 = new Rudz.Chess.Types.Move(movingPiece, fromTwoSquare, toSquare);
+            var w1 = new Move(movingPiece, fromOneSquare, toSquare);
+            var w2 = new Move(movingPiece, fromTwoSquare, toSquare);
 
             var actualPrimary = w1.ToNotation(g.State, notation);
             var actualSecondary = w2.ToNotation(g.State, notation);
@@ -151,8 +151,8 @@ namespace Chess.Test.Move
             var g = new Game();
             g.NewGame(fen);
 
-            var w1 = new Rudz.Chess.Types.Move(movingPiece, fromOneSquare, toSquare);
-            var w2 = new Rudz.Chess.Types.Move(movingPiece, fromTwoSquare, toSquare);
+            var w1 = new Move(movingPiece, fromOneSquare, toSquare);
+            var w2 = new Move(movingPiece, fromTwoSquare, toSquare);
 
             var actualPrimary = w1.ToNotation(g.State, notation);
             var actualSecondary = w2.ToNotation(g.State, notation);
@@ -183,8 +183,8 @@ namespace Chess.Test.Move
             var g = new Game();
             g.NewGame(fen);
 
-            var w1 = new Rudz.Chess.Types.Move(movingPiece, fromOneSquare, toSquare);
-            var w2 = new Rudz.Chess.Types.Move(movingPiece, fromTwoSquare, toSquare);
+            var w1 = new Move(movingPiece, fromOneSquare, toSquare);
+            var w2 = new Move(movingPiece, fromTwoSquare, toSquare);
 
             var actualPrimary = w1.ToNotation(g.State, notation);
             var actualSecondary = w2.ToNotation(g.State, notation);
@@ -215,8 +215,8 @@ namespace Chess.Test.Move
             var g = new Game();
             g.NewGame(fen);
 
-            var w1 = new Rudz.Chess.Types.Move(movingPiece, fromOneSquare, toSquare);
-            var w2 = new Rudz.Chess.Types.Move(movingPiece, fromTwoSquare, toSquare);
+            var w1 = new Move(movingPiece, fromOneSquare, toSquare);
+            var w2 = new Move(movingPiece, fromTwoSquare, toSquare);
 
             var actualPrimary = w1.ToNotation(g.State, notation);
             var actualSecondary = w2.ToNotation(g.State, notation);
@@ -247,8 +247,8 @@ namespace Chess.Test.Move
             var g = new Game();
             g.NewGame(fen);
 
-            var w1 = new Rudz.Chess.Types.Move(movingPiece, fromOneSquare, toSquare);
-            var w2 = new Rudz.Chess.Types.Move(movingPiece, fromTwoSquare, toSquare);
+            var w1 = new Move(movingPiece, fromOneSquare, toSquare);
+            var w2 = new Move(movingPiece, fromTwoSquare, toSquare);
 
             var actualPrimary = w1.ToNotation(g.State, notation);
             var actualSecondary = w2.ToNotation(g.State, notation);
@@ -279,8 +279,8 @@ namespace Chess.Test.Move
             var g = new Game();
             g.NewGame(fen);
 
-            var w1 = new Rudz.Chess.Types.Move(movingPiece, fromOneSquare, toSquare);
-            var w2 = new Rudz.Chess.Types.Move(movingPiece, fromTwoSquare, toSquare);
+            var w1 = new Move(movingPiece, fromOneSquare, toSquare);
+            var w2 = new Move(movingPiece, fromTwoSquare, toSquare);
 
             var actualPrimary = w1.ToNotation(g.State, notation);
             var actualSecondary = w2.ToNotation(g.State, notation);
@@ -311,8 +311,8 @@ namespace Chess.Test.Move
             var g = new Game();
             g.NewGame(fen);
 
-            var w1 = new Rudz.Chess.Types.Move(movingPiece, fromOneSquare, toSquare);
-            var w2 = new Rudz.Chess.Types.Move(movingPiece, fromTwoSquare, toSquare);
+            var w1 = new Move(movingPiece, fromOneSquare, toSquare);
+            var w2 = new Move(movingPiece, fromTwoSquare, toSquare);
 
             var actualPrimary = w1.ToNotation(g.State, notation);
             var actualSecondary = w2.ToNotation(g.State, notation);
@@ -343,8 +343,8 @@ namespace Chess.Test.Move
             var g = new Game();
             g.NewGame(fen);
 
-            var w1 = new Rudz.Chess.Types.Move(movingPiece, fromOneSquare, toSquare);
-            var w2 = new Rudz.Chess.Types.Move(movingPiece, fromTwoSquare, toSquare);
+            var w1 = new Move(movingPiece, fromOneSquare, toSquare);
+            var w2 = new Move(movingPiece, fromTwoSquare, toSquare);
 
             var actualPrimary = w1.ToNotation(g.State, notation);
             var actualSecondary = w2.ToNotation(g.State, notation);
@@ -375,8 +375,8 @@ namespace Chess.Test.Move
             var g = new Game();
             g.NewGame(fen);
 
-            var w1 = new Rudz.Chess.Types.Move(movingPiece, fromOneSquare, toSquare);
-            var w2 = new Rudz.Chess.Types.Move(movingPiece, fromTwoSquare, toSquare);
+            var w1 = new Move(movingPiece, fromOneSquare, toSquare);
+            var w2 = new Move(movingPiece, fromTwoSquare, toSquare);
 
             var actualPrimary = w1.ToNotation(g.State, notation);
             var actualSecondary = w2.ToNotation(g.State, notation);
@@ -407,8 +407,8 @@ namespace Chess.Test.Move
             var g = new Game();
             g.NewGame(fen);
 
-            var w1 = new Rudz.Chess.Types.Move(movingPiece, fromOneSquare, toSquare);
-            var w2 = new Rudz.Chess.Types.Move(movingPiece, fromTwoSquare, toSquare);
+            var w1 = new Move(movingPiece, fromOneSquare, toSquare);
+            var w2 = new Move(movingPiece, fromTwoSquare, toSquare);
 
             var actualPrimary = w1.ToNotation(g.State, notation);
             var actualSecondary = w2.ToNotation(g.State, notation);

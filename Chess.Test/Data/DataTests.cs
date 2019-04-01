@@ -36,8 +36,8 @@ namespace Chess.Test.Data
         [Fact]
         public void TestSquareChars()
         {
-            StringBuilder chars = new StringBuilder(1024);
-            StringBuilder strings = new StringBuilder(1024);
+            var chars = new StringBuilder(1024);
+            var strings = new StringBuilder(1024);
 
             for (Square sq = ESquare.a1; sq; ++sq)
             {
