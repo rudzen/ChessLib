@@ -142,8 +142,8 @@ namespace Rudz.Chess
 
             // compute en-passant if present
             State.EnPassantSquare = move.IsDoublePush()
-                ? (BitBoard)(move.GetToSquare().BitBoardSquare().First() + State.SideToMove.PawnPushDistance())
-                : 0ul;
+                ? move.GetFromSquare() + (move.GetMovingSide() == PlayerExtensions.White ? EDirection.North : EDirection.South)
+                : ESquare.none;
 
             State.Key = previous.Key;
             State.PawnStructureKey = previous.PawnStructureKey;
@@ -271,10 +271,10 @@ namespace Rudz.Chess
             if (!Fen.Fen.IsDelimiter(fen.GetAdvance()))
                 return new FenError(-6, fen.GetIndex());
 
-            Square epSq = fen.GetEpSquare();
+            State.EnPassantSquare = fen.GetEpSquare();
 
-            if (epSq == ESquare.fail)
-                return new FenError(-6, fen.GetIndex());
+            //if (epSq == ESquare.fail)
+            //    return new FenError(-6, fen.GetIndex());
 
             // temporary.. the whole method should be using this, but this will do for now.
             var first = string.Empty;
@@ -301,18 +301,6 @@ namespace Rudz.Chess
 
             State.SideToMove = player;
 
-            // ReSharper disable once SwitchStatementMissingSomeCases
-            switch (epSq.Value)
-            {
-                case ESquare.none:
-                    State.EnPassantSquare = 0;
-                    break;
-
-                default:
-                    State.EnPassantSquare = epSq;
-                    break;
-            }
-
             if (!player.IsWhite())
             {
                 /* black */
@@ -322,8 +310,8 @@ namespace Rudz.Chess
 
             State.Key ^= Zobrist.GetZobristCastleling(State.CastlelingRights);
 
-            if (State.EnPassantSquare)
-                State.Key ^= Zobrist.GetZobristEnPessant(BitBoards.First(State.EnPassantSquare).File());
+            if (State.EnPassantSquare != ESquare.none)
+                State.Key ^= Zobrist.GetZobristEnPessant(State.EnPassantSquare.File());
 
             State.InCheck = Position.IsAttacked(Position.KingSquares[player.Side], ~State.SideToMove);
 
@@ -477,11 +465,11 @@ namespace Rudz.Chess
             var key = State.Key ^ pawnKey;
             pawnKey ^= Zobrist.GetZobristSide();
 
-            if (_stateList[PositionIndex - 1].EnPassantSquare)
-                key ^= Zobrist.GetZobristEnPessant(BitBoards.First(_stateList[PositionIndex - 1].EnPassantSquare).File());
+            if (_stateList[PositionIndex - 1].EnPassantSquare != ESquare.none)
+                key ^= Zobrist.GetZobristEnPessant(_stateList[PositionIndex - 1].EnPassantSquare.File());
 
-            if (State.EnPassantSquare)
-                key ^= Zobrist.GetZobristEnPessant(BitBoards.First(State.EnPassantSquare).File());
+            if (State.EnPassantSquare != ESquare.none)
+                key ^= Zobrist.GetZobristEnPessant(State.EnPassantSquare.File());
 
             if (move.IsNullMove())
             {

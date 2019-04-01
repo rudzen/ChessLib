@@ -69,7 +69,7 @@ namespace Rudz.Chess
 
         public bool InCheck { get; set; }
 
-        public BitBoard EnPassantSquare { get; set; }
+        public Square EnPassantSquare { get; set; }
 
         public Player SideToMove { get; set; }
 
@@ -166,8 +166,7 @@ namespace Rudz.Chess
 
                 // TODO : Test with unit test
                 var opponent = ~move.GetMovingSide();
-                var esq = EnPassantSquare.First();
-                if (esq.PawnAttack(opponent) & Position.Pieces(EPieceType.Pawn, opponent))
+                if (EnPassantSquare.PawnAttack(opponent) & Position.Pieces(EPieceType.Pawn, opponent))
                     return true;
             }
             else if (move.IsCaptureMove())
@@ -244,8 +243,11 @@ namespace Rudz.Chess
             AddPawnMoves(moves, currentSide.PawnPush(pawns & currentSide.Rank7()) & ~_occupied, currentSide.PawnPushDistance(), EMoveType.Quiet);
             AddPawnMoves(moves, _pawnAttacksWest[currentSide.Side](pawns) & occupiedByThem, currentSide.PawnWestAttackDistance(), EMoveType.Capture);
             AddPawnMoves(moves, _pawnAttacksEast[currentSide.Side](pawns) & occupiedByThem, currentSide.PawnEastAttackDistance(), EMoveType.Capture);
-            AddPawnMoves(moves, _pawnAttacksWest[currentSide.Side](pawns) & EnPassantSquare, currentSide.PawnWestAttackDistance(), EMoveType.Epcapture);
-            AddPawnMoves(moves, _pawnAttacksEast[currentSide.Side](pawns) & EnPassantSquare, currentSide.PawnEastAttackDistance(), EMoveType.Epcapture);
+            if (EnPassantSquare != ESquare.none)
+            {
+                AddPawnMoves(moves, _pawnAttacksWest[currentSide.Side](pawns) & EnPassantSquare, currentSide.PawnWestAttackDistance(), EMoveType.Epcapture);
+                AddPawnMoves(moves, _pawnAttacksEast[currentSide.Side](pawns) & EnPassantSquare, currentSide.PawnEastAttackDistance(), EMoveType.Epcapture);
+            }
         }
 
         private void GenerateQuietMoves(ICollection<Move> moves)

@@ -127,10 +127,10 @@ namespace Rudz.Chess.Fen
 
             sv.Append(' ');
 
-            if (state.EnPassantSquare.Empty())
+            if (state.EnPassantSquare == ESquare.none)
                 sv.Append('-');
             else
-                sv.Append(state.EnPassantSquare.First().ToString());
+                sv.Append(state.EnPassantSquare.ToString());
 
             sv.Append(' ');
 
@@ -172,11 +172,11 @@ namespace Rudz.Chess.Fen
                 return ESquare.none;
 
             if (!c.InBetween('a', 'h'))
-                return ESquare.fail;
+                return ESquare.none;
 
             var c2 = fen.GetAdvance();
 
-            return c.InBetween('3', '6') ? ESquare.fail : new Square(c2 - '1', c - 'a').Value;
+            return c.InBetween('3', '6') ? ESquare.none : new Square(c2 - '1', c - 'a').Value;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

@@ -26,6 +26,7 @@ SOFTWARE.
 
 namespace Rudz.Chess.Extensions
 {
+    using System;
     using System.Collections.Generic;
 
     public static class StringExtensions
@@ -38,19 +39,22 @@ namespace Rudz.Chess.Extensions
         /// <param name="separator">The separator</param>
         /// <param name="tokenizer">The end token char to trim from the pillaged command string</param>
         /// <returns></returns>
-        public static IEnumerable<string> Parse(this string command, char separator, char tokenizer)
+        public static Queue<string> Parse(this ReadOnlySpan<char> command, char separator, char tokenizer)
         {
+            var q = new Queue<string>();
             var startIndex = 0;
             var inToken = false;
-            for (var index = 0; index < command.Length; index++)
+
+            for (var i = 0; i < command.Length; ++i)
             {
-                var character = command[index];
-                if (index == command.Length - 1)
+                if (i == command.Length - 1)
                 {
                     // return last token.
-                    yield return command.Substring(startIndex, index - startIndex + 1).TrimEnd(tokenizer);
+                    q.Enqueue(new string(command.Slice(startIndex, i - startIndex + 1).TrimEnd(tokenizer).ToArray()));
                     break;
                 }
+
+                var character = command[i];
 
                 if (character == separator)
                 {
@@ -59,15 +63,17 @@ namespace Rudz.Chess.Extensions
                         continue;
 
                     // return token
-                    yield return command.Substring(startIndex, index - startIndex).TrimEnd(tokenizer);
-                    startIndex = index + 1;
+                    q.Enqueue(new string(command.Slice(startIndex, i - startIndex).TrimEnd(tokenizer).ToArray()));
+                    startIndex = i + 1;
                 }
                 else if (character == tokenizer)
                 {
                     inToken ^= true;
-                    startIndex = index + 1;
+                    startIndex = i + 1;
                 }
             }
+
+            return q;
         }
     }
 }
