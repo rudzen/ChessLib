@@ -38,12 +38,16 @@
 
         private readonly Action<string, ulong> _callback;
 
-        public Perft(int depth, Action<string, ulong> callback = null)
+        public Perft(int depth, Action<string, ulong> callback, ICollection<PerftPosition> positions = null)
         {
-            _positions = new List<PerftPosition>();
+            _positions = positions == null ? new List<PerftPosition>() : positions.ToList();
             _perftLimit = depth;
             _callback = callback;
         }
+
+        public Perft(int depth, Action<string, ulong> callback = null) : this(depth, callback, null)
+        { }
+
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ulong DoPerft()
@@ -57,7 +61,7 @@
             }
 
             var game = new Game();
-            foreach (var position in _positions.Where(x => x.Value.Count >= _perftLimit))
+            foreach (var position in _positions)
             {
                 game.SetFen(position.Fen);
                 var res = game.Perft(_perftLimit);
@@ -70,6 +74,9 @@
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void ClearPositions() => _positions.Clear();
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void AddPosition(PerftPosition pp) => _positions.Add(pp);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void AddStartPosition()
