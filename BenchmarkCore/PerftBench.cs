@@ -1,6 +1,7 @@
 ﻿namespace BenchmarkCore
 {
     using BenchmarkDotNet.Attributes;
+    using Rudz.Chess.Perft;
 
     [ClrJob(true), CoreJob]
     //[RPlotExporter, RankColumn]
@@ -15,6 +16,7 @@
         public void Setup()
         {
             _perft = new Perft(N);
+            _perft.AddStartPosition();
         }
 
         [Benchmark]
