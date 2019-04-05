@@ -2,7 +2,7 @@
 {
     using BenchmarkDotNet.Attributes;
 
-    //[ClrJob(true), CoreJob, CoreRtJob]
+    [ClrJob(true), CoreJob]
     //[RPlotExporter, RankColumn]
     public class PerftBench
     {

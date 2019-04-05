@@ -4,11 +4,11 @@
 
     public partial class Perft
     {
-        internal static readonly List<PerftPositions> Positions;
+        internal static readonly PerftPosition[] Positions;
 
         static Perft()
         {
-            Positions = new List<PerftPositions>();
+            Positions = new PerftPosition[1];
             var vals = new List<ulong>(6)
             {
                 20,
@@ -18,7 +18,7 @@
                 4865609,
                 119060324
             };
-            Positions.Add(new PerftPositions("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", vals));
+            Positions[0] = new PerftPosition("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", vals);
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿namespace BenchmarkCore
 {
-    using System;
     using BenchmarkDotNet.Running;
     using Rudz.Chess;
 
@@ -36,21 +35,15 @@ Result	6	1,912,300.6 us	3,551.167 us	3,148.017 us
         /// </summary>
         private readonly int _perftLimit;
 
-        /// <summary>
-        /// To notify about update.
-        /// </summary>
-        private Action<string, ulong> CallBack { get; set; }
-
         public ulong DoPerft()
         {
             var game = new Game();
             ulong total = 0;
-            foreach (var perftPositions in global::BenchmarkCore.Perft.Positions)
+            foreach (var perftPositions in Positions)
             {
                 game.SetFen(perftPositions.fen);
                 var res = game.Perft(_perftLimit);
                 total += res;
-                CallBack?.Invoke(perftPositions.fen, res);
             }
 
             return total;
