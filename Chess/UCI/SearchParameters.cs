@@ -26,7 +26,7 @@ SOFTWARE.
 
 namespace Rudz.Chess.UCI
 {
-    using System;
+    using Extensions;
     using System.Collections.Generic;
     using System.Runtime.CompilerServices;
     using System.Text;
@@ -46,8 +46,7 @@ namespace Rudz.Chess.UCI
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public SearchParameters()
         {
-            _time = new ulong[2];
-            _inc = new ulong[2];
+            _time = _inc = new ulong[2];
             MovesToGo = new int[2];
         }
 
@@ -118,9 +117,9 @@ namespace Rudz.Chess.UCI
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Clear()
         {
-            Array.Clear(_time, 0, 2);
-            Array.Clear(_inc, 0, 2);
-            Array.Clear(MovesToGo, 0, 2);
+            _time.Clear();
+            _inc.Clear();
+            MovesToGo.Clear();
             MoveTime = 0;
             Infinite = false;
         }

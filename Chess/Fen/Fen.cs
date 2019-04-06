@@ -24,15 +24,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using Rudz.Chess.Exceptions;
+
 namespace Rudz.Chess.Fen
 {
+    using EnsureThat;
+    using Enums;
+    using Extensions;
+    using Properties;
     using System;
     using System.Runtime.CompilerServices;
     using System.Text;
     using System.Text.RegularExpressions;
-    using Enums;
-    using Extensions;
-    using Properties;
     using Types;
 
     public static class Fen
@@ -71,6 +74,9 @@ namespace Rudz.Chess.Fen
         /// </returns>
         public static FenData GenerateFen([NotNull] this State state, Piece[] boardLayout, int halfMoveCount)
         {
+            EnsureArg.IsNotNull(boardLayout, nameof(boardLayout));
+            EnsureArg.IsGte(halfMoveCount, 0, nameof(halfMoveCount));
+
             var sv = new StringBuilder(MaxFenLen);
 
             for (var rank = ERank.Rank8; rank >= ERank.Rank1; rank--)
@@ -150,14 +156,21 @@ namespace Rudz.Chess.Fen
         /// <param name="fen">The FEN string to validate</param>
         /// <returns>true if all requirements are met, otherwise false</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Validate([CanBeNull] string fen)
+        public static void Validate(string fen)
         {
-            if (string.IsNullOrWhiteSpace(fen))
-                return false;
+            EnsureArg.IsNotEmptyOrWhitespace(fen, nameof(fen));
 
-            var f = fen.Trim();
+            var f = fen.Trim().AsSpan();
 
-            return f.Length <= MaxFenLen && CountValidity(f.AsSpan()) && ValidFenRegex.Value.IsMatch(fen) && CountPieceValidity(f);
+            if (f.Length <= MaxFenLen)
+                throw new InvalidFenException($"Invalid length for fen {fen}.");
+
+            if (!ValidFenRegex.Value.IsMatch(fen))
+                throw new InvalidFenException($"Invalid format for fen {fen}.");
+
+            CountValidity(f);
+            if (!CountPieceValidity(f))
+                throw new InvalidFenException($"Invalid piece validity for fen {fen}");
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -168,10 +181,7 @@ namespace Rudz.Chess.Fen
         {
             var c = fen.GetAdvance();
 
-            if (c == '-')
-                return ESquare.none;
-
-            if (!c.InBetween('a', 'h'))
+            if (c == '-' || !c.InBetween('a', 'h'))
                 return ESquare.none;
 
             var c2 = fen.GetAdvance();
@@ -180,9 +190,14 @@ namespace Rudz.Chess.Fen
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static bool CountPieceValidity([NotNull] string str)
+        private static bool CountPieceValidity(ReadOnlySpan<char> str)
         {
-            var testArray = str.Split();
+            var spaceIndex = str.IndexOf(' ');
+            if (spaceIndex == -1)
+                throw new InvalidFenException($"Invalid fen {str.ToString()}");
+
+            var mainSection = str.Slice(0, spaceIndex);
+
             short whitePawnCount = 0;
             short whiteRookCount = 0;
             short whiteQueenCount = 0;
@@ -197,11 +212,14 @@ namespace Rudz.Chess.Fen
             short blackKingCount = 0;
             short blackBishopCount = 0;
 
-            foreach (var c in testArray[0])
+            foreach (var c in mainSection)
             {
                 // ReSharper disable once SwitchStatementMissingSomeCases
                 switch (c)
                 {
+                    case '\\':
+                        continue;
+
                     case 'p':
                         if (++whitePawnCount > 8 && whiteRookCount + whitePawnCount + whiteBishopCount + whiteKnightCount + whiteQueenCount < 15)
                             return false;
@@ -263,7 +281,14 @@ namespace Rudz.Chess.Fen
                         break;
                 }
             }
-            return int.Parse(testArray[testArray.Length - 1]) <= 2048;
+
+            spaceIndex = str.LastIndexOf(' ');
+            var endSection = str.Slice(spaceIndex);
+
+            if (endSection.ToString().ToIntegral() <= 2048)
+                throw new InvalidFenException($"Invalid half move count for fen {str.ToString()}");
+
+            return true;
         }
 
         /// <summary>
@@ -273,7 +298,7 @@ namespace Rudz.Chess.Fen
         /// <param name="str">The fen string to check</param>
         /// <returns>true if format seems ok, otherwise false</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static bool CountValidity(ReadOnlySpan<char> str)
+        private static void CountValidity(ReadOnlySpan<char> str)
         {
             var spaceCount = 0;
             var seperatorCount = 0;
@@ -281,7 +306,7 @@ namespace Rudz.Chess.Fen
             // ReSharper disable once ForCanBeConvertedToForeach
             for (var index = 0; index < str.Length; index++)
             {
-// ReSharper disable once SwitchStatementMissingSomeCases
+                // ReSharper disable once SwitchStatementMissingSomeCases
                 switch (str[index])
                 {
                     case Seperator:
@@ -293,7 +318,15 @@ namespace Rudz.Chess.Fen
                 }
             }
 
-            return spaceCount >= SpaceCount && seperatorCount == SeperatorCount;
+            var valid = spaceCount >= SpaceCount;
+
+            if (!valid)
+                throw new InvalidFenException($"Invalid space character count in fen {str.ToString()}");
+
+            valid = seperatorCount == SeperatorCount;
+
+            if (!valid)
+                throw new InvalidFenException($"Invalid separator count in fen {str.ToString()}");
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace Rudz.Chess.Perft
+﻿using EnsureThat;
+
+namespace Rudz.Chess.Perft
 {
     using System;
     using System.Collections.Generic;
@@ -40,6 +42,7 @@
 
         public Perft(int depth, Action<string, ulong> callback, ICollection<PerftPosition> positions = null)
         {
+            EnsureArg.IsGt(depth, 0, nameof(depth));
             _positions = positions == null ? new List<PerftPosition>() : positions.ToList();
             _perftLimit = depth;
             _callback = callback;
@@ -76,7 +79,12 @@
         public void ClearPositions() => _positions.Clear();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void AddPosition(PerftPosition pp) => _positions.Add(pp);
+        public void AddPosition(PerftPosition pp)
+        {
+            EnsureArg.IsNotNull(pp.Value, nameof(pp.Value));
+            EnsureArg.IsNotNullOrWhiteSpace(pp.Fen, nameof(pp.Fen));
+            _positions.Add(pp);
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void AddStartPosition()

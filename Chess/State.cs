@@ -142,6 +142,5 @@ namespace Rudz.Chess
 
             return MoveExtensions.EmptyMove;
         }
-
     }
 }

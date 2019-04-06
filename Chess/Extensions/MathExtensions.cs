@@ -97,23 +97,7 @@ namespace Rudz.Chess.Extensions
                 return false;
             }
 
-            var x = 0;
-            var neg = false;
-            var pos = 0;
-            var max = str.Length - 1;
-            if (str[pos] == '-')
-            {
-                neg = true;
-                pos++;
-            }
-
-            while (pos <= max && InBetween(str[pos], '0', '9'))
-            {
-                x = x * 10 + (str[pos] - '0');
-                pos++;
-            }
-
-            result = neg ? -x : x;
+            result = str.ToIntegral();
             return true;
         }
 

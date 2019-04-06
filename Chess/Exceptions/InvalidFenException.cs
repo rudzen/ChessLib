@@ -24,26 +24,23 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Enums
+namespace Rudz.Chess.Exceptions
 {
     using System;
-    using System.Runtime.CompilerServices;
+    using System.Runtime.Serialization;
 
-    [Flags]
-    public enum EMoveType
+    public class InvalidFenException : ArgumentException
     {
-        Normal = 0,
-        Quiet = 1,
-        Doublepush = 2,
-        Castle = 4,
-        Epcapture = 8,
-        Promotion = 16,
-        Capture = 32
-    }
+        public InvalidFenException()
+        { }
 
-    public static class EMoveTypeExtensions
-    {
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool HasFlagFast(this EMoveType value, EMoveType flag) => (value & flag) != 0;
+        public InvalidFenException(string message)
+            : base(message) { }
+
+        public InvalidFenException(string message, Exception innerException)
+            : base(message, innerException) { }
+
+        protected InvalidFenException(SerializationInfo info, StreamingContext context)
+            : base(info, context) { }
     }
 }

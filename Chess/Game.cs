@@ -26,13 +26,12 @@ SOFTWARE.
 
 // ReSharper disable RedundantCheckBeforeAssignment
 
-using Rudz.Chess.Fen;
-
 namespace Rudz.Chess
 {
     using Data;
     using Enums;
     using Extensions;
+    using Fen;
     using Properties;
     using System;
     using System.Collections;
@@ -56,12 +55,12 @@ namespace Rudz.Chess
         private static readonly int[,] CastlePositionalOr;
 
         [NotNull]
-        private readonly int[] _castleRightsMask = new int[64];
+        private readonly int[] _castleRightsMask;
 
         [NotNull]
         private readonly State[] _stateList;
 
-        private readonly StringBuilder _output = new StringBuilder(256);
+        private readonly StringBuilder _output;
 
         private bool _chess960;
 
@@ -76,8 +75,10 @@ namespace Rudz.Chess
 
         public Game(Action<Piece, Square> pieceUpdateCallback)
         {
+            _castleRightsMask = new int[64];
             Position = new Position(pieceUpdateCallback);
             _stateList = new State[MaxPositions];
+            _output = new StringBuilder(256);
 
             for (var i = 0; i < _stateList.Length; i++)
                 _stateList[i] = new State(Position);
@@ -190,8 +191,8 @@ namespace Rudz.Chess
             // TODO : Replace with stream at some point
 
             // basic validation, catches format errors
-            if (validate && !Fen.Fen.Validate(fenString))
-                return new FenError(-9, 0);
+            if (validate)
+                Fen.Fen.Validate(fenString);
 
             foreach (var square in Occupied)
                 Position.RemovePiece(square, Position.BoardLayout[square.ToInt()]);
@@ -223,17 +224,15 @@ namespace Rudz.Chess
                     continue;
                 }
 
-                // ReSharper disable once SwitchStatementMissingSomeCases
-                switch (c)
+                if (c == '/')
                 {
-                    case '/' when f != 9:
+                    if (f != 9)
                         return new FenError(-2, fen.GetIndex());
 
-                    case '/':
-                        r--;
-                        f = 1;
-                        c = fen.GetAdvance();
-                        continue;
+                    r--;
+                    f = 1;
+                    c = fen.GetAdvance();
+                    continue;
                 }
 
                 var pieceIndex = PieceExtensions.PieceChars.IndexOf(c);
@@ -273,17 +272,12 @@ namespace Rudz.Chess
 
             State.EnPassantSquare = fen.GetEpSquare();
 
-            //if (epSq == ESquare.fail)
-            //    return new FenError(-6, fen.GetIndex());
-
             // temporary.. the whole method should be using this, but this will do for now.
-            var first = string.Empty;
-            var second = string.Empty;
 
             var moveCounters = fen.Fen.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
-            first = moveCounters[moveCounters.Length - 2];
-            second = moveCounters[moveCounters.Length - 1];
+            var first = moveCounters[moveCounters.Length - 2];
+            var second = moveCounters[moveCounters.Length - 1];
 
             second.ToIntegral(out int number);
 
@@ -316,6 +310,7 @@ namespace Rudz.Chess
             State.InCheck = Position.IsAttacked(Position.KingSquares[player.Side], ~State.SideToMove);
 
             State.GenerateMoves(true);
+
             return 0;
         }
 
@@ -338,13 +333,9 @@ namespace Rudz.Chess
             if (_chess960 || move.IsCastlelingMove())
             {
                 if (_xfen && move.GetToSquare() == ECastleling.Long.GetKingCastleTo(move.GetMovingSide()))
-                {
                     output.Append(ECastleling.Long.GetCastlelingString());
-                }
                 else if (_xfen)
-                {
                     output.Append(ECastleling.Short.GetCastlelingString());
-                }
                 else
                 {
                     output.Append(move.GetFromSquare().ToString());
@@ -368,7 +359,7 @@ namespace Rudz.Chess
                 gameEndType |= EGameEndType.Pat;
             if (IsRepetition())
                 gameEndType |= EGameEndType.Repetition;
-            if (State.Material.MaterialValueBlack <= 300 && State.Material.MaterialValueWhite <= 300 && Position.BoardPieces[0].Empty() && Position.BoardPieces[8].Empty())
+            if (State.Material[PlayerExtensions.White.Side] <= 300 && State.Material[PlayerExtensions.Black.Side] <= 300 && Position.BoardPieces[0].Empty() && Position.BoardPieces[8].Empty())
                 gameEndType |= EGameEndType.MaterialDrawn;
             if (State.ReversibleHalfMoveCount >= 100)
                 gameEndType |= EGameEndType.FiftyMove;
@@ -489,9 +480,7 @@ namespace Rudz.Chess
             var squareTo = move.GetToSquare();
 
             if (move.IsPromotionMove())
-            {
                 key ^= Zobrist.GetZobristPst(move.GetPromotedPiece(), squareTo);
-            }
             else
             {
                 if (pawnPiece)
@@ -501,9 +490,7 @@ namespace Rudz.Chess
             }
 
             if (pawnPiece && move.IsEnPassantMove())
-            {
                 pawnKey ^= Zobrist.GetZobristPst(move.GetCapturedPiece().Type() + (State.SideToMove << 3), squareTo + (State.SideToMove.Side == 0 ? 8 : -8));
-            }
             else if (move.IsCaptureMove())
             {
                 if (pawnPiece)
@@ -637,10 +624,11 @@ namespace Rudz.Chess
             {
                 for (var file = EFile.FileH; file >= EFile.FileA; file--)
                 {
-                    if (!Position.IsPieceTypeOnSquare((ESquare)((int)file + side.Side * 56), EPieceType.Rook))
-                        continue;
-                    rookFile = (int)file; // right outermost rook for side
-                    break;
+                    if (Position.IsPieceTypeOnSquare((ESquare)((int)file + side.Side * 56), EPieceType.Rook))
+                    {
+                        rookFile = (int)file; // right outermost rook for side
+                        break;
+                    }
                 }
 
                 _xfen = true;
@@ -671,10 +659,11 @@ namespace Rudz.Chess
             {
                 for (var file = EFile.FileA; file <= EFile.FileH; file++)
                 {
-                    if (!Position.IsPieceTypeOnSquare((ESquare)(int)(file + side.Side * 56), EPieceType.Rook))
-                        continue;
-                    rookFile = (int)file; // left outermost rook for side
-                    break;
+                    if (Position.IsPieceTypeOnSquare((ESquare)(int)(file + side.Side * 56), EPieceType.Rook))
+                    {
+                        rookFile = (int)file; // left outermost rook for side
+                        break;
+                    }
                 }
 
                 _xfen = true;

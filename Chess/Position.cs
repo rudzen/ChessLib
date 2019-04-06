@@ -159,9 +159,7 @@ namespace Rudz.Chess
                 RemovePiece(t, move.GetCapturedPiece());
             }
             else if (move.IsCaptureMove())
-            {
                 RemovePiece(toSquare, move.GetCapturedPiece());
-            }
 
             AddPiece(move.IsPromotionMove() ? move.GetPromotedPiece() : move.GetMovingPiece(), toSquare);
 
@@ -194,9 +192,7 @@ namespace Rudz.Chess
                 AddPiece(move.GetCapturedPiece(), t);
             }
             else if (move.IsCaptureMove())
-            {
                 AddPiece(move.GetCapturedPiece(), toSquare);
-            }
 
             AddPiece(move.GetMovingPiece(), move.GetFromSquare());
 

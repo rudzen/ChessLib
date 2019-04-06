@@ -83,10 +83,7 @@ namespace Rudz.Chess
 
         public Position Position { get; set; }
 
-        public static void ClearMoveCache()
-        {
-            Table.Clear();
-        }
+        public static void ClearMoveCache() => Table.Clear();
 
         public void GenerateMoves(bool force = false)
         {
@@ -97,20 +94,34 @@ namespace Rudz.Chess
             if (Flags.HasFlagFast(Emgf.Stages))
                 return;
 
-            if (Table.ContainsKey(Key) && !force)
-                Moves = Table[Key];
+            if (Table.TryGetValue(Key, out var moves))
+                Moves = moves;
             else
             {
-                var moves = new List<Move>(256);
-
+                moves = new List<Move>(256);
                 // relax the gc while generating moves.
                 GCSettings.LatencyMode = GCLatencyMode.LowLatency;
                 GenerateCapturesAndPromotions(moves);
                 GenerateQuietMoves(moves);
-                Moves = moves;
                 Table.TryAdd(Key, moves);
+                Moves = moves;
                 GCSettings.LatencyMode = GCLatencyMode.Interactive;
             }
+
+            //if (Table.ContainsKey(Key) && !force)
+            //    Moves = Table[Key];
+            //else
+            //{
+            //    var moves = new List<Move>(256);
+
+            //    // relax the gc while generating moves.
+            //    GCSettings.LatencyMode = GCLatencyMode.LowLatency;
+            //    GenerateCapturesAndPromotions(moves);
+            //    GenerateQuietMoves(moves);
+            //    Moves = moves;
+            //    Table.TryAdd(Key, moves);
+            //    GCSettings.LatencyMode = GCLatencyMode.Interactive;
+            //}
         }
 
         /// <summary>
@@ -123,7 +134,7 @@ namespace Rudz.Chess
         /// <returns>true if legal, otherwise false</returns>
         public bool IsLegal(Move move, Piece piece, Square from, EMoveType type)
         {
-            if (!InCheck && piece.Type() != EPieceType.King && (Pinned & from).Empty() && (type & EMoveType.Epcapture) == 0)
+            if (!InCheck && piece.Type() != EPieceType.King && (Pinned & from).Empty() && !type.HasFlagFast(EMoveType.Epcapture))
                 return true;
 
             Position.IsProbing = true;
@@ -203,10 +214,7 @@ namespace Rudz.Chess
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="ea"></param>
-        private static void Clean(object sender, EventArgs ea)
-        {
-            ClearMoveCache();
-        }
+        private static void Clean(object sender, EventArgs ea) => ClearMoveCache();
 
         /// <summary>
         /// Aligns the current positional data to the position data.
@@ -255,15 +263,13 @@ namespace Rudz.Chess
             var currentSide = SideToMove;
             if (!InCheck)
                 for (var castleType = ECastleling.Short; castleType < ECastleling.CastleNb; castleType++)
-                {
                     if (CanCastle(castleType))
                         AddCastleMove(moves, Position.GetKingCastleFrom(currentSide, castleType), castleType.GetKingCastleTo(currentSide));
-                }
 
             var notOccupied = ~_occupied;
             var pushed = currentSide.PawnPush(Position.Pieces(EPieceType.Pawn, currentSide).Value & ~currentSide.Rank7()) & notOccupied;
             AddPawnMoves(moves, pushed.Value, currentSide.PawnPushDistance(), EMoveType.Quiet);
-            AddPawnMoves(moves,  currentSide.PawnPush(pushed.Value & currentSide.Rank3()) & notOccupied, currentSide.PawnDoublePushDistance(), EMoveType.Doublepush);
+            AddPawnMoves(moves, currentSide.PawnPush(pushed.Value & currentSide.Rank3()) & notOccupied, currentSide.PawnDoublePushDistance(), EMoveType.Doublepush);
             AddMoves(moves, notOccupied);
         }
 
@@ -282,9 +288,9 @@ namespace Rudz.Chess
         {
             Move move;
 
-            if ((type & EMoveType.Capture) != 0)
+            if (type.HasFlagFast(EMoveType.Capture))
                 move = new Move(piece, Position.GetPiece(to), from, to, type, promoted);
-            else if ((type & EMoveType.Epcapture) != 0)
+            else if (type.HasFlagFast(EMoveType.Epcapture))
                 move = new Move(piece, EPieceType.Pawn.MakePiece(~SideToMove), from, to, type, promoted);
             else
                 move = new Move(piece, from, to, type, promoted);
@@ -339,17 +345,18 @@ namespace Rudz.Chess
             foreach (var squareTo in targetSquares)
             {
                 var squareFrom = squareTo - direction;
-                if (!squareTo.IsPromotionRank())
+                if (squareTo.IsPromotionRank())
                 {
-                    AddMove(moves, piece, squareFrom, squareTo, PieceExtensions.EmptyPiece, type);
-                    continue;
+                    if (Flags.HasFlagFast(Emgf.Queenpromotion))
+                        AddMove(moves, piece, squareFrom, squareTo, EPieceType.Queen.MakePiece(SideToMove),
+                            type | EMoveType.Promotion);
+                    else
+                        for (var promotedPiece = EPieceType.Queen; promotedPiece >= EPieceType.Knight; promotedPiece--)
+                            AddMove(moves, piece, squareFrom, squareTo, promotedPiece.MakePiece(SideToMove),
+                                type | EMoveType.Promotion);
                 }
-
-                if (Flags.HasFlagFast(Emgf.Queenpromotion))
-                    AddMove(moves, piece, squareFrom, squareTo, EPieceType.Queen.MakePiece(SideToMove), type | EMoveType.Promotion);
                 else
-                    for (var promotedPiece = EPieceType.Queen; promotedPiece >= EPieceType.Knight; promotedPiece--)
-                        AddMove(moves, piece, squareFrom, squareTo, promotedPiece.MakePiece(SideToMove), type | EMoveType.Promotion);
+                    AddMove(moves, piece, squareFrom, squareTo, PieceExtensions.EmptyPiece, type);
             }
         }
 

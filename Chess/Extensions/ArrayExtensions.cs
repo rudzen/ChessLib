@@ -27,6 +27,7 @@ SOFTWARE.
 namespace Rudz.Chess.Extensions
 {
     using Properties;
+    using System;
     using System.Runtime.CompilerServices;
 
     public static class ArrayExtensions
@@ -37,5 +38,8 @@ namespace Rudz.Chess.Extensions
             for (var i = 0; i < arr.Length; i++)
                 arr[i] = value;
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Clear<T>([NotNull] this T[] arr) => Array.Clear(arr, 0, arr.Length);
     }
 }

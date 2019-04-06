@@ -31,7 +31,7 @@
 
 namespace Rudz.Chess
 {
-    using System;
+    using Extensions;
     using System.Collections.Generic;
     using System.Runtime.CompilerServices;
     using Types;
@@ -123,7 +123,7 @@ namespace Rudz.Chess
                 }
             }
 
-            Array.Clear(squares, 0, squares.Length);
+            squares.Clear();
 
             for (var i = 0; i < squares.Length; ++i)
             {

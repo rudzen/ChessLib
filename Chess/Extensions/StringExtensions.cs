@@ -26,8 +26,12 @@ SOFTWARE.
 
 namespace Rudz.Chess.Extensions
 {
+    using EnsureThat;
     using System;
     using System.Collections.Generic;
+    using System.IO;
+    using System.Runtime.CompilerServices;
+    using System.Text;
 
     public static class StringExtensions
     {
@@ -41,6 +45,7 @@ namespace Rudz.Chess.Extensions
         /// <returns></returns>
         public static Queue<string> Parse(this ReadOnlySpan<char> command, char separator, char tokenizer)
         {
+            EnsureArg.IsGt(command.Length, 0, nameof(command));
             var q = new Queue<string>();
             var startIndex = 0;
             var inToken = false;
@@ -75,5 +80,21 @@ namespace Rudz.Chess.Extensions
 
             return q;
         }
+
+        public static IEnumerable<int> GetLocations(this string @this, char token = ' ')
+        {
+            var pos = 0;
+            while (true)
+            {
+                var index = @this.IndexOf(token, pos);
+                if (index == -1)
+                    yield break;
+                yield return index;
+                pos = index;
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static MemoryStream GenerateStream(this string @this) => new MemoryStream(Encoding.UTF8.GetBytes(@this ?? ""));
     }
 }

@@ -24,6 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using EnsureThat;
+
 namespace Rudz.Chess.UCI
 {
     using Properties;
@@ -57,6 +59,8 @@ namespace Rudz.Chess.UCI
 
         public HiResTimer(float interval, int id, Action<HiResTimerArgs> elapsed)
         {
+            EnsureArg.IsGte(interval, 0.01f, nameof(interval));
+            EnsureArg.IsGte(id, 1, nameof(id));
             _intervalLock = new object();
             Interval = interval;
             Elapsed = elapsed;
