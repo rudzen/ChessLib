@@ -39,7 +39,7 @@ namespace Rudz.Chess.Util
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public RKiss(ulong s)
         {
-            EnsureArg.IsGte(s, 1ul, nameof(s));
+            EnsureArg.IsNot(s, 0ul, nameof(s));
             _s = s;
         }
 

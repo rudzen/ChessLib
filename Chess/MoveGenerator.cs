@@ -26,6 +26,7 @@ SOFTWARE.
 
 namespace Rudz.Chess
 {
+    using EnsureThat;
     using Enums;
     using System;
     using System.Collections.Concurrent;
@@ -60,6 +61,7 @@ namespace Rudz.Chess
 
         protected internal MoveGenerator(Position position)
         {
+            EnsureArg.IsNotNull(position, nameof(position));
             Position = position;
             _bitboardPieces = position.BoardPieces;
             _occupiedBySide = position.OccupiedBySide;
@@ -94,34 +96,20 @@ namespace Rudz.Chess
             if (Flags.HasFlagFast(Emgf.Stages))
                 return;
 
-            if (Table.TryGetValue(Key, out var moves))
+            if (Table.TryGetValue(Key, out var moves) && !force)
                 Moves = moves;
             else
             {
                 moves = new List<Move>(256);
                 // relax the gc while generating moves.
+                var old = GCSettings.LatencyMode;
                 GCSettings.LatencyMode = GCLatencyMode.LowLatency;
                 GenerateCapturesAndPromotions(moves);
                 GenerateQuietMoves(moves);
                 Table.TryAdd(Key, moves);
                 Moves = moves;
-                GCSettings.LatencyMode = GCLatencyMode.Interactive;
+                GCSettings.LatencyMode = old;
             }
-
-            //if (Table.ContainsKey(Key) && !force)
-            //    Moves = Table[Key];
-            //else
-            //{
-            //    var moves = new List<Move>(256);
-
-            //    // relax the gc while generating moves.
-            //    GCSettings.LatencyMode = GCLatencyMode.LowLatency;
-            //    GenerateCapturesAndPromotions(moves);
-            //    GenerateQuietMoves(moves);
-            //    Moves = moves;
-            //    Table.TryAdd(Key, moves);
-            //    GCSettings.LatencyMode = GCLatencyMode.Interactive;
-            //}
         }
 
         /// <summary>
