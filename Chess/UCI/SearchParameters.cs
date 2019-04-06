@@ -137,20 +137,18 @@ namespace Rudz.Chess.UCI
                 return _output.ToString();
             }
 
-            _output.Append("wtime ");
-            _output.Append(WhiteTimeMilliseconds);
-            _output.Append(" btime ");
-            _output.Append(BlackTimeMilliseconds);
+            const string timeFormatString = "wtime {0} btime {1}";
+            const string incFormatString = " winc {0} binc {1}";
+
+            _output.AppendFormat(timeFormatString, WhiteTimeMilliseconds, BlackTimeMilliseconds);
+
             if (MoveTime > 0)
             {
                 _output.Append(" movetime ");
                 _output.Append(MoveTime);
             }
 
-            _output.Append(" winc ");
-            _output.Append(WhiteIncrementTimeMilliseconds);
-            _output.Append(" binc ");
-            _output.Append(BlackIncrementTimeMilliseconds);
+            _output.AppendFormat(incFormatString, WhiteIncrementTimeMilliseconds, BlackIncrementTimeMilliseconds);
 
             // ReSharper disable once InvertIf
             if (MovesToGo[side.Side] > 0)
