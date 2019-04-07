@@ -29,6 +29,7 @@ SOFTWARE.
 namespace Rudz.Chess.Types
 {
     using Enums;
+    using Extensions;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
@@ -176,6 +177,10 @@ namespace Rudz.Chess.Types
 
         private static readonly BitBoard[,] KingRingBB;
 
+        private static readonly byte[,] SquareDistance; // chebyshev distance
+
+        private static readonly BitBoard[,] DistanceRingBB;
+
         private static readonly IDictionary<EDirection, Func<BitBoard, BitBoard>> ShiftFuncs;
 
         static BitBoards()
@@ -196,6 +201,8 @@ namespace Rudz.Chess.Types
             ForwardFileBB = new BitBoard[2, 64];
             LineBB = new BitBoard[64, 64];
             KingRingBB = new BitBoard[2, 64];
+            SquareDistance = new byte[64, 64];
+            DistanceRingBB = new BitBoard[64, 8];
 
             var validMagicPieces = new[] { EPieceType.Bishop, EPieceType.Rook };
 
@@ -237,6 +244,19 @@ namespace Rudz.Chess.Types
             {
                 var sq = s1.ToInt();
                 var b = s1.BitBoardSquare();
+
+                var file = s1.File();
+                var rank = s1.RankOf();
+
+                // distance computation
+                foreach (var s2 in BitBoards.AllSquares)
+                {
+                    var ranks = Math.Abs(rank - s2.RankOf());
+                    var files = Math.Abs((int)rank - s2.File());
+                    SquareDistance[sq, s2.ToInt()] = (byte)ranks.Max(files);
+                    DistanceRingBB[sq, SquareDistance[sq, s2.ToInt()]] |= s2;
+                }
+
                 PseudoAttacksBB[0, sq] = b.NorthEastOne() | b.NorthWestOne();
                 PseudoAttacksBB[1, sq] = b.SouthWestOne() | b.SouthEastOne();
 
@@ -282,10 +302,9 @@ namespace Rudz.Chess.Types
                     if (s1.RelativeRank(side) == ERank.Rank1)
                         KingRingBB[c, sq] |= KingRingBB[c, sq].Shift(side == EPlayer.White ? EDirection.North : EDirection.South);
 
-                    var f = s1.File();
-                    if (f == (int)EFile.FileH)
+                    if (file == (int)EFile.FileH)
                         KingRingBB[c, sq] |= KingRingBB[c, sq].WestOne();
-                    else if (f == (int)EFile.FileA)
+                    else if (file == (int)EFile.FileA)
                         KingRingBB[c, sq] |= KingRingBB[c, sq].EastOne();
 
                     Debug.Assert(!KingRingBB[c, sq].Empty());
@@ -421,6 +440,12 @@ namespace Rudz.Chess.Types
         public static BitBoard KingRing(this Square sq, Player side) => KingRingBB[side.Side, sq.ToInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int Distance(this Square source, Square destination) => SquareDistance[source.ToInt(), destination.ToInt()];
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static BitBoard DistanceRing(this Square square, int length) => DistanceRingBB[square.ToInt(), length];
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void ToString(this BitBoard bb, TextWriter outputWriter)
         {
             try
@@ -440,7 +465,7 @@ namespace Rudz.Chess.Types
                 s.AppendLine($"| {title}");
             for (var r = ERank.Rank8; r >= ERank.Rank1; --r)
             {
-                s.AppendFormat("| {0} ", (int) r + 1);
+                s.AppendFormat("| {0} ", (int)r + 1);
                 for (var f = EFile.FileA; f <= EFile.FileH; ++f)
                     s.AppendFormat("| {0} ", (b & new Square(r, f)).Empty() ? ' ' : 'X');
                 s.AppendLine("|\n+---+---+---+---+---+---+---+---+---+");

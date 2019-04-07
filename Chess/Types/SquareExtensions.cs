@@ -27,15 +27,10 @@ SOFTWARE.
 namespace Rudz.Chess.Types
 {
     using Enums;
-    using Extensions;
-    using System;
     using System.Runtime.CompilerServices;
 
     public static class SquareExtensions
     {
-        // TODO : Add distance for files/ranks as well
-        private static readonly byte[,] Distance; // chebyshev distance
-
         private static readonly char[] RankChars;
 
         private static readonly char[] FileChars;
@@ -50,7 +45,6 @@ namespace Rudz.Chess.Types
         static SquareExtensions()
         {
             // Initialize arrays
-            Distance = new byte[64, 64];
             RankChars = new[] { '1', '2', '3', '4', '5', '6', '7', '8' };
             FileChars = new[] { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' };
             SquareStrings = new[]
@@ -74,14 +68,6 @@ namespace Rudz.Chess.Types
                 var rank = square.RankOf();
                 Flip[0, square.ToInt()] = file + ((7 - (int)rank) << 3);
                 Flip[1, square.ToInt()] = file + ((int)rank << 3);
-
-                // distance computation
-                foreach (var distSquare in BitBoards.AllSquares)
-                {
-                    var ranks = Math.Abs(rank - distSquare.RankOf());
-                    var files = Math.Abs((int)rank - distSquare.File());
-                    Distance[square.ToInt(), distSquare.ToInt()] = (byte)ranks.Max(files);
-                }
             }
 
             // generate rook castleling destination squares for both sides
@@ -126,9 +112,6 @@ namespace Rudz.Chess.Types
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ref string GetSquareString(this Square s) => ref SquareStrings[s.ToInt()];
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int GetDistance(this Square source, Square destination) => Distance[source.ToInt(), destination.ToInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsPromotionRank(this Square square) => (BitBoards.PromotionRanks & square) != 0;
