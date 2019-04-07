@@ -78,8 +78,6 @@ namespace Chess.Test.Pieces
                 0xff818181818181ff, 0x7e424242427e00, 0x3c24243c0000, 0x1818000000
             };
 
-        protected static readonly BitBoard EmptyBoard = 0;
-
         public abstract void AlphaPattern();
 
         public abstract void BetaPattern();

@@ -39,10 +39,7 @@ namespace Chess.Test.Pieces
          * - Each band tests cover both the white and black side
          */
 
-        protected static readonly BitBoard[] PawnBands =
-            {
-                0x81818181818100, 0x42424242424200, 0x24242424242400, 0x18181818181800
-            };
+        private static readonly BitBoard[] PawnBands = { 0x81818181818100, 0x42424242424200, 0x24242424242400, 0x18181818181800 };
 
         /*
          * Pawn bands :
@@ -70,10 +67,7 @@ namespace Chess.Test.Pieces
          * 0 0 0 0 0 0 0 0      0 0 0 0 0 0 0 0
          */
 
-        protected static readonly int[] PawnExpected =
-            {
-                1, 2, 2, 2
-            };
+        private static readonly int[] PawnExpected = { 1, 2, 2, 2 };
 
         [Fact]
         public override void AlphaPattern()

@@ -26,6 +26,8 @@ SOFTWARE.
 
 namespace Chess.Test.Pieces
 {
+    using Rudz.Chess.Types;
+    using System.Linq;
     using Xunit;
 
     public sealed class PieceAttacksQueenTests : PieceAttacksSliders
@@ -35,12 +37,11 @@ namespace Chess.Test.Pieces
         {
             const int index = (int)EBands.Alpha;
             const int sliderIndex = 2;
+            var expected = BishopExpected[index] + RookExpected[index];
+            var attackCounts = Bands[index].Select(x => SlideAttacks[sliderIndex](x, BitBoards.EmptyBitBoard).Count);
 
-            foreach (var pieceLocation in Bands[index])
-            {
-                var attacks = SlideAttacks[sliderIndex](pieceLocation, EmptyBoard);
-                Assert.Equal(BishopExpected[index] + RookExpected[index], attacks.Count);
-            }
+            foreach (var actual in attackCounts)
+                Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -48,12 +49,11 @@ namespace Chess.Test.Pieces
         {
             const int index = (int)EBands.Beta;
             const int sliderIndex = 2;
+            var expected = BishopExpected[index] + RookExpected[index];
+            var attackCounts = Bands[index].Select(x => SlideAttacks[sliderIndex](x, BitBoards.EmptyBitBoard).Count);
 
-            foreach (var pieceLocation in Bands[index])
-            {
-                var attacks = SlideAttacks[sliderIndex](pieceLocation, EmptyBoard);
-                Assert.Equal(BishopExpected[index] + RookExpected[index], attacks.Count);
-            }
+            foreach (var actual in attackCounts)
+                Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -61,12 +61,11 @@ namespace Chess.Test.Pieces
         {
             const int index = (int)EBands.Gamma;
             const int sliderIndex = 2;
+            var expected = BishopExpected[index] + RookExpected[index];
+            var attackCounts = Bands[index].Select(x => SlideAttacks[sliderIndex](x, BitBoards.EmptyBitBoard).Count);
 
-            foreach (var pieceLocation in Bands[index])
-            {
-                var attacks = SlideAttacks[sliderIndex](pieceLocation, EmptyBoard);
-                Assert.Equal(BishopExpected[index] + RookExpected[index], attacks.Count);
-            }
+            foreach (var actual in attackCounts)
+                Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -74,11 +73,11 @@ namespace Chess.Test.Pieces
         {
             const int index = (int)EBands.Delta;
             const int sliderIndex = 2;
-            foreach (var pieceLocation in Bands[index])
-            {
-                var attacks = SlideAttacks[sliderIndex](pieceLocation, EmptyBoard);
-                Assert.Equal(BishopExpected[index] + RookExpected[index], attacks.Count);
-            }
+            var expected = BishopExpected[index] + RookExpected[index];
+            var attackCounts = Bands[index].Select(x => SlideAttacks[sliderIndex](x, BitBoards.EmptyBitBoard).Count);
+
+            foreach (var actual in attackCounts)
+                Assert.Equal(expected, actual);
         }
     }
 }

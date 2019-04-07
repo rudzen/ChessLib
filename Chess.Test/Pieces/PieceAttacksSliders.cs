@@ -32,20 +32,11 @@ namespace Chess.Test.Pieces
 
     public abstract class PieceAttacksSliders : PieceAttacks
     {
-        protected static readonly int[] BishopExpected =
-            {
-                7, 9, 11, 13
-            };
+        protected static readonly int[] BishopExpected = { 7, 9, 11, 13 };
 
-        protected static readonly int[] RookExpected =
-            {
-                14, 14, 14, 14
-            }; // rooks always 14 :>
+        protected static readonly int[] RookExpected = { 14, 14, 14, 14 }; // rooks always 14 :>
 
-        protected readonly Func<Square, BitBoard, BitBoard>[] SlideAttacks =
-            {
-                MagicBB.BishopAttacks, MagicBB.RookAttacks, MagicBB.QueenAttacks
-            };
+        protected readonly Func<Square, BitBoard, BitBoard>[] SlideAttacks = { MagicBB.BishopAttacks, MagicBB.RookAttacks, MagicBB.QueenAttacks };
 
         public abstract override void AlphaPattern();
 

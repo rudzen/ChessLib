@@ -41,7 +41,7 @@ namespace Chess.Test.Pieces
 
             foreach (var pieceLocation in Bands[index])
             {
-                var attacks = SlideAttacks[sliderIndex](pieceLocation, EmptyBoard);
+                var attacks = SlideAttacks[sliderIndex](pieceLocation, BitBoards.EmptyBitBoard);
                 Assert.Equal(BishopExpected[index], attacks.Count);
             }
         }
@@ -54,7 +54,7 @@ namespace Chess.Test.Pieces
 
             foreach (var pieceLocation in Bands[index])
             {
-                var attacks = SlideAttacks[sliderIndex](pieceLocation, EmptyBoard);
+                var attacks = SlideAttacks[sliderIndex](pieceLocation, BitBoards.EmptyBitBoard);
                 Assert.Equal(BishopExpected[index], attacks.Count);
             }
         }
@@ -67,7 +67,7 @@ namespace Chess.Test.Pieces
 
             foreach (var pieceLocation in Bands[index])
             {
-                var attacks = SlideAttacks[sliderIndex](pieceLocation, EmptyBoard);
+                var attacks = SlideAttacks[sliderIndex](pieceLocation, BitBoards.EmptyBitBoard);
                 Assert.Equal(BishopExpected[index], attacks.Count);
             }
         }
@@ -80,7 +80,7 @@ namespace Chess.Test.Pieces
 
             foreach (var pieceLocation in Bands[index])
             {
-                var attacks = SlideAttacks[sliderIndex](pieceLocation, EmptyBoard);
+                var attacks = SlideAttacks[sliderIndex](pieceLocation, BitBoards.EmptyBitBoard);
                 Assert.Equal(BishopExpected[index], attacks.Count);
             }
         }
