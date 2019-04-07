@@ -305,7 +305,7 @@ namespace Rudz.Chess
             State.Key ^= Zobrist.GetZobristCastleling(State.CastlelingRights);
 
             if (State.EnPassantSquare != ESquare.none)
-                State.Key ^= Zobrist.GetZobristEnPessant(State.EnPassantSquare.File());
+                State.Key ^= Zobrist.GetZobristEnPessant(State.EnPassantSquare.File().ToInt());
 
             State.InCheck = Position.IsAttacked(Position.KingSquares[player.Side], ~State.SideToMove);
 
@@ -457,10 +457,10 @@ namespace Rudz.Chess
             pawnKey ^= Zobrist.GetZobristSide();
 
             if (_stateList[PositionIndex - 1].EnPassantSquare != ESquare.none)
-                key ^= Zobrist.GetZobristEnPessant(_stateList[PositionIndex - 1].EnPassantSquare.File());
+                key ^= Zobrist.GetZobristEnPessant(_stateList[PositionIndex - 1].EnPassantSquare.File().ToInt());
 
             if (State.EnPassantSquare != ESquare.none)
-                key ^= Zobrist.GetZobristEnPessant(State.EnPassantSquare.File());
+                key ^= Zobrist.GetZobristEnPessant(State.EnPassantSquare.File().ToInt());
 
             if (move.IsNullMove())
             {
@@ -645,7 +645,7 @@ namespace Rudz.Chess
             var them = ~side;
             var castlelingMask = ECastleling.Short.GetCastleAllowedMask(side);
             _castleRightsMask[SquareExtensions.GetFlip(rookFile, them).ToInt()] -= castlelingMask;
-            _castleRightsMask[SquareExtensions.GetFlip(Position.KingSquares[side.Side].File(), them).ToInt()] -= castlelingMask;
+            _castleRightsMask[SquareExtensions.GetFlip(Position.KingSquares[side.Side].File().ToInt(), them).ToInt()] -= castlelingMask;
             Position.SetRookCastleFrom(SquareExtensions.GetFlip((int)ESquare.g1, them), SquareExtensions.GetFlip(rookFile, them));
             Position.SetKingCastleFrom(side, Position.KingSquares[side.Side], ECastleling.Short);
 
@@ -680,7 +680,7 @@ namespace Rudz.Chess
             var them = ~side;
             var castlelingMask = ECastleling.Long.GetCastleAllowedMask(side);
             _castleRightsMask[SquareExtensions.GetFlip(rookFile, them).ToInt()] -= castlelingMask;
-            _castleRightsMask[SquareExtensions.GetFlip(Position.KingSquares[side.Side].File(), them).ToInt()] -= castlelingMask;
+            _castleRightsMask[SquareExtensions.GetFlip(Position.KingSquares[side.Side].File().ToInt(), them).ToInt()] -= castlelingMask;
             Position.SetRookCastleFrom(SquareExtensions.GetFlip((int)ESquare.c1, them), SquareExtensions.GetFlip(rookFile, them));
             Position.SetKingCastleFrom(side, Position.KingSquares[side.Side], ECastleling.Long);
 

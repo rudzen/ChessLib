@@ -219,8 +219,8 @@ namespace Rudz.Chess.Types
                 foreach (var square in AllSquares)
                 {
                     var s = square.ToInt();
-                    ForwardFileBB[c, s] = ForwardRanksBB[c, (int)square.RankOf()] & FileBB[square.File()];
-                    PawnAttackSpanBB[c, s] = ForwardRanksBB[c, (int)square.RankOf()] & AdjacentFilesBB[square.File()];
+                    ForwardFileBB[c, s] = ForwardRanksBB[c, square.RankOf().ToInt()] & FileBB[square.File().ToInt()];
+                    PawnAttackSpanBB[c, s] = ForwardRanksBB[c, square.RankOf().ToInt()] & AdjacentFilesBB[square.File().ToInt()];
                     PassedPawnMaskBB[c, s] = ForwardFileBB[c, s] | PawnAttackSpanBB[c, s];
                 }
             }
@@ -251,8 +251,8 @@ namespace Rudz.Chess.Types
                 // distance computation
                 foreach (var s2 in BitBoards.AllSquares)
                 {
-                    var ranks = Math.Abs(rank - s2.RankOf());
-                    var files = Math.Abs((int)rank - s2.File());
+                    var ranks = Math.Abs(rank.ToInt() - s2.RankOf().ToInt());
+                    var files = Math.Abs(rank.ToInt() - s2.File().ToInt());
                     SquareDistance[sq, s2.ToInt()] = (byte)ranks.Max(files);
                     DistanceRingBB[sq, SquareDistance[sq, s2.ToInt()]] |= s2;
                 }
@@ -302,9 +302,9 @@ namespace Rudz.Chess.Types
                     if (s1.RelativeRank(side) == ERank.Rank1)
                         KingRingBB[c, sq] |= KingRingBB[c, sq].Shift(side == EPlayer.White ? EDirection.North : EDirection.South);
 
-                    if (file == (int)EFile.FileH)
+                    if (file == EFile.FileH)
                         KingRingBB[c, sq] |= KingRingBB[c, sq].WestOne();
-                    else if (file == (int)EFile.FileA)
+                    else if (file == EFile.FileA)
                         KingRingBB[c, sq] |= KingRingBB[c, sq].EastOne();
 
                     Debug.Assert(!KingRingBB[c, sq].Empty());
@@ -371,7 +371,15 @@ namespace Rudz.Chess.Types
         /// <param name="sq">The square</param>
         /// <returns>The bitboard of square rank</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static BitBoard BitBoardRank(this Square sq) => RankBB[(int)sq.RankOf()];
+        public static BitBoard BitBoardRank(this Square sq) => RankBB[sq.RankOf().ToInt()];
+
+        /// <summary>
+        /// Returns the bitboard representation of a rank.
+        /// </summary>
+        /// <param name="r">The rank</param>
+        /// <returns>The bitboard of square rank</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static BitBoard BitBoardRank(this Rank r) => RankBB[r.ToInt()];
 
         /// <summary>
         /// Returns the bitboard representation of the file of which the square is located.
@@ -379,7 +387,15 @@ namespace Rudz.Chess.Types
         /// <param name="this">The square</param>
         /// <returns>The bitboard of square file</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static BitBoard BitBoardFile(this Square @this) => FileBB[@this.File()];
+        public static BitBoard BitBoardFile(this Square @this) => FileBB[@this.File().ToInt()];
+
+        /// <summary>
+        /// Returns the bitboard representation of the file.
+        /// </summary>
+        /// <param name="this">The file</param>
+        /// <returns>The bitboard of file</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static BitBoard BitBoardFile(this File @this) => FileBB[@this.ToInt()];
 
         /// <summary>
         /// Returns all squares in front of the square in the same file as bitboard
