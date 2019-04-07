@@ -35,7 +35,7 @@ namespace Rudz.Chess.Data
     using Util;
 
     /// <summary>
-    /// Class resposible for keeping random values for use with Zobrist hashing.
+    /// Class responsible for keeping random values for use with Zobrist hashing.
     /// The zobrist key for which this class helps generate, is a "unique" representation of
     /// a complete chess board, including its status.
     ///
@@ -48,7 +48,7 @@ namespace Rudz.Chess.Data
     ///
     /// Collisions:
     /// Key collisions or type-1 errors are inherent in using Zobrist keys with far less bits than required to encode all reachable chess positions.
-    /// This representaion is using a 64 bit key, thus it could be expected to get a collision after about 2 ^ 32 or 4 billion positions.
+    /// This representation is using a 64 bit key, thus it could be expected to get a collision after about 2 ^ 32 or 4 billion positions.
     ///
     /// Collision information from
     /// https://chessprogramming.wikispaces.com/Zobrist+Hashing
@@ -66,12 +66,12 @@ namespace Rudz.Chess.Data
         private static readonly ulong[] ZobristCastling = new ulong[16];
 
         /// <summary>
-        /// En-Passant is only required to have 8 entries, one for each possible file where the En-Passant square can occour.
+        /// En-Passant is only required to have 8 entries, one for each possible file where the En-Passant square can occur.
         /// </summary>
         private static readonly ulong[] ZobristEpFile = new ulong[8];
 
         /// <summary>
-        /// This is used if the side to move is black, if the side is white, no hashing will occour.
+        /// This is used if the side to move is black, if the side is white, no hashing will occur.
         /// </summary>
         private static readonly ulong ZobristSide;
 
@@ -84,20 +84,20 @@ namespace Rudz.Chess.Data
         {
             RKiss rnd = (ulong)DateTime.Now.Ticks;
 
-            for (EPlayer side = EPlayer.White; side < EPlayer.PlayerNb; ++side)
+            for (var side = EPlayer.White; side < EPlayer.PlayerNb; ++side)
             {
-                for (EPieceType pieceType = EPieceType.Pawn; pieceType < EPieceType.PieceTypeNb; ++pieceType)
+                for (var pieceType = EPieceType.Pawn; pieceType < EPieceType.PieceTypeNb; ++pieceType)
                 {
-                    Piece piece = pieceType.MakePiece(side);
-                    for (ESquare square = ESquare.a1; square <= ESquare.h8; square++)
+                    var piece = pieceType.MakePiece(side);
+                    for (var square = ESquare.a1; square <= ESquare.h8; square++)
                         ZobristPst[piece.ToInt(), (int)square] = rnd.Rand();
                 }
             }
 
-            for (int i = 0; i < ZobristCastling.Length; i++)
+            for (var i = 0; i < ZobristCastling.Length; i++)
                 ZobristCastling[i] = rnd.Rand();
 
-            for (int i = 0; i < ZobristEpFile.Length; i++)
+            for (var i = 0; i < ZobristEpFile.Length; i++)
                 ZobristEpFile[i] = rnd.Rand();
 
             ZobristSide = rnd.Rand();

@@ -16,6 +16,7 @@
     <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Ensure.That" Version="8.1.1" />
     <PackageReference Include="System.Memory" Version="4.5.2" />
   </ItemGroup>
 

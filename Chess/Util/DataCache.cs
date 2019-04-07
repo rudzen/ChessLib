@@ -37,11 +37,11 @@ namespace Rudz.Chess.Util
     {
         public static Func<TArg, TRet> Cache<TArg, TRet>(this Func<TArg, TRet> functor)
         {
-            ConcurrentDictionary<TArg, TRet> table = new ConcurrentDictionary<TArg, TRet>();
+            var table = new ConcurrentDictionary<TArg, TRet>();
 
             return arg0 =>
                 {
-                    if (table.TryGetValue(arg0, out TRet returnValue))
+                    if (table.TryGetValue(arg0, out var returnValue))
                         return returnValue;
 
                     returnValue = functor(arg0);

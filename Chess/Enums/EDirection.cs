@@ -39,6 +39,9 @@ namespace Rudz.Chess.Enums
         NorthWest = North + West,  //  7
 
         NorthDouble = North + North,
-        SouthDouble = South + South
+        SouthDouble = South + South,
+
+        NorthFill = NorthDouble << 1,
+        SouthFill = -NorthFill
     }
 }

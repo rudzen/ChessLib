@@ -32,7 +32,7 @@ namespace Rudz.Chess.Types
 
     /// <summary>
     /// Piece.
-    /// Contains the piece type which indicate what type and colour the piece is
+    /// Contains the piece type which indicate what type and color the piece is
     /// </summary>
     public struct Piece
     {

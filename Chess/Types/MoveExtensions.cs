@@ -63,7 +63,7 @@ namespace Rudz.Chess.Types
             if (move.IsNullMove())
                 return "(none)";
 
-            if (!NotationFuncs.TryGetValue(notation, out Func<Move, MoveGenerator, string> func))
+            if (!NotationFuncs.TryGetValue(notation, out var func))
                 throw new InvalidMoveException("Invalid move notation detected.");
 
             return func(move, state);
@@ -98,37 +98,21 @@ namespace Rudz.Chess.Types
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static string ToFan(Move move, MoveGenerator moveGenerator)
         {
-            Square from = move.GetFromSquare();
-            Square to = move.GetToSquare();
+            var from = move.GetFromSquare();
+            var to = move.GetToSquare();
 
-            StringBuilder notation = new StringBuilder(12);
+            var notation = new StringBuilder(12);
 
             if (move.IsCastlelingMove())
-            {
                 notation.Append(ECastlelingExtensions.GetCastlelingString(to, from));
-            }
             else
             {
-                EPieceType pt = move.GetMovingPieceType();
+                var pt = move.GetMovingPieceType();
 
                 if (pt != EPieceType.Pawn)
                 {
                     notation.Append(move.GetMovingPiece().GetUnicodeChar());
-
-                    // Disambiguation.
-                    // if we have more then one piece with destination 'to'
-                    // note that for pawns is not needed because starting file is explicit.
-                    BitBoard similarTypeAttacks = move.GetSimilarAttacks(moveGenerator.Position);
-
-                    (bool ambiguousMove, bool ambiguousFile, bool ambiguousRank) = move.Ambiguity(ref similarTypeAttacks, moveGenerator.Position);
-
-                    if (ambiguousMove)
-                        if (!ambiguousFile)
-                            notation.Append(from.FileChar());
-                        else if (!ambiguousRank)
-                            notation.Append(from.RankOfChar());
-                        else
-                            notation.Append(from.ToString());
+                    move.Disambiguation(from, moveGenerator.Position, notation);
                 }
 
                 if (move.IsEnPassantMove())
@@ -152,9 +136,9 @@ namespace Rudz.Chess.Types
                 }
             }
 
-            if (!moveGenerator.InCheck) return notation.ToString();
+            if (moveGenerator.InCheck)
+                notation.Append(moveGenerator.GetCheckChar());
 
-            notation.Append(moveGenerator.GetCheckChar());
             return notation.ToString();
         }
 
@@ -167,39 +151,21 @@ namespace Rudz.Chess.Types
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static string ToSan(this Move move, MoveGenerator moveGenerator)
         {
-            Square from = move.GetFromSquare();
-            Square to = move.GetToSquare();
+            var from = move.GetFromSquare();
+            var to = move.GetToSquare();
 
-            StringBuilder notation = new StringBuilder(12);
+            var notation = new StringBuilder(12);
 
             if (move.IsCastlelingMove())
-            {
                 notation.Append(ECastlelingExtensions.GetCastlelingString(to, from));
-            }
             else
             {
-                EPieceType pt = move.GetMovingPieceType();
+                var pt = move.GetMovingPieceType();
 
                 if (pt != EPieceType.Pawn)
                 {
                     notation.Append(move.GetMovingPiece().GetPgnChar());
-
-                    // Disambiguation.
-                    // if we have more then one piece with destination 'to'
-                    // note that for pawns is not needed because starting file is explicit.
-                    BitBoard simularTypeAttacks = move.GetSimilarAttacks(moveGenerator.Position);
-
-                    (bool ambiguousMove, bool ambiguousFile, bool ambiguousRank) = move.Ambiguity(ref simularTypeAttacks, moveGenerator.Position);
-
-                    if (ambiguousMove)
-                    {
-                        if (!ambiguousFile)
-                            notation.Append(from.FileChar());
-                        else if (!ambiguousRank)
-                            notation.Append(from.RankOfChar());
-                        else
-                            notation.Append(from.ToString());
-                    }
+                    move.Disambiguation(from, moveGenerator.Position, notation);
                 }
 
                 if (move.IsEnPassantMove())
@@ -224,10 +190,9 @@ namespace Rudz.Chess.Types
                 }
             }
 
-            if (!moveGenerator.InCheck)
-                return notation.ToString();
+            if (moveGenerator.InCheck)
+                notation.Append(moveGenerator.GetCheckChar());
 
-            notation.Append(moveGenerator.GetCheckChar());
             return notation.ToString();
         }
 
@@ -239,18 +204,16 @@ namespace Rudz.Chess.Types
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static string ToLan(Move move, MoveGenerator moveGenerator)
         {
-            Square from = move.GetFromSquare();
-            Square to = move.GetToSquare();
+            var from = move.GetFromSquare();
+            var to = move.GetToSquare();
 
-            StringBuilder notation = new StringBuilder(12);
+            var notation = new StringBuilder(12);
 
             if (move.IsCastlelingMove())
-            {
                 notation.Append(ECastlelingExtensions.GetCastlelingString(to, from));
-            }
             else
             {
-                EPieceType pt = move.GetMovingPieceType();
+                var pt = move.GetMovingPieceType();
 
                 if (pt != EPieceType.Pawn)
                     notation.Append(pt.GetPieceChar());
@@ -270,9 +233,7 @@ namespace Rudz.Chess.Types
                     notation.Append('x');
                 }
                 else
-                {
                     notation.Append('-');
-                }
 
                 notation.Append(to.ToString());
 
@@ -283,10 +244,9 @@ namespace Rudz.Chess.Types
                 }
             }
 
-            if (!moveGenerator.InCheck)
-                return notation.ToString();
+            if (moveGenerator.InCheck)
+                notation.Append(moveGenerator.GetCheckChar());
 
-            notation.Append(moveGenerator.GetCheckChar());
             return notation.ToString();
         }
 
@@ -299,18 +259,16 @@ namespace Rudz.Chess.Types
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static string ToRan(Move move, MoveGenerator moveGenerator)
         {
-            Square from = move.GetFromSquare();
-            Square to = move.GetToSquare();
+            var from = move.GetFromSquare();
+            var to = move.GetToSquare();
 
-            StringBuilder notation = new StringBuilder(12);
+            var notation = new StringBuilder(12);
 
             if (move.IsCastlelingMove())
-            {
                 notation.Append(ECastlelingExtensions.GetCastlelingString(to, from));
-            }
             else
             {
-                EPieceType pt = move.GetMovingPieceType();
+                var pt = move.GetMovingPieceType();
 
                 if (pt != EPieceType.Pawn)
                     notation.Append(pt.GetPieceChar());
@@ -344,10 +302,9 @@ namespace Rudz.Chess.Types
                 }
             }
 
-            if (!moveGenerator.InCheck)
-                return notation.ToString();
+            if (moveGenerator.InCheck)
+                notation.Append(moveGenerator.GetCheckChar());
 
-            notation.Append(moveGenerator.GetCheckChar());
             return notation.ToString();
         }
 
@@ -359,15 +316,13 @@ namespace Rudz.Chess.Types
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static (bool, bool, bool) Ambiguity(this Move move, ref BitBoard similarTypeAttacks, IPosition position)
+        private static EMoveAmbiguity Ambiguity(this Move move, BitBoard similarTypeAttacks, IPosition position)
         {
-            bool ambiguousMove = false;
-            bool ambiguousFile = false;
-            bool ambiguousRank = false;
+            var ambiguity = EMoveAmbiguity.None;
 
-            foreach (Square square in similarTypeAttacks)
+            foreach (var square in similarTypeAttacks)
             {
-                BitBoard pinned = position.GetPinnedPieces(square, move.GetMovingSide());
+                var pinned = position.GetPinnedPieces(square, move.GetMovingSide());
 
                 if (similarTypeAttacks & pinned)
                     continue;
@@ -379,37 +334,52 @@ namespace Rudz.Chess.Types
                 if (position.OccupiedBySide[move.GetMovingSide().Side] & square)
                 {
                     if (square.File() == move.GetFromSquare().File())
-                        ambiguousFile = true;
+                        ambiguity |= EMoveAmbiguity.File;
                     else if (square.RankOf() == move.GetFromSquare().RankOf())
-                        ambiguousRank = true;
+                        ambiguity |= EMoveAmbiguity.Rank;
 
-                    ambiguousMove = true;
+                    ambiguity |= EMoveAmbiguity.Move;
                 }
             }
 
-            return (ambiguousMove, ambiguousFile, ambiguousRank);
+            return ambiguity;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static BitBoard GetSimilarAttacks(this Move move, Position position)
+        private static BitBoard GetSimilarAttacks(this IPosition position, Move move)
         {
-            BitBoard resultBitBoard = 0;
+            var pt = move.GetMovingPieceType();
 
-            // ReSharper disable once SwitchStatementMissingSomeCases
-            switch (move.GetMovingPieceType())
-            {
-                case EPieceType.Bishop:
-                case EPieceType.Rook:
-                case EPieceType.Queen:
-                    resultBitBoard |= move.GetToSquare().GetAttacks(move.GetMovingPieceType(), position.Occupied);
-                    break;
+            return pt == EPieceType.Pawn || pt == EPieceType.King
+                ? BitBoards.ZeroBb
+                : move.GetToSquare().GetAttacks(pt, position.Occupied) ^ move.GetFromSquare();
+        }
 
-                case EPieceType.Knight:
-                    resultBitBoard |= move.GetToSquare().GetAttacks(move.GetMovingPieceType());
-                    break;
-            }
+        /// <summary>
+        /// Disambiguation.
+        /// <para>If we have more then one piece with destination 'to'.</para>
+        /// <para>Note that for pawns is not needed because starting file is explicit.</para>
+        /// </summary>
+        /// <param name="move">The move to check</param>
+        /// <param name="from">The from square</param>
+        /// <param name="position">The current used position</param>
+        /// <param name="sb">The StringBuilder to append to if needed</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static void Disambiguation(this Move move, Square from, IPosition position, StringBuilder sb)
+        {
+            var simularTypeAttacks = position.GetSimilarAttacks(move);
 
-            return resultBitBoard ^ move.GetFromSquare();
+            var ambiguity = move.Ambiguity(simularTypeAttacks, position);
+
+            if (!ambiguity.HasFlagFast(EMoveAmbiguity.Move))
+                return;
+
+            if (!ambiguity.HasFlagFast(EMoveAmbiguity.File))
+                sb.Append(from.FileChar());
+            else if (!ambiguity.HasFlagFast(EMoveAmbiguity.Rank))
+                sb.Append(from.RankOfChar());
+            else
+                sb.Append(from.ToString());
         }
     }
 }

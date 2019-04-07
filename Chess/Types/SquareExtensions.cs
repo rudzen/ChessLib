@@ -1,4 +1,4 @@
-﻿/*
+/*
 ChessLib, a chess data structure library
 
 MIT License
@@ -27,19 +27,10 @@ SOFTWARE.
 namespace Rudz.Chess.Types
 {
     using Enums;
-    using Extensions;
-    using System;
     using System.Runtime.CompilerServices;
 
     public static class SquareExtensions
     {
-        // TODO : Add distance for files/ranks as well
-        private static readonly int[,] Distance; // chebyshev distance
-
-        private static readonly char[] RankChars;
-
-        private static readonly char[] FileChars;
-
         private static readonly string[] SquareStrings;
 
         // TODO : Replace with relative methods
@@ -49,10 +40,6 @@ namespace Rudz.Chess.Types
 
         static SquareExtensions()
         {
-            // Initialize arrays
-            Distance = new int[64, 64];
-            RankChars = new[] { '1', '2', '3', '4', '5', '6', '7', '8' };
-            FileChars = new[] { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' };
             SquareStrings = new[]
             {
                 "a1", "b1", "c1", "d1", "e1", "f1", "g1", "h1",
@@ -68,20 +55,12 @@ namespace Rudz.Chess.Types
             RookCastlesTo = new Square[64];
 
             // generate square flipping array for both sides
-            foreach (Square square in BitBoards.AllSquares)
+            foreach (var square in BitBoards.AllSquares)
             {
-                int file = square.File();
-                ERank rank = square.RankOf();
-                Flip[0, square.ToInt()] = file + ((7 - (int)rank) << 3);
-                Flip[1, square.ToInt()] = file + ((int)rank << 3);
-
-                // distance computation
-                foreach (Square distSquare in BitBoards.AllSquares)
-                {
-                    int ranks = Math.Abs(rank - distSquare.RankOf());
-                    int files = Math.Abs((int)rank - distSquare.File());
-                    Distance[square.ToInt(), distSquare.ToInt()] = ranks.Max(files);
-                }
+                var file = square.File().ToInt();
+                var rank = square.RankOf();
+                Flip[0, square.ToInt()] = file + ((7 - rank.ToInt()) << 3);
+                Flip[1, square.ToInt()] = file + (rank.ToInt() << 3);
             }
 
             // generate rook castleling destination squares for both sides
@@ -98,41 +77,37 @@ namespace Rudz.Chess.Types
         public static bool IsValidEp(this Square s) => s.RankOf() == ERank.Rank3 || s.RankOf() == ERank.Rank6;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool IsValidEp(this Square s, Player c) => s.RelativeRank(c) == ERank.Rank3;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsDark(this Square s) => (s & BitBoards.DarkSquares) != 0;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int ToInt(this Square s) => (int)s.Value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ERank RankOf(this Square s) => (ERank)(s.ToInt() >> 3);
+        public static Rank RankOf(this Square s) => (ERank)(s.ToInt() >> 3);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static char RankOfChar(this Square s) => RankChars[(int)s.RankOf()];
+        public static char RankOfChar(this Square s) => s.RankOf().RankChar();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ERank RelativeRank(this ERank rank, Player color) => (ERank)((int)rank ^ (color.Side * 7));
+        public static Rank RelativeRank(this Rank rank, Player color) => rank.ToInt() ^ (color.Side * 7);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ERank RelativeRank(this Square s, Player color) => s.RankOf().RelativeRank(color);
+        public static Rank RelativeRank(this Square s, Player color) => s.RankOf().RelativeRank(color);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int File(this Square s) => s.ToInt() & 7;
+        public static File File(this Square s) => s.ToInt() & 7;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static char FileChar(this Square s) => FileChars[s.File()];
+        public static char FileChar(this Square s) => s.File().FileChar();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsOppositeOf(this Square @this, Square other)
-        {
-            int s = @this.ToInt() ^ other.ToInt();
-            return (((s >> 3) ^ s) & 1) != 0;
-        }
+        public static bool IsOppositeColor(this Square @this, Square other) => ((BitBoards.DarkSquares & @this) != 0) != ((BitBoards.DarkSquares & other) != 0);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ref string GetSquareString(this Square s) => ref SquareStrings[s.ToInt()];
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int GetDistance(this Square source, Square destination) => Distance[source.ToInt(), destination.ToInt()];
+        public static string GetSquareString(this Square s) => SquareStrings[s.ToInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsPromotionRank(this Square square) => (BitBoards.PromotionRanks & square) != 0;

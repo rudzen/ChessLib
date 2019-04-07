@@ -26,7 +26,7 @@ SOFTWARE.
 
 namespace Rudz.Chess.UCI
 {
-    using System;
+    using Extensions;
     using System.Collections.Generic;
     using System.Runtime.CompilerServices;
     using System.Text;
@@ -46,8 +46,7 @@ namespace Rudz.Chess.UCI
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public SearchParameters()
         {
-            _time = new ulong[2];
-            _inc = new ulong[2];
+            _time = _inc = new ulong[2];
             MovesToGo = new int[2];
         }
 
@@ -118,9 +117,9 @@ namespace Rudz.Chess.UCI
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Clear()
         {
-            Array.Clear(_time, 0, 2);
-            Array.Clear(_inc, 0, 2);
-            Array.Clear(MovesToGo, 0, 2);
+            _time.Clear();
+            _inc.Clear();
+            MovesToGo.Clear();
             MoveTime = 0;
             Infinite = false;
         }
@@ -138,20 +137,18 @@ namespace Rudz.Chess.UCI
                 return _output.ToString();
             }
 
-            _output.Append("wtime ");
-            _output.Append(WhiteTimeMilliseconds);
-            _output.Append(" btime ");
-            _output.Append(BlackTimeMilliseconds);
+            const string timeFormatString = "wtime {0} btime {1}";
+            const string incFormatString = " winc {0} binc {1}";
+
+            _output.AppendFormat(timeFormatString, WhiteTimeMilliseconds, BlackTimeMilliseconds);
+
             if (MoveTime > 0)
             {
                 _output.Append(" movetime ");
                 _output.Append(MoveTime);
             }
 
-            _output.Append(" winc ");
-            _output.Append(WhiteIncrementTimeMilliseconds);
-            _output.Append(" binc ");
-            _output.Append(BlackIncrementTimeMilliseconds);
+            _output.AppendFormat(incFormatString, WhiteIncrementTimeMilliseconds, BlackIncrementTimeMilliseconds);
 
             // ReSharper disable once InvertIf
             if (MovesToGo[side.Side] > 0)

@@ -24,6 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using EnsureThat;
+
 namespace Rudz.Chess.UCI
 {
     using Properties;
@@ -36,7 +38,7 @@ namespace Rudz.Chess.UCI
     /// <summary>
     /// Idea From https://stackoverflow.com/a/41697139/548894
     /// </summary>
-    public sealed class HiResTimer : IHiResTimer, IDisposable
+    public sealed class HiResTimer : IHiResTimer
     {
         public static readonly double TickLength = 1000f / Stopwatch.Frequency; // ms
 
@@ -53,28 +55,26 @@ namespace Rudz.Chess.UCI
         public HiResTimer() => _intervalLock = new object();
 
         public HiResTimer(int id)
-            : this(1f, id) { }
+            : this(1f, id, null) { }
 
-        public HiResTimer(float interval, int id)
+        public HiResTimer(float interval, int id, Action<HiResTimerArgs> elapsed)
         {
+            EnsureArg.IsGte(interval, 0.01f, nameof(interval));
+            EnsureArg.IsGte(id, 1, nameof(id));
             _intervalLock = new object();
             Interval = interval;
+            Elapsed = elapsed;
             Id = id;
-        }
-
-        ~HiResTimer()
-        {
-            Dispose(false);
         }
 
         /// <summary>
         /// Invoked when the timer is elapsed
         /// </summary>
-        public event EventHandler<HiResTimerArgs> Elapsed;
+        public Action<HiResTimerArgs> Elapsed { get; set; }
 
         public static bool IsHighResolution => Stopwatch.IsHighResolution;
 
-        public int Id { get; set; }
+        public int Id { get; }
 
         public float Interval
         {
@@ -162,21 +162,15 @@ namespace Rudz.Chess.UCI
 
         public bool Equals(HiResTimer other) => Id == other.Id;
 
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
         private static double ElapsedHiRes(Stopwatch stopwatch) => stopwatch.ElapsedTicks * TickLength;
 
         private void ExecuteTimer(CancellationToken cancellationToken)
         {
             Debug.Print($"Timer ExecuteTimer on thread {Thread.CurrentThread.ManagedThreadId}");
 
-            float nextTrigger = 0f;
+            var nextTrigger = 0f;
 
-            Stopwatch stopwatch = new Stopwatch();
+            var stopwatch = new Stopwatch();
             stopwatch.Start();
 
             while (!cancellationToken.IsCancellationRequested)
@@ -187,7 +181,7 @@ namespace Rudz.Chess.UCI
                 while (true)
                 {
                     elapsed = ElapsedHiRes(stopwatch);
-                    double diff = nextTrigger - elapsed;
+                    var diff = nextTrigger - elapsed;
                     if (diff <= 0f)
                         break;
 
@@ -204,8 +198,8 @@ namespace Rudz.Chess.UCI
                         return;
                 }
 
-                double delay = elapsed - nextTrigger;
-                Elapsed?.Invoke(this, new HiResTimerArgs(delay));
+                var delay = elapsed - nextTrigger;
+                Elapsed?.Invoke(new HiResTimerArgs(delay, Id));
 
                 if (cancellationToken.IsCancellationRequested)
                     return;
@@ -219,27 +213,5 @@ namespace Rudz.Chess.UCI
 
             stopwatch.Stop();
         }
-
-        private void ReleaseUnmanagedResources()
-        {
-            // TODO release unmanaged resources here
-        }
-
-        private void Dispose(bool disposing)
-        {
-            ReleaseUnmanagedResources();
-            if (!disposing)
-                return;
-            Debug.Print($"Timer with ID {Id.ToString()} disposed.");
-            _executer?.Dispose();
-        }
-    }
-
-    // ReSharper disable once StyleCop.SA1402
-    public class HiResTimerArgs : EventArgs, IHiResTimerArgs
-    {
-        internal HiResTimerArgs(double delay) => Delay = delay;
-
-        public double Delay { get; }
     }
 }

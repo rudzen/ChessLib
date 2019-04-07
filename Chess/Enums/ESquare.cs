@@ -26,7 +26,6 @@ SOFTWARE.
 
 namespace Rudz.Chess.Enums
 {
-    //[Flags]
     public enum ESquare
     {
         // ReSharper disable InconsistentNaming
@@ -39,8 +38,7 @@ namespace Rudz.Chess.Enums
         a6 = 40, b6 = 41, c6 = 42, d6 = 43, e6 = 44, f6 = 45, g6 = 46, h6 = 47,
         a7 = 48, b7 = 49, c7 = 50, d7 = 51, e7 = 52, f7 = 53, g7 = 54, h7 = 55,
         a8 = 56, b8 = 57, c8 = 58, d8 = 59, e8 = 60, f8 = 61, g8 = 62, h8 = 63,
-        none = 64,
-        fail = 65
+        none = 65
         // ReSharper restore InconsistentNaming
         // ReSharper restore UnusedMember.Global
     }

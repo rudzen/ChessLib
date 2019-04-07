@@ -26,7 +26,12 @@ SOFTWARE.
 
 namespace Rudz.Chess.Extensions
 {
+    using EnsureThat;
+    using System;
     using System.Collections.Generic;
+    using System.IO;
+    using System.Runtime.CompilerServices;
+    using System.Text;
 
     public static class StringExtensions
     {
@@ -38,19 +43,23 @@ namespace Rudz.Chess.Extensions
         /// <param name="separator">The separator</param>
         /// <param name="tokenizer">The end token char to trim from the pillaged command string</param>
         /// <returns></returns>
-        public static IEnumerable<string> Parse(this string command, char separator, char tokenizer)
+        public static Queue<string> Parse(this ReadOnlySpan<char> command, char separator, char tokenizer)
         {
-            int startIndex = 0;
-            bool inToken = false;
-            for (int index = 0; index < command.Length; index++)
+            EnsureArg.IsGt(command.Length, 0, nameof(command));
+            var q = new Queue<string>();
+            var startIndex = 0;
+            var inToken = false;
+
+            for (var i = 0; i < command.Length; ++i)
             {
-                char character = command[index];
-                if (index == command.Length - 1)
+                if (i == command.Length - 1)
                 {
                     // return last token.
-                    yield return command.Substring(startIndex, index - startIndex + 1).TrimEnd(tokenizer);
+                    q.Enqueue(new string(command.Slice(startIndex, i - startIndex + 1).TrimEnd(tokenizer).ToArray()));
                     break;
                 }
+
+                var character = command[i];
 
                 if (character == separator)
                 {
@@ -59,15 +68,33 @@ namespace Rudz.Chess.Extensions
                         continue;
 
                     // return token
-                    yield return command.Substring(startIndex, index - startIndex).TrimEnd(tokenizer);
-                    startIndex = index + 1;
+                    q.Enqueue(new string(command.Slice(startIndex, i - startIndex).TrimEnd(tokenizer).ToArray()));
+                    startIndex = i + 1;
                 }
                 else if (character == tokenizer)
                 {
                     inToken ^= true;
-                    startIndex = index + 1;
+                    startIndex = i + 1;
                 }
             }
+
+            return q;
         }
+
+        public static IEnumerable<int> GetLocations(this string @this, char token = ' ')
+        {
+            var pos = 0;
+            while (true)
+            {
+                var index = @this.IndexOf(token, pos);
+                if (index == -1)
+                    yield break;
+                yield return index;
+                pos = index;
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static MemoryStream GenerateStream(this string @this) => new MemoryStream(Encoding.UTF8.GetBytes(@this ?? ""));
     }
 }

@@ -26,6 +26,7 @@ SOFTWARE.
 
 namespace Rudz.Chess.UCI
 {
+    using EnsureThat;
     using System;
     using System.Runtime.CompilerServices;
     using Types;
@@ -36,6 +37,7 @@ namespace Rudz.Chess.UCI
 
         public MovesToGoModel(ISearchParameters original)
         {
+            EnsureArg.IsNotNull(original, nameof(original));
             _time = new[] { original.WhiteTimeMilliseconds, original.BlackTimeMilliseconds };
             MovesToGo = new[] { original.MovesToGo[0], original.MovesToGo[1] };
         }

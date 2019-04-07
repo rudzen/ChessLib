@@ -69,11 +69,11 @@ namespace Rudz.Chess
         }
 
         /// <summary>
-        /// TODO : This method is incomplete, and is not ment to be used atm.
+        /// TODO : This method is incomplete, and is not meant to be used atm.
         /// Parse a string and convert to a valid move. If the move is not valid.. hell breaks loose.
         /// * NO EXCEPTIONS IS ALLOWED IN THIS FUNCTION *
         /// </summary>
-        /// <param name="m">string representaion of the move to parse</param>
+        /// <param name="m">string representation of the move to parse</param>
         /// <returns>
         /// On fail : Move containing from and to squares as ESquare.none (empty move)
         /// On Ok   : The move!
@@ -91,7 +91,7 @@ namespace Rudz.Chess
             if (!m.Length.InBetween(4, 5))
                 return MoveExtensions.EmptyMove;
 
-            ECastleling castleType = Position.IsCastleMove(m);
+            var castleType = Position.IsCastleMove(m);
 
             if (castleType == ECastleling.None && (!m[0].InBetween('a', 'h') || !m[1].InBetween('1', '8') || !m[2].InBetween('a', 'h') || !m[3].InBetween('1', '8')))
                 return MoveExtensions.EmptyMove;
@@ -100,10 +100,10 @@ namespace Rudz.Chess
              * Needs to be assigned here.
              * Otherwise it won't compile because of later split check using both two independent IF and optional reassignment through local method.
              */
-            Square from = new Square(m[1] - '1', m[0] - 'a');
-            Square to = new Square(m[3] - '1', m[2] - 'a');
+            var from = new Square(m[1] - '1', m[0] - 'a');
+            var to = new Square(m[3] - '1', m[2] - 'a');
 
-            // local function to determin if the move is actually a castleling move by looking at the piece location of the squares
+            // local function to determine if the move is actually a castleling move by looking at the piece location of the squares
             ECastleling ShredderFunc(Square fromSquare, Square toSquare) =>
                 Position.GetPiece(fromSquare).Value == EPieces.WhiteKing && Position.GetPiece(toSquare).Value == EPieces.WhiteRook
                 || Position.GetPiece(fromSquare).Value == EPieces.BlackKing && Position.GetPiece(toSquare).Value == EPieces.BlackRook
@@ -126,7 +126,7 @@ namespace Rudz.Chess
             GenerateMoves();
 
             // ** untested area **
-            foreach (Move move in Moves)
+            foreach (var move in Moves)
             {
                 if (move.GetFromSquare() != from || move.GetToSquare() != to)
                     continue;
@@ -142,6 +142,5 @@ namespace Rudz.Chess
 
             return MoveExtensions.EmptyMove;
         }
-
     }
 }

@@ -57,7 +57,7 @@ namespace Rudz.Chess.Types
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Move"/> struct.
-        /// Neccesary extra constructor as it can sometimes be required to only created a basic move.
+        /// Necessary extra constructor as it can sometimes be required to only created a basic move.
         /// </summary>
         /// <param name="from">The from square/// </param>
         /// <param name="to">The to square</param>
@@ -207,19 +207,19 @@ namespace Rudz.Chess.Types
         public bool IsType(EMoveType moveType) => GetMoveType() == moveType;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsCaptureMove() => (GetMoveType() & (EMoveType.Epcapture | EMoveType.Capture)) != 0;
+        public bool IsCaptureMove() => GetMoveType().HasFlagFast(EMoveType.Epcapture | EMoveType.Capture);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsEnPassantMove() => (GetMoveType() & EMoveType.Epcapture) != 0;
+        public bool IsEnPassantMove() => GetMoveType().HasFlagFast(EMoveType.Epcapture);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsCastlelingMove() => (GetMoveType() & EMoveType.Castle) != 0;
+        public bool IsCastlelingMove() => GetMoveType().HasFlagFast(EMoveType.Castle);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsPromotionMove() => (GetMoveType() & EMoveType.Promotion) != 0;
+        public bool IsPromotionMove() => GetMoveType().HasFlagFast(EMoveType.Promotion);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsDoublePush() => (GetMoveType() & EMoveType.Doublepush) != 0;
+        public bool IsDoublePush() => GetMoveType().HasFlagFast(EMoveType.Doublepush);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool IsNullMove() => _data == 0;
@@ -240,14 +240,11 @@ namespace Rudz.Chess.Types
         public override int GetHashCode() => _data;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public override string ToString()
-        {
-            if (IsNullMove())
-                return "..";
-
-            return !IsPromotionMove()
-                   ? $"{GetFromSquare().GetSquareString()}{GetToSquare().GetSquareString()}"
-                   : $"{GetFromSquare().GetSquareString()}{GetToSquare().GetSquareString()}{GetPromotedPiece().GetPromotionChar()}";
-        }
+        public override string ToString() =>
+            IsNullMove()
+                ? ".."
+                : !IsPromotionMove()
+                    ? $"{GetFromSquare().GetSquareString()}{GetToSquare().GetSquareString()}"
+                    : $"{GetFromSquare().GetSquareString()}{GetToSquare().GetSquareString()}{GetPromotedPiece().GetPromotionChar()}";
     }
 }

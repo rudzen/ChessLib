@@ -31,7 +31,7 @@ namespace Rudz.Chess.Types
 
     /// <summary>
     /// Type for 64 bit key.
-    /// Used for Zobrist hashing, but can be used for other things as well, such as Transpositional Table etc.
+    /// Used for Zobrist hashing, but can be used for other things as well, such as Transposition Table etc.
     /// </summary>
     public struct Key
     {

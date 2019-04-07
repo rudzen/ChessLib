@@ -27,6 +27,7 @@ SOFTWARE.
 namespace Rudz.Chess.Enums
 {
     using System;
+    using System.Runtime.CompilerServices;
 
     [Flags]
     public enum EMoveType
@@ -38,5 +39,11 @@ namespace Rudz.Chess.Enums
         Epcapture = 8,
         Promotion = 16,
         Capture = 32
+    }
+
+    public static class EMoveTypeExtensions
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool HasFlagFast(this EMoveType value, EMoveType flag) => (value & flag) != 0;
     }
 }

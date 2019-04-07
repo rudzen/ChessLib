@@ -24,8 +24,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using Rudz.Chess.Types;
-
 namespace Rudz.Chess.Enums
 {
     using System;
@@ -37,5 +35,17 @@ namespace Rudz.Chess.Enums
         Short = 1,
         Long = 2,
         CastleNb = 3
+    }
+
+    [Flags]
+    public enum ECastlelingRights
+    {
+        None = 0,
+        WhiteOO = 1,
+        WhiteOOO = WhiteOO << 1,
+        BlackOO = WhiteOO << 2,
+        BlackOOO = WhiteOO << 3,
+        Any = WhiteOO | WhiteOOO | BlackOO | BlackOOO,
+        CastleRightsNb = 16
     }
 }

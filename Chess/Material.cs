@@ -27,7 +27,7 @@ SOFTWARE.
 namespace Rudz.Chess
 {
     using Enums;
-    using System;
+    using Extensions;
     using System.Runtime.CompilerServices;
     using Types;
 
@@ -37,11 +37,11 @@ namespace Rudz.Chess
 
         public static readonly int MaxValue;
 
-        public readonly int[] MaterialValue = { 0, 0 };
-
         private static readonly int[] PieceBitShift;
 
         private readonly uint[] _key = { 0, 0 };
+
+        public int[] MaterialValue { get; }
 
         public int MaterialValueTotal => MaterialValue[0] - MaterialValue[1];
 
@@ -49,11 +49,22 @@ namespace Rudz.Chess
 
         public int MaterialValueBlack => MaterialValue[1];
 
+        int IMaterial.this[int index]
+        {
+            get => MaterialValue[index];
+            set => MaterialValue[index] = value;
+        }
+
         static Material()
         {
             MaxValueWithoutPawns = 2 * (2 * (double)PieceExtensions.PieceValues[1]) + 2 * (double)PieceExtensions.PieceValues[2] + 2 * (double)PieceExtensions.PieceValues[3] + (double)PieceExtensions.PieceValues[4];
             MaxValue = (int)(MaxValueWithoutPawns + 2 * 8 * (int)PieceExtensions.PieceValues[0]);
             PieceBitShift = new[] { 0, 4, 8, 12, 16, 20 };
+        }
+
+        public Material()
+        {
+            MaterialValue = new int[2];
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -69,7 +80,7 @@ namespace Rudz.Chess
             if (pieceType == EPieceType.King)
                 return;
 
-            int x = Count(side, pieceType) + delta;
+            var x = Count(side, pieceType) + delta;
 
             _key[side.Side] &= ~(15u << PieceBitShift[(int)pieceType]);
             _key[side.Side] |= (uint)(x << PieceBitShift[(int)pieceType]);
@@ -93,8 +104,8 @@ namespace Rudz.Chess
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Clear()
         {
-            Array.Clear(_key, 0, 2);
-            Array.Clear(MaterialValue, 0, 2);
+            _key.Clear();
+            MaterialValue.Clear();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
