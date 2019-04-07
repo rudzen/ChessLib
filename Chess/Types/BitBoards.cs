@@ -419,9 +419,6 @@ namespace Rudz.Chess.Types
         public static Square Get(this BitBoard bb, int pos) => (int)(bb.Value >> pos) & 0x1;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Empty(this BitBoard bb) => bb.Value == 0;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsSet(this BitBoard bb, int pos) => (bb.Value & (One << pos)) != 0;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

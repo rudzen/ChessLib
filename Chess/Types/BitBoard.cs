@@ -175,6 +175,9 @@ namespace Rudz.Chess.Types
         public static bool operator false(BitBoard bitBoard) => bitBoard.Value == 0;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool Empty() => Value == 0;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Clear() => Value = 0;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
