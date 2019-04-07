@@ -423,22 +423,19 @@ namespace Rudz.Chess.Types
 
         public static string PrintBitBoard(BitBoard b, string title = "")
         {
-            var s = new StringBuilder(title, 128);
-            s.Append("\n+---+---+---+---+---+---+---+---+\n");
-            for (var r = 7; r >= 0; r--)
+            var s = new StringBuilder("+---+---+---+---+---+---+---+---+---+\n", 1024);
+            if (!string.IsNullOrWhiteSpace(title))
+                s.AppendLine($"| {title}");
+            for (var r = ERank.Rank8; r >= ERank.Rank1; --r)
             {
-                s.Append(r + 1);
-                s.Append(' ');
-                for (var f = 0; f <= 7; f++)
-                {
-                    s.Append(b & BbSquares[(r << 3) + f] ? " 1 " : " . ");
-                    s.Append(' ');
-                }
-
-                s.Append('\n');
+                s.AppendFormat("| {0} ", (int) r + 1);
+                for (var f = EFile.FileA; f <= EFile.FileH; ++f)
+                    s.AppendFormat("| {0} ", (b & new Square(r, f)).Empty() ? ' ' : 'X');
+                s.AppendLine("|\n+---+---+---+---+---+---+---+---+---+");
             }
 
-            s.Append("|+---+---+---+---+---+---+---+---+\n");
+            s.AppendLine("|   | A | B | C | D | E | F | G | H |");
+            s.AppendLine("+---+---+---+---+---+---+---+---+---+");
             return s.ToString();
         }
 
