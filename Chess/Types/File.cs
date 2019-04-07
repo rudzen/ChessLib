@@ -126,7 +126,7 @@ namespace Rudz.Chess.Types
         public bool IsValid() => Value <= EFile.FileH;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public override string ToString() => this.FileChar().ToString();
+        public override string ToString() => this.FileString();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals(File other) => Value == other.Value;

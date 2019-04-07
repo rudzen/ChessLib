@@ -32,6 +32,7 @@ namespace Rudz.Chess.Types
     /// <summary>
     /// Type for 64 bit key.
     /// Used for Zobrist hashing, but can be used for other things as well, such as Transposition Table etc.
+    /// <para>WARNING : Not yet complete</para>
     /// </summary>
     public struct Key
     {
@@ -40,6 +41,10 @@ namespace Rudz.Chess.Types
         public uint GetFirst32Bits() => (uint)Value;
 
         public uint GetLast32Bits() => (uint)(Value >> 32);
+
+        public ushort GetFirst16Bits() => (ushort) Value;
+
+        public ushort GetLast16Bits() => (ushort) (Value >> 48);
 
         public void Hash(ECastleling castleling, ERank rank) => Value ^= Zobrist.GetZobristCastleling((int) rank);
 

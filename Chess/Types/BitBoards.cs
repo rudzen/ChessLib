@@ -249,7 +249,7 @@ namespace Rudz.Chess.Types
                 var rank = s1.RankOf();
 
                 // distance computation
-                foreach (var s2 in BitBoards.AllSquares)
+                foreach (var s2 in AllSquares)
                 {
                     var ranks = Math.Abs(rank.ToInt() - s2.RankOf().ToInt());
                     var files = Math.Abs(rank.ToInt() - s2.File().ToInt());

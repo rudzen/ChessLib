@@ -84,11 +84,7 @@ namespace Rudz.Chess.Types
         /// </summary>
         /// <param name="index">the damn index</param>
         /// <returns>the Bit object if assigning</returns>
-        public BitBoard this[int index]
-        {
-            get => this.Get(index);
-            set => Set(index); // TODO : Untested
-        }
+        public BitBoard this[int index] => this.Get(index);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator BitBoard(ulong value) => new BitBoard(value);
