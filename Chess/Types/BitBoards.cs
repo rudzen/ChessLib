@@ -39,6 +39,7 @@ namespace Rudz.Chess.Types
     public static class BitBoards
     {
         // TODO : Redesign some of these arrays for better memory and/or cache line use.
+        internal const ulong One = 0x1ul;
 
         public const int Zero = 0x0;
 
@@ -49,30 +50,6 @@ namespace Rudz.Chess.Types
         public const ulong BlackArea = ~WhiteArea;
 
         public const ulong DarkSquares = ~LightSquares;
-
-        public const ulong PromotionRanks = RANK1 | RANK8;
-
-        public static readonly BitBoard EmptyBitBoard;
-
-        public static readonly BitBoard AllSquares;
-
-        public static readonly BitBoard CornerA1;
-
-        public static readonly BitBoard CornerA8;
-
-        public static readonly BitBoard CornerH1;
-
-        public static readonly BitBoard CornerH8;
-
-        internal const ulong One = 0x1ul;
-
-        internal static readonly BitBoard[] BbSquares =
-            {
-                0x1, 0x2, 0x4, 0x8, 0x10, 0x20, 0x40, 0x80, 0x100, 0x200, 0x400, 0x800, 0x1000, 0x2000, 0x4000, 0x8000, 0x10000, 0x20000, 0x40000, 0x80000, 0x100000, 0x200000, 0x400000, 0x800000, 0x1000000, 0x2000000, 0x4000000, 0x8000000,
-                0x10000000, 0x20000000, 0x40000000, 0x80000000, 0x100000000, 0x200000000, 0x400000000, 0x800000000, 0x1000000000, 0x2000000000, 0x4000000000, 0x8000000000, 0x10000000000, 0x20000000000, 0x40000000000, 0x80000000000,
-                0x100000000000, 0x200000000000, 0x400000000000, 0x800000000000, 0x1000000000000, 0x2000000000000, 0x4000000000000, 0x8000000000000, 0x10000000000000, 0x20000000000000, 0x40000000000000, 0x80000000000000, 0x100000000000000,
-                0x200000000000000, 0x400000000000000, 0x800000000000000, 0x1000000000000000, 0x2000000000000000, 0x4000000000000000, 0x8000000000000000
-            };
 
         private const ulong FILEA = 0x0101010101010101;
 
@@ -106,7 +83,37 @@ namespace Rudz.Chess.Types
 
         private const ulong RANK8 = 0xff00000000000000;
 
+        public const ulong PromotionRanks = RANK1 | RANK8;
+
         private const ulong LightSquares = 0x55AA55AA55AA55AA;
+
+        public static readonly BitBoard EmptyBitBoard;
+
+        public static readonly BitBoard AllSquares;
+
+        public static readonly BitBoard CornerA1;
+
+        public static readonly BitBoard CornerA8;
+
+        public static readonly BitBoard CornerH1;
+
+        public static readonly BitBoard CornerH8;
+
+        public static readonly BitBoard QueenSide;
+
+        public static readonly BitBoard CenterFiles;
+
+        public static readonly BitBoard KingSide;
+
+        public static readonly BitBoard Center;
+
+        internal static readonly BitBoard[] BbSquares =
+            {
+                0x1, 0x2, 0x4, 0x8, 0x10, 0x20, 0x40, 0x80, 0x100, 0x200, 0x400, 0x800, 0x1000, 0x2000, 0x4000, 0x8000, 0x10000, 0x20000, 0x40000, 0x80000, 0x100000, 0x200000, 0x400000, 0x800000, 0x1000000, 0x2000000, 0x4000000, 0x8000000,
+                0x10000000, 0x20000000, 0x40000000, 0x80000000, 0x100000000, 0x200000000, 0x400000000, 0x800000000, 0x1000000000, 0x2000000000, 0x4000000000, 0x8000000000, 0x10000000000, 0x20000000000, 0x40000000000, 0x80000000000,
+                0x100000000000, 0x200000000000, 0x400000000000, 0x800000000000, 0x1000000000000, 0x2000000000000, 0x4000000000000, 0x8000000000000, 0x10000000000000, 0x20000000000000, 0x40000000000000, 0x80000000000000, 0x100000000000000,
+                0x200000000000000, 0x400000000000000, 0x800000000000000, 0x1000000000000000, 0x2000000000000000, 0x4000000000000000, 0x8000000000000000
+            };
 
         private static readonly BitBoard[] FileBB = { FILEA, FILEB, FILEC, FILED, FILEE, FILEF, FILEG, FILEH };
 
@@ -173,6 +180,11 @@ namespace Rudz.Chess.Types
 
         static BitBoards()
         {
+            QueenSide = new BitBoard(FILEA | FILEB | FILEC | FILED);
+            CenterFiles = new BitBoard(FILEC | FILED | FILEE | FILEF);
+            KingSide = new BitBoard(FILEE | FILEF | FILEG | FILEH);
+            Center = new BitBoard((FILED | FILEE) & (RANK4 | RANK5));
+
             ShiftFuncs = MakeShiftFuncs();
             BetweenBB = new BitBoard[64, 64];
             PseudoAttacksBB = new BitBoard[EPieceType.PieceTypeNb.ToInt(), 64];
