@@ -24,24 +24,24 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Enums
+namespace Rudz.Chess.Types
 {
-    public enum EDirection
+    using System.Linq;
+    using System.Runtime.CompilerServices;
+
+    public static class FileExtensions
     {
-        NoDirection = 0,
-        North = 8,
-        East = 1,
-        South = -North,            // -8
-        West = -East,             // -1
-        NorthEast = North + East, //  9
-        SouthEast = South + East, // -7
-        SouthWest = South + West, // -9
-        NorthWest = North + West,  //  7
+        private static readonly char[] FileChars;
 
-        NorthDouble = North + North,
-        SouthDouble = South + South,
+        private static readonly string[] FileStrings;
 
-        NorthFill = NorthDouble << 1,
-        SouthFill = -NorthFill
+        static FileExtensions()
+        {
+            FileChars = new[] { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' };
+            FileStrings = FileChars.Select(x => x.ToString()).ToArray();
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static char FileChar(this File f) => FileChars[f.ToInt()];
     }
 }

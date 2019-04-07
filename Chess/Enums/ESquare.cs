@@ -26,7 +26,6 @@ SOFTWARE.
 
 namespace Rudz.Chess.Enums
 {
-    //[Flags]
     public enum ESquare
     {
         // ReSharper disable InconsistentNaming

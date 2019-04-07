@@ -24,24 +24,39 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Enums
+namespace Chess.Test.File
 {
-    public enum EDirection
+    using Rudz.Chess.Enums;
+    using Xunit;
+    using F = Rudz.Chess.Types.File;
+
+    public sealed class FileTests
     {
-        NoDirection = 0,
-        North = 8,
-        East = 1,
-        South = -North,            // -8
-        West = -East,             // -1
-        NorthEast = North + East, //  9
-        SouthEast = South + East, // -7
-        SouthWest = South + West, // -9
-        NorthWest = North + West,  //  7
+        [Fact]
+        public void FileStructureIntTest()
+        {
+            const int val = 3;
+            const EFile expected = (EFile)val;
+            var f = new F(val);
+            var actual = f.Value;
+            Assert.Equal(expected, actual);
 
-        NorthDouble = North + North,
-        SouthDouble = South + South,
+            f = val;
+            actual = f.Value;
+            Assert.Equal(expected, actual);
+        }
 
-        NorthFill = NorthDouble << 1,
-        SouthFill = -NorthFill
+        [Fact]
+        public void FileStructureEFileTest()
+        {
+            const EFile expected = EFile.FileG;
+            var f = new F(expected);
+            var actual = f.Value;
+            Assert.Equal(expected, actual);
+
+            f = expected;
+            actual = f.Value;
+            Assert.Equal(expected, actual);
+        }
     }
 }

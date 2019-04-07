@@ -26,12 +26,10 @@ SOFTWARE.
 
 namespace Rudz.Chess.Types
 {
-    using Enums;
     using System;
     using System.Collections;
     using System.Collections.Generic;
     using System.Runtime.CompilerServices;
-    using System.Text;
 
     /*
          * In general, the bitboard layout of a chess board matches that of a real chess board.
@@ -175,6 +173,9 @@ namespace Rudz.Chess.Types
         public static bool operator false(BitBoard bitBoard) => bitBoard.Value == 0;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool Empty() => Value == 0;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Clear() => Value = 0;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -186,11 +187,26 @@ namespace Rudz.Chess.Types
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Xor(int pos) => Value ^= (uint)pos;
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void OrAll(params BitBoard[] bbs)
         {
             // ReSharper disable once ForCanBeConvertedToForeach
             for (var i = 0; i < bbs.Length; ++i)
                 Value |= bbs[i].Value;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void OrAll(IEnumerable<BitBoard> bbs)
+        {
+            foreach (var bb in bbs)
+                Value |= bb.Value;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void OrAll(IEnumerable<Square> sqs)
+        {
+            foreach (var sq in sqs)
+                this |= sq;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -203,31 +219,8 @@ namespace Rudz.Chess.Types
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-        public override string ToString()
-        {
-            var output = new StringBuilder(512);
-            const string seperator = "\n  +BB-+---+---+---+---+---+---+---+\n";
-            const char splitter = '|';
-            output.Append(seperator);
-            for (var rank = ERank.Rank8; rank >= ERank.Rank1; rank--)
-            {
-                output.Append((int)rank + 1);
-                output.Append(' ');
-                for (var file = EFile.FileA; file <= EFile.FileH; file++)
-                {
-                    output.Append(splitter);
-                    output.Append(' ');
-                    output.Append((Value & new Square(rank, file)) != 0 ? " 1 " : " . ");
-                    output.Append(' ');
-                }
-
-                output.Append(splitter);
-                output.Append(seperator);
-            }
-
-            output.Append("    a   b   c   d   e   f   g   h\n");
-            return output.ToString();
-        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public override string ToString() => BitBoards.PrintBitBoard(this, Value.ToString());
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals(BitBoard other) => Value == other.Value;
