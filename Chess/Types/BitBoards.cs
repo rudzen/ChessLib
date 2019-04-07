@@ -1,4 +1,4 @@
-﻿/*
+/*
 ChessLib, a chess data structure library
 
 MIT License
@@ -30,6 +30,8 @@ namespace Rudz.Chess.Types
 {
     using Enums;
     using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
     using System.IO;
     using System.Runtime.CompilerServices;
     using System.Text;
@@ -61,13 +63,6 @@ namespace Rudz.Chess.Types
         public static readonly BitBoard CornerH1;
 
         public static readonly BitBoard CornerH8;
-
-        /// <summary>
-        /// PseudoAttacks are just that, full attack range for all squares for all pieces.
-        /// The pawns are a special case, as index range 0,sq are for White and 1,sq are for Black.
-        /// This is possible because index 0 is NoPiece type.
-        /// </summary>
-        private static readonly BitBoard[,] PseudoAttacksBB;
 
         internal const ulong One = 0x1ul;
 
@@ -113,19 +108,19 @@ namespace Rudz.Chess.Types
 
         private const ulong LightSquares = 0x55AA55AA55AA55AA;
 
-        private static readonly ulong[] FileBB = { FILEA, FILEB, FILEC, FILED, FILEE, FILEF, FILEG, FILEH };
+        private static readonly BitBoard[] FileBB = { FILEA, FILEB, FILEC, FILED, FILEE, FILEF, FILEG, FILEH };
 
-        private static readonly ulong[] RankBB = { RANK1, RANK2, RANK3, RANK4, RANK5, RANK6, RANK7, RANK8 };
+        private static readonly BitBoard[] RankBB = { RANK1, RANK2, RANK3, RANK4, RANK5, RANK6, RANK7, RANK8 };
 
-        private static readonly ulong[] Rank1 = { RANK1, RANK8 };
+        private static readonly BitBoard[] Rank1 = { RANK1, RANK8 };
 
-        private static readonly ulong[] Rank3BitBoards = { RANK3, RANK6 };
+        private static readonly BitBoard[] Rank3BitBoards = { RANK3, RANK6 };
 
         private static readonly BitBoard[] Rank7BitBoards = { RANK7, RANK2 };
 
-        private static readonly ulong[] Rank6And7 = { RANK6 | RANK7, RANK2 | RANK3 };
+        private static readonly BitBoard[] Rank6And7 = { RANK6 | RANK7, RANK2 | RANK3 };
 
-        private static readonly ulong[] Rank7And8 = { RANK7 | RANK8, RANK1 | RANK2 };
+        private static readonly BitBoard[] Rank7And8 = { RANK7 | RANK8, RANK1 | RANK2 };
 
         private static readonly int[] Lsb64Table =
             {
@@ -151,6 +146,13 @@ namespace Rudz.Chess.Types
                 13, 18,  8, 12,  7,  6,  5, 63
             };
 
+        /// <summary>
+        /// PseudoAttacks are just that, full attack range for all squares for all pieces.
+        /// The pawns are a special case, as index range 0,sq are for White and 1,sq are for Black.
+        /// This is possible because index 0 is NoPiece type.
+        /// </summary>
+        private static readonly BitBoard[,] PseudoAttacksBB;
+
         private static readonly BitBoard[] AdjacentFilesBB = { FILEB, FILEA | FILEC, FILEB | FILED, FILEC | FILEE, FILED | FILEF, FILEE | FILEG, FILEF | FILEH, FILEG };
 
         private static readonly BitBoard[,] BetweenBB;
@@ -163,16 +165,27 @@ namespace Rudz.Chess.Types
 
         private static readonly BitBoard[,] ForwardFileBB;
 
+        private static readonly BitBoard[,] LineBB;
+
+        private static readonly BitBoard[,] KingRingBB;
+
+        private static readonly IDictionary<EDirection, Func<BitBoard, BitBoard>> ShiftFuncs;
+
         static BitBoards()
         {
+            ShiftFuncs = MakeShiftFuncs();
             BetweenBB = new BitBoard[64, 64];
             PseudoAttacksBB = new BitBoard[EPieceType.PieceTypeNb.ToInt(), 64];
             EmptyBitBoard = new BitBoard(ZeroBb);
-            AllSquares = ~Zero;
+            AllSquares = ~EmptyBitBoard;
             PawnAttackSpanBB = new BitBoard[2, 64];
             PassedPawnMaskBB = new BitBoard[2, 64];
             ForwardRanksBB = new BitBoard[2, 64];
             ForwardFileBB = new BitBoard[2, 64];
+            LineBB = new BitBoard[64, 64];
+            KingRingBB = new BitBoard[2, 64];
+
+            var validMagicPieces = new[] { EPieceType.Bishop, EPieceType.Rook };
 
             // ForwardRanksBB population loop idea from sf
             for (var r = ERank.Rank1; r < ERank.RankNb; ++r)
@@ -193,57 +206,78 @@ namespace Rudz.Chess.Types
                 }
             }
 
-            foreach (var s in AllSquares)
+            // mini local helpers
+            BitBoard ComputeKnightAttack(BitBoard b)
             {
-                foreach (var fillSq in AllSquares)
-                    BetweenBB[s.ToInt(), fillSq.ToInt()] = 0;
-
-                InitBetweenBitboards(s, NorthOne, EDirection.North);
-                InitBetweenBitboards(s, NorthEastOne, EDirection.NorthEast);
-                InitBetweenBitboards(s, EastOne, EDirection.East);
-                InitBetweenBitboards(s, SouthEastOne, EDirection.SouthEast);
-                InitBetweenBitboards(s, SouthOne, EDirection.South);
-                InitBetweenBitboards(s, SouthWestOne, EDirection.SouthWest);
-                InitBetweenBitboards(s, WestOne, EDirection.West);
-                InitBetweenBitboards(s, NorthWestOne, EDirection.NorthWest);
+                BitBoard res = (b & ~(FILEA | FILEB)) << 6;
+                res |= (b & ~FILEA) << 15;
+                res |= (b & ~FILEH) << 17;
+                res |= (b & ~(FILEG | FILEH)) << 10;
+                res |= (b & ~(FILEG | FILEH)) >> 6;
+                res |= (b & ~FILEH) >> 15;
+                res |= (b & ~FILEA) >> 17;
+                res |= (b & ~(FILEA | FILEB)) >> 10;
+                return res;
             }
 
             // Pseudo attacks for all pieces
-            foreach (var s in AllSquares)
+            foreach (var s1 in AllSquares)
             {
-                var sq = s.ToInt();
-                var b = s.BitBoardSquare();
+                var sq = s1.ToInt();
+                var b = s1.BitBoardSquare();
                 PseudoAttacksBB[0, sq] = b.NorthEastOne() | b.NorthWestOne();
                 PseudoAttacksBB[1, sq] = b.SouthWestOne() | b.SouthEastOne();
 
                 var pt = EPieceType.Knight.ToInt();
-                PseudoAttacksBB[pt, sq] = (b & ~(FILEA | FILEB)) << 6;
-                PseudoAttacksBB[pt, sq] |= (b & ~FILEA) << 15;
-                PseudoAttacksBB[pt, sq] |= (b & ~FILEH) << 17;
-                PseudoAttacksBB[pt, sq] |= (b & ~(FILEG | FILEH)) << 10;
-                PseudoAttacksBB[pt, sq] |= (b & ~(FILEG | FILEH)) >> 6;
-                PseudoAttacksBB[pt, sq] |= (b & ~FILEH) >> 15;
-                PseudoAttacksBB[pt, sq] |= (b & ~FILEA) >> 17;
-                PseudoAttacksBB[pt, sq] |= (b & ~(FILEA | FILEB)) >> 10;
+                PseudoAttacksBB[pt, sq] = ComputeKnightAttack(b);
+
+                var bishopAttacks = s1.BishopAttacks(EmptyBitBoard);
+                var rookAttacks = s1.RookAttacks(EmptyBitBoard);
 
                 pt = EPieceType.Bishop.ToInt();
-                PseudoAttacksBB[pt, sq] = s.BishopAttacks(Zero);
+                PseudoAttacksBB[pt, sq] = bishopAttacks;
 
                 pt = EPieceType.Rook.ToInt();
-                PseudoAttacksBB[pt, sq] = s.RookAttacks(Zero);
+                PseudoAttacksBB[pt, sq] = rookAttacks;
 
                 pt = EPieceType.Queen.ToInt();
-                PseudoAttacksBB[pt, sq] = s.QueenAttacks(Zero);
+                PseudoAttacksBB[pt, sq] = bishopAttacks | rookAttacks;
 
                 pt = EPieceType.King.ToInt();
-                PseudoAttacksBB[pt, sq] = (b & ~FILEA) >> 1;
-                PseudoAttacksBB[pt, sq] |= (b & ~FILEA) << 7;
-                PseudoAttacksBB[pt, sq] |= b << 8;
-                PseudoAttacksBB[pt, sq] |= (b & ~FILEH) << 9;
-                PseudoAttacksBB[pt, sq] |= (b & ~FILEH) << 1;
-                PseudoAttacksBB[pt, sq] |= (b & ~FILEH) >> 7;
-                PseudoAttacksBB[pt, sq] |= b >> 8;
-                PseudoAttacksBB[pt, sq] |= (b & ~FILEA) >> 9;
+                PseudoAttacksBB[pt, sq] = b.NorthOne() | b.SouthOne() | b.EastOne() | b.WestOne()
+                                        | b.NorthEastOne() | b.NorthWestOne() | b.SouthEastOne() | b.SouthWestOne();
+
+                // Compute lines and betweens
+                foreach (var validMagicPiece in validMagicPieces)
+                {
+                    pt = validMagicPiece.ToInt();
+                    foreach (var s2 in AllSquares)
+                    {
+                        if ((PseudoAttacksBB[pt, sq] & s2).Empty())
+                            continue;
+
+                        LineBB[sq, s2.ToInt()] = GetAttacks(s1, validMagicPiece, EmptyBitBoard) & GetAttacks(s2, validMagicPiece, EmptyBitBoard) | s1 | s2;
+                        BetweenBB[sq, s2.ToInt()] = GetAttacks(s1, validMagicPiece, BbSquares[s2.ToInt()]) & GetAttacks(s2, validMagicPiece, BbSquares[sq]);
+                    }
+                }
+
+                // Compute KingRings
+                pt = EPieceType.King.ToInt();
+                for (var side = EPlayer.White; side < EPlayer.PlayerNb; ++side)
+                {
+                    var c = (int)side;
+                    KingRingBB[c, sq] = PseudoAttacksBB[pt, sq];
+                    if (s1.RelativeRank(side) == ERank.Rank1)
+                        KingRingBB[c, sq] |= KingRingBB[c, sq].Shift(side == EPlayer.White ? EDirection.North : EDirection.South);
+
+                    var f = s1.File();
+                    if (f == (int)EFile.FileH)
+                        KingRingBB[c, sq] |= KingRingBB[c, sq].WestOne();
+                    else if (f == (int)EFile.FileA)
+                        KingRingBB[c, sq] |= KingRingBB[c, sq].EastOne();
+
+                    Debug.Assert(!KingRingBB[c, sq].Empty());
+                }
             }
 
             CornerA1 = MakeBitboard(ESquare.a1, ESquare.b1, ESquare.a2, ESquare.b2);
@@ -366,6 +400,15 @@ namespace Rudz.Chess.Types
         public static Square Last(this BitBoard bb) => bb.Msb();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static BitBoard Line(this Square s1, Square s2) => LineBB[s1.ToInt(), s2.ToInt()];
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Aligned(this Square s1, Square s2, Square s3) => (Line(s1, s2) & s3) != 0;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static BitBoard KingRing(this Square sq, Player side) => KingRingBB[side.Side, sq.ToInt()];
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void ToString(this BitBoard bb, TextWriter outputWriter)
         {
             try
@@ -478,7 +521,13 @@ namespace Rudz.Chess.Types
         public static BitBoard Fill(this BitBoard bb, Player side) => side == EPlayer.White ? bb.NorthFill() : bb.SouthFill();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static BitBoard Shift(this BitBoard bb, Direction direction) => direction.Value == EDirection.North ? bb.NorthOne() : bb.SouthOne();
+        public static BitBoard Shift(this BitBoard bb, Direction direction)
+        {
+            if (ShiftFuncs.TryGetValue(direction.Value, out var func))
+                return func(bb);
+
+            throw new ArgumentException($"Invalid shift argument.", nameof(direction));
+        }
 
         /* non extension methods */
 
@@ -521,28 +570,38 @@ namespace Rudz.Chess.Types
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static BitBoard MakeBitboard(params Square[] squares)
         {
-            BitBoard b = squares[0];
-            for (var i = 1; i < squares.Length; ++i)
+            BitBoard b = ZeroBb;
+            // ReSharper disable once ForCanBeConvertedToForeach
+            // ReSharper disable once LoopCanBeConvertedToQuery
+            for (var i = 0; i < squares.Length; ++i)
                 b |= squares[i];
             return b;
         }
 
-        [MethodImpl(MethodImplOptions.NoInlining)]
-        private static void InitBetweenBitboards(Square from, Func<BitBoard, BitBoard> stepFunc, Direction step)
+        /// <summary>
+        /// Helper method to generate shift function dictionary for all directions.
+        /// </summary>
+        /// <returns>The generated shift dictionary</returns>
+        private static IDictionary<EDirection, Func<BitBoard, BitBoard>> MakeShiftFuncs()
         {
-            var bb = stepFunc(from.BitBoardSquare());
-            var to = from + step;
-            BitBoard between = 0;
-            while (bb)
+            var sf = new Dictionary<EDirection, Func<BitBoard, BitBoard>>(13)
             {
-                if (!from.IsValid() || !to.IsValid())
-                    continue;
+                {EDirection.NoDirection, board => board},
+                {EDirection.North, board => board.NorthOne()},
+                {EDirection.NorthDouble, board => board.NorthOne().NorthOne()},
+                {EDirection.NorthEast, board => board.NorthEastOne()},
+                {EDirection.NorthWest, board => board.NorthWestOne()},
+                {EDirection.NorthFill, board => board.NorthFill()},
+                {EDirection.South, board => board.SouthOne()},
+                {EDirection.SouthDouble, board => board.SouthOne().SouthOne()},
+                {EDirection.SouthEast, board => board.SouthEastOne()},
+                {EDirection.SouthWest, board => board.SouthWestOne()},
+                {EDirection.SouthFill, board => board.SouthFill()},
+                {EDirection.East, board => board.EastOne()},
+                {EDirection.West, board => board.WestOne()}
+            };
 
-                BetweenBB[from.ToInt(), to.ToInt()] = between;
-                between |= bb;
-                bb = stepFunc(bb);
-                to += step;
-            }
+            return sf;
         }
     }
 }
