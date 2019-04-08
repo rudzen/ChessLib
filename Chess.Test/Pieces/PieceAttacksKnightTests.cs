@@ -75,10 +75,9 @@ namespace Chess.Test.Pieces
             const int index = (int)EBands.Gamma;
             const int attackIndex = 1;
             var expected = KnightExpected[index];
+            var actuals = Bands[index].Select(x => RegAttacks[attackIndex](x).Count);
 
-            var attackCounts = Bands[index].Select(x => RegAttacks[attackIndex](x).Count);
-
-            foreach (var actual in attackCounts)
+            foreach (var actual in actuals)
                 Assert.Equal(expected, actual);
         }
 
@@ -88,10 +87,9 @@ namespace Chess.Test.Pieces
             const int index = (int)EBands.Delta;
             const int attackIndex = 1;
             var expected = KnightExpected[index];
+            var actuals = Bands[index].Select(x => RegAttacks[attackIndex](x).Count);
 
-            var attackCounts = Bands[index].Select(x => RegAttacks[attackIndex](x).Count);
-
-            foreach (var actual in attackCounts)
+            foreach (var actual in actuals)
                 Assert.Equal(expected, actual);
         }
     }

@@ -113,8 +113,8 @@ namespace Chess.Test.Move
             var uniChar = movingPiece.GetUnicodeChar();
             var toSquareString = toSquare.GetSquareString();
 
-            var expectedPrimary = $"{uniChar}{fromOneSquare.RankOfChar()}{toSquareString}";
-            var expectedSecondary = $"{uniChar}{fromTwoSquare.RankOfChar()}{toSquareString}";
+            var expectedPrimary = $"{uniChar}{fromOneSquare.RankChar()}{toSquareString}";
+            var expectedSecondary = $"{uniChar}{fromTwoSquare.RankChar()}{toSquareString}";
 
             var g = new Game();
             g.NewGame(fen);
@@ -209,8 +209,8 @@ namespace Chess.Test.Move
             var uniChar = movingPiece.GetPieceChar();
             var toSquareString = toSquare.GetSquareString();
 
-            var expectedPrimary = $"{uniChar}{fromOneSquare.RankOfChar()}{toSquareString}";
-            var expectedSecondary = $"{uniChar}{fromTwoSquare.RankOfChar()}{toSquareString}";
+            var expectedPrimary = $"{uniChar}{fromOneSquare.RankChar()}{toSquareString}";
+            var expectedSecondary = $"{uniChar}{fromTwoSquare.RankChar()}{toSquareString}";
 
             var g = new Game();
             g.NewGame(fen);

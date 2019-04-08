@@ -335,7 +335,7 @@ namespace Rudz.Chess.Types
                 {
                     if (square.File() == move.GetFromSquare().File())
                         ambiguity |= EMoveAmbiguity.File;
-                    else if (square.RankOf() == move.GetFromSquare().RankOf())
+                    else if (square.Rank() == move.GetFromSquare().Rank())
                         ambiguity |= EMoveAmbiguity.Rank;
 
                     ambiguity |= EMoveAmbiguity.Move;
@@ -377,7 +377,7 @@ namespace Rudz.Chess.Types
             if (!ambiguity.HasFlagFast(EMoveAmbiguity.File))
                 sb.Append(from.FileChar());
             else if (!ambiguity.HasFlagFast(EMoveAmbiguity.Rank))
-                sb.Append(from.RankOfChar());
+                sb.Append(from.RankChar());
             else
                 sb.Append(from.ToString());
         }

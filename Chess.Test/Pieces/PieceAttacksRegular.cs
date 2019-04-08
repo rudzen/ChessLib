@@ -26,21 +26,21 @@ SOFTWARE.
 
 namespace Chess.Test.Pieces
 {
-    using System;
+    using Rudz.Chess.Enums;
     using Rudz.Chess.Types;
+    using System;
 
     public abstract class PieceAttacksRegular : PieceAttacks
     {
-        // care is taken to avoid mistakes, the pawn is not "as is"
-        protected static readonly int[] PawnExpected = { 1, 2, 2, 2 };
-
         // special case with alpha and beta bands in the corners are taken care of
         protected static readonly int[] KnightExpected = { 4, 6, 8, 8 };
 
         // special case with alpha band is taken care of
         protected static readonly int[] KingExpected = { 5, 8, 8, 8 };
 
-        protected static readonly ulong BoardCorners = 0x1u | 0x80u | 0x100000000000000u | 0x8000000000000000u;
+        protected static readonly BitBoard BoardCorners
+            = BitBoards.MakeBitboard(ESquare.a1) | BitBoards.MakeBitboard(ESquare.a8)
+            | BitBoards.MakeBitboard(ESquare.h1) | BitBoards.MakeBitboard(ESquare.h8);
 
         // pawn = 0 (N/A for now), knight = 1, king = 2
         protected readonly Func<Square, BitBoard>[] RegAttacks = { BitBoards.KnightAttacks, BitBoards.KnightAttacks, BitBoards.KingAttacks };

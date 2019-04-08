@@ -58,7 +58,7 @@ namespace Rudz.Chess.Types
             foreach (var square in BitBoards.AllSquares)
             {
                 var file = square.File().ToInt();
-                var rank = square.RankOf();
+                var rank = square.Rank();
                 Flip[0, square.ToInt()] = file + ((7 - rank.ToInt()) << 3);
                 Flip[1, square.ToInt()] = file + (rank.ToInt() << 3);
             }
@@ -74,7 +74,7 @@ namespace Rudz.Chess.Types
         public static bool IsValid(this Square s) => s.Value <= ESquare.h8;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsValidEp(this Square s) => s.RankOf() == ERank.Rank3 || s.RankOf() == ERank.Rank6;
+        public static bool IsValidEp(this Square s) => s.Rank() == ERank.Rank3 || s.Rank() == ERank.Rank6;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsValidEp(this Square s, Player c) => s.RelativeRank(c) == ERank.Rank3;
@@ -86,16 +86,16 @@ namespace Rudz.Chess.Types
         public static int ToInt(this Square s) => (int)s.Value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Rank RankOf(this Square s) => (ERank)(s.ToInt() >> 3);
+        public static Rank Rank(this Square s) => (ERank)(s.ToInt() >> 3);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static char RankOfChar(this Square s) => s.RankOf().RankChar();
+        public static char RankChar(this Square s) => s.Rank().RankChar();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Rank RelativeRank(this Rank rank, Player color) => rank.ToInt() ^ (color.Side * 7);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Rank RelativeRank(this Square s, Player color) => s.RankOf().RelativeRank(color);
+        public static Rank RelativeRank(this Square s, Player color) => s.Rank().RelativeRank(color);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static File File(this Square s) => s.ToInt() & 7;

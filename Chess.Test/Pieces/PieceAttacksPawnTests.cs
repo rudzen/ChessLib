@@ -24,6 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using System.Linq;
+
 namespace Chess.Test.Pieces
 {
     using Rudz.Chess.Types;
@@ -73,92 +75,84 @@ namespace Chess.Test.Pieces
         public override void AlphaPattern()
         {
             const int index = (int)EBands.Alpha;
-            Player side = 0;
+            var us = PlayerExtensions.White;
+            var expected = PawnExpected[index];
+            var actuals = PawnBands[index].Select(w => w.PawnAttack(us).Count);
 
             // white
-            foreach (var pieceLocation in PawnBands[index])
-            {
-                var attacks = pieceLocation.PawnAttack(side);
-                Assert.Equal(PawnExpected[index], attacks.Count);
-            }
+            foreach (var actual in actuals)
+                Assert.Equal(expected, actual);
 
-            side = ~side;
+            us = ~us;
+
+            actuals = PawnBands[index].Select(x => x.PawnAttack(us).Count);
 
             // black
-            foreach (var pieceLocation in PawnBands[index])
-            {
-                var attacks = pieceLocation.PawnAttack(side);
-                Assert.Equal(PawnExpected[index], attacks.Count);
-            }
+            foreach (var actual in actuals)
+                Assert.Equal(expected, actual);
         }
 
         [Fact]
         public override void BetaPattern()
         {
             const int index = (int)EBands.Beta;
-            Player side = 0;
+            var us = PlayerExtensions.White;
+            var expected = PawnExpected[index];
+            var actuals = PawnBands[index].Select(w => w.PawnAttack(us).Count);
 
             // white
-            foreach (var pieceLocation in PawnBands[index])
-            {
-                var attacks = pieceLocation.PawnAttack(side);
-                Assert.Equal(PawnExpected[index], attacks.Count);
-            }
+            foreach (var actual in actuals)
+                Assert.Equal(expected, actual);
 
-            side = ~side;
+            us = ~us;
+
+            actuals = PawnBands[index].Select(x => x.PawnAttack(us).Count);
 
             // black
-            foreach (var pieceLocation in PawnBands[index])
-            {
-                var attacks = pieceLocation.PawnAttack(side);
-                Assert.Equal(PawnExpected[index], attacks.Count);
-            }
+            foreach (var actual in actuals)
+                Assert.Equal(expected, actual);
         }
 
         [Fact]
         public override void GammaPattern()
         {
             const int index = (int)EBands.Gamma;
-            Player side = 0;
+            var us = PlayerExtensions.White;
+            var expected = PawnExpected[index];
+            var actuals = PawnBands[index].Select(w => w.PawnAttack(us).Count);
 
             // white
-            foreach (var pieceLocation in PawnBands[index])
-            {
-                var attacks = pieceLocation.PawnAttack(side);
-                Assert.Equal(PawnExpected[index], attacks.Count);
-            }
+            foreach (var actual in actuals)
+                Assert.Equal(expected, actual);
 
-            side = ~side;
+            us = ~us;
+
+            actuals = PawnBands[index].Select(x => x.PawnAttack(us).Count);
 
             // black
-            foreach (var pieceLocation in PawnBands[index])
-            {
-                var attacks = pieceLocation.PawnAttack(side);
-                Assert.Equal(PawnExpected[index], attacks.Count);
-            }
+            foreach (var actual in actuals)
+                Assert.Equal(expected, actual);
         }
 
         [Fact]
         public override void DeltaPattern()
         {
             const int index = (int)EBands.Delta;
-            Player side = 0;
+            var us = PlayerExtensions.White;
+            var expected = PawnExpected[index];
+            var actuals = PawnBands[index].Select(w => w.PawnAttack(us).Count);
 
             // white
-            foreach (var pieceLocation in PawnBands[index])
-            {
-                var attacks = pieceLocation.PawnAttack(side);
-                Assert.Equal(PawnExpected[index], attacks.Count);
-            }
+            foreach (var actual in actuals)
+                Assert.Equal(expected, actual);
 
-            side = ~side;
+            us = ~us;
+
+            actuals = PawnBands[index].Select(x => x.PawnAttack(us).Count);
 
             // black
-            foreach (var pieceLocation in PawnBands[index])
-            {
-                var attacks = pieceLocation.PawnAttack(side);
-                Assert.Equal(PawnExpected[index], attacks.Count);
-            }
+            foreach (var actual in actuals)
+                Assert.Equal(expected, actual);
         }
     }
 }

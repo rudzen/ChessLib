@@ -204,6 +204,11 @@ namespace Rudz.Chess.Types
             SquareDistance = new byte[64, 64];
             DistanceRingBB = new BitBoard[64, 8];
 
+            // local helper functions to calculate distance
+            int distance(int x, int y) { return Math.Abs(x - y); }
+            int distanceFile(Square x, Square y) { return distance(x.File().ToInt(), y.File().ToInt()); }
+            int distanceRank(Square x, Square y) { return distance(x.Rank().ToInt(),  y.Rank().ToInt()); }
+
             var validMagicPieces = new[] { EPieceType.Bishop, EPieceType.Rook };
 
             // ForwardRanksBB population loop idea from sf
@@ -219,8 +224,8 @@ namespace Rudz.Chess.Types
                 foreach (var square in AllSquares)
                 {
                     var s = square.ToInt();
-                    ForwardFileBB[c, s] = ForwardRanksBB[c, square.RankOf().ToInt()] & FileBB[square.File().ToInt()];
-                    PawnAttackSpanBB[c, s] = ForwardRanksBB[c, square.RankOf().ToInt()] & AdjacentFilesBB[square.File().ToInt()];
+                    ForwardFileBB[c, s] = ForwardRanksBB[c, square.Rank().ToInt()] & FileBB[square.File().ToInt()];
+                    PawnAttackSpanBB[c, s] = ForwardRanksBB[c, square.Rank().ToInt()] & AdjacentFilesBB[square.File().ToInt()];
                     PassedPawnMaskBB[c, s] = ForwardFileBB[c, s] | PawnAttackSpanBB[c, s];
                 }
             }
@@ -246,14 +251,11 @@ namespace Rudz.Chess.Types
                 var b = s1.BitBoardSquare();
 
                 var file = s1.File();
-                var rank = s1.RankOf();
 
                 // distance computation
                 foreach (var s2 in AllSquares)
                 {
-                    var ranks = Math.Abs(rank.ToInt() - s2.RankOf().ToInt());
-                    var files = Math.Abs(rank.ToInt() - s2.File().ToInt());
-                    SquareDistance[sq, s2.ToInt()] = (byte)ranks.Max(files);
+                    SquareDistance[sq, s2.ToInt()] = (byte) distanceFile(s1, s2).Max(distanceRank(s1, s2));
                     DistanceRingBB[sq, SquareDistance[sq, s2.ToInt()]] |= s2;
                 }
 
@@ -371,7 +373,7 @@ namespace Rudz.Chess.Types
         /// <param name="sq">The square</param>
         /// <returns>The bitboard of square rank</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static BitBoard BitBoardRank(this Square sq) => RankBB[sq.RankOf().ToInt()];
+        public static BitBoard BitBoardRank(this Square sq) => RankBB[sq.Rank().ToInt()];
 
         /// <summary>
         /// Returns the bitboard representation of a rank.
@@ -453,7 +455,7 @@ namespace Rudz.Chess.Types
         public static BitBoard KingRing(this Square sq, Player side) => KingRingBB[side.Side, sq.ToInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int Distance(this Square source, Square destination) => SquareDistance[source.ToInt(), destination.ToInt()];
+        public static byte Distance(this Square source, Square destination) => SquareDistance[source.ToInt(), destination.ToInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static BitBoard DistanceRing(this Square square, int length) => DistanceRingBB[square.ToInt(), length];
