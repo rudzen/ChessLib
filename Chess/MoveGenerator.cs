@@ -55,15 +55,7 @@ namespace Rudz.Chess
             _position = position;
         }
 
-        public ECastlelingRights CastlelingRights { get; set; }
-
-        public Square EnPassantSquare { get; set; }
-
-        public Player SideToMove { get; set; }
-
         public BitBoard Pinned { get; set; }
-
-        public ulong Key { get; internal set; }
 
         public Emgf Flags { get; set; } = Emgf.Legalmoves;
 
@@ -80,7 +72,7 @@ namespace Rudz.Chess
             if (Flags.HasFlagFast(Emgf.Stages))
                 return;
 
-            if (Table.TryGetValue(Key, out var moves) && !force)
+            if (Table.TryGetValue(_position.State.Key, out var moves) && !force)
                 Moves = moves;
             else
             {
@@ -90,7 +82,7 @@ namespace Rudz.Chess
                 GCSettings.LatencyMode = GCLatencyMode.LowLatency;
                 GenerateCapturesAndPromotions(moves);
                 GenerateQuietMoves(moves);
-                Table.TryAdd(Key, moves);
+                Table.TryAdd(_position.State.Key, moves);
                 Moves = moves;
                 GCSettings.LatencyMode = old;
             }
@@ -111,7 +103,7 @@ namespace Rudz.Chess
 
             _position.IsProbing = true;
             _position.MakeMove(move);
-            var opponentAttacking = _position.IsAttacked(_position.GetPieceSquare(EPieceType.King, SideToMove), ~SideToMove);
+            var opponentAttacking = _position.IsAttacked(_position.GetPieceSquare(EPieceType.King, _position.State.SideToMove), ~_position.State.SideToMove);
             _position.TakeMove(move);
             _position.IsProbing = false;
             return !opponentAttacking;
@@ -149,7 +141,7 @@ namespace Rudz.Chess
 
                 // TODO : Test with unit test
                 var opponent = ~move.GetMovingSide();
-                if (EnPassantSquare.PawnAttack(opponent) & _position.Pieces(EPieceType.Pawn, opponent))
+                if (_position.State.EnPassantSquare.PawnAttack(opponent) & _position.Pieces(EPieceType.Pawn, opponent))
                     return true;
             }
             else if (move.IsCaptureMove())
@@ -199,7 +191,7 @@ namespace Rudz.Chess
                 flags &= ~Emgf.Stages;
 
             Pinned = flags.HasFlagFast(Emgf.Legalmoves)
-                ? _position.GetPinnedPieces(_position.GetPieceSquare(EPieceType.King, SideToMove), SideToMove)
+                ? _position.GetPinnedPieces(_position.GetPieceSquare(EPieceType.King, _position.State.SideToMove), _position.State.SideToMove)
                 : BitBoards.EmptyBitBoard;
 
             Flags = flags;
@@ -207,7 +199,7 @@ namespace Rudz.Chess
 
         private void GenerateCapturesAndPromotions(ICollection<Move> moves)
         {
-            var currentSide = SideToMove;
+            var currentSide = _position.State.SideToMove;
             var them = ~currentSide;
             var occupiedByThem = _position.OccupiedBySide[them.Side];
             var (northEast, northWest) = currentSide == PlayerExtensions.White ? (EDirection.NorthEast, EDirection.NorthWest) : (EDirection.SouthEast, EDirection.SouthWest);
@@ -220,16 +212,16 @@ namespace Rudz.Chess
             AddPawnMoves(moves, pawns.Shift(northEast) & occupiedByThem, currentSide.PawnWestAttackDistance(), EMoveType.Capture);
             AddPawnMoves(moves,  pawns.Shift(northWest) & occupiedByThem, currentSide.PawnEastAttackDistance(), EMoveType.Capture);
 
-            if (EnPassantSquare == ESquare.none)
+            if (_position.State.EnPassantSquare == ESquare.none)
                 return;
 
-            AddPawnMoves(moves, pawns.Shift(northEast) & EnPassantSquare, currentSide.PawnWestAttackDistance(), EMoveType.Epcapture);
-            AddPawnMoves(moves, pawns.Shift(northWest) & EnPassantSquare, currentSide.PawnEastAttackDistance(), EMoveType.Epcapture);
+            AddPawnMoves(moves, pawns.Shift(northEast) & _position.State.EnPassantSquare, currentSide.PawnWestAttackDistance(), EMoveType.Epcapture);
+            AddPawnMoves(moves, pawns.Shift(northWest) & _position.State.EnPassantSquare, currentSide.PawnEastAttackDistance(), EMoveType.Epcapture);
         }
 
         private void GenerateQuietMoves(ICollection<Move> moves)
         {
-            var currentSide = SideToMove;
+            var currentSide = _position.State.SideToMove;
             var up = currentSide == PlayerExtensions.White ? EDirection.North : EDirection.South;
             var notOccupied = ~_position.Occupied;
             var pushed = (_position.Pieces(EPieceType.Pawn, currentSide) & ~currentSide.Rank7()).Shift(up) & notOccupied;
@@ -266,7 +258,7 @@ namespace Rudz.Chess
             if (type.HasFlagFast(EMoveType.Capture))
                 move = new Move(piece, _position.GetPiece(to), from, to, type, promoted);
             else if (type.HasFlagFast(EMoveType.Epcapture))
-                move = new Move(piece, EPieceType.Pawn.MakePiece(~SideToMove), from, to, type, promoted);
+                move = new Move(piece, EPieceType.Pawn.MakePiece(~_position.State.SideToMove), from, to, type, promoted);
             else
                 move = new Move(piece, from, to, type, promoted);
 
@@ -298,7 +290,7 @@ namespace Rudz.Chess
         /// <param name="targetSquares">The target squares to move to</param>
         private void AddMoves(ICollection<Move> moves, BitBoard targetSquares)
         {
-            var c = SideToMove;
+            var c = _position.State.SideToMove;
 
             var occupied = _position.Occupied;
 
@@ -316,7 +308,7 @@ namespace Rudz.Chess
             if (targetSquares.Empty())
                 return;
 
-            var piece = EPieceType.Pawn.MakePiece(SideToMove);
+            var piece = EPieceType.Pawn.MakePiece(_position.State.SideToMove);
 
             foreach (var squareTo in targetSquares)
             {
@@ -324,11 +316,11 @@ namespace Rudz.Chess
                 if (squareTo.IsPromotionRank())
                 {
                     if (Flags.HasFlagFast(Emgf.Queenpromotion))
-                        AddMove(moves, piece, squareFrom, squareTo, EPieceType.Queen.MakePiece(SideToMove),
+                        AddMove(moves, piece, squareFrom, squareTo, EPieceType.Queen.MakePiece(_position.State.SideToMove),
                             type | EMoveType.Promotion);
                     else
                         for (var promotedPiece = EPieceType.Queen; promotedPiece >= EPieceType.Knight; promotedPiece--)
-                            AddMove(moves, piece, squareFrom, squareTo, promotedPiece.MakePiece(SideToMove),
+                            AddMove(moves, piece, squareFrom, squareTo, promotedPiece.MakePiece(_position.State.SideToMove),
                                 type | EMoveType.Promotion);
                 }
                 else
@@ -337,7 +329,7 @@ namespace Rudz.Chess
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void AddCastleMove(ICollection<Move> moves, Square from, Square to) => AddMove(moves, EPieceType.King.MakePiece(SideToMove), from, to, PieceExtensions.EmptyPiece, EMoveType.Castle);
+        private void AddCastleMove(ICollection<Move> moves, Square from, Square to) => AddMove(moves, EPieceType.King.MakePiece(_position.State.SideToMove), from, to, PieceExtensions.EmptyPiece, EMoveType.Castle);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private bool CanCastle(ECastleling type)
@@ -347,7 +339,7 @@ namespace Rudz.Chess
             {
                 case ECastleling.Short:
                 case ECastleling.Long:
-                    return CastlelingRights.HasFlagFast(type.GetCastleAllowedMask(SideToMove)) && IsCastleAllowed(type.GetKingCastleTo(SideToMove));
+                    return _position.State.CastlelingRights.HasFlagFast(type.GetCastleAllowedMask(_position.State.SideToMove)) && IsCastleAllowed(type.GetKingCastleTo(_position.State.SideToMove));
 
                 default:
                     throw new ArgumentException("Illegal castleling type.");
@@ -356,7 +348,7 @@ namespace Rudz.Chess
 
         private bool IsCastleAllowed(Square square)
         {
-            var c = SideToMove;
+            var c = _position.State.SideToMove;
             // The complexity of this function is mainly due to the support for Chess960 variant.
             var rookTo = square.GetRookCastleTo();
             var rookFrom = _position.GetRookCastleFrom(square);

@@ -82,6 +82,8 @@ namespace Rudz.Chess
 
         public bool InCheck { get; set; }
 
+        public State State { get; set; }
+
         public void Clear()
         {
             BoardLayout.Fill(EPieces.NoPiece);
@@ -272,7 +274,7 @@ namespace Rudz.Chess
 
             Player c = pc.ColorOf();
 
-            return (square.PassedPawnFrontAttackSpan(c) & Pieces(EPieceType.Pawn, c)) == 0;
+            return (square.PassedPawnFrontAttackSpan(c) & Pieces(EPieceType.Pawn, c)).Empty();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

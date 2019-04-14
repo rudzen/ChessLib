@@ -78,12 +78,12 @@ namespace Rudz.Chess
                 _stateList[i] = new State(Position);
 
             PositionIndex = 0;
-            State = _stateList[PositionIndex];
+            Position.State = _stateList[PositionIndex];
             _chess960 = false;
             _xfen = false;
         }
 
-        public State State { get; private set; }
+        public State State => Position.State;
 
         public int PositionIndex { get; private set; }
 
@@ -118,7 +118,7 @@ namespace Rudz.Chess
 
             // advances the position
             var previous = _stateList[PositionIndex++];
-            State = _stateList[PositionIndex];
+            Position.State = _stateList[PositionIndex];
             State.SideToMove = ~previous.SideToMove;
             State.Material = previous.Material;
             State.LastMove = move;
@@ -154,7 +154,7 @@ namespace Rudz.Chess
             // careful.. NO check for invalid PositionIndex.. make sure it's always counted correctly
             Position.TakeMove(State.LastMove);
             --PositionIndex;
-            State = _stateList[PositionIndex];
+            Position.State = _stateList[PositionIndex];
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -281,7 +281,7 @@ namespace Rudz.Chess
 
             first.ToIntegral(out number);
 
-            State = _stateList[PositionIndex];
+            Position.State = _stateList[PositionIndex];
 
             State.ReversibleHalfMoveCount = number;
 

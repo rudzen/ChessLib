@@ -47,6 +47,8 @@ namespace Rudz.Chess
 
         bool InCheck { get; set; }
 
+        State State { get; set; }
+
         void Clear();
 
         void AddPiece(Piece piece, Square square);
