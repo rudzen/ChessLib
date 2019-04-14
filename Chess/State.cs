@@ -26,9 +26,6 @@ SOFTWARE.
 
 namespace Rudz.Chess
 {
-    using Enums;
-    using Extensions;
-    using Properties;
     using System.Linq;
     using System.Runtime.CompilerServices;
     using Types;
@@ -37,17 +34,17 @@ namespace Rudz.Chess
     {
         public Move LastMove { get; set; }
 
-        public IMaterial Material;
+        public IMaterial Material { get; set; }
 
-        public ulong PawnStructureKey;
+        public ulong PawnStructureKey { get; set; }
 
-        public int ReversibleHalfMoveCount;
+        public int ReversibleHalfMoveCount { get; set; }
 
-        public int NullMovesInRow;
+        public int NullMovesInRow { get; set; }
 
         public int FiftyMoveRuleCounter { get; set; }
 
-        public State([NotNull] Position position)
+        public State(IPosition position)
             : base(position)
         {
             Material = new Material();

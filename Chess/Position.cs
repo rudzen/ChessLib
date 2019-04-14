@@ -28,7 +28,6 @@ namespace Rudz.Chess
 {
     using Enums;
     using Extensions;
-    using Properties;
     using System;
     using System.Collections;
     using System.Collections.Generic;
@@ -46,13 +45,10 @@ namespace Rudz.Chess
 
         private static readonly Func<BitBoard, BitBoard>[] EnPasCapturePos;
 
-        [NotNull]
         private readonly Square[] _rookCastlesFrom; // indexed by position of the king
 
-        [NotNull]
         private readonly Square[] _castleShortKingFrom;
 
-        [NotNull]
         private readonly Square[] _castleLongKingFrom;
 
         public Position(Action<Piece, Square> pieceUpdateCallback)
@@ -70,15 +66,10 @@ namespace Rudz.Chess
 
         static Position() => EnPasCapturePos = new Func<BitBoard, BitBoard>[] { BitBoards.SouthOne, BitBoards.NorthOne };
 
-        // TODO : redesign BoardPieces + OccupiedBySide into simple arrays
-
-        [NotNull]
         public BitBoard[] BoardPieces { get; }
 
-        [NotNull]
         public BitBoard[] OccupiedBySide { get; }
 
-        [NotNull]
         public Square[] KingSquares { get; }
 
         public bool IsProbing { get; set; }

@@ -32,7 +32,6 @@ namespace Rudz.Chess
     using Enums;
     using Extensions;
     using Fen;
-    using Properties;
     using System;
     using System.Collections;
     using System.Collections.Generic;
@@ -51,13 +50,10 @@ namespace Rudz.Chess
         /// <summary>
         /// [short/long, side] castle positional | array when altering castleling rights.
         /// </summary>
-        [NotNull]
         private static readonly int[,] CastlePositionalOr;
 
-        [NotNull]
         private readonly int[] _castleRightsMask;
 
-        [NotNull]
         private readonly State[] _stateList;
 
         private readonly StringBuilder _output;
@@ -89,7 +85,6 @@ namespace Rudz.Chess
             _xfen = false;
         }
 
-        [NotNull]
         public State State { get; private set; }
 
         public int PositionIndex { get; private set; }
@@ -100,7 +95,6 @@ namespace Rudz.Chess
 
         public BitBoard Occupied => Position.Occupied;
 
-        [NotNull]
         public Position Position { get; }
 
         public EGameEndType GameEndType { get; set; }
@@ -166,7 +160,7 @@ namespace Rudz.Chess
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public FenError NewGame([CanBeNull] string fen = Fen.Fen.StartPositionFen) => SetFen(fen);
+        public FenError NewGame(string fen = Fen.Fen.StartPositionFen) => SetFen(fen);
 
         public FenError SetFen(FenData fenData) => SetFen(fenData.Fen);
 
@@ -186,7 +180,7 @@ namespace Rudz.Chess
         /// -6 = Error while parsing en-passant square
         /// -9 = FEN length exceeding maximum
         /// </returns>
-        public FenError SetFen([CanBeNull] string fenString, bool validate = false)
+        public FenError SetFen(string fenString, bool validate = false)
         {
             // TODO : Replace with stream at some point
 
@@ -328,7 +322,7 @@ namespace Rudz.Chess
         /// The stringbuilder used to generate the string with
         /// </param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void MoveToString(Move move, [NotNull] StringBuilder output)
+        public void MoveToString(Move move, StringBuilder output)
         {
             if (_chess960 || move.IsCastlelingMove())
             {

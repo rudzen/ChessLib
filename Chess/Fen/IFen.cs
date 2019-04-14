@@ -24,13 +24,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using Rudz.Chess.Properties;
-
 namespace Rudz.Chess.Fen
 {
     public interface IFenData
     {
-        [CanBeNull]
         string Fen { get; set; }
 
         void Advance();

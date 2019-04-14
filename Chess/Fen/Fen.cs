@@ -31,7 +31,6 @@ namespace Rudz.Chess.Fen
     using EnsureThat;
     using Enums;
     using Extensions;
-    using Properties;
     using System;
     using System.Runtime.CompilerServices;
     using System.Text;
@@ -72,7 +71,7 @@ namespace Rudz.Chess.Fen
         /// <returns>
         /// The FenData which contains the fen string that was generated.
         /// </returns>
-        public static FenData GenerateFen([NotNull] this State state, Piece[] boardLayout, int halfMoveCount)
+        public static FenData GenerateFen(this State state, Piece[] boardLayout, int halfMoveCount)
         {
             EnsureArg.IsNotNull(boardLayout, nameof(boardLayout));
             EnsureArg.IsGte(halfMoveCount, 0, nameof(halfMoveCount));

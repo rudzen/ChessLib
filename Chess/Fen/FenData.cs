@@ -27,13 +27,12 @@ SOFTWARE.
 // ReSharper disable PossibleNullReferenceException
 // ReSharper disable ExceptionNotDocumentedOptional
 
-using System;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using Rudz.Chess.Properties;
-
 namespace Rudz.Chess.Fen
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Runtime.CompilerServices;
+
     /// <summary>
     /// FenData contains a FEN string and an index pointer to a location in the FEN string.
     /// For more information about the format, see
@@ -51,7 +50,7 @@ namespace Rudz.Chess.Fen
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public FenData([NotNull] string fen, int index = 0)
+        public FenData(string fen, int index = 0)
         {
             Fen = fen;
             _index = index;
