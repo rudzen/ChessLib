@@ -479,6 +479,54 @@ namespace Rudz.Chess
             return MoveExtensions.EmptyMove;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool CanCastle(ECastleling type)
+        {
+            // ReSharper disable once SwitchStatementMissingSomeCases
+            switch (type)
+            {
+                case ECastleling.Short:
+                case ECastleling.Long:
+                    return State.CastlelingRights.HasFlagFast(type.GetCastleAllowedMask(State.SideToMove)) && IsCastleAllowed(type.GetKingCastleTo(State.SideToMove));
+
+                default:
+                    throw new ArgumentException("Illegal castleling type.");
+            }
+        }
+
+        public bool IsCastleAllowed(Square square)
+        {
+            var c = State.SideToMove;
+            // The complexity of this function is mainly due to the support for Chess960 variant.
+            var rookTo = square.GetRookCastleTo();
+            var rookFrom = GetRookCastleFrom(square);
+            var ksq = GetPieceSquare(EPieceType.King, c);
+
+            // The pieces in question.. rook and king
+            var castlePieces = rookFrom | ksq;
+
+            // The span between the rook and the king
+            var castleSpan = ksq.BitboardBetween(rookFrom) | rookFrom.BitboardBetween(rookTo) | castlePieces | rookTo | square;
+
+            // check that the span AND current occupied pieces are no different that the piece themselves.
+            if ((castleSpan & Occupied) != castlePieces)
+                return false;
+
+            // Check that no square between the king's initial and final squares (including the initial and final squares)
+            // may be under attack by an enemy piece. Initial square was already checked a this point.
+
+            c = ~c;
+
+            // ReSharper disable once LoopCanBeConvertedToQuery
+            foreach (var s in ksq.BitboardBetween(square) | square)
+            {
+                if (IsAttacked(s, c))
+                    return false;
+            }
+
+            return true;
+        }
+
         public IEnumerator<Piece> GetEnumerator()
         {
             // ReSharper disable once ForCanBeConvertedToForeach

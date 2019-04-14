@@ -116,5 +116,9 @@ namespace Rudz.Chess
         ECastleling IsCastleMove(string m);
 
         Move StringToMove(string m, State state);
+
+        bool CanCastle(ECastleling type);
+
+        bool IsCastleAllowed(Square square);
     }
 }

@@ -128,7 +128,7 @@ namespace Rudz.Chess
             if (move.IsCastlelingMove())
             {
                 // TODO : Basic castleling verification
-                if (CanCastle(move.GetFromSquare() < to ? ECastleling.Short : ECastleling.Long))
+                if (_position.CanCastle(move.GetFromSquare() < to ? ECastleling.Short : ECastleling.Long))
                     return true;
 
                 var mg = new MoveGenerator(_position);
@@ -236,7 +236,7 @@ namespace Rudz.Chess
                 return;
 
             for (var castleType = ECastleling.Short; castleType < ECastleling.CastleNb; castleType++)
-                if (CanCastle(castleType))
+                if (_position.CanCastle(castleType))
                     AddCastleMove(moves, _position.GetKingCastleFrom(currentSide, castleType), castleType.GetKingCastleTo(currentSide));
         }
 
@@ -330,53 +330,5 @@ namespace Rudz.Chess
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void AddCastleMove(ICollection<Move> moves, Square from, Square to) => AddMove(moves, EPieceType.King.MakePiece(_position.State.SideToMove), from, to, PieceExtensions.EmptyPiece, EMoveType.Castle);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private bool CanCastle(ECastleling type)
-        {
-            // ReSharper disable once SwitchStatementMissingSomeCases
-            switch (type)
-            {
-                case ECastleling.Short:
-                case ECastleling.Long:
-                    return _position.State.CastlelingRights.HasFlagFast(type.GetCastleAllowedMask(_position.State.SideToMove)) && IsCastleAllowed(type.GetKingCastleTo(_position.State.SideToMove));
-
-                default:
-                    throw new ArgumentException("Illegal castleling type.");
-            }
-        }
-
-        private bool IsCastleAllowed(Square square)
-        {
-            var c = _position.State.SideToMove;
-            // The complexity of this function is mainly due to the support for Chess960 variant.
-            var rookTo = square.GetRookCastleTo();
-            var rookFrom = _position.GetRookCastleFrom(square);
-            var ksq = _position.GetPieceSquare(EPieceType.King, c);
-
-            // The pieces in question.. rook and king
-            var castlePieces = rookFrom | ksq;
-
-            // The span between the rook and the king
-            var castleSpan = ksq.BitboardBetween(rookFrom) | rookFrom.BitboardBetween(rookTo) | castlePieces | rookTo | square;
-
-            // check that the span AND current occupied pieces are no different that the piece themselves.
-            if ((castleSpan & _position.Occupied) != castlePieces)
-                return false;
-
-            // Check that no square between the king's initial and final squares (including the initial and final squares)
-            // may be under attack by an enemy piece. Initial square was already checked a this point.
-
-            c = ~c;
-
-            // ReSharper disable once LoopCanBeConvertedToQuery
-            foreach (var s in ksq.BitboardBetween(square) | square)
-            {
-                if (_position.IsAttacked(s, c))
-                    return false;
-            }
-
-            return true;
-        }
     }
 }
