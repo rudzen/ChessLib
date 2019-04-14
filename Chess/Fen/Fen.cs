@@ -115,16 +115,16 @@ namespace Rudz.Chess.Fen
 
             if (castleRights != 0)
             {
-                if ((castleRights & 1) != 0)
+                if (castleRights.HasFlagFast(ECastlelingRights.WhiteOO))
                     sv.Append('K');
 
-                if ((castleRights & 2) != 0)
+                if (castleRights.HasFlagFast(ECastlelingRights.WhiteOOO))
                     sv.Append('Q');
 
-                if ((castleRights & 4) != 0)
+                if (castleRights.HasFlagFast(ECastlelingRights.BlackOO))
                     sv.Append('k');
 
-                if ((castleRights & 8) != 0)
+                if (castleRights.HasFlagFast(ECastlelingRights.BlackOOO))
                     sv.Append('q');
             }
             else

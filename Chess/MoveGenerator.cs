@@ -55,7 +55,7 @@ namespace Rudz.Chess
             _position = position;
         }
 
-        public int CastlelingRights { get; set; }
+        public ECastlelingRights CastlelingRights { get; set; }
 
         public Square EnPassantSquare { get; set; }
 
@@ -347,7 +347,7 @@ namespace Rudz.Chess
             {
                 case ECastleling.Short:
                 case ECastleling.Long:
-                    return (CastlelingRights & type.GetCastleAllowedMask(SideToMove)) != 0 && IsCastleAllowed(type.GetKingCastleTo(SideToMove));
+                    return CastlelingRights.HasFlagFast(type.GetCastleAllowedMask(SideToMove)) && IsCastleAllowed(type.GetKingCastleTo(SideToMove));
 
                 default:
                     throw new ArgumentException("Illegal castleling type.");

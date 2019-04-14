@@ -24,8 +24,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-// ReSharper disable RedundantCheckBeforeAssignment
-
 namespace Rudz.Chess
 {
     using Data;
@@ -50,9 +48,9 @@ namespace Rudz.Chess
         /// <summary>
         /// [short/long, side] castle positional | array when altering castleling rights.
         /// </summary>
-        private static readonly int[,] CastlePositionalOr;
+        private static readonly ECastlelingRights[,] CastlePositionalOr;
 
-        private readonly int[] _castleRightsMask;
+        private readonly ECastlelingRights[] _castleRightsMask;
 
         private readonly State[] _stateList;
 
@@ -64,14 +62,14 @@ namespace Rudz.Chess
 
         private int _repetitionCounter;
 
-        static Game() => CastlePositionalOr = new[,] { { 1, 4 }, { 2, 8 } };
+        static Game() => CastlePositionalOr = new[,] { { ECastlelingRights.WhiteOO, ECastlelingRights.BlackOO }, { ECastlelingRights.WhiteOOO, ECastlelingRights.BlackOOO } };
 
         public Game()
             : this(null) { }
 
         public Game(Action<Piece, Square> pieceUpdateCallback)
         {
-            _castleRightsMask = new int[64];
+            _castleRightsMask = new ECastlelingRights[64];
             Position = new Position(pieceUpdateCallback);
             _stateList = new State[MaxPositions];
             _output = new StringBuilder(256);
@@ -315,12 +313,8 @@ namespace Rudz.Chess
         /// Converts a move data type to move notation string format which chess engines understand.
         /// e.g. "a2a4", "a7a8q"
         /// </summary>
-        /// <param name="move">
-        /// The move to convert
-        /// </param>
-        /// <param name="output">
-        /// The stringbuilder used to generate the string with
-        /// </param>
+        /// <param name="move">The move to convert</param>
+        /// <param name="output">The string builder used to generate the string with</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void MoveToString(Move move, StringBuilder output)
         {
@@ -373,11 +367,8 @@ namespace Rudz.Chess
                 _output.Append(space);
                 for (var file = EFile.FileA; file <= EFile.FileH; file++)
                 {
-                    _output.Append(splitter);
                     var piece = Position.GetPiece(new Square((int)file, (int)rank));
-                    _output.Append(space);
-                    _output.Append(piece.GetPieceChar());
-                    _output.Append(space);
+                    _output.AppendFormat("{0}{1}{2}{1}", splitter, space, piece.GetPieceChar());
                 }
 
                 _output.Append(splitter);
@@ -439,9 +430,9 @@ namespace Rudz.Chess
         }
 
         /// <summary>
-        /// Updates the hashkey depending on a move
+        /// Updates the hash key depending on a move
         /// </summary>
-        /// <param name="move">The move the hashkey is depending on</param>
+        /// <param name="move">The move the hash key is depending on</param>
         private void UpdateKey(Move move)
         {
             // TODO : Merge with MakeMove to avoid duplicate ifs
@@ -530,7 +521,7 @@ namespace Rudz.Chess
         private int SetupCastleling(IFenData fen)
         {
             // reset castleling rights to defaults
-            _castleRightsMask.Fill(15);
+            _castleRightsMask.Fill(ECastlelingRights.Any);
 
             if (fen.Get() == '-')
             {
