@@ -132,7 +132,7 @@ namespace Rudz.Chess
             State.LastMove = move;
 
             // compute in-check
-            State.InCheck = Position.IsAttacked(Position.KingSquares[State.SideToMove.Side], ~State.SideToMove);
+            Position.InCheck = Position.IsAttacked(Position.KingSquares[State.SideToMove.Side], ~State.SideToMove);
             State.CastlelingRights = _stateList[PositionIndex - 1].CastlelingRights & _castleRightsMask[move.GetFromSquare().ToInt()] & _castleRightsMask[move.GetToSquare().ToInt()];
             State.NullMovesInRow = 0;
 
@@ -307,7 +307,7 @@ namespace Rudz.Chess
             if (State.EnPassantSquare != ESquare.none)
                 State.Key ^= Zobrist.GetZobristEnPessant(State.EnPassantSquare.File().ToInt());
 
-            State.InCheck = Position.IsAttacked(Position.KingSquares[player.Side], ~State.SideToMove);
+            Position.InCheck = Position.IsAttacked(Position.KingSquares[player.Side], ~State.SideToMove);
 
             State.GenerateMoves(true);
 

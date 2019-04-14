@@ -59,7 +59,6 @@ namespace Rudz.Chess
 
         public void Clear()
         {
-            InCheck = false;
             CastlelingRights = 0;
             ReversibleHalfMoveCount = 0;
             PawnStructureKey = 0;

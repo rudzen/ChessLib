@@ -47,6 +47,8 @@ namespace Rudz.Chess
 
         Action<Piece, Square> PieceUpdated { get; }
 
+        bool InCheck { get; set; }
+
         void Clear();
 
         void AddPiece(Piece piece, Square square);

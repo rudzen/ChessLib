@@ -136,7 +136,7 @@ namespace Rudz.Chess.Types
                 }
             }
 
-            if (moveGenerator.InCheck)
+            if (pos.InCheck)
                 notation.Append(moveGenerator.GetCheckChar());
 
             return notation.ToString();
@@ -190,7 +190,7 @@ namespace Rudz.Chess.Types
                 }
             }
 
-            if (moveGenerator.InCheck)
+            if (pos.InCheck)
                 notation.Append(moveGenerator.GetCheckChar());
 
             return notation.ToString();
@@ -244,7 +244,7 @@ namespace Rudz.Chess.Types
                 }
             }
 
-            if (moveGenerator.InCheck)
+            if (pos.InCheck)
                 notation.Append(moveGenerator.GetCheckChar());
 
             return notation.ToString();
@@ -302,7 +302,7 @@ namespace Rudz.Chess.Types
                 }
             }
 
-            if (moveGenerator.InCheck)
+            if (pos.InCheck)
                 notation.Append(moveGenerator.GetCheckChar());
 
             return notation.ToString();

@@ -63,8 +63,6 @@ namespace Rudz.Chess
 
         public int CastlelingRights { get; set; }
 
-        public bool InCheck { get; set; }
-
         public Square EnPassantSquare { get; set; }
 
         public Player SideToMove { get; set; }
@@ -114,7 +112,7 @@ namespace Rudz.Chess
         /// <returns>true if legal, otherwise false</returns>
         public bool IsLegal(Move move, Piece piece, Square from, EMoveType type)
         {
-            if (!InCheck && piece.Type() != EPieceType.King && (Pinned & from).Empty() && !type.HasFlagFast(EMoveType.Epcapture))
+            if (!_position.InCheck && piece.Type() != EPieceType.King && (Pinned & from).Empty() && !type.HasFlagFast(EMoveType.Epcapture))
                 return true;
 
             _position.IsProbing = true;
@@ -238,7 +236,7 @@ namespace Rudz.Chess
         private void GenerateQuietMoves(ICollection<Move> moves)
         {
             var currentSide = SideToMove;
-            if (!InCheck)
+            if (!_position.InCheck)
                 for (var castleType = ECastleling.Short; castleType < ECastleling.CastleNb; castleType++)
                     if (CanCastle(castleType))
                         AddCastleMove(moves, _position.GetKingCastleFrom(currentSide, castleType), castleType.GetKingCastleTo(currentSide));

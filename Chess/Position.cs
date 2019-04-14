@@ -92,6 +92,8 @@ namespace Rudz.Chess
         /// </summary>
         public Action<Piece, Square> PieceUpdated { get; }
 
+        public bool InCheck { get; set; }
+
         public void Clear()
         {
             BoardLayout.Fill(EPieces.NoPiece);

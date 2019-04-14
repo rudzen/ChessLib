@@ -54,7 +54,7 @@ namespace Chess.Test.Gameplay
                 Assert.True(game.MakeMove(move));
 
             // verify in check is actually true
-            Assert.True(game.State.InCheck);
+            Assert.True(game.Position.InCheck);
 
             game.State.Flags = Emgf.Legalmoves;
 
