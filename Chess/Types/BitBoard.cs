@@ -175,34 +175,42 @@ namespace Rudz.Chess.Types
         public void Clear() => Value = 0;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Set(int pos) => Value |= BitBoards.One << pos;
+        public void SetBit(int pos) => Value |= BitBoards.One << pos;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Set(ulong data) => Value = data;
+        public BitBoard Xor(int pos) => Value ^ (uint)pos;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Xor(int pos) => Value ^= (uint)pos;
+        public BitBoard And(BitBoard other) => Value & other;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void OrAll(params BitBoard[] bbs)
+        public BitBoard Or(BitBoard other) => Value | other;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public BitBoard OrAll(params BitBoard[] bbs)
         {
-            // ReSharper disable once ForCanBeConvertedToForeach
+            var val = Value;
             for (var i = 0; i < bbs.Length; ++i)
-                Value |= bbs[i].Value;
+                val |= bbs[i].Value;
+            return val;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void OrAll(IEnumerable<BitBoard> bbs)
+        public BitBoard OrAll(IEnumerable<BitBoard> bbs)
         {
+            var val = Value;
             foreach (var bb in bbs)
-                Value |= bb.Value;
+                val |= bb.Value;
+            return val;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void OrAll(IEnumerable<Square> sqs)
+        public BitBoard OrAll(IEnumerable<Square> sqs)
         {
+            var b = this;
             foreach (var sq in sqs)
-                this |= sq;
+                b |= sq;
+            return b;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

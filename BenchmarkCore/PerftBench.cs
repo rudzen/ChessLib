@@ -3,7 +3,7 @@
     using BenchmarkDotNet.Attributes;
     using Rudz.Chess.Perft;
 
-    [ClrJob(true), CoreJob]
+    //[ClrJob(true), CoreJob]
     //[RPlotExporter, RankColumn]
     public class PerftBench
     {

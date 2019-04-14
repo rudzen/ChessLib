@@ -39,12 +39,6 @@ namespace Rudz.Chess
     {
         private static readonly ConcurrentDictionary<ulong, List<Move>> Table;
 
-        // to be replaced
-        private readonly Func<BitBoard, BitBoard>[] _pawnAttacksWest = { BitBoards.NorthEastOne, BitBoards.SouthEastOne };
-
-        // to be replaced
-        private readonly Func<BitBoard, BitBoard>[] _pawnAttacksEast = { BitBoards.NorthWestOne, BitBoards.SouthWestOne };
-
         private readonly IPosition _position;
 
         static MoveGenerator()
@@ -168,9 +162,7 @@ namespace Rudz.Chess
                     return false;
             }
             else if ((_position.Occupied & to) != 0)
-            {
                 return false;
-            }
 
             // ReSharper disable once SwitchStatementMissingSomeCases
             switch (move.GetMovingPiece().Type())
@@ -218,34 +210,42 @@ namespace Rudz.Chess
             var currentSide = SideToMove;
             var them = ~currentSide;
             var occupiedByThem = _position.OccupiedBySide[them.Side];
+            var (northEast, northWest) = currentSide == PlayerExtensions.White ? (EDirection.NorthEast, EDirection.NorthWest) : (EDirection.SouthEast, EDirection.SouthWest);
 
             AddMoves(moves, occupiedByThem);
 
             var pawns = _position.Pieces(EPieceType.Pawn, currentSide);
 
             AddPawnMoves(moves, currentSide.PawnPush(pawns & currentSide.Rank7()) & ~_position.Occupied, currentSide.PawnPushDistance(), EMoveType.Quiet);
-            AddPawnMoves(moves, _pawnAttacksWest[currentSide.Side](pawns) & occupiedByThem, currentSide.PawnWestAttackDistance(), EMoveType.Capture);
-            AddPawnMoves(moves, _pawnAttacksEast[currentSide.Side](pawns) & occupiedByThem, currentSide.PawnEastAttackDistance(), EMoveType.Capture);
-            if (EnPassantSquare != ESquare.none)
-            {
-                AddPawnMoves(moves, _pawnAttacksWest[currentSide.Side](pawns) & EnPassantSquare, currentSide.PawnWestAttackDistance(), EMoveType.Epcapture);
-                AddPawnMoves(moves, _pawnAttacksEast[currentSide.Side](pawns) & EnPassantSquare, currentSide.PawnEastAttackDistance(), EMoveType.Epcapture);
-            }
+            AddPawnMoves(moves, pawns.Shift(northEast) & occupiedByThem, currentSide.PawnWestAttackDistance(), EMoveType.Capture);
+            AddPawnMoves(moves,  pawns.Shift(northWest) & occupiedByThem, currentSide.PawnEastAttackDistance(), EMoveType.Capture);
+
+            if (EnPassantSquare == ESquare.none)
+                return;
+
+            AddPawnMoves(moves, pawns.Shift(northEast) & EnPassantSquare, currentSide.PawnWestAttackDistance(), EMoveType.Epcapture);
+            AddPawnMoves(moves, pawns.Shift(northWest) & EnPassantSquare, currentSide.PawnEastAttackDistance(), EMoveType.Epcapture);
         }
 
         private void GenerateQuietMoves(ICollection<Move> moves)
         {
             var currentSide = SideToMove;
-            if (!_position.InCheck)
-                for (var castleType = ECastleling.Short; castleType < ECastleling.CastleNb; castleType++)
-                    if (CanCastle(castleType))
-                        AddCastleMove(moves, _position.GetKingCastleFrom(currentSide, castleType), castleType.GetKingCastleTo(currentSide));
-
+            var up = currentSide == PlayerExtensions.White ? EDirection.North : EDirection.South;
             var notOccupied = ~_position.Occupied;
-            var pushed = currentSide.PawnPush(_position.Pieces(EPieceType.Pawn, currentSide).Value & ~currentSide.Rank7()) & notOccupied;
-            AddPawnMoves(moves, pushed.Value, currentSide.PawnPushDistance(), EMoveType.Quiet);
-            AddPawnMoves(moves, currentSide.PawnPush(pushed.Value & currentSide.Rank3()) & notOccupied, currentSide.PawnDoublePushDistance(), EMoveType.Doublepush);
+            var pushed = (_position.Pieces(EPieceType.Pawn, currentSide) & ~currentSide.Rank7()).Shift(up) & notOccupied;
+            AddPawnMoves(moves, pushed, currentSide.PawnPushDistance(), EMoveType.Quiet);
+
+            pushed &= currentSide.Rank3();
+            AddPawnMoves(moves, pushed.Shift(up) & notOccupied, currentSide.PawnDoublePushDistance(), EMoveType.Doublepush);
+
             AddMoves(moves, notOccupied);
+
+            if (_position.InCheck)
+                return;
+
+            for (var castleType = ECastleling.Short; castleType < ECastleling.CastleNb; castleType++)
+                if (CanCastle(castleType))
+                    AddCastleMove(moves, _position.GetKingCastleFrom(currentSide, castleType), castleType.GetKingCastleTo(currentSide));
         }
 
         /// <summary>
