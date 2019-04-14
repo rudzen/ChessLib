@@ -60,7 +60,6 @@ namespace Rudz.Chess
             BoardLayout = new Piece[64];
             BoardPieces = new BitBoard[2 << 3];
             OccupiedBySide = new BitBoard[2];
-            KingSquares = new Square[2];
             Clear();
         }
 
@@ -69,8 +68,6 @@ namespace Rudz.Chess
         public BitBoard[] BoardPieces { get; }
 
         public BitBoard[] OccupiedBySide { get; }
-
-        public Square[] KingSquares { get; }
 
         public bool IsProbing { get; set; }
 
@@ -89,7 +86,6 @@ namespace Rudz.Chess
         {
             BoardLayout.Fill(EPieces.NoPiece);
             OccupiedBySide.Fill(Zero);
-            KingSquares.Fill(ESquare.none);
             BoardPieces.Fill(Zero);
             Occupied = Zero;
         }
@@ -103,10 +99,10 @@ namespace Rudz.Chess
             OccupiedBySide[color] |= bbsq;
             Occupied |= bbsq;
             BoardLayout[square.ToInt()] = piece;
-            if (piece.Type() == EPieceType.King)
-                KingSquares[color] = square;
+
             if (IsProbing)
                 return;
+
             PieceUpdated?.Invoke(piece, square);
         }
 
@@ -118,8 +114,6 @@ namespace Rudz.Chess
             OccupiedBySide[side.Side] |= square;
             Occupied |= square;
             BoardLayout[square.ToInt()] = piece;
-            if (pieceType == EPieceType.King)
-                KingSquares[side.Side] = square;
 
             if (IsProbing)
                 return;
@@ -139,7 +133,6 @@ namespace Rudz.Chess
                 RemovePiece(move.GetFromSquare(), king);
                 AddPiece(rook, toSquare.GetRookCastleTo());
                 AddPiece(king, toSquare);
-                KingSquares[move.GetMovingSide().Side] = toSquare;
                 return;
             }
 
@@ -155,9 +148,6 @@ namespace Rudz.Chess
                 RemovePiece(toSquare, move.GetCapturedPiece());
 
             AddPiece(move.IsPromotionMove() ? move.GetPromotedPiece() : move.GetMovingPiece(), toSquare);
-
-            if (move.GetMovingPieceType() == EPieceType.King)
-                KingSquares[move.GetMovingSide().Side] = toSquare;
         }
 
         public void TakeMove(Move move)
@@ -172,7 +162,6 @@ namespace Rudz.Chess
                 RemovePiece(toSquare.GetRookCastleTo(), rook);
                 AddPiece(king, move.GetFromSquare());
                 AddPiece(rook, _rookCastlesFrom[toSquare.ToInt()]);
-                KingSquares[move.GetMovingSide().Side] = move.GetFromSquare();
                 return;
             }
 
@@ -188,9 +177,6 @@ namespace Rudz.Chess
                 AddPiece(move.GetCapturedPiece(), toSquare);
 
             AddPiece(move.GetMovingPiece(), move.GetFromSquare());
-
-            if (move.GetMovingPieceType() == EPieceType.King)
-                KingSquares[move.GetMovingSide().Side] = move.GetFromSquare();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -251,6 +237,9 @@ namespace Rudz.Chess
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public BitBoard Pieces(EPieceType type1, EPieceType type2, Player side) => BoardPieces[type1.MakePiece(side).ToInt()] | BoardPieces[type2.MakePiece(side).ToInt()];
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Square GetPieceSquare(EPieceType pt, Player color) => Pieces(pt, color).Lsb();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool PieceOnFile(Square square, Player side, EPieceType pieceType) => (BoardPieces[(int)(pieceType + (side << 3))] & square) != 0;

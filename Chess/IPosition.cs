@@ -37,8 +37,6 @@ namespace Rudz.Chess
 
         BitBoard[] OccupiedBySide { get; }
 
-        Square[] KingSquares { get; }
-
         bool IsProbing { get; set; }
 
         BitBoard Occupied { get; set; }
@@ -82,6 +80,8 @@ namespace Rudz.Chess
         BitBoard Pieces(EPieceType type, Player side);
 
         BitBoard Pieces(EPieceType type1, EPieceType type2, Player side);
+
+        Square GetPieceSquare(EPieceType pt, Player color);
 
         bool PieceOnFile(Square square, Player side, EPieceType pieceType);
 

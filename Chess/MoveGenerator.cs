@@ -117,7 +117,7 @@ namespace Rudz.Chess
 
             _position.IsProbing = true;
             _position.MakeMove(move);
-            var opponentAttacking = _position.IsAttacked(_position.KingSquares[SideToMove.Side], ~SideToMove);
+            var opponentAttacking = _position.IsAttacked(_position.GetPieceSquare(EPieceType.King, SideToMove), ~SideToMove);
             _position.TakeMove(move);
             _position.IsProbing = false;
             return !opponentAttacking;
@@ -207,7 +207,7 @@ namespace Rudz.Chess
                 flags &= ~Emgf.Stages;
 
             Pinned = flags.HasFlagFast(Emgf.Legalmoves)
-                ? _position.GetPinnedPieces(_position.KingSquares[SideToMove.Side], SideToMove)
+                ? _position.GetPinnedPieces(_position.GetPieceSquare(EPieceType.King, SideToMove), SideToMove)
                 : BitBoards.EmptyBitBoard;
 
             Flags = flags;
@@ -360,15 +360,13 @@ namespace Rudz.Chess
             // The complexity of this function is mainly due to the support for Chess960 variant.
             var rookTo = square.GetRookCastleTo();
             var rookFrom = _position.GetRookCastleFrom(square);
-            var kingSquare = _position.KingSquares[c.Side];
+            var ksq = _position.GetPieceSquare(EPieceType.King, c);
 
             // The pieces in question.. rook and king
-            var castlePieces = rookFrom | kingSquare;
+            var castlePieces = rookFrom | ksq;
 
             // The span between the rook and the king
-            var castleSpan = castlePieces | rookTo;
-            castleSpan |= square;
-            castleSpan |= kingSquare.BitboardBetween(rookFrom) | rookFrom.BitboardBetween(rookTo);
+            var castleSpan = ksq.BitboardBetween(rookFrom) | rookFrom.BitboardBetween(rookTo) | castlePieces | rookTo | square;
 
             // check that the span AND current occupied pieces are no different that the piece themselves.
             if ((castleSpan & _position.Occupied) != castlePieces)
@@ -380,7 +378,7 @@ namespace Rudz.Chess
             c = ~c;
 
             // ReSharper disable once LoopCanBeConvertedToQuery
-            foreach (var s in kingSquare.BitboardBetween(square) | square)
+            foreach (var s in ksq.BitboardBetween(square) | square)
             {
                 if (_position.IsAttacked(s, c))
                     return false;
