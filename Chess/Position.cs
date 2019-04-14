@@ -419,6 +419,82 @@ namespace Rudz.Chess
             return ECastleling.None;
         }
 
+        /// <summary>
+        /// TODO : This method is incomplete, and is not meant to be used atm.
+        /// Parse a string and convert to a valid move. If the move is not valid.. hell breaks loose.
+        /// * NO EXCEPTIONS IS ALLOWED IN THIS FUNCTION *
+        /// </summary>
+        /// <param name="m">string representation of the move to parse</param>
+        /// <returns>
+        /// On fail : Move containing from and to squares as ESquare.none (empty move)
+        /// On Ok   : The move!
+        /// </returns>
+        public Move StringToMove(string m, State state)
+        {
+            // guards
+            if (string.IsNullOrWhiteSpace(m))
+                return MoveExtensions.EmptyMove;
+
+            if (m.Equals(@"\"))
+                return MoveExtensions.EmptyMove;
+
+            // only lengths of 4 and 5 are acceptable.
+            if (!m.Length.InBetween(4, 5))
+                return MoveExtensions.EmptyMove;
+
+            var castleType = IsCastleMove(m);
+
+            if (castleType == ECastleling.None && (!m[0].InBetween('a', 'h') || !m[1].InBetween('1', '8') || !m[2].InBetween('a', 'h') || !m[3].InBetween('1', '8')))
+                return MoveExtensions.EmptyMove;
+
+            /*
+             * Needs to be assigned here.
+             * Otherwise it won't compile because of later split check using both two independent IF and optional reassignment through local method.
+             */
+            var from = new Square(m[1] - '1', m[0] - 'a');
+            var to = new Square(m[3] - '1', m[2] - 'a');
+
+            // local function to determine if the move is actually a castleling move by looking at the piece location of the squares
+            ECastleling ShredderFunc(Square fromSquare, Square toSquare) =>
+                GetPiece(fromSquare).Value == EPieces.WhiteKing && GetPiece(toSquare).Value == EPieces.WhiteRook
+                || GetPiece(fromSquare).Value == EPieces.BlackKing && GetPiece(toSquare).Value == EPieces.BlackRook
+                    ? toSquare > fromSquare
+                          ? ECastleling.Short
+                          : ECastleling.Long
+                    : ECastleling.None;
+
+            // part one of pillaging the castleType.. detection of chess 960 - shredder fen
+            if (castleType == ECastleling.None)
+                castleType = ShredderFunc(from, to); /* look for the air balloon */
+
+            // part two of pillaging the castleType var, since it might have changed
+            if (castleType != ECastleling.None)
+            {
+                from = GetKingCastleFrom(state.SideToMove, castleType);
+                to = castleType.GetKingCastleTo(state.SideToMove);
+            }
+
+            var mg = new MoveGenerator(this);
+            mg.GenerateMoves();
+
+            // ** untested area **
+            foreach (var move in mg.Moves)
+            {
+                if (move.GetFromSquare() != from || move.GetToSquare() != to)
+                    continue;
+                if (castleType == ECastleling.None && move.IsCastlelingMove())
+                    continue;
+                if (!move.IsPromotionMove())
+                    return move;
+                if (char.ToLower(m[m.Length - 1]) != move.GetPromotedPiece().GetPromotionChar())
+                    continue;
+
+                return move;
+            }
+
+            return MoveExtensions.EmptyMove;
+        }
+
         public IEnumerator<Piece> GetEnumerator()
         {
             // ReSharper disable once ForCanBeConvertedToForeach

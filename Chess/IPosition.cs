@@ -110,5 +110,7 @@ namespace Rudz.Chess
         void SetKingCastleFrom(Player side, Square square, ECastleling castleType);
 
         ECastleling IsCastleMove(string m);
+
+        Move StringToMove(string m, State state);
     }
 }
