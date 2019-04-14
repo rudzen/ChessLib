@@ -1,4 +1,4 @@
-﻿/*
+/*
 ChessLib, a chess data structure library
 
 MIT License
@@ -24,12 +24,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using Rudz.Chess.Exceptions;
-
 namespace Rudz.Chess.Fen
 {
     using EnsureThat;
     using Enums;
+    using Exceptions;
     using Extensions;
     using System;
     using System.Runtime.CompilerServices;
@@ -310,10 +309,11 @@ namespace Rudz.Chess.Fen
                 {
                     case Seperator:
                         seperatorCount++;
-                        continue;
+                        break;
+
                     case Space:
                         spaceCount++;
-                        continue;
+                        break;
                 }
             }
 
