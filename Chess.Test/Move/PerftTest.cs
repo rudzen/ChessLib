@@ -24,6 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using System.Threading.Tasks;
+
 namespace Chess.Test.Move
 {
     using System.Collections.Generic;
@@ -50,40 +52,40 @@ namespace Chess.Test.Move
         }
 
         [Fact]
-        public void PerftShort()
+        public async Task PerftShort()
         {
             foreach (var perftPosition in Positions)
             {
                 var perft = new Perft(ShortCount);
                 perft.AddPosition(perftPosition);
                 var expected = perft.GetPositionCount(0, ShortCount);
-                var actual = perft.DoPerft();
+                var actual = await perft.DoPerft();
                 Assert.Equal(expected, actual);
             }
         }
 
         [Fact]
-        public void PerftMedium()
+        public async Task PerftMedium()
         {
             foreach (var perftPosition in Positions)
             {
                 var perft = new Perft(MediumCount);
                 perft.AddPosition(perftPosition);
                 var expected = perft.GetPositionCount(0, MediumCount);
-                var actual = perft.DoPerft();
+                var actual = await perft.DoPerft();
                 Assert.Equal(expected, actual);
             }
         }
 
         [Fact]
-        public void PerftFull()
+        public async Task PerftFull()
         {
             foreach (var perftPosition in Positions)
             {
                 var perft = new Perft(Positions.Length);
                 perft.AddPosition(perftPosition);
                 var expected = perft.GetPositionCount(0, Positions.Length);
-                var actual = perft.DoPerft();
+                var actual = await perft.DoPerft();
                 Assert.Equal(expected, actual);
             }
         }

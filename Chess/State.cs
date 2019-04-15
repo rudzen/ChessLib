@@ -27,15 +27,13 @@ SOFTWARE.
 namespace Rudz.Chess
 {
     using Enums;
-    using System.Linq;
-    using System.Runtime.CompilerServices;
     using Types;
 
-    public sealed class State : MoveGenerator
+    public sealed class State
     {
         public Move LastMove { get; set; }
 
-        public IMaterial Material { get; set; }
+        public Material Material { get; set; }
 
         public ulong PawnStructureKey { get; set; }
 
@@ -45,7 +43,7 @@ namespace Rudz.Chess
 
         public int FiftyMoveRuleCounter { get; set; }
 
-        public ulong Key { get; internal set; }
+        public ulong Key { get; set; }
 
         public ECastlelingRights CastlelingRights { get; set; }
 
@@ -53,15 +51,13 @@ namespace Rudz.Chess
 
         public Player SideToMove { get; set; }
 
-        public State(IPosition position)
-            : base(position)
+        public BitBoard Pinned { get; set; }
+
+        public State()
         {
             Material = new Material();
             Clear();
         }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsMate() => !Moves.Any(IsLegal);
 
         public void Clear()
         {

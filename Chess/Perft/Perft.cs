@@ -1,4 +1,5 @@
-﻿using EnsureThat;
+﻿using System.Threading.Tasks;
+using EnsureThat;
 
 namespace Rudz.Chess.Perft
 {
@@ -53,7 +54,7 @@ namespace Rudz.Chess.Perft
 
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ulong DoPerft()
+        public async Task<ulong> DoPerft()
         {
             var total = 0ul;
 
@@ -67,7 +68,7 @@ namespace Rudz.Chess.Perft
             foreach (var position in _positions)
             {
                 game.SetFen(position.Fen);
-                var res = game.Perft(_perftLimit);
+                var res = await game.Perft(_perftLimit);
                 total += res;
                 _callback?.Invoke(position.Fen, res);
             }

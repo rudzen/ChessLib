@@ -29,17 +29,18 @@ namespace Rudz.Chess
     using EnsureThat;
     using Enums;
     using System;
+    using System.Collections;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Runtime;
     using System.Runtime.CompilerServices;
     using Types;
 
-    public class MoveGenerator
+    public sealed class MoveGenerator
     {
         private static readonly ConcurrentDictionary<ulong, List<Move>> Table;
 
-        private readonly IPosition _position;
+        private readonly Position _position;
 
         static MoveGenerator()
         {
@@ -49,13 +50,11 @@ namespace Rudz.Chess
             AppDomain.CurrentDomain.ProcessExit += Clean;
         }
 
-        protected internal MoveGenerator(IPosition position)
+        public MoveGenerator(Position position)
         {
             EnsureArg.IsNotNull(position, nameof(position));
             _position = position;
         }
-
-        public BitBoard Pinned { get; set; }
 
         public Emgf Flags { get; set; } = Emgf.Legalmoves;
 
@@ -78,38 +77,15 @@ namespace Rudz.Chess
             {
                 moves = new List<Move>(256);
                 // relax the gc while generating moves.
-                var old = GCSettings.LatencyMode;
-                GCSettings.LatencyMode = GCLatencyMode.LowLatency;
+                //var old = GCSettings.LatencyMode;
+                GCSettings.LatencyMode = GCLatencyMode.Batch;
                 GenerateCapturesAndPromotions(moves);
                 GenerateQuietMoves(moves);
                 Table.TryAdd(_position.State.Key, moves);
                 Moves = moves;
-                GCSettings.LatencyMode = old;
+                GCSettings.LatencyMode = GCLatencyMode.Interactive;
             }
         }
-
-        /// <summary>
-        /// Determine if a move is legal or not, by performing the move and checking if the king is under attack afterwards.
-        /// </summary>
-        /// <param name="move">The move to check</param>
-        /// <param name="piece">The moving piece</param>
-        /// <param name="from">The from square</param>
-        /// <param name="type">The move type</param>
-        /// <returns>true if legal, otherwise false</returns>
-        public bool IsLegal(Move move, Piece piece, Square from, EMoveType type)
-        {
-            if (!_position.InCheck && piece.Type() != EPieceType.King && (Pinned & from).Empty() && !type.HasFlagFast(EMoveType.Epcapture))
-                return true;
-
-            _position.IsProbing = true;
-            _position.MakeMove(move);
-            var opponentAttacking = _position.IsAttacked(_position.GetPieceSquare(EPieceType.King, _position.State.SideToMove), ~_position.State.SideToMove);
-            _position.TakeMove(move);
-            _position.IsProbing = false;
-            return !opponentAttacking;
-        }
-
-        public bool IsLegal(Move move) => IsLegal(move, move.GetMovingPiece(), move.GetFromSquare(), move.GetMoveType());
 
         /// <summary>
         /// <para>"Validates" a move using simple logic. For example that the piece actually being moved exists etc.</para>
@@ -190,9 +166,9 @@ namespace Rudz.Chess
             if (!move.IsNullMove() && (move.IsCastlelingMove() || move.IsEnPassantMove()))
                 flags &= ~Emgf.Stages;
 
-            Pinned = flags.HasFlagFast(Emgf.Legalmoves)
-                ? _position.GetPinnedPieces(_position.GetPieceSquare(EPieceType.King, _position.State.SideToMove), _position.State.SideToMove)
-                : BitBoards.EmptyBitBoard;
+            //_position.State.Pinned = flags.HasFlagFast(Emgf.Legalmoves)
+            //    ? _position.GetPinnedPieces(_position.GetPieceSquare(EPieceType.King, _position.State.SideToMove), _position.State.SideToMove)
+            //    : BitBoards.EmptyBitBoard;
 
             Flags = flags;
         }
@@ -210,7 +186,7 @@ namespace Rudz.Chess
 
             AddPawnMoves(moves, currentSide.PawnPush(pawns & currentSide.Rank7()) & ~_position.Occupied, currentSide.PawnPushDistance(), EMoveType.Quiet);
             AddPawnMoves(moves, pawns.Shift(northEast) & occupiedByThem, currentSide.PawnWestAttackDistance(), EMoveType.Capture);
-            AddPawnMoves(moves,  pawns.Shift(northWest) & occupiedByThem, currentSide.PawnEastAttackDistance(), EMoveType.Capture);
+            AddPawnMoves(moves, pawns.Shift(northWest) & occupiedByThem, currentSide.PawnEastAttackDistance(), EMoveType.Capture);
 
             if (_position.State.EnPassantSquare == ESquare.none)
                 return;
@@ -263,7 +239,7 @@ namespace Rudz.Chess
                 move = new Move(piece, from, to, type, promoted);
 
             // check if move is actual a legal move if the flag is enabled
-            if (Flags.HasFlagFast(Emgf.Legalmoves) && !IsLegal(move, piece, from, type))
+            if (Flags.HasFlagFast(Emgf.Legalmoves) && !_position.IsLegal(move, piece, from, type))
                 return;
 
             moves.Add(move);

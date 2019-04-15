@@ -42,12 +42,12 @@ namespace Rudz.Chess.Types
     {
         public static readonly Move EmptyMove;
 
-        private static readonly Dictionary<EMoveNotation, Func<Move, IPosition, MoveGenerator, string>> NotationFuncs;
+        private static readonly Dictionary<EMoveNotation, Func<Move, Position, string>> NotationFuncs;
 
         static MoveExtensions()
         {
             EmptyMove = new Move();
-            NotationFuncs = new Dictionary<EMoveNotation, Func<Move, IPosition, MoveGenerator, string>>
+            NotationFuncs = new Dictionary<EMoveNotation, Func<Move, Position, string>>
             {
                 {EMoveNotation.Fan, ToFan},
                 {EMoveNotation.San, ToSan},
@@ -58,7 +58,7 @@ namespace Rudz.Chess.Types
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string ToNotation(this Move move, IPosition pos, State state, EMoveNotation notation = EMoveNotation.Fan)
+        public static string ToNotation(this Move move, Position pos, EMoveNotation notation = EMoveNotation.Fan)
         {
             if (move.IsNullMove())
                 return "(none)";
@@ -66,16 +66,17 @@ namespace Rudz.Chess.Types
             if (!NotationFuncs.TryGetValue(notation, out var func))
                 throw new InvalidMoveException("Invalid move notation detected.");
 
-            return func(move, pos, state);
+            return func(move, pos);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static (bool, Move) Locate(this Move move, Game game)
         {
             // force position to contain the latest moves for the position moves to be searched in
-            game.State.GenerateMoves();
+            var mg = new MoveGenerator(game.Position);
+            mg.GenerateMoves();
 
-            var element = game.State.Moves.FirstOrDefault(x => x.GetFromSquare() == move.GetFromSquare() && x.GetToSquare() == move.GetToSquare());
+            var element = mg.Moves.FirstOrDefault(x => x.GetFromSquare() == move.GetFromSquare() && x.GetToSquare() == move.GetToSquare());
             return element == null ? (false, EmptyMove) : (true, element);
 
             //for (int i = 0; i < game.State.Moves.Count; i++) {
@@ -87,7 +88,7 @@ namespace Rudz.Chess.Types
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static string ToUci(Move move, IPosition pos, MoveGenerator moveGenerator = null) => move.ToString();
+        private static string ToUci(Move move, Position pos = null) => move.ToString();
 
         /// <summary>
         /// <para>Converts a move to FAN notation.</para>
@@ -96,7 +97,7 @@ namespace Rudz.Chess.Types
         /// <param name="moveGenerator"></param>
         /// <returns>FAN move string</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static string ToFan(Move move, IPosition pos, MoveGenerator moveGenerator)
+        private static string ToFan(Move move, Position pos)
         {
             var from = move.GetFromSquare();
             var to = move.GetToSquare();
@@ -137,7 +138,7 @@ namespace Rudz.Chess.Types
             }
 
             if (pos.InCheck)
-                notation.Append(moveGenerator.GetCheckChar());
+                notation.Append(pos.GetCheckChar());
 
             return notation.ToString();
         }
@@ -149,7 +150,7 @@ namespace Rudz.Chess.Types
         /// <param name="moveGenerator"></param>
         /// <returns>SAN move string</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static string ToSan(this Move move, IPosition pos, MoveGenerator moveGenerator)
+        private static string ToSan(this Move move, Position pos)
         {
             var from = move.GetFromSquare();
             var to = move.GetToSquare();
@@ -191,7 +192,7 @@ namespace Rudz.Chess.Types
             }
 
             if (pos.InCheck)
-                notation.Append(moveGenerator.GetCheckChar());
+                notation.Append(pos.GetCheckChar());
 
             return notation.ToString();
         }
@@ -202,7 +203,7 @@ namespace Rudz.Chess.Types
         /// <param name="moveGenerator"></param>
         /// <returns>LAN move string</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static string ToLan(Move move, IPosition pos, MoveGenerator moveGenerator)
+        private static string ToLan(Move move, Position pos)
         {
             var from = move.GetFromSquare();
             var to = move.GetToSquare();
@@ -245,7 +246,7 @@ namespace Rudz.Chess.Types
             }
 
             if (pos.InCheck)
-                notation.Append(moveGenerator.GetCheckChar());
+                notation.Append(pos.GetCheckChar());
 
             return notation.ToString();
         }
@@ -257,7 +258,7 @@ namespace Rudz.Chess.Types
         /// <param name="moveGenerator">The position from where the move exist</param>
         /// <returns>RAN move string</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static string ToRan(Move move, IPosition pos, MoveGenerator moveGenerator)
+        private static string ToRan(Move move, Position pos)
         {
             var from = move.GetFromSquare();
             var to = move.GetToSquare();
@@ -303,20 +304,21 @@ namespace Rudz.Chess.Types
             }
 
             if (pos.InCheck)
-                notation.Append(moveGenerator.GetCheckChar());
+                notation.Append(pos.GetCheckChar());
 
             return notation.ToString();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static char GetCheckChar(this MoveGenerator moveGenerator)
+        private static char GetCheckChar(this Position pos)
         {
-            moveGenerator.GenerateMoves();
-            return moveGenerator.Moves.Count > 0 ? '+' : '#';
+            var mg = new MoveGenerator(pos);
+            mg.GenerateMoves();
+            return mg.Moves.Count > 0 ? '+' : '#';
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static EMoveAmbiguity Ambiguity(this Move move, BitBoard similarTypeAttacks, IPosition position)
+        private static EMoveAmbiguity Ambiguity(this Move move, BitBoard similarTypeAttacks, Position position)
         {
             var ambiguity = EMoveAmbiguity.None;
 
@@ -346,7 +348,7 @@ namespace Rudz.Chess.Types
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static BitBoard GetSimilarAttacks(this IPosition position, Move move)
+        private static BitBoard GetSimilarAttacks(this Position position, Move move)
         {
             var pt = move.GetMovingPieceType();
 
@@ -365,7 +367,7 @@ namespace Rudz.Chess.Types
         /// <param name="position">The current used position</param>
         /// <param name="sb">The StringBuilder to append to if needed</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void Disambiguation(this Move move, Square from, IPosition position, StringBuilder sb)
+        private static void Disambiguation(this Move move, Square from, Position position, StringBuilder sb)
         {
             var simularTypeAttacks = position.GetSimilarAttacks(move);
 
