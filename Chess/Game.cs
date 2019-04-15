@@ -343,7 +343,7 @@ namespace Rudz.Chess
         public void UpdateDrawTypes()
         {
             var gameEndType = EGameEndType.None;
-            if (!State.Moves.Any(move => State.IsLegal(move)))
+            if (!State.Moves.Any(move => Position.IsLegal(move)))
                 gameEndType |= EGameEndType.Pat;
             if (IsRepetition())
                 gameEndType |= EGameEndType.Repetition;

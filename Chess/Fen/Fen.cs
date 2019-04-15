@@ -175,7 +175,7 @@ namespace Rudz.Chess.Fen
         public static bool IsDelimiter(char c) => c == Space;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ESquare GetEpSquare(this FenData fen)
+        public static Square GetEpSquare(this FenData fen)
         {
             var c = fen.GetAdvance();
 

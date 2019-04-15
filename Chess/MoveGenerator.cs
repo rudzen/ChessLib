@@ -55,8 +55,6 @@ namespace Rudz.Chess
             _position = position;
         }
 
-        public BitBoard Pinned { get; set; }
-
         public Emgf Flags { get; set; } = Emgf.Legalmoves;
 
         public List<Move> Moves { get; private set; }
@@ -89,89 +87,6 @@ namespace Rudz.Chess
         }
 
         /// <summary>
-        /// Determine if a move is legal or not, by performing the move and checking if the king is under attack afterwards.
-        /// </summary>
-        /// <param name="move">The move to check</param>
-        /// <param name="piece">The moving piece</param>
-        /// <param name="from">The from square</param>
-        /// <param name="type">The move type</param>
-        /// <returns>true if legal, otherwise false</returns>
-        public bool IsLegal(Move move, Piece piece, Square from, EMoveType type)
-        {
-            if (!_position.InCheck && piece.Type() != EPieceType.King && (Pinned & from).Empty() && !type.HasFlagFast(EMoveType.Epcapture))
-                return true;
-
-            _position.IsProbing = true;
-            _position.MakeMove(move);
-            var opponentAttacking = _position.IsAttacked(_position.GetPieceSquare(EPieceType.King, _position.State.SideToMove), ~_position.State.SideToMove);
-            _position.TakeMove(move);
-            _position.IsProbing = false;
-            return !opponentAttacking;
-        }
-
-        public bool IsLegal(Move move) => IsLegal(move, move.GetMovingPiece(), move.GetFromSquare(), move.GetMoveType());
-
-        /// <summary>
-        /// <para>"Validates" a move using simple logic. For example that the piece actually being moved exists etc.</para>
-        /// <para>This is basically only useful while developing and/or debugging</para>
-        /// </summary>
-        /// <param name="move">The move to check for logical errors</param>
-        /// <returns>True if move "appears" to be legal, otherwise false</returns>
-        public bool IsPseudoLegal(Move move)
-        {
-            // Verify that the piece actually exists on the board at the location defined by the move struct
-            if ((_position.BoardPieces[move.GetMovingPiece().ToInt()] & move.GetFromSquare()).Empty())
-                return false;
-
-            var to = move.GetToSquare();
-
-            if (move.IsCastlelingMove())
-            {
-                // TODO : Basic castleling verification
-                if (_position.CanCastle(move.GetFromSquare() < to ? ECastleling.Short : ECastleling.Long))
-                    return true;
-
-                var mg = new MoveGenerator(_position);
-                mg.GenerateMoves();
-                return mg.Moves.Contains(move);
-            }
-            else if (move.IsEnPassantMove())
-            {
-                // TODO : En-passant here
-
-                // TODO : Test with unit test
-                var opponent = ~move.GetMovingSide();
-                if (_position.State.EnPassantSquare.PawnAttack(opponent) & _position.Pieces(EPieceType.Pawn, opponent))
-                    return true;
-            }
-            else if (move.IsCaptureMove())
-            {
-                var opponent = ~move.GetMovingSide();
-                if ((_position.OccupiedBySide[opponent.Side] & to).Empty())
-                    return false;
-
-                if ((_position.BoardPieces[move.GetCapturedPiece().ToInt()] & to).Empty())
-                    return false;
-            }
-            else if ((_position.Occupied & to) != 0)
-                return false;
-
-            // ReSharper disable once SwitchStatementMissingSomeCases
-            switch (move.GetMovingPiece().Type())
-            {
-                case EPieceType.Bishop:
-                case EPieceType.Rook:
-                case EPieceType.Queen:
-                    if (move.GetFromSquare().BitboardBetween(to) & _position.Occupied)
-                        return false;
-
-                    break;
-            }
-
-            return true;
-        }
-
-        /// <summary>
         /// Class clean up method, to be expanded at some point.
         /// </summary>
         /// <param name="sender"></param>
@@ -190,7 +105,7 @@ namespace Rudz.Chess
             if (!move.IsNullMove() && (move.IsCastlelingMove() || move.IsEnPassantMove()))
                 flags &= ~Emgf.Stages;
 
-            Pinned = flags.HasFlagFast(Emgf.Legalmoves)
+            _position.State.Pinned = flags.HasFlagFast(Emgf.Legalmoves)
                 ? _position.GetPinnedPieces(_position.GetPieceSquare(EPieceType.King, _position.State.SideToMove), _position.State.SideToMove)
                 : BitBoards.EmptyBitBoard;
 
@@ -210,7 +125,7 @@ namespace Rudz.Chess
 
             AddPawnMoves(moves, currentSide.PawnPush(pawns & currentSide.Rank7()) & ~_position.Occupied, currentSide.PawnPushDistance(), EMoveType.Quiet);
             AddPawnMoves(moves, pawns.Shift(northEast) & occupiedByThem, currentSide.PawnWestAttackDistance(), EMoveType.Capture);
-            AddPawnMoves(moves,  pawns.Shift(northWest) & occupiedByThem, currentSide.PawnEastAttackDistance(), EMoveType.Capture);
+            AddPawnMoves(moves, pawns.Shift(northWest) & occupiedByThem, currentSide.PawnEastAttackDistance(), EMoveType.Capture);
 
             if (_position.State.EnPassantSquare == ESquare.none)
                 return;
@@ -263,7 +178,7 @@ namespace Rudz.Chess
                 move = new Move(piece, from, to, type, promoted);
 
             // check if move is actual a legal move if the flag is enabled
-            if (Flags.HasFlagFast(Emgf.Legalmoves) && !IsLegal(move, piece, from, type))
+            if (Flags.HasFlagFast(Emgf.Legalmoves) && !_position.IsLegal(move, piece, from, type))
                 return;
 
             moves.Add(move);

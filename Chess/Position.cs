@@ -1,4 +1,4 @@
-﻿/*
+/*
 ChessLib, a chess data structure library
 
 MIT License
@@ -31,6 +31,7 @@ namespace Rudz.Chess
     using System;
     using System.Collections;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Runtime.CompilerServices;
     using Types;
 
@@ -142,8 +143,7 @@ namespace Rudz.Chess
 
             if (move.IsEnPassantMove())
             {
-                BitBoard targetSquare = toSquare;
-                var t = EnPasCapturePos[move.GetMovingSide().Side](targetSquare).First();
+                var t = EnPasCapturePos[move.GetMovingSide().Side](toSquare).First();
                 RemovePiece(t, move.GetCapturedPiece());
             }
             else if (move.IsCaptureMove())
@@ -171,8 +171,7 @@ namespace Rudz.Chess
 
             if (move.IsEnPassantMove())
             {
-                BitBoard targetSquare = toSquare;
-                var t = EnPasCapturePos[move.GetMovingSide().Side](targetSquare).First();
+                var t = EnPasCapturePos[move.GetMovingSide().Side](toSquare).First();
                 AddPiece(move.GetCapturedPiece(), t);
             }
             else if (move.IsCaptureMove())
@@ -525,6 +524,97 @@ namespace Rudz.Chess
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Determine if a move is legal or not, by performing the move and checking if the king is under attack afterwards.
+        /// </summary>
+        /// <param name="move">The move to check</param>
+        /// <param name="piece">The moving piece</param>
+        /// <param name="from">The from square</param>
+        /// <param name="type">The move type</param>
+        /// <returns>true if legal, otherwise false</returns>
+        public bool IsLegal(Move move, Piece piece, Square from, EMoveType type)
+        {
+            if (!InCheck && piece.Type() != EPieceType.King && (State.Pinned & from).Empty() && !type.HasFlagFast(EMoveType.Epcapture))
+                return true;
+
+            IsProbing = true;
+            MakeMove(move);
+            var opponentAttacking = IsAttacked(GetPieceSquare(EPieceType.King, State.SideToMove), ~State.SideToMove);
+            TakeMove(move);
+            IsProbing = false;
+            return !opponentAttacking;
+        }
+
+        public bool IsLegal(Move move) => IsLegal(move, move.GetMovingPiece(), move.GetFromSquare(), move.GetMoveType());
+
+        /// <summary>
+        /// <para>"Validates" a move using simple logic. For example that the piece actually being moved exists etc.</para>
+        /// <para>This is basically only useful while developing and/or debugging</para>
+        /// </summary>
+        /// <param name="move">The move to check for logical errors</param>
+        /// <returns>True if move "appears" to be legal, otherwise false</returns>
+        public bool IsPseudoLegal(Move move)
+        {
+            // Verify that the piece actually exists on the board at the location defined by the move struct
+            if ((BoardPieces[move.GetMovingPiece().ToInt()] & move.GetFromSquare()).Empty())
+                return false;
+
+            var to = move.GetToSquare();
+
+            if (move.IsCastlelingMove())
+            {
+                // TODO : Basic castleling verification
+                if (CanCastle(move.GetFromSquare() < to ? ECastleling.Short : ECastleling.Long))
+                    return true;
+
+                var mg = new MoveGenerator(this);
+                mg.GenerateMoves();
+                return mg.Moves.Contains(move);
+            }
+            else if (move.IsEnPassantMove())
+            {
+                // TODO : En-passant here
+
+                // TODO : Test with unit test
+                var opponent = ~move.GetMovingSide();
+                if (State.EnPassantSquare.PawnAttack(opponent) & Pieces(EPieceType.Pawn, opponent))
+                    return true;
+            }
+            else if (move.IsCaptureMove())
+            {
+                var opponent = ~move.GetMovingSide();
+                if ((OccupiedBySide[opponent.Side] & to).Empty())
+                    return false;
+
+                if ((BoardPieces[move.GetCapturedPiece().ToInt()] & to).Empty())
+                    return false;
+            }
+            else if ((Occupied & to) != 0)
+                return false;
+
+            // ReSharper disable once SwitchStatementMissingSomeCases
+            switch (move.GetMovingPiece().Type())
+            {
+                case EPieceType.Bishop:
+                case EPieceType.Rook:
+                case EPieceType.Queen:
+                    if (move.GetFromSquare().BitboardBetween(to) & Occupied)
+                        return false;
+
+                    break;
+            }
+
+            return true;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool IsMate()
+        {
+            var mg = new MoveGenerator(this);
+            mg.GenerateMoves();
+            return !mg.Moves.Any(IsLegal);
         }
 
         public IEnumerator<Piece> GetEnumerator()

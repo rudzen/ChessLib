@@ -27,8 +27,6 @@ SOFTWARE.
 namespace Rudz.Chess
 {
     using Enums;
-    using System.Linq;
-    using System.Runtime.CompilerServices;
     using Types;
 
     public sealed class State : MoveGenerator
@@ -53,15 +51,14 @@ namespace Rudz.Chess
 
         public Player SideToMove { get; set; }
 
+        public BitBoard Pinned { get; set; }
+
         public State(IPosition position)
             : base(position)
         {
             Material = new Material();
             Clear();
         }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsMate() => !Moves.Any(IsLegal);
 
         public void Clear()
         {

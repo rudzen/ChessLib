@@ -120,5 +120,13 @@ namespace Rudz.Chess
         bool CanCastle(ECastleling type);
 
         bool IsCastleAllowed(Square square);
+
+        bool IsPseudoLegal(Move move);
+
+        bool IsLegal(Move move, Piece piece, Square from, EMoveType type);
+
+        bool IsLegal(Move move);
+
+        bool IsMate();
     }
 }
