@@ -31,7 +31,7 @@ namespace Rudz.Chess
     using System.Runtime.CompilerServices;
     using Types;
 
-    public sealed class Material
+    public sealed class Material : IMaterial
     {
         public static readonly double MaxValueWithoutPawns;
 
@@ -49,7 +49,7 @@ namespace Rudz.Chess
 
         public int MaterialValueBlack => MaterialValue[1];
 
-        public int this[int index]
+        int IMaterial.this[int index]
         {
             get => MaterialValue[index];
             set => MaterialValue[index] = value;

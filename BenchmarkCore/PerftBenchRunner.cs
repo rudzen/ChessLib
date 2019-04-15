@@ -1,30 +1,4 @@
-﻿/*
-ChessLib, a chess data structure library
-
-MIT License
-
-Copyright (c) 2017-2019 Rudy Alex Kohn
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
-
-namespace BenchmarkCore
+﻿namespace BenchmarkCore
 {
     using BenchmarkDotNet.Running;
 
@@ -62,15 +36,6 @@ Result	6	1,912,300.6 us	3,551.167 us	3,148.017 us
  Result | 4 |     1,588.79 us |     3.5257 us |     3.2979 us |
  Result | 5 |    51,304.89 us | 1,006.0687 us | 1,235.5427 us |
  Result | 6 | 1,547,075.27 us | 2,673.5871 us | 2,500.8751 us |
-
- Method | N |            Mean |         Error |        StdDev |
-------- |-- |----------------:|--------------:|--------------:|
- Result | 1 |        89.39 us |     0.6328 us |     0.5919 us |
- Result | 2 |        93.61 us |     0.1749 us |     0.1636 us |
- Result | 3 |       163.75 us |     0.8769 us |     0.8203 us |
- Result | 4 |     1,912.89 us |     4.6211 us |     3.8588 us |
- Result | 5 |    59,044.49 us | 1,182.6350 us | 1,106.2375 us |
- Result | 6 | 1,721,455.09 us | 3,501.8163 us | 3,104.2690 us |
 
      */
     public class PerftBenchRunner

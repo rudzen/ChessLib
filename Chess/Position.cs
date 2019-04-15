@@ -31,7 +31,6 @@ namespace Rudz.Chess
     using System;
     using System.Collections;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Runtime.CompilerServices;
     using Types;
 
@@ -40,7 +39,7 @@ namespace Rudz.Chess
     /// It stores all the information about the current board in a simple structure.
     /// It also serves the purpose of being able to give the UI controller feedback on various things on the board
     /// </summary>
-    public sealed class Position : IEnumerable<Piece>
+    public sealed class Position : IPosition
     {
         private const ulong Zero = 0;
 
@@ -414,7 +413,7 @@ namespace Rudz.Chess
         /// On fail : Move containing from and to squares as ESquare.none (empty move)
         /// On Ok   : The move!
         /// </returns>
-        public Move StringToMove(string m)
+        public Move StringToMove(string m, State state)
         {
             // guards
             if (string.IsNullOrWhiteSpace(m))
@@ -455,8 +454,8 @@ namespace Rudz.Chess
             // part two of pillaging the castleType var, since it might have changed
             if (castleType != ECastleling.None)
             {
-                from = GetKingCastleFrom(State.SideToMove, castleType);
-                to = castleType.GetKingCastleTo(State.SideToMove);
+                from = GetKingCastleFrom(state.SideToMove, castleType);
+                to = castleType.GetKingCastleTo(state.SideToMove);
             }
 
             var mg = new MoveGenerator(this);
@@ -528,38 +527,13 @@ namespace Rudz.Chess
             return true;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsMate()
+        public IEnumerator<Piece> GetEnumerator()
         {
-            var mg = new MoveGenerator(this);
-            mg.GenerateMoves();
-            return !mg.Moves.Any(IsLegal);
+            // ReSharper disable once ForCanBeConvertedToForeach
+            // ReSharper disable once LoopCanBeConvertedToQuery
+            for (var index = 0; index < BoardLayout.Length; index++)
+                yield return BoardLayout[index];
         }
-
-        /// <summary>
-        /// Determine if a move is legal or not, by performing the move and checking if the king is under attack afterwards.
-        /// </summary>
-        /// <param name="move">The move to check</param>
-        /// <param name="piece">The moving piece</param>
-        /// <param name="from">The from square</param>
-        /// <param name="type">The move type</param>
-        /// <returns>true if legal, otherwise false</returns>
-        public bool IsLegal(Move move, Piece piece, Square from, EMoveType type)
-        {
-            if (!InCheck && piece.Type() != EPieceType.King && (State.Pinned & from).Empty() && !type.HasFlagFast(EMoveType.Epcapture))
-                return true;
-
-            IsProbing = true;
-            MakeMove(move);
-            var opponentAttacking = IsAttacked(GetPieceSquare(EPieceType.King, State.SideToMove), ~State.SideToMove);
-            TakeMove(move);
-            IsProbing = false;
-            return !opponentAttacking;
-        }
-
-        public bool IsLegal(Move move) => IsLegal(move, move.GetMovingPiece(), move.GetFromSquare(), move.GetMoveType());
-
-        public IEnumerator<Piece> GetEnumerator() => ((IEnumerable<Piece>) BoardLayout).GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }

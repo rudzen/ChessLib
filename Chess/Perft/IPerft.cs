@@ -1,10 +1,8 @@
-﻿using System.Threading.Tasks;
-
-namespace Rudz.Chess.Perft
+﻿namespace Rudz.Chess.Perft
 {
     public interface IPerft
     {
-        Task<ulong> DoPerft();
+        ulong DoPerft();
 
         void ClearPositions();
 

@@ -24,8 +24,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System.Threading.Tasks;
-
 namespace Perft
 {
     using Rudz.Chess.Extensions;
@@ -35,7 +33,7 @@ namespace Perft
 
     internal sealed class Program
     {
-        public static async Task Main(string[] args)
+        public static void Main(string[] args)
         {
             Console.WriteLine("ChessLib Perft test program v0.1.1");
             Console.WriteLine("Use Perft.exe <depth> to set depth (1-6), default is 5.");
@@ -59,7 +57,7 @@ namespace Perft
             var p = new P(depth, Callback);
             p.AddStartPosition();
             var watch = Stopwatch.StartNew();
-            var result = await p.DoPerft();
+            var result = p.DoPerft();
             // add 1 to avoid potential dbz
             var elapsedMs = watch.ElapsedMilliseconds + 1;
             var nps = 1000 * result / (ulong)elapsedMs;

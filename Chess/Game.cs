@@ -24,8 +24,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System.Threading.Tasks;
-
 namespace Rudz.Chess
 {
     using Data;
@@ -77,15 +75,15 @@ namespace Rudz.Chess
             _output = new StringBuilder(256);
 
             for (var i = 0; i < _stateList.Length; i++)
-                _stateList[i] = new State();
+                _stateList[i] = new State(Position);
 
             PositionIndex = 0;
-            Position.State = _stateList[PositionIndex];
+            State = Position.State = _stateList[PositionIndex];
             _chess960 = false;
             _xfen = false;
         }
 
-        //public State State => Position.State;
+        public State State { get; set; }
 
         public int PositionIndex { get; private set; }
 
@@ -95,7 +93,7 @@ namespace Rudz.Chess
 
         public BitBoard Occupied => Position.Occupied;
 
-        public Position Position { get; }
+        public IPosition Position { get; }
 
         public EGameEndType GameEndType { get; set; }
 
@@ -109,45 +107,44 @@ namespace Rudz.Chess
             if (move.IsNullMove())
                 return false;
 
-            // advances the position
-            var previous = _stateList[PositionIndex++];
-            Position.State = _stateList[PositionIndex];
-            var state = Position.State;
-            state.SideToMove = ~previous.SideToMove;
-            state.Material = previous.Material;
-            state.LastMove = move;
-
             Position.MakeMove(move);
 
             // commented because of missing implementations
-            if (!move.IsCastlelingMove() && Position.IsAttacked(Position.GetPieceSquare(EPieceType.King, state.SideToMove), ~state.SideToMove))
+            if (!move.IsCastlelingMove() && Position.IsAttacked(Position.GetPieceSquare(EPieceType.King, State.SideToMove), ~State.SideToMove))
             {
                 Position.TakeMove(move);
                 return false;
             }
 
+            // advances the position
+            var previous = _stateList[PositionIndex++];
+            State = Position.State = _stateList[PositionIndex];
+            State.SideToMove = ~previous.SideToMove;
+            State.Material = previous.Material;
+            State.LastMove = move;
+
             // compute in-check
-            Position.InCheck = Position.IsAttacked(Position.GetPieceSquare(EPieceType.King, state.SideToMove), ~state.SideToMove);
-            state.CastlelingRights = _stateList[PositionIndex - 1].CastlelingRights & _castleRightsMask[move.GetFromSquare().ToInt()] & _castleRightsMask[move.GetToSquare().ToInt()];
-            state.NullMovesInRow = 0;
+            Position.InCheck = Position.IsAttacked(Position.GetPieceSquare(EPieceType.King, State.SideToMove), ~State.SideToMove);
+            State.CastlelingRights = _stateList[PositionIndex - 1].CastlelingRights & _castleRightsMask[move.GetFromSquare().ToInt()] & _castleRightsMask[move.GetToSquare().ToInt()];
+            State.NullMovesInRow = 0;
 
             // compute reversible half move count
-            state.ReversibleHalfMoveCount = move.IsCaptureMove() || move.GetMovingPieceType() == EPieceType.Pawn
+            State.ReversibleHalfMoveCount = move.IsCaptureMove() || move.GetMovingPieceType() == EPieceType.Pawn
                 ? 0
                 : previous.ReversibleHalfMoveCount + 1;
 
             // compute en-passant if present
-            state.EnPassantSquare = move.IsDoublePush()
+            State.EnPassantSquare = move.IsDoublePush()
                 ? move.GetFromSquare() + (move.GetMovingSide() == PlayerExtensions.White ? EDirection.North : EDirection.South)
                 : ESquare.none;
 
-            state.Key = previous.Key;
-            state.PawnStructureKey = previous.PawnStructureKey;
+            State.Key = previous.Key;
+            State.PawnStructureKey = previous.PawnStructureKey;
 
             UpdateKey(move);
-            state.Material.MakeMove(move);
+            State.Material.MakeMove(move);
 
-            //State.GenerateMoves();
+            State.GenerateMoves();
 
             return true;
         }
@@ -155,9 +152,9 @@ namespace Rudz.Chess
         public void TakeMove()
         {
             // careful.. NO check for invalid PositionIndex.. make sure it's always counted correctly
-            Position.TakeMove(Position.State.LastMove);
+            Position.TakeMove(State.LastMove);
             --PositionIndex;
-            Position.State = _stateList[PositionIndex];
+            State = Position.State = _stateList[PositionIndex];
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -265,9 +262,7 @@ namespace Rudz.Chess
             if (!Fen.Fen.IsDelimiter(fen.GetAdvance()))
                 return new FenError(-6, fen.GetIndex());
 
-            var state = Position.State;
-
-            state.EnPassantSquare = fen.GetEpSquare();
+            State.EnPassantSquare = fen.GetEpSquare();
 
             // temporary.. the whole method should be using this, but this will do for now.
 
@@ -286,35 +281,33 @@ namespace Rudz.Chess
 
             first.ToIntegral(out number);
 
-            Position.State = state = _stateList[PositionIndex];
+            State = Position.State = _stateList[PositionIndex];
 
-            state.ReversibleHalfMoveCount = number;
+            State.ReversibleHalfMoveCount = number;
 
-            state.SideToMove = player;
+            State.SideToMove = player;
 
             if (!player.IsWhite())
             {
                 /* black */
-                state.Key ^= Zobrist.GetZobristSide();
-                state.PawnStructureKey ^= Zobrist.GetZobristSide();
+                State.Key ^= Zobrist.GetZobristSide();
+                State.PawnStructureKey ^= Zobrist.GetZobristSide();
             }
 
-            state.Key ^= Zobrist.GetZobristCastleling(state.CastlelingRights);
+            State.Key ^= Zobrist.GetZobristCastleling(State.CastlelingRights);
 
-            if (state.EnPassantSquare != ESquare.none)
-                state.Key ^= Zobrist.GetZobristEnPessant(state.EnPassantSquare.File().ToInt());
+            if (State.EnPassantSquare != ESquare.none)
+                State.Key ^= Zobrist.GetZobristEnPessant(State.EnPassantSquare.File().ToInt());
 
-            var ksq = Position.GetPieceSquare(EPieceType.King, player);
-            Position.InCheck = Position.IsAttacked(ksq, ~player);
-            Position.State.Pinned = Position.GetPinnedPieces(ksq, player);
+            Position.InCheck = Position.IsAttacked(Position.GetPieceSquare(EPieceType.King, State.SideToMove), ~State.SideToMove);
 
-            //State.GenerateMoves(true);
+            State.GenerateMoves(true);
 
             return 0;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public FenData GetFen() => Position.State.GenerateFen(Position.BoardLayout, HalfMoveCount());
+        public FenData GetFen() => State.GenerateFen(Position.BoardLayout, HalfMoveCount());
 
         /// <summary>
         /// Converts a move data type to move notation string format which chess engines understand.
@@ -350,18 +343,14 @@ namespace Rudz.Chess
         public void UpdateDrawTypes()
         {
             var gameEndType = EGameEndType.None;
+            if (!State.Moves.Any(move => State.IsLegal(move)))
+                gameEndType |= EGameEndType.Pat;
             if (IsRepetition())
                 gameEndType |= EGameEndType.Repetition;
-            if (Position.State.Material[PlayerExtensions.White.Side] <= 300 && Position.State.Material[PlayerExtensions.Black.Side] <= 300 && Position.BoardPieces[0].Empty() && Position.BoardPieces[8].Empty())
+            if (State.Material[PlayerExtensions.White.Side] <= 300 && State.Material[PlayerExtensions.Black.Side] <= 300 && Position.BoardPieces[0].Empty() && Position.BoardPieces[8].Empty())
                 gameEndType |= EGameEndType.MaterialDrawn;
-            if (Position.State.ReversibleHalfMoveCount >= 100)
+            if (State.ReversibleHalfMoveCount >= 100)
                 gameEndType |= EGameEndType.FiftyMove;
-            
-            var mg = new MoveGenerator(Position);
-            mg.GenerateMoves();
-            if (!mg.Moves.Any(move => Position.IsLegal(move)))
-                gameEndType |= EGameEndType.Pat;
-
             GameEndType = gameEndType;
         }
 
@@ -388,33 +377,32 @@ namespace Rudz.Chess
 
             _output.Append("    a   b   c   d   e   f   g   h\n");
             _output.Append("Zobrist : ");
-            _output.Append($"0x{Position.State.Key:X}\n");
+            _output.Append($"0x{State.Key:X}\n");
             return _output.ToString();
         }
 
-        public IEnumerator<Piece> GetEnumerator() => Position.GetEnumerator();
-
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        public IEnumerator<Piece> GetEnumerator() => Position.GetEnumerator();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public BitBoard OccupiedBySide(Player side) => Position.OccupiedBySide[side.Side];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Player CurrentPlayer() => Position.State.SideToMove;
+        public Player CurrentPlayer() => State.SideToMove;
 
-        public async Task<ulong> Perft(int depth)
+        public ulong Perft(int depth)
         {
-            var mg = new MoveGenerator(Position);
-            mg.GenerateMoves();
+            State.GenerateMoves();
             if (depth == 1)
-                return (ulong)mg.Moves.Count;
+                return (ulong)State.Moves.Count;
 
             ulong tot = 0;
 
-            foreach (var move in mg.Moves)
+            foreach (var move in State.Moves)
             {
                 MakeMove(move);
-                tot += await Perft(depth - 1);
+                tot += Perft(depth - 1);
                 TakeMove();
             }
 
@@ -433,12 +421,12 @@ namespace Rudz.Chess
 
             Position.AddPiece(piece, square);
 
-            Position.State.Key ^= Zobrist.GetZobristPst(piece, square);
+            State.Key ^= Zobrist.GetZobristPst(piece, square);
 
             if (pieceType == EPieceType.Pawn)
-                Position.State.PawnStructureKey ^= Zobrist.GetZobristPst(piece, square);
+                State.PawnStructureKey ^= Zobrist.GetZobristPst(piece, square);
 
-            Position.State.Material.Add(piece);
+            State.Material.Add(piece);
         }
 
         /// <summary>
@@ -449,21 +437,21 @@ namespace Rudz.Chess
         {
             // TODO : Merge with MakeMove to avoid duplicate ifs
 
-            var pawnKey = Position.State.PawnStructureKey;
-            var key = Position.State.Key ^ pawnKey;
+            var pawnKey = State.PawnStructureKey;
+            var key = State.Key ^ pawnKey;
             pawnKey ^= Zobrist.GetZobristSide();
 
             if (_stateList[PositionIndex - 1].EnPassantSquare != ESquare.none)
                 key ^= Zobrist.GetZobristEnPessant(_stateList[PositionIndex - 1].EnPassantSquare.File().ToInt());
 
-            if (Position.State.EnPassantSquare != ESquare.none)
-                key ^= Zobrist.GetZobristEnPessant(Position.State.EnPassantSquare.File().ToInt());
+            if (State.EnPassantSquare != ESquare.none)
+                key ^= Zobrist.GetZobristEnPessant(State.EnPassantSquare.File().ToInt());
 
             if (move.IsNullMove())
             {
                 key ^= pawnKey;
-                Position.State.Key = key;
-                Position.State.PawnStructureKey = pawnKey;
+                State.Key = key;
+                State.PawnStructureKey = pawnKey;
                 return;
             }
 
@@ -487,7 +475,7 @@ namespace Rudz.Chess
             }
 
             if (pawnPiece && move.IsEnPassantMove())
-                pawnKey ^= Zobrist.GetZobristPst(move.GetCapturedPiece().Type() + (Position.State.SideToMove << 3), squareTo + (Position.State.SideToMove.Side == 0 ? 8 : -8));
+                pawnKey ^= Zobrist.GetZobristPst(move.GetCapturedPiece().Type() + (State.SideToMove << 3), squareTo + (State.SideToMove.Side == 0 ? 8 : -8));
             else if (move.IsCaptureMove())
             {
                 if (pawnPiece)
@@ -504,15 +492,15 @@ namespace Rudz.Chess
 
             // castleling
             // castling rights
-            if (Position.State.CastlelingRights != _stateList[PositionIndex - 1].CastlelingRights)
+            if (State.CastlelingRights != _stateList[PositionIndex - 1].CastlelingRights)
             {
                 key ^= Zobrist.GetZobristCastleling(_stateList[PositionIndex - 1].CastlelingRights);
-                key ^= Zobrist.GetZobristCastleling(Position.State.CastlelingRights);
+                key ^= Zobrist.GetZobristCastleling(State.CastlelingRights);
             }
 
             key ^= pawnKey;
-            Position.State.Key = key;
-            Position.State.PawnStructureKey = pawnKey;
+            State.Key = key;
+            State.PawnStructureKey = pawnKey;
         }
 
         private bool IsRepetition()
@@ -521,7 +509,7 @@ namespace Rudz.Chess
             var backPosition = PositionIndex;
             while ((backPosition -= 2) >= 0)
             {
-                if (_stateList[backPosition].Key != Position.State.Key)
+                if (_stateList[backPosition].Key != State.Key)
                     continue;
                 if (++_repetitionCounter == 3)
                     return true;
@@ -638,7 +626,7 @@ namespace Rudz.Chess
                 return;
             }
 
-            Position.State.CastlelingRights |= CastlePositionalOr[0, side.Side];
+            State.CastlelingRights |= CastlePositionalOr[0, side.Side];
             var them = ~side;
             var castlelingMask = ECastleling.Short.GetCastleAllowedMask(side);
             var ksq = Position.GetPieceSquare(EPieceType.King, side);
@@ -674,7 +662,7 @@ namespace Rudz.Chess
                 return;
             }
 
-            Position.State.CastlelingRights |= CastlePositionalOr[1, side.Side];
+            State.CastlelingRights |= CastlePositionalOr[1, side.Side];
             var them = ~side;
             var castlelingMask = ECastleling.Long.GetCastleAllowedMask(side);
             var ksq = Position.GetPieceSquare(EPieceType.King, side);
