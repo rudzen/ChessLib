@@ -43,7 +43,7 @@ namespace Rudz.Chess
 
         public int FiftyMoveRuleCounter { get; set; }
 
-        public ulong Key { get; internal set; }
+        public ulong Key { get; set; }
 
         public ECastlelingRights CastlelingRights { get; set; }
 
@@ -53,20 +53,24 @@ namespace Rudz.Chess
 
         public BitBoard Pinned { get; set; }
 
-        public State(IPosition position)
+        public State()
         {
+            LastMove = MoveExtensions.EmptyMove;
             Material = new Material();
-            Clear();
+            CastlelingRights = ECastlelingRights.None;
+            EnPassantSquare = ESquare.none;
+            SideToMove = PlayerExtensions.White;
         }
 
         public void Clear()
         {
-            CastlelingRights = 0;
-            ReversibleHalfMoveCount = 0;
-            PawnStructureKey = 0;
-            Key = 0;
-            Material.Clear();
             LastMove = MoveExtensions.EmptyMove;
+            Material.Clear();
+            PawnStructureKey = Key = 0ul;
+            ReversibleHalfMoveCount = NullMovesInRow = FiftyMoveRuleCounter = 0;
+            CastlelingRights = ECastlelingRights.None;
+            EnPassantSquare = ESquare.none;
+            SideToMove = PlayerExtensions.White;
         }
     }
 }

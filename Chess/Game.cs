@@ -75,7 +75,7 @@ namespace Rudz.Chess
             _output = new StringBuilder(256);
 
             for (var i = 0; i < _stateList.Length; i++)
-                _stateList[i] = new State(Position);
+                _stateList[i] = new State();
 
             PositionIndex = 0;
             State = Position.State = _stateList[PositionIndex];
