@@ -406,8 +406,9 @@ namespace Rudz.Chess
 
             ulong tot = 0;
 
-            foreach (var move in mg.Moves)
+            for (var i = 0; i < mg.Moves.Count; ++i)
             {
+                var move = mg.Moves.GetMove(i);
                 MakeMove(move);
                 tot += Perft(depth - 1);
                 TakeMove();
@@ -515,12 +516,8 @@ namespace Rudz.Chess
             _repetitionCounter = 1;
             var backPosition = PositionIndex;
             while ((backPosition -= 2) >= 0)
-            {
-                if (_stateList[backPosition].Key != State.Key)
-                    continue;
-                if (++_repetitionCounter == 3)
+                if (_stateList[backPosition].Key == State.Key && ++_repetitionCounter == 3)
                     return true;
-            }
 
             return false;
         }
@@ -600,7 +597,7 @@ namespace Rudz.Chess
                 fen.Advance();
             }
 
-            if (castleFunctions.Count != 0)
+            if (castleFunctions.Any())
             {
                 // invoke the gathered castleling configure functions
                 foreach (var castleFunction in castleFunctions)

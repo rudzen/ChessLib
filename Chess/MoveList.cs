@@ -26,6 +26,7 @@ SOFTWARE.
 
 namespace Rudz.Chess
 {
+    using EnsureThat;
     using Extensions;
     using System.Collections;
     using System.Collections.Generic;
@@ -42,6 +43,7 @@ namespace Rudz.Chess
 
         public MoveList(Move[] moves)
         {
+            EnsureArg.IsNotNull(moves, nameof(moves));
             _moveIndex = -1;
             _moves = moves;
         }
@@ -63,12 +65,27 @@ namespace Rudz.Chess
                 ? _moves[index]
                 : MoveExtensions.EmptyMove;
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Move GetMove(Square fromSquare, Square toSquare)
+        {
+            var max = _moveIndex + 1;
+            for (var i = 0; i < max; ++i)
+            {
+                var move = _moves[i];
+                if (move.GetFromSquare() == fromSquare && move.GetToSquare() == toSquare)
+                    return move;
+            }
+
+            return MoveExtensions.EmptyMove;
+        }
+
         public Move this[int index] => GetMove(index);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public IEnumerator<Move> GetEnumerator()
         {
-            for (var i = 0; i < _moveIndex; ++i)
+            var max = _moveIndex + 1;
+            for (var i = 0; i < max; ++i)
                 yield return _moves[i];
         }
 
