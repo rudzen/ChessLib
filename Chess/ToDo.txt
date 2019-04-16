@@ -24,16 +24,13 @@ SOFTWARE.
 
 Types for:
 - Zobrist key
-- CastlelingRights
 - Movelist (done, not tested)
 - Piece value
-- Score value
-- Move value
 
 Improve:
 - Move generation cache dictionary functionality
-- Move notation functionality (add more notaion variation, including humanoid readble)
+- Move notation functionality (add more notaion variation, including humanoid readable)
 
 Functionality:
-- Transposition Table (perhaps)
+- Transposition Table
 - Pinned pieces should be generated when making a move and stored as array in State

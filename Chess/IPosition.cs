@@ -27,6 +27,7 @@ SOFTWARE.
 namespace Rudz.Chess
 {
     using Enums;
+    using Fen;
     using System;
     using System.Collections.Generic;
     using Types;
@@ -37,8 +38,6 @@ namespace Rudz.Chess
 
         BitBoard[] OccupiedBySide { get; }
 
-        Square[] KingSquares { get; }
-
         bool IsProbing { get; set; }
 
         BitBoard Occupied { get; set; }
@@ -46,6 +45,10 @@ namespace Rudz.Chess
         Piece[] BoardLayout { get; }
 
         Action<Piece, Square> PieceUpdated { get; }
+
+        bool InCheck { get; set; }
+
+        State State { get; set; }
 
         void Clear();
 
@@ -81,6 +84,8 @@ namespace Rudz.Chess
 
         BitBoard Pieces(EPieceType type1, EPieceType type2, Player side);
 
+        Square GetPieceSquare(EPieceType pt, Player color);
+
         bool PieceOnFile(Square square, Player side, EPieceType pieceType);
 
         bool PawnIsolated(Square square, Player side);
@@ -110,5 +115,21 @@ namespace Rudz.Chess
         void SetKingCastleFrom(Player side, Square square, ECastleling castleType);
 
         ECastleling IsCastleMove(string m);
+
+        Move StringToMove(string m);
+
+        bool CanCastle(ECastleling type);
+
+        bool IsCastleAllowed(Square square);
+
+        bool IsPseudoLegal(Move move);
+
+        bool IsLegal(Move move, Piece piece, Square from, EMoveType type);
+
+        bool IsLegal(Move move);
+
+        bool IsMate();
+
+        FenData GenerateFen();
     }
 }

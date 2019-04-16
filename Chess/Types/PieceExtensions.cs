@@ -39,7 +39,7 @@ namespace Rudz.Chess.Types
         private const string PromotionPieceNotation = "  nbrq";
 
         // for polyglot support in the future
-        private const string BookPieceNames = "pPnNbBrRqQkK";
+        public const string BookPieceNames = "pPnNbBrRqQkK";
 
         private const ushort WhitePieces = 126;
 

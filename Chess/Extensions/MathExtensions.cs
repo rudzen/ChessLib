@@ -26,7 +26,6 @@ SOFTWARE.
 
 namespace Rudz.Chess.Extensions
 {
-    using Properties;
     using System;
     using System.Diagnostics.CodeAnalysis;
     using System.Runtime.CompilerServices;
@@ -65,7 +64,7 @@ namespace Rudz.Chess.Extensions
         /// <param name="str">The string to convert</param>
         /// <returns>The resulting number</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int ToIntegral([CanBeNull] this string str)
+        public static int ToIntegral(this string str)
         {
             if (string.IsNullOrWhiteSpace(str))
                 return 0;
@@ -89,7 +88,7 @@ namespace Rudz.Chess.Extensions
             return neg ? -x : x;
         }
 
-        public static bool ToIntegral([CanBeNull] this string str, out int result)
+        public static bool ToIntegral(this string str, out int result)
         {
             if (string.IsNullOrWhiteSpace(str))
             {
@@ -102,7 +101,7 @@ namespace Rudz.Chess.Extensions
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool ToIntegral([CanBeNull] this string str, out ulong result)
+        public static bool ToIntegral(this string str, out ulong result)
         {
             if (string.IsNullOrWhiteSpace(str))
             {

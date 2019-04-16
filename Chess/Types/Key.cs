@@ -27,7 +27,6 @@ SOFTWARE.
 namespace Rudz.Chess.Types
 {
     using Data;
-    using Enums;
 
     /// <summary>
     /// Type for 64 bit key.
@@ -46,7 +45,7 @@ namespace Rudz.Chess.Types
 
         public ushort GetLast16Bits() => (ushort) (Value >> 48);
 
-        public void Hash(ECastleling castleling, ERank rank) => Value ^= Zobrist.GetZobristCastleling((int) rank);
+        //public void Hash(ECastleling castleling, ERank rank) => Value ^= Zobrist.GetZobristCastleling((int) rank);
 
         public void Hash(Piece piece, Square square) => Value ^= Zobrist.GetZobristPst(piece, square);
 

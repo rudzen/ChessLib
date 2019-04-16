@@ -39,7 +39,7 @@ namespace Rudz.Chess
 
         private static readonly int[] PieceBitShift;
 
-        private readonly uint[] _key = { 0, 0 };
+        private readonly uint[] _key;
 
         public int[] MaterialValue { get; }
 
@@ -65,6 +65,7 @@ namespace Rudz.Chess
         public Material()
         {
             MaterialValue = new int[2];
+            _key = new[] { 0u, 0u };
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -91,11 +92,11 @@ namespace Rudz.Chess
             if (move.IsCaptureMove())
                 Remove(move.GetCapturedPiece());
 
-            if (!move.IsPromotionMove())
-                return;
-
-            Remove(move.GetMovingPiece());
-            Add(move.GetPromotedPiece());
+            if (move.IsPromotionMove())
+            {
+                Remove(move.GetMovingPiece());
+                Add(move.GetPromotedPiece());
+            }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

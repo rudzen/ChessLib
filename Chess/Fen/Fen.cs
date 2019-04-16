@@ -1,4 +1,4 @@
-﻿/*
+/*
 ChessLib, a chess data structure library
 
 MIT License
@@ -24,14 +24,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using Rudz.Chess.Exceptions;
-
 namespace Rudz.Chess.Fen
 {
     using EnsureThat;
     using Enums;
+    using Exceptions;
     using Extensions;
-    using Properties;
     using System;
     using System.Runtime.CompilerServices;
     using System.Text;
@@ -42,9 +40,9 @@ namespace Rudz.Chess.Fen
     {
         public const string StartPositionFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
-        private const string FenRankRegexSnippet = @"[1-8KkQqRrBbNnPp]{1,8}";
+        public const int MaxFenLen = 128;
 
-        private const int MaxFenLen = 128;
+        private const string FenRankRegexSnippet = @"[1-8KkQqRrBbNnPp]{1,8}";
 
         private const char Space = ' ';
 
@@ -57,94 +55,6 @@ namespace Rudz.Chess.Fen
         private static readonly Lazy<Regex> ValidFenRegex = new Lazy<Regex>(() => new Regex(
            string.Format(@"^ \s* {0}/{0}/{0}/{0}/{0}/{0}/{0}/{0} \s+ (?:w|b) \s+ (?:[KkQq]+|\-) \s+ (?:[a-h][1-8]|\-) \s+ \d+ \s+ \d+ \s* $", FenRankRegexSnippet),
            RegexOptions.Compiled | RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline));
-
-        /// <summary>
-        /// Parses the board layout to a FEN representation..
-        /// Beware, goblins are a foot.
-        /// </summary>
-        /// <param name="state">
-        /// The position class which contains relevant information about the status of the board.
-        /// </param>
-        /// <param name="boardLayout"></param>
-        /// <param name="halfMoveCount">
-        /// The half Move Count.
-        /// </param>
-        /// <returns>
-        /// The FenData which contains the fen string that was generated.
-        /// </returns>
-        public static FenData GenerateFen([NotNull] this State state, Piece[] boardLayout, int halfMoveCount)
-        {
-            EnsureArg.IsNotNull(boardLayout, nameof(boardLayout));
-            EnsureArg.IsGte(halfMoveCount, 0, nameof(halfMoveCount));
-
-            var sv = new StringBuilder(MaxFenLen);
-
-            for (var rank = ERank.Rank8; rank >= ERank.Rank1; rank--)
-            {
-                var empty = 0;
-
-                for (var file = EFile.FileA; file < EFile.FileNb; file++)
-                {
-                    var square = new Square(rank, file);
-                    var piece = boardLayout[square.ToInt()];
-
-                    if (piece.IsNoPiece())
-                    {
-                        empty++;
-                        continue;
-                    }
-
-                    if (empty != 0)
-                    {
-                        sv.Append(empty);
-                        empty = 0;
-                    }
-
-                    sv.Append(piece.GetPieceChar());
-                }
-
-                if (empty != 0)
-                    sv.Append(empty);
-
-                if (rank > ERank.Rank1)
-                    sv.Append('/');
-            }
-
-            sv.Append(state.SideToMove.IsWhite() ? " w " : " b ");
-
-            var castleRights = state.CastlelingRights;
-
-            if (castleRights != 0)
-            {
-                if ((castleRights & 1) != 0)
-                    sv.Append('K');
-
-                if ((castleRights & 2) != 0)
-                    sv.Append('Q');
-
-                if ((castleRights & 4) != 0)
-                    sv.Append('k');
-
-                if ((castleRights & 8) != 0)
-                    sv.Append('q');
-            }
-            else
-                sv.Append('-');
-
-            sv.Append(' ');
-
-            if (state.EnPassantSquare == ESquare.none)
-                sv.Append('-');
-            else
-                sv.Append(state.EnPassantSquare.ToString());
-
-            sv.Append(' ');
-
-            sv.Append(state.ReversibleHalfMoveCount);
-            sv.Append(' ');
-            sv.Append(halfMoveCount + 1);
-            return new FenData(sv.ToString());
-        }
 
         /// <summary>
         /// Performs basic validation of FEN string.
@@ -177,7 +87,7 @@ namespace Rudz.Chess.Fen
         public static bool IsDelimiter(char c) => c == Space;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ESquare GetEpSquare(this FenData fen)
+        public static Square GetEpSquare(this FenData fen)
         {
             var c = fen.GetAdvance();
 
@@ -311,10 +221,11 @@ namespace Rudz.Chess.Fen
                 {
                     case Seperator:
                         seperatorCount++;
-                        continue;
+                        break;
+
                     case Space:
                         spaceCount++;
-                        continue;
+                        break;
                 }
             }
 

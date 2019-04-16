@@ -575,7 +575,7 @@ namespace Rudz.Chess.Types
             if (ShiftFuncs.TryGetValue(direction.Value, out var func))
                 return func(bb);
 
-            throw new ArgumentException($"Invalid shift argument.", nameof(direction));
+            throw new ArgumentException("Invalid shift argument.", nameof(direction));
         }
 
         /* non extension methods */
