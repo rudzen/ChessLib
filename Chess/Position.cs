@@ -28,11 +28,13 @@ namespace Rudz.Chess
 {
     using Enums;
     using Extensions;
+    using Fen;
     using System;
     using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
     using System.Runtime.CompilerServices;
+    using System.Text;
     using Types;
 
     /// <summary>
@@ -412,7 +414,7 @@ namespace Rudz.Chess
         /// On fail : Move containing from and to squares as ESquare.none (empty move)
         /// On Ok   : The move!
         /// </returns>
-        public Move StringToMove(string m, State state)
+        public Move StringToMove(string m)
         {
             // guards
             if (string.IsNullOrWhiteSpace(m))
@@ -438,13 +440,6 @@ namespace Rudz.Chess
             var to = new Square(m[3] - '1', m[2] - 'a');
 
             // local function to determine if the move is actually a castleling move by looking at the piece location of the squares
-            ECastleling ShredderFunc(Square fromSquare, Square toSquare) =>
-                GetPiece(fromSquare).Value == EPieces.WhiteKing && GetPiece(toSquare).Value == EPieces.WhiteRook
-                || GetPiece(fromSquare).Value == EPieces.BlackKing && GetPiece(toSquare).Value == EPieces.BlackRook
-                    ? toSquare > fromSquare
-                          ? ECastleling.Short
-                          : ECastleling.Long
-                    : ECastleling.None;
 
             // part one of pillaging the castleType.. detection of chess 960 - shredder fen
             if (castleType == ECastleling.None)
@@ -453,18 +448,18 @@ namespace Rudz.Chess
             // part two of pillaging the castleType var, since it might have changed
             if (castleType != ECastleling.None)
             {
-                from = GetKingCastleFrom(state.SideToMove, castleType);
-                to = castleType.GetKingCastleTo(state.SideToMove);
+                from = GetKingCastleFrom(State.SideToMove, castleType);
+                to = castleType.GetKingCastleTo(State.SideToMove);
             }
 
             var mg = new MoveGenerator(this);
             mg.GenerateMoves();
 
+            var matchingMoves = mg.Moves.Where(x => x.GetFromSquare() == from && x.GetToSquare() == to);
+
             // ** untested area **
-            foreach (var move in mg.Moves)
+            foreach (var move in matchingMoves)
             {
-                if (move.GetFromSquare() != from || move.GetToSquare() != to)
-                    continue;
                 if (castleType == ECastleling.None && move.IsCastlelingMove())
                     continue;
                 if (!move.IsPromotionMove())
@@ -617,6 +612,84 @@ namespace Rudz.Chess
             return !mg.Moves.Any(IsLegal);
         }
 
+        /// <summary>
+        /// Parses the board layout to a FEN representation..
+        /// Beware, goblins are a foot.
+        /// </summary>
+        /// <returns>
+        /// The FenData which contains the fen string that was generated.
+        /// </returns>
+        public FenData GenerateFen()
+        {
+            var sv = new StringBuilder(Fen.Fen.MaxFenLen);
+
+            for (var rank = ERank.Rank8; rank >= ERank.Rank1; rank--)
+            {
+                var empty = 0;
+
+                for (var file = EFile.FileA; file < EFile.FileNb; file++)
+                {
+                    var square = new Square(rank, file);
+                    var piece = BoardLayout[square.ToInt()];
+
+                    if (piece.IsNoPiece())
+                    {
+                        empty++;
+                        continue;
+                    }
+
+                    if (empty != 0)
+                    {
+                        sv.Append(empty);
+                        empty = 0;
+                    }
+
+                    sv.Append(piece.GetPieceChar());
+                }
+
+                if (empty != 0)
+                    sv.Append(empty);
+
+                if (rank > ERank.Rank1)
+                    sv.Append('/');
+            }
+
+            sv.Append(State.SideToMove.IsWhite() ? " w " : " b ");
+
+            var castleRights = State.CastlelingRights;
+
+            if (castleRights != 0)
+            {
+                if (castleRights.HasFlagFast(ECastlelingRights.WhiteOO))
+                    sv.Append('K');
+
+                if (castleRights.HasFlagFast(ECastlelingRights.WhiteOOO))
+                    sv.Append('Q');
+
+                if (castleRights.HasFlagFast(ECastlelingRights.BlackOO))
+                    sv.Append('k');
+
+                if (castleRights.HasFlagFast(ECastlelingRights.BlackOOO))
+                    sv.Append('q');
+            }
+            else
+                sv.Append('-');
+
+            sv.Append(' ');
+
+            if (State.EnPassantSquare == ESquare.none)
+                sv.Append('-');
+            else
+                sv.Append(State.EnPassantSquare.ToString());
+
+            sv.Append(' ');
+
+            sv.Append(State.ReversibleHalfMoveCount);
+            sv.Append(' ');
+            sv.Append(State.HalfMoveCount + 1);
+            return new FenData(sv.ToString());
+        }
+
         public IEnumerator<Piece> GetEnumerator()
         {
             // ReSharper disable once ForCanBeConvertedToForeach
@@ -626,5 +699,13 @@ namespace Rudz.Chess
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private ECastleling ShredderFunc(Square fromSquare, Square toSquare) =>
+            GetPiece(fromSquare).Value == EPieces.WhiteKing && GetPiece(toSquare).Value == EPieces.WhiteRook || GetPiece(fromSquare).Value == EPieces.BlackKing && GetPiece(toSquare).Value == EPieces.BlackRook
+                ? toSquare > fromSquare
+                    ? ECastleling.Short
+                    : ECastleling.Long
+                : ECastleling.None;
     }
 }

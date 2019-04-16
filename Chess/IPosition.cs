@@ -27,6 +27,7 @@ SOFTWARE.
 namespace Rudz.Chess
 {
     using Enums;
+    using Fen;
     using System;
     using System.Collections.Generic;
     using Types;
@@ -115,7 +116,7 @@ namespace Rudz.Chess
 
         ECastleling IsCastleMove(string m);
 
-        Move StringToMove(string m, State state);
+        Move StringToMove(string m);
 
         bool CanCastle(ECastleling type);
 
@@ -128,5 +129,7 @@ namespace Rudz.Chess
         bool IsLegal(Move move);
 
         bool IsMate();
+
+        FenData GenerateFen();
     }
 }

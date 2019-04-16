@@ -40,9 +40,9 @@ namespace Rudz.Chess.Fen
     {
         public const string StartPositionFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
-        private const string FenRankRegexSnippet = @"[1-8KkQqRrBbNnPp]{1,8}";
+        public const int MaxFenLen = 128;
 
-        private const int MaxFenLen = 128;
+        private const string FenRankRegexSnippet = @"[1-8KkQqRrBbNnPp]{1,8}";
 
         private const char Space = ' ';
 
@@ -55,94 +55,6 @@ namespace Rudz.Chess.Fen
         private static readonly Lazy<Regex> ValidFenRegex = new Lazy<Regex>(() => new Regex(
            string.Format(@"^ \s* {0}/{0}/{0}/{0}/{0}/{0}/{0}/{0} \s+ (?:w|b) \s+ (?:[KkQq]+|\-) \s+ (?:[a-h][1-8]|\-) \s+ \d+ \s+ \d+ \s* $", FenRankRegexSnippet),
            RegexOptions.Compiled | RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline));
-
-        /// <summary>
-        /// Parses the board layout to a FEN representation..
-        /// Beware, goblins are a foot.
-        /// </summary>
-        /// <param name="state">
-        /// The position class which contains relevant information about the status of the board.
-        /// </param>
-        /// <param name="boardLayout"></param>
-        /// <param name="halfMoveCount">
-        /// The half Move Count.
-        /// </param>
-        /// <returns>
-        /// The FenData which contains the fen string that was generated.
-        /// </returns>
-        public static FenData GenerateFen(this State state, Piece[] boardLayout, int halfMoveCount)
-        {
-            EnsureArg.IsNotNull(boardLayout, nameof(boardLayout));
-            EnsureArg.IsGte(halfMoveCount, 0, nameof(halfMoveCount));
-
-            var sv = new StringBuilder(MaxFenLen);
-
-            for (var rank = ERank.Rank8; rank >= ERank.Rank1; rank--)
-            {
-                var empty = 0;
-
-                for (var file = EFile.FileA; file < EFile.FileNb; file++)
-                {
-                    var square = new Square(rank, file);
-                    var piece = boardLayout[square.ToInt()];
-
-                    if (piece.IsNoPiece())
-                    {
-                        empty++;
-                        continue;
-                    }
-
-                    if (empty != 0)
-                    {
-                        sv.Append(empty);
-                        empty = 0;
-                    }
-
-                    sv.Append(piece.GetPieceChar());
-                }
-
-                if (empty != 0)
-                    sv.Append(empty);
-
-                if (rank > ERank.Rank1)
-                    sv.Append('/');
-            }
-
-            sv.Append(state.SideToMove.IsWhite() ? " w " : " b ");
-
-            var castleRights = state.CastlelingRights;
-
-            if (castleRights != 0)
-            {
-                if (castleRights.HasFlagFast(ECastlelingRights.WhiteOO))
-                    sv.Append('K');
-
-                if (castleRights.HasFlagFast(ECastlelingRights.WhiteOOO))
-                    sv.Append('Q');
-
-                if (castleRights.HasFlagFast(ECastlelingRights.BlackOO))
-                    sv.Append('k');
-
-                if (castleRights.HasFlagFast(ECastlelingRights.BlackOOO))
-                    sv.Append('q');
-            }
-            else
-                sv.Append('-');
-
-            sv.Append(' ');
-
-            if (state.EnPassantSquare == ESquare.none)
-                sv.Append('-');
-            else
-                sv.Append(state.EnPassantSquare.ToString());
-
-            sv.Append(' ');
-
-            sv.Append(state.ReversibleHalfMoveCount);
-            sv.Append(' ');
-            sv.Append(halfMoveCount + 1);
-            return new FenData(sv.ToString());
-        }
 
         /// <summary>
         /// Performs basic validation of FEN string.

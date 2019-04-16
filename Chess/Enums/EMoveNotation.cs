@@ -29,6 +29,9 @@ namespace Rudz.Chess.Enums
     using System;
 
     // TODO : implement Crn/Smith/Descriptive/Coordinate/ICCF notations
+
+    // ICCF : https://en.wikipedia.org/wiki/ICCF_numeric_notation
+
     [Flags]
     public enum EMoveNotation
     {

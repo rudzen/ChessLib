@@ -122,6 +122,7 @@ namespace Rudz.Chess
             State.SideToMove = ~previous.SideToMove;
             State.Material = previous.Material;
             State.LastMove = move;
+            State.HalfMoveCount = PositionIndex;
 
             // compute in-check
             Position.InCheck = Position.IsAttacked(Position.GetPieceSquare(EPieceType.King, State.SideToMove), ~State.SideToMove);
@@ -155,6 +156,7 @@ namespace Rudz.Chess
             Position.TakeMove(State.LastMove);
             --PositionIndex;
             State = Position.State = _stateList[PositionIndex];
+            State.HalfMoveCount = PositionIndex;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -307,7 +309,7 @@ namespace Rudz.Chess
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public FenData GetFen() => State.GenerateFen(Position.BoardLayout, HalfMoveCount());
+        public FenData GetFen() => Position.GenerateFen();
 
         /// <summary>
         /// Converts a move data type to move notation string format which chess engines understand.
@@ -684,7 +686,7 @@ namespace Rudz.Chess
         private int HalfMoveCount()
         {
             // TODO : This is WRONG!? :)
-            return PositionIndex;
+            return State.HalfMoveCount;
         }
     }
 }

@@ -39,6 +39,8 @@ namespace Rudz.Chess
 
         public int ReversibleHalfMoveCount { get; set; }
 
+        public int HalfMoveCount { get; set; }
+
         public int NullMovesInRow { get; set; }
 
         public int FiftyMoveRuleCounter { get; set; }

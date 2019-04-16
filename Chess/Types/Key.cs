@@ -27,7 +27,6 @@ SOFTWARE.
 namespace Rudz.Chess.Types
 {
     using Data;
-    using Enums;
 
     /// <summary>
     /// Type for 64 bit key.

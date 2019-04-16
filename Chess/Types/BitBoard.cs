@@ -190,8 +190,9 @@ namespace Rudz.Chess.Types
         public BitBoard OrAll(params BitBoard[] bbs)
         {
             var val = Value;
-            for (var i = 0; i < bbs.Length; ++i)
-                val |= bbs[i].Value;
+            foreach (var b in bbs)
+                val |= b.Value;
+
             return val;
         }
 
