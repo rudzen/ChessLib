@@ -144,7 +144,7 @@ namespace Rudz.Chess
             UpdateKey(move);
             State.Material.MakeMove(move);
 
-            State.GenerateMoves();
+            //State.GenerateMoves();
 
             return true;
         }
@@ -301,7 +301,7 @@ namespace Rudz.Chess
 
             Position.InCheck = Position.IsAttacked(Position.GetPieceSquare(EPieceType.King, State.SideToMove), ~State.SideToMove);
 
-            State.GenerateMoves(true);
+            //State.GenerateMoves(true);
 
             return 0;
         }
@@ -343,14 +343,18 @@ namespace Rudz.Chess
         public void UpdateDrawTypes()
         {
             var gameEndType = EGameEndType.None;
-            if (!State.Moves.Any(move => Position.IsLegal(move)))
-                gameEndType |= EGameEndType.Pat;
             if (IsRepetition())
                 gameEndType |= EGameEndType.Repetition;
             if (State.Material[PlayerExtensions.White.Side] <= 300 && State.Material[PlayerExtensions.Black.Side] <= 300 && Position.BoardPieces[0].Empty() && Position.BoardPieces[8].Empty())
                 gameEndType |= EGameEndType.MaterialDrawn;
             if (State.ReversibleHalfMoveCount >= 100)
                 gameEndType |= EGameEndType.FiftyMove;
+
+            var mg = new MoveGenerator(Position);
+            mg.GenerateMoves();
+            if (!mg.Moves.Any(move => Position.IsLegal(move)))
+                gameEndType |= EGameEndType.Pat;
+
             GameEndType = gameEndType;
         }
 
@@ -393,13 +397,14 @@ namespace Rudz.Chess
 
         public ulong Perft(int depth)
         {
-            State.GenerateMoves();
+            var mg = new MoveGenerator(Position);
+            mg.GenerateMoves();
             if (depth == 1)
-                return (ulong)State.Moves.Count;
+                return (ulong)mg.Moves.Count;
 
             ulong tot = 0;
 
-            foreach (var move in State.Moves)
+            foreach (var move in mg.Moves)
             {
                 MakeMove(move);
                 tot += Perft(depth - 1);

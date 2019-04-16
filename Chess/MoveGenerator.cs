@@ -35,7 +35,7 @@ namespace Rudz.Chess
     using System.Runtime.CompilerServices;
     using Types;
 
-    public class MoveGenerator
+    public sealed class MoveGenerator
     {
         private static readonly ConcurrentDictionary<ulong, List<Move>> Table;
 
@@ -49,7 +49,7 @@ namespace Rudz.Chess
             AppDomain.CurrentDomain.ProcessExit += Clean;
         }
 
-        protected internal MoveGenerator(IPosition position)
+        public MoveGenerator(IPosition position)
         {
             EnsureArg.IsNotNull(position, nameof(position));
             _position = position;

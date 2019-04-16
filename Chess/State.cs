@@ -29,7 +29,7 @@ namespace Rudz.Chess
     using Enums;
     using Types;
 
-    public sealed class State : MoveGenerator
+    public sealed class State
     {
         public Move LastMove { get; set; }
 
@@ -54,7 +54,6 @@ namespace Rudz.Chess
         public BitBoard Pinned { get; set; }
 
         public State(IPosition position)
-            : base(position)
         {
             Material = new Material();
             Clear();

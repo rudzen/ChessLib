@@ -37,7 +37,13 @@ Result	6	1,912,300.6 us	3,551.167 us	3,148.017 us
  Result | 5 |    51,304.89 us | 1,006.0687 us | 1,235.5427 us |
  Result | 6 | 1,547,075.27 us | 2,673.5871 us | 2,500.8751 us |
 
-     */
+ Method | N |         Mean |     Error |    StdDev |
+------- |-- |-------------:|----------:|----------:|
+ Result | 4 |     1.569 ms | 0.0032 ms | 0.0030 ms |
+ Result | 5 |    49.873 ms | 0.6022 ms | 0.5029 ms |
+ Result | 6 | 1,525.450 ms | 2.8101 ms | 2.3466 ms |
+*/
+
     public class PerftBenchRunner
     {
         public static void Main(string[] args)
