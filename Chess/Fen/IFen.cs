@@ -24,11 +24,21 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using System.Runtime.CompilerServices;
+
 namespace Rudz.Chess.Fen
 {
     public interface IFenData
     {
         string Fen { get; set; }
+
+        int Index { get; }
+
+        char GetAdvance { get; }
+
+        char Get { get; }
+
+        char this[int index] { get; }
 
         void Advance();
 
@@ -36,23 +46,6 @@ namespace Rudz.Chess.Fen
 
         bool Equals(object obj);
 
-        char Get();
-
-        char Get(int index);
-
-        char GetAdvance();
-
-        char GetAdvance(int count);
-
         int GetHashCode();
-
-        int GetIndex();
-    }
-
-    public interface IFenError
-    {
-        int ErrorNumber { get; set; }
-
-        int FenIndex { get; set; }
     }
 }

@@ -104,9 +104,6 @@ namespace Rudz.Chess
         /// <returns>true if everything was fine, false if unable to progress - fx castleling position under attack</returns>
         public bool MakeMove(Move move)
         {
-            if (move.IsNullMove())
-                return false;
-
             if (!Position.MakeMove(move))
                 return false;
 
@@ -194,7 +191,7 @@ namespace Rudz.Chess
             var fen = new FenData(fenString);
 
             Player player;
-            var c = fen.GetAdvance();
+            var c = fen.GetAdvance;
 
             var f = 1; // file (column)
             var r = 8; // rank (row)
@@ -206,27 +203,27 @@ namespace Rudz.Chess
                 {
                     f += c - '0';
                     if (f > 9)
-                        return new FenError(-1, fen.GetIndex());
+                        return new FenError(-1, fen.Index);
 
-                    c = fen.GetAdvance();
+                    c = fen.GetAdvance;
                     continue;
                 }
 
                 if (c == '/')
                 {
                     if (f != 9)
-                        return new FenError(-2, fen.GetIndex());
+                        return new FenError(-2, fen.Index);
 
                     r--;
                     f = 1;
-                    c = fen.GetAdvance();
+                    c = fen.GetAdvance;
                     continue;
                 }
 
                 var pieceIndex = PieceExtensions.PieceChars.IndexOf(c);
 
                 if (pieceIndex == -1)
-                    return new FenError(-3, fen.GetIndex());
+                    return new FenError(-3, fen.Index);
 
                 player = char.IsLower(PieceExtensions.PieceChars[pieceIndex]);
 
@@ -234,29 +231,29 @@ namespace Rudz.Chess
 
                 AddPiece(square, player, (EPieceType)pieceIndex);
 
-                c = fen.GetAdvance();
+                c = fen.GetAdvance;
 
                 f++;
             }
 
             if (!Fen.Fen.IsDelimiter(c))
-                return new FenError(-4, fen.GetIndex());
+                return new FenError(-4, fen.Index);
 
-            c = fen.GetAdvance();
+            c = fen.GetAdvance;
 
             player = c == 'w' ? 0 : 1;
 
             if (player == -1)
-                return new FenError(-4, fen.GetIndex());
+                return new FenError(-4, fen.Index);
 
-            if (!Fen.Fen.IsDelimiter(fen.GetAdvance()))
-                return new FenError(-5, fen.GetIndex());
+            if (!Fen.Fen.IsDelimiter(fen.GetAdvance))
+                return new FenError(-5, fen.Index);
 
             if (SetupCastleling(fen) == -1)
-                return new FenError(-5, fen.GetIndex());
+                return new FenError(-5, fen.Index);
 
-            if (!Fen.Fen.IsDelimiter(fen.GetAdvance()))
-                return new FenError(-6, fen.GetIndex());
+            if (!Fen.Fen.IsDelimiter(fen.GetAdvance))
+                return new FenError(-6, fen.Index);
 
             State.EnPassantSquare = fen.GetEpSquare();
 
@@ -521,7 +518,7 @@ namespace Rudz.Chess
             // reset castleling rights to defaults
             _castleRightsMask.Fill(ECastlelingRights.Any);
 
-            if (fen.Get() == '-')
+            if (fen.Get == '-')
             {
                 fen.Advance();
                 return 0;
@@ -530,9 +527,9 @@ namespace Rudz.Chess
             // List to gather functions for castleling rights addition.
             var castleFunctions = new List<Action>(4);
 
-            while (fen.Get() != 0 && fen.Get() != ' ')
+            while (fen.Get != 0 && fen.Get != ' ')
             {
-                var c = fen.Get();
+                var c = fen.Get;
 
                 if (c.InBetween('A', 'H'))
                 {

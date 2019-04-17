@@ -128,6 +128,9 @@ namespace Rudz.Chess
 
         public bool MakeMove(Move move)
         {
+            if (move.IsNullMove())
+                return false;
+
             var toSquare = move.GetToSquare();
 
             if (move.IsCastlelingMove())

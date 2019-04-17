@@ -42,12 +42,7 @@ namespace Rudz.Chess.Fen
     {
         private int _index;
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public FenData()
-        {
-            Fen = string.Empty;
-            _index = 0;
-        }
+        static FenData() => FenComparer = new FenEqualityComparer();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public FenData(string fen, int index = 0)
@@ -56,9 +51,21 @@ namespace Rudz.Chess.Fen
             _index = index;
         }
 
-        public static IEqualityComparer<FenData> FenComparer { get; } = new FenEqualityComparer();
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public FenData() : this(string.Empty)
+        { }
+
+        public static IEqualityComparer<FenData> FenComparer { get; }
 
         public string Fen { get; set; }
+
+        public int Index => _index;
+
+        public char GetAdvance => Fen[_index++];
+
+        public char Get => Fen[_index];
+
+        public char this[int index] => Fen[_index];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator FenData(int value) => new FenData(Chess.Fen.Fen.StartPositionFen, value);
@@ -73,32 +80,13 @@ namespace Rudz.Chess.Fen
         public static bool operator !=(FenData left, FenData right) => !left.Equals(right);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public char Get() => Fen[_index];
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public char Get(int index) => Fen[index];
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Advance() => _index++;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Advance(int count) => _index += count;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public char GetAdvance() => Fen[_index++];
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public char GetAdvance(int count)
-        {
-            Advance(count);
-            return Get();
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int GetIndex() => _index;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public override int GetHashCode() => Fen.GetHashCode();
+        public override int GetHashCode() => Fen.GetHashCode() ^ (_index << 24);
 
         public override bool Equals(object obj)
         {

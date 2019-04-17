@@ -89,12 +89,12 @@ namespace Rudz.Chess.Fen
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Square GetEpSquare(this FenData fen)
         {
-            var c = fen.GetAdvance();
+            var c = fen.GetAdvance;
 
             if (c == '-' || !c.InBetween('a', 'h'))
                 return ESquare.none;
 
-            var c2 = fen.GetAdvance();
+            var c2 = fen.GetAdvance;
 
             return c.InBetween('3', '6') ? ESquare.none : new Square(c2 - '1', c - 'a').Value;
         }
