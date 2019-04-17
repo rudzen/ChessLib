@@ -24,8 +24,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-// ReSharper disable IdentifierTypo
-
 namespace Rudz.Chess.Enums
 {
     using System;
@@ -37,10 +35,50 @@ namespace Rudz.Chess.Enums
     [Flags]
     public enum Emgf
     {
-        NoMgf = 0,
-        Legalmoves = 1,
-        Stages = 2,
-        Queenpromotion = 4
+        /// <summary>
+        /// Generate capture moves
+        /// </summary>
+        Capture = 1,
+
+        /// <summary>
+        /// Generate quiet moves
+        /// </summary>
+        Quiet = 2,
+
+        /// <summary>
+        /// Generate quiet moves giving check
+        /// </summary>
+        QuietChecks = 4,
+
+        /// <summary>
+        /// Generate all moves while not in check
+        /// </summary>
+        NonEvasion = 8,
+
+        /// <summary>
+        /// Generate all moves while in check
+        /// </summary>
+        Evasion = 16,
+
+        /// <summary>
+        /// General generate all legal move
+        /// </summary>
+        Legalmoves = 32,
+
+        /// <summary>
+        /// Generate capture while in check
+        /// </summary>
+        EvasionCapture = 64,
+
+        /// <summary>
+        /// Generate quiet moves while in check
+        /// </summary>
+        EvasionQuiet = 128,
+
+        /// <summary>
+        /// Only include queen promotions
+        /// </summary>
+        Queenpromotion = 256
     }
 
     public static class EmgfExtensions

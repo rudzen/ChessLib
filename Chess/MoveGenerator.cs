@@ -30,20 +30,19 @@ namespace Rudz.Chess
     using Enums;
     using System;
     using System.Collections.Concurrent;
-    using System.Collections.Generic;
     using System.Runtime;
     using System.Runtime.CompilerServices;
     using Types;
 
     public sealed class MoveGenerator
     {
-        private static readonly ConcurrentDictionary<ulong, List<Move>> Table;
+        private static readonly ConcurrentDictionary<ulong, MoveList> Table;
 
         private readonly IPosition _position;
 
         static MoveGenerator()
         {
-            Table = new ConcurrentDictionary<ulong, List<Move>>();
+            Table = new ConcurrentDictionary<ulong, MoveList>();
 
             // Force cleaning when process exists
             AppDomain.CurrentDomain.ProcessExit += Clean;
@@ -57,24 +56,21 @@ namespace Rudz.Chess
 
         public Emgf Flags { get; set; } = Emgf.Legalmoves;
 
-        public List<Move> Moves { get; private set; }
+        public MoveList Moves { get; private set; }
 
         public static void ClearMoveCache() => Table.Clear();
 
         public void GenerateMoves(bool force = false)
         {
-            // Align current structure to position.
-            Reset(MoveExtensions.EmptyMove);
-
             // this is only preparation for true engine integration (not used yet)
-            if (Flags.HasFlagFast(Emgf.Stages))
-                return;
+            //if (Flags.HasFlagFast(Emgf.Stages))
+            //    return;
 
             if (Table.TryGetValue(_position.State.Key, out var moves) && !force)
                 Moves = moves;
             else
             {
-                moves = new List<Move>(256);
+                moves = new MoveList();
                 // relax the gc while generating moves.
                 var old = GCSettings.LatencyMode;
                 GCSettings.LatencyMode = GCLatencyMode.LowLatency;
@@ -93,26 +89,7 @@ namespace Rudz.Chess
         /// <param name="ea"></param>
         private static void Clean(object sender, EventArgs ea) => ClearMoveCache();
 
-        /// <summary>
-        /// Aligns the current positional data to the position data.
-        /// </summary>
-        /// <param name="move">Not used atm, but for future library completion</param>
-        private void Reset(Move move)
-        {
-            var flags = Flags;
-
-            // not being used in the current version
-            if (!move.IsNullMove() && (move.IsCastlelingMove() || move.IsEnPassantMove()))
-                flags &= ~Emgf.Stages;
-
-            _position.State.Pinned = flags.HasFlagFast(Emgf.Legalmoves)
-                ? _position.GetPinnedPieces(_position.GetPieceSquare(EPieceType.King, _position.State.SideToMove), _position.State.SideToMove)
-                : BitBoards.EmptyBitBoard;
-
-            Flags = flags;
-        }
-
-        private void GenerateCapturesAndPromotions(ICollection<Move> moves)
+        private void GenerateCapturesAndPromotions(MoveList moves)
         {
             var currentSide = _position.State.SideToMove;
             var them = ~currentSide;
@@ -134,7 +111,7 @@ namespace Rudz.Chess
             AddPawnMoves(moves, pawns.Shift(northWest) & _position.State.EnPassantSquare, currentSide.PawnEastAttackDistance(), EMoveType.Epcapture);
         }
 
-        private void GenerateQuietMoves(ICollection<Move> moves)
+        private void GenerateQuietMoves(MoveList moves)
         {
             var currentSide = _position.State.SideToMove;
             var up = currentSide == PlayerExtensions.White ? EDirection.North : EDirection.South;
@@ -166,7 +143,7 @@ namespace Rudz.Chess
         /// <param name="promoted">The promotion piece (if any, defaults to NoPiece type)</param>
         /// <param name="type">The move type</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void AddMove(ICollection<Move> moves, Piece piece, Square from, Square to, Piece promoted, EMoveType type = EMoveType.Quiet)
+        private void AddMove(MoveList moves, Piece piece, Square from, Square to, Piece promoted, EMoveType type = EMoveType.Quiet)
         {
             Move move;
 
@@ -185,7 +162,7 @@ namespace Rudz.Chess
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void AddMoves(ICollection<Move> moves, Piece piece, Square from, BitBoard attacks)
+        private void AddMoves(MoveList moves, Piece piece, Square from, BitBoard attacks)
         {
             var target = _position.Occupied & attacks;
             foreach (var to in target)
@@ -203,7 +180,7 @@ namespace Rudz.Chess
         /// </summary>
         /// <param name="moves">The move list to add potential moves to.</param>
         /// <param name="targetSquares">The target squares to move to</param>
-        private void AddMoves(ICollection<Move> moves, BitBoard targetSquares)
+        private void AddMoves(MoveList moves, BitBoard targetSquares)
         {
             var c = _position.State.SideToMove;
 
@@ -218,7 +195,7 @@ namespace Rudz.Chess
             }
         }
 
-        private void AddPawnMoves(ICollection<Move> moves, BitBoard targetSquares, Direction direction, EMoveType type)
+        private void AddPawnMoves(MoveList moves, BitBoard targetSquares, Direction direction, EMoveType type)
         {
             if (targetSquares.Empty())
                 return;
@@ -244,6 +221,6 @@ namespace Rudz.Chess
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void AddCastleMove(ICollection<Move> moves, Square from, Square to) => AddMove(moves, EPieceType.King.MakePiece(_position.State.SideToMove), from, to, PieceExtensions.EmptyPiece, EMoveType.Castle);
+        private void AddCastleMove(MoveList moves, Square from, Square to) => AddMove(moves, EPieceType.King.MakePiece(_position.State.SideToMove), from, to, PieceExtensions.EmptyPiece, EMoveType.Castle);
     }
 }
