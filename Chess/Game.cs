@@ -141,6 +141,7 @@ namespace Rudz.Chess
 
             State.Key = previous.Key;
             State.PawnStructureKey = previous.PawnStructureKey;
+            State.Pinned = Position.GetPinnedPieces(Position.GetPieceSquare(EPieceType.King, State.SideToMove), State.SideToMove);
 
             UpdateKey(move);
             State.Material.MakeMove(move);
