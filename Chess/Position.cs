@@ -126,7 +126,7 @@ namespace Rudz.Chess
             PieceUpdated?.Invoke(piece, square);
         }
 
-        public void MakeMove(Move move)
+        public bool MakeMove(Move move)
         {
             var toSquare = move.GetToSquare();
 
@@ -138,8 +138,11 @@ namespace Rudz.Chess
                 RemovePiece(move.GetFromSquare(), king);
                 AddPiece(rook, toSquare.GetRookCastleTo());
                 AddPiece(king, toSquare);
-                return;
+                return true;
             }
+
+            if (IsAttacked(GetPieceSquare(EPieceType.King, ~State.SideToMove), State.SideToMove))
+                return false;
 
             RemovePiece(move.GetFromSquare(), move.GetMovingPiece());
 
@@ -152,6 +155,8 @@ namespace Rudz.Chess
                 RemovePiece(toSquare, move.GetCapturedPiece());
 
             AddPiece(move.IsPromotionMove() ? move.GetPromotedPiece() : move.GetMovingPiece(), toSquare);
+
+            return true;
         }
 
         public void TakeMove(Move move)

@@ -62,6 +62,9 @@ namespace Rudz.Chess
 
         public void GenerateMoves(bool force = false)
         {
+            // Align current structure to position.
+            Reset(MoveExtensions.EmptyMove);
+
             // this is only preparation for true engine integration (not used yet)
             //if (Flags.HasFlagFast(Emgf.Stages))
             //    return;
@@ -88,6 +91,21 @@ namespace Rudz.Chess
         /// <param name="sender"></param>
         /// <param name="ea"></param>
         private static void Clean(object sender, EventArgs ea) => ClearMoveCache();
+
+        /// <summary>
+        /// Aligns the current positional data to the position data.
+        /// </summary>
+        /// <param name="move">Not used atm, but for future library completion</param>
+        private void Reset(Move move)
+        {
+            // not being used in the current version
+            //if (!move.IsNullMove() && (move.IsCastlelingMove() || move.IsEnPassantMove()))
+            //    Flags &= ~Emgf.Stages;
+
+            _position.State.Pinned = Flags.HasFlagFast(Emgf.Legalmoves)
+                ? _position.GetPinnedPieces(_position.GetPieceSquare(EPieceType.King, _position.State.SideToMove), _position.State.SideToMove)
+                : BitBoards.EmptyBitBoard;
+        }
 
         private void GenerateCapturesAndPromotions(MoveList moves)
         {

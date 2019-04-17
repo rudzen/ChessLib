@@ -56,7 +56,7 @@ namespace Rudz.Chess
 
         void AddPiece(EPieceType pieceType, Square square, Player side);
 
-        void MakeMove(Move move);
+        bool MakeMove(Move move);
 
         void TakeMove(Move move);
 

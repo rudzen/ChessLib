@@ -107,22 +107,16 @@ namespace Rudz.Chess
             if (move.IsNullMove())
                 return false;
 
-            Position.MakeMove(move);
-
-            // commented because of missing implementations
-            if (!move.IsCastlelingMove() && Position.IsAttacked(Position.GetPieceSquare(EPieceType.King, State.SideToMove), ~State.SideToMove))
-            {
-                Position.TakeMove(move);
+            if (!Position.MakeMove(move))
                 return false;
-            }
 
             // advances the position
             var previous = _stateList[PositionIndex++];
             State = Position.State = _stateList[PositionIndex];
             State.SideToMove = ~previous.SideToMove;
             State.Material = previous.Material;
-            State.LastMove = move;
             State.HalfMoveCount = PositionIndex;
+            State.LastMove = move;
 
             // compute in-check
             Position.InCheck = Position.IsAttacked(Position.GetPieceSquare(EPieceType.King, State.SideToMove), ~State.SideToMove);
@@ -141,7 +135,6 @@ namespace Rudz.Chess
 
             State.Key = previous.Key;
             State.PawnStructureKey = previous.PawnStructureKey;
-            State.Pinned = Position.GetPinnedPieces(Position.GetPieceSquare(EPieceType.King, State.SideToMove), State.SideToMove);
 
             UpdateKey(move);
             State.Material.MakeMove(move);
