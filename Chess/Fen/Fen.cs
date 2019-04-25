@@ -32,7 +32,6 @@ namespace Rudz.Chess.Fen
     using Extensions;
     using System;
     using System.Runtime.CompilerServices;
-    using System.Text;
     using System.Text.RegularExpressions;
     using Types;
 

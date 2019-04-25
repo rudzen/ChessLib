@@ -64,10 +64,7 @@ namespace Rudz.Chess
 
         static Game() => CastlePositionalOr = new[,] { { ECastlelingRights.WhiteOO, ECastlelingRights.BlackOO }, { ECastlelingRights.WhiteOOO, ECastlelingRights.BlackOOO } };
 
-        public Game()
-            : this(null) { }
-
-        public Game(Action<Piece, Square> pieceUpdateCallback)
+        public Game(Action<Piece, Square> pieceUpdateCallback = null)
         {
             _castleRightsMask = new ECastlelingRights[64];
             Position = new Position(pieceUpdateCallback);
@@ -249,7 +246,7 @@ namespace Rudz.Chess
             if (!Fen.Fen.IsDelimiter(fen.GetAdvance))
                 return new FenError(-5, fen.Index);
 
-            if (SetupCastleling(fen) == -1)
+            if (!SetupCastleling(fen))
                 return new FenError(-5, fen.Index);
 
             if (!Fen.Fen.IsDelimiter(fen.GetAdvance))
@@ -280,11 +277,11 @@ namespace Rudz.Chess
 
             State.SideToMove = player;
 
-            if (!player.IsWhite())
+            if (player.IsBlack())
             {
-                /* black */
-                State.Key ^= Zobrist.GetZobristSide();
-                State.PawnStructureKey ^= Zobrist.GetZobristSide();
+                var zobristSide = Zobrist.GetZobristSide();
+                State.Key ^= zobristSide;
+                State.PawnStructureKey ^= zobristSide;
             }
 
             State.Key ^= Zobrist.GetZobristCastleling(State.CastlelingRights);
@@ -364,7 +361,7 @@ namespace Rudz.Chess
                 _output.Append(space);
                 for (var file = EFile.FileA; file <= EFile.FileH; file++)
                 {
-                    var piece = Position.GetPiece(new Square((int)file, (int)rank));
+                    var piece = Position.GetPiece(new Square(rank, file));
                     _output.AppendFormat("{0}{1}{2}{1}", splitter, space, piece.GetPieceChar());
                 }
 
@@ -513,7 +510,7 @@ namespace Rudz.Chess
             return false;
         }
 
-        private int SetupCastleling(IFenData fen)
+        private bool SetupCastleling(IFenData fen)
         {
             // reset castleling rights to defaults
             _castleRightsMask.Fill(ECastlelingRights.Any);
@@ -521,7 +518,7 @@ namespace Rudz.Chess
             if (fen.Get == '-')
             {
                 fen.Advance();
-                return 0;
+                return true;
             }
 
             // List to gather functions for castleling rights addition.
@@ -581,21 +578,18 @@ namespace Rudz.Chess
                             break;
 
                         default:
-                            return -1;
+                            return false;
                     }
                 }
 
                 fen.Advance();
             }
 
-            if (castleFunctions.Any())
-            {
-                // invoke the gathered castleling configure functions
-                foreach (var castleFunction in castleFunctions)
-                    castleFunction();
-            }
+            // invoke the gathered castleling configure functions
+            foreach (var castleFunction in castleFunctions)
+                castleFunction();
 
-            return 0;
+            return true;
         }
 
         private void AddShortCastleRights(int rookFile, Player side)

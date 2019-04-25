@@ -132,10 +132,11 @@ namespace Rudz.Chess
                 return false;
 
             var toSquare = move.GetToSquare();
+            var movingSide = move.GetMovingSide();
 
             if (move.IsCastlelingMove())
             {
-                Piece rook = (int)EPieceType.Rook + move.GetSideMask();
+                var rook = EPieceType.Rook.MakePiece(movingSide);
                 var king = move.GetMovingPiece();
                 RemovePiece(_rookCastlesFrom[toSquare.ToInt()], rook);
                 RemovePiece(move.GetFromSquare(), king);
@@ -144,14 +145,15 @@ namespace Rudz.Chess
                 return true;
             }
 
-            if (IsAttacked(GetPieceSquare(EPieceType.King, ~State.SideToMove), State.SideToMove))
+            // reverse sideToMove as it has not been changed yet.
+            if (IsAttacked(GetPieceSquare(EPieceType.King, ~movingSide), movingSide))
                 return false;
 
             RemovePiece(move.GetFromSquare(), move.GetMovingPiece());
 
             if (move.IsEnPassantMove())
             {
-                var t = EnPasCapturePos[move.GetMovingSide().Side](toSquare).First();
+                var t = EnPasCapturePos[movingSide.Side](toSquare).First();
                 RemovePiece(t, move.GetCapturedPiece());
             }
             else if (move.IsCaptureMove())
@@ -168,7 +170,7 @@ namespace Rudz.Chess
 
             if (move.IsCastlelingMove())
             {
-                Piece rook = (int)EPieceType.Rook + move.GetSideMask();
+                var rook = EPieceType.Rook.MakePiece(move.GetMovingSide());
                 var king = move.GetMovingPiece();
                 RemovePiece(toSquare, king);
                 RemovePiece(toSquare.GetRookCastleTo(), rook);
