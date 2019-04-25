@@ -74,8 +74,6 @@ namespace Rudz.Chess
 
         public bool IsProbing { get; set; }
 
-        public BitBoard Occupied { get; set; }
-
         public Piece[] BoardLayout { get; }
 
         /// <summary>
@@ -92,7 +90,6 @@ namespace Rudz.Chess
             BoardLayout.Fill(EPieces.NoPiece);
             OccupiedBySide.Fill(Zero);
             BoardPieces.Fill(Zero);
-            Occupied = Zero;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -102,7 +99,6 @@ namespace Rudz.Chess
             var color = piece.ColorOf();
             BoardPieces[piece.ToInt()] |= bbsq;
             OccupiedBySide[color] |= bbsq;
-            Occupied |= bbsq;
             BoardLayout[square.ToInt()] = piece;
 
             if (!IsProbing)
@@ -115,7 +111,6 @@ namespace Rudz.Chess
             var piece = pieceType.MakePiece(side);
             BoardPieces[piece.ToInt()] |= square;
             OccupiedBySide[side.Side] |= square;
-            Occupied |= square;
             BoardLayout[square.ToInt()] = piece;
 
             if (!IsProbing)
@@ -214,9 +209,10 @@ namespace Rudz.Chess
 
             var opponentQueens = Pieces(EPieceType.Queen, them);
             var ourPieces = Pieces(side);
+            var pieces = Pieces();
 
-            var pinners = square.XrayBishopAttacks(Occupied, ourPieces) & (Pieces(EPieceType.Bishop, them) | opponentQueens)
-                        | square.XrayRookAttacks(Occupied, ourPieces) & (Pieces(EPieceType.Rook, them) | opponentQueens);
+            var pinners = square.XrayBishopAttacks(pieces, ourPieces) & (Pieces(EPieceType.Bishop, them) | opponentQueens)
+                        | square.XrayRookAttacks(pieces, ourPieces) & (Pieces(EPieceType.Rook, them) | opponentQueens);
 
             while (pinners)
             {
@@ -228,16 +224,22 @@ namespace Rudz.Chess
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsOccupied(Square square) => (Occupied & square) != 0;
+        public bool IsOccupied(Square square) => (Pieces() & square) != 0;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool IsAttacked(Square square, Player side) => AttackedBySlider(square, side) || AttackedByKnight(square, side) || AttackedByPawn(square, side) || AttackedByKing(square, side);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public BitBoard PieceAttacks(Square square, EPieceType pieceType) => square.GetAttacks(pieceType, Occupied);
+        public BitBoard PieceAttacks(Square square, EPieceType pieceType) => square.GetAttacks(pieceType, Pieces());
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public BitBoard Pieces() => OccupiedBySide[PlayerExtensions.White.Side] | OccupiedBySide[PlayerExtensions.Black.Side];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public BitBoard Pieces(Player side) => OccupiedBySide[side.Side];
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public BitBoard Pieces(Piece pc) => BoardPieces[pc.ToInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public BitBoard Pieces(EPieceType type) => BoardPieces[type.MakePiece(PlayerExtensions.White).ToInt()] | BoardPieces[type.MakePiece(PlayerExtensions.Black).ToInt()];
@@ -294,7 +296,6 @@ namespace Rudz.Chess
             BitBoard invertedSq = square;
             BoardPieces[piece.ToInt()] &= ~invertedSq;
             OccupiedBySide[piece.ColorOf()] &= ~invertedSq;
-            Occupied &= ~invertedSq;
             BoardLayout[square.ToInt()] = PieceExtensions.EmptyPiece;
             if (IsProbing)
                 return;
@@ -312,16 +313,17 @@ namespace Rudz.Chess
                   | (square.GetAttacks(EPieceType.King) & Pieces(EPieceType.King));
         }
 
-        public BitBoard AttacksTo(Square square) => AttacksTo(square, Occupied);
+        public BitBoard AttacksTo(Square square) => AttacksTo(square, Pieces());
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool AttackedBySlider(Square square, Player side)
         {
-            var rookAttacks = square.RookAttacks(Occupied);
+            var occupied = Pieces();
+            var rookAttacks = square.RookAttacks(occupied);
             if (Pieces(EPieceType.Rook, side) & rookAttacks)
                 return true;
 
-            var bishopAttacks = square.BishopAttacks(Occupied);
+            var bishopAttacks = square.BishopAttacks(occupied);
             if (Pieces(EPieceType.Bishop, side) & bishopAttacks)
                 return true;
 
@@ -513,7 +515,7 @@ namespace Rudz.Chess
             var castleSpan = ksq.BitboardBetween(rookFrom) | rookFrom.BitboardBetween(rookTo) | castlePieces | rookTo | square;
 
             // check that the span AND current occupied pieces are no different that the piece themselves.
-            if ((castleSpan & Occupied) != castlePieces)
+            if ((castleSpan & Pieces()) != castlePieces)
                 return false;
 
             // Check that no square between the king's initial and final squares (including the initial and final squares)
@@ -563,7 +565,7 @@ namespace Rudz.Chess
         public bool IsPseudoLegal(Move move)
         {
             // Verify that the piece actually exists on the board at the location defined by the move struct
-            if ((BoardPieces[move.GetMovingPiece().ToInt()] & move.GetFromSquare()).Empty())
+            if ((Pieces(move.GetMovingPiece()) & move.GetFromSquare()).Empty())
                 return false;
 
             var to = move.GetToSquare();
@@ -593,10 +595,10 @@ namespace Rudz.Chess
                 if ((OccupiedBySide[opponent.Side] & to).Empty())
                     return false;
 
-                if ((BoardPieces[move.GetCapturedPiece().ToInt()] & to).Empty())
+                if ((Pieces(move.GetCapturedPiece()) & to).Empty())
                     return false;
             }
-            else if ((Occupied & to) != 0)
+            else if ((Pieces() & to) != 0)
                 return false;
 
             // ReSharper disable once SwitchStatementMissingSomeCases
@@ -605,7 +607,7 @@ namespace Rudz.Chess
                 case EPieceType.Bishop:
                 case EPieceType.Rook:
                 case EPieceType.Queen:
-                    if (move.GetFromSquare().BitboardBetween(to) & Occupied)
+                    if (move.GetFromSquare().BitboardBetween(to) & Pieces())
                         return false;
 
                     break;

@@ -40,8 +40,6 @@ namespace Rudz.Chess
 
         bool IsProbing { get; set; }
 
-        BitBoard Occupied { get; set; }
-
         Piece[] BoardLayout { get; }
 
         Action<Piece, Square> PieceUpdated { get; }
@@ -74,7 +72,11 @@ namespace Rudz.Chess
 
         BitBoard PieceAttacks(Square square, EPieceType pieceType);
 
+        BitBoard Pieces();
+
         BitBoard Pieces(Player side);
+
+        BitBoard Pieces(Piece pc);
 
         BitBoard Pieces(EPieceType type);
 

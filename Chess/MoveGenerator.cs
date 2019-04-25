@@ -118,7 +118,7 @@ namespace Rudz.Chess
 
             var pawns = _position.Pieces(EPieceType.Pawn, currentSide);
 
-            AddPawnMoves(moves, currentSide.PawnPush(pawns & currentSide.Rank7()) & ~_position.Occupied, currentSide.PawnPushDistance(), EMoveType.Quiet);
+            AddPawnMoves(moves, currentSide.PawnPush(pawns & currentSide.Rank7()) & ~_position.Pieces(), currentSide.PawnPushDistance(), EMoveType.Quiet);
             AddPawnMoves(moves, pawns.Shift(northEast) & occupiedByThem, currentSide.PawnWestAttackDistance(), EMoveType.Capture);
             AddPawnMoves(moves, pawns.Shift(northWest) & occupiedByThem, currentSide.PawnEastAttackDistance(), EMoveType.Capture);
 
@@ -133,7 +133,7 @@ namespace Rudz.Chess
         {
             var currentSide = _position.State.SideToMove;
             var up = currentSide == PlayerExtensions.White ? EDirection.North : EDirection.South;
-            var notOccupied = ~_position.Occupied;
+            var notOccupied = ~_position.Pieces();
             var pushed = (_position.Pieces(EPieceType.Pawn, currentSide) & ~currentSide.Rank7()).Shift(up) & notOccupied;
             AddPawnMoves(moves, pushed, currentSide.PawnPushDistance(), EMoveType.Quiet);
 
@@ -182,11 +182,11 @@ namespace Rudz.Chess
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void AddMoves(MoveList moves, Piece piece, Square from, BitBoard attacks)
         {
-            var target = _position.Occupied & attacks;
+            var target = _position.Pieces(~_position.State.SideToMove) & attacks;
             foreach (var to in target)
                 AddMove(moves, piece, from, to, EPieces.NoPiece, EMoveType.Capture);
 
-            target = ~_position.Occupied & attacks;
+            target = ~_position.Pieces() & attacks;
             foreach (var to in target)
                 AddMove(moves, piece, from, to, PieceExtensions.EmptyPiece);
         }
@@ -202,12 +202,12 @@ namespace Rudz.Chess
         {
             var c = _position.State.SideToMove;
 
-            var occupied = _position.Occupied;
+            var occupied = _position.Pieces();
 
             for (var pt = EPieceType.King; pt >= EPieceType.Knight; --pt)
             {
                 var pc = pt.MakePiece(c);
-                var pieces = _position.BoardPieces[pc.ToInt()];
+                var pieces = _position.Pieces(pc);
                 foreach (var from in pieces)
                     AddMoves(moves, pc, from, from.GetAttacks(pt, occupied) & targetSquares);
             }
@@ -223,18 +223,20 @@ namespace Rudz.Chess
             foreach (var squareTo in targetSquares)
             {
                 var squareFrom = squareTo - direction;
-                if (squareTo.IsPromotionRank())
+                if (!squareTo.IsPromotionRank())
+                    AddMove(moves, piece, squareFrom, squareTo, PieceExtensions.EmptyPiece, type);
+                else
                 {
                     if (Flags.HasFlagFast(Emgf.Queenpromotion))
-                        AddMove(moves, piece, squareFrom, squareTo, EPieceType.Queen.MakePiece(_position.State.SideToMove),
+                        AddMove(moves, piece, squareFrom, squareTo,
+                            EPieceType.Queen.MakePiece(_position.State.SideToMove),
                             type | EMoveType.Promotion);
                     else
                         for (var promotedPiece = EPieceType.Queen; promotedPiece >= EPieceType.Knight; promotedPiece--)
-                            AddMove(moves, piece, squareFrom, squareTo, promotedPiece.MakePiece(_position.State.SideToMove),
+                            AddMove(moves, piece, squareFrom, squareTo,
+                                promotedPiece.MakePiece(_position.State.SideToMove),
                                 type | EMoveType.Promotion);
                 }
-                else
-                    AddMove(moves, piece, squareFrom, squareTo, PieceExtensions.EmptyPiece, type);
             }
         }
 

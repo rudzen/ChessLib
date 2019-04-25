@@ -45,9 +45,9 @@ Result	6	1,912,300.6 us	3,551.167 us	3,148.017 us
 
  Method | N |         Mean |     Error |    StdDev |
 ------- |-- |-------------:|----------:|----------:|
- Result | 4 |     1.411 ms | 0.0045 ms | 0.0042 ms |
- Result | 5 |    48.951 ms | 0.8226 ms | 0.7695 ms |
- Result | 6 | 1,486.312 ms | 1.7112 ms | 1.6006 ms |
+ Result | 4 |     1.426 ms | 0.0039 ms | 0.0033 ms |
+ Result | 5 |    48.468 ms | 0.2311 ms | 0.2048 ms |
+ Result | 6 | 1,487.300 ms | 2.3406 ms | 1.9545 ms |
 */
 
     public class PerftBenchRunner

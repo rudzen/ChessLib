@@ -88,7 +88,7 @@ namespace Rudz.Chess
 
         public int MoveNumber => (PositionIndex - 1) / 2 + 1;
 
-        public BitBoard Occupied => Position.Occupied;
+        public BitBoard Occupied => Position.Pieces();
 
         public IPosition Position { get; }
 
