@@ -105,10 +105,8 @@ namespace Rudz.Chess
             Occupied |= bbsq;
             BoardLayout[square.ToInt()] = piece;
 
-            if (IsProbing)
-                return;
-
-            PieceUpdated?.Invoke(piece, square);
+            if (!IsProbing)
+                PieceUpdated?.Invoke(piece, square);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -120,10 +118,8 @@ namespace Rudz.Chess
             Occupied |= square;
             BoardLayout[square.ToInt()] = piece;
 
-            if (IsProbing)
-                return;
-
-            PieceUpdated?.Invoke(piece, square);
+            if (!IsProbing)
+                PieceUpdated?.Invoke(piece, square);
         }
 
         public bool MakeMove(Move move)
@@ -213,14 +209,18 @@ namespace Rudz.Chess
         {
             // TODO : Move into state data structure instead of real-time calculation
 
-            BitBoard pinnedPieces = 0;
-            var oppShift = ~side << 3;
-            var pinners = square.XrayBishopAttacks(Occupied, OccupiedBySide[side.Side]) & (BoardPieces[(int)EPieceType.Bishop | oppShift] | BoardPieces[(int)EPieceType.Queen | oppShift]);
-            pinners |= square.XrayRookAttacks(Occupied, OccupiedBySide[side.Side]) & (BoardPieces[(int)EPieceType.Rook | oppShift] | BoardPieces[(int)EPieceType.Queen | oppShift]);
+            var pinnedPieces = BitBoards.EmptyBitBoard;
+            var them = ~side;
+
+            var opponentQueens = Pieces(EPieceType.Queen, them);
+            var ourPieces = Pieces(side);
+
+            var pinners = square.XrayBishopAttacks(Occupied, ourPieces) & (Pieces(EPieceType.Bishop, them) | opponentQueens)
+                        | square.XrayRookAttacks(Occupied, ourPieces) & (Pieces(EPieceType.Rook, them) | opponentQueens);
 
             while (pinners)
             {
-                pinnedPieces |= pinners.Lsb().BitboardBetween(square) & OccupiedBySide[side.Side];
+                pinnedPieces |= pinners.Lsb().BitboardBetween(square) & ourPieces;
                 pinners--;
             }
 

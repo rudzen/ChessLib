@@ -43,14 +43,11 @@ Result	6	1,912,300.6 us	3,551.167 us	3,148.017 us
  Result | 5 |    49.873 ms | 0.6022 ms | 0.5029 ms |
  Result | 6 | 1,525.450 ms | 2.8101 ms | 2.3466 ms |
 
-
-MoveList:
  Method | N |         Mean |     Error |    StdDev |
 ------- |-- |-------------:|----------:|----------:|
- Result | 4 |     1.462 ms | 0.0032 ms | 0.0028 ms |
- Result | 5 |    48.687 ms | 0.5139 ms | 0.4012 ms |
- Result | 6 | 1,501.077 ms | 4.2503 ms | 3.9758 ms |
-
+ Result | 4 |     1.411 ms | 0.0045 ms | 0.0042 ms |
+ Result | 5 |    48.951 ms | 0.8226 ms | 0.7695 ms |
+ Result | 6 | 1,486.312 ms | 1.7112 ms | 1.6006 ms |
 */
 
     public class PerftBenchRunner
