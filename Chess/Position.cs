@@ -487,18 +487,7 @@ namespace Rudz.Chess
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool CanCastle(ECastleling type)
-        {
-            // ReSharper disable once SwitchStatementMissingSomeCases
-            switch (type)
-            {
-                case ECastleling.Short:
-                case ECastleling.Long:
-                    return State.CastlelingRights.HasFlagFast(type.GetCastleAllowedMask(State.SideToMove)) && IsCastleAllowed(type.GetKingCastleTo(State.SideToMove));
-
-                default:
-                    throw new ArgumentException("Illegal castleling type.");
-            }
-        }
+            => State.CastlelingRights.HasFlagFast(type.GetCastleAllowedMask(State.SideToMove)) && IsCastleAllowed(type.GetKingCastleTo(State.SideToMove));
 
         public bool IsCastleAllowed(Square square)
         {
@@ -523,14 +512,8 @@ namespace Rudz.Chess
 
             c = ~c;
 
-            // ReSharper disable once LoopCanBeConvertedToQuery
-            foreach (var s in ksq.BitboardBetween(square) | square)
-            {
-                if (IsAttacked(s, c))
-                    return false;
-            }
-
-            return true;
+            castleSpan = ksq.BitboardBetween(square) | square;
+            return !castleSpan.Any(x => IsAttacked(x, c));
         }
 
         /// <summary>
