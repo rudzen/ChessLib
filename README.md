@@ -5,7 +5,7 @@ A C# chess data library with complete move generation and all needed custom type
 
 ## Requirements
 
-ChessLib is using NET_STANDARD 2.0, which enables it to be used with the follow
+ChessLib is using NET_STANDARD 2.0, which enables it to be used with the following
 
 * .NET Framework 4.6.1+
 * .NET Core 2.0+
