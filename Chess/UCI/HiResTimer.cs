@@ -24,11 +24,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using EnsureThat;
-
 namespace Rudz.Chess.UCI
 {
-    using Properties;
+    using EnsureThat;
     using System;
     using System.Diagnostics;
     using System.Threading;
@@ -101,15 +99,15 @@ namespace Rudz.Chess.UCI
 
         public static bool operator ==(HiResTimer left, HiResTimer right) => Equals(left, right);
 
-        public static bool operator ==([NotNull] HiResTimer left, int right) => left != null && left.Id == right;
+        public static bool operator ==(HiResTimer left, int right) => left != null && left.Id == right;
 
-        public static bool operator ==([NotNull] HiResTimer left, Player right) => left != null && left.Id == right.Side;
+        public static bool operator ==(HiResTimer left, Player right) => left != null && left.Id == right.Side;
 
         public static bool operator !=(HiResTimer left, HiResTimer right) => !Equals(left, right);
 
-        public static bool operator !=([NotNull] HiResTimer left, int right) => left != null && left.Id != right;
+        public static bool operator !=(HiResTimer left, int right) => left != null && left.Id != right;
 
-        public static bool operator !=([NotNull] HiResTimer left, Player right) => left != null && left.Id != right.Side;
+        public static bool operator !=(HiResTimer left, Player right) => left != null && left.Id != right.Side;
 
         public void Start()
         {

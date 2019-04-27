@@ -26,20 +26,19 @@ SOFTWARE.
 
 namespace Rudz.Chess.Extensions
 {
-    using Properties;
     using System;
     using System.Runtime.CompilerServices;
 
     public static class ArrayExtensions
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Fill<T>([NotNull] this T[] arr, T value)
+        public static void Fill<T>(this T[] arr, T value)
         {
             for (var i = 0; i < arr.Length; i++)
                 arr[i] = value;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Clear<T>([NotNull] this T[] arr) => Array.Clear(arr, 0, arr.Length);
+        public static void Clear<T>(this T[] arr) => Array.Clear(arr, 0, arr.Length);
     }
 }

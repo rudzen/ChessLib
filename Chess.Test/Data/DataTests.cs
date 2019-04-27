@@ -26,9 +26,9 @@ SOFTWARE.
 
 namespace Chess.Test.Data
 {
-    using System.Text;
     using Rudz.Chess.Enums;
     using Rudz.Chess.Types;
+    using System.Text;
     using Xunit;
 
     public sealed class DataTests
@@ -44,7 +44,7 @@ namespace Chess.Test.Data
                 chars.Clear();
                 strings.Clear();
                 chars.Append(sq.FileChar());
-                chars.Append(sq.RankOfChar());
+                chars.Append(sq.RankChar());
                 strings.Append(sq.ToString());
                 Assert.Equal(chars.ToString(), strings.ToString());
             }

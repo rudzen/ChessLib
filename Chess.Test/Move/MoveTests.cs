@@ -115,8 +115,6 @@ namespace Chess.Test.Move
         [Fact]
         public void MoveToStringTest()
         {
-            var sb = new StringBuilder(256);
-
             var moves = new List<Move>(128);
             var movesString = new List<Movestrings>(128);
 

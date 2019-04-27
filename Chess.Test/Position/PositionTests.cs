@@ -39,7 +39,8 @@ namespace Chess.Test.Position
             var position = new Position(null);
 
             position.AddPiece(EPieces.WhiteKing, ESquare.a7);
-            var square = position.Occupied.Lsb();
+            var pieces = position.Pieces();
+            var square = pieces.Lsb();
             Assert.Equal(ESquare.a7, square.Value);
 
             var piece = position.GetPiece(square);
@@ -50,7 +51,8 @@ namespace Chess.Test.Position
             position = new Position(null);
 
             position.AddPiece(EPieceType.Knight, ESquare.d5, PlayerExtensions.Black);
-            square = position.Occupied.Lsb();
+            pieces = position.Pieces();
+            square = pieces.Lsb();
             Assert.Equal(ESquare.d5, square.Value);
 
             piece = position.GetPiece(square);

@@ -26,6 +26,7 @@ SOFTWARE.
 
 namespace Chess.Test.Pieces
 {
+    using System.Linq;
     using Xunit;
 
     public sealed class PieceAttacksKingTests : PieceAttacksRegular
@@ -50,12 +51,11 @@ namespace Chess.Test.Pieces
         {
             const int index = (int)EBands.Beta;
             const int attackIndex = 2;
+            var expected = KingExpected[index];
+            var actuals = Bands[index].Select(x => RegAttacks[attackIndex](x).Count);
 
-            foreach (var pieceLocation in Bands[index])
-            {
-                var attacks = RegAttacks[attackIndex](pieceLocation);
-                Assert.Equal(KingExpected[index], attacks.Count);
-            }
+            foreach (var actual in actuals)
+                Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -63,12 +63,11 @@ namespace Chess.Test.Pieces
         {
             const int index = (int)EBands.Gamma;
             const int attackIndex = 2;
+            var expected = KingExpected[index];
+            var actuals = Bands[index].Select(x => RegAttacks[attackIndex](x).Count);
 
-            foreach (var pieceLocation in Bands[index])
-            {
-                var attacks = RegAttacks[attackIndex](pieceLocation);
-                Assert.Equal(KingExpected[index], attacks.Count);
-            }
+            foreach (var actual in actuals)
+                Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -76,12 +75,11 @@ namespace Chess.Test.Pieces
         {
             const int index = (int)EBands.Delta;
             const int attackIndex = 2;
+            var expected = KingExpected[index];
+            var actuals = Bands[index].Select(x => RegAttacks[attackIndex](x).Count);
 
-            foreach (var pieceLocation in Bands[index])
-            {
-                var attacks = RegAttacks[attackIndex](pieceLocation);
-                Assert.Equal(KingExpected[index], attacks.Count);
-            }
+            foreach (var actual in actuals)
+                Assert.Equal(expected, actual);
         }
     }
 }

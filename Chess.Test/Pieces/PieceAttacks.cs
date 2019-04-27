@@ -40,11 +40,8 @@ namespace Chess.Test.Pieces
         protected enum EBands
         {
             Alpha = 0,
-
             Beta = 1,
-
             Gamma = 2,
-
             Delta = 3
         }
 
@@ -73,12 +70,7 @@ namespace Chess.Test.Pieces
          *
          */
 
-        protected static readonly BitBoard[] Bands =
-            {
-                0xff818181818181ff, 0x7e424242427e00, 0x3c24243c0000, 0x1818000000
-            };
-
-        protected static readonly BitBoard EmptyBoard = 0;
+        protected static readonly BitBoard[] Bands ={0xff818181818181ff, 0x7e424242427e00, 0x3c24243c0000, 0x1818000000};
 
         public abstract void AlphaPattern();
 

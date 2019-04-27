@@ -26,40 +26,73 @@ SOFTWARE.
 
 namespace Chess.Test.Pieces
 {
+    using Rudz.Chess.Enums;
     using Rudz.Chess.Types;
-    using System;
     using Xunit;
 
     public sealed class PawnPushTests
     {
-        private static readonly Func<BitBoard, BitBoard>[] PawnPushDel ={ BitBoards.NorthOne, BitBoards.SouthOne };
-
         [Fact]
-        public void PawnPush()
+        public void PawnPushNorth()
         {
             BitBoard fullBoard = 0xffffffffffff00;
+            Direction direction = EDirection.North;
 
-            Player side = 0;
+            const int expected = 1;
 
-            var expected = 8;
-
-            foreach (var square in fullBoard)
+            foreach (var sq in fullBoard)
             {
-                var targetPosition = PawnPushDel[side.Side](square.BitBoardSquare());
-                var toSquare = targetPosition.Lsb();
-                var distance = toSquare.ToInt() - square.ToInt();
-                Assert.Equal(expected, distance);
+                var toSq = sq + direction;
+                var actual = sq.Distance(toSq);
+                Assert.Equal(expected, actual);
             }
+        }
 
-            side = ~side;
-            expected = -expected;
+        [Fact]
+        public void PawnPushSouth()
+        {
+            BitBoard fullBoard = 0xffffffffffff00;
+            Direction direction = EDirection.South;
 
-            foreach (var square in fullBoard)
+            const int expected = 1;
+
+            foreach (var sq in fullBoard)
             {
-                var targetPosition = PawnPushDel[side.Side](square.BitBoardSquare());
-                var toSquare = targetPosition.Lsb();
-                var distance = toSquare.ToInt() - square.ToInt();
-                Assert.Equal(expected, distance);
+                var toSq = sq + direction;
+                var actual = sq.Distance(toSq);
+                Assert.Equal(expected, actual);
+            }
+        }
+
+        [Fact]
+        public void PawnDoublePushNorth()
+        {
+            BitBoard fullBoard = BitBoards.RANK2;
+            Direction direction = EDirection.North;
+
+            const int expected = 2;
+
+            foreach (var sq in fullBoard)
+            {
+                var toSq = sq + 2 * direction;
+                var actual = sq.Distance(toSq);
+                Assert.Equal(expected, actual);
+            }
+        }
+
+        [Fact]
+        public void PawnDoublePushSouth()
+        {
+            BitBoard fullBoard = BitBoards.RANK7;
+            Direction direction = EDirection.South;
+
+            const int expected = 2;
+
+            foreach (var sq in fullBoard)
+            {
+                var toSq = sq + 2 * direction;
+                var actual = sq.Distance(toSq);
+                Assert.Equal(expected, actual);
             }
         }
     }

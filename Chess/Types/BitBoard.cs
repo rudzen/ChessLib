@@ -84,11 +84,7 @@ namespace Rudz.Chess.Types
         /// </summary>
         /// <param name="index">the damn index</param>
         /// <returns>the Bit object if assigning</returns>
-        public BitBoard this[int index]
-        {
-            get => this.Get(index);
-            set => Set(index); // TODO : Untested
-        }
+        public BitBoard this[int index] => this.Get(index);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator BitBoard(ulong value) => new BitBoard(value);
@@ -179,34 +175,43 @@ namespace Rudz.Chess.Types
         public void Clear() => Value = 0;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Set(int pos) => Value |= BitBoards.One << pos;
+        public void SetBit(int pos) => Value |= BitBoards.One << pos;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Set(ulong data) => Value = data;
+        public BitBoard Xor(int pos) => Value ^ (uint)pos;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Xor(int pos) => Value ^= (uint)pos;
+        public BitBoard And(BitBoard other) => Value & other;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void OrAll(params BitBoard[] bbs)
+        public BitBoard Or(BitBoard other) => Value | other;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public BitBoard OrAll(params BitBoard[] bbs)
         {
-            // ReSharper disable once ForCanBeConvertedToForeach
-            for (var i = 0; i < bbs.Length; ++i)
-                Value |= bbs[i].Value;
+            var val = Value;
+            foreach (var b in bbs)
+                val |= b.Value;
+
+            return val;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void OrAll(IEnumerable<BitBoard> bbs)
+        public BitBoard OrAll(IEnumerable<BitBoard> bbs)
         {
+            var val = Value;
             foreach (var bb in bbs)
-                Value |= bb.Value;
+                val |= bb.Value;
+            return val;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void OrAll(IEnumerable<Square> sqs)
+        public BitBoard OrAll(IEnumerable<Square> sqs)
         {
+            var b = this;
             foreach (var sq in sqs)
-                this |= sq;
+                b |= sq;
+            return b;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

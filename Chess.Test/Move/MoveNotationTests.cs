@@ -58,8 +58,8 @@ namespace Chess.Test.Move
             var w1 = new Move(movingPiece, fromOneSquare, toSquare);
             var w2 = new Move(movingPiece, fromTwoSquare, toSquare);
 
-            var actualPrimary = w1.ToNotation(g.State, notation);
-            var actualSecondary = w2.ToNotation(g.State, notation);
+            var actualPrimary = w1.ToNotation(g.Position, notation);
+            var actualSecondary = w2.ToNotation(g.Position, notation);
 
             Assert.Equal(expectedPrimary, actualPrimary);
             Assert.Equal(expectedSecondary, actualSecondary);
@@ -90,8 +90,8 @@ namespace Chess.Test.Move
             var w1 = new Move(movingPiece, fromOneSquare, toSquare);
             var w2 = new Move(movingPiece, fromTwoSquare, toSquare);
 
-            var actualPrimary = w1.ToNotation(g.State, notation);
-            var actualSecondary = w2.ToNotation(g.State, notation);
+            var actualPrimary = w1.ToNotation(g.Position, notation);
+            var actualSecondary = w2.ToNotation(g.Position, notation);
 
             Assert.Equal(expectedPrimary, actualPrimary);
             Assert.Equal(expectedSecondary, actualSecondary);
@@ -113,8 +113,8 @@ namespace Chess.Test.Move
             var uniChar = movingPiece.GetUnicodeChar();
             var toSquareString = toSquare.GetSquareString();
 
-            var expectedPrimary = $"{uniChar}{fromOneSquare.RankOfChar()}{toSquareString}";
-            var expectedSecondary = $"{uniChar}{fromTwoSquare.RankOfChar()}{toSquareString}";
+            var expectedPrimary = $"{uniChar}{fromOneSquare.RankChar()}{toSquareString}";
+            var expectedSecondary = $"{uniChar}{fromTwoSquare.RankChar()}{toSquareString}";
 
             var g = new Game();
             g.NewGame(fen);
@@ -122,8 +122,8 @@ namespace Chess.Test.Move
             var w1 = new Move(movingPiece, fromOneSquare, toSquare);
             var w2 = new Move(movingPiece, fromTwoSquare, toSquare);
 
-            var actualPrimary = w1.ToNotation(g.State, notation);
-            var actualSecondary = w2.ToNotation(g.State, notation);
+            var actualPrimary = w1.ToNotation(g.Position, notation);
+            var actualSecondary = w2.ToNotation(g.Position, notation);
 
             Assert.Equal(expectedPrimary, actualPrimary);
             Assert.Equal(expectedSecondary, actualSecondary);
@@ -154,8 +154,8 @@ namespace Chess.Test.Move
             var w1 = new Move(movingPiece, fromOneSquare, toSquare);
             var w2 = new Move(movingPiece, fromTwoSquare, toSquare);
 
-            var actualPrimary = w1.ToNotation(g.State, notation);
-            var actualSecondary = w2.ToNotation(g.State, notation);
+            var actualPrimary = w1.ToNotation(g.Position, notation);
+            var actualSecondary = w2.ToNotation(g.Position, notation);
 
             Assert.Equal(expectedPrimary, actualPrimary);
             Assert.Equal(expectedSecondary, actualSecondary);
@@ -186,8 +186,8 @@ namespace Chess.Test.Move
             var w1 = new Move(movingPiece, fromOneSquare, toSquare);
             var w2 = new Move(movingPiece, fromTwoSquare, toSquare);
 
-            var actualPrimary = w1.ToNotation(g.State, notation);
-            var actualSecondary = w2.ToNotation(g.State, notation);
+            var actualPrimary = w1.ToNotation(g.Position, notation);
+            var actualSecondary = w2.ToNotation(g.Position, notation);
 
             Assert.Equal(expectedPrimary, actualPrimary);
             Assert.Equal(expectedSecondary, actualSecondary);
@@ -209,8 +209,8 @@ namespace Chess.Test.Move
             var uniChar = movingPiece.GetPieceChar();
             var toSquareString = toSquare.GetSquareString();
 
-            var expectedPrimary = $"{uniChar}{fromOneSquare.RankOfChar()}{toSquareString}";
-            var expectedSecondary = $"{uniChar}{fromTwoSquare.RankOfChar()}{toSquareString}";
+            var expectedPrimary = $"{uniChar}{fromOneSquare.RankChar()}{toSquareString}";
+            var expectedSecondary = $"{uniChar}{fromTwoSquare.RankChar()}{toSquareString}";
 
             var g = new Game();
             g.NewGame(fen);
@@ -218,8 +218,8 @@ namespace Chess.Test.Move
             var w1 = new Move(movingPiece, fromOneSquare, toSquare);
             var w2 = new Move(movingPiece, fromTwoSquare, toSquare);
 
-            var actualPrimary = w1.ToNotation(g.State, notation);
-            var actualSecondary = w2.ToNotation(g.State, notation);
+            var actualPrimary = w1.ToNotation(g.Position, notation);
+            var actualSecondary = w2.ToNotation(g.Position, notation);
 
             Assert.Equal(expectedPrimary, actualPrimary);
             Assert.Equal(expectedSecondary, actualSecondary);
@@ -250,8 +250,8 @@ namespace Chess.Test.Move
             var w1 = new Move(movingPiece, fromOneSquare, toSquare);
             var w2 = new Move(movingPiece, fromTwoSquare, toSquare);
 
-            var actualPrimary = w1.ToNotation(g.State, notation);
-            var actualSecondary = w2.ToNotation(g.State, notation);
+            var actualPrimary = w1.ToNotation(g.Position, notation);
+            var actualSecondary = w2.ToNotation(g.Position, notation);
 
             Assert.Equal(expectedPrimary, actualPrimary);
             Assert.Equal(expectedSecondary, actualSecondary);
@@ -282,8 +282,8 @@ namespace Chess.Test.Move
             var w1 = new Move(movingPiece, fromOneSquare, toSquare);
             var w2 = new Move(movingPiece, fromTwoSquare, toSquare);
 
-            var actualPrimary = w1.ToNotation(g.State, notation);
-            var actualSecondary = w2.ToNotation(g.State, notation);
+            var actualPrimary = w1.ToNotation(g.Position, notation);
+            var actualSecondary = w2.ToNotation(g.Position, notation);
 
             Assert.Equal(expectedPrimary, actualPrimary);
             Assert.Equal(expectedSecondary, actualSecondary);
@@ -314,8 +314,8 @@ namespace Chess.Test.Move
             var w1 = new Move(movingPiece, fromOneSquare, toSquare);
             var w2 = new Move(movingPiece, fromTwoSquare, toSquare);
 
-            var actualPrimary = w1.ToNotation(g.State, notation);
-            var actualSecondary = w2.ToNotation(g.State, notation);
+            var actualPrimary = w1.ToNotation(g.Position, notation);
+            var actualSecondary = w2.ToNotation(g.Position, notation);
 
             Assert.Equal(expectedPrimary, actualPrimary);
             Assert.Equal(expectedSecondary, actualSecondary);
@@ -346,8 +346,8 @@ namespace Chess.Test.Move
             var w1 = new Move(movingPiece, fromOneSquare, toSquare);
             var w2 = new Move(movingPiece, fromTwoSquare, toSquare);
 
-            var actualPrimary = w1.ToNotation(g.State, notation);
-            var actualSecondary = w2.ToNotation(g.State, notation);
+            var actualPrimary = w1.ToNotation(g.Position, notation);
+            var actualSecondary = w2.ToNotation(g.Position, notation);
 
             Assert.Equal(expectedPrimary, actualPrimary);
             Assert.Equal(expectedSecondary, actualSecondary);
@@ -378,8 +378,8 @@ namespace Chess.Test.Move
             var w1 = new Move(movingPiece, fromOneSquare, toSquare);
             var w2 = new Move(movingPiece, fromTwoSquare, toSquare);
 
-            var actualPrimary = w1.ToNotation(g.State, notation);
-            var actualSecondary = w2.ToNotation(g.State, notation);
+            var actualPrimary = w1.ToNotation(g.Position, notation);
+            var actualSecondary = w2.ToNotation(g.Position, notation);
 
             Assert.Equal(expectedPrimary, actualPrimary);
             Assert.Equal(expectedSecondary, actualSecondary);
@@ -410,8 +410,8 @@ namespace Chess.Test.Move
             var w1 = new Move(movingPiece, fromOneSquare, toSquare);
             var w2 = new Move(movingPiece, fromTwoSquare, toSquare);
 
-            var actualPrimary = w1.ToNotation(g.State, notation);
-            var actualSecondary = w2.ToNotation(g.State, notation);
+            var actualPrimary = w1.ToNotation(g.Position, notation);
+            var actualSecondary = w2.ToNotation(g.Position, notation);
 
             Assert.Equal(expectedPrimary, actualPrimary);
             Assert.Equal(expectedSecondary, actualSecondary);

@@ -1,4 +1,4 @@
-﻿/*
+/*
 ChessLib, a chess data structure library
 
 MIT License
@@ -26,6 +26,7 @@ SOFTWARE.
 
 namespace Chess.Test.Pieces
 {
+    using System.Linq;
     using Xunit;
 
     public sealed class PieceAttacksKnightTests : PieceAttacksRegular
@@ -40,8 +41,13 @@ namespace Chess.Test.Pieces
             foreach (var pieceLocation in Bands[index])
             {
                 var attacks = RegAttacks[attackIndex](pieceLocation);
-                var expected = (BoardCorners & pieceLocation) != 0 ? KnightExpected[index] >> 1 /* for corners */ : (narrowLocations & pieceLocation) != 0 ? KnightExpected[index] - 1 /* narrowLocations */ : KnightExpected[index];
-                Assert.Equal(expected, attacks.Count);
+                var expected = (BoardCorners & pieceLocation) != 0
+                    ? KnightExpected[index] >> 1 /* for corners */
+                    : (narrowLocations & pieceLocation) != 0
+                        ? KnightExpected[index] - 1 /* narrowLocations */
+                        : KnightExpected[index];
+                var actual = attacks.Count;
+                Assert.Equal(expected, actual);
             }
         }
 
@@ -55,8 +61,11 @@ namespace Chess.Test.Pieces
             foreach (var pieceLocation in Bands[index])
             {
                 var attacks = RegAttacks[attackIndex](pieceLocation);
-                var expected = (narrowLocations & pieceLocation) != 0 ? KnightExpected[index] - 2 : KnightExpected[index];
-                Assert.Equal(expected, attacks.Count);
+                var expected = (narrowLocations & pieceLocation) != 0
+                    ? KnightExpected[index] - 2
+                    : KnightExpected[index];
+                var actual = attacks.Count;
+                Assert.Equal(expected, actual);
             }
         }
 
@@ -65,12 +74,11 @@ namespace Chess.Test.Pieces
         {
             const int index = (int)EBands.Gamma;
             const int attackIndex = 1;
+            var expected = KnightExpected[index];
+            var actuals = Bands[index].Select(x => RegAttacks[attackIndex](x).Count);
 
-            foreach (var pieceLocation in Bands[index])
-            {
-                var attacks = RegAttacks[attackIndex](pieceLocation);
-                Assert.Equal(KnightExpected[index], attacks.Count);
-            }
+            foreach (var actual in actuals)
+                Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -78,12 +86,11 @@ namespace Chess.Test.Pieces
         {
             const int index = (int)EBands.Delta;
             const int attackIndex = 1;
+            var expected = KnightExpected[index];
+            var actuals = Bands[index].Select(x => RegAttacks[attackIndex](x).Count);
 
-            foreach (var pieceLocation in Bands[index])
-            {
-                var attacks = RegAttacks[attackIndex](pieceLocation);
-                Assert.Equal(KnightExpected[index], attacks.Count);
-            }
+            foreach (var actual in actuals)
+                Assert.Equal(expected, actual);
         }
     }
 }

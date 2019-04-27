@@ -54,15 +54,15 @@ namespace Chess.Test.Gameplay
                 Assert.True(game.MakeMove(move));
 
             // verify in check is actually true
-            Assert.True(game.State.InCheck);
+            Assert.True(game.Position.InCheck);
 
-            game.State.Flags = Emgf.Legalmoves;
+            var mg = new MoveGenerator(game.Position);
 
             // generate all legal moves
-            game.State.GenerateMoves(true);
+            mg.GenerateMoves(true);
 
             // verify that no legal moves actually exists.
-            Assert.Empty(game.State.Moves);
+            Assert.Empty(mg.Moves);
         }
     }
 }

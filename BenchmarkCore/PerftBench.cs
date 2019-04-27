@@ -3,13 +3,13 @@
     using BenchmarkDotNet.Attributes;
     using Rudz.Chess.Perft;
 
-    [ClrJob(true), CoreJob]
+    //[ClrJob(true), CoreJob]
     //[RPlotExporter, RankColumn]
     public class PerftBench
     {
         private Perft _perft;
 
-        [Params(1, 2, 3, 4, 5, 6)]
+        [Params(4, 5, 6)]
         public int N;
 
         [GlobalSetup]

@@ -43,5 +43,8 @@ namespace Rudz.Chess.Types
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static char FileChar(this File f) => FileChars[f.ToInt()];
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static string FileString(this File f) => FileStrings[f.ToInt()];
     }
 }

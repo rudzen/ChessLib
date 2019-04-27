@@ -31,7 +31,7 @@ namespace Rudz.Chess.Types
 
     public struct Direction
     {
-        public EDirection Value { get; private set; }
+        public EDirection Value { get; }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Direction(EDirection d) => Value = d;

@@ -108,7 +108,7 @@ namespace Rudz.Chess.Data
         public static ulong GetZobristPst(Piece piece, Square square) => ZobristPst[piece.ToInt(), square.ToInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ulong GetZobristCastleling(int index) => ZobristCastling[index];
+        public static ulong GetZobristCastleling(ECastlelingRights index) => ZobristCastling[index.ToInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ulong GetZobristSide() => ZobristSide;
