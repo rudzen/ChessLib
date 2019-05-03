@@ -58,5 +58,28 @@ namespace Chess.Test.Square
             Assert.Equal(expected, actual);
         }
 
+        [Fact]
+        public void RelativeSquareBlackTest()
+        {
+            const ESquare expected = ESquare.h8;
+
+            var s = new Square(ERank.Rank1, EFile.FileH);
+
+            var actual = s.Relative(PlayerExtensions.Black);
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void RelativeSquareWhiteTest()
+        {
+            const ESquare expected = ESquare.c3;
+
+            var s = new Square(ERank.Rank3, EFile.FileC);
+
+            var actual = s.Relative(PlayerExtensions.White);
+
+            Assert.Equal(expected, actual);
+        }
     }
 }

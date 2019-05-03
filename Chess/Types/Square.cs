@@ -133,6 +133,9 @@ namespace Rudz.Chess.Types
         public static bool operator false(Square sq) => !sq.IsValid();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Square Relative(Player p) => (int) Value ^ (p.Side * 56);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override string ToString() => this.GetSquareString();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

@@ -26,6 +26,7 @@ SOFTWARE.
 
 namespace Rudz.Chess.Types
 {
+    using Enums;
     using System;
     using System.Collections;
     using System.Collections.Generic;
@@ -176,6 +177,9 @@ namespace Rudz.Chess.Types
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetBit(int pos) => Value |= BitBoards.One << pos;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Square FirstOrDefault() => Empty() ? ESquare.none : this.First();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public BitBoard Xor(int pos) => Value ^ (uint)pos;

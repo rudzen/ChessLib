@@ -369,9 +369,8 @@ namespace Rudz.Chess
                 _output.Append(seperator);
             }
 
-            _output.Append("    a   b   c   d   e   f   g   h\n");
-            _output.Append("Zobrist : ");
-            _output.Append($"0x{State.Key:X}\n");
+            _output.AppendLine("    a   b   c   d   e   f   g   h");
+            _output.AppendLine($"Zobrist : 0x{State.Key:X}");
             return _output.ToString();
         }
 
