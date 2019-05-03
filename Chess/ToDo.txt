@@ -23,8 +23,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 Types for:
-- Zobrist key
-- Movelist (done, not tested)
 - Piece value
 
 Improve:
