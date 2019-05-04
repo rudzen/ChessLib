@@ -24,6 +24,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using System.Runtime.CompilerServices;
+
+[assembly: InternalsVisibleTo("Chess.Test")]
+
 namespace Rudz.Chess.Types
 {
     using Enums;
