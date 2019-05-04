@@ -24,6 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using Rudz.Chess.TranspositionTable;
+
 namespace Rudz.Chess
 {
     using Data;
@@ -392,15 +394,35 @@ namespace Rudz.Chess
             if (depth == 1)
                 return (ulong)mg.Moves.Count;
 
+            var (found, entry) = TT.Trans.Probe(Position.State.Key);
+
+            if (found && entry.key32 == (uint) (Position.State.Key >> 32) && entry.depth == depth)
+            {
+                Console.WriteLine("hit");
+                return (ulong)entry.value;
+            }
+
+            //return (uint64_t)(((unsigned int)tte->get_value()) &TT_SCORE_MASK) +(((uint64_t)((unsigned int)tte->get_static_value()) &TT_SCORE_MASK) << 23);
+
+            //if (found)
+            //{
+            //return (ulong) entry.value;
+            //}
+
             ulong tot = 0;
+
+            var move = MoveExtensions.EmptyMove;
 
             for (var i = 0; i < mg.Moves.Count; ++i)
             {
-                var move = mg.Moves.GetMove(i);
+                move = mg.Moves.GetMove(i);
                 MakeMove(move);
                 tot += Perft(depth - 1);
                 TakeMove();
             }
+
+            if (move != MoveExtensions.EmptyMove)
+                TT.Trans.Store(Position.State.Key, (int) tot, Bound.Exact, sbyte.MinValue, move, 0);
 
             return tot;
         }

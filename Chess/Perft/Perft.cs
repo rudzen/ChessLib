@@ -1,11 +1,11 @@
-﻿using EnsureThat;
-
-namespace Rudz.Chess.Perft
+﻿namespace Rudz.Chess.Perft
 {
+    using EnsureThat;
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Runtime.CompilerServices;
+    using TranspositionTable;
 
     /*
 
@@ -51,7 +51,6 @@ namespace Rudz.Chess.Perft
         public Perft(int depth, Action<string, ulong> callback = null) : this(depth, callback, null)
         { }
 
-
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ulong DoPerft()
         {
@@ -71,6 +70,8 @@ namespace Rudz.Chess.Perft
                 total += res;
                 _callback?.Invoke(position.Fen, res);
             }
+
+            Console.WriteLine(TT.Trans.Fullness());
 
             return total;
         }
