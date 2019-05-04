@@ -24,6 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using Rudz.Chess.Transposition;
+
 namespace Rudz.Chess
 {
     using Data;
@@ -62,7 +64,15 @@ namespace Rudz.Chess
 
         private int _repetitionCounter;
 
-        static Game() => CastlePositionalOr = new[,] { { ECastlelingRights.WhiteOO, ECastlelingRights.BlackOO }, { ECastlelingRights.WhiteOOO, ECastlelingRights.BlackOOO } };
+        static Game()
+        {
+            CastlePositionalOr = new[,]
+            {
+                {ECastlelingRights.WhiteOO, ECastlelingRights.BlackOO},
+                {ECastlelingRights.WhiteOOO, ECastlelingRights.BlackOOO}
+            };
+            TT = new TranspositionTable(32);
+        }
 
         public Game(Action<Piece, Square> pieceUpdateCallback = null)
         {
@@ -93,6 +103,8 @@ namespace Rudz.Chess
         public IPosition Position { get; }
 
         public EGameEndType GameEndType { get; set; }
+
+        public static TranspositionTable TT { get; set; }
 
         /// <summary>
         /// Makes a chess move in the data structure
@@ -391,15 +403,25 @@ namespace Rudz.Chess
             if (depth == 1)
                 return (ulong)mg.Moves.Count;
 
+            var (found, entry) = TT.Probe(Position.State.Key);
+
+            if (found && entry.key32 == (uint) (Position.State.Key >> 32) && entry.depth == depth)
+                return (ulong)entry.value;
+
             ulong tot = 0;
+
+            var move = MoveExtensions.EmptyMove;
 
             for (var i = 0; i < mg.Moves.Count; ++i)
             {
-                var move = mg.Moves.GetMove(i);
+                move = mg.Moves.GetMove(i);
                 MakeMove(move);
                 tot += Perft(depth - 1);
                 TakeMove();
             }
+
+            if (move != MoveExtensions.EmptyMove)
+                TT.Store(Position.State.Key, (int) tot, Bound.Exact, (sbyte) depth, move, 0);
 
             return tot;
         }

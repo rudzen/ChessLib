@@ -1,7 +1,6 @@
-﻿using EnsureThat;
-
-namespace Rudz.Chess.Perft
+﻿namespace Rudz.Chess.Perft
 {
+    using EnsureThat;
     using System;
     using System.Collections.Generic;
     using System.Linq;
@@ -50,7 +49,6 @@ namespace Rudz.Chess.Perft
 
         public Perft(int depth, Action<string, ulong> callback = null) : this(depth, callback, null)
         { }
-
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ulong DoPerft()

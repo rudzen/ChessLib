@@ -87,5 +87,18 @@ namespace Chess.Test.Move
                 Assert.Equal(expected, actual);
             }
         }
+
+        [Fact]
+        public void PerftFull2()
+        {
+            foreach (var perftPosition in Positions)
+            {
+                var perft = new Perft(Positions.Length);
+                perft.AddPosition(perftPosition);
+                var expected = perft.GetPositionCount(0, Positions.Length);
+                var actual = perft.DoPerft();
+                Assert.Equal(expected, actual);
+            }
+        }
     }
 }
