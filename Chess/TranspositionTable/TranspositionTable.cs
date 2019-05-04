@@ -83,7 +83,7 @@ namespace Rudz.Chess.TranspositionTable
             return (ulong)(size * ClusterSize);
         }
 
-        public TTCluster find_cluster(ulong key)
+        public TTCluster FindCluster(ulong key)
         {
             var idx = (uint) ((uint) key * elements) >> 32;
             var idx2 = (ulong) ((uint) (key) & (elements - 1));
@@ -95,7 +95,7 @@ namespace Rudz.Chess.TranspositionTable
 
         public (bool, TTEntry) Probe(ulong key)
         {
-            var ttc = find_cluster(key);
+            var ttc = FindCluster(key);
             var keyH = (uint)(key >> 32);
             var g = generation;
 
@@ -120,7 +120,7 @@ namespace Rudz.Chess.TranspositionTable
 
         public TTEntry ProbeFirst(ulong key)
         {
-            return find_cluster(key)[0];
+            return FindCluster(key)[0];
         }
 
         public void Store(ulong key, int value, Bound type, sbyte depth, Move move, int statValue)
@@ -128,7 +128,7 @@ namespace Rudz.Chess.TranspositionTable
             // Use the high 32 bits as key inside the cluster
             var e = new TTEntry((uint)(key >> 32), move, depth, generation, value, statValue, type);
 
-            var ttc = find_cluster(key);
+            var ttc = FindCluster(key);
 
             var clusterIndex = 0;
             var found = false;
