@@ -24,13 +24,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.TranspositionTable
+namespace Rudz.Chess.Transposition
 {
-    public enum Bound : byte
+    // ReSharper disable once InconsistentNaming
+    public sealed class TTCluster
     {
-        Void = 0,
-        Alpha = 1,
-        Beta = 2,
-        Exact = Alpha | Beta
+        public TTEntry[] Cluster = new TTEntry[4];
+
+        public TTEntry this[int key]
+        {
+            get => Cluster[key];
+            set => Cluster[key] = value;
+        }
     }
 }

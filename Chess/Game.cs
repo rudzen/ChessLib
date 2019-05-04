@@ -24,7 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using Rudz.Chess.TranspositionTable;
+using Rudz.Chess.Transposition;
 
 namespace Rudz.Chess
 {
@@ -64,7 +64,15 @@ namespace Rudz.Chess
 
         private int _repetitionCounter;
 
-        static Game() => CastlePositionalOr = new[,] { { ECastlelingRights.WhiteOO, ECastlelingRights.BlackOO }, { ECastlelingRights.WhiteOOO, ECastlelingRights.BlackOOO } };
+        static Game()
+        {
+            CastlePositionalOr = new[,]
+            {
+                {ECastlelingRights.WhiteOO, ECastlelingRights.BlackOO},
+                {ECastlelingRights.WhiteOOO, ECastlelingRights.BlackOOO}
+            };
+            TT = new TranspositionTable(32);
+        }
 
         public Game(Action<Piece, Square> pieceUpdateCallback = null)
         {
@@ -95,6 +103,8 @@ namespace Rudz.Chess
         public IPosition Position { get; }
 
         public EGameEndType GameEndType { get; set; }
+
+        public static TranspositionTable TT { get; set; }
 
         /// <summary>
         /// Makes a chess move in the data structure
@@ -394,20 +404,10 @@ namespace Rudz.Chess
             if (depth == 1)
                 return (ulong)mg.Moves.Count;
 
-            var (found, entry) = TT.Trans.Probe(Position.State.Key);
+            var (found, entry) = TT.Probe(Position.State.Key);
 
             if (found && entry.key32 == (uint) (Position.State.Key >> 32) && entry.depth == depth)
-            {
-                //Console.WriteLine($"hits {TT.Trans.Hits}");
                 return (ulong)entry.value;
-            }
-
-            //return (uint64_t)(((unsigned int)tte->get_value()) &TT_SCORE_MASK) +(((uint64_t)((unsigned int)tte->get_static_value()) &TT_SCORE_MASK) << 23);
-
-            //if (found)
-            //{
-            //return (ulong) entry.value;
-            //}
 
             ulong tot = 0;
 
@@ -422,7 +422,7 @@ namespace Rudz.Chess
             }
 
             if (move != MoveExtensions.EmptyMove)
-                TT.Trans.Store(Position.State.Key, (int) tot, Bound.Exact, (sbyte) depth, move, 0);
+                TT.Store(Position.State.Key, (int) tot, Bound.Exact, (sbyte) depth, move, 0);
 
             return tot;
         }

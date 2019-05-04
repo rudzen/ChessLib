@@ -24,7 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.TranspositionTable
+namespace Rudz.Chess.Transposition
 {
     using EnsureThat;
     using System;
@@ -40,8 +40,7 @@ namespace Rudz.Chess.TranspositionTable
         private List<TTCluster> _table;
         private ulong _elements;
         private int _fullnessElements;
-        private byte _generation;
-        private ulong _hits;
+        private sbyte _generation;
 
         static TranspositionTable()
         {
@@ -56,7 +55,7 @@ namespace Rudz.Chess.TranspositionTable
             Size(mbSize);
         }
 
-        public ulong Hits => _hits;
+        public ulong Hits { get; private set; }
 
         public void NewSearch()
         {
@@ -123,7 +122,7 @@ namespace Rudz.Chess.TranspositionTable
             }
 
             if (set)
-                _hits++;
+                Hits++;
 
             return (set, e);
         }
@@ -175,9 +174,7 @@ namespace Rudz.Chess.TranspositionTable
                 clusterIndex = index;
             }
 
-            //Console.WriteLine($"Stored at cluster index {clusterIndex}");
             ttc.Cluster[clusterIndex].Save(e);
-            //Console.WriteLine($"Fullness : {Fullness()}");
         }
 
         public int Fullness()

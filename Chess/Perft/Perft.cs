@@ -5,7 +5,6 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Runtime.CompilerServices;
-    using TranspositionTable;
 
     /*
 
@@ -70,8 +69,6 @@
                 total += res;
                 _callback?.Invoke(position.Fen, res);
             }
-
-            Console.WriteLine(TT.Trans.Fullness());
 
             return total;
         }

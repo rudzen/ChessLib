@@ -24,7 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.TranspositionTable
+namespace Rudz.Chess.Transposition
 {
     using Types;
 
@@ -33,12 +33,12 @@ namespace Rudz.Chess.TranspositionTable
         public uint key32;
         public Move move;
         public sbyte depth;
-        public byte generation;
+        public sbyte generation;
         public int value;
         public int staticValue;
         public Bound type;
 
-        public TTEntry(uint k, Move m, sbyte d, byte g, int v, int sv, Bound b)
+        public TTEntry(uint k, Move m, sbyte d, sbyte g, int v, int sv, Bound b)
         {
             key32 = k;
             move = m;
@@ -75,6 +75,5 @@ namespace Rudz.Chess.TranspositionTable
             staticValue = tte.staticValue;
             type = tte.type;
         }
-
     };
 }

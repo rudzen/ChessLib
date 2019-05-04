@@ -24,10 +24,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.TranspositionTable
+namespace Rudz.Chess.Transposition
 {
-    public static class TT
+    public enum Bound : byte
     {
-        public static readonly TranspositionTable Trans = new TranspositionTable(32);
+        Void = 0,
+        Alpha = 1,
+        Beta = 2,
+        Exact = Alpha | Beta
     }
 }
