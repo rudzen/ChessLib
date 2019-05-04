@@ -59,7 +59,7 @@ namespace Rudz.Chess.TranspositionTable
             key32 = 0;
             move = MoveExtensions.EmptyMove;
             depth = sbyte.MinValue;
-            generation = 0;
+            generation = 1;
             value = staticValue = int.MaxValue;
             type = Bound.Void;
         }

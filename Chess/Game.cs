@@ -398,7 +398,7 @@ namespace Rudz.Chess
 
             if (found && entry.key32 == (uint) (Position.State.Key >> 32) && entry.depth == depth)
             {
-                Console.WriteLine("hit");
+                //Console.WriteLine($"hits {TT.Trans.Hits}");
                 return (ulong)entry.value;
             }
 
@@ -422,7 +422,7 @@ namespace Rudz.Chess
             }
 
             if (move != MoveExtensions.EmptyMove)
-                TT.Trans.Store(Position.State.Key, (int) tot, Bound.Exact, sbyte.MinValue, move, 0);
+                TT.Trans.Store(Position.State.Key, (int) tot, Bound.Exact, (sbyte) depth, move, 0);
 
             return tot;
         }
