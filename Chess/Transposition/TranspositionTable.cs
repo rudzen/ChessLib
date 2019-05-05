@@ -57,10 +57,8 @@ namespace Rudz.Chess.Transposition
 
         public ulong Hits { get; private set; }
 
-        public void NewSearch()
-        {
-            ++_generation;
-        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void NewSearch() => ++_generation;
 
         public ulong Size(int mbSize)
         {
@@ -91,7 +89,6 @@ namespace Rudz.Chess.Transposition
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public TTCluster FindCluster(ulong key)
         {
-            //var idx = (uint)((uint)key * elements) >> 32;
             var idx = (int)((uint)(key) & (_elements - 1));
             return _table[idx];
         }

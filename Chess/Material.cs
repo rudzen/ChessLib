@@ -87,6 +87,11 @@ namespace Rudz.Chess
             _key[side.Side] |= (uint)(x << PieceBitShift[(int)pieceType]);
         }
 
+        public uint GetKey(int index)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public void MakeMove(Move move)
         {
             if (move.IsCaptureMove())
@@ -107,6 +112,12 @@ namespace Rudz.Chess
         {
             _key.Clear();
             MaterialValue.Clear();
+        }
+
+        public void CopyFrom(IMaterial material)
+        {
+
+            throw new System.NotImplementedException();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

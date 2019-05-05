@@ -24,8 +24,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using Rudz.Chess.Transposition;
-
 namespace Rudz.Chess
 {
     using Data;
@@ -38,6 +36,7 @@ namespace Rudz.Chess
     using System.Linq;
     using System.Runtime.CompilerServices;
     using System.Text;
+    using Transposition;
     using Types;
     using Move = Types.Move;
     using Piece = Types.Piece;
@@ -136,7 +135,7 @@ namespace Rudz.Chess
 
             // compute en-passant if present
             State.EnPassantSquare = move.IsDoublePush()
-                ? move.GetFromSquare() + (move.GetMovingSide() == PlayerExtensions.White ? EDirection.North : EDirection.South)
+                ? move.GetFromSquare() + move.GetMovingSide().PawnPushDistance()
                 : ESquare.none;
 
             State.Key = previous.Key;
@@ -191,8 +190,8 @@ namespace Rudz.Chess
             foreach (var square in Occupied)
                 Position.RemovePiece(square, Position.BoardLayout[square.ToInt()]);
 
-            for (var i = 0; i <= PositionIndex; i++)
-                _stateList[i].Clear();
+            //for (var i = 0; i <= PositionIndex; i++)
+            //    _stateList[i].Clear();
 
             Position.Clear();
 
@@ -278,8 +277,7 @@ namespace Rudz.Chess
             if (number > 0)
                 number -= 1;
 
-            PositionIndex = number;
-            PositionStart = number;
+            PositionIndex = PositionStart = number;
 
             first.ToIntegral(out number);
 
@@ -335,8 +333,7 @@ namespace Rudz.Chess
                 return;
             }
 
-            output.Append(move.GetFromSquare().ToString());
-            output.Append(move.GetToSquare().ToString());
+            output.Append($"{move.GetFromSquare().ToString()}{move.GetToSquare().ToString()}");
 
             if (move.IsPromotionMove())
                 output.Append(move.GetPromotedPiece().GetPromotionChar());
@@ -405,7 +402,7 @@ namespace Rudz.Chess
 
             var (found, entry) = TT.Probe(Position.State.Key);
 
-            if (found && entry.key32 == (uint) (Position.State.Key >> 32) && entry.depth == depth)
+            if (found && entry.key32 == (uint)(Position.State.Key >> 32) && entry.depth == depth)
                 return (ulong)entry.value;
 
             ulong tot = 0;
@@ -421,7 +418,7 @@ namespace Rudz.Chess
             }
 
             if (move != MoveExtensions.EmptyMove)
-                TT.Store(Position.State.Key, (int) tot, Bound.Exact, (sbyte) depth, move, 0);
+                TT.Store(Position.State.Key, (int)tot, Bound.Exact, (sbyte)depth, move, 0);
 
             return tot;
         }
