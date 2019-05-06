@@ -30,23 +30,23 @@ namespace Rudz.Chess.Transposition
 
     public struct TTEntry
     {
-        public uint key32;
-        public Move move;
-        public sbyte depth;
-        public sbyte generation;
-        public int value;
-        public int staticValue;
-        public Bound type;
+        public uint Key32;
+        public Move Move;
+        public sbyte Depth;
+        public sbyte Generation;
+        public int Value;
+        public int StaticValue;
+        public Bound Type;
 
         public TTEntry(uint k, Move m, sbyte d, sbyte g, int v, int sv, Bound b)
         {
-            key32 = k;
-            move = m;
-            depth = d;
-            generation = g;
-            value = v;
-            staticValue = sv;
-            type = b;
+            Key32 = k;
+            Move = m;
+            Depth = d;
+            Generation = g;
+            Value = v;
+            StaticValue = sv;
+            Type = b;
         }
 
         public TTEntry(TTEntry tte)
@@ -56,24 +56,24 @@ namespace Rudz.Chess.Transposition
 
         public void Defaults()
         {
-            key32 = 0;
-            move = MoveExtensions.EmptyMove;
-            depth = sbyte.MinValue;
-            generation = 1;
-            value = staticValue = int.MaxValue;
-            type = Bound.Void;
+            Key32 = 0;
+            Move = MoveExtensions.EmptyMove;
+            Depth = sbyte.MinValue;
+            Generation = 1;
+            Value = StaticValue = int.MaxValue;
+            Type = Bound.Void;
         }
 
         public void Save(TTEntry tte)
         {
-            key32 = tte.key32;
-            if (tte.move != MoveExtensions.EmptyMove)
-                move = tte.move;
-            depth = tte.depth;
-            generation = tte.generation;
-            value = tte.value;
-            staticValue = tte.staticValue;
-            type = tte.type;
+            Key32 = tte.Key32;
+            if (tte.Move != MoveExtensions.EmptyMove)
+                Move = tte.Move;
+            Depth = tte.Depth;
+            Generation = tte.Generation;
+            Value = tte.Value;
+            StaticValue = tte.StaticValue;
+            Type = tte.Type;
         }
     };
 }

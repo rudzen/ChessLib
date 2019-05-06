@@ -333,10 +333,7 @@ namespace Rudz.Chess
                 return;
             }
 
-            output.Append($"{move.GetFromSquare().ToString()}{move.GetToSquare().ToString()}");
-
-            if (move.IsPromotionMove())
-                output.Append(move.GetPromotedPiece().GetPromotionChar());
+            output.Append(move);
         }
 
         public void UpdateDrawTypes()
@@ -402,10 +399,10 @@ namespace Rudz.Chess
 
             var (found, entry) = TT.Probe(Position.State.Key);
 
-            if (found && entry.key32 == (uint)(Position.State.Key >> 32) && entry.depth == depth)
-                return (ulong)entry.value;
+            if (found && entry.Key32 == (uint)(Position.State.Key >> 32) && entry.Depth == depth)
+                return (ulong)entry.Value;
 
-            ulong tot = 0;
+            var tot = 0ul;
 
             var move = MoveExtensions.EmptyMove;
 
