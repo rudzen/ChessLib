@@ -41,6 +41,8 @@ namespace Rudz.Chess.Types
             [FieldOffset(16)]public int eg;
         }
 
+        private ScoreUnion _data;
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Score(int value)
         {
@@ -64,8 +66,6 @@ namespace Rudz.Chess.Types
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator Score(ExtMove value) => new Score(value.Score._data.mg, value.Score._data.eg);
-
-        private ScoreUnion _data;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetMg(int v) => _data.mg = v;

@@ -43,9 +43,6 @@ namespace Rudz.Chess
         static MoveGenerator()
         {
             Table = new ConcurrentDictionary<ulong, MoveList>();
-
-            // Force cleaning when process exists
-            AppDomain.CurrentDomain.ProcessExit += Clean;
         }
 
         public MoveGenerator(IPosition position)

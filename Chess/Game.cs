@@ -67,10 +67,10 @@ namespace Rudz.Chess
         {
             CastlePositionalOr = new[,]
             {
-                {ECastlelingRights.WhiteOO, ECastlelingRights.BlackOO},
-                {ECastlelingRights.WhiteOOO, ECastlelingRights.BlackOOO}
+                {ECastlelingRights.WhiteOo, ECastlelingRights.BlackOo},
+                {ECastlelingRights.WhiteOoo, ECastlelingRights.BlackOoo}
             };
-            TT = new TranspositionTable(32);
+            Table = new TranspositionTable(32);
         }
 
         public Game(Action<Piece, Square> pieceUpdateCallback = null)
@@ -103,7 +103,7 @@ namespace Rudz.Chess
 
         public EGameEndType GameEndType { get; set; }
 
-        public static TranspositionTable TT { get; set; }
+        public static TranspositionTable Table { get; set; }
 
         /// <summary>
         /// Makes a chess move in the data structure
@@ -195,7 +195,6 @@ namespace Rudz.Chess
 
             Position.Clear();
 
-            // ReSharper disable once AssignNullToNotNullAttribute
             var fen = new FenData(fenString);
 
             Player player;
@@ -397,7 +396,7 @@ namespace Rudz.Chess
             if (depth == 1)
                 return (ulong)mg.Moves.Count;
 
-            var (found, entry) = TT.Probe(Position.State.Key);
+            var (found, entry) = Table.Probe(Position.State.Key);
 
             if (found && entry.Key32 == (uint)(Position.State.Key >> 32) && entry.Depth == depth)
                 return (ulong)entry.Value;
@@ -415,7 +414,7 @@ namespace Rudz.Chess
             }
 
             if (move != MoveExtensions.EmptyMove)
-                TT.Store(Position.State.Key, (int)tot, Bound.Exact, (sbyte)depth, move, 0);
+                Table.Store(Position.State.Key, (int)tot, Bound.Exact, (sbyte)depth, move, 0);
 
             return tot;
         }
@@ -536,9 +535,6 @@ namespace Rudz.Chess
                 return true;
             }
 
-            // List to gather functions for castleling rights addition.
-            var castleFunctions = new List<Action>(4);
-
             while (fen.Get != 0 && fen.Get != ' ')
             {
                 var c = fen.Get;
@@ -548,45 +544,43 @@ namespace Rudz.Chess
                     _chess960 = true;
                     _xfen = false;
 
-                    // ReSharper disable once HeapView.ClosureAllocation
                     var rookFile = c - 'A';
 
                     if (rookFile > Position.GetPieceSquare(EPieceType.King, PlayerExtensions.White).File())
-                        castleFunctions.Add(() => AddShortCastleRights(rookFile, PlayerExtensions.White));
+                        AddShortCastleRights(rookFile, PlayerExtensions.White);
                     else
-                        castleFunctions.Add(() => AddLongCastleRights(rookFile, PlayerExtensions.White));
+                        AddLongCastleRights(rookFile, PlayerExtensions.White);
                 }
                 else if (c.InBetween('a', 'h'))
                 {
                     _chess960 = true;
                     _xfen = false;
 
-                    // ReSharper disable once HeapView.ClosureAllocation
                     var rookFile = c - 'a';
 
                     if (rookFile > Position.GetPieceSquare(EPieceType.King, PlayerExtensions.Black).File())
-                        castleFunctions.Add(() => AddShortCastleRights(rookFile, PlayerExtensions.Black));
+                        AddShortCastleRights(rookFile, PlayerExtensions.Black);
                     else
-                        castleFunctions.Add(() => AddLongCastleRights(rookFile, PlayerExtensions.Black));
+                        AddLongCastleRights(rookFile, PlayerExtensions.Black);
                 }
                 else
                 {
                     switch (c)
                     {
                         case 'K':
-                            castleFunctions.Add(() => AddShortCastleRights(-1, PlayerExtensions.White));
+                            AddShortCastleRights(-1, PlayerExtensions.White);
                             break;
 
                         case 'Q':
-                            castleFunctions.Add(() => AddLongCastleRights(-1, PlayerExtensions.White));
+                            AddLongCastleRights(-1, PlayerExtensions.White);
                             break;
 
                         case 'k':
-                            castleFunctions.Add(() => AddShortCastleRights(-1, PlayerExtensions.Black));
+                            AddShortCastleRights(-1, PlayerExtensions.Black);
                             break;
 
                         case 'q':
-                            castleFunctions.Add(() => AddLongCastleRights(-1, PlayerExtensions.Black));
+                            AddLongCastleRights(-1, PlayerExtensions.Black);
                             break;
 
                         case '-':
@@ -599,10 +593,6 @@ namespace Rudz.Chess
 
                 fen.Advance();
             }
-
-            // invoke the gathered castleling configure functions
-            foreach (var castleFunction in castleFunctions)
-                castleFunction();
 
             return true;
         }

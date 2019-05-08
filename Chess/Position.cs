@@ -348,7 +348,6 @@ namespace Rudz.Chess
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Square GetKingCastleFrom(Player side, ECastleling castleType)
         {
-            // ReSharper disable once SwitchStatementMissingSomeCases
             switch (castleType)
             {
                 case ECastleling.Short:
@@ -365,7 +364,6 @@ namespace Rudz.Chess
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetKingCastleFrom(Player side, Square square, ECastleling castleType)
         {
-            // ReSharper disable once SwitchStatementMissingSomeCases
             switch (castleType)
             {
                 case ECastleling.Short:
@@ -393,7 +391,6 @@ namespace Rudz.Chess
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ECastleling IsCastleMove(string m)
         {
-            // ReSharper disable once SwitchStatementMissingSomeCases
             switch (m)
             {
                 case "O-O":
@@ -584,7 +581,6 @@ namespace Rudz.Chess
             else if ((Pieces() & to) != 0)
                 return false;
 
-            // ReSharper disable once SwitchStatementMissingSomeCases
             switch (move.GetMovingPiece().Type())
             {
                 case EPieceType.Bishop:
@@ -655,16 +651,16 @@ namespace Rudz.Chess
 
             if (castleRights != 0)
             {
-                if (castleRights.HasFlagFast(ECastlelingRights.WhiteOO))
+                if (castleRights.HasFlagFast(ECastlelingRights.WhiteOo))
                     sv.Append('K');
 
-                if (castleRights.HasFlagFast(ECastlelingRights.WhiteOOO))
+                if (castleRights.HasFlagFast(ECastlelingRights.WhiteOoo))
                     sv.Append('Q');
 
-                if (castleRights.HasFlagFast(ECastlelingRights.BlackOO))
+                if (castleRights.HasFlagFast(ECastlelingRights.BlackOo))
                     sv.Append('k');
 
-                if (castleRights.HasFlagFast(ECastlelingRights.BlackOOO))
+                if (castleRights.HasFlagFast(ECastlelingRights.BlackOoo))
                     sv.Append('q');
             }
             else
@@ -685,13 +681,7 @@ namespace Rudz.Chess
             return new FenData(sv.ToString());
         }
 
-        public IEnumerator<Piece> GetEnumerator()
-        {
-            // ReSharper disable once ForCanBeConvertedToForeach
-            // ReSharper disable once LoopCanBeConvertedToQuery
-            for (var index = 0; index < BoardLayout.Length; index++)
-                yield return BoardLayout[index];
-        }
+        public IEnumerator<Piece> GetEnumerator() => ((IEnumerable<Piece>) BoardLayout).GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 

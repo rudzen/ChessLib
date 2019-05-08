@@ -46,7 +46,7 @@ namespace Rudz.Chess.Transposition
         {
             unsafe
             {
-                ClusterSize = sizeof(TTEntry) * 4;
+                ClusterSize = sizeof(TranspositionTableEntry) * 4;
             }
         }
 
@@ -94,18 +94,18 @@ namespace Rudz.Chess.Transposition
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Refresh(TTEntry tte) => tte.Generation = _generation;
+        public void Refresh(TranspositionTableEntry tte) => tte.Generation = _generation;
 
-        public (bool, TTEntry) Probe(ulong key)
+        public (bool, TranspositionTableEntry) Probe(ulong key)
         {
             var ttc = FindCluster(key);
             var keyH = (uint)(key >> 32);
             var g = _generation;
 
-            // Probing the TT will automatically update the generation of the entry
+            // Probing the Table will automatically update the generation of the entry
             // in case the probing retrieves an element.
 
-            TTEntry e = default;
+            TranspositionTableEntry e = default;
             var set = false;
             for (var i = 0; i < ttc.Cluster.Length; ++i)
             {
@@ -125,12 +125,12 @@ namespace Rudz.Chess.Transposition
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public TTEntry ProbeFirst(ulong key) => FindCluster(key)[0];
+        public TranspositionTableEntry ProbeFirst(ulong key) => FindCluster(key)[0];
 
         public void Store(ulong key, int value, Bound type, sbyte depth, Move move, int statValue)
         {
             // Use the high 32 bits as key inside the cluster
-            var e = new TTEntry((uint)(key >> 32), move, depth, _generation, value, statValue, type);
+            var e = new TranspositionTableEntry((uint)(key >> 32), move, depth, _generation, value, statValue, type);
 
             var ttc = FindCluster(key);
 
@@ -205,7 +205,7 @@ namespace Rudz.Chess.Transposition
                 var ttc = new TTCluster();
                 for (var j = 0; j < ttc.Cluster.Length; j++)
                 {
-                    ttc.Cluster[j] = new TTEntry();
+                    ttc.Cluster[j] = new TranspositionTableEntry();
                     ttc.Cluster[j].Defaults();
                 }
                 _table.Add(ttc);

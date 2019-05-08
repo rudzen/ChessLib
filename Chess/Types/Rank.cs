@@ -126,7 +126,7 @@ namespace Rudz.Chess.Types
         public bool IsValid() => Value < ERank.RankNb;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public override string ToString() => this.RankChar().ToString();
+        public override string ToString() => ((int) Value + 1).ToString();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals(Rank other) => Value == other.Value;

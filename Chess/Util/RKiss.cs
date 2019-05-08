@@ -44,8 +44,6 @@ namespace Rudz.Chess.Util
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-
-        // ReSharper disable once MissingAnnotation
         public static implicit operator RKiss(ulong seed) => new RKiss(seed);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

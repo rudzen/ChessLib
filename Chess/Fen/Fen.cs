@@ -123,7 +123,6 @@ namespace Rudz.Chess.Fen
 
             foreach (var c in mainSection)
             {
-                // ReSharper disable once SwitchStatementMissingSomeCases
                 switch (c)
                 {
                     case '\\':
@@ -212,11 +211,9 @@ namespace Rudz.Chess.Fen
             var spaceCount = 0;
             var seperatorCount = 0;
 
-            // ReSharper disable once ForCanBeConvertedToForeach
-            for (var index = 0; index < str.Length; index++)
+            foreach (var c in str)
             {
-                // ReSharper disable once SwitchStatementMissingSomeCases
-                switch (str[index])
+                switch (c)
                 {
                     case Seperator:
                         seperatorCount++;

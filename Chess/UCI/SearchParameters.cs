@@ -150,7 +150,6 @@ namespace Rudz.Chess.UCI
 
             _output.AppendFormat(incFormatString, WhiteIncrementTimeMilliseconds, BlackIncrementTimeMilliseconds);
 
-            // ReSharper disable once InvertIf
             if (MovesToGo[side.Side] > 0)
             {
                 _output.Append(" movestogo ");

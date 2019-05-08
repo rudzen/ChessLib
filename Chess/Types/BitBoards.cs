@@ -26,6 +26,8 @@ SOFTWARE.
 
 // ReSharper disable InconsistentNaming
 
+using System.Linq;
+
 namespace Rudz.Chess.Types
 {
     using Enums;
@@ -617,15 +619,7 @@ namespace Rudz.Chess.Types
         /// <param name="squares">The squares to generate bitboard from</param>
         /// <returns>The generated bitboard</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static BitBoard MakeBitboard(params Square[] squares)
-        {
-            BitBoard b = ZeroBb;
-            // ReSharper disable once ForCanBeConvertedToForeach
-            // ReSharper disable once LoopCanBeConvertedToQuery
-            for (var i = 0; i < squares.Length; ++i)
-                b |= squares[i];
-            return b;
-        }
+        public static BitBoard MakeBitboard(params Square[] squares) => squares.Aggregate<Square, BitBoard>(ZeroBb, (current, t) => current | t);
 
         /// <summary>
         /// Helper method to generate shift function dictionary for all directions.

@@ -28,7 +28,7 @@ namespace Rudz.Chess.Transposition
 {
     using Types;
 
-    public struct TTEntry
+    public struct TranspositionTableEntry
     {
         public uint Key32;
         public Move Move;
@@ -38,7 +38,7 @@ namespace Rudz.Chess.Transposition
         public int StaticValue;
         public Bound Type;
 
-        public TTEntry(uint k, Move m, sbyte d, sbyte g, int v, int sv, Bound b)
+        public TranspositionTableEntry(uint k, Move m, sbyte d, sbyte g, int v, int sv, Bound b)
         {
             Key32 = k;
             Move = m;
@@ -49,7 +49,7 @@ namespace Rudz.Chess.Transposition
             Type = b;
         }
 
-        public TTEntry(TTEntry tte)
+        public TranspositionTableEntry(TranspositionTableEntry tte)
         {
             this = tte;
         }
@@ -64,7 +64,7 @@ namespace Rudz.Chess.Transposition
             Type = Bound.Void;
         }
 
-        public void Save(TTEntry tte)
+        public void Save(TranspositionTableEntry tte)
         {
             Key32 = tte.Key32;
             if (tte.Move != MoveExtensions.EmptyMove)

@@ -65,7 +65,7 @@ namespace Rudz.Chess
         public Material()
         {
             MaterialValue = new int[2];
-            _key = new[] { 0u, 0u };
+            _key = new uint[2];
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -116,8 +116,9 @@ namespace Rudz.Chess
 
         public void CopyFrom(IMaterial material)
         {
-
-            throw new System.NotImplementedException();
+            material.MaterialValue.CopyTo(MaterialValue, 0);
+            _key[0] = material.GetKey(0);
+            _key[1] = material.GetKey(1);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

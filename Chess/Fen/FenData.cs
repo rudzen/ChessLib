@@ -40,15 +40,13 @@ namespace Rudz.Chess.Fen
     /// </summary>
     public sealed class FenData : EventArgs, IFenData
     {
-        private int _index;
-
         static FenData() => FenComparer = new FenEqualityComparer();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public FenData(string fen, int index = 0)
         {
             Fen = fen;
-            _index = index;
+            Index = index;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -59,13 +57,13 @@ namespace Rudz.Chess.Fen
 
         public string Fen { get; set; }
 
-        public int Index => _index;
+        public int Index { get; private set; }
 
-        public char GetAdvance => Fen[_index++];
+        public char GetAdvance => Fen[Index++];
 
-        public char Get => Fen[_index];
+        public char Get => Fen[Index];
 
-        public char this[int index] => Fen[_index];
+        public char this[int index] => Fen[Index];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator FenData(int value) => new FenData(Chess.Fen.Fen.StartPositionFen, value);
@@ -80,13 +78,13 @@ namespace Rudz.Chess.Fen
         public static bool operator !=(FenData left, FenData right) => !left.Equals(right);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Advance() => _index++;
+        public void Advance() => Index++;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Advance(int count) => _index += count;
+        public void Advance(int count) => Index += count;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public override int GetHashCode() => Fen.GetHashCode() ^ (_index << 24);
+        public override int GetHashCode() => Fen.GetHashCode() ^ (Index << 24);
 
         public override bool Equals(object obj)
         {
