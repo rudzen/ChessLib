@@ -38,9 +38,9 @@ namespace Rudz.Chess.Types
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static char RankChar(this Rank r) => RankChars[r.ToInt()];
+        public static char RankChar(this Rank r) => RankChars[r.AsInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string RankString(this Rank r) => RankChars[r.ToInt()].ToString();
+        public static string RankString(this Rank r) => RankChars[r.AsInt()].ToString();
     }
 }

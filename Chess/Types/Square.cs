@@ -73,28 +73,28 @@ namespace Rudz.Chess.Types
         public static bool operator !=(Square left, ESquare right) => left.Value != right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Square operator +(Square left, Square right) => left.ToInt() + right.ToInt();
+        public static Square operator +(Square left, Square right) => left.AsInt() + right.AsInt();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Square operator +(Square left, int right) => left.ToInt() + right;
+        public static Square operator +(Square left, int right) => left.AsInt() + right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Square operator +(Square left, Direction right) => left.ToInt() + (int)right.Value;
+        public static Square operator +(Square left, Direction right) => left.AsInt() + (int)right.Value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Square operator +(Square left, EDirection right) => left.ToInt() + (int)right;
+        public static Square operator +(Square left, EDirection right) => left.AsInt() + (int)right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Square operator -(Square left, Square right) => left.ToInt() - right.ToInt();
+        public static Square operator -(Square left, Square right) => left.AsInt() - right.AsInt();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Square operator -(Square left, int right) => left.ToInt() - right;
+        public static Square operator -(Square left, int right) => left.AsInt() - right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Square operator -(Square left, Direction right) => left.ToInt() - (int)right.Value;
+        public static Square operator -(Square left, Direction right) => left.AsInt() - (int)right.Value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Square operator -(Square left, EDirection right) => left.ToInt() - (int)right;
+        public static Square operator -(Square left, EDirection right) => left.AsInt() - (int)right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Square operator ++(Square square) => ++square.Value;
@@ -112,19 +112,19 @@ namespace Rudz.Chess.Types
         public static BitBoard operator |(ulong left, Square right) => left | right.BitBoardSquare();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int operator |(Square left, int right) => left.ToInt() | right;
+        public static int operator |(Square left, int right) => left.AsInt() | right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static BitBoard operator ~(Square left) => ~left.BitBoardSquare();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int operator >>(Square left, int right) => left.ToInt() >> right;
+        public static int operator >>(Square left, int right) => left.AsInt() >> right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator >(Square left, Square right) => left.ToInt() > right.ToInt();
+        public static bool operator >(Square left, Square right) => left.AsInt() > right.AsInt();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator <(Square left, Square right) => left.ToInt() < right.ToInt();
+        public static bool operator <(Square left, Square right) => left.AsInt() < right.AsInt();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator true(Square sq) => sq.IsValid();
@@ -145,6 +145,6 @@ namespace Rudz.Chess.Types
         public override bool Equals(object obj) => obj is Square square && Equals(square);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public override int GetHashCode() => this.ToInt();
+        public override int GetHashCode() => this.AsInt();
     }
 }

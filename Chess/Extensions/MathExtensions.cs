@@ -131,7 +131,7 @@ namespace Rudz.Chess.Extensions
         public static int ModPow2(int input, int ceil) => input & (ceil - 1);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int Pow2(this int value) => 1 << BitBoards.Msb(value).ToInt();
+        public static int Pow2(this int value) => 1 << BitBoards.Msb(value).AsInt();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsEven(this int value) => (value & 1) == 0;

@@ -97,9 +97,9 @@ namespace Rudz.Chess
         {
             BitBoard bbsq = square;
             var color = piece.ColorOf();
-            BoardPieces[piece.ToInt()] |= bbsq;
+            BoardPieces[piece.AsInt()] |= bbsq;
             OccupiedBySide[color] |= bbsq;
-            BoardLayout[square.ToInt()] = piece;
+            BoardLayout[square.AsInt()] = piece;
 
             if (!IsProbing)
                 PieceUpdated?.Invoke(piece, square);
@@ -109,9 +109,9 @@ namespace Rudz.Chess
         public void AddPiece(EPieceType pieceType, Square square, Player side)
         {
             var piece = pieceType.MakePiece(side);
-            BoardPieces[piece.ToInt()] |= square;
+            BoardPieces[piece.AsInt()] |= square;
             OccupiedBySide[side.Side] |= square;
-            BoardLayout[square.ToInt()] = piece;
+            BoardLayout[square.AsInt()] = piece;
 
             if (!IsProbing)
                 PieceUpdated?.Invoke(piece, square);
@@ -129,7 +129,7 @@ namespace Rudz.Chess
             {
                 var rook = EPieceType.Rook.MakePiece(movingSide);
                 var king = move.GetMovingPiece();
-                RemovePiece(_rookCastlesFrom[toSquare.ToInt()], rook);
+                RemovePiece(_rookCastlesFrom[toSquare.AsInt()], rook);
                 RemovePiece(move.GetFromSquare(), king);
                 AddPiece(rook, toSquare.GetRookCastleTo());
                 AddPiece(king, toSquare);
@@ -166,7 +166,7 @@ namespace Rudz.Chess
                 RemovePiece(toSquare, king);
                 RemovePiece(toSquare.GetRookCastleTo(), rook);
                 AddPiece(king, move.GetFromSquare());
-                AddPiece(rook, _rookCastlesFrom[toSquare.ToInt()]);
+                AddPiece(rook, _rookCastlesFrom[toSquare.AsInt()]);
                 return;
             }
 
@@ -184,10 +184,10 @@ namespace Rudz.Chess
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Piece GetPiece(Square square) => BoardLayout[square.ToInt()];
+        public Piece GetPiece(Square square) => BoardLayout[square.AsInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public EPieceType GetPieceType(Square square) => BoardLayout[square.ToInt()].Type();
+        public EPieceType GetPieceType(Square square) => BoardLayout[square.AsInt()].Type();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool IsPieceTypeOnSquare(Square square, EPieceType pieceType) => GetPieceType(square) == pieceType;
@@ -239,19 +239,19 @@ namespace Rudz.Chess
         public BitBoard Pieces(Player side) => OccupiedBySide[side.Side];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public BitBoard Pieces(Piece pc) => BoardPieces[pc.ToInt()];
+        public BitBoard Pieces(Piece pc) => BoardPieces[pc.AsInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public BitBoard Pieces(EPieceType type) => BoardPieces[type.MakePiece(PlayerExtensions.White).ToInt()] | BoardPieces[type.MakePiece(PlayerExtensions.Black).ToInt()];
+        public BitBoard Pieces(EPieceType type) => BoardPieces[type.MakePiece(PlayerExtensions.White).AsInt()] | BoardPieces[type.MakePiece(PlayerExtensions.Black).AsInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public BitBoard Pieces(EPieceType type1, EPieceType type2) => Pieces(type1) | Pieces(type2);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public BitBoard Pieces(EPieceType type, Player side) => BoardPieces[type.MakePiece(side).ToInt()];
+        public BitBoard Pieces(EPieceType type, Player side) => BoardPieces[type.MakePiece(side).AsInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public BitBoard Pieces(EPieceType type1, EPieceType type2, Player side) => BoardPieces[type1.MakePiece(side).ToInt()] | BoardPieces[type2.MakePiece(side).ToInt()];
+        public BitBoard Pieces(EPieceType type1, EPieceType type2, Player side) => BoardPieces[type1.MakePiece(side).AsInt()] | BoardPieces[type2.MakePiece(side).AsInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Square GetPieceSquare(EPieceType pt, Player color) => Pieces(pt, color).Lsb();
@@ -280,7 +280,7 @@ namespace Rudz.Chess
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool PassedPawn(Square square)
         {
-            var pc = BoardLayout[square.ToInt()];
+            var pc = BoardLayout[square.AsInt()];
 
             if (pc.Type() != EPieceType.Pawn)
                 return false;
@@ -294,9 +294,9 @@ namespace Rudz.Chess
         public void RemovePiece(Square square, Piece piece)
         {
             BitBoard invertedSq = square;
-            BoardPieces[piece.ToInt()] &= ~invertedSq;
+            BoardPieces[piece.AsInt()] &= ~invertedSq;
             OccupiedBySide[piece.ColorOf()] &= ~invertedSq;
-            BoardLayout[square.ToInt()] = PieceExtensions.EmptyPiece;
+            BoardLayout[square.AsInt()] = PieceExtensions.EmptyPiece;
             if (IsProbing)
                 return;
             PieceUpdated?.Invoke(EPieces.NoPiece, square);
@@ -340,10 +340,10 @@ namespace Rudz.Chess
         public bool AttackedByKing(Square square, Player side) => (Pieces(EPieceType.King, side) & square.GetAttacks(EPieceType.King)) != 0;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Square GetRookCastleFrom(Square index) => _rookCastlesFrom[index.ToInt()];
+        public Square GetRookCastleFrom(Square index) => _rookCastlesFrom[index.AsInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetRookCastleFrom(Square index, Square square) => _rookCastlesFrom[index.ToInt()] = square;
+        public void SetRookCastleFrom(Square index, Square square) => _rookCastlesFrom[index.AsInt()] = square;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Square GetKingCastleFrom(Player side, ECastleling castleType)
@@ -621,7 +621,7 @@ namespace Rudz.Chess
                 for (var file = EFile.FileA; file < EFile.FileNb; file++)
                 {
                     var square = new Square(rank, file);
-                    var piece = BoardLayout[square.ToInt()];
+                    var piece = BoardLayout[square.AsInt()];
 
                     if (piece.IsNoPiece())
                     {

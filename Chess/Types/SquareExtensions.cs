@@ -61,17 +61,17 @@ namespace Rudz.Chess.Types
             // generate square flipping array for both sides
             foreach (var square in BitBoards.AllSquares)
             {
-                var file = square.File().ToInt();
+                var file = square.File().AsInt();
                 var rank = square.Rank();
-                Flip[0, square.ToInt()] = file + ((7 - rank.ToInt()) << 3);
-                Flip[1, square.ToInt()] = file + (rank.ToInt() << 3);
+                Flip[0, square.AsInt()] = file + ((7 - rank.AsInt()) << 3);
+                Flip[1, square.AsInt()] = file + (rank.AsInt() << 3);
             }
 
             // generate rook castleling destination squares for both sides
-            RookCastlesTo[Flip[PlayerExtensions.White.Side, (int)ESquare.g1].ToInt()] = Flip[PlayerExtensions.White.Side, (int)ESquare.f1];
-            RookCastlesTo[Flip[PlayerExtensions.White.Side, (int)ESquare.c1].ToInt()] = Flip[PlayerExtensions.White.Side, (int)ESquare.d1];
-            RookCastlesTo[Flip[PlayerExtensions.Black.Side, (int)ESquare.g1].ToInt()] = Flip[PlayerExtensions.Black.Side, (int)ESquare.f1];
-            RookCastlesTo[Flip[PlayerExtensions.Black.Side, (int)ESquare.c1].ToInt()] = Flip[PlayerExtensions.Black.Side, (int)ESquare.d1];
+            RookCastlesTo[Flip[PlayerExtensions.White.Side, (int)ESquare.g1].AsInt()] = Flip[PlayerExtensions.White.Side, (int)ESquare.f1];
+            RookCastlesTo[Flip[PlayerExtensions.White.Side, (int)ESquare.c1].AsInt()] = Flip[PlayerExtensions.White.Side, (int)ESquare.d1];
+            RookCastlesTo[Flip[PlayerExtensions.Black.Side, (int)ESquare.g1].AsInt()] = Flip[PlayerExtensions.Black.Side, (int)ESquare.f1];
+            RookCastlesTo[Flip[PlayerExtensions.Black.Side, (int)ESquare.c1].AsInt()] = Flip[PlayerExtensions.Black.Side, (int)ESquare.d1];
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -87,22 +87,22 @@ namespace Rudz.Chess.Types
         public static bool IsDark(this Square s) => (s & BitBoards.DarkSquares) != 0;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int ToInt(this Square s) => (int)s.Value;
+        public static int AsInt(this Square s) => (int)s.Value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Rank Rank(this Square s) => (ERank)(s.ToInt() >> 3);
+        public static Rank Rank(this Square s) => (ERank)(s.AsInt() >> 3);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static char RankChar(this Square s) => s.Rank().RankChar();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Rank RelativeRank(this Rank rank, Player color) => rank.ToInt() ^ (color.Side * 7);
+        public static Rank RelativeRank(this Rank rank, Player color) => rank.AsInt() ^ (color.Side * 7);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Rank RelativeRank(this Square s, Player color) => s.Rank().RelativeRank(color);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static File File(this Square s) => s.ToInt() & 7;
+        public static File File(this Square s) => s.AsInt() & 7;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static char FileChar(this Square s) => s.File().FileChar();
@@ -111,19 +111,19 @@ namespace Rudz.Chess.Types
         public static bool IsOppositeColor(this Square @this, Square other) => ((BitBoards.DarkSquares & @this) != 0) != ((BitBoards.DarkSquares & other) != 0);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string GetSquareString(this Square s) => SquareStrings[s.ToInt()];
+        public static string GetSquareString(this Square s) => SquareStrings[s.AsInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsPromotionRank(this Square square) => (BitBoards.PromotionRanks & square) != 0;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static BitBoard BitBoardSquare(this Square sq) => BitBoards.BbSquares[sq.ToInt()];
+        public static BitBoard BitBoardSquare(this Square sq) => BitBoards.BbSquares[sq.AsInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static BitBoard BitBoardSquare(this ESquare sq) => BitBoards.BbSquares[(int)sq];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static Square GetRookCastleTo(this Square square) => RookCastlesTo[square.ToInt()];
+        internal static Square GetRookCastleTo(this Square square) => RookCastlesTo[square.AsInt()];
 
         /// <summary>
         /// Uses a file(column) index and not a square

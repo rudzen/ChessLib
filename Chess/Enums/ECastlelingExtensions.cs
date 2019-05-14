@@ -104,6 +104,6 @@ namespace Rudz.Chess.Enums
         public static bool HasFlagFast(this ECastlelingRights value, ECastlelingRights flag) => (value & flag) != 0;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int ToInt(this ECastlelingRights value) => (int) value;
+        public static int AsInt(this ECastlelingRights value) => (int) value;
     }
 }

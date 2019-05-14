@@ -82,19 +82,19 @@ namespace Rudz.Chess.Types
 
         // Generic helper functions
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsWhite(this Piece p) => p.ToInt().InBetween((int)EPieces.WhitePawn, (int)EPieces.WhiteKing);
+        public static bool IsWhite(this Piece p) => p.AsInt().InBetween((int)EPieces.WhitePawn, (int)EPieces.WhiteKing);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsBlack(this Piece p) => p.ToInt().InBetween((int)EPieces.BlackPawn, (int)EPieces.BlackKing);
+        public static bool IsBlack(this Piece p) => p.AsInt().InBetween((int)EPieces.BlackPawn, (int)EPieces.BlackKing);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int ToInt(this Piece p) => (int)p.Value;
+        public static int AsInt(this Piece p) => (int)p.Value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int ToInt(this EPieceType p) => (int)p;
+        public static int AsInt(this EPieceType p) => (int)p;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static EPieceType Type(this Piece p) => (EPieceType)(p.ToInt() & 0x7);
+        public static EPieceType Type(this Piece p) => (EPieceType)(p.AsInt() & 0x7);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Piece MakePiece(this EPieceType @this, Player side) => @this + (side.Side << 3);
@@ -103,13 +103,13 @@ namespace Rudz.Chess.Types
         public static bool IsNoPiece(this Piece p) => p == EPieces.NoPiece;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static char GetPieceChar(this Piece p) => PieceChars[p.ToInt()];
+        public static char GetPieceChar(this Piece p) => PieceChars[p.AsInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static char GetPieceChar(this EPieceType p) => PieceChars[(int)p];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string GetPieceString(this Piece p) => PieceStrings[p.ToInt()];
+        public static string GetPieceString(this Piece p) => PieceStrings[p.AsInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsPieceWhite(int code) => (WhitePieces & code) != 0;
@@ -120,7 +120,7 @@ namespace Rudz.Chess.Types
         public static EPieceValue PieceValue(this Piece p) => PieceValues[(int)p.Type()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ref string GetName(this Piece p) => ref PieceNames[p.Type().ToInt()];
+        public static ref string GetName(this Piece p) => ref PieceNames[p.Type().AsInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static char GetPromotionChar(this Piece p) => PromotionPieceNotation[(int)p.Type()];
@@ -129,6 +129,6 @@ namespace Rudz.Chess.Types
         public static char GetPgnChar(this Piece p) => PgnPieceChars[(int)p.Type()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static char GetUnicodeChar(this Piece p) => PieceUnicodeChar[p.ToInt()];
+        public static char GetUnicodeChar(this Piece p) => PieceUnicodeChar[p.AsInt()];
     }
 }

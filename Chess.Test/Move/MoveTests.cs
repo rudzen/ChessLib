@@ -43,7 +43,7 @@ namespace Chess.Test.Move
             for (var i = 0; i < 64; i++)
             {
                 Square expectedFrom = i;
-                var actualInt = expectedFrom.ToInt();
+                var actualInt = expectedFrom.AsInt();
                 Assert.Equal(i, actualInt);
                 for (var j = 1 /* NOTE! from 1 !! */; j < 64; j++)
                 {

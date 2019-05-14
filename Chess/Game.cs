@@ -125,7 +125,7 @@ namespace Rudz.Chess
 
             // compute in-check
             Position.InCheck = Position.IsAttacked(Position.GetPieceSquare(EPieceType.King, State.SideToMove), ~State.SideToMove);
-            State.CastlelingRights = _stateList[PositionIndex - 1].CastlelingRights & _castleRightsMask[move.GetFromSquare().ToInt()] & _castleRightsMask[move.GetToSquare().ToInt()];
+            State.CastlelingRights = _stateList[PositionIndex - 1].CastlelingRights & _castleRightsMask[move.GetFromSquare().AsInt()] & _castleRightsMask[move.GetToSquare().AsInt()];
             State.NullMovesInRow = 0;
 
             // compute reversible half move count
@@ -188,7 +188,7 @@ namespace Rudz.Chess
                 Fen.Fen.Validate(fenString);
 
             foreach (var square in Occupied)
-                Position.RemovePiece(square, Position.BoardLayout[square.ToInt()]);
+                Position.RemovePiece(square, Position.BoardLayout[square.AsInt()]);
 
             //for (var i = 0; i <= PositionIndex; i++)
             //    _stateList[i].Clear();
@@ -296,7 +296,7 @@ namespace Rudz.Chess
             State.Key ^= Zobrist.GetZobristCastleling(State.CastlelingRights);
 
             if (State.EnPassantSquare != ESquare.none)
-                State.Key ^= Zobrist.GetZobristEnPessant(State.EnPassantSquare.File().ToInt());
+                State.Key ^= Zobrist.GetZobristEnPessant(State.EnPassantSquare.File().AsInt());
 
             Position.InCheck = Position.IsAttacked(Position.GetPieceSquare(EPieceType.King, State.SideToMove), ~State.SideToMove);
 
@@ -452,10 +452,10 @@ namespace Rudz.Chess
             pawnKey ^= Zobrist.GetZobristSide();
 
             if (_stateList[PositionIndex - 1].EnPassantSquare != ESquare.none)
-                key ^= Zobrist.GetZobristEnPessant(_stateList[PositionIndex - 1].EnPassantSquare.File().ToInt());
+                key ^= Zobrist.GetZobristEnPessant(_stateList[PositionIndex - 1].EnPassantSquare.File().AsInt());
 
             if (State.EnPassantSquare != ESquare.none)
-                key ^= Zobrist.GetZobristEnPessant(State.EnPassantSquare.File().ToInt());
+                key ^= Zobrist.GetZobristEnPessant(State.EnPassantSquare.File().AsInt());
 
             if (move.IsNullMove())
             {
@@ -624,8 +624,8 @@ namespace Rudz.Chess
             var them = ~side;
             var castlelingMask = ECastleling.Short.GetCastleAllowedMask(side);
             var ksq = Position.GetPieceSquare(EPieceType.King, side);
-            _castleRightsMask[SquareExtensions.GetFlip(rookFile, them).ToInt()] -= castlelingMask;
-            _castleRightsMask[SquareExtensions.GetFlip(ksq.File().ToInt(), them).ToInt()] -= castlelingMask;
+            _castleRightsMask[SquareExtensions.GetFlip(rookFile, them).AsInt()] -= castlelingMask;
+            _castleRightsMask[SquareExtensions.GetFlip(ksq.File().AsInt(), them).AsInt()] -= castlelingMask;
             Position.SetRookCastleFrom(SquareExtensions.GetFlip((int)ESquare.g1, them), SquareExtensions.GetFlip(rookFile, them));
             Position.SetKingCastleFrom(side, ksq, ECastleling.Short);
 
@@ -660,8 +660,8 @@ namespace Rudz.Chess
             var them = ~side;
             var castlelingMask = ECastleling.Long.GetCastleAllowedMask(side);
             var ksq = Position.GetPieceSquare(EPieceType.King, side);
-            _castleRightsMask[SquareExtensions.GetFlip(rookFile, them).ToInt()] -= castlelingMask;
-            _castleRightsMask[SquareExtensions.GetFlip(ksq.File().ToInt(), them).ToInt()] -= castlelingMask;
+            _castleRightsMask[SquareExtensions.GetFlip(rookFile, them).AsInt()] -= castlelingMask;
+            _castleRightsMask[SquareExtensions.GetFlip(ksq.File().AsInt(), them).AsInt()] -= castlelingMask;
             Position.SetRookCastleFrom(SquareExtensions.GetFlip((int)ESquare.c1, them), SquareExtensions.GetFlip(rookFile, them));
             Position.SetKingCastleFrom(side, ksq, ECastleling.Long);
 

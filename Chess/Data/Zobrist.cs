@@ -90,7 +90,7 @@ namespace Rudz.Chess.Data
                 {
                     var piece = pieceType.MakePiece(side);
                     for (var square = ESquare.a1; square <= ESquare.h8; square++)
-                        ZobristPst[piece.ToInt(), (int)square] = rnd.Rand();
+                        ZobristPst[piece.AsInt(), (int)square] = rnd.Rand();
                 }
             }
 
@@ -105,10 +105,10 @@ namespace Rudz.Chess.Data
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ulong GetZobristPst(Piece piece, Square square) => ZobristPst[piece.ToInt(), square.ToInt()];
+        public static ulong GetZobristPst(Piece piece, Square square) => ZobristPst[piece.AsInt(), square.AsInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ulong GetZobristCastleling(ECastlelingRights index) => ZobristCastling[index.ToInt()];
+        public static ulong GetZobristCastleling(ECastlelingRights index) => ZobristCastling[index.AsInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ulong GetZobristSide() => ZobristSide;

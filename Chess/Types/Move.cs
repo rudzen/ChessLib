@@ -156,19 +156,19 @@ namespace Rudz.Chess.Types
         public Square GetFromSquare() => new Square((_data >> MoveFromSquareOffset) & 0x3F);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetFromSquare(Square square) => _data |= square.ToInt() << MoveFromSquareOffset;
+        public void SetFromSquare(Square square) => _data |= square.AsInt() << MoveFromSquareOffset;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Square GetToSquare() => new Square(_data & 0x3F);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetToSquare(Square square) => _data |= square.ToInt();
+        public void SetToSquare(Square square) => _data |= square.AsInt();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Piece GetMovingPiece() => (_data >> MovePieceOffset) & 0xF;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetMovingPiece(Piece piece) => _data |= piece.ToInt() << MovePieceOffset;
+        public void SetMovingPiece(Piece piece) => _data |= piece.AsInt() << MovePieceOffset;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public EPieceType GetMovingPieceType() => GetMovingPiece().Type();
@@ -180,13 +180,13 @@ namespace Rudz.Chess.Types
         public bool IsCapturedPieceType(EPieceType pieceType) => GetCapturedPiece().Type() == pieceType;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetCapturedPiece(Piece piece) => _data |= piece.ToInt() << CapturePieceOffset;
+        public void SetCapturedPiece(Piece piece) => _data |= piece.AsInt() << CapturePieceOffset;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Piece GetPromotedPiece() => (_data >> PromotePieceOffset) & 0xF;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetPromotedPiece(Piece piece) => _data |= piece.ToInt() << PromotePieceOffset;
+        public void SetPromotedPiece(Piece piece) => _data |= piece.AsInt() << PromotePieceOffset;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool IsQueenPromotion() => IsPromotionMove() && GetPromotedPiece().Type() == EPieceType.Queen;
@@ -225,7 +225,7 @@ namespace Rudz.Chess.Types
         public bool IsNullMove() => _data == 0;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsValidMove() => GetFromSquare().ToInt() != GetToSquare().ToInt();
+        public bool IsValidMove() => GetFromSquare().AsInt() != GetToSquare().AsInt();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public object Clone() => new Move(_data);
