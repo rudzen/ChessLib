@@ -24,8 +24,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using Rudz.Chess.Transposition;
-
 namespace Rudz.Chess
 {
     using Data;
@@ -38,6 +36,7 @@ namespace Rudz.Chess
     using System.Linq;
     using System.Runtime.CompilerServices;
     using System.Text;
+    using Transposition;
     using Types;
     using Move = Types.Move;
     using Piece = Types.Piece;
@@ -68,10 +67,10 @@ namespace Rudz.Chess
         {
             CastlePositionalOr = new[,]
             {
-                {ECastlelingRights.WhiteOO, ECastlelingRights.BlackOO},
-                {ECastlelingRights.WhiteOOO, ECastlelingRights.BlackOOO}
+                {ECastlelingRights.WhiteOo, ECastlelingRights.BlackOo},
+                {ECastlelingRights.WhiteOoo, ECastlelingRights.BlackOoo}
             };
-            TT = new TranspositionTable(32);
+            Table = new TranspositionTable(32);
         }
 
         public Game(Action<Piece, Square> pieceUpdateCallback = null)
@@ -104,7 +103,7 @@ namespace Rudz.Chess
 
         public EGameEndType GameEndType { get; set; }
 
-        public static TranspositionTable TT { get; set; }
+        public static TranspositionTable Table { get; set; }
 
         /// <summary>
         /// Makes a chess move in the data structure
@@ -126,7 +125,7 @@ namespace Rudz.Chess
 
             // compute in-check
             Position.InCheck = Position.IsAttacked(Position.GetPieceSquare(EPieceType.King, State.SideToMove), ~State.SideToMove);
-            State.CastlelingRights = _stateList[PositionIndex - 1].CastlelingRights & _castleRightsMask[move.GetFromSquare().ToInt()] & _castleRightsMask[move.GetToSquare().ToInt()];
+            State.CastlelingRights = _stateList[PositionIndex - 1].CastlelingRights & _castleRightsMask[move.GetFromSquare().AsInt()] & _castleRightsMask[move.GetToSquare().AsInt()];
             State.NullMovesInRow = 0;
 
             // compute reversible half move count
@@ -136,7 +135,7 @@ namespace Rudz.Chess
 
             // compute en-passant if present
             State.EnPassantSquare = move.IsDoublePush()
-                ? move.GetFromSquare() + (move.GetMovingSide() == PlayerExtensions.White ? EDirection.North : EDirection.South)
+                ? move.GetFromSquare() + move.GetMovingSide().PawnPushDistance()
                 : ESquare.none;
 
             State.Key = previous.Key;
@@ -189,14 +188,13 @@ namespace Rudz.Chess
                 Fen.Fen.Validate(fenString);
 
             foreach (var square in Occupied)
-                Position.RemovePiece(square, Position.BoardLayout[square.ToInt()]);
+                Position.RemovePiece(square, Position.BoardLayout[square.AsInt()]);
 
-            for (var i = 0; i <= PositionIndex; i++)
-                _stateList[i].Clear();
+            //for (var i = 0; i <= PositionIndex; i++)
+            //    _stateList[i].Clear();
 
             Position.Clear();
 
-            // ReSharper disable once AssignNullToNotNullAttribute
             var fen = new FenData(fenString);
 
             Player player;
@@ -278,8 +276,7 @@ namespace Rudz.Chess
             if (number > 0)
                 number -= 1;
 
-            PositionIndex = number;
-            PositionStart = number;
+            PositionIndex = PositionStart = number;
 
             first.ToIntegral(out number);
 
@@ -299,7 +296,7 @@ namespace Rudz.Chess
             State.Key ^= Zobrist.GetZobristCastleling(State.CastlelingRights);
 
             if (State.EnPassantSquare != ESquare.none)
-                State.Key ^= Zobrist.GetZobristEnPessant(State.EnPassantSquare.File().ToInt());
+                State.Key ^= Zobrist.GetZobristEnPessant(State.EnPassantSquare.File().AsInt());
 
             Position.InCheck = Position.IsAttacked(Position.GetPieceSquare(EPieceType.King, State.SideToMove), ~State.SideToMove);
 
@@ -335,11 +332,7 @@ namespace Rudz.Chess
                 return;
             }
 
-            output.Append(move.GetFromSquare().ToString());
-            output.Append(move.GetToSquare().ToString());
-
-            if (move.IsPromotionMove())
-                output.Append(move.GetPromotedPiece().GetPromotionChar());
+            output.Append(move);
         }
 
         public void UpdateDrawTypes()
@@ -403,12 +396,12 @@ namespace Rudz.Chess
             if (depth == 1)
                 return (ulong)mg.Moves.Count;
 
-            var (found, entry) = TT.Probe(Position.State.Key);
+            var (found, entry) = Table.Probe(Position.State.Key);
 
-            if (found && entry.key32 == (uint) (Position.State.Key >> 32) && entry.depth == depth)
-                return (ulong)entry.value;
+            if (found && entry.Key32 == (uint)(Position.State.Key >> 32) && entry.Depth == depth)
+                return (ulong)entry.Value;
 
-            ulong tot = 0;
+            var tot = 0ul;
 
             var move = MoveExtensions.EmptyMove;
 
@@ -421,7 +414,7 @@ namespace Rudz.Chess
             }
 
             if (move != MoveExtensions.EmptyMove)
-                TT.Store(Position.State.Key, (int) tot, Bound.Exact, (sbyte) depth, move, 0);
+                Table.Store(Position.State.Key, (int)tot, Bound.Exact, (sbyte)depth, move, 0);
 
             return tot;
         }
@@ -459,10 +452,10 @@ namespace Rudz.Chess
             pawnKey ^= Zobrist.GetZobristSide();
 
             if (_stateList[PositionIndex - 1].EnPassantSquare != ESquare.none)
-                key ^= Zobrist.GetZobristEnPessant(_stateList[PositionIndex - 1].EnPassantSquare.File().ToInt());
+                key ^= Zobrist.GetZobristEnPessant(_stateList[PositionIndex - 1].EnPassantSquare.File().AsInt());
 
             if (State.EnPassantSquare != ESquare.none)
-                key ^= Zobrist.GetZobristEnPessant(State.EnPassantSquare.File().ToInt());
+                key ^= Zobrist.GetZobristEnPessant(State.EnPassantSquare.File().AsInt());
 
             if (move.IsNullMove())
             {
@@ -542,9 +535,6 @@ namespace Rudz.Chess
                 return true;
             }
 
-            // List to gather functions for castleling rights addition.
-            var castleFunctions = new List<Action>(4);
-
             while (fen.Get != 0 && fen.Get != ' ')
             {
                 var c = fen.Get;
@@ -554,45 +544,43 @@ namespace Rudz.Chess
                     _chess960 = true;
                     _xfen = false;
 
-                    // ReSharper disable once HeapView.ClosureAllocation
                     var rookFile = c - 'A';
 
                     if (rookFile > Position.GetPieceSquare(EPieceType.King, PlayerExtensions.White).File())
-                        castleFunctions.Add(() => AddShortCastleRights(rookFile, PlayerExtensions.White));
+                        AddShortCastleRights(rookFile, PlayerExtensions.White);
                     else
-                        castleFunctions.Add(() => AddLongCastleRights(rookFile, PlayerExtensions.White));
+                        AddLongCastleRights(rookFile, PlayerExtensions.White);
                 }
                 else if (c.InBetween('a', 'h'))
                 {
                     _chess960 = true;
                     _xfen = false;
 
-                    // ReSharper disable once HeapView.ClosureAllocation
                     var rookFile = c - 'a';
 
                     if (rookFile > Position.GetPieceSquare(EPieceType.King, PlayerExtensions.Black).File())
-                        castleFunctions.Add(() => AddShortCastleRights(rookFile, PlayerExtensions.Black));
+                        AddShortCastleRights(rookFile, PlayerExtensions.Black);
                     else
-                        castleFunctions.Add(() => AddLongCastleRights(rookFile, PlayerExtensions.Black));
+                        AddLongCastleRights(rookFile, PlayerExtensions.Black);
                 }
                 else
                 {
                     switch (c)
                     {
                         case 'K':
-                            castleFunctions.Add(() => AddShortCastleRights(-1, PlayerExtensions.White));
+                            AddShortCastleRights(-1, PlayerExtensions.White);
                             break;
 
                         case 'Q':
-                            castleFunctions.Add(() => AddLongCastleRights(-1, PlayerExtensions.White));
+                            AddLongCastleRights(-1, PlayerExtensions.White);
                             break;
 
                         case 'k':
-                            castleFunctions.Add(() => AddShortCastleRights(-1, PlayerExtensions.Black));
+                            AddShortCastleRights(-1, PlayerExtensions.Black);
                             break;
 
                         case 'q':
-                            castleFunctions.Add(() => AddLongCastleRights(-1, PlayerExtensions.Black));
+                            AddLongCastleRights(-1, PlayerExtensions.Black);
                             break;
 
                         case '-':
@@ -605,10 +593,6 @@ namespace Rudz.Chess
 
                 fen.Advance();
             }
-
-            // invoke the gathered castleling configure functions
-            foreach (var castleFunction in castleFunctions)
-                castleFunction();
 
             return true;
         }
@@ -640,8 +624,8 @@ namespace Rudz.Chess
             var them = ~side;
             var castlelingMask = ECastleling.Short.GetCastleAllowedMask(side);
             var ksq = Position.GetPieceSquare(EPieceType.King, side);
-            _castleRightsMask[SquareExtensions.GetFlip(rookFile, them).ToInt()] -= castlelingMask;
-            _castleRightsMask[SquareExtensions.GetFlip(ksq.File().ToInt(), them).ToInt()] -= castlelingMask;
+            _castleRightsMask[SquareExtensions.GetFlip(rookFile, them).AsInt()] -= castlelingMask;
+            _castleRightsMask[SquareExtensions.GetFlip(ksq.File().AsInt(), them).AsInt()] -= castlelingMask;
             Position.SetRookCastleFrom(SquareExtensions.GetFlip((int)ESquare.g1, them), SquareExtensions.GetFlip(rookFile, them));
             Position.SetKingCastleFrom(side, ksq, ECastleling.Short);
 
@@ -676,8 +660,8 @@ namespace Rudz.Chess
             var them = ~side;
             var castlelingMask = ECastleling.Long.GetCastleAllowedMask(side);
             var ksq = Position.GetPieceSquare(EPieceType.King, side);
-            _castleRightsMask[SquareExtensions.GetFlip(rookFile, them).ToInt()] -= castlelingMask;
-            _castleRightsMask[SquareExtensions.GetFlip(ksq.File().ToInt(), them).ToInt()] -= castlelingMask;
+            _castleRightsMask[SquareExtensions.GetFlip(rookFile, them).AsInt()] -= castlelingMask;
+            _castleRightsMask[SquareExtensions.GetFlip(ksq.File().AsInt(), them).AsInt()] -= castlelingMask;
             Position.SetRookCastleFrom(SquareExtensions.GetFlip((int)ESquare.c1, them), SquareExtensions.GetFlip(rookFile, them));
             Position.SetKingCastleFrom(side, ksq, ECastleling.Long);
 

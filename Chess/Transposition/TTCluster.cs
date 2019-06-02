@@ -29,9 +29,9 @@ namespace Rudz.Chess.Transposition
     // ReSharper disable once InconsistentNaming
     public sealed class TTCluster
     {
-        public TTEntry[] Cluster = new TTEntry[4];
+        public TranspositionTableEntry[] Cluster = new TranspositionTableEntry[4];
 
-        public TTEntry this[int key]
+        public TranspositionTableEntry this[int key]
         {
             get => Cluster[key];
             set => Cluster[key] = value;

@@ -46,7 +46,7 @@ namespace Rudz.Chess.Transposition
         {
             unsafe
             {
-                ClusterSize = sizeof(TTEntry) * 4;
+                ClusterSize = sizeof(TranspositionTableEntry) * 4;
             }
         }
 
@@ -57,10 +57,8 @@ namespace Rudz.Chess.Transposition
 
         public ulong Hits { get; private set; }
 
-        public void NewSearch()
-        {
-            ++_generation;
-        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void NewSearch() => ++_generation;
 
         public ulong Size(int mbSize)
         {
@@ -91,31 +89,30 @@ namespace Rudz.Chess.Transposition
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public TTCluster FindCluster(ulong key)
         {
-            //var idx = (uint)((uint)key * elements) >> 32;
             var idx = (int)((uint)(key) & (_elements - 1));
             return _table[idx];
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Refresh(TTEntry tte) => tte.generation = _generation;
+        public void Refresh(TranspositionTableEntry tte) => tte.Generation = _generation;
 
-        public (bool, TTEntry) Probe(ulong key)
+        public (bool, TranspositionTableEntry) Probe(ulong key)
         {
             var ttc = FindCluster(key);
             var keyH = (uint)(key >> 32);
             var g = _generation;
 
-            // Probing the TT will automatically update the generation of the entry
+            // Probing the Table will automatically update the generation of the entry
             // in case the probing retrieves an element.
 
-            TTEntry e = default;
+            TranspositionTableEntry e = default;
             var set = false;
             for (var i = 0; i < ttc.Cluster.Length; ++i)
             {
-                if (ttc.Cluster[i].key32 != 0 && ttc.Cluster[i].key32 != keyH)
+                if (ttc.Cluster[i].Key32 != 0 && ttc.Cluster[i].Key32 != keyH)
                     continue;
 
-                ttc.Cluster[i].generation = g;
+                ttc.Cluster[i].Generation = g;
                 e = ttc.Cluster[i];
                 set = true;
                 break;
@@ -128,12 +125,12 @@ namespace Rudz.Chess.Transposition
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public TTEntry ProbeFirst(ulong key) => FindCluster(key)[0];
+        public TranspositionTableEntry ProbeFirst(ulong key) => FindCluster(key)[0];
 
         public void Store(ulong key, int value, Bound type, sbyte depth, Move move, int statValue)
         {
             // Use the high 32 bits as key inside the cluster
-            var e = new TTEntry((uint)(key >> 32), move, depth, _generation, value, statValue, type);
+            var e = new TranspositionTableEntry((uint)(key >> 32), move, depth, _generation, value, statValue, type);
 
             var ttc = FindCluster(key);
 
@@ -142,7 +139,7 @@ namespace Rudz.Chess.Transposition
 
             for (var i = 0; i < ttc.Cluster.Length; ++i)
             {
-                if (ttc.Cluster[i].key32 == 0 || ttc.Cluster[i].key32 == e.key32)
+                if (ttc.Cluster[i].Key32 == 0 || ttc.Cluster[i].Key32 == e.Key32)
                 {
                     clusterIndex = i;
                     found = true;
@@ -159,10 +156,10 @@ namespace Rudz.Chess.Transposition
                 {
                     var ttEntry = ttc.Cluster[i];
                     var (cc1, cc2, cc3, cc4) =
-                        (candidate.generation == g,
-                            ttEntry.generation == g,
-                            ttEntry.type == Bound.Exact,
-                            ttEntry.depth < candidate.depth);
+                        (candidate.Generation == g,
+                            ttEntry.Generation == g,
+                            ttEntry.Type == Bound.Exact,
+                            ttEntry.Depth < candidate.Depth);
 
                     if (cc1 && cc4 || !(cc2 || cc3) && (cc4 || cc1))
                     {
@@ -184,7 +181,7 @@ namespace Rudz.Chess.Transposition
             var gen = _generation;
             var sum = 0;
             for (var i = 0; i < _fullnessElements; ++i)
-                sum += _table[i].Cluster.Count(x => x.generation == gen);
+                sum += _table[i].Cluster.Count(x => x.Generation == gen);
 
             return sum * 250 / _fullnessElements;
         }
@@ -193,7 +190,11 @@ namespace Rudz.Chess.Transposition
         public void Clear()
         {
             for (var i = 0; i < _table.Count; ++i)
+            {
                 _table[i] = new TTCluster();
+                for (var j = 0; j < _table[0].Cluster.Length; ++j)
+                    _table[i].Cluster[j].Defaults();
+            }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -204,7 +205,7 @@ namespace Rudz.Chess.Transposition
                 var ttc = new TTCluster();
                 for (var j = 0; j < ttc.Cluster.Length; j++)
                 {
-                    ttc.Cluster[j] = new TTEntry();
+                    ttc.Cluster[j] = new TranspositionTableEntry();
                     ttc.Cluster[j].Defaults();
                 }
                 _table.Add(ttc);

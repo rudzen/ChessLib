@@ -145,10 +145,10 @@ namespace Rudz.Chess
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static BitBoard BishopAttacks(this Square square, BitBoard occupied) => MagicBishopDb[square.ToInt(), ((occupied.Value & MagicmovesBMask[square.ToInt()]) * MagicmovesBMagics[square.ToInt()]) >> 55];
+        public static BitBoard BishopAttacks(this Square square, BitBoard occupied) => MagicBishopDb[square.AsInt(), ((occupied.Value & MagicmovesBMask[square.AsInt()]) * MagicmovesBMagics[square.AsInt()]) >> 55];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static BitBoard RookAttacks(this Square square, BitBoard occupied) => MagicRookDb[square.ToInt(), ((occupied.Value & MagicmovesRMask[square.ToInt()]) * MagicmovesRMagics[square.ToInt()]) >> 52];
+        public static BitBoard RookAttacks(this Square square, BitBoard occupied) => MagicRookDb[square.AsInt(), ((occupied.Value & MagicmovesRMask[square.AsInt()]) * MagicmovesRMagics[square.AsInt()]) >> 52];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static BitBoard QueenAttacks(this Square square, BitBoard occupied) => BishopAttacks(square, occupied) | RookAttacks(square, occupied);

@@ -43,10 +43,14 @@ namespace Rudz.Chess
 
         void UpdateKey(Player side, EPieceType pieceType, int delta);
 
+        uint GetKey(int index);
+
         void MakeMove(Move move);
 
         int Count(Player side, EPieceType pieceType);
 
         void Clear();
+
+        void CopyFrom(IMaterial material);
     }
 }

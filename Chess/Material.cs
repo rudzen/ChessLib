@@ -65,7 +65,7 @@ namespace Rudz.Chess
         public Material()
         {
             MaterialValue = new int[2];
-            _key = new[] { 0u, 0u };
+            _key = new uint[2];
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -85,6 +85,11 @@ namespace Rudz.Chess
 
             _key[side.Side] &= ~(15u << PieceBitShift[(int)pieceType]);
             _key[side.Side] |= (uint)(x << PieceBitShift[(int)pieceType]);
+        }
+
+        public uint GetKey(int index)
+        {
+            throw new System.NotImplementedException();
         }
 
         public void MakeMove(Move move)
@@ -107,6 +112,13 @@ namespace Rudz.Chess
         {
             _key.Clear();
             MaterialValue.Clear();
+        }
+
+        public void CopyFrom(IMaterial material)
+        {
+            material.MaterialValue.CopyTo(MaterialValue, 0);
+            _key[0] = material.GetKey(0);
+            _key[1] = material.GetKey(1);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

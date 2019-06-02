@@ -42,9 +42,9 @@ namespace Rudz.Chess.Types
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static char FileChar(this File f) => FileChars[f.ToInt()];
+        public static char FileChar(this File f) => FileChars[f.AsInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string FileString(this File f) => FileStrings[f.ToInt()];
+        public static string FileString(this File f) => FileStrings[f.AsInt()];
     }
 }

@@ -41,11 +41,11 @@ namespace Rudz.Chess.Enums
     public enum ECastlelingRights
     {
         None = 0,
-        WhiteOO = 1,
-        WhiteOOO = WhiteOO << 1,
-        BlackOO = WhiteOO << 2,
-        BlackOOO = WhiteOO << 3,
-        Any = WhiteOO | WhiteOOO | BlackOO | BlackOOO,
+        WhiteOo = 1,
+        WhiteOoo = WhiteOo << 1,
+        BlackOo = WhiteOo << 2,
+        BlackOoo = WhiteOo << 3,
+        Any = WhiteOo | WhiteOoo | BlackOo | BlackOoo,
         CastleRightsNb = 16
     }
 }

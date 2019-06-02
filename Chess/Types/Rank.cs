@@ -67,22 +67,22 @@ namespace Rudz.Chess.Types
         public static bool operator !=(Rank left, int right) => left.Value != (ERank)right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Rank operator +(Rank left, Rank right) => left.ToInt() + right.ToInt();
+        public static Rank operator +(Rank left, Rank right) => left.AsInt() + right.AsInt();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Rank operator +(Rank left, int right) => left.ToInt() + right;
+        public static Rank operator +(Rank left, int right) => left.AsInt() + right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Rank operator +(Rank left, ERank right) => left.ToInt() + (int)right;
+        public static Rank operator +(Rank left, ERank right) => left.AsInt() + (int)right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Rank operator -(Rank left, Rank right) => left.ToInt() - right.ToInt();
+        public static Rank operator -(Rank left, Rank right) => left.AsInt() - right.AsInt();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Rank operator -(Rank left, int right) => left.ToInt() - right;
+        public static Rank operator -(Rank left, int right) => left.AsInt() - right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Rank operator -(Rank left, ERank right) => left.ToInt() - (int)right;
+        public static Rank operator -(Rank left, ERank right) => left.AsInt() - (int)right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Rank operator ++(Rank rank) => ++rank.Value;
@@ -100,19 +100,19 @@ namespace Rudz.Chess.Types
         public static BitBoard operator |(ulong left, Rank right) => left | right.BitBoardRank();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int operator |(Rank left, int right) => left.ToInt() | right;
+        public static int operator |(Rank left, int right) => left.AsInt() | right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static BitBoard operator ~(Rank left) => ~left.BitBoardRank();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int operator >>(Rank left, int right) => left.ToInt() >> right;
+        public static int operator >>(Rank left, int right) => left.AsInt() >> right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator >(Rank left, Rank right) => left.ToInt() > right.ToInt();
+        public static bool operator >(Rank left, Rank right) => left.AsInt() > right.AsInt();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator <(Rank left, Rank right) => left.ToInt() < right.ToInt();
+        public static bool operator <(Rank left, Rank right) => left.AsInt() < right.AsInt();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator true(Rank sq) => sq.IsValid();
@@ -121,12 +121,12 @@ namespace Rudz.Chess.Types
         public static bool operator false(Rank sq) => !sq.IsValid();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int ToInt() => (int)Value;
+        public int AsInt() => (int)Value;
 
         public bool IsValid() => Value < ERank.RankNb;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public override string ToString() => this.RankChar().ToString();
+        public override string ToString() => ((int) Value + 1).ToString();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals(Rank other) => Value == other.Value;
@@ -135,6 +135,6 @@ namespace Rudz.Chess.Types
         public override bool Equals(object obj) => obj is Rank file && Equals(file);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public override int GetHashCode() => ToInt();
+        public override int GetHashCode() => AsInt();
     }
 }

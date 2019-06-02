@@ -324,7 +324,6 @@ namespace Rudz.Chess.Types
                 if (move.GetMovingPieceType() != position.GetPieceType(square))
                     continue;
 
-                // ReSharper disable once InvertIf
                 if (position.OccupiedBySide[move.GetMovingSide().Side] & square)
                 {
                     if (square.File() == move.GetFromSquare().File())

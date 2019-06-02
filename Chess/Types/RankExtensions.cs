@@ -26,25 +26,21 @@ SOFTWARE.
 
 namespace Rudz.Chess.Types
 {
-    using System.Linq;
     using System.Runtime.CompilerServices;
 
     public static class RankExtensions
     {
         private static readonly char[] RankChars;
 
-        private static readonly string[] RankStrings;
-
         static RankExtensions()
         {
             RankChars = new[] { '1', '2', '3', '4', '5', '6', '7', '8' };
-            RankStrings = RankChars.Select(x => x.ToString()).ToArray();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static char RankChar(this Rank r) => RankChars[r.ToInt()];
+        public static char RankChar(this Rank r) => RankChars[r.AsInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string RankString(this Rank r) => RankStrings[r.ToInt()];
+        public static string RankString(this Rank r) => RankChars[r.AsInt()].ToString();
     }
 }

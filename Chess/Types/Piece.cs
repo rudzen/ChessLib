@@ -188,7 +188,7 @@ namespace Rudz.Chess.Types
                 if (x.PieceValue() == y.PieceValue())
                     return 0;
 
-                return x.PieceValue() > y.PieceValue() ? 1 : x.ToInt().CompareTo(y.ToInt());
+                return x.PieceValue() > y.PieceValue() ? 1 : x.AsInt().CompareTo(y.AsInt());
             }
         }
     }
