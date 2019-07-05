@@ -78,7 +78,7 @@ namespace Rudz.Chess.Data
         /// <summary>
         /// To use as base for pawn hash table
         /// </summary>
-        private static readonly ulong ZobristNoPawn;
+        public static readonly ulong ZobristNoPawn;
 
         static Zobrist()
         {

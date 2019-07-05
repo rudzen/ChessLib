@@ -41,7 +41,6 @@ namespace Rudz.Chess.Types
 
     public static class BitBoards
     {
-        // TODO : Redesign some of these arrays for better memory and/or cache line use.
         internal const ulong One = 0x1ul;
 
         public const int Zero = 0x0;

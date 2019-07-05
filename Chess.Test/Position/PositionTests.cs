@@ -62,6 +62,8 @@ namespace Chess.Test.Position
         [Fact]
         public void PinnedPiecesTest()
         {
+            const int expected = 1;
+
             var cb = new Position(null);
 
             cb.AddPiece(EPieces.WhiteKing, ESquare.a6);
@@ -75,9 +77,9 @@ namespace Chess.Test.Position
             // b must contain one square at this point
             var pinnedCount = b.Count;
 
-            Assert.Equal(1, pinnedCount);
+            Assert.Equal(expected, pinnedCount);
 
-            // test it's the correct square
+            // test for correct square
             var pinnedSquare = b.Lsb();
 
             Assert.Equal(ESquare.c4, pinnedSquare.Value);

@@ -61,8 +61,6 @@ namespace Rudz.Chess
 
         private bool _xfen;
 
-        private int _repetitionCounter;
-
         static Game()
         {
             CastlePositionalOr = new[,]
@@ -165,7 +163,6 @@ namespace Rudz.Chess
 
         /// <summary>
         /// Apply a FEN string board setup to the board structure.
-        /// *EXCEPTION FREE FUNCTION*
         /// </summary>
         /// <param name="fenString">The string to set</param>
         /// <param name="validate">If true, the fen string is validated, otherwise not</param>
@@ -515,10 +512,10 @@ namespace Rudz.Chess
 
         private bool IsRepetition()
         {
-            _repetitionCounter = 1;
+            var repetitionCounter = 1;
             var backPosition = PositionIndex;
             while ((backPosition -= 2) >= 0)
-                if (_stateList[backPosition].Key == State.Key && ++_repetitionCounter == 3)
+                if (_stateList[backPosition].Key == State.Key && ++repetitionCounter == 3)
                     return true;
 
             return false;

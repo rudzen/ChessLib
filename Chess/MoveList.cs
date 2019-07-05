@@ -57,6 +57,21 @@ namespace Rudz.Chess
         public int Count => _moveIndex + 1;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static MoveList operator +(MoveList left, Move right)
+        {
+            left.Add(right);
+            return left;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static MoveList operator +(MoveList left, MoveList right)
+        {
+            foreach (var m in right._moves)
+                left.Add(m);
+            return left;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Add(Move move) => _moves[++_moveIndex] = move;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
