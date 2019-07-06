@@ -481,8 +481,8 @@ namespace Rudz.Chess
                     key ^= Zobrist.GetZobristPst(move.GetMovingPiece(), squareTo);
             }
 
-            if (pawnPiece && move.IsEnPassantMove())
-                pawnKey ^= Zobrist.GetZobristPst(move.GetCapturedPiece().Type() + (State.SideToMove << 3), squareTo + (State.SideToMove.Side == 0 ? 8 : -8));
+            if (move.IsEnPassantMove())
+                pawnKey ^= Zobrist.GetZobristPst(move.GetCapturedPiece(), squareTo + State.SideToMove.PawnPushDistance());
             else if (move.IsCaptureMove())
             {
                 if (pawnPiece)
