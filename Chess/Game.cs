@@ -463,13 +463,12 @@ namespace Rudz.Chess
             }
 
             var pawnPiece = move.GetMovingPieceType() == EPieceType.Pawn;
+            var squareTo = move.GetToSquare();
 
             if (pawnPiece)
                 pawnKey ^= Zobrist.GetZobristPst(move.GetMovingPiece(), move.GetFromSquare());
             else
                 key ^= Zobrist.GetZobristPst(move.GetMovingPiece(), move.GetFromSquare());
-
-            var squareTo = move.GetToSquare();
 
             if (move.IsPromotionMove())
                 key ^= Zobrist.GetZobristPst(move.GetPromotedPiece(), squareTo);
@@ -481,20 +480,23 @@ namespace Rudz.Chess
                     key ^= Zobrist.GetZobristPst(move.GetMovingPiece(), squareTo);
             }
 
-            if (move.IsEnPassantMove())
-                pawnKey ^= Zobrist.GetZobristPst(move.GetCapturedPiece(), squareTo + State.SideToMove.PawnPushDistance());
-            else if (move.IsCaptureMove())
+            if (pawnPiece)
             {
-                if (pawnPiece)
+                if (move.IsEnPassantMove())
+                    pawnKey ^= Zobrist.GetZobristPst(move.GetCapturedPiece(), squareTo + State.SideToMove.PawnPushDistance());
+                else if (move.IsCaptureMove())
                     pawnKey ^= Zobrist.GetZobristPst(move.GetCapturedPiece(), squareTo);
-                else
-                    key ^= Zobrist.GetZobristPst(move.GetCapturedPiece(), squareTo);
             }
-            else if (move.IsCastlelingMove())
+            else
             {
-                var piece = EPieceType.Rook.MakePiece(Position.State.SideToMove);
-                key ^= Zobrist.GetZobristPst(piece, Position.GetRookCastleFrom(squareTo));
-                key ^= Zobrist.GetZobristPst(piece, squareTo.GetRookCastleTo());
+                if (move.IsCaptureMove())
+                    key ^= Zobrist.GetZobristPst(move.GetCapturedPiece(), squareTo);
+                else if (move.IsCastlelingMove())
+                {
+                    var piece = EPieceType.Rook.MakePiece(Position.State.SideToMove);
+                    key ^= Zobrist.GetZobristPst(piece, Position.GetRookCastleFrom(squareTo));
+                    key ^= Zobrist.GetZobristPst(piece, squareTo.GetRookCastleTo());
+                }
             }
 
             // castleling
