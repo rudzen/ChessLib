@@ -465,11 +465,6 @@ namespace Rudz.Chess
             var pawnPiece = move.GetMovingPieceType() == EPieceType.Pawn;
             var squareTo = move.GetToSquare();
 
-            if (pawnPiece)
-                pawnKey ^= Zobrist.GetZobristPst(move.GetMovingPiece(), move.GetFromSquare());
-            else
-                key ^= Zobrist.GetZobristPst(move.GetMovingPiece(), move.GetFromSquare());
-
             if (move.IsPromotionMove())
                 key ^= Zobrist.GetZobristPst(move.GetPromotedPiece(), squareTo);
             else
@@ -482,6 +477,7 @@ namespace Rudz.Chess
 
             if (pawnPiece)
             {
+                pawnKey ^= Zobrist.GetZobristPst(move.GetMovingPiece(), move.GetFromSquare());
                 if (move.IsEnPassantMove())
                     pawnKey ^= Zobrist.GetZobristPst(move.GetCapturedPiece(), squareTo + State.SideToMove.PawnPushDistance());
                 else if (move.IsCaptureMove())
@@ -489,6 +485,7 @@ namespace Rudz.Chess
             }
             else
             {
+                key ^= Zobrist.GetZobristPst(move.GetMovingPiece(), move.GetFromSquare());
                 if (move.IsCaptureMove())
                     key ^= Zobrist.GetZobristPst(move.GetCapturedPiece(), squareTo);
                 else if (move.IsCastlelingMove())
@@ -499,7 +496,6 @@ namespace Rudz.Chess
                 }
             }
 
-            // castleling
             // castling rights
             if (State.CastlelingRights != _stateList[PositionIndex - 1].CastlelingRights)
             {
@@ -507,8 +503,7 @@ namespace Rudz.Chess
                 key ^= Zobrist.GetZobristCastleling(State.CastlelingRights);
             }
 
-            key ^= pawnKey;
-            State.Key = key;
+            State.Key = key ^ pawnKey;
             State.PawnStructureKey = pawnKey;
         }
 
