@@ -492,7 +492,7 @@ namespace Rudz.Chess
             }
             else if (move.IsCastlelingMove())
             {
-                var piece = (EPieces)(EPieceType.Rook + move.GetSideMask());
+                var piece = EPieceType.Rook.MakePiece(Position.State.SideToMove);
                 key ^= Zobrist.GetZobristPst(piece, Position.GetRookCastleFrom(squareTo));
                 key ^= Zobrist.GetZobristPst(piece, squareTo.GetRookCastleTo());
             }

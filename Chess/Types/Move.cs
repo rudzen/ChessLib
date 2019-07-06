@@ -195,9 +195,6 @@ namespace Rudz.Chess.Types
         public Player GetMovingSide() => new Player((_data >> MoveSideOffset) & 0x1);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int GetSideMask() => GetMovingSide() << 0x3;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public EMoveType GetMoveType() => (EMoveType)((_data >> MoveTypeOffset) & 0x3F);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
