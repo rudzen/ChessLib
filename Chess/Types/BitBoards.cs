@@ -336,6 +336,20 @@ namespace Rudz.Chess.Types
             return attacks ^ square.RookAttacks(occupied ^ blockers);
         }
 
+        public static BitBoard XrayAttacks(this Square square, EPieceType pieceType, BitBoard occupied, BitBoard blockers)
+        {
+            if (pieceType == EPieceType.Bishop)
+                return square.XrayBishopAttacks(occupied, blockers);
+
+            if (pieceType == EPieceType.Rook)
+                return square.XrayRookAttacks(occupied, blockers);
+
+            if (pieceType == EPieceType.Queen)
+                return XrayBishopAttacks(square, occupied, blockers) | XrayRookAttacks(square, occupied, blockers);
+
+            return ZeroBb;
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static BitBoard KnightAttacks(this Square square) => PseudoAttacksBB[EPieceType.Knight.AsInt(), square.AsInt()];
 
@@ -345,15 +359,20 @@ namespace Rudz.Chess.Types
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static BitBoard GetAttacks(this Square square, EPieceType pieceType, BitBoard occupied = new BitBoard())
         {
-            return pieceType == EPieceType.Knight || pieceType == EPieceType.King
-                ? PseudoAttacksBB[pieceType.AsInt(), square.AsInt()]
-                : pieceType == EPieceType.Bishop
-                    ? square.BishopAttacks(occupied)
-                    : pieceType == EPieceType.Rook
-                        ? square.RookAttacks(occupied)
-                        : pieceType == EPieceType.Queen
-                            ? square.QueenAttacks(occupied)
-                            : Zero;
+            switch (pieceType)
+            {
+                case EPieceType.Knight:
+                case EPieceType.King:
+                    return PseudoAttacksBB[pieceType.AsInt(), square.AsInt()];
+                case EPieceType.Bishop:
+                    return square.BishopAttacks(occupied);
+                case EPieceType.Rook:
+                    return square.RookAttacks(occupied);
+                case EPieceType.Queen:
+                    return square.QueenAttacks(occupied);
+                default:
+                    return ZeroBb;
+            }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -589,7 +608,7 @@ namespace Rudz.Chess.Types
         public static void ResetLsb(ref BitBoard bb) => bb &= bb - 1;
 
         /// <summary>
-        /// Counts bit set in a specified ulong
+        /// Counts bit set in a specified BitBoard
         /// </summary>
         /// <param name="bb">The ulong bit representation to count</param>
         /// <returns>The number of bits found</returns>
