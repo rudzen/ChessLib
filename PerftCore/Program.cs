@@ -35,7 +35,7 @@ namespace Perft
     {
         public static void Main(string[] args)
         {
-            Console.WriteLine("ChessLib Perft test program v0.1.1");
+            Console.WriteLine($"ChessLib Perft test program v0.1.1 ({BuildTimeStamp.TimeStamp})");
             Console.WriteLine("Use Perft.exe <depth> to set depth (1-6), default is 5.");
 
             if (Stopwatch.IsHighResolution)

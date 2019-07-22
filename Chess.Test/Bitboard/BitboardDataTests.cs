@@ -43,7 +43,7 @@ namespace Chess.Test.Bitboard
             const ESquare sq2 = ESquare.a2;
             const ESquare sq3 = ESquare.a3;
 
-            var actual = await Task.Run(() => BitBoards.Aligned(sq1, sq2, sq3));
+            var actual = await Task.Run(() => BitBoards.Aligned(sq1, sq2, sq3)).ConfigureAwait(false);
 
             Assert.Equal(expected, actual);
         }
@@ -61,7 +61,7 @@ namespace Chess.Test.Bitboard
                         .Sum(s2 => BitBoards.AllSquares
                             .Count(s3 => s1.Aligned(s2, s3)));
                 return sum;
-            });
+            }).ConfigureAwait(false);
 
             Assert.Equal(expected, actual);
         }
