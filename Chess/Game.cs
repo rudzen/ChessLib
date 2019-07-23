@@ -390,6 +390,7 @@ namespace Rudz.Chess
         {
             var mg = new MoveGenerator(Position);
             mg.GenerateMoves();
+
             if (depth == 1)
                 return (ulong)mg.Moves.Count;
 

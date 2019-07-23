@@ -109,8 +109,7 @@ namespace Rudz.Chess
                     44, 24, 15,  8, 23,  7,  6,  5
                 };
 
-            var squareArr = new int[64];
-            Span<int> squares = squareArr;
+            Span<int> squares = stackalloc int[64];
             int numSquares;
 
             for (var i = 0; i < squares.Length; ++i)

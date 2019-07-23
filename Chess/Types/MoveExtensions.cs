@@ -40,22 +40,16 @@ namespace Rudz.Chess.Types
     /// </summary>
     public static class MoveExtensions
     {
-        public static readonly Move EmptyMove;
+        public static readonly Move EmptyMove = new Move();
 
-        private static readonly Dictionary<EMoveNotation, Func<Move, IPosition, string>> NotationFuncs;
-
-        static MoveExtensions()
+        private static readonly Dictionary<EMoveNotation, Func<Move, IPosition, string>> NotationFuncs = new Dictionary<EMoveNotation, Func<Move, IPosition, string>>
         {
-            EmptyMove = new Move();
-            NotationFuncs = new Dictionary<EMoveNotation, Func<Move, IPosition, string>>
-            {
-                {EMoveNotation.Fan, ToFan},
-                {EMoveNotation.San, ToSan},
-                {EMoveNotation.Lan, ToLan},
-                {EMoveNotation.Ran, ToRan},
-                {EMoveNotation.Uci, ToUci}
-            };
-        }
+            {EMoveNotation.Fan, ToFan},
+            {EMoveNotation.San, ToSan},
+            {EMoveNotation.Lan, ToLan},
+            {EMoveNotation.Ran, ToRan},
+            {EMoveNotation.Uci, ToUci}
+        };
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string ToNotation(this Move move, IPosition pos, EMoveNotation notation = EMoveNotation.Fan)

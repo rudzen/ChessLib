@@ -45,13 +45,13 @@ namespace Rudz.Chess.Types
 
         private const ushort BlackPieces = 32256;
 
-        public static readonly Piece EmptyPiece;
+        public static readonly Piece EmptyPiece = EPieces.NoPiece;
 
-        public static readonly EPieceValue[] PieceValues;
+        public static readonly EPieceValue[] PieceValues = { 0, EPieceValue.Pawn, EPieceValue.Knight, EPieceValue.Bishop, EPieceValue.Rook, EPieceValue.Queen, EPieceValue.King };
 
-        private static readonly string[] PieceStrings;
+        private static readonly string[] PieceStrings = { " ", "P", "N", "B", "R", "Q", "K", " ", " ", "p", "n", "b", "r", "q", "k" };
 
-        private static readonly string[] PieceNames;
+        private static readonly string[] PieceNames = { "None", "Pawn", "Knight", "Bishop", "Rook", "Queen", "King" };
 
         /*
  * white chess king 	♔ 	U+2654 	&#9812;
@@ -71,14 +71,6 @@ namespace Rudz.Chess.Types
         private static readonly string[] PieceUnicode = { " ", "\u2659", "\u2658", "\u2657", "\u2656", "\u2655", "\u2654", " ", " ", "\u265F", "\u265E", "\u265D", "\u265C", "\u265B", "\u265A", " " };
 
         private static readonly char[] PieceUnicodeChar = { ' ', '\u2659', '\u2658', '\u2657', '\u2656', '\u2655', '\u2654', ' ', ' ', '\u265F', '\u265E', '\u265D', '\u265C', '\u265B', '\u265A', ' ' };
-
-        static PieceExtensions()
-        {
-            EmptyPiece = EPieces.NoPiece;
-            PieceValues = new EPieceValue[] { 0, EPieceValue.Pawn, EPieceValue.Knight, EPieceValue.Bishop, EPieceValue.Rook, EPieceValue.Queen, EPieceValue.King };
-            PieceStrings = new[] { " ", "P", "N", "B", "R", "Q", "K", " ", " ", "p", "n", "b", "r", "q", "k" };
-            PieceNames = new[] { "None", "Pawn", "Knight", "Bishop", "Rook", "Queen", "King" };
-        }
 
         // Generic helper functions
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

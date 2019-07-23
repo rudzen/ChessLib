@@ -69,7 +69,7 @@ namespace Rudz.Chess.Types
 
         private const ulong FILEH = 0x8080808080808080;
 
-        private const ulong RANK1 = 0x00000000000000ff;
+        public const ulong RANK1 = 0x00000000000000ff;
 
         public const ulong RANK2 = 0x000000000000ff00;
 
@@ -83,15 +83,13 @@ namespace Rudz.Chess.Types
 
         public const ulong RANK7 = 0x00ff000000000000;
 
-        private const ulong RANK8 = 0xff00000000000000;
-
-        public const ulong PromotionRanks = RANK1 | RANK8;
+        public const ulong RANK8 = 0xff00000000000000;
 
         private const ulong LightSquares = 0x55AA55AA55AA55AA;
 
-        public static readonly BitBoard EmptyBitBoard;
+        public static readonly BitBoard EmptyBitBoard = new BitBoard(ZeroBb);
 
-        public static readonly BitBoard AllSquares;
+        public static readonly BitBoard AllSquares = ~EmptyBitBoard;
 
         public static readonly BitBoard CornerA1;
 
@@ -101,13 +99,17 @@ namespace Rudz.Chess.Types
 
         public static readonly BitBoard CornerH8;
 
-        public static readonly BitBoard QueenSide;
+        public static readonly BitBoard QueenSide = new BitBoard(FILEA | FILEB | FILEC | FILED);
 
-        public static readonly BitBoard CenterFiles;
+        public static readonly BitBoard CenterFiles = new BitBoard(FILEC | FILED | FILEE | FILEF);
 
-        public static readonly BitBoard KingSide;
+        public static readonly BitBoard KingSide = new BitBoard(FILEE | FILEF | FILEG | FILEH);
 
-        public static readonly BitBoard Center;
+        public static readonly BitBoard Center = new BitBoard((FILED | FILEE) & (RANK4 | RANK5));
+
+        public static readonly BitBoard[] PromotionRanks = { RANK8, RANK1 };
+
+        public static readonly BitBoard PromotionRanksBB = RANK1 | RANK8;
 
         internal static readonly BitBoard[] BbSquares =
             {
@@ -160,57 +162,38 @@ namespace Rudz.Chess.Types
         /// The pawns are a special case, as index range 0,sq are for White and 1,sq are for Black.
         /// This is possible because index 0 is NoPiece type.
         /// </summary>
-        private static readonly BitBoard[,] PseudoAttacksBB;
+        private static readonly BitBoard[,] PseudoAttacksBB = new BitBoard[EPieceType.PieceTypeNb.AsInt(), 64];
 
         private static readonly BitBoard[] AdjacentFilesBB = { FILEB, FILEA | FILEC, FILEB | FILED, FILEC | FILEE, FILED | FILEF, FILEE | FILEG, FILEF | FILEH, FILEG };
 
-        private static readonly BitBoard[,] BetweenBB;
+        private static readonly BitBoard[,] BetweenBB = new BitBoard[64, 64];
 
-        private static readonly BitBoard[,] PawnAttackSpanBB;
+        private static readonly BitBoard[,] PawnAttackSpanBB = new BitBoard[2, 64];
 
-        private static readonly BitBoard[,] PassedPawnMaskBB;
+        private static readonly BitBoard[,] PassedPawnMaskBB = new BitBoard[2, 64];
 
-        private static readonly BitBoard[,] ForwardRanksBB;
+        private static readonly BitBoard[,] ForwardRanksBB = new BitBoard[2, 64];
 
-        private static readonly BitBoard[,] ForwardFileBB;
+        private static readonly BitBoard[,] ForwardFileBB = new BitBoard[2, 64];
 
-        private static readonly BitBoard[,] LineBB;
+        private static readonly BitBoard[,] LineBB = new BitBoard[64, 64];
 
-        private static readonly BitBoard[,] KingRingBB;
+        private static readonly BitBoard[,] KingRingBB = new BitBoard[2, 64];
 
-        private static readonly byte[,] SquareDistance; // chebyshev distance
+        private static readonly byte[,] SquareDistance = new byte[64, 64]; // chebyshev distance
 
-        private static readonly BitBoard[,] DistanceRingBB;
+        private static readonly BitBoard[,] DistanceRingBB = new BitBoard[64, 8];
 
-        private static readonly IDictionary<EDirection, Func<BitBoard, BitBoard>> ShiftFuncs;
+        private static readonly IDictionary<EDirection, Func<BitBoard, BitBoard>> ShiftFuncs = MakeShiftFuncs();
 
         static BitBoards()
         {
-            QueenSide = new BitBoard(FILEA | FILEB | FILEC | FILED);
-            CenterFiles = new BitBoard(FILEC | FILED | FILEE | FILEF);
-            KingSide = new BitBoard(FILEE | FILEF | FILEG | FILEH);
-            Center = new BitBoard((FILED | FILEE) & (RANK4 | RANK5));
-
-            ShiftFuncs = MakeShiftFuncs();
-            BetweenBB = new BitBoard[64, 64];
-            PseudoAttacksBB = new BitBoard[EPieceType.PieceTypeNb.AsInt(), 64];
-            EmptyBitBoard = new BitBoard(ZeroBb);
-            AllSquares = ~EmptyBitBoard;
-            PawnAttackSpanBB = new BitBoard[2, 64];
-            PassedPawnMaskBB = new BitBoard[2, 64];
-            ForwardRanksBB = new BitBoard[2, 64];
-            ForwardFileBB = new BitBoard[2, 64];
-            LineBB = new BitBoard[64, 64];
-            KingRingBB = new BitBoard[2, 64];
-            SquareDistance = new byte[64, 64];
-            DistanceRingBB = new BitBoard[64, 8];
-
             // local helper functions to calculate distance
             int distance(int x, int y) { return Math.Abs(x - y); }
             int distanceFile(Square x, Square y) { return distance(x.File().AsInt(), y.File().AsInt()); }
-            int distanceRank(Square x, Square y) { return distance(x.Rank().AsInt(),  y.Rank().AsInt()); }
+            int distanceRank(Square x, Square y) { return distance(x.Rank().AsInt(), y.Rank().AsInt()); }
 
-            var validMagicPieces = new[] { EPieceType.Bishop, EPieceType.Rook };
+            Span<EPieceType> validMagicPieces = stackalloc EPieceType[] { EPieceType.Bishop, EPieceType.Rook };
 
             // ForwardRanksBB population loop idea from sf
             for (var r = ERank.Rank1; r < ERank.RankNb; ++r)
@@ -256,7 +239,7 @@ namespace Rudz.Chess.Types
                 // distance computation
                 foreach (var s2 in AllSquares)
                 {
-                    SquareDistance[sq, s2.AsInt()] = (byte) distanceFile(s1, s2).Max(distanceRank(s1, s2));
+                    SquareDistance[sq, s2.AsInt()] = (byte)distanceFile(s1, s2).Max(distanceRank(s1, s2));
                     DistanceRingBB[sq, SquareDistance[sq, s2.AsInt()]] |= s2;
                 }
 
@@ -364,12 +347,16 @@ namespace Rudz.Chess.Types
                 case EPieceType.Knight:
                 case EPieceType.King:
                     return PseudoAttacksBB[pieceType.AsInt(), square.AsInt()];
+
                 case EPieceType.Bishop:
                     return square.BishopAttacks(occupied);
+
                 case EPieceType.Rook:
                     return square.RookAttacks(occupied);
+
                 case EPieceType.Queen:
                     return square.QueenAttacks(occupied);
+
                 default:
                     return ZeroBb;
             }
@@ -479,6 +466,9 @@ namespace Rudz.Chess.Types
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static BitBoard DistanceRing(this Square square, int length) => DistanceRingBB[square.AsInt(), length];
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static BitBoard PromotionRank(this Player us) => PromotionRanks[us.Side];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void ToString(this BitBoard bb, TextWriter outputWriter)

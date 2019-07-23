@@ -40,10 +40,12 @@ namespace Rudz.Chess
 
         private readonly IPosition _position;
 
-        public MoveGenerator(IPosition position)
+        public MoveGenerator(IPosition position, bool generate = true, bool force = false)
         {
             EnsureArg.IsNotNull(position, nameof(position));
             _position = position;
+            if (generate)
+                GenerateMoves(force);
         }
 
         public Emgf Flags { get; set; } = Emgf.Legalmoves;
@@ -219,25 +221,29 @@ namespace Rudz.Chess
             if (targetSquares.Empty())
                 return moves;
 
-            var piece = EPieceType.Pawn.MakePiece(_position.State.SideToMove);
+            var stm = _position.State.SideToMove;
+            var piece = EPieceType.Pawn.MakePiece(stm);
 
-            foreach (var squareTo in targetSquares)
+            var promotionRank = stm.PromotionRank();
+            var promotionSquares = targetSquares & promotionRank;
+            var nonPromotionSquares = targetSquares & ~promotionRank;
+
+            foreach (var sqTo in nonPromotionSquares)
             {
-                var squareFrom = squareTo - direction;
-                if (!squareTo.IsPromotionRank())
-                    moves = AddMove(moves, piece, squareFrom, squareTo, PieceExtensions.EmptyPiece, type);
+                var sqFrom = sqTo - direction;
+                moves = AddMove(moves, piece, sqFrom, sqTo, PieceExtensions.EmptyPiece, type);
+            }
+
+            type |= EMoveType.Promotion;
+
+            foreach (var sqTo in promotionSquares)
+            {
+                var sqFrom = sqTo - direction;
+                if (Flags.HasFlagFast(Emgf.Queenpromotion))
+                    AddMove(moves, piece, sqFrom, sqTo, EPieceType.Queen.MakePiece(stm), type);
                 else
-                {
-                    if (Flags.HasFlagFast(Emgf.Queenpromotion))
-                        AddMove(moves, piece, squareFrom, squareTo,
-                            EPieceType.Queen.MakePiece(_position.State.SideToMove),
-                            type | EMoveType.Promotion);
-                    else
-                        for (var promotedPiece = EPieceType.Queen; promotedPiece >= EPieceType.Knight; promotedPiece--)
-                            AddMove(moves, piece, squareFrom, squareTo,
-                                promotedPiece.MakePiece(_position.State.SideToMove),
-                                type | EMoveType.Promotion);
-                }
+                    for (var promotedPiece = EPieceType.Queen; promotedPiece >= EPieceType.Knight; promotedPiece--)
+                        AddMove(moves, piece, sqFrom, sqTo, promotedPiece.MakePiece(stm), type);
             }
 
             return moves;
