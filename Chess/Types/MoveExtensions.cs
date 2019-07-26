@@ -67,10 +67,9 @@ namespace Rudz.Chess.Types
         public static (bool, Move) Locate(this Move move, IPosition pos)
         {
             // force position to contain the latest moves for the position moves to be searched in
-            var mg = new MoveGenerator(pos);
-            mg.GenerateMoves();
+            var moveList = new MoveGenerator(pos).Moves;
 
-            var element = mg.Moves.FirstOrDefault(x => x.GetFromSquare() == move.GetFromSquare() && x.GetToSquare() == move.GetToSquare());
+            var element = moveList.FirstOrDefault(x => x.GetFromSquare() == move.GetFromSquare() && x.GetToSquare() == move.GetToSquare());
             return element == null ? (false, EmptyMove) : (true, element);
         }
 
@@ -298,9 +297,7 @@ namespace Rudz.Chess.Types
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static char GetCheckChar(this IPosition pos)
         {
-            var mg = new MoveGenerator(pos);
-            mg.GenerateMoves();
-            return mg.Moves.Count > 0 ? '+' : '#';
+            return new MoveGenerator(pos).Moves.Any() ? '+' : '#';
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

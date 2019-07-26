@@ -342,9 +342,8 @@ namespace Rudz.Chess
             if (State.ReversibleHalfMoveCount >= 100)
                 gameEndType |= EGameEndType.FiftyMove;
 
-            var mg = new MoveGenerator(Position);
-            mg.GenerateMoves();
-            if (!mg.Moves.Any(move => Position.IsLegal(move)))
+            var moveList = new MoveGenerator(Position).Moves;
+            if (!moveList.Any(move => Position.IsLegal(move)))
                 gameEndType |= EGameEndType.Pat;
 
             GameEndType = gameEndType;
@@ -388,11 +387,10 @@ namespace Rudz.Chess
 
         public ulong Perft(int depth)
         {
-            var mg = new MoveGenerator(Position);
-            mg.GenerateMoves();
+            var moveList = new MoveGenerator(Position).Moves;
 
             if (depth == 1)
-                return (ulong)mg.Moves.Count;
+                return (ulong)moveList.Count;
 
             var (found, entry) = Table.Probe(Position.State.Key);
 
@@ -403,9 +401,9 @@ namespace Rudz.Chess
 
             var move = MoveExtensions.EmptyMove;
 
-            for (var i = 0; i < mg.Moves.Count; ++i)
+            for (var i = 0; i < moveList.Count; ++i)
             {
-                move = mg.Moves.GetMove(i);
+                move = moveList.GetMove(i);
                 MakeMove(move);
                 tot += Perft(depth - 1);
                 TakeMove();
