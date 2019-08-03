@@ -49,7 +49,10 @@ namespace Rudz.Chess
         /// <summary>
         /// [short/long, side] castle positional | array when altering castleling rights.
         /// </summary>
-        private static readonly ECastlelingRights[,] CastlePositionalOr;
+        private static readonly ECastlelingRights[,] CastlePositionalOr = {
+            {ECastlelingRights.WhiteOo, ECastlelingRights.BlackOo},
+            {ECastlelingRights.WhiteOoo, ECastlelingRights.BlackOoo}
+        };
 
         private readonly ECastlelingRights[] _castleRightsMask;
 
@@ -60,16 +63,6 @@ namespace Rudz.Chess
         private bool _chess960;
 
         private bool _xfen;
-
-        static Game()
-        {
-            CastlePositionalOr = new[,]
-            {
-                {ECastlelingRights.WhiteOo, ECastlelingRights.BlackOo},
-                {ECastlelingRights.WhiteOoo, ECastlelingRights.BlackOoo}
-            };
-            Table = new TranspositionTable(32);
-        }
 
         public Game(Action<Piece, Square> pieceUpdateCallback = null)
         {
@@ -101,7 +94,7 @@ namespace Rudz.Chess
 
         public EGameEndType GameEndType { get; set; }
 
-        public static TranspositionTable Table { get; set; }
+        public static TranspositionTable Table { get; set; } = new TranspositionTable(32);
 
         /// <summary>
         /// Makes a chess move in the data structure
