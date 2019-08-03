@@ -26,7 +26,6 @@ SOFTWARE.
 
 namespace Rudz.Chess
 {
-    using EnsureThat;
     using Extensions;
     using System.Collections;
     using System.Collections.Generic;
@@ -43,7 +42,6 @@ namespace Rudz.Chess
 
         public MoveList(Move[] moves)
         {
-            EnsureArg.IsNotNull(moves, nameof(moves));
             _moveIndex = -1;
             _moves = moves;
         }

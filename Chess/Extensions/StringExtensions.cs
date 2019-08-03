@@ -26,7 +26,6 @@ SOFTWARE.
 
 namespace Rudz.Chess.Extensions
 {
-    using EnsureThat;
     using System;
     using System.Collections.Generic;
     using System.IO;
@@ -45,7 +44,6 @@ namespace Rudz.Chess.Extensions
         /// <returns></returns>
         public static Queue<string> Parse(this ReadOnlySpan<char> command, char separator, char tokenizer)
         {
-            EnsureArg.IsGt(command.Length, 0, nameof(command));
             var q = new Queue<string>();
             var startIndex = 0;
             var inToken = false;

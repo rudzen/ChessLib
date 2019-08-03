@@ -26,7 +26,6 @@ SOFTWARE.
 
 namespace Rudz.Chess.Perft
 {
-    using EnsureThat;
     using System;
     using System.Collections.Generic;
     using System.Linq;
@@ -67,7 +66,6 @@ namespace Rudz.Chess.Perft
 
         public Perft(int depth, Action<string, ulong> callback, ICollection<PerftPosition> positions = null)
         {
-            EnsureArg.IsGt(depth, 0, nameof(depth));
             _positions = positions == null ? new List<PerftPosition>() : positions.ToList();
             _perftLimit = depth;
             _callback = callback;
@@ -105,8 +103,6 @@ namespace Rudz.Chess.Perft
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void AddPosition(PerftPosition pp)
         {
-            EnsureArg.IsNotNull(pp.Value, nameof(pp.Value));
-            EnsureArg.IsNotNullOrWhiteSpace(pp.Fen, nameof(pp.Fen));
             _positions.Add(pp);
         }
 

@@ -43,3 +43,7 @@ PerftFramework/obj/
 
 Docs/
 
+
+PerftCore/Properties/PublishProfiles/
+
+PerftCore/Perft\.csproj\.user

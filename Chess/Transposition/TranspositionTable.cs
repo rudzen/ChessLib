@@ -26,7 +26,6 @@ SOFTWARE.
 
 namespace Rudz.Chess.Transposition
 {
-    using EnsureThat;
     using System;
     using System.Collections.Generic;
     using System.Linq;
@@ -74,8 +73,6 @@ namespace Rudz.Chess.Transposition
         public ulong Size(int mbSize)
         {
             var size = (int)(((ulong)mbSize << 20) / (ulong)ClusterSize);
-
-            EnsureArg.IsGte(mbSize, 1, nameof(mbSize));
 
             if (_table == null)
             {

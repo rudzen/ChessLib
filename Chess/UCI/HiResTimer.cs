@@ -26,7 +26,6 @@ SOFTWARE.
 
 namespace Rudz.Chess.UCI
 {
-    using EnsureThat;
     using System;
     using System.Diagnostics;
     using System.Threading;
@@ -57,8 +56,6 @@ namespace Rudz.Chess.UCI
 
         public HiResTimer(float interval, int id, Action<HiResTimerArgs> elapsed)
         {
-            EnsureArg.IsGte(interval, 0.01f, nameof(interval));
-            EnsureArg.IsGte(id, 1, nameof(id));
             _intervalLock = new object();
             Interval = interval;
             Elapsed = elapsed;

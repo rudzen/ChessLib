@@ -26,7 +26,6 @@ SOFTWARE.
 
 namespace Rudz.Chess
 {
-    using EnsureThat;
     using Enums;
     using System;
     using System.Collections.Concurrent;
@@ -42,7 +41,6 @@ namespace Rudz.Chess
 
         public MoveGenerator(IPosition position, bool generate = true, bool force = false)
         {
-            EnsureArg.IsNotNull(position, nameof(position));
             _position = position;
             if (generate)
                 GenerateMoves(force);
