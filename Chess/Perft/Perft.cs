@@ -55,7 +55,7 @@ namespace Rudz.Chess.Perft
         /// <summary>
         /// The positional data for the run
         /// </summary>
-        private readonly List<PerftPosition> _positions;
+        private readonly List<IPerftPosition> _positions;
 
         /// <summary>
         /// How deep the test should proceed.
@@ -64,9 +64,9 @@ namespace Rudz.Chess.Perft
 
         private readonly Action<string, ulong> _callback;
 
-        public Perft(int depth, Action<string, ulong> callback, ICollection<PerftPosition> positions = null)
+        public Perft(int depth, Action<string, ulong> callback, IEnumerable<IPerftPosition> positions = null)
         {
-            _positions = positions == null ? new List<PerftPosition>() : positions.ToList();
+            _positions = positions == null ? new List<IPerftPosition>() : positions.ToList();
             _perftLimit = depth;
             _callback = callback;
         }
@@ -101,7 +101,7 @@ namespace Rudz.Chess.Perft
         public void ClearPositions() => _positions.Clear();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void AddPosition(PerftPosition pp)
+        public void AddPosition(IPerftPosition pp)
         {
             _positions.Add(pp);
         }

@@ -28,7 +28,7 @@ namespace Rudz.Chess.Perft
 {
     using System.Collections.Generic;
 
-    public struct PerftPosition
+    public sealed class PerftPosition : IPerftPosition
     {
         public PerftPosition(string fen, List<ulong> value)
         {
@@ -36,7 +36,7 @@ namespace Rudz.Chess.Perft
             Value = value;
         }
 
-        public readonly string Fen;
-        public List<ulong> Value;
+        public string Fen { get; }
+        public List<ulong> Value { get; set; }
     }
 }

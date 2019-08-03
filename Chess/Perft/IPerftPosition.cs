@@ -26,16 +26,11 @@ SOFTWARE.
 
 namespace Rudz.Chess.Perft
 {
-    public interface IPerft
+    using System.Collections.Generic;
+
+    public interface IPerftPosition
     {
-        ulong DoPerft();
-
-        void ClearPositions();
-
-        void AddPosition(IPerftPosition pp);
-
-        void AddStartPosition();
-
-        ulong GetPositionCount(int index, int depth);
+        string Fen { get; }
+        List<ulong> Value { get; set; }
     }
 }
