@@ -32,7 +32,7 @@ namespace Rudz.Chess.Transposition
     using System.Runtime.CompilerServices;
     using Types;
 
-    public sealed class TranspositionTable
+    public sealed class TranspositionTable : ITranspositionTable
     {
         private static readonly int ClusterSize;
 

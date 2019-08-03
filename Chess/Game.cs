@@ -94,7 +94,7 @@ namespace Rudz.Chess
 
         public EGameEndType GameEndType { get; set; }
 
-        public static TranspositionTable Table { get; set; } = new TranspositionTable(32);
+        public static ITranspositionTable Table { get; set; } = new TranspositionTable(32);
 
         /// <summary>
         /// Makes a chess move in the data structure
