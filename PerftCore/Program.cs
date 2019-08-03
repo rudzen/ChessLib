@@ -1,4 +1,4 @@
-﻿/*
+/*
 ChessLib, a chess data structure library
 
 MIT License
@@ -31,15 +31,13 @@ namespace Perft
     using System.Diagnostics;
     using P = Rudz.Chess.Perft.Perft;
 
-    internal sealed class Program
+    internal static class Program
     {
         public static void Main(string[] args)
         {
-            Console.WriteLine("ChessLib Perft test program v0.1.1");
+            Console.WriteLine($"ChessLib Perft test program v0.1.1 ({BuildTimeStamp.TimeStamp})");
             Console.WriteLine("Use Perft.exe <depth> to set depth (1-6), default is 5.");
-
-            if (Stopwatch.IsHighResolution)
-                Console.WriteLine($"Timer resolution : {(Stopwatch.IsHighResolution ? "high" : "normal")}.");
+            Console.WriteLine($"Timer resolution : {(Stopwatch.IsHighResolution ? "high" : "normal")}.");
 
             var depth = 0;
             if (args.Length > 0)
@@ -49,8 +47,6 @@ namespace Perft
                 depth = 5;
 
             Console.WriteLine($"Running perft test with depth {depth}.");
-            if (depth > 5)
-                Console.WriteLine("Brace yourself.");
 
             void Callback(string s, ulong v) => Console.WriteLine($"Position   : {s}\nMove Count : {v}");
 

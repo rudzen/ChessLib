@@ -26,7 +26,6 @@ SOFTWARE.
 
 namespace Rudz.Chess.Transposition
 {
-    using EnsureThat;
     using System;
     using System.Collections.Generic;
     using System.Linq;
@@ -55,16 +54,25 @@ namespace Rudz.Chess.Transposition
             Size(mbSize);
         }
 
+        /// <summary>
+        /// Number of table hits
+        /// </summary>
         public ulong Hits { get; private set; }
 
+        /// <summary>
+        /// Increases the generation of the table by one
+        /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void NewSearch() => ++_generation;
 
+        /// <summary>
+        /// Sets the size of the table in Mb
+        /// </summary>
+        /// <param name="mbSize">The size to set it to</param>
+        /// <returns>The number of clusters in the table</returns>
         public ulong Size(int mbSize)
         {
             var size = (int)(((ulong)mbSize << 20) / (ulong)ClusterSize);
-
-            EnsureArg.IsGte(mbSize, 1, nameof(mbSize));
 
             if (_table == null)
             {
@@ -86,6 +94,11 @@ namespace Rudz.Chess.Transposition
             return (ulong)(size * ClusterSize);
         }
 
+        /// <summary>
+        /// Finds a cluster in the table based on a position key
+        /// </summary>
+        /// <param name="key">The position key</param>
+        /// <returns>The cluster of the keys position in the table</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public TTCluster FindCluster(ulong key)
         {
@@ -96,6 +109,11 @@ namespace Rudz.Chess.Transposition
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Refresh(TranspositionTableEntry tte) => tte.Generation = _generation;
 
+        /// <summary>
+        /// Probes the transposition table for a entry that matches the position key.
+        /// </summary>
+        /// <param name="key">The position key</param>
+        /// <returns>(true, entry) if one was found, (false, empty) if not found</returns>
         public (bool, TranspositionTableEntry) Probe(ulong key)
         {
             var ttc = FindCluster(key);
@@ -124,9 +142,26 @@ namespace Rudz.Chess.Transposition
             return (set, e);
         }
 
+        /// <summary>
+        /// Probes the table for the first cluster index which matches the position key
+        /// </summary>
+        /// <param name="key">The position key</param>
+        /// <returns>The cluster entry</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public TranspositionTableEntry ProbeFirst(ulong key) => FindCluster(key)[0];
 
+        /// <summary>
+        /// Stores a move in the transposition table.
+        /// It will automatically detect the best cluster location to store it in.
+        /// If a similar move already is present, a simple check if done to make sure
+        /// it actually is an improvement of the previous move.
+        /// </summary>
+        /// <param name="key">The position key</param>
+        /// <param name="value">The value of the move</param>
+        /// <param name="type">The bound type, e.i. did it exceed alpha or beta</param>
+        /// <param name="depth">The depth of the move</param>
+        /// <param name="move">The move it self</param>
+        /// <param name="statValue">The static value of the move</param>
         public void Store(ulong key, int value, Bound type, sbyte depth, Move move, int statValue)
         {
             // Use the high 32 bits as key inside the cluster
@@ -174,6 +209,11 @@ namespace Rudz.Chess.Transposition
             ttc.Cluster[clusterIndex].Save(e);
         }
 
+        /// <summary>
+        /// Get the approximation full % of the table
+        /// // todo : fix
+        /// </summary>
+        /// <returns>The % as integer value</returns>
         public int Fullness()
         {
             if (_generation == 1)
@@ -186,6 +226,9 @@ namespace Rudz.Chess.Transposition
             return sum * 250 / _fullnessElements;
         }
 
+        /// <summary>
+        /// Clears the current table
+        /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Clear()
         {

@@ -40,22 +40,16 @@ namespace Rudz.Chess.Types
     /// </summary>
     public static class MoveExtensions
     {
-        public static readonly Move EmptyMove;
+        public static readonly Move EmptyMove = new Move();
 
-        private static readonly Dictionary<EMoveNotation, Func<Move, IPosition, string>> NotationFuncs;
-
-        static MoveExtensions()
+        private static readonly Dictionary<EMoveNotation, Func<Move, IPosition, string>> NotationFuncs = new Dictionary<EMoveNotation, Func<Move, IPosition, string>>
         {
-            EmptyMove = new Move();
-            NotationFuncs = new Dictionary<EMoveNotation, Func<Move, IPosition, string>>
-            {
-                {EMoveNotation.Fan, ToFan},
-                {EMoveNotation.San, ToSan},
-                {EMoveNotation.Lan, ToLan},
-                {EMoveNotation.Ran, ToRan},
-                {EMoveNotation.Uci, ToUci}
-            };
-        }
+            {EMoveNotation.Fan, ToFan},
+            {EMoveNotation.San, ToSan},
+            {EMoveNotation.Lan, ToLan},
+            {EMoveNotation.Ran, ToRan},
+            {EMoveNotation.Uci, ToUci}
+        };
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string ToNotation(this Move move, IPosition pos, EMoveNotation notation = EMoveNotation.Fan)
@@ -73,10 +67,9 @@ namespace Rudz.Chess.Types
         public static (bool, Move) Locate(this Move move, IPosition pos)
         {
             // force position to contain the latest moves for the position moves to be searched in
-            var mg = new MoveGenerator(pos);
-            mg.GenerateMoves();
+            var moveList = new MoveGenerator(pos).Moves;
 
-            var element = mg.Moves.FirstOrDefault(x => x.GetFromSquare() == move.GetFromSquare() && x.GetToSquare() == move.GetToSquare());
+            var element = moveList.FirstOrDefault(x => x.GetFromSquare() == move.GetFromSquare() && x.GetToSquare() == move.GetToSquare());
             return element == null ? (false, EmptyMove) : (true, element);
         }
 
@@ -304,9 +297,7 @@ namespace Rudz.Chess.Types
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static char GetCheckChar(this IPosition pos)
         {
-            var mg = new MoveGenerator(pos);
-            mg.GenerateMoves();
-            return mg.Moves.Count > 0 ? '+' : '#';
+            return new MoveGenerator(pos).Moves.Any() ? '+' : '#';
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

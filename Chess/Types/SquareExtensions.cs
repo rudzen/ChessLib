@@ -35,29 +35,25 @@ namespace Rudz.Chess.Types
 
     public static class SquareExtensions
     {
-        private static readonly string[] SquareStrings;
+        private static readonly string[] SquareStrings =
+        {
+            "a1", "b1", "c1", "d1", "e1", "f1", "g1", "h1",
+            "a2", "b2", "c2", "d2", "e2", "f2", "g2", "h2",
+            "a3", "b3", "c3", "d3", "e3", "f3", "g3", "h3",
+            "a4", "b4", "c4", "d4", "e4", "f4", "g4", "h4",
+            "a5", "b5", "c5", "d5", "e5", "f5", "g5", "h5",
+            "a6", "b6", "c6", "d6", "e6", "f6", "g6", "h6",
+            "a7", "b7", "c7", "d7", "e7", "f7", "g7", "h7",
+            "a8", "b8", "c8", "d8", "e8", "f8", "g8", "h8"
+        };
 
         // TODO : Replace with relative methods
-        private static readonly Square[,] Flip;
+        private static readonly Square[,] Flip = new Square[2, 64];
 
-        private static readonly Square[] RookCastlesTo; // indexed by position of the king
+        private static readonly Square[] RookCastlesTo = new Square[64]; // indexed by position of the king
 
         static SquareExtensions()
         {
-            SquareStrings = new[]
-            {
-                "a1", "b1", "c1", "d1", "e1", "f1", "g1", "h1",
-                "a2", "b2", "c2", "d2", "e2", "f2", "g2", "h2",
-                "a3", "b3", "c3", "d3", "e3", "f3", "g3", "h3",
-                "a4", "b4", "c4", "d4", "e4", "f4", "g4", "h4",
-                "a5", "b5", "c5", "d5", "e5", "f5", "g5", "h5",
-                "a6", "b6", "c6", "d6", "e6", "f6", "g6", "h6",
-                "a7", "b7", "c7", "d7", "e7", "f7", "g7", "h7",
-                "a8", "b8", "c8", "d8", "e8", "f8", "g8", "h8"
-            };
-            Flip = new Square[2, 64];
-            RookCastlesTo = new Square[64];
-
             // generate square flipping array for both sides
             foreach (var square in BitBoards.AllSquares)
             {
@@ -114,7 +110,7 @@ namespace Rudz.Chess.Types
         public static string GetSquareString(this Square s) => SquareStrings[s.AsInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsPromotionRank(this Square square) => (BitBoards.PromotionRanks & square) != 0;
+        public static bool IsPromotionRank(this Square square) => (BitBoards.PromotionRanksBB & square) != 0;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static BitBoard BitBoardSquare(this Square sq) => BitBoards.BbSquares[sq.AsInt()];

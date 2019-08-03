@@ -29,12 +29,13 @@ namespace Chess.Test.Bitboard
     using Rudz.Chess.Enums;
     using Rudz.Chess.Types;
     using System.Linq;
+    using System.Threading.Tasks;
     using Xunit;
 
     public sealed class BitboardDataTests
     {
         [Fact]
-        public void AlignedSimplePositiveTest()
+        public async Task AlignedSimplePositiveTest()
         {
             const bool expected = true;
 
@@ -42,22 +43,25 @@ namespace Chess.Test.Bitboard
             const ESquare sq2 = ESquare.a2;
             const ESquare sq3 = ESquare.a3;
 
-            var actual = BitBoards.Aligned(sq1, sq2, sq3);
+            var actual = await Task.Run(() => BitBoards.Aligned(sq1, sq2, sq3)).ConfigureAwait(false);
 
             Assert.Equal(expected, actual);
         }
 
         [Fact]
-        public void AlignedSimpleTotalTest()
+        public async Task AlignedSimpleTotalTest()
         {
             const int expected = 10640;
 
-            var actual = 0;
-
-            foreach (var s1 in BitBoards.AllSquares)
-                actual += BitBoards.AllSquares
-                    .Sum(s2 => BitBoards.AllSquares
-                        .Count(s3 => s1.Aligned(s2, s3)));
+            var actual = await Task.Run(() =>
+            {
+                var sum = 0;
+                foreach (var s1 in BitBoards.AllSquares)
+                    sum += BitBoards.AllSquares
+                        .Sum(s2 => BitBoards.AllSquares
+                            .Count(s3 => s1.Aligned(s2, s3)));
+                return sum;
+            }).ConfigureAwait(false);
 
             Assert.Equal(expected, actual);
         }

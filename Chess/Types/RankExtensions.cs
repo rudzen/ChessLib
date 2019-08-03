@@ -30,12 +30,7 @@ namespace Rudz.Chess.Types
 
     public static class RankExtensions
     {
-        private static readonly char[] RankChars;
-
-        static RankExtensions()
-        {
-            RankChars = new[] { '1', '2', '3', '4', '5', '6', '7', '8' };
-        }
+        private static readonly char[] RankChars = { '1', '2', '3', '4', '5', '6', '7', '8' };
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static char RankChar(this Rank r) => RankChars[r.AsInt()];

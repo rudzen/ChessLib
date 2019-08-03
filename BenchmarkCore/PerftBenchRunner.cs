@@ -74,6 +74,22 @@ Result	6	1,912,300.6 us	3,551.167 us	3,148.017 us
  Result | 4 |     1.426 ms | 0.0039 ms | 0.0033 ms |
  Result | 5 |    48.468 ms | 0.2311 ms | 0.2048 ms |
  Result | 6 | 1,487.300 ms | 2.3406 ms | 1.9545 ms |
+
+
+v2: with perft cache
+ Method | N |     Mean |     Error |    StdDev |
+------- |-- |---------:|----------:|----------:|
+ Result | 4 | 58.50 us | 0.1632 us | 0.1527 us |
+ Result | 5 | 61.89 us | 1.1856 us | 1.4994 us |
+ Result | 6 | 63.71 us | 0.7055 us | 0.6599 us |
+
+No perft cache:
+ Method | N |         Mean |     Error |    StdDev |
+------- |-- |-------------:|----------:|----------:|
+ Result | 4 |     1.561 ms | 0.0044 ms | 0.0041 ms |
+ Result | 5 |    50.971 ms | 0.6585 ms | 0.5837 ms |
+ Result | 6 | 1,545.322 ms | 2.1404 ms | 1.7873 ms |
+
 */
 
     public class PerftBenchRunner

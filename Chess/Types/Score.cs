@@ -38,7 +38,7 @@ namespace Rudz.Chess.Types
         private struct ScoreUnion
         {
             [FieldOffset(0)] public int mg;
-            [FieldOffset(16)]public int eg;
+            [FieldOffset(16)] public int eg;
         }
 
         private ScoreUnion _data;
@@ -57,15 +57,26 @@ namespace Rudz.Chess.Types
             _data.eg = eg;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Score(Score s) => _data = s._data;
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Score(ExtMove em) => _data = em.Score._data;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator Score(int value) => new Score(value);
+        public static implicit operator Score(int v) => new Score(v);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator Score(ExtMove value) => new Score(value.Score._data.mg, value.Score._data.eg);
+        public static implicit operator Score(ExtMove em) => new Score(em.Score._data.mg, em.Score._data.eg);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Score operator *(Score s, int v) => new Score(s.Mg() * v, s.Eg() * v);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Score operator +(Score s1, Score s2) => new Score(s1.Mg() + s2.Mg(), s1.Eg() + s2.Eg());
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Score operator +(Score s, int v) => new Score(s.Mg() + v, s.Eg() + v);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetMg(int v) => _data.mg = v;
@@ -78,6 +89,5 @@ namespace Rudz.Chess.Types
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int Mg() => _data.mg;
-
     }
 }

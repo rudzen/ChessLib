@@ -61,8 +61,6 @@ namespace Rudz.Chess
 
         private bool _xfen;
 
-        private int _repetitionCounter;
-
         static Game()
         {
             CastlePositionalOr = new[,]
@@ -165,7 +163,6 @@ namespace Rudz.Chess
 
         /// <summary>
         /// Apply a FEN string board setup to the board structure.
-        /// *EXCEPTION FREE FUNCTION*
         /// </summary>
         /// <param name="fenString">The string to set</param>
         /// <param name="validate">If true, the fen string is validated, otherwise not</param>
@@ -345,9 +342,8 @@ namespace Rudz.Chess
             if (State.ReversibleHalfMoveCount >= 100)
                 gameEndType |= EGameEndType.FiftyMove;
 
-            var mg = new MoveGenerator(Position);
-            mg.GenerateMoves();
-            if (!mg.Moves.Any(move => Position.IsLegal(move)))
+            var moveList = new MoveGenerator(Position).Moves;
+            if (!moveList.Any(move => Position.IsLegal(move)))
                 gameEndType |= EGameEndType.Pat;
 
             GameEndType = gameEndType;
@@ -391,10 +387,10 @@ namespace Rudz.Chess
 
         public ulong Perft(int depth)
         {
-            var mg = new MoveGenerator(Position);
-            mg.GenerateMoves();
+            var moveList = new MoveGenerator(Position).Moves;
+
             if (depth == 1)
-                return (ulong)mg.Moves.Count;
+                return (ulong)moveList.Count;
 
             var (found, entry) = Table.Probe(Position.State.Key);
 
@@ -405,9 +401,9 @@ namespace Rudz.Chess
 
             var move = MoveExtensions.EmptyMove;
 
-            for (var i = 0; i < mg.Moves.Count; ++i)
+            for (var i = 0; i < moveList.Count; ++i)
             {
-                move = mg.Moves.GetMove(i);
+                move = moveList.GetMove(i);
                 MakeMove(move);
                 tot += Perft(depth - 1);
                 TakeMove();
@@ -466,12 +462,6 @@ namespace Rudz.Chess
             }
 
             var pawnPiece = move.GetMovingPieceType() == EPieceType.Pawn;
-
-            if (pawnPiece)
-                pawnKey ^= Zobrist.GetZobristPst(move.GetMovingPiece(), move.GetFromSquare());
-            else
-                key ^= Zobrist.GetZobristPst(move.GetMovingPiece(), move.GetFromSquare());
-
             var squareTo = move.GetToSquare();
 
             if (move.IsPromotionMove())
@@ -484,23 +474,27 @@ namespace Rudz.Chess
                     key ^= Zobrist.GetZobristPst(move.GetMovingPiece(), squareTo);
             }
 
-            if (pawnPiece && move.IsEnPassantMove())
-                pawnKey ^= Zobrist.GetZobristPst(move.GetCapturedPiece().Type() + (State.SideToMove << 3), squareTo + (State.SideToMove.Side == 0 ? 8 : -8));
-            else if (move.IsCaptureMove())
+            if (pawnPiece)
             {
-                if (pawnPiece)
+                pawnKey ^= Zobrist.GetZobristPst(move.GetMovingPiece(), move.GetFromSquare());
+                if (move.IsEnPassantMove())
+                    pawnKey ^= Zobrist.GetZobristPst(move.GetCapturedPiece(), squareTo + State.SideToMove.PawnPushDistance());
+                else if (move.IsCaptureMove())
                     pawnKey ^= Zobrist.GetZobristPst(move.GetCapturedPiece(), squareTo);
-                else
-                    key ^= Zobrist.GetZobristPst(move.GetCapturedPiece(), squareTo);
             }
-            else if (move.IsCastlelingMove())
+            else
             {
-                var piece = (EPieces)(EPieceType.Rook + move.GetSideMask());
-                key ^= Zobrist.GetZobristPst(piece, Position.GetRookCastleFrom(squareTo));
-                key ^= Zobrist.GetZobristPst(piece, squareTo.GetRookCastleTo());
+                key ^= Zobrist.GetZobristPst(move.GetMovingPiece(), move.GetFromSquare());
+                if (move.IsCaptureMove())
+                    key ^= Zobrist.GetZobristPst(move.GetCapturedPiece(), squareTo);
+                else if (move.IsCastlelingMove())
+                {
+                    var piece = EPieceType.Rook.MakePiece(Position.State.SideToMove);
+                    key ^= Zobrist.GetZobristPst(piece, Position.GetRookCastleFrom(squareTo));
+                    key ^= Zobrist.GetZobristPst(piece, squareTo.GetRookCastleTo());
+                }
             }
 
-            // castleling
             // castling rights
             if (State.CastlelingRights != _stateList[PositionIndex - 1].CastlelingRights)
             {
@@ -508,17 +502,16 @@ namespace Rudz.Chess
                 key ^= Zobrist.GetZobristCastleling(State.CastlelingRights);
             }
 
-            key ^= pawnKey;
-            State.Key = key;
+            State.Key = key ^ pawnKey;
             State.PawnStructureKey = pawnKey;
         }
 
         private bool IsRepetition()
         {
-            _repetitionCounter = 1;
+            var repetitionCounter = 1;
             var backPosition = PositionIndex;
             while ((backPosition -= 2) >= 0)
-                if (_stateList[backPosition].Key == State.Key && ++_repetitionCounter == 3)
+                if (_stateList[backPosition].Key == State.Key && ++repetitionCounter == 3)
                     return true;
 
             return false;

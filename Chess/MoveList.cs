@@ -26,7 +26,6 @@ SOFTWARE.
 
 namespace Rudz.Chess
 {
-    using EnsureThat;
     using Extensions;
     using System.Collections;
     using System.Collections.Generic;
@@ -43,7 +42,6 @@ namespace Rudz.Chess
 
         public MoveList(Move[] moves)
         {
-            EnsureArg.IsNotNull(moves, nameof(moves));
             _moveIndex = -1;
             _moves = moves;
         }
@@ -55,6 +53,21 @@ namespace Rudz.Chess
         }
 
         public int Count => _moveIndex + 1;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static MoveList operator +(MoveList left, Move right)
+        {
+            left.Add(right);
+            return left;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static MoveList operator +(MoveList left, MoveList right)
+        {
+            foreach (var m in right._moves)
+                left.Add(m);
+            return left;
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Add(Move move) => _moves[++_moveIndex] = move;

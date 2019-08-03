@@ -71,9 +71,6 @@ namespace Rudz.Chess.Types
         public BitBoard(int value)
             : this((ulong)value) { }
 
-        /// <summary>
-        /// Gets and sets the bits of the... tadaaaa.. bitboard
-        /// </summary>
         public ulong Value { get; private set; }
 
         public int Count => BitBoards.PopCount(Value);

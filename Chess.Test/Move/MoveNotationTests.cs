@@ -75,7 +75,7 @@ namespace Chess.Test.Move
 
             var movingPiece = new Piece(EPieces.WhiteKnight);
             var fromOneSquare = new Square(ESquare.d2);
-            var fromTwoSquare = new Square(ESquare.g5);
+            var fromTwoSquare = new Square(ESquare.f2);
             var toSquare = new Square(ESquare.e4);
 
             var uniChar = movingPiece.GetUnicodeChar();
@@ -171,7 +171,7 @@ namespace Chess.Test.Move
 
             var movingPiece = new Piece(EPieces.WhiteKnight);
             var fromOneSquare = new Square(ESquare.d2);
-            var fromTwoSquare = new Square(ESquare.g5);
+            var fromTwoSquare = new Square(ESquare.f2);
             var toSquare = new Square(ESquare.e4);
 
             var uniChar = movingPiece.GetPieceChar();
@@ -267,7 +267,7 @@ namespace Chess.Test.Move
 
             var movingPiece = new Piece(EPieces.WhiteKnight);
             var fromOneSquare = new Square(ESquare.d2);
-            var fromTwoSquare = new Square(ESquare.g5);
+            var fromTwoSquare = new Square(ESquare.f2);
             var toSquare = new Square(ESquare.e4);
 
             var uniChar = movingPiece.GetPieceChar();
@@ -363,7 +363,7 @@ namespace Chess.Test.Move
 
             var movingPiece = new Piece(EPieces.WhiteKnight);
             var fromOneSquare = new Square(ESquare.d2);
-            var fromTwoSquare = new Square(ESquare.g5);
+            var fromTwoSquare = new Square(ESquare.f5);
             var toSquare = new Square(ESquare.e4);
 
             var uniChar = movingPiece.GetPieceChar();

@@ -99,11 +99,18 @@ namespace Rudz.Chess
         {
             int[] initmagicmovesBitpos64Database =
                 {
-                    63, 0, 58, 1, 59, 47, 53, 2, 60, 39, 48, 27, 54, 33, 42, 3, 61, 51, 37, 40, 49, 18, 28, 20, 55, 30, 34, 11, 43, 14, 22, 4, 62, 57, 46, 52, 38, 26, 32, 41, 50, 36, 17, 19, 29, 10, 13, 21, 56, 45, 25, 31, 35, 16, 9, 12,
-                    44, 24, 15, 8, 23, 7, 6, 5
+                    63,  0, 58,  1, 59, 47, 53,  2,
+                    60, 39, 48, 27, 54, 33, 42,  3,
+                    61, 51, 37, 40, 49, 18, 28, 20,
+                    55, 30, 34, 11, 43, 14, 22,  4,
+                    62, 57, 46, 52, 38, 26, 32, 41,
+                    50, 36, 17, 19, 29, 10, 13, 21,
+                    56, 45, 25, 31, 35, 16,  9, 12,
+                    44, 24, 15,  8, 23,  7,  6,  5
                 };
-            var squares = new int[64];
-            var numSquares = 0;
+
+            Span<int> squares = stackalloc int[64];
+            int numSquares;
 
             for (var i = 0; i < squares.Length; ++i)
             {
@@ -118,12 +125,12 @@ namespace Rudz.Chess
 
                 for (temp = 0; temp < One << numSquares; ++temp)
                 {
-                    var tempocc = InitmagicmovesOcc(squares, numSquares, temp);
+                    var tempocc = InitmagicmovesOcc(squares.Slice(0, numSquares), temp);
                     MagicBishopDb[i, (tempocc * MagicmovesBMagics[i]) >> 55] = InitmagicmovesBmoves(i, tempocc);
                 }
             }
 
-            Array.Clear(squares, 0, numSquares);
+            squares.Clear();
 
             for (var i = 0; i < squares.Length; ++i)
             {
@@ -138,7 +145,7 @@ namespace Rudz.Chess
 
                 for (temp = 0; temp < One << numSquares; ++temp)
                 {
-                    var tempocc = InitmagicmovesOcc(squares, numSquares, temp);
+                    var tempocc = InitmagicmovesOcc(squares.Slice(0, numSquares), temp);
                     MagicRookDb[i, (tempocc * MagicmovesRMagics[i]) >> 52] = InitmagicmovesRmoves(i, tempocc);
                 }
             }
@@ -153,11 +160,11 @@ namespace Rudz.Chess
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static BitBoard QueenAttacks(this Square square, BitBoard occupied) => BishopAttacks(square, occupied) | RookAttacks(square, occupied);
 
-        private static ulong InitmagicmovesOcc(IReadOnlyList<int> squares, int numSquares, ulong linocc)
+        private static ulong InitmagicmovesOcc(ReadOnlySpan<int> squares, ulong linocc)
         {
             // Note, the numSquares IS required, as this method will be called without a fully populated squares.
             ulong ret = 0;
-            for (var i = 0; i < numSquares; ++i)
+            for (var i = 0; i < squares.Length; ++i)
             {
                 if ((linocc & (One << i)) != 0)
                     ret |= One << squares[i];

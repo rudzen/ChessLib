@@ -29,7 +29,6 @@
 
 namespace Rudz.Chess.Util
 {
-    using EnsureThat;
     using System.Runtime.CompilerServices;
 
     public class RKiss
@@ -39,7 +38,6 @@ namespace Rudz.Chess.Util
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public RKiss(ulong s)
         {
-            EnsureArg.IsNot(s, 0ul, nameof(s));
             _s = s;
         }
 

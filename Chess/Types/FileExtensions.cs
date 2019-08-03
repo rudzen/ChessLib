@@ -31,13 +31,12 @@ namespace Rudz.Chess.Types
 
     public static class FileExtensions
     {
-        private static readonly char[] FileChars;
+        private static readonly char[] FileChars = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' };
 
         private static readonly string[] FileStrings;
 
         static FileExtensions()
         {
-            FileChars = new[] { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' };
             FileStrings = FileChars.Select(x => x.ToString()).ToArray();
         }
 

@@ -33,33 +33,21 @@ namespace Rudz.Chess.Types
 
     public static class PlayerExtensions
     {
-        public static readonly Player White;
+        public static readonly Player White = 0;
 
-        public static readonly Player Black;
+        public static readonly Player Black = 1;
 
-        private static readonly Direction[] PawnPushDist;
+        private static readonly Direction[] PawnPushDist = { EDirection.North, EDirection.South };
 
-        private static readonly Direction[] PawnDoublePushDist;
+        private static readonly Direction[] PawnDoublePushDist = { EDirection.NorthDouble, EDirection.SouthDouble };
 
-        private static readonly Direction[] PawnWestAttackDist;
+        private static readonly Direction[] PawnWestAttackDist = { EDirection.NorthEast, EDirection.SouthEast };
 
-        private static readonly Direction[] PawnEastAttackDist;
+        private static readonly Direction[] PawnEastAttackDist = { EDirection.NorthWest, EDirection.SouthWest };
 
-        private static readonly string[] PlayerColors;
+        private static readonly string[] PlayerColors = { "White", "Black" };
 
-        private static readonly Func<BitBoard, BitBoard>[] PawnPushModifiers;
-
-        static PlayerExtensions()
-        {
-            White = 0;
-            Black = 1;
-            PawnPushDist = new Direction[] { EDirection.North, EDirection.South };
-            PawnDoublePushDist = new Direction[] { EDirection.NorthDouble, EDirection.SouthDouble };
-            PawnWestAttackDist = new Direction[] { EDirection.NorthEast, EDirection.SouthEast };
-            PawnEastAttackDist = new Direction[] { EDirection.NorthWest, EDirection.SouthWest };
-            PlayerColors = new[] { "White", "Black" };
-            PawnPushModifiers = new Func<BitBoard, BitBoard>[] { BitBoards.NorthOne, BitBoards.SouthOne };
-        }
+        private static readonly Func<BitBoard, BitBoard>[] PawnPushModifiers = { BitBoards.NorthOne, BitBoards.SouthOne };
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsLegalPlayer(this Player player) => player.Side.InBetween(White.Side, Black.Side);

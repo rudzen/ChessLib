@@ -26,7 +26,6 @@ SOFTWARE.
 
 namespace Rudz.Chess.Fen
 {
-    using EnsureThat;
     using Enums;
     using Exceptions;
     using Extensions;
@@ -67,8 +66,6 @@ namespace Rudz.Chess.Fen
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Validate(string fen)
         {
-            EnsureArg.IsNotEmptyOrWhitespace(fen, nameof(fen));
-
             var f = fen.Trim().AsSpan();
 
             if (f.Length <= MaxFenLen)

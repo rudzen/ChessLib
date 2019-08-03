@@ -46,7 +46,7 @@ namespace Rudz.Chess
     {
         private const ulong Zero = 0;
 
-        private static readonly Func<BitBoard, BitBoard>[] EnPasCapturePos;
+        private static readonly Func<BitBoard, BitBoard>[] EnPasCapturePos = { BitBoards.SouthOne, BitBoards.NorthOne };
 
         private readonly Square[] _rookCastlesFrom; // indexed by position of the king
 
@@ -65,8 +65,6 @@ namespace Rudz.Chess
             OccupiedBySide = new BitBoard[2];
             Clear();
         }
-
-        static Position() => EnPasCapturePos = new Func<BitBoard, BitBoard>[] { BitBoards.SouthOne, BitBoards.NorthOne };
 
         public BitBoard[] BoardPieces { get; }
 
@@ -461,10 +459,9 @@ namespace Rudz.Chess
                 to = castleType.GetKingCastleTo(State.SideToMove);
             }
 
-            var mg = new MoveGenerator(this);
-            mg.GenerateMoves();
+            var moveList = new MoveGenerator(this).Moves;
 
-            var matchingMoves = mg.Moves.Where(x => x.GetFromSquare() == from && x.GetToSquare() == to);
+            var matchingMoves = moveList.Where(x => x.GetFromSquare() == from && x.GetToSquare() == to);
 
             // ** untested area **
             foreach (var move in matchingMoves)
@@ -556,9 +553,7 @@ namespace Rudz.Chess
                 if (CanCastle(move.GetFromSquare() < to ? ECastleling.Short : ECastleling.Long))
                     return true;
 
-                var mg = new MoveGenerator(this);
-                mg.GenerateMoves();
-                return mg.Moves.Contains(move);
+                return new MoveGenerator(this).Moves.Contains(move);
             }
             else if (move.IsEnPassantMove())
             {
@@ -598,9 +593,7 @@ namespace Rudz.Chess
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool IsMate()
         {
-            var mg = new MoveGenerator(this);
-            mg.GenerateMoves();
-            return !mg.Moves.Any(IsLegal);
+            return !new MoveGenerator(this).Moves.Any(IsLegal);
         }
 
         /// <summary>
