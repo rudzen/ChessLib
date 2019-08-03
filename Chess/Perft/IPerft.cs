@@ -36,6 +36,6 @@ namespace Rudz.Chess.Perft
 
         void AddStartPosition();
 
-        ulong GetPositionCount(int index, int positionIndex);
+        ulong GetPositionCount(int index, int depth);
     }
 }
