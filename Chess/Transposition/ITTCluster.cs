@@ -26,20 +26,9 @@ SOFTWARE.
 
 namespace Rudz.Chess.Transposition
 {
-    // ReSharper disable once InconsistentNaming
-    public sealed class TTCluster : ITTCluster
+    public interface ITTCluster
     {
-        public TTCluster()
-        {
-            Cluster = new TranspositionTableEntry[4];
-        }
-
-        public TranspositionTableEntry[] Cluster { get; }
-
-        public TranspositionTableEntry this[int key]
-        {
-            get => Cluster[key];
-            set => Cluster[key] = value;
-        }
+        TranspositionTableEntry[] Cluster { get; }
+        TranspositionTableEntry this[int key] { get; set; }
     }
 }

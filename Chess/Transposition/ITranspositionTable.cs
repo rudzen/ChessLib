@@ -52,7 +52,7 @@ namespace Rudz.Chess.Transposition
         /// </summary>
         /// <param name="key">The position key</param>
         /// <returns>The cluster of the keys position in the table</returns>
-        TTCluster FindCluster(ulong key);
+        ITTCluster FindCluster(ulong key);
 
         void Refresh(TranspositionTableEntry tte);
 

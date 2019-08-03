@@ -36,7 +36,7 @@ namespace Rudz.Chess.Transposition
     {
         private static readonly int ClusterSize;
 
-        private List<TTCluster> _table;
+        private List<ITTCluster> _table;
         private ulong _elements;
         private int _fullnessElements;
         private sbyte _generation;
@@ -76,7 +76,7 @@ namespace Rudz.Chess.Transposition
 
             if (_table == null)
             {
-                _table = new List<TTCluster>(size);
+                _table = new List<ITTCluster>(size);
                 _elements = (ulong)size;
             }
             else if (_table.Count != size)
@@ -100,7 +100,7 @@ namespace Rudz.Chess.Transposition
         /// <param name="key">The position key</param>
         /// <returns>The cluster of the keys position in the table</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public TTCluster FindCluster(ulong key)
+        public ITTCluster FindCluster(ulong key)
         {
             var idx = (int)((uint)(key) & (_elements - 1));
             return _table[idx];
