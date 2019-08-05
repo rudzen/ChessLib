@@ -47,3 +47,5 @@ Docs/
 PerftCore/Properties/PublishProfiles/
 
 PerftCore/Perft\.csproj\.user
+
+PerftCore/BuildTimeStamp\.txt
