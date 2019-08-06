@@ -24,14 +24,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Data
+namespace Rudz.Chess
 {
     using Types;
 
-    public interface IPieceSquare
+    public interface IKillerMoves
     {
-        Piece Piece { get; set; }
+        int GetValue(int depth, Move move);
 
-        Square Square { get; set; }
+        void UpdateValue(int depth, Move move);
+
+        void Shift(int depth);
+
+        void Reset();
     }
 }

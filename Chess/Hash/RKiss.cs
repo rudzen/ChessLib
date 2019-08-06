@@ -27,11 +27,11 @@
 
  */
 
-namespace Rudz.Chess.Util
+namespace Rudz.Chess.Hash
 {
     using System.Runtime.CompilerServices;
 
-    public class RKiss
+    public sealed class RKiss : IRKiss
     {
         private ulong _s;
 

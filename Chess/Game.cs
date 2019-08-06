@@ -26,10 +26,10 @@ SOFTWARE.
 
 namespace Rudz.Chess
 {
-    using Data;
     using Enums;
     using Extensions;
     using Fen;
+    using Hash;
     using System;
     using System.Collections;
     using System.Collections.Generic;
@@ -283,10 +283,10 @@ namespace Rudz.Chess
                 State.PawnStructureKey ^= zobristSide;
             }
 
-            State.Key ^= Zobrist.GetZobristCastleling(State.CastlelingRights);
+            State.Key ^= State.CastlelingRights.GetZobristCastleling();
 
             if (State.EnPassantSquare != ESquare.none)
-                State.Key ^= Zobrist.GetZobristEnPessant(State.EnPassantSquare.File().AsInt());
+                State.Key ^= State.EnPassantSquare.File().GetZobristEnPessant();
 
             Position.InCheck = Position.IsAttacked(Position.GetPieceSquare(EPieceType.King, State.SideToMove), ~State.SideToMove);
 
@@ -420,10 +420,10 @@ namespace Rudz.Chess
 
             Position.AddPiece(piece, square);
 
-            State.Key ^= Zobrist.GetZobristPst(piece, square);
+            State.Key ^= piece.GetZobristPst(square);
 
             if (pieceType == EPieceType.Pawn)
-                State.PawnStructureKey ^= Zobrist.GetZobristPst(piece, square);
+                State.PawnStructureKey ^= piece.GetZobristPst(square);
 
             State.Material.Add(piece);
         }
@@ -441,10 +441,10 @@ namespace Rudz.Chess
             pawnKey ^= Zobrist.GetZobristSide();
 
             if (_stateList[PositionIndex - 1].EnPassantSquare != ESquare.none)
-                key ^= Zobrist.GetZobristEnPessant(_stateList[PositionIndex - 1].EnPassantSquare.File().AsInt());
+                key ^= _stateList[PositionIndex - 1].EnPassantSquare.File().GetZobristEnPessant();
 
             if (State.EnPassantSquare != ESquare.none)
-                key ^= Zobrist.GetZobristEnPessant(State.EnPassantSquare.File().AsInt());
+                key ^= State.EnPassantSquare.File().GetZobristEnPessant();
 
             if (move.IsNullMove())
             {
@@ -458,41 +458,41 @@ namespace Rudz.Chess
             var squareTo = move.GetToSquare();
 
             if (move.IsPromotionMove())
-                key ^= Zobrist.GetZobristPst(move.GetPromotedPiece(), squareTo);
+                key ^= move.GetPromotedPiece().GetZobristPst(squareTo);
             else
             {
                 if (pawnPiece)
-                    pawnKey ^= Zobrist.GetZobristPst(move.GetMovingPiece(), squareTo);
+                    pawnKey ^= move.GetMovingPiece().GetZobristPst(squareTo);
                 else
-                    key ^= Zobrist.GetZobristPst(move.GetMovingPiece(), squareTo);
+                    key ^= move.GetMovingPiece().GetZobristPst(squareTo);
             }
 
             if (pawnPiece)
             {
-                pawnKey ^= Zobrist.GetZobristPst(move.GetMovingPiece(), move.GetFromSquare());
+                pawnKey ^= move.GetMovingPiece().GetZobristPst(move.GetFromSquare());
                 if (move.IsEnPassantMove())
-                    pawnKey ^= Zobrist.GetZobristPst(move.GetCapturedPiece(), squareTo + State.SideToMove.PawnPushDistance());
+                    pawnKey ^= move.GetCapturedPiece().GetZobristPst(squareTo + State.SideToMove.PawnPushDistance());
                 else if (move.IsCaptureMove())
-                    pawnKey ^= Zobrist.GetZobristPst(move.GetCapturedPiece(), squareTo);
+                    pawnKey ^= move.GetCapturedPiece().GetZobristPst(squareTo);
             }
             else
             {
-                key ^= Zobrist.GetZobristPst(move.GetMovingPiece(), move.GetFromSquare());
+                key ^= move.GetMovingPiece().GetZobristPst(move.GetFromSquare());
                 if (move.IsCaptureMove())
-                    key ^= Zobrist.GetZobristPst(move.GetCapturedPiece(), squareTo);
+                    key ^= move.GetCapturedPiece().GetZobristPst(squareTo);
                 else if (move.IsCastlelingMove())
                 {
                     var piece = EPieceType.Rook.MakePiece(Position.State.SideToMove);
-                    key ^= Zobrist.GetZobristPst(piece, Position.GetRookCastleFrom(squareTo));
-                    key ^= Zobrist.GetZobristPst(piece, squareTo.GetRookCastleTo());
+                    key ^= piece.GetZobristPst(Position.GetRookCastleFrom(squareTo));
+                    key ^= piece.GetZobristPst(squareTo.GetRookCastleTo());
                 }
             }
 
             // castling rights
             if (State.CastlelingRights != _stateList[PositionIndex - 1].CastlelingRights)
             {
-                key ^= Zobrist.GetZobristCastleling(_stateList[PositionIndex - 1].CastlelingRights);
-                key ^= Zobrist.GetZobristCastleling(State.CastlelingRights);
+                key ^= _stateList[PositionIndex - 1].CastlelingRights.GetZobristCastleling();
+                key ^= State.CastlelingRights.GetZobristCastleling();
             }
 
             State.Key = key ^ pawnKey;

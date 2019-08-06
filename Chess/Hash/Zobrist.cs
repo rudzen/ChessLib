@@ -26,13 +26,12 @@ SOFTWARE.
 
 // ReSharper disable NotAccessedField.Local
 
-namespace Rudz.Chess.Data
+namespace Rudz.Chess.Hash
 {
     using Enums;
     using System;
     using System.Runtime.CompilerServices;
     using Types;
-    using Util;
 
     /// <summary>
     /// Class responsible for keeping random values for use with Zobrist hashing.
@@ -82,7 +81,7 @@ namespace Rudz.Chess.Data
 
         static Zobrist()
         {
-            RKiss rnd = (ulong)DateTime.Now.Ticks;
+            IRKiss rnd = new RKiss((ulong) DateTime.Now.Ticks);
 
             for (var side = EPlayer.White; side < EPlayer.PlayerNb; ++side)
             {
@@ -105,15 +104,15 @@ namespace Rudz.Chess.Data
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ulong GetZobristPst(Piece piece, Square square) => ZobristPst[piece.AsInt(), square.AsInt()];
+        public static ulong GetZobristPst(this Piece piece, Square square) => ZobristPst[piece.AsInt(), square.AsInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ulong GetZobristCastleling(ECastlelingRights index) => ZobristCastling[index.AsInt()];
+        public static ulong GetZobristCastleling(this ECastlelingRights index) => ZobristCastling[index.AsInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ulong GetZobristSide() => ZobristSide;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ulong GetZobristEnPessant(int file) => ZobristEpFile[file];
+        public static ulong GetZobristEnPessant(this File file) => ZobristEpFile[file.AsInt()];
     }
 }

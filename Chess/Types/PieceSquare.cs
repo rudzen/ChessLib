@@ -24,10 +24,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Data
+namespace Rudz.Chess.Types
 {
     using System;
-    using Types;
 
     /// <summary>
     /// Model for data transfer of piece and square

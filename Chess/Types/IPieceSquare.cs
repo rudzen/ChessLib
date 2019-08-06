@@ -24,26 +24,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Enums
+namespace Rudz.Chess.Types
 {
-    using System;
-
-    [Flags]
-    public enum EPieces : byte
+    public interface IPieceSquare
     {
-        NoPiece = 0,
-        WhitePawn = 1,
-        WhiteKnight = 2,
-        WhiteBishop = 3,
-        WhiteRook = 4,
-        WhiteQueen = 5,
-        WhiteKing = 6,
-        BlackPawn = 9,
-        BlackKnight = 10,
-        BlackBishop = 11,
-        BlackRook = 12,
-        BlackQueen = 13,
-        BlackKing = 14,
-        PieceNb = 15
+        Piece Piece { get; set; }
+
+        Square Square { get; set; }
     }
 }
