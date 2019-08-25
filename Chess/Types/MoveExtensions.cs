@@ -335,7 +335,7 @@ namespace Rudz.Chess.Types
             var pt = move.GetMovingPieceType();
 
             return pt == EPieceType.Pawn || pt == EPieceType.King
-                ? BitBoards.ZeroBb
+                ? BitBoards.EmptyBitBoard
                 : move.GetToSquare().GetAttacks(pt, position.Pieces()) ^ move.GetFromSquare();
         }
 

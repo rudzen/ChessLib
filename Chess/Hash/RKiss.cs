@@ -29,6 +29,8 @@
 
 namespace Rudz.Chess.Hash
 {
+    using System.Collections.Generic;
+    using System.Linq;
     using System.Runtime.CompilerServices;
 
     public sealed class RKiss : IRKiss
@@ -43,6 +45,10 @@ namespace Rudz.Chess.Hash
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator RKiss(ulong seed) => new RKiss(seed);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public IEnumerable<ulong> Get(int count)
+            => Enumerable.Repeat(Rand64(), count);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ulong Rand() => Rand64();

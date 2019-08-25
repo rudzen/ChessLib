@@ -29,8 +29,12 @@
 
 namespace Rudz.Chess.Hash
 {
+    using System.Collections.Generic;
+
     public interface IRKiss
     {
+        IEnumerable<ulong> Get(int count);
+
         ulong Rand();
 
         /// Special generator used to fast init magic numbers.

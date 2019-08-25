@@ -45,8 +45,6 @@ namespace Rudz.Chess.Types
 
         public const int Zero = 0x0;
 
-        public const ulong ZeroBb = 0x0u;
-
         public const ulong WhiteArea = 0x00000000FFFFFFFF;
 
         public const ulong BlackArea = ~WhiteArea;
@@ -87,7 +85,7 @@ namespace Rudz.Chess.Types
 
         private const ulong LightSquares = 0x55AA55AA55AA55AA;
 
-        public static readonly BitBoard EmptyBitBoard = new BitBoard(ZeroBb);
+        public static readonly BitBoard EmptyBitBoard = new BitBoard(0UL);
 
         public static readonly BitBoard AllSquares = ~EmptyBitBoard;
 
@@ -188,6 +186,11 @@ namespace Rudz.Chess.Types
 
         static BitBoards()
         {
+            CornerA1 = MakeBitboard(ESquare.a1, ESquare.b1, ESquare.a2, ESquare.b2);
+            CornerA8 = MakeBitboard(ESquare.a8, ESquare.b8, ESquare.a7, ESquare.b7);
+            CornerH1 = MakeBitboard(ESquare.h1, ESquare.g1, ESquare.h2, ESquare.g2);
+            CornerH8 = MakeBitboard(ESquare.h8, ESquare.g8, ESquare.h7, ESquare.g7);
+
             // local helper functions to calculate distance
             int distance(int x, int y) { return Math.Abs(x - y); }
             int distanceFile(Square x, Square y) { return distance(x.File().AsInt(), y.File().AsInt()); }
@@ -296,11 +299,6 @@ namespace Rudz.Chess.Types
                     Debug.Assert(!KingRingBB[c, sq].Empty());
                 }
             }
-
-            CornerA1 = MakeBitboard(ESquare.a1, ESquare.b1, ESquare.a2, ESquare.b2);
-            CornerA8 = MakeBitboard(ESquare.a8, ESquare.b8, ESquare.a7, ESquare.b7);
-            CornerH1 = MakeBitboard(ESquare.h1, ESquare.g1, ESquare.h2, ESquare.g2);
-            CornerH8 = MakeBitboard(ESquare.h8, ESquare.g8, ESquare.h7, ESquare.g7);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -321,16 +319,17 @@ namespace Rudz.Chess.Types
 
         public static BitBoard XrayAttacks(this Square square, EPieceType pieceType, BitBoard occupied, BitBoard blockers)
         {
-            if (pieceType == EPieceType.Bishop)
-                return square.XrayBishopAttacks(occupied, blockers);
-
-            if (pieceType == EPieceType.Rook)
-                return square.XrayRookAttacks(occupied, blockers);
-
-            if (pieceType == EPieceType.Queen)
-                return XrayBishopAttacks(square, occupied, blockers) | XrayRookAttacks(square, occupied, blockers);
-
-            return ZeroBb;
+            switch (pieceType)
+            {
+                case EPieceType.Bishop:
+                    return square.XrayBishopAttacks(occupied, blockers);
+                case EPieceType.Rook:
+                    return square.XrayRookAttacks(occupied, blockers);
+                case EPieceType.Queen:
+                    return XrayBishopAttacks(square, occupied, blockers) | XrayRookAttacks(square, occupied, blockers);
+                default:
+                    return EmptyBitBoard;
+            }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -358,7 +357,7 @@ namespace Rudz.Chess.Types
                     return square.QueenAttacks(occupied);
 
                 default:
-                    return ZeroBb;
+                    return EmptyBitBoard;
             }
         }
 
@@ -627,7 +626,7 @@ namespace Rudz.Chess.Types
         /// <param name="squares">The squares to generate bitboard from</param>
         /// <returns>The generated bitboard</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static BitBoard MakeBitboard(params Square[] squares) => squares.Aggregate<Square, BitBoard>(ZeroBb, (current, t) => current | t);
+        public static BitBoard MakeBitboard(params Square[] squares) => squares.Aggregate(EmptyBitBoard, (current, t) => current | t);
 
         /// <summary>
         /// Helper method to generate shift function dictionary for all directions.

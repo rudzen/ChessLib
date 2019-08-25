@@ -35,6 +35,9 @@ namespace Rudz.Chess.Transposition
         /// </summary>
         ulong Hits { get; }
 
+
+        int Size { get; }
+
         /// <summary>
         /// Increases the generation of the table by one
         /// </summary>
@@ -45,7 +48,7 @@ namespace Rudz.Chess.Transposition
         /// </summary>
         /// <param name="mbSize">The size to set it to</param>
         /// <returns>The number of clusters in the table</returns>
-        ulong Size(int mbSize);
+        ulong SetSize(int mbSize);
 
         /// <summary>
         /// Finds a cluster in the table based on a position key
