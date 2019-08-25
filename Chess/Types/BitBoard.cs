@@ -30,6 +30,7 @@ namespace Rudz.Chess.Types
     using System;
     using System.Collections;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Runtime.CompilerServices;
 
     /*
@@ -106,7 +107,7 @@ namespace Rudz.Chess.Types
         public static BitBoard operator >>(BitBoard left, int right) => left.Value >> right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ulong operator <<(BitBoard left, int right) => left.Value << right;
+        public static BitBoard operator <<(BitBoard left, int right) => left.Value << right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static BitBoard operator |(BitBoard left, Square right) => left.Value | right.BitBoardSquare();
@@ -189,37 +190,31 @@ namespace Rudz.Chess.Types
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public BitBoard OrAll(params BitBoard[] bbs)
-        {
-            var val = Value;
-            foreach (var b in bbs)
-                val |= b.Value;
-
-            return val;
-        }
+            => bbs.Aggregate(Value, (current, b) => current | b.Value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public BitBoard OrAll(IEnumerable<BitBoard> bbs)
-        {
-            var val = Value;
-            foreach (var bb in bbs)
-                val |= bb.Value;
-            return val;
-        }
+            => bbs.Aggregate(Value, (current, bb) => current | bb.Value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public BitBoard OrAll(IEnumerable<Square> sqs)
         {
             var b = this;
-            foreach (var sq in sqs)
-                b |= sq;
-            return b;
+            return sqs.Aggregate(b, (current, sq) => current | sq);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public IEnumerator<Square> GetEnumerator()
         {
-            for (BitBoard bb = Value; bb; bb--)
-                yield return bb.First();
+            if (Empty())
+                yield break;
+
+            BitBoard bb = Value;
+            while (bb)
+            {
+                yield return bb.Lsb();
+                BitBoards.ResetLsb(ref bb);
+            }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
