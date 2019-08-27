@@ -24,12 +24,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-// ReSharper disable NotAccessedField.Local
-
 namespace Rudz.Chess.Hash
 {
     using Enums;
-    using System;
     using System.Runtime.CompilerServices;
     using Types;
 
@@ -54,6 +51,11 @@ namespace Rudz.Chess.Hash
     /// </summary>
     public static class Zobrist
     {
+        /// <summary>
+        /// The default value for random seed for improved consistency
+        /// </summary>
+        private const ulong DefaultRandomSeed = 1070372;
+
         /// <summary>
         /// Represents the piece index (as in EPieces), with each a square of the board value to match.
         /// </summary>
@@ -81,7 +83,7 @@ namespace Rudz.Chess.Hash
 
         static Zobrist()
         {
-            IRKiss rnd = new RKiss((ulong) DateTime.Now.Ticks);
+            IRKiss rnd = new RKiss(DefaultRandomSeed);
 
             for (var side = EPlayer.White; side < EPlayer.PlayerNb; ++side)
             {
