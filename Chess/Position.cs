@@ -507,17 +507,7 @@ namespace Rudz.Chess
             c = ~c;
 
             castleSpan = ksq.BitboardBetween(square) | square;
-
-            while (castleSpan)
-            {
-                square = castleSpan.Lsb();
-                if (IsAttacked(square, c))
-                    return true;
-
-                BitBoards.ResetLsb(ref castleSpan);
-            }
-
-            return false;
+            return !castleSpan.Any(x => IsAttacked(x, c));
         }
 
         /// <summary>

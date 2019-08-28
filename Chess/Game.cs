@@ -42,7 +42,7 @@ namespace Rudz.Chess
     using Piece = Types.Piece;
     using Square = Types.Square;
 
-    public sealed class Game : IGame
+    public sealed class Game : IEnumerable<Piece>
     {
         private const int MaxPositions = 2048;
 
@@ -75,12 +75,12 @@ namespace Rudz.Chess
                 _stateList[i] = new State();
 
             PositionIndex = 0;
-            Position.State = _stateList[PositionIndex];
+            State = Position.State = _stateList[PositionIndex];
             _chess960 = false;
             _xfen = false;
         }
 
-        public State State => Position.State;
+        public State State { get; set; }
 
         public int PositionIndex { get; private set; }
 
@@ -94,9 +94,7 @@ namespace Rudz.Chess
 
         public EGameEndType GameEndType { get; set; }
 
-        public int Threads { get; set; }
-
-        public static TranspositionTable Table { get; set; } = new TranspositionTable(256);
+        public static ITranspositionTable Table { get; set; } = new TranspositionTable(32);
 
         /// <summary>
         /// Makes a chess move in the data structure
@@ -110,7 +108,7 @@ namespace Rudz.Chess
 
             // advances the position
             var previous = _stateList[PositionIndex++];
-            Position.State = _stateList[PositionIndex];
+            State = Position.State = _stateList[PositionIndex];
             State.SideToMove = ~previous.SideToMove;
             State.Material = previous.Material;
             State.HalfMoveCount = PositionIndex;
@@ -147,7 +145,7 @@ namespace Rudz.Chess
             // careful.. NO check for invalid PositionIndex.. make sure it's always counted correctly
             Position.TakeMove(State.LastMove);
             --PositionIndex;
-            Position.State = _stateList[PositionIndex];
+            State = Position.State = _stateList[PositionIndex];
             State.HalfMoveCount = PositionIndex;
         }
 
@@ -179,16 +177,11 @@ namespace Rudz.Chess
             if (validate)
                 Fen.Fen.Validate(fenString);
 
-            var bb = Occupied;
-            while (bb)
-            {
-                var sq = bb.Lsb();
-                Position.RemovePiece(sq, Position.BoardLayout[sq.AsInt()]);
-                BitBoards.ResetLsb(ref bb);
-            }
+            foreach (var square in Occupied)
+                Position.RemovePiece(square, Position.BoardLayout[square.AsInt()]);
 
-            for (var i = 0; i <= PositionIndex; i++)
-                _stateList[i].Clear();
+            //for (var i = 0; i <= PositionIndex; i++)
+            //    _stateList[i].Clear();
 
             Position.Clear();
 
@@ -277,7 +270,7 @@ namespace Rudz.Chess
 
             first.ToIntegral(out number);
 
-            Position.State = _stateList[PositionIndex];
+            State = Position.State = _stateList[PositionIndex];
 
             State.ReversibleHalfMoveCount = number;
 
@@ -351,11 +344,11 @@ namespace Rudz.Chess
 
         public override string ToString()
         {
-            const string separator = "\n  +---+---+---+---+---+---+---+---+\n";
+            const string seperator = "\n  +---+---+---+---+---+---+---+---+\n";
             const char splitter = '|';
             const char space = ' ';
             _output.Clear();
-            _output.Append(separator);
+            _output.Append(seperator);
             for (var rank = ERank.Rank8; rank >= ERank.Rank1; rank--)
             {
                 _output.Append((int)rank + 1);
@@ -367,7 +360,7 @@ namespace Rudz.Chess
                 }
 
                 _output.Append(splitter);
-                _output.Append(separator);
+                _output.Append(seperator);
             }
 
             _output.AppendLine("    a   b   c   d   e   f   g   h");
@@ -387,14 +380,14 @@ namespace Rudz.Chess
 
         public ulong Perft(int depth)
         {
-            var moveList = Position.GenerateMoves(Emgf.Legalmoves);
+            var moveList = new MoveGenerator(Position).Moves;
 
             if (depth == 1)
                 return (ulong)moveList.Count;
 
             var (found, entry) = Table.Probe(Position.State.Key);
 
-            if (found && entry.Key32 == (uint) (Position.State.Key >> 32) && entry.Depth == depth)
+            if (found && entry.Key32 == (uint)(Position.State.Key >> 32) && entry.Depth == depth)
                 return (ulong)entry.Value;
 
             var tot = 0ul;
@@ -403,21 +396,11 @@ namespace Rudz.Chess
 
             for (var i = 0; i < moveList.Count; ++i)
             {
-                move = moveList[i];
+                move = moveList.GetMove(i);
                 MakeMove(move);
-                var result = Perft(depth - 1);
-                tot += result;
+                tot += Perft(depth - 1);
                 TakeMove();
             }
-
-            //foreach (var m in moveList)
-            //{
-            //    move = m;
-            //    MakeMove(move);
-            //    var result = Perft(depth - 1);
-            //    tot += result;
-            //    TakeMove();
-            //}
 
             if (move != MoveExtensions.EmptyMove)
                 Table.Store(Position.State.Key, (int)tot, Bound.Exact, (sbyte)depth, move, 0);
