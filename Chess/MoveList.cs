@@ -26,10 +26,10 @@ SOFTWARE.
 
 namespace Rudz.Chess
 {
-    using Enums;
     using Extensions;
     using System.Collections;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Runtime.CompilerServices;
     using Types;
 
@@ -37,13 +37,23 @@ namespace Rudz.Chess
     {
         private const int MaxPossibleMoves = 218;
 
-        private Move[] _moves;
+        private readonly Move[] _moves;
 
         private int _moveIndex;
 
-        public int Count => _moveIndex + 1;
+        public MoveList(Move[] moves)
+        {
+            _moveIndex = -1;
+            _moves = moves;
+        }
 
-        public Emgf Flags { get; }
+        public MoveList()
+        {
+            _moveIndex = -1;
+            _moves = new Move[MaxPossibleMoves];
+        }
+
+        public int Count => _moveIndex + 1;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static MoveList operator +(MoveList left, Move right)
@@ -52,10 +62,12 @@ namespace Rudz.Chess
             return left;
         }
 
-        public void Initialize()
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static MoveList operator +(MoveList left, MoveList right)
         {
-            _moveIndex = -1;
-            _moves = new Move[MaxPossibleMoves];
+            foreach (var m in right)
+                left.Add(m);
+            return left;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -76,12 +88,8 @@ namespace Rudz.Chess
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Move GetMove(Square from, Square to)
         {
-            if (_moves[0] == MoveExtensions.EmptyMove)
-                return MoveExtensions.EmptyMove;
-
-            for (var i = 0; i < _moveIndex; ++i)
+            foreach (var move in _moves)
             {
-                var move = _moves[i];
                 if (move == MoveExtensions.EmptyMove)
                     return MoveExtensions.EmptyMove;
                 if (move.GetFromSquare() == from & move.GetToSquare() == to)
@@ -93,21 +101,11 @@ namespace Rudz.Chess
 
         public Move this[int index] => GetMove(index);
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public IEnumerator<Move> GetEnumerator()
-        {
-            if (_moves[0] == MoveExtensions.EmptyMove)
-                yield break;
+            => _moves.TakeWhile(m => m != MoveExtensions.EmptyMove).GetEnumerator();
 
-            for (var i = 0; i < _moveIndex; ++i)
-            {
-                var move = _moves[i];
-                if (move == MoveExtensions.EmptyMove)
-                    yield break;
-                yield return move;
-            }
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-            => GetEnumerator();
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }

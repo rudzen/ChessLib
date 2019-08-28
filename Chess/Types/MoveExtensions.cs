@@ -295,17 +295,18 @@ namespace Rudz.Chess.Types
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static char GetCheckChar(this IPosition pos) => new MoveGenerator(pos).Moves.Any() ? '+' : '#';
+        private static char GetCheckChar(this IPosition pos)
+        {
+            return new MoveGenerator(pos).Moves.Any() ? '+' : '#';
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static EMoveAmbiguity Ambiguity(this Move move, BitBoard similarTypeAttacks, IPosition position)
         {
             var ambiguity = EMoveAmbiguity.None;
 
-            var bb = similarTypeAttacks;
-            while (bb)
+            foreach (var square in similarTypeAttacks)
             {
-                var square = bb.Lsb();
                 var pinned = position.GetPinnedPieces(square, move.GetMovingSide());
 
                 if (similarTypeAttacks & pinned)
@@ -323,8 +324,6 @@ namespace Rudz.Chess.Types
 
                     ambiguity |= EMoveAmbiguity.Move;
                 }
-
-                BitBoards.ResetLsb(ref bb);
             }
 
             return ambiguity;

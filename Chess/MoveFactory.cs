@@ -39,7 +39,7 @@ namespace Rudz.Chess
                 : BitBoards.EmptyBitBoard;
 
             var moves = new MoveList();
-            moves.Initialize();
+            //moves.Initialize();
 
             moves = pos.GenerateCapturesAndPromotions(moves, flags);
             moves = pos.GenerateQuietMoves(moves, flags);
