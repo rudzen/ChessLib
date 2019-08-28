@@ -85,16 +85,8 @@ namespace Rudz.Chess.Transposition
             var size = (int)(((ulong)mbSize << 20) / (ulong)ClusterSize);
             _mbSize = mbSize;
 
-            if (_table == null)
-            {
-                _table = new ITTCluster[size];
-                _elements = (ulong)size;
-            }
-            else if (_table.Length != size)
-            {
-                Array.Resize(ref _table, size);
-                _elements = (ulong)size;
-            }
+            Array.Resize(ref _table, size);
+            _elements = (ulong)size;
 
             _generation = 1;
             Clear();

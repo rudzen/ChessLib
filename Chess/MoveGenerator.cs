@@ -149,12 +149,21 @@ namespace Rudz.Chess
         private void AddMoves(Piece piece, Square from, BitBoard attacks)
         {
             var target = _position.Pieces(~_position.State.SideToMove) & attacks;
-            foreach (var to in target)
+            while (target)
+            {
+                var to = target.Lsb();
                 AddMove(piece, from, to, EPieces.NoPiece, EMoveType.Capture);
+                BitBoards.ResetLsb(ref target);
+            }
 
             target = ~_position.Pieces() & attacks;
-            foreach (var to in target)
+
+            while (target)
+            {
+                var to = target.Lsb();
                 AddMove(piece, from, to, PieceExtensions.EmptyPiece);
+                BitBoards.ResetLsb(ref target);
+            }
         }
 
         /// <summary>
@@ -173,8 +182,13 @@ namespace Rudz.Chess
             {
                 var pc = pt.MakePiece(c);
                 var pieces = _position.Pieces(pc);
-                foreach (var from in pieces)
+
+                while (pieces)
+                {
+                    var from = pieces.Lsb();
                     AddMoves(pc, from, from.GetAttacks(pt, occupied) & targetSquares);
+                    BitBoards.ResetLsb(ref pieces);
+                }
             }
         }
 
@@ -190,22 +204,27 @@ namespace Rudz.Chess
             var promotionSquares = targetSquares & promotionRank;
             var nonPromotionSquares = targetSquares & ~promotionRank;
 
-            foreach (var sqTo in nonPromotionSquares)
+            while (nonPromotionSquares)
             {
+                var sqTo = nonPromotionSquares.Lsb();
                 var sqFrom = sqTo - direction;
                 AddMove(piece, sqFrom, sqTo, PieceExtensions.EmptyPiece, type);
+                BitBoards.ResetLsb(ref nonPromotionSquares);
             }
 
             type |= EMoveType.Promotion;
 
-            foreach (var sqTo in promotionSquares)
+            while (promotionSquares)
             {
+                var sqTo = promotionSquares.Lsb();
                 var sqFrom = sqTo - direction;
                 if (Flags.HasFlagFast(Emgf.Queenpromotion))
                     AddMove(piece, sqFrom, sqTo, EPieceType.Queen.MakePiece(stm), type);
                 else
                     for (var promotedPiece = EPieceType.Queen; promotedPiece >= EPieceType.Knight; promotedPiece--)
                         AddMove(piece, sqFrom, sqTo, promotedPiece.MakePiece(stm), type);
+
+                BitBoards.ResetLsb(ref promotionSquares);
             }
         }
 
