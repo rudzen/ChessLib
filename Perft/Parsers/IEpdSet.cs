@@ -24,15 +24,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Perft
+namespace Perft.Parsers
 {
+    using System;
     using System.Collections.Generic;
 
-    public static class PerftPositionFactory
+    public interface IEpdSet : IEqualityComparer<IEpdSet>, IComparable<IEpdSet>
     {
-        public static IPerftPosition Create(string fen, List<ulong> values)
-        {
-            return new PerftPosition(fen, values);
-        }
+        string Id { get; set; }
+        string Epd { get; set; }
+        List<(int, ulong)> Perft { get; set; }
     }
 }

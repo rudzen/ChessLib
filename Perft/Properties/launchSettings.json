@@ -2,7 +2,7 @@
   "profiles": {
     "Perft": {
       "commandName": "Project",
-      "commandLineArgs": "6"
+      "commandLineArgs": "epd -f D:\\perft-random.epd"
     }
   }
 }

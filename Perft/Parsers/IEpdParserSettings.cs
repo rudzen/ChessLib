@@ -24,19 +24,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Perft
+namespace Perft.Parsers
 {
-    using System.Collections.Generic;
-
-    public sealed class PerftPosition : IPerftPosition
+    public interface IEpdParserSettings
     {
-        public PerftPosition(string fen, List<ulong> value)
-        {
-            Fen = fen;
-            Value = value;
-        }
-
-        public string Fen { get; }
-        public List<ulong> Value { get; set; }
+        string Filename { get; set; }
     }
 }

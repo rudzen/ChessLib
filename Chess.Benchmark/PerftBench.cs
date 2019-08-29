@@ -24,10 +24,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using Chess.Perft;
+
 namespace BenchmarkCore
 {
     using BenchmarkDotNet.Attributes;
-    using Rudz.Chess.Perft;
 
     //[ClrJob(true), CoreJob]
     //[RPlotExporter, RankColumn]
@@ -41,11 +42,11 @@ namespace BenchmarkCore
         [GlobalSetup]
         public void Setup()
         {
-            _perft = new Perft(N);
+            _perft = new Perft();
             _perft.AddStartPosition();
         }
 
         [Benchmark]
-        public ulong Result() => _perft.DoPerft();
+        public ulong Result() => _perft.DoPerft(N);
     }
 }

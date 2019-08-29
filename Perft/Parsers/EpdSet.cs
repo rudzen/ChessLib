@@ -24,13 +24,36 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Perft
+namespace Perft.Parsers
 {
+    using System;
     using System.Collections.Generic;
 
-    public interface IPerftPosition
+    public sealed class EpdSet : IEpdSet
     {
-        string Fen { get; }
-        List<ulong> Value { get; set; }
+        public string Id { get; set; }
+
+        public string Epd { get; set; }
+
+        public List<(int, ulong)> Perft { get; set; }
+
+        public bool Equals(IEpdSet x, IEpdSet y)
+        {
+            var idComparison = string.Equals(x.Id, y.Id, StringComparison.Ordinal);
+            return idComparison && string.Equals(x.Epd, x.Epd, StringComparison.Ordinal);
+        }
+
+        public int GetHashCode(IEpdSet obj)
+            => Id.GetHashCode(StringComparison.Ordinal) & Epd.GetHashCode(StringComparison.Ordinal);
+
+        public int CompareTo(IEpdSet other)
+        {
+            if (ReferenceEquals(this, other)) return 0;
+            if (ReferenceEquals(null, other)) return 1;
+            var idComparison = string.Compare(Id, other.Id, StringComparison.Ordinal);
+            return idComparison != 0
+                ? idComparison
+                : string.Compare(Epd, other.Epd, StringComparison.Ordinal);
+        }
     }
 }

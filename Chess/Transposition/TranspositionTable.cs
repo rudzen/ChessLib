@@ -27,29 +27,24 @@ SOFTWARE.
 namespace Rudz.Chess.Transposition
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Runtime.CompilerServices;
     using Types;
 
-    /// <summary>
-    /// Quick storage of worthy positional data while performing search.
-    /// The size is defined in mb.
-    /// </summary>
     public sealed class TranspositionTable : ITranspositionTable
     {
         private static readonly int ClusterSize;
 
-        private ITTCluster[] _table;
+        private List<ITTCluster> _table;
         private ulong _elements;
         private int _fullnessElements;
         private sbyte _generation;
-        private int _mbSize;
 
         static TranspositionTable()
         {
             unsafe
             {
-                // get the size of an entry and multiply by 4 since the cluster contains four of them
                 ClusterSize = sizeof(TranspositionTableEntry) * 4;
             }
         }
@@ -64,10 +59,7 @@ namespace Rudz.Chess.Transposition
         /// </summary>
         public ulong Hits { get; private set; }
 
-        /// <summary>
-        /// Get the current table size in mb
-        /// </summary>
-        public int Size => _mbSize;
+        public int Size { get; private set; }
 
         /// <summary>
         /// Increases the generation of the table by one
@@ -79,25 +71,26 @@ namespace Rudz.Chess.Transposition
         /// Sets the size of the table in Mb
         /// </summary>
         /// <param name="mbSize">The size to set it to</param>
-        /// <returns>The number of entries in the table</returns>
+        /// <returns>The number of clusters in the table</returns>
         public ulong SetSize(int mbSize)
         {
+            Size = mbSize;
             var size = (int)(((ulong)mbSize << 20) / (ulong)ClusterSize);
-            _mbSize = mbSize;
-
             if (_table == null)
             {
-                _table = new ITTCluster[size];
+                _table = new List<ITTCluster>(size);
                 _elements = (ulong)size;
             }
-            else if (_table.Length != size)
+            else if (_table.Count != size)
             {
-                Array.Resize(ref _table, size);
                 _elements = (ulong)size;
+                _table.Clear();
+                _table.Capacity = size;
+                _table.TrimExcess();
             }
 
             _generation = 1;
-            Clear();
+            PopulateTable();
             _fullnessElements = Math.Min(size, 250);
 
             return (ulong)(size * ClusterSize);
@@ -136,11 +129,11 @@ namespace Rudz.Chess.Transposition
             var set = false;
             for (var i = 0; i < ttc.Cluster.Length; ++i)
             {
-                if (ttc[i].Key32 != 0 && ttc[i].Key32 != keyH)
+                if (ttc.Cluster[i].Key32 != 0 && ttc.Cluster[i].Key32 != keyH)
                     continue;
 
                 ttc.Cluster[i].Generation = g;
-                e = ttc[i];
+                e = ttc.Cluster[i];
                 set = true;
                 break;
             }
@@ -174,9 +167,7 @@ namespace Rudz.Chess.Transposition
         public void Store(ulong key, int value, Bound type, sbyte depth, Move move, int statValue)
         {
             // Use the high 32 bits as key inside the cluster
-            var key32 = (uint)key >> 32;
-
-            var e = new TranspositionTableEntry(key32, move, depth, _generation, value, statValue, type);
+            var e = new TranspositionTableEntry((uint)(key >> 32), move, depth, _generation, value, statValue, type);
 
             var ttc = FindCluster(key);
 
@@ -243,8 +234,27 @@ namespace Rudz.Chess.Transposition
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Clear()
         {
-            for (var i = 0; i < _table.Length; ++i)
+            for (var i = 0; i < _table.Count; ++i)
+            {
                 _table[i] = new TTCluster();
+                for (var j = 0; j < _table[0].Cluster.Length; ++j)
+                    _table[i].Cluster[j].Defaults();
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void PopulateTable()
+        {
+            for (var i = 0ul; i < _elements; ++i)
+            {
+                var ttc = new TTCluster();
+                for (var j = 0; j < ttc.Cluster.Length; j++)
+                {
+                    ttc.Cluster[j] = new TranspositionTableEntry();
+                    ttc.Cluster[j].Defaults();
+                }
+                _table.Add(ttc);
+            }
         }
     }
 }
