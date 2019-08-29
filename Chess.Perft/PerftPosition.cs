@@ -24,18 +24,24 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Perft
+namespace Chess.Perft
 {
-    public interface IPerft
+    using System.Collections.Generic;
+
+    public sealed class PerftPosition : IPerftPosition
     {
-        ulong DoPerft();
+        public PerftPosition(string fen, List<(int, ulong)> value)
+        {
+            Fen = fen;
+            Value = value;
+        }
 
-        void ClearPositions();
+        public PerftPosition(string fen)
+        {
+            Fen = fen;
+        }
 
-        void AddPosition(IPerftPosition pp);
-
-        void AddStartPosition();
-
-        ulong GetPositionCount(int index, int depth);
+        public string Fen { get; }
+        public List<(int, ulong)> Value { get; set; }
     }
 }

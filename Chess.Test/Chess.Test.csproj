@@ -26,6 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Chess.Perft\Chess.Perft.csproj" />
     <ProjectReference Include="..\Chess\Chess.csproj" />
   </ItemGroup>
 

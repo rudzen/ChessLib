@@ -24,26 +24,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Perft
+namespace Chess.Perft
 {
-    using System;
-    using System.IO;
-    using System.Reflection;
+    using System.Collections.Generic;
+    using System.Runtime.CompilerServices;
 
-    public static class BuildTimeStamp
+    public static class PerftPositionFactory
     {
-        private static readonly Lazy<string> _buildTimeStamp = new Lazy<string>(GetTimestamp);
-
-        public static string TimeStamp => _buildTimeStamp.Value;
-
-        private static string GetTimestamp()
-        {
-            var assembly = Assembly.GetEntryAssembly();
-
-            var stream = assembly.GetManifestResourceStream("Perft.BuildTimeStamp.txt");
-
-            using (var reader = new StreamReader(stream))
-                return reader.ReadToEnd().TrimEnd('\r', '\n').TrimEnd();
-        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static IPerftPosition Create(string fen, List<(int, ulong)> values)
+            => new PerftPosition(fen, values);
     }
 }

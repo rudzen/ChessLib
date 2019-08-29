@@ -24,28 +24,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace BenchmarkCore
+using System.Collections.Generic;
+
+namespace Chess.Perft
 {
-    using BenchmarkDotNet.Attributes;
-    using Rudz.Chess.Perft;
-
-    //[ClrJob(true), CoreJob]
-    //[RPlotExporter, RankColumn]
-    public class PerftBench
+    public interface IPerftPosition
     {
-        private Perft _perft;
-
-        [Params(4, 5, 6)]
-        public int N;
-
-        [GlobalSetup]
-        public void Setup()
-        {
-            _perft = new Perft(N);
-            _perft.AddStartPosition();
-        }
-
-        [Benchmark]
-        public ulong Result() => _perft.DoPerft();
+        string Fen { get; }
+        List<(int, ulong)> Value { get; set; }
     }
 }

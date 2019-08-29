@@ -3,9 +3,8 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.2</TargetFramework>
-    <LangVersion>7.3</LangVersion>
     <Platforms>AnyCPU;x64</Platforms>
-    <Today>$([System.DateTime]::Now.ToString("s"))</Today>
+    <LangVersion>7.3</LangVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -13,19 +12,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="BuildTimeStamp.txt" />
+    <PackageReference Include="BenchmarkDotNet" Version="0.11.3" />
+    <PackageReference Include="System.Runtime" Version="4.3.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="BuildTimeStamp.txt" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <ProjectReference Include="..\Chess.Perft\Chess.Perft.csproj" />
     <ProjectReference Include="..\Chess\Chess.csproj" />
   </ItemGroup>
-
-  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="echo $(today) &gt; &quot;$(ProjectDir)BuildTimeStamp.txt&quot;" />
-  </Target>
 
 </Project>

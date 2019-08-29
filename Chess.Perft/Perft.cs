@@ -24,12 +24,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Perft
+namespace Chess.Perft
 {
+    using Interfaces;
+    using Rudz.Chess;
+    using Rudz.Chess.Factories;
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Runtime.CompilerServices;
+    using System.Threading.Tasks;
 
     /*
     // (first version)
@@ -52,76 +56,100 @@ namespace Rudz.Chess.Perft
 
     public sealed class Perft : IPerft
     {
+        private readonly Action<string> _boardPrintCallback;
+
+        public Perft(Action<string> boardPrintCallback, IEnumerable<IPerftPosition> positions = null)
+        {
+            Positions = positions == null ? new List<IPerftPosition>() : positions.ToList();
+            _boardPrintCallback = boardPrintCallback;
+            CurrentGame = GameFactory.Create();
+        }
+
+        public Perft(Action<string> boardPrintCallback = null) : this(boardPrintCallback, null)
+        { }
+
         /// <summary>
         /// The positional data for the run
         /// </summary>
-        private readonly List<IPerftPosition> _positions;
+        public List<IPerftPosition> Positions { get; set; }
 
-        /// <summary>
-        /// How deep the test should proceed.
-        /// </summary>
-        private readonly int _perftLimit;
-
-        private readonly Action<string, ulong> _callback;
-
-        public Perft(int depth, Action<string, ulong> callback, IEnumerable<IPerftPosition> positions = null)
-        {
-            _positions = positions == null ? new List<IPerftPosition>() : positions.ToList();
-            _perftLimit = depth;
-            _callback = callback;
-        }
-
-        public Perft(int depth, Action<string, ulong> callback = null) : this(depth, callback, null)
-        { }
+        public IGame CurrentGame { get; set; }
+        public int Depth { get; set; }
+        public ulong Expected { get; set; }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ulong DoPerft()
+        public ulong DoPerft(int depth)
         {
             var total = 0ul;
 
-            if (_positions.Count == 0)
+            if (Positions.Count == 0)
             {
-                _callback?.Invoke("Unable to run without any perft positions (did you forget to call AddStartPosition()?", total);
+                //_boardPrintCallback?.Invoke("Unable to run without any perft positions (did you forget to call AddStartPosition()?", total);
                 return total;
             }
 
-            var game = new Game();
-            foreach (var position in _positions)
+            foreach (var position in Positions)
             {
-                game.SetFen(position.Fen);
-                var res = game.Perft(_perftLimit);
+                CurrentGame.SetFen(position.Fen);
+                var res = CurrentGame.Perft(depth);
                 total += res;
-                _callback?.Invoke(position.Fen, res);
+                //_boardPrintCallback?.Invoke(position.Fen, res);
             }
 
             return total;
         }
 
+        public Task<ulong> DoPerftAsync(int depth)
+            => Task.Run(()
+                => CurrentGame.Perft(depth));
+
+        public string GetBoard()
+            => CurrentGame.ToString();
+
+        public void SetGamePosition(IPerftPosition pp)
+            => CurrentGame.SetFen(pp.Fen);
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void ClearPositions() => _positions.Clear();
+        public void ClearPositions() => Positions.Clear();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void AddPosition(IPerftPosition pp)
         {
-            _positions.Add(pp);
+            Positions.Add(pp);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void AddStartPosition()
         {
-            var vals = new List<ulong>(6)
+            var vals = new List<(int, ulong)>(6)
             {
-                20,
-                400,
-                8902,
-                197281,
-                4865609,
-                119060324
+                (1, 20),
+                (2, 400),
+                (3, 8902),
+                (4, 197281),
+                (5, 4865609),
+                (6, 119060324)
             };
-            _positions.Add(new PerftPosition(Fen.Fen.StartPositionFen, vals));
+
+            Positions.Add(new PerftPosition(Rudz.Chess.Fen.Fen.StartPositionFen, vals));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ulong GetPositionCount(int index, int depth) => _positions[index].Value[depth - 1];
+        public bool HasPositionCount(int index, int depth)
+        {
+            if (Positions[index].Value == null)
+                return false;
+
+            if (!Positions[index].Value.Any())
+                return false;
+
+            var depthValue = Positions[index].Value.FirstOrDefault(v => v.Item1 == depth && v.Item2 > 0);
+
+            return !depthValue.Equals(default);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ulong GetPositionCount(int index, int depth)
+            => Positions[index].Value[depth - 1].Item2;
     }
 }

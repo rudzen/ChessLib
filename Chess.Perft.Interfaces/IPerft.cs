@@ -24,13 +24,33 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Perft
+namespace Chess.Perft.Interfaces
 {
     using System.Collections.Generic;
+    using System.Threading.Tasks;
 
-    public interface IPerftPosition
+    public interface IPerft
     {
-        string Fen { get; }
-        List<ulong> Value { get; set; }
+        List<IPerftPosition> Positions { get; set; }
+
+        int Depth { get; set; }
+
+        ulong Expected { get; set; }
+
+        ulong DoPerft(int depth);
+
+        Task<ulong> DoPerftAsync(int depth);
+
+        void ClearPositions();
+
+        string GetBoard();
+
+        void SetGamePosition(IPerftPosition pp);
+
+        void AddPosition(IPerftPosition pp);
+
+        void AddStartPosition();
+
+        ulong GetPositionCount(int index, int depth);
     }
 }
