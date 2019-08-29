@@ -42,7 +42,7 @@ namespace Rudz.Chess
     using Piece = Types.Piece;
     using Square = Types.Square;
 
-    public sealed class Game : IEnumerable<Piece>
+    public sealed class Game : IGame
     {
         private const int MaxPositions = 2048;
 
@@ -75,12 +75,12 @@ namespace Rudz.Chess
                 _stateList[i] = new State();
 
             PositionIndex = 0;
-            State = Position.State = _stateList[PositionIndex];
+            Position.State = _stateList[PositionIndex];
             _chess960 = false;
             _xfen = false;
         }
 
-        public State State { get; set; }
+        public State State => Position.State;
 
         public int PositionIndex { get; private set; }
 
@@ -94,7 +94,7 @@ namespace Rudz.Chess
 
         public EGameEndType GameEndType { get; set; }
 
-        public static ITranspositionTable Table { get; set; } = new TranspositionTable(32);
+        public static TranspositionTable Table { get; set; } = new TranspositionTable(256);
 
         /// <summary>
         /// Makes a chess move in the data structure
@@ -108,7 +108,7 @@ namespace Rudz.Chess
 
             // advances the position
             var previous = _stateList[PositionIndex++];
-            State = Position.State = _stateList[PositionIndex];
+            Position.State = _stateList[PositionIndex];
             State.SideToMove = ~previous.SideToMove;
             State.Material = previous.Material;
             State.HalfMoveCount = PositionIndex;
@@ -135,8 +135,6 @@ namespace Rudz.Chess
             UpdateKey(move);
             State.Material.MakeMove(move);
 
-            //State.GenerateMoves();
-
             return true;
         }
 
@@ -145,7 +143,7 @@ namespace Rudz.Chess
             // careful.. NO check for invalid PositionIndex.. make sure it's always counted correctly
             Position.TakeMove(State.LastMove);
             --PositionIndex;
-            State = Position.State = _stateList[PositionIndex];
+            Position.State = _stateList[PositionIndex];
             State.HalfMoveCount = PositionIndex;
         }
 
@@ -177,11 +175,13 @@ namespace Rudz.Chess
             if (validate)
                 Fen.Fen.Validate(fenString);
 
-            foreach (var square in Occupied)
+            var bb = Occupied;
+            while (bb)
+            {
+                var square = bb.Lsb();
                 Position.RemovePiece(square, Position.BoardLayout[square.AsInt()]);
-
-            //for (var i = 0; i <= PositionIndex; i++)
-            //    _stateList[i].Clear();
+                BitBoards.ResetLsb(ref bb);
+            }
 
             Position.Clear();
 
@@ -270,7 +270,7 @@ namespace Rudz.Chess
 
             first.ToIntegral(out number);
 
-            State = Position.State = _stateList[PositionIndex];
+            Position.State = _stateList[PositionIndex];
 
             State.ReversibleHalfMoveCount = number;
 
@@ -278,9 +278,8 @@ namespace Rudz.Chess
 
             if (player.IsBlack())
             {
-                var zobristSide = Zobrist.GetZobristSide();
-                State.Key ^= zobristSide;
-                State.PawnStructureKey ^= zobristSide;
+                State.Key ^= Zobrist.GetZobristSide();
+                State.PawnStructureKey ^= Zobrist.GetZobristSide();
             }
 
             State.Key ^= State.CastlelingRights.GetZobristCastleling();
@@ -289,8 +288,6 @@ namespace Rudz.Chess
                 State.Key ^= State.EnPassantSquare.File().GetZobristEnPessant();
 
             Position.InCheck = Position.IsAttacked(Position.GetPieceSquare(EPieceType.King, State.SideToMove), ~State.SideToMove);
-
-            //State.GenerateMoves(true);
 
             return 0;
         }
@@ -344,11 +341,11 @@ namespace Rudz.Chess
 
         public override string ToString()
         {
-            const string seperator = "\n  +---+---+---+---+---+---+---+---+\n";
+            const string separator = "\n  +---+---+---+---+---+---+---+---+\n";
             const char splitter = '|';
             const char space = ' ';
             _output.Clear();
-            _output.Append(seperator);
+            _output.Append(separator);
             for (var rank = ERank.Rank8; rank >= ERank.Rank1; rank--)
             {
                 _output.Append((int)rank + 1);
@@ -360,7 +357,7 @@ namespace Rudz.Chess
                 }
 
                 _output.Append(splitter);
-                _output.Append(seperator);
+                _output.Append(separator);
             }
 
             _output.AppendLine("    a   b   c   d   e   f   g   h");
@@ -380,7 +377,7 @@ namespace Rudz.Chess
 
         public ulong Perft(int depth)
         {
-            var moveList = new MoveGenerator(Position).Moves;
+            var moveList = Position.GenerateMoves();
 
             if (depth == 1)
                 return (ulong)moveList.Count;
@@ -448,8 +445,7 @@ namespace Rudz.Chess
 
             if (move.IsNullMove())
             {
-                key ^= pawnKey;
-                State.Key = key;
+                State.Key = key ^ pawnKey;
                 State.PawnStructureKey = pawnKey;
                 return;
             }
@@ -501,7 +497,7 @@ namespace Rudz.Chess
 
         private bool IsRepetition()
         {
-            var repetitionCounter = 1;
+            var repetitionCounter = 0;
             var backPosition = PositionIndex;
             while ((backPosition -= 2) >= 0)
                 if (_stateList[backPosition].Key == State.Key && ++repetitionCounter == 3)

@@ -1,4 +1,5 @@
-﻿ChessLib, a chess data structure library
+﻿/*
+ChessLib, a chess data structure library
 
 MIT License
 
@@ -21,17 +22,19 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+*/
 
-The following FEN's were used during the developement to try and
-weed out some bugs.
+namespace Rudz.Chess.Factories
+{
+    public static class GameFactory
+    {
+        public static IGame Create() => new Game();
 
-1kr2R2/8/1p1pq3/p7/7p/PP3Q1P/6PK/4N2R w - - 3 87
-OnPieceClick : f8 [61] [Rook].
-GenerateMoveData() moves :  f3e2 f3e3 f3e4 e1d1 e1f1 e1d2 e1f2 h2g1 h2h1
-OnPieceClick : c8 [58] [Rook].
-Chosen move not allowed.
-bestmove string recieved from engine :
-bestmove f8c8 ponder e6c8
-
-rnkq1bnr/p3ppp1/1ppp3p/3B4/6b1/2PQ3P/PP1PPP2/RNB1K1NR w KQ -
-- Causes index out of bounds during perft when depth hits 2, the state index is mismatched by -1 for some reason.
+        public static IGame Create(string fen)
+        {
+            var g = Create();
+            g.SetFen(fen);
+            return g;
+        }
+    }
+}

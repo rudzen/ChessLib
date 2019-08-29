@@ -35,7 +35,7 @@ namespace Chess.Test.Bitboard
     public sealed class BitboardDataTests
     {
         [Fact]
-        public async Task AlignedSimplePositiveTest()
+        public void AlignedSimplePositiveTest()
         {
             const bool expected = true;
 
@@ -43,7 +43,7 @@ namespace Chess.Test.Bitboard
             const ESquare sq2 = ESquare.a2;
             const ESquare sq3 = ESquare.a3;
 
-            var actual = await Task.Run(() => BitBoards.Aligned(sq1, sq2, sq3)).ConfigureAwait(false);
+            var actual = BitBoards.Aligned(sq1, sq2, sq3);
 
             Assert.Equal(expected, actual);
         }
@@ -67,18 +67,21 @@ namespace Chess.Test.Bitboard
         }
 
         [Fact]
-        public void AlignedSimpleTotalNoIdenticalsTest()
+        public async Task AlignedSimpleTotalNoIdenticalsTest()
         {
             const int expected = 9184;
 
-            var actual = 0;
-
-            foreach (var s1 in BitBoards.AllSquares)
-                actual += BitBoards.AllSquares
-                    .Where(x2 => x2 != s1)
-                    .Sum(s2 => BitBoards.AllSquares
-                        .Where(x3 => x3 != s2)
-                        .Count(s3 => s1.Aligned(s2, s3)));
+            var actual = await Task.Run(() =>
+            {
+                var sum = 0;
+                foreach (var s1 in BitBoards.AllSquares)
+                    sum += BitBoards.AllSquares
+                        .Where(x2 => x2 != s1)
+                        .Sum(s2 => BitBoards.AllSquares
+                            .Where(x3 => x3 != s2)
+                            .Count(s3 => s1.Aligned(s2, s3)));
+                return sum;
+            }).ConfigureAwait(false);
 
             Assert.Equal(expected, actual);
         }
