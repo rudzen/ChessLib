@@ -33,19 +33,13 @@ namespace Rudz.Chess
     using System.Runtime.CompilerServices;
     using Types;
 
-    public sealed class MoveList : IEnumerable<Move>
+    public sealed class MoveList : IMoveList
     {
         private const int MaxPossibleMoves = 218;
 
         private readonly Move[] _moves;
 
         private int _moveIndex;
-
-        public MoveList(Move[] moves)
-        {
-            _moveIndex = -1;
-            _moves = moves;
-        }
 
         public MoveList()
         {

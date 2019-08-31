@@ -27,50 +27,52 @@ SOFTWARE.
 namespace Rudz.Chess
 {
     using Enums;
+    using System;
     using System.Runtime.CompilerServices;
     using Types;
 
     public sealed class KillerMoves : IKillerMoves
     {
-        private readonly IPosition _position;
-        private readonly IPieceSquare[][] _killerMoves;
+        private IPieceSquare[,] _killerMoves;
 
-        public KillerMoves(IPosition position, int maxDepth)
+        public KillerMoves()
+        { }
+
+        public void Initialize(int maxDepth)
         {
-            _position = position;
-            _killerMoves = new IPieceSquare[maxDepth + 1][];
+            _killerMoves = new IPieceSquare[maxDepth + 1, 2];
             for (var depth = 0; depth <= maxDepth; depth++)
             {
-                _killerMoves[depth] = new IPieceSquare[]
-                    {new PieceSquare(EPieces.NoPiece, ESquare.none), new PieceSquare(EPieces.NoPiece, ESquare.none)};
+                _killerMoves[depth, 0] = new PieceSquare(EPieces.NoPiece, ESquare.none);
+                _killerMoves[depth, 1] = new PieceSquare(EPieces.NoPiece, ESquare.none);
             }
             Reset();
         }
 
-        public int GetValue(int depth, Move move)
+        public int GetValue(int depth, Move move, Piece fromPiece)
         {
-            if (Equals(_killerMoves[depth][0], move))
+            if (Equals(_killerMoves[depth, 0], move, fromPiece))
                 return 2;
 
-            return Equals(_killerMoves[depth][1], move) ? 1 : 0;
+            return Equals(_killerMoves[depth, 1], move, fromPiece) ? 1 : 0;
         }
 
-        public void UpdateValue(int depth, Move move)
+        public void UpdateValue(int depth, Move move, Piece fromPiece)
         {
-            if (Equals(_killerMoves[depth][0], move))
+            if (Equals(_killerMoves[depth, 0], move, fromPiece))
                 return;
 
             // Shift killer move.
-            _killerMoves[depth][1].Piece = _killerMoves[depth][0].Piece;
-            _killerMoves[depth][1].Square = _killerMoves[depth][0].Square;
+            _killerMoves[depth, 1].Piece = _killerMoves[depth, 0].Piece;
+            _killerMoves[depth, 1].Square = _killerMoves[depth, 0].Square;
             // Update killer move.
-            _killerMoves[depth][0].Piece = _position.GetPiece(move.GetFromSquare());
-            _killerMoves[depth][0].Square = move.GetToSquare();
+            _killerMoves[depth, 0].Piece = fromPiece;
+            _killerMoves[depth, 0].Square = move.GetToSquare();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private bool Equals(IPieceSquare killerMove, Move move)
-            => killerMove.Piece == _position.GetPiece(move.GetFromSquare()) && killerMove.Square == move.GetToSquare();
+        private bool Equals(IPieceSquare killerMove, Move move, Piece fromPiece)
+            => killerMove.Piece == fromPiece && killerMove.Square == move.GetToSquare();
 
         public void Shift(int depth)
         {
@@ -78,30 +80,31 @@ namespace Rudz.Chess
             var lastDepth = _killerMoves.Length - depth - 1;
             for (var i = 0; i <= lastDepth; i++)
             {
-                _killerMoves[i][0].Piece = _killerMoves[i + depth][0].Piece;
-                _killerMoves[i][0].Square = _killerMoves[i + depth][0].Square;
-                _killerMoves[i][1].Piece = _killerMoves[i + depth][1].Piece;
-                _killerMoves[i][1].Square = _killerMoves[i + depth][1].Square;
+                _killerMoves[i, 0].Piece = _killerMoves[i + depth, 0].Piece;
+                _killerMoves[i, 0].Square = _killerMoves[i + depth, 0].Square;
+                _killerMoves[i, 1].Piece = _killerMoves[i + depth, 1].Piece;
+                _killerMoves[i, 1].Square = _killerMoves[i + depth, 1].Square;
             }
 
             // Reset killer moves far from root position.
             for (var i = lastDepth + 1; i < _killerMoves.Length; i++)
             {
-                _killerMoves[i][0].Piece = EPieces.NoPiece;
-                _killerMoves[i][0].Square = ESquare.none;
-                _killerMoves[i][1].Piece = EPieces.NoPiece;
-                _killerMoves[i][1].Square = ESquare.none;
+                _killerMoves[i, 0].Piece = EPieces.NoPiece;
+                _killerMoves[i, 0].Square = ESquare.none;
+                _killerMoves[i, 1].Piece = EPieces.NoPiece;
+                _killerMoves[i, 1].Square = ESquare.none;
             }
         }
 
         public void Reset()
         {
-            foreach (var killerMoves in _killerMoves)
+            Array.Clear(_killerMoves, 0, _killerMoves.Length);
+            for (var i = 0; i < _killerMoves.Length; i++)
             {
-                killerMoves[0].Piece = EPieces.NoPiece;
-                killerMoves[0].Square = ESquare.none;
-                killerMoves[1].Piece = EPieces.NoPiece;
-                killerMoves[1].Square = ESquare.none;
+                _killerMoves[i, 0].Piece = EPieces.NoPiece;
+                _killerMoves[i, 0].Square = ESquare.none;
+                _killerMoves[i, 1].Piece = EPieces.NoPiece;
+                _killerMoves[i, 1].Square = ESquare.none;
             }
         }
     }

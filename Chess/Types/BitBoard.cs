@@ -33,26 +33,10 @@ namespace Rudz.Chess.Types
     using System.Linq;
     using System.Runtime.CompilerServices;
 
-    /*
-         * In general, the bitboard layout of a chess board matches that of a real chess board.
-         *
-            56	57	58	59	60	61	62	63      (RANK 8)
-            48	49	50	51	52	53	54	55      (RANK 7)
-            40	41	42	43	44	45	46	47      (RANK 6)
-            32	33	34	35	36	37	38	39      (RANK .)
-            24	25	26	27	28	29	30	31      (RANK .)
-            16	17	18	19	20	21	22	23
-            08	09	10	11	12	13	14	15
-            00	01	02	03	04	05	06	07
-         *
-         *   A   B   C   D   E   F   G   H
-         *
-         *  Direction of bits --->
-         */
-
     /// <summary>
     /// Bitboard struct, wraps an unsigned long with some nifty helper functionality and operators.
     /// Enumeration will yield each set bit as a Square struct.
+    /// <para>For more information - please see https://github.com/rudzen/ChessLib/wiki/BitBoard</para>
     /// </summary>
     public struct BitBoard : IEnumerable<Square>
     {
@@ -177,7 +161,7 @@ namespace Rudz.Chess.Types
         public void SetBit(int pos) => Value |= BitBoards.One << pos;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Square FirstOrDefault() => Empty() ? ESquare.none : this.First();
+        public Square FirstOrDefault() => Empty() ? ESquare.none : this.Lsb();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public BitBoard Xor(int pos) => Value ^ (uint)pos;

@@ -28,11 +28,11 @@ namespace Rudz.Chess.Factories
 {
     public static class GameFactory
     {
-        public static IGame Create() => new Game();
+        public static IGame Create(IPosition position) => new Game(position);
 
         public static IGame Create(string fen)
         {
-            var g = Create();
+            var g = Create(new Position());
             g.SetFen(fen);
             return g;
         }

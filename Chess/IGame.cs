@@ -28,6 +28,7 @@ namespace Rudz.Chess
 {
     using Enums;
     using Fen;
+    using System;
     using System.Collections.Generic;
     using System.Text;
     using Types;
@@ -35,6 +36,7 @@ namespace Rudz.Chess
     public interface IGame : IEnumerable<Piece>
     {
         State State { get; }
+        Action<Piece, Square> PieceUpdated { get; }
         int PositionIndex { get; }
         int PositionStart { get; }
         int MoveNumber { get; }

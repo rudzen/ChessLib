@@ -149,12 +149,21 @@ namespace Rudz.Chess
         private void AddMoves(Piece piece, Square from, BitBoard attacks)
         {
             var target = _position.Pieces(~_position.State.SideToMove) & attacks;
-            foreach (var to in target)
+            while (target)
+            {
+                var to = target.Lsb();
                 AddMove(piece, from, to, EPieces.NoPiece, EMoveType.Capture);
+                BitBoards.ResetLsb(ref target);
+            }
 
             target = ~_position.Pieces() & attacks;
-            foreach (var to in target)
+
+            while (target)
+            {
+                var to = target.Lsb();
                 AddMove(piece, from, to, PieceExtensions.EmptyPiece);
+                BitBoards.ResetLsb(ref target);
+            }
         }
 
         /// <summary>

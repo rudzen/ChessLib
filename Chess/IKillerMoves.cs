@@ -30,9 +30,11 @@ namespace Rudz.Chess
 
     public interface IKillerMoves
     {
-        int GetValue(int depth, Move move);
+        void Initialize(int maxDepth);
 
-        void UpdateValue(int depth, Move move);
+        int GetValue(int depth, Move move, Piece fromPiece);
+
+        void UpdateValue(int depth, Move move, Piece fromPiece);
 
         void Shift(int depth);
 

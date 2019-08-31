@@ -64,10 +64,10 @@ namespace Rudz.Chess
 
         private bool _xfen;
 
-        public Game(Action<Piece, Square> pieceUpdateCallback = null)
+        public Game(IPosition position)
         {
             _castleRightsMask = new ECastlelingRights[64];
-            Position = new Position(pieceUpdateCallback);
+            Position = position;
             _stateList = new State[MaxPositions];
             _output = new StringBuilder(256);
 
@@ -81,6 +81,8 @@ namespace Rudz.Chess
         }
 
         public State State => Position.State;
+
+        public Action<Piece, Square> PieceUpdated => Position.PieceUpdated;
 
         public int PositionIndex { get; private set; }
 
@@ -319,7 +321,7 @@ namespace Rudz.Chess
                 return;
             }
 
-            output.Append(move);
+            output.Append(move.ToString());
         }
 
         public void UpdateDrawTypes()
