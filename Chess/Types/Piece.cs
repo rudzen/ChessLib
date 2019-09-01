@@ -24,6 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using System.Runtime.InteropServices;
+
 namespace Rudz.Chess.Types
 {
     using Enums;
@@ -34,6 +36,7 @@ namespace Rudz.Chess.Types
     /// Piece.
     /// Contains the piece type which indicate what type and color the piece is
     /// </summary>
+    [StructLayout(LayoutKind.Explicit, Size = 1)]
     public struct Piece
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -50,15 +53,16 @@ namespace Rudz.Chess.Types
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Piece(EPieceType pieceType, Player side)
-            : this(pieceType) => Value += side.Side << 3;
+            : this(pieceType) => Value += (byte) (side.Side << 3);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Piece(EPieceType pieceType, int offset)
-            : this(pieceType) => Value += offset;
+            : this(pieceType) => Value += (byte) offset;
 
         public static Comparer<Piece> PieceComparer { get; } = new PieceRelationalComparer();
 
-        public EPieces Value { get; private set; }
+        [FieldOffset(0)]
+        public EPieces Value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator Piece(char value) => new Piece(GetPiece(value));
@@ -73,7 +77,7 @@ namespace Rudz.Chess.Types
         public static implicit operator Piece(EPieceType pieceType) => new Piece(pieceType);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Piece operator +(Piece left, Player right) => new Piece(left.Value + (right << 3));
+        public static Piece operator +(Piece left, Player right) => new Piece(left.Value + (byte)(right << 3));
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Piece operator >>(Piece left, int right) => (int)left.Value >> right;

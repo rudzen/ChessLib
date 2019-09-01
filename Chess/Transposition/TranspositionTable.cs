@@ -32,11 +32,11 @@ namespace Rudz.Chess.Transposition
     using System.Runtime.CompilerServices;
     using Types;
 
-    public sealed class TranspositionTable
+    public sealed class TranspositionTable : ITranspositionTable
     {
         private static readonly int ClusterSize;
 
-        private List<TTCluster> _table;
+        private List<ITTCluster> _table;
         private ulong _elements;
         private int _fullnessElements;
         private sbyte _generation;
@@ -51,13 +51,15 @@ namespace Rudz.Chess.Transposition
 
         public TranspositionTable(int mbSize)
         {
-            Size(mbSize);
+            SetSize(mbSize);
         }
 
         /// <summary>
         /// Number of table hits
         /// </summary>
         public ulong Hits { get; private set; }
+
+        public int Size { get; private set; }
 
         /// <summary>
         /// Increases the generation of the table by one
@@ -70,13 +72,13 @@ namespace Rudz.Chess.Transposition
         /// </summary>
         /// <param name="mbSize">The size to set it to</param>
         /// <returns>The number of clusters in the table</returns>
-        public ulong Size(int mbSize)
+        public ulong SetSize(int mbSize)
         {
+            Size = mbSize;
             var size = (int)(((ulong)mbSize << 20) / (ulong)ClusterSize);
-
             if (_table == null)
             {
-                _table = new List<TTCluster>(size);
+                _table = new List<ITTCluster>(size);
                 _elements = (ulong)size;
             }
             else if (_table.Count != size)
@@ -100,7 +102,7 @@ namespace Rudz.Chess.Transposition
         /// <param name="key">The position key</param>
         /// <returns>The cluster of the keys position in the table</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public TTCluster FindCluster(ulong key)
+        public ITTCluster FindCluster(ulong key)
         {
             var idx = (int)((uint)(key) & (_elements - 1));
             return _table[idx];

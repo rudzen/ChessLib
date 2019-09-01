@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="MUCI.Chess.Squares" Collapsed="true">
+    <Position X="4.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAA=</HashCode>
+      <FileName>Chess\Board\Square.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MUCI.Chess.Piece">
+    <Position X="8.5" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACCAABAAEAAAAAAAAAAQAACgAAAAAAgGAACAAAAACA=</HashCode>
+      <FileName>Chess\Board\Piece.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MUCI.Chess.BoardUtil" Collapsed="true">
+    <Position X="4.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Chess\Board\BoardUtil.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MUCI.Chess.Board" BaseTypeListCollapsed="true">
+    <Position X="0.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gAIQAgCQIACgAAQGgIAVAoQAAAEAJ4hgJIAQJABAAAA=</HashCode>
+      <FileName>Chess\Board\Board.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Field Name="board" />
+    </ShowAsCollectionAssociation>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Enum Name="MUCI.Chess.ESquare" Collapsed="true">
+    <Position X="3" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>sA8AEAAAAABE+wAAAAAAAAAA36L9PgCAb5BgHwDAN0g=</HashCode>
+      <FileName>Chess\Board\Square.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="MUCI.Chess.Pieces" Collapsed="true">
+    <Position X="3.25" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gBAAAAACAAAEAAggAAAAQAAQgAAASgAAACAAAAAAAOA=</HashCode>
+      <FileName>Chess\Board\Piece.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="MUCI.Chess.PieceType" Collapsed="true">
+    <Position X="3" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gAAAAAAAAAEggAAAAEAAAAQAAAAAAAAAAAAEAAAAAAA=</HashCode>
+      <FileName>Chess\Board\Piece.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="8.25" />
+</ClassDiagram>

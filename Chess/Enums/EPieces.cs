@@ -29,7 +29,7 @@ namespace Rudz.Chess.Enums
     using System;
 
     [Flags]
-    public enum EPieces
+    public enum EPieces : byte
     {
         NoPiece = 0,
         WhitePawn = 1,

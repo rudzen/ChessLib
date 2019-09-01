@@ -42,7 +42,7 @@ namespace Rudz.Chess
 
         Piece[] BoardLayout { get; }
 
-        Action<Piece, Square> PieceUpdated { get; }
+        Action<Piece, Square> PieceUpdated { get; set; }
 
         bool InCheck { get; set; }
 

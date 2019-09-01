@@ -26,10 +26,26 @@ SOFTWARE.
 
 namespace Rudz.Chess.Transposition
 {
-    // ReSharper disable once InconsistentNaming
-    public sealed class TTCluster
+    using System;
+    using Types;
+
+    /// <summary>
+    /// Stores an array of <see cref="TranspositionTableEntry"/>.
+    /// In essence it acts like a entry bucket of 4 elements for each position stored in the <see cref="TranspositionTable"/>
+    /// </summary>
+    public sealed class TTCluster : ITTCluster
     {
-        public TranspositionTableEntry[] Cluster = new TranspositionTableEntry[4];
+        private static readonly TranspositionTableEntry DefaultEntry = new TranspositionTableEntry(0, MoveExtensions.EmptyMove, 0, 0, 0, 0, Bound.Void);
+
+        private static readonly TranspositionTableEntry[] Defaults = { DefaultEntry, DefaultEntry, DefaultEntry, DefaultEntry };
+
+        public TTCluster()
+        {
+            Cluster = new TranspositionTableEntry[4];
+            Array.Copy(Defaults, Cluster, Defaults.Length);
+        }
+
+        public TranspositionTableEntry[] Cluster { get; }
 
         public TranspositionTableEntry this[int key]
         {

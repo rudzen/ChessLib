@@ -24,6 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using Rudz.Chess.Factories;
+
 namespace Chess.Test.Gameplay
 {
     using System.Collections.Generic;
@@ -46,7 +48,8 @@ namespace Chess.Test.Gameplay
                                                   };
 
             // construct game and start a new game
-            var game = new Game();
+            var position = new Position();
+            var game = GameFactory.Create(position);
             game.NewGame();
 
             // make the moves necessary to create a mate

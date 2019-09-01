@@ -30,28 +30,13 @@ namespace Rudz.Chess.Types
     using System;
     using System.Collections;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Runtime.CompilerServices;
-
-    /*
-         * In general, the bitboard layout of a chess board matches that of a real chess board.
-         *
-            56	57	58	59	60	61	62	63      (RANK 8)
-            48	49	50	51	52	53	54	55      (RANK 7)
-            40	41	42	43	44	45	46	47      (RANK 6)
-            32	33	34	35	36	37	38	39      (RANK .)
-            24	25	26	27	28	29	30	31      (RANK .)
-            16	17	18	19	20	21	22	23
-            08	09	10	11	12	13	14	15
-            00	01	02	03	04	05	06	07
-         *
-         *   A   B   C   D   E   F   G   H
-         *
-         *  Direction of bits --->
-         */
 
     /// <summary>
     /// Bitboard struct, wraps an unsigned long with some nifty helper functionality and operators.
     /// Enumeration will yield each set bit as a Square struct.
+    /// <para>For more information - please see https://github.com/rudzen/ChessLib/wiki/BitBoard</para>
     /// </summary>
     public struct BitBoard : IEnumerable<Square>
     {
@@ -106,7 +91,7 @@ namespace Rudz.Chess.Types
         public static BitBoard operator >>(BitBoard left, int right) => left.Value >> right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ulong operator <<(BitBoard left, int right) => left.Value << right;
+        public static BitBoard operator <<(BitBoard left, int right) => left.Value << right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static BitBoard operator |(BitBoard left, Square right) => left.Value | right.BitBoardSquare();
@@ -176,7 +161,7 @@ namespace Rudz.Chess.Types
         public void SetBit(int pos) => Value |= BitBoards.One << pos;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Square FirstOrDefault() => Empty() ? ESquare.none : this.First();
+        public Square FirstOrDefault() => Empty() ? ESquare.none : this.Lsb();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public BitBoard Xor(int pos) => Value ^ (uint)pos;
@@ -189,37 +174,31 @@ namespace Rudz.Chess.Types
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public BitBoard OrAll(params BitBoard[] bbs)
-        {
-            var val = Value;
-            foreach (var b in bbs)
-                val |= b.Value;
-
-            return val;
-        }
+            => bbs.Aggregate(Value, (current, b) => current | b.Value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public BitBoard OrAll(IEnumerable<BitBoard> bbs)
-        {
-            var val = Value;
-            foreach (var bb in bbs)
-                val |= bb.Value;
-            return val;
-        }
+            => bbs.Aggregate(Value, (current, bb) => current | bb.Value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public BitBoard OrAll(IEnumerable<Square> sqs)
         {
             var b = this;
-            foreach (var sq in sqs)
-                b |= sq;
-            return b;
+            return sqs.Aggregate(b, (current, sq) => current | sq);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public IEnumerator<Square> GetEnumerator()
         {
-            for (BitBoard bb = Value; bb; bb--)
-                yield return bb.First();
+            if (Empty())
+                yield break;
+
+            BitBoard bb = Value;
+            while (bb)
+            {
+                yield return bb.Lsb();
+                BitBoards.ResetLsb(ref bb);
+            }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

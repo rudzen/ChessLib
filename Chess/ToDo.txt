@@ -26,9 +26,10 @@ Types for:
 - Piece value
 
 Improve:
+- Move generation
 - Move generation cache dictionary functionality
 - Move notation functionality (add more notaion variation, including humanoid readable)
+- MakeMove() and UpdateKey() should be merged
 
 Functionality:
-- Transposition Table
 - Pinned pieces should be generated when making a move and stored as array in State

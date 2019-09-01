@@ -27,6 +27,7 @@ SOFTWARE.
 namespace Chess.Test.Pieces
 {
     using Rudz.Chess;
+    using Rudz.Chess.Enums;
     using Rudz.Chess.Types;
     using System.Linq;
     using Xunit;
@@ -90,7 +91,7 @@ namespace Chess.Test.Pieces
         {
             BitBoard border = 0xff818181818181ff;
             BitBoard borderInner = 0x7e424242427e00;
-            BitBoard corners = 0x8100000000000081;
+            var corners = BitBoards.MakeBitboard(ESquare.a1, ESquare.a8, ESquare.h1, ESquare.h8);
 
             const int expectedCorner = 1; // just a single attack square no matter what
             const int expectedSide = 2;

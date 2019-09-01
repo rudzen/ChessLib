@@ -24,6 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using Rudz.Chess.Factories;
+
 namespace Chess.Test.Move
 {
     using System;
@@ -118,7 +120,8 @@ namespace Chess.Test.Move
             var moves = new List<Move>(128);
             var movesString = new List<Movestrings>(128);
 
-            var game = new Game();
+            var pos = new Position();
+            var game = GameFactory.Create(pos);
 
             game.NewGame();
 
@@ -155,7 +158,8 @@ namespace Chess.Test.Move
         [Fact]
         public void MoveListToStringTest()
         {
-            var game = new Game();
+            var pos = new Position();
+            var game = GameFactory.Create(pos);
 
             game.NewGame();
 

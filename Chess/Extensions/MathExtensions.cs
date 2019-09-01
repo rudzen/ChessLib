@@ -43,10 +43,10 @@ namespace Rudz.Chess.Extensions
         public static bool InBetween(this uint v, int min, int max) => v - (uint)min <= (uint)max - (uint)min;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int Clamp(this int v, int min, int max) => v < min ? min : (v > max ? max : v);
+        public static int Clamp(this int v, int min, int max) => v < min ? min : v > max ? max : v;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static double Clamp(this double v, double min, double max) => v < min ? min : (v > max ? max : v);
+        public static double Clamp(this double v, double min, double max) => v < min ? min : v > max ? max : v;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int Abs(this int @this) => Math.Abs(@this);
@@ -125,8 +125,6 @@ namespace Rudz.Chess.Extensions
         /// <summary>
         /// Modulo for pow^2 values...
         /// </summary>
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1615:ElementReturnValueMustBeDocumented", Justification = "Reviewed. Suppression is OK here.")]
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1611:ElementParametersMustBeDocumented", Justification = "Reviewed. Suppression is OK here.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int ModPow2(int input, int ceil) => input & (ceil - 1);
 

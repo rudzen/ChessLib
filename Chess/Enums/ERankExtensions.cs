@@ -26,15 +26,12 @@ SOFTWARE.
 
 namespace Rudz.Chess.Enums
 {
-    namespace Rudz.Chess.Enums
-    {
-        using System.Runtime.CompilerServices;
-        using Types;
+    using System.Runtime.CompilerServices;
+    using Types;
 
-        public static class ERankExtensions
-        {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public static ERank RelativeRank(this ERank rank, Player color) => (ERank)((int)rank ^ (color.Side * 7));
-        }
+    public static class ERankExtensions
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Rank RelativeRank(this ERank rank, Player color) => (ERank)((int)rank ^ (color.Side * 7));
     }
 }

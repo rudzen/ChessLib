@@ -54,9 +54,8 @@ namespace Rudz.Chess
 
         private readonly Square[] _castleLongKingFrom;
 
-        public Position(Action<Piece, Square> pieceUpdateCallback)
+        public Position()
         {
-            PieceUpdated = pieceUpdateCallback;
             _castleLongKingFrom = new Square[2];
             _rookCastlesFrom = new Square[64];
             _castleShortKingFrom = new Square[2];
@@ -77,7 +76,7 @@ namespace Rudz.Chess
         /// <summary>
         /// To let something outside the library be aware of changes (like a UI etc)
         /// </summary>
-        public Action<Piece, Square> PieceUpdated { get; }
+        public Action<Piece, Square> PieceUpdated { get; set; }
 
         public bool InCheck { get; set; }
 

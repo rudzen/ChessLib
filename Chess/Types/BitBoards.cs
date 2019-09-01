@@ -43,51 +43,47 @@ namespace Rudz.Chess.Types
     {
         internal const ulong One = 0x1ul;
 
-        public const int Zero = 0x0;
+        public static readonly BitBoard WhiteArea = 0x00000000FFFFFFFF;
 
-        public const ulong ZeroBb = 0x0u;
+        public static readonly BitBoard BlackArea = ~WhiteArea;
 
-        public const ulong WhiteArea = 0x00000000FFFFFFFF;
+        public static readonly BitBoard LightSquares = 0x55AA55AA55AA55AA;
 
-        public const ulong BlackArea = ~WhiteArea;
+        public static readonly BitBoard DarkSquares = ~LightSquares;
 
-        public const ulong DarkSquares = ~LightSquares;
+        public static readonly BitBoard FILEA = 0x0101010101010101;
 
-        private const ulong FILEA = 0x0101010101010101;
+        public static readonly BitBoard FILEB = 0x0202020202020202;
 
-        private const ulong FILEB = 0x0202020202020202;
+        public static readonly BitBoard FILEC = 0x404040404040404;
 
-        private const ulong FILEC = 0x2020202020202020;
+        public static readonly BitBoard FILED = 0x808080808080808;
 
-        private const ulong FILED = 0x1010101010101010;
+        public static readonly BitBoard FILEE = 0x1010101010101010;
 
-        private const ulong FILEE = 0x808080808080808;
+        public static readonly BitBoard FILEF = 0x2020202020202020;
 
-        private const ulong FILEF = 0x404040404040404;
+        public static readonly BitBoard FILEG = 0x4040404040404040;
 
-        private const ulong FILEG = 0x4040404040404040;
+        public static readonly BitBoard FILEH = 0x8080808080808080;
 
-        private const ulong FILEH = 0x8080808080808080;
+        public static readonly BitBoard RANK1 = 0x00000000000000ff;
 
-        public const ulong RANK1 = 0x00000000000000ff;
+        public static readonly BitBoard RANK2 = 0x000000000000ff00;
 
-        public const ulong RANK2 = 0x000000000000ff00;
+        public static readonly BitBoard RANK3 = 0x0000000000ff0000;
 
-        public const ulong RANK3 = 0x0000000000ff0000;
+        public static readonly BitBoard RANK4 = 0x00000000ff000000;
 
-        private const ulong RANK4 = 0x00000000ff000000;
+        public static readonly BitBoard RANK5 = 0x000000ff00000000;
 
-        private const ulong RANK5 = 0x000000ff00000000;
+        public static readonly BitBoard RANK6 = 0x0000ff0000000000;
 
-        public const ulong RANK6 = 0x0000ff0000000000;
+        public static readonly BitBoard RANK7 = 0x00ff000000000000;
 
-        public const ulong RANK7 = 0x00ff000000000000;
+        public static readonly BitBoard RANK8 = 0xff00000000000000;
 
-        public const ulong RANK8 = 0xff00000000000000;
-
-        private const ulong LightSquares = 0x55AA55AA55AA55AA;
-
-        public static readonly BitBoard EmptyBitBoard = new BitBoard(ZeroBb);
+        public static readonly BitBoard EmptyBitBoard = new BitBoard(0UL);
 
         public static readonly BitBoard AllSquares = ~EmptyBitBoard;
 
@@ -188,6 +184,11 @@ namespace Rudz.Chess.Types
 
         static BitBoards()
         {
+            CornerA1 = MakeBitboard(ESquare.a1, ESquare.b1, ESquare.a2, ESquare.b2);
+            CornerA8 = MakeBitboard(ESquare.a8, ESquare.b8, ESquare.a7, ESquare.b7);
+            CornerH1 = MakeBitboard(ESquare.h1, ESquare.g1, ESquare.h2, ESquare.g2);
+            CornerH8 = MakeBitboard(ESquare.h8, ESquare.g8, ESquare.h7, ESquare.g7);
+
             // local helper functions to calculate distance
             int distance(int x, int y) { return Math.Abs(x - y); }
             int distanceFile(Square x, Square y) { return distance(x.File().AsInt(), y.File().AsInt()); }
@@ -296,11 +297,6 @@ namespace Rudz.Chess.Types
                     Debug.Assert(!KingRingBB[c, sq].Empty());
                 }
             }
-
-            CornerA1 = MakeBitboard(ESquare.a1, ESquare.b1, ESquare.a2, ESquare.b2);
-            CornerA8 = MakeBitboard(ESquare.a8, ESquare.b8, ESquare.a7, ESquare.b7);
-            CornerH1 = MakeBitboard(ESquare.h1, ESquare.g1, ESquare.h2, ESquare.g2);
-            CornerH8 = MakeBitboard(ESquare.h8, ESquare.g8, ESquare.h7, ESquare.g7);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -321,16 +317,17 @@ namespace Rudz.Chess.Types
 
         public static BitBoard XrayAttacks(this Square square, EPieceType pieceType, BitBoard occupied, BitBoard blockers)
         {
-            if (pieceType == EPieceType.Bishop)
-                return square.XrayBishopAttacks(occupied, blockers);
-
-            if (pieceType == EPieceType.Rook)
-                return square.XrayRookAttacks(occupied, blockers);
-
-            if (pieceType == EPieceType.Queen)
-                return XrayBishopAttacks(square, occupied, blockers) | XrayRookAttacks(square, occupied, blockers);
-
-            return ZeroBb;
+            switch (pieceType)
+            {
+                case EPieceType.Bishop:
+                    return square.XrayBishopAttacks(occupied, blockers);
+                case EPieceType.Rook:
+                    return square.XrayRookAttacks(occupied, blockers);
+                case EPieceType.Queen:
+                    return XrayBishopAttacks(square, occupied, blockers) | XrayRookAttacks(square, occupied, blockers);
+                default:
+                    return EmptyBitBoard;
+            }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -358,7 +355,7 @@ namespace Rudz.Chess.Types
                     return square.QueenAttacks(occupied);
 
                 default:
-                    return ZeroBb;
+                    return EmptyBitBoard;
             }
         }
 
@@ -627,7 +624,7 @@ namespace Rudz.Chess.Types
         /// <param name="squares">The squares to generate bitboard from</param>
         /// <returns>The generated bitboard</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static BitBoard MakeBitboard(params Square[] squares) => squares.Aggregate<Square, BitBoard>(ZeroBb, (current, t) => current | t);
+        public static BitBoard MakeBitboard(params Square[] squares) => squares.Aggregate(EmptyBitBoard, (current, t) => current | t);
 
         /// <summary>
         /// Helper method to generate shift function dictionary for all directions.

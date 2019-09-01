@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Perft": {
+      "commandName": "Project",
+      "commandLineArgs": "epd -f D:\\perft-random.epd"
+    }
+  }
+}

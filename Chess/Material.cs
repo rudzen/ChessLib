@@ -33,11 +33,11 @@ namespace Rudz.Chess
 
     public sealed class Material : IMaterial
     {
-        public static readonly double MaxValueWithoutPawns;
+        public static readonly double MaxValueWithoutPawns = 2 * (2 * (double)PieceExtensions.PieceValues[1]) + 2 * (double)PieceExtensions.PieceValues[2] + 2 * (double)PieceExtensions.PieceValues[3] + (double)PieceExtensions.PieceValues[4];
 
-        public static readonly int MaxValue;
+        public static readonly int MaxValue = (int)(MaxValueWithoutPawns + 2 * 8 * (int)PieceExtensions.PieceValues[0]);
 
-        private static readonly int[] PieceBitShift;
+        private static readonly int[] PieceBitShift = { 0, 4, 8, 12, 16, 20 };
 
         private readonly uint[] _key;
 
@@ -53,13 +53,6 @@ namespace Rudz.Chess
         {
             get => MaterialValue[index];
             set => MaterialValue[index] = value;
-        }
-
-        static Material()
-        {
-            MaxValueWithoutPawns = 2 * (2 * (double)PieceExtensions.PieceValues[1]) + 2 * (double)PieceExtensions.PieceValues[2] + 2 * (double)PieceExtensions.PieceValues[3] + (double)PieceExtensions.PieceValues[4];
-            MaxValue = (int)(MaxValueWithoutPawns + 2 * 8 * (int)PieceExtensions.PieceValues[0]);
-            PieceBitShift = new[] { 0, 4, 8, 12, 16, 20 };
         }
 
         public Material()
