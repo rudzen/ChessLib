@@ -24,15 +24,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
 namespace Perft.Parsers
 {
-    using System;
-    using System.Collections.Generic;
-
-    public interface IEpdSet : IEqualityComparer<IEpdSet>, IComparable<IEpdSet>
+    public interface IEpdParser
     {
-        string Id { get; set; }
-        string Epd { get; set; }
-        List<(int, ulong)> Perft { get; set; }
+        List<IEpdSet> Sets { get; set; }
+        IEpdParserSettings Settings { get; set; }
+        Task<ulong> ParseAsync();
+        ulong Parse();
     }
 }

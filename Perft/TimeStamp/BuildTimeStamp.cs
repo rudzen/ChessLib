@@ -1,5 +1,5 @@
 ﻿/*
-ChessLib, a chess data structure library
+Perft, a chess perft testing application
 
 MIT License
 
@@ -24,17 +24,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Perft
+namespace Perft.TimeStamp
 {
     using System;
     using System.IO;
     using System.Reflection;
 
-    public static class BuildTimeStamp
+    public sealed class BuildTimeStamp : IBuildTimeStamp
     {
-        private static readonly Lazy<string> _buildTimeStamp = new Lazy<string>(GetTimestamp);
+        private readonly string _buildTimeStamp = GetTimestamp();
 
-        public static string TimeStamp => _buildTimeStamp.Value;
+        public string TimeStamp => _buildTimeStamp;
 
         private static string GetTimestamp()
         {
@@ -43,7 +43,7 @@ namespace Perft
             if (assembly == null)
                 return DateTime.Now.ToString("s");
 
-            var stream = assembly.GetManifestResourceStream("Perft.BuildTimeStamp.txt");
+            var stream = assembly.GetManifestResourceStream("Perft.TimeStamp.BuildTimeStamp.txt");
 
             using (var reader = new StreamReader(stream))
                 return reader.ReadToEnd().TrimEnd('\r', '\n').TrimEnd();

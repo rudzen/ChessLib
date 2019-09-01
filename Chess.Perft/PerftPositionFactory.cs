@@ -1,5 +1,5 @@
 ﻿/*
-ChessLib, a chess data structure library
+Perft, a chess perft test library
 
 MIT License
 
@@ -26,6 +26,7 @@ SOFTWARE.
 
 namespace Chess.Perft
 {
+    using Interfaces;
     using System.Collections.Generic;
     using System.Runtime.CompilerServices;
 
@@ -33,6 +34,8 @@ namespace Chess.Perft
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static IPerftPosition Create(string fen, List<(int, ulong)> values)
-            => new PerftPosition(fen, values);
+        {
+            return new PerftPosition { Fen = fen, Value = values };
+        }
     }
 }

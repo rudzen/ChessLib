@@ -1,5 +1,5 @@
 ﻿/*
-ChessLib, a chess data structure library
+Perft, a chess perft testing application
 
 MIT License
 
@@ -40,16 +40,16 @@ namespace Perft.Parsers
         public bool Equals(IEpdSet x, IEpdSet y)
         {
             var idComparison = string.Equals(x.Id, y.Id, StringComparison.Ordinal);
-            return idComparison && string.Equals(x.Epd, x.Epd, StringComparison.Ordinal);
+            return idComparison && string.Equals(x.Epd, y.Epd, StringComparison.Ordinal);
         }
 
         public int GetHashCode(IEpdSet obj)
-            => Id.GetHashCode(StringComparison.Ordinal) & Epd.GetHashCode(StringComparison.Ordinal);
+            => Id.GetHashCode(StringComparison.Ordinal) ^ Epd.GetHashCode(StringComparison.Ordinal);
 
         public int CompareTo(IEpdSet other)
         {
             if (ReferenceEquals(this, other)) return 0;
-            if (ReferenceEquals(null, other)) return 1;
+            if (other is null) return 1;
             var idComparison = string.Compare(Id, other.Id, StringComparison.Ordinal);
             return idComparison != 0
                 ? idComparison

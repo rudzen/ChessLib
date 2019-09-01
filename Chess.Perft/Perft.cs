@@ -1,5 +1,5 @@
 ﻿/*
-ChessLib, a chess data structure library
+Perft, a chess perft test library
 
 MIT License
 
@@ -28,7 +28,6 @@ namespace Chess.Perft
 {
     using Interfaces;
     using Rudz.Chess;
-    using Rudz.Chess.Factories;
     using System;
     using System.Collections.Generic;
     using System.Linq;
@@ -56,17 +55,12 @@ namespace Chess.Perft
 
     public sealed class Perft : IPerft
     {
-        private readonly Action<string> _boardPrintCallback;
-
-        public Perft(Action<string> boardPrintCallback, IEnumerable<IPerftPosition> positions = null)
+        public Perft(IGame game, IEnumerable<IPerftPosition> positions)
         {
-            Positions = positions == null ? new List<IPerftPosition>() : positions.ToList();
-            _boardPrintCallback = boardPrintCallback;
-            CurrentGame = GameFactory.Create();
+            CurrentGame = game;
         }
 
-        public Perft(Action<string> boardPrintCallback = null) : this(boardPrintCallback, null)
-        { }
+        public Action<string> BoardPrintCallback { get; }
 
         /// <summary>
         /// The positional data for the run
@@ -84,7 +78,6 @@ namespace Chess.Perft
 
             if (Positions.Count == 0)
             {
-                //_boardPrintCallback?.Invoke("Unable to run without any perft positions (did you forget to call AddStartPosition()?", total);
                 return total;
             }
 
@@ -93,7 +86,7 @@ namespace Chess.Perft
                 CurrentGame.SetFen(position.Fen);
                 var res = CurrentGame.Perft(depth);
                 total += res;
-                //_boardPrintCallback?.Invoke(position.Fen, res);
+                BoardPrintCallback?.Invoke(position.Fen);
             }
 
             return total;
@@ -116,22 +109,6 @@ namespace Chess.Perft
         public void AddPosition(IPerftPosition pp)
         {
             Positions.Add(pp);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void AddStartPosition()
-        {
-            var vals = new List<(int, ulong)>(6)
-            {
-                (1, 20),
-                (2, 400),
-                (3, 8902),
-                (4, 197281),
-                (5, 4865609),
-                (6, 119060324)
-            };
-
-            Positions.Add(new PerftPosition(Rudz.Chess.Fen.Fen.StartPositionFen, vals));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

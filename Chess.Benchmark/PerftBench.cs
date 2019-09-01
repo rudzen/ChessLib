@@ -24,17 +24,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using Chess.Perft;
-
-namespace BenchmarkCore
+namespace Chess.Benchmark
 {
     using BenchmarkDotNet.Attributes;
+    using Perft;
+    using Perft.Interfaces;
 
     //[ClrJob(true), CoreJob]
     //[RPlotExporter, RankColumn]
     public class PerftBench
     {
-        private Perft _perft;
+        private IPerft _perft;
 
         [Params(4, 5, 6)]
         public int N;
@@ -42,8 +42,9 @@ namespace BenchmarkCore
         [GlobalSetup]
         public void Setup()
         {
-            _perft = new Perft();
-            _perft.AddStartPosition();
+            _perft = PerftFactory.Create();
+            
+            //_perft.AddStartPosition();
         }
 
         [Benchmark]

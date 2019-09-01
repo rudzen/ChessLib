@@ -13,7 +13,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chess.Perft", "Chess.Perft\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chess.Perft.Interfaces", "Chess.Perft.Interfaces\Chess.Perft.Interfaces.csproj", "{4AD06BC1-F944-41E8-AAF8-3AA02642E18C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Perft", "Perft\Perft.csproj", "{8BE6ADD1-7347-412E-B974-02C5866E59A4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Perft", "Perft\Perft.csproj", "{8BE6ADD1-7347-412E-B974-02C5866E59A4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chess.Perft.Framework", "Chess.Perft.Framework\Chess.Perft.Framework.csproj", "{55E449CF-B5AB-4405-8B64-2F1AB1346D90}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -71,6 +73,14 @@ Global
 		{8BE6ADD1-7347-412E-B974-02C5866E59A4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8BE6ADD1-7347-412E-B974-02C5866E59A4}.Release|x64.ActiveCfg = Release|Any CPU
 		{8BE6ADD1-7347-412E-B974-02C5866E59A4}.Release|x64.Build.0 = Release|Any CPU
+		{55E449CF-B5AB-4405-8B64-2F1AB1346D90}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{55E449CF-B5AB-4405-8B64-2F1AB1346D90}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{55E449CF-B5AB-4405-8B64-2F1AB1346D90}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{55E449CF-B5AB-4405-8B64-2F1AB1346D90}.Debug|x64.Build.0 = Debug|Any CPU
+		{55E449CF-B5AB-4405-8B64-2F1AB1346D90}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{55E449CF-B5AB-4405-8B64-2F1AB1346D90}.Release|Any CPU.Build.0 = Release|Any CPU
+		{55E449CF-B5AB-4405-8B64-2F1AB1346D90}.Release|x64.ActiveCfg = Release|Any CPU
+		{55E449CF-B5AB-4405-8B64-2F1AB1346D90}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

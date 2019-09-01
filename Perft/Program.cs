@@ -1,5 +1,5 @@
 /*
-ChessLib, a chess data structure library
+Perft, a chess perft testing application
 
 MIT License
 
@@ -24,33 +24,43 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using System.Collections.Generic;
+
 namespace Perft
 {
     using Chess.Perft;
+    using Chess.Perft.Interfaces;
     using CommandLine;
+    using DryIoc;
+    using Microsoft.Extensions.Configuration;
     using Options;
     using Parsers;
     using Rudz.Chess;
     using Rudz.Chess.Fen;
     using Serilog;
     using System;
-    using System.Collections.Concurrent;
     using System.Diagnostics;
+    using System.IO;
     using System.Linq;
     using System.Threading.Tasks;
+    using TimeStamp;
 
     internal static class Program
     {
         private static readonly string Line = new string('-', 65);
 
-        private static readonly BlockingCollection<PerftPrintData> PrintData = new BlockingCollection<PerftPrintData>();
+        private static readonly ILogger log;
+
+        private const string ConfigFileName = "appsettings.json";
+
+        static Program()
+        {
+            Framework.Startup(BuildConfiguration, AddServices);
+            log = Framework.Logger;
+        }
 
         public static async Task<int> Main(string[] args)
         {
-            Log.Logger = new LoggerConfiguration()
-                .WriteTo.Console()
-                .CreateLogger();
-
             EpdOptions epdOptions = null;
             FenOptions fenOptions = null;
             TTOptions ttOptions = null;
@@ -93,17 +103,19 @@ namespace Perft
 
         private static async Task<int> RunAsync(EpdOptions epdOptions, FenOptions fenOptions, TTOptions ttOptions)
         {
-            Log.Information("ChessLib Perft test program {0} ({1})", "v0.1.1", BuildTimeStamp.TimeStamp);
-            Log.Information("High timer resolution : {0}", Stopwatch.IsHighResolution);
-            Log.Information("Initializing..");
+            log.Information("ChessLib Perft test program {0} ({1})", "v0.1.1", Framework.IoC.Resolve<IBuildTimeStamp>().TimeStamp);
+            log.Information("High timer resolution : {0}", Stopwatch.IsHighResolution);
+            log.Information("Initializing..");
 
             var useEpd = epdOptions != null;
 
             if (!useEpd && fenOptions == null)
-                fenOptions = new FenOptions { Depths = new[] { 5 }, Fens = new[] { Fen.StartPositionFen } };
+                fenOptions = new FenOptions { Depths = new[] { 6 }, Fens = new[] { Fen.StartPositionFen } };
 
             if (ttOptions == null)
                 ttOptions = new TTOptions { Use = true, Size = 32 };
+
+            Game.Table.SetSize(ttOptions.Size);
 
             void BoardPrint(string s) => Log.Information("Board:\n{0}", s);
 
@@ -112,6 +124,11 @@ namespace Perft
             {
                 var epdResult = await RunEpd(epdOptions, BoardPrint).ConfigureAwait(false);
                 return epdResult;
+            }
+            else if (fenOptions != null)
+            {
+                var fenResult = await RunFen(fenOptions, BoardPrint).ConfigureAwait(false);
+                return fenResult;
             }
 
             //if (baseOptions.Depth == 0)
@@ -178,28 +195,79 @@ namespace Perft
             return returnValue;
         }
 
+        private static async Task<int> RunFen(FenOptions fenOptions, Action<string> boardPrint = null)
+        {
+            var depths = fenOptions.Depths.Select(d => (d, 0ul)).ToList();
+
+            var perftPositions = new List<IPerftPosition>(fenOptions.Fens.Select(f => PerftPositionFactory.Create(f, depths)));
+
+            var p = Framework.IoC.Resolve<IPerft>();
+            var errors = 0;
+
+            foreach (var pp in perftPositions)
+            {
+                p.SetGamePosition(pp);
+                boardPrint?.Invoke(p.GetBoard());
+                log.Information("Fen         : {0}", pp.Fen);
+                log.Information(Line);
+
+                foreach (var (d, e) in pp.Value)
+                {
+                    log.Information("Depth       : {0}", d);
+                    var sw = Stopwatch.StartNew();
+                    var result = await p.DoPerftAsync(d).ConfigureAwait(false);
+                    sw.Stop();
+
+                    // add 1 to avoid potential dbz
+                    var elapsedMs = sw.ElapsedMilliseconds + 1;
+                    var nps = 1000 * result / (ulong)elapsedMs;
+                    log.Information("Time passed : {0}", elapsedMs);
+                    log.Information("Nps         : {0}", nps);
+                    log.Information("Result      : {0} - should be {1}", result, e);
+                    log.Information("TT hits     : {0}", Game.Table.Hits);
+                    if (e == result)
+                        log.Information("Move count matches!");
+                    else
+                    {
+                        log.Error("Move count failed!");
+                        errors++;
+                    }
+                    Console.WriteLine();
+                }
+
+                Game.Table.Clear();
+
+            }
+
+            return 0;
+        }
+
         private static async Task<int> RunEpd(EpdOptions options, Action<string> boardPrint = null)
         {
+            //var r = new PerftRunner2();
+            //await r.Run(options, boardPrint).ConfigureAwait(false);
+
             //var r = new PerftRunner();
             //r.Initialize();
             //await r.Run(options);
 
-            var parserSettings = new EpdParserSettings { Filename = options.Epds.First() };
-            var parser = new EpdParser(parserSettings);
+            //return 0;
 
+            var parser = Framework.IoC.Resolve<IEpdParser>();
+            parser.Settings.Filename = options.Epds.First();
             var sw = Stopwatch.StartNew();
 
             var parsedCount = await parser.ParseAsync().ConfigureAwait(false);
 
             sw.Stop();
             var elapsedMs = sw.ElapsedMilliseconds;
-            Log.Information("Parsed {0} epd entries in {1} ms", parsedCount, elapsedMs);
+            log.Information("Parsed {0} epd entries in {1} ms", parsedCount, elapsedMs);
 
             var perftPositions = parser.Sets.Select(set => PerftPositionFactory.Create(set.Epd, set.Perft)).ToList();
 
             var errors = 0;
 
-            var perft = new Perft(boardPrint);
+            var perft = Framework.IoC.Resolve<IPerft>();
 
             perft.Positions = perftPositions;
 
@@ -208,27 +276,28 @@ namespace Perft
                 var pp = perftPositions[i];
                 perft.SetGamePosition(pp);
                 boardPrint?.Invoke(perft.GetBoard());
-                Log.Information("Fen         : {0}", pp.Fen);
-                Log.Information(Line);
+                log.Information("Fen         : {0}", pp.Fen);
+                log.Information(Line);
 
                 foreach (var (depth, expected) in parser.Sets[i].Perft)
                 {
-                    Log.Information("Depth       : {0}", depth);
+                    log.Information("Depth       : {0}", depth);
                     sw.Restart();
                     var result = await perft.DoPerftAsync(depth).ConfigureAwait(false);
                     sw.Stop();
+
                     // add 1 to avoid potential dbz
                     elapsedMs = sw.ElapsedMilliseconds + 1;
                     var nps = 1000 * result / (ulong)elapsedMs;
-                    Log.Information("Time passed : {0}", elapsedMs);
-                    Log.Information("Nps         : {0}", nps);
-                    Log.Information("Result      : {0} - should be {1}", result, expected);
-                    Log.Information("TT hits     : {0}", Game.Table.Hits);
+                    log.Information("Time passed : {0}", elapsedMs);
+                    log.Information("Nps         : {0}", nps);
+                    log.Information("Result      : {0} - should be {1}", result, expected);
+                    log.Information("TT hits     : {0}", Game.Table.Hits);
                     if (expected == result)
-                        Log.Information("Move count matches!");
+                        log.Information("Move count matches!");
                     else
                     {
-                        Log.Error("Move count failed!");
+                        log.Error("Move count failed!");
                         errors++;
                     }
                     Console.WriteLine();
@@ -239,6 +308,179 @@ namespace Perft
 
             return 0;
             //return errors;
+        }
+
+        private static void BuildConfiguration(IConfigurationBuilder builder)
+        {
+            // Read the configuration file for this assembly
+            builder.SetBasePath(Directory.GetCurrentDirectory())
+                //.AddInMemoryCollection(new[] { new KeyValuePair<string, string>("ScannerName", scannerName) })
+                .AddJsonFile(ConfigFileName);
+        }
+
+        public static void AddServices(IContainer container, IConfiguration configuration)
+        {
+            // Bind logger with configuration
+            container.Register(made: Made.Of(() => ConfigureLogger(configuration)), reuse: Reuse.Singleton);
+
+            // Bind build time stamp class
+            container.Register<IBuildTimeStamp, BuildTimeStamp>(reuse: Reuse.Singleton);
+
+            // Bind chess classes
+            container.Register<IGame, Game>(reuse: Reuse.Transient);
+            container.Register<IMoveList, MoveList>(reuse: Reuse.Transient);
+            container.Register<IMaterial, Material>(reuse: Reuse.Transient);
+            container.Register<IPosition, Position>(reuse: Reuse.Transient);
+            container.Register<IKillerMoves, KillerMoves>(reuse: Reuse.Transient);
+
+            // Bind chess perft classes
+            container.Register<IPerftPosition, PerftPosition>(reuse: Reuse.Transient);
+            container.Register<IPerft, Perft>(reuse: Reuse.Transient);
+
+            // Bind perft classes
+            container.Register<IEpdParserSettings, EpdParserSettings>(reuse: Reuse.Singleton);
+            container.Register<IEpdSet, EpdSet>(reuse: Reuse.Transient);
+            container.Register<IEpdParser, EpdParser>(reuse: Reuse.Singleton);
+
+            // Bind a connection string
+            //container.Register(made: Made.Of(() => ConnectionFactory.CreateConnection(configuration)), reuse: Reuse.Singleton);
+
+            //container.Register<IFileSystemScannerDatabase, FileSystemScannerDatabase>();
+
+            //// Add other singletons services
+            //container.Register<IExceptionFormatter, ExceptionFormatter>(reuse: Reuse.Singleton);
+            //container.Register<IDisk, Disk>(reuse: Reuse.Singleton);
+            //container.Register<IScanner, Scanner>(reuse: Reuse.Transient);
+
+            //// Add other transient services
+            //container.Register<ISqlScriptIterator, SqlScriptIterator>(reuse: Reuse.Transient);
+            //container.Register<IStatistics, Statistics>(reuse: Reuse.Transient);
+            //container.Register<IBatch, Batch>(reuse: Reuse.Transient);
+            //container.Register<IPropertyType, PropertyType>(reuse: Reuse.Transient);
+
+            //// TODO : Re-code the entirety to use a more subtle IoC
+            //// Register services which requires special care (for now).
+            //// Note that when resolving these, the helper method object.ToParams() can be used
+            //container.Register<IFileScannerBranchConfig, FileScannerBranchConfig>
+            //(
+            //    made: Made.Of(() => new FileScannerBranchConfig
+            //        (
+            //        Arg.Of(0, IfUnresolved.Throw),
+            //        Arg.Of(0, IfUnresolved.Throw),
+            //        Arg.Of<string>(null, IfUnresolved.ReturnDefault),
+            //        Arg.Of<string>(null, IfUnresolved.ReturnDefault),
+            //        Arg.Of<string>(null, IfUnresolved.ReturnDefault)
+            //        )
+            //    ),
+            //    reuse: Reuse.Transient
+            //);
+
+            //container.Register<IBranch, Branch>
+            //(
+            //    //made: Made.Of(() => new Branch
+            //    //    (
+            //    //    Arg.Of<IFileSystemScannerDatabase>(IfUnresolved.Throw),
+            //    //    Arg.Of<IFileScannerBranchConfig>(IfUnresolved.Throw)
+            //    //    )
+            //    //),
+            //    reuse: Reuse.Transient
+            //);
+
+            //container.Register<IPoint, Point>
+            //(
+            //    made: Made.Of(() => new Point
+            //        (
+            //            Arg.Of<int>(IfUnresolved.Throw),
+            //            Arg.Of<string>(null, IfUnresolved.Throw),
+            //            Arg.Of<string>(null, IfUnresolved.Throw),
+            //            Arg.Of(false, IfUnresolved.Throw)
+            //        )
+            //    ),
+            //    reuse: Reuse.Transient
+            //);
+
+            //// Register PropertyReader services
+            //container.Register<IPropertyReader, AccessControlPropertyReader>(serviceKey: "Access Control", reuse: Reuse.Transient);
+            //container.Register<IPropertyReader, ExtendedPropertyReader>(serviceKey: "Extended", reuse: Reuse.Transient);
+            //container.Register<IPropertyReader, OpenXmlPropertyReader>(serviceKey: "OpenXML", reuse: Reuse.Transient);
+
+            //// Register calculated properties
+            ////int propertyTypeID, string type, string value
+            //container.Register<ICalculatedProperty, ConstantCalculatedProperty>
+            //(
+            //    made: Made.Of(() => new ConstantCalculatedProperty
+            //        (
+            //            Arg.Of<int>(IfUnresolved.Throw),
+            //            Arg.Of<string>(null, IfUnresolved.Throw)
+            //        )
+            //    ),
+            //    reuse: Reuse.Transient,
+            //    serviceKey: CalculatedPropertyType.Constant
+            //);
+
+            //container.Register<ICalculatedProperty, PropertyCalculatedProperty>
+            //(
+            //    made: Made.Of(() => new PropertyCalculatedProperty
+            //        (
+            //            Arg.Of<int>(IfUnresolved.Throw),
+            //            Arg.Of<string>(null, IfUnresolved.Throw)
+            //        )
+            //    ),
+            //    reuse: Reuse.Transient,
+            //    serviceKey: CalculatedPropertyType.Property
+            //);
+
+            //container.Register<ICalculatedProperty, RootDirectoryCalculatedProperty>
+            //(
+            //    made: Made.Of(() => new RootDirectoryCalculatedProperty
+            //        (
+            //            Arg.Of<int>(IfUnresolved.Throw),
+            //            Arg.Of<string>(null, IfUnresolved.Throw)
+            //        )
+            //    ),
+            //    reuse: Reuse.Transient,
+            //    serviceKey: CalculatedPropertyType.RootDirectoryName
+            //);
+
+            //// single instance
+            //container.Register<ISingleApplicationSemaphore, SingleApplicationSemaphore>(reuse: Reuse.Singleton);
+
+            // property
+            //container.Register<IProperty, Property>
+            //(
+            //    made:Made.Of(() => PropertyFactory.Create(
+            //        Arg.Of<ICalculatedProperty>(IfUnresolved.Throw),
+            //        Arg.Of<IFileSystemInfoExtended>(IfUnresolved.ReturnDefault),
+            //        Arg.Of<IDictionary<int, string>>(IfUnresolved.ReturnDefault)
+            //    )),
+            //    reuse: Reuse.Transient
+            //);
+
+            // propertiesconfiguration
+            //container.Register<IPropertiesConfiguration, PropertiesConfiguration>
+            //(
+            //    made: Made.Of(() => PropertiesConfigurationFactory.Create(
+            //        Arg.Of<IFileSystemInfoExtended>(IfUnresolved.Throw),
+            //        Arg.Of<List<IPropertyReader>>(IfUnresolved.ReturnDefault)
+            //    ))
+            //);
+        }
+
+        private static ILogger ConfigureLogger(IConfiguration configuration)
+        {
+            // Apply the config to the logger
+            Log.Logger = new LoggerConfiguration()
+                //.WriteTo.EventLog("File System Scanner", manageEventSource: true, restrictedToMinimumLevel: LogEventLevel.Error)
+                .ReadFrom.Configuration(configuration)
+                .Enrich.WithThreadId()
+                .Enrich.FromLogContext()
+                .CreateLogger();
+            AppDomain.CurrentDomain.ProcessExit += (s, e) => Log.CloseAndFlush();
+            return Log.Logger;
+        }
+
+        private static void PrintData(PerftPrintData data)
+        {
         }
     }
 }

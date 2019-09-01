@@ -1,5 +1,5 @@
 ﻿/*
-ChessLib, a chess data structure library
+Perft, a chess perft testing application
 
 MIT License
 
@@ -34,7 +34,7 @@ namespace Perft.Parsers
     /// <summary>
     /// Fast epd file parser
     /// </summary>
-    public class EpdParser
+    public class EpdParser : IEpdParser
     {
         public EpdParser(IEpdParserSettings settings)
         {
