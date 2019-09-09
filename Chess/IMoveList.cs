@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Rudz.Chess.Types;
 
 namespace Rudz.Chess
 {
-    public interface IMoveList : IEnumerable<Move>
+    public interface IMoveList : IEnumerable<Move>, IDisposable
     {
         int Count { get; }
         void Add(Move move);

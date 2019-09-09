@@ -59,7 +59,7 @@ namespace Perft.Parsers
                         string id = string.Empty, epd = string.Empty;
                         bool idSet = false, epdSet = false;
                         var perftData = new List<string>(16);
-                        while ((s = await sr.ReadLineAsync()) != null)
+                        while ((s = await sr.ReadLineAsync().ConfigureAwait(false)) != null)
                         {
                             // skip comments
                             if (s.Length < 4 || s[0] == '#')

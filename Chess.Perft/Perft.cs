@@ -57,6 +57,7 @@ namespace Chess.Perft
     {
         public Perft(IGame game, IEnumerable<IPerftPosition> positions)
         {
+            Positions = new List<IPerftPosition>();
             CurrentGame = game;
         }
 

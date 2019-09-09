@@ -1,4 +1,4 @@
-﻿/*
+/*
 ChessLib, a chess data structure library
 
 MIT License
@@ -27,6 +27,8 @@ SOFTWARE.
 namespace Rudz.Chess
 {
     using Extensions;
+    using System;
+    using System.Buffers;
     using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
@@ -41,10 +43,19 @@ namespace Rudz.Chess
 
         private int _moveIndex;
 
+        private bool _disposed;
+
+        private ArrayPool<Move> _pool;
+
+        static MoveList()
+        {
+        }
+
         public MoveList()
         {
+            _pool = ArrayPool<Move>.Shared;
             _moveIndex = -1;
-            _moves = new Move[MaxPossibleMoves];
+            _moves = _pool.Rent(MaxPossibleMoves);// new Move[MaxPossibleMoves];
         }
 
         public int Count => _moveIndex + 1;
@@ -101,5 +112,21 @@ namespace Rudz.Chess
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        private void ReleaseUnmanagedResources()
+        {
+            _pool.Return(_moves);
+        }
+
+        public void Dispose()
+        {
+            ReleaseUnmanagedResources();
+            //GC.SuppressFinalize(this);
+        }
+
+        ~MoveList()
+        {
+            ReleaseUnmanagedResources();
+        }
     }
 }
