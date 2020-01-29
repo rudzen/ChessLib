@@ -24,6 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using Rudz.Chess.Extensions;
+
 namespace Rudz.Chess.Types
 {
     using Enums;
@@ -52,7 +54,7 @@ namespace Rudz.Chess.Types
         public static implicit operator Player(EPlayer value) => new Player(value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator Player(bool value) => new Player(value ? 1 : 0);
+        public static implicit operator Player(bool value) => new Player(value.AsByte());
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Player operator ~(Player player) => new Player(player.Side ^ 1);

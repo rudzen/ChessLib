@@ -3,7 +3,7 @@ Perft, a chess perft testing application
 
 MIT License
 
-Copyright (c) 2017-2019 Rudy Alex Kohn
+Copyright (c) 2019-2020 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -40,7 +40,13 @@ namespace Perft.Parsers
         public bool Equals(IEpdSet x, IEpdSet y)
         {
             var idComparison = string.Equals(x.Id, y.Id, StringComparison.Ordinal);
-            return idComparison && string.Equals(x.Epd, y.Epd, StringComparison.Ordinal);
+
+            if (!idComparison)
+                return false;
+
+            var epdComparison = string.Equals(x.Epd, y.Epd, StringComparison.Ordinal);
+
+            return epdComparison;
         }
 
         public int GetHashCode(IEpdSet obj)
@@ -48,9 +54,14 @@ namespace Perft.Parsers
 
         public int CompareTo(IEpdSet other)
         {
-            if (ReferenceEquals(this, other)) return 0;
-            if (other is null) return 1;
+            if (ReferenceEquals(this, other))
+                return 0;
+
+            if (other is null)
+                return 1;
+
             var idComparison = string.Compare(Id, other.Id, StringComparison.Ordinal);
+
             return idComparison != 0
                 ? idComparison
                 : string.Compare(Epd, other.Epd, StringComparison.Ordinal);

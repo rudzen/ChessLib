@@ -290,9 +290,9 @@ namespace Rudz.Chess
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void RemovePiece(Square square, Piece piece)
         {
-            BitBoard invertedSq = square;
-            BoardPieces[piece.AsInt()] &= ~invertedSq;
-            OccupiedBySide[piece.ColorOf()] &= ~invertedSq;
+            var invertedSq = ~square;
+            BoardPieces[piece.AsInt()] &= invertedSq;
+            OccupiedBySide[piece.ColorOf()] &= invertedSq;
             BoardLayout[square.AsInt()] = PieceExtensions.EmptyPiece;
             if (IsProbing)
                 return;

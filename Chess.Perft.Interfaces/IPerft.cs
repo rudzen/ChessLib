@@ -32,7 +32,7 @@ namespace Chess.Perft.Interfaces
 
     public interface IPerft
     {
-        Action<string> BoardPrintCallback { get; }
+        Action<string> BoardPrintCallback { get; set; }
 
         List<IPerftPosition> Positions { get; set; }
 

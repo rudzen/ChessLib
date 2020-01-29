@@ -306,7 +306,9 @@ namespace Rudz.Chess
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void MoveToString(Move move, StringBuilder output)
         {
-            if (_chess960 || move.IsCastlelingMove())
+            if (!_chess960 && !move.IsCastlelingMove())
+                output.Append(move.ToString());
+            else
             {
                 if (_xfen && move.GetToSquare() == ECastleling.Long.GetKingCastleTo(move.GetMovingSide()))
                     output.Append(ECastleling.Long.GetCastlelingString());
@@ -317,11 +319,7 @@ namespace Rudz.Chess
                     output.Append(move.GetFromSquare().ToString());
                     output.Append(Position.GetRookCastleFrom(move.GetToSquare()).ToString());
                 }
-
-                return;
             }
-
-            output.Append(move.ToString());
         }
 
         public void UpdateDrawTypes()

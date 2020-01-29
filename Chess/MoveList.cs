@@ -45,7 +45,7 @@ namespace Rudz.Chess
 
         private bool _disposed;
 
-        private ArrayPool<Move> _pool;
+        private readonly ArrayPool<Move> _pool;
 
         static MoveList()
         {

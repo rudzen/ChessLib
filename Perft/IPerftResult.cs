@@ -24,10 +24,20 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Perft.Options
+namespace Perft
 {
-    public interface IOptions
+    public interface IPerftResult
     {
-        
+        string Fen { get; set; }
+        int Depth { get; set; }
+        ulong Result { get; set; }
+        ulong CorrectResult { get; set; }
+        long ElapsedMs { get; set; }
+        ulong Nps { get; set; }
+        ulong TableHits { get; set; }
+        bool Passed { get; set; }
+        int Errors { get; set; }
+
+        void Clear();
     }
 }

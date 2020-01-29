@@ -32,9 +32,14 @@ namespace Rudz.Chess.Factories
 
         public static IGame Create(string fen)
         {
-            var g = Create(new Position());
+            var g = Create();
             g.SetFen(fen);
             return g;
+        }
+
+        public static IGame Create()
+        {
+            return new Game(new Position());
         }
     }
 }

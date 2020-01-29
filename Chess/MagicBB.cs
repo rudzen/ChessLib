@@ -161,8 +161,7 @@ namespace Rudz.Chess
 
         private static ulong InitmagicmovesOcc(ReadOnlySpan<int> squares, ulong linocc)
         {
-            // Note, the numSquares IS required, as this method will be called without a fully populated squares.
-            var ret = 0UL;
+            var ret = 0ul;
             for (var i = 0; i < squares.Length; ++i)
             {
                 if ((linocc & (One << i)) != 0)
@@ -174,7 +173,7 @@ namespace Rudz.Chess
 
         private static ulong InitmagicmovesRmoves(int square, ulong occ)
         {
-            ulong ret = 0;
+            var ret = 0ul;
             var rowbits = Ff << (8 * (square / 8));
 
             var bit = One << square;

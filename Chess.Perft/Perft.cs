@@ -61,7 +61,7 @@ namespace Chess.Perft
             CurrentGame = game;
         }
 
-        public Action<string> BoardPrintCallback { get; }
+        public Action<string> BoardPrintCallback { get; set; }
 
         /// <summary>
         /// The positional data for the run

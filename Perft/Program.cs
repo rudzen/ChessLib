@@ -3,7 +3,7 @@ Perft, a chess perft testing application
 
 MIT License
 
-Copyright (c) 2017-2019 Rudy Alex Kohn
+Copyright (c) 2019-2020 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -34,51 +34,42 @@ namespace Perft
     using Options;
     using Parsers;
     using Rudz.Chess;
-    using Rudz.Chess.Fen;
     using Serilog;
     using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
     using System.IO;
-    using System.Linq;
     using System.Threading.Tasks;
     using TimeStamp;
 
     internal static class Program
     {
-        private static readonly string Line = new string('-', 65);
-
-        private static readonly ILogger log;
-
         private const string ConfigFileName = "appsettings.json";
 
         static Program()
         {
             Framework.Startup(BuildConfiguration, AddServices);
-            log = Framework.Logger;
         }
 
         public static async Task<int> Main(string[] args)
         {
-            EpdOptions epdOptions = null;
-            FenOptions fenOptions = null;
-            TTOptions ttOptions = null;
+            IOptions options = null;
+            //FenOptions fenOptions = null;
+            //TTOptions ttOptions = null;
 
-            var setEdp = new Func<EpdOptions, int>(options =>
+            var setEdp = new Func<EpdOptions, int>(o =>
             {
-                epdOptions = options;
+                options = o;
                 return 0;
             });
 
-            var setFen = new Func<FenOptions, int>(options =>
+            var setFen = new Func<FenOptions, int>(o =>
             {
-                fenOptions = options;
+                options = o;
                 return 0;
             });
 
-            var setTT = new Func<TTOptions, int>(options =>
+            var setTT = new Func<TTOptions, int>(o =>
             {
-                ttOptions = options;
+                options = o;
                 return 0;
             });
 
@@ -95,217 +86,15 @@ namespace Perft
                     errs => 1);
 
             if (returnValue == 0)
-                returnValue = await RunAsync(epdOptions, fenOptions, ttOptions).ConfigureAwait(false);
+            {
+                var perftRunner = Framework.IoC.Resolve<IPerftRunner>();
+                perftRunner.Options = options;
+                perftRunner.SaveResults = true;
+
+                returnValue = await perftRunner.Run().ConfigureAwait(false);
+            }
 
             return returnValue;
-        }
-
-        private static async Task<int> RunAsync(EpdOptions epdOptions, FenOptions fenOptions, TTOptions ttOptions)
-        {
-            log.Information("ChessLib Perft test program {0} ({1})", "v0.1.1", Framework.IoC.Resolve<IBuildTimeStamp>().TimeStamp);
-            log.Information("High timer resolution : {0}", Stopwatch.IsHighResolution);
-            log.Information("Initializing..");
-
-            var useEpd = epdOptions != null;
-
-            if (!useEpd && fenOptions == null)
-                fenOptions = new FenOptions { Depths = new[] { 6 }, Fens = new[] { Fen.StartPositionFen } };
-
-            if (ttOptions == null)
-                ttOptions = new TTOptions { Use = true, Size = 32 };
-
-            Game.Table.SetSize(ttOptions.Size);
-
-            void BoardPrint(string s) => Log.Information("Board:\n{0}", s);
-
-            // test parse
-            if (useEpd)
-            {
-                var epdResult = await RunEpd(epdOptions, BoardPrint).ConfigureAwait(false);
-                return epdResult;
-            }
-            else if (fenOptions != null)
-            {
-                var fenResult = await RunFen(fenOptions, BoardPrint).ConfigureAwait(false);
-                return fenResult;
-            }
-
-            //if (baseOptions.Depth == 0)
-            //    baseOptions.Depth = 5;
-
-            //var p = new P(baseOptions.Depth, Callback);
-
-            //bool defaultPos;
-
-            //if (!baseOptions.Fen.Any())
-            //{
-            //    baseOptions.Fen = new []{ Fen.StartPositionFen };
-            //    p.AddStartPosition();
-            //    defaultPos = true;
-            //    Log.Information("Using startpos");
-            //}
-            //else
-            //{
-            //    var perftPositions = baseOptions.Fen.Select(fen =>
-            //    {
-            //        var toAdd = string.Equals(fen, "startpos", StringComparison.OrdinalIgnoreCase)
-            //            ? Fen.StartPositionFen
-            //            : fen;
-            //        return new PerftPosition(toAdd);
-            //    });
-
-            //    foreach (var perftPosition in perftPositions)
-            //    {
-            //        p.AddPosition(perftPosition);
-            //        Log.Information("Found position {0}", perftPosition.Fen);
-            //    }
-
-            //    //p.AddPosition(new PerftPosition(options.Fen, new List<ulong>(1) { options.MoveCount }));
-            //    defaultPos = false;
-            //}
-
-            //Log.Information("Running");
-            //var watch = Stopwatch.StartNew();
-            //var result = p.DoPerft();
-
-            //watch.Stop();
-
-            //// add 1 to avoid potential dbz
-            //var elapsedMs = watch.ElapsedMilliseconds + 1;
-            //var nps = 1000 * result / (ulong)elapsedMs;
-
-            //Log.Information("Time passed : {0}", elapsedMs);
-            //Log.Information("Nps         : {0}", nps);
-
-            var returnValue = 0;
-
-            //if (p.HasPositionCount(0, baseOptions.Depth) && defaultPos)
-            //{
-            //    var matches = p.GetPositionCount(0, baseOptions.Depth) == result;
-
-            //    Console.WriteLine(matches
-            //        ? "Move count matches!"
-            //        : "Move count failed!");
-            //}
-
-            //Console.WriteLine("Press any key to exit.");
-            //Console.ReadKey();
-
-            return returnValue;
-        }
-
-        private static async Task<int> RunFen(FenOptions fenOptions, Action<string> boardPrint = null)
-        {
-            var depths = fenOptions.Depths.Select(d => (d, 0ul)).ToList();
-
-            var perftPositions = new List<IPerftPosition>(fenOptions.Fens.Select(f => PerftPositionFactory.Create(f, depths)));
-
-            var p = Framework.IoC.Resolve<IPerft>();
-            var errors = 0;
-
-            foreach (var pp in perftPositions)
-            {
-                p.SetGamePosition(pp);
-                boardPrint?.Invoke(p.GetBoard());
-                log.Information("Fen         : {0}", pp.Fen);
-                log.Information(Line);
-
-                foreach (var (d, e) in pp.Value)
-                {
-                    log.Information("Depth       : {0}", d);
-                    var sw = Stopwatch.StartNew();
-                    var result = await p.DoPerftAsync(d).ConfigureAwait(false);
-                    sw.Stop();
-
-                    // add 1 to avoid potential dbz
-                    var elapsedMs = sw.ElapsedMilliseconds + 1;
-                    var nps = 1000 * result / (ulong)elapsedMs;
-                    log.Information("Time passed : {0}", elapsedMs);
-                    log.Information("Nps         : {0}", nps);
-                    log.Information("Result      : {0} - should be {1}", result, e);
-                    log.Information("TT hits     : {0}", Game.Table.Hits);
-                    if (e == result)
-                        log.Information("Move count matches!");
-                    else
-                    {
-                        log.Error("Move count failed!");
-                        errors++;
-                    }
-                    Console.WriteLine();
-                }
-
-                Game.Table.Clear();
-            }
-
-            return 0;
-        }
-
-        private static async Task<int> RunEpd(EpdOptions options, Action<string> boardPrint = null)
-        {
-            //var r = new PerftRunner2();
-            //await r.Run(options, boardPrint).ConfigureAwait(false);
-
-            //var r = new PerftRunner();
-            //r.Initialize();
-            //await r.Run(options);
-
-            //return 0;
-
-            var parser = Framework.IoC.Resolve<IEpdParser>();
-            parser.Settings.Filename = options.Epds.First();
-            var sw = Stopwatch.StartNew();
-
-            var parsedCount = await parser.ParseAsync().ConfigureAwait(false);
-
-            sw.Stop();
-            var elapsedMs = sw.ElapsedMilliseconds;
-            log.Information("Parsed {0} epd entries in {1} ms", parsedCount, elapsedMs);
-
-            var perftPositions = parser.Sets.Select(set => PerftPositionFactory.Create(set.Epd, set.Perft)).ToList();
-
-            var errors = 0;
-
-            var perft = Framework.IoC.Resolve<IPerft>();
-
-            perft.Positions = perftPositions;
-
-            for (var i = 0; i < parser.Sets.Count; ++i)
-            {
-                var pp = perftPositions[i];
-                perft.SetGamePosition(pp);
-                boardPrint?.Invoke(perft.GetBoard());
-                log.Information("Fen         : {0}", pp.Fen);
-                log.Information(Line);
-
-                foreach (var (depth, expected) in parser.Sets[i].Perft)
-                {
-                    log.Information("Depth       : {0}", depth);
-                    sw.Restart();
-                    var result = await perft.DoPerftAsync(depth).ConfigureAwait(false);
-                    sw.Stop();
-
-                    // add 1 to avoid potential dbz
-                    elapsedMs = sw.ElapsedMilliseconds + 1;
-                    var nps = 1000 * result / (ulong)elapsedMs;
-                    log.Information("Time passed : {0}", elapsedMs);
-                    log.Information("Nps         : {0}", nps);
-                    log.Information("Result      : {0} - should be {1}", result, expected);
-                    log.Information("TT hits     : {0}", Game.Table.Hits);
-                    if (expected == result)
-                        log.Information("Move count matches!");
-                    else
-                    {
-                        log.Error("Move count failed!");
-                        errors++;
-                    }
-                    Console.WriteLine();
-                }
-            }
-
-            //Log.Information("EPD parsing complete. Encountered {0} errors.", errors);
-
-            return 0;
-            //return errors;
         }
 
         private static void BuildConfiguration(IConfigurationBuilder builder)
@@ -334,6 +123,8 @@ namespace Perft
             // Bind chess perft classes
             container.Register<IPerftPosition, PerftPosition>(Reuse.Transient);
             container.Register<IPerft, Perft>(Reuse.Transient);
+            container.Register<IPerftResult, PerftResult>(Reuse.Transient);
+            container.Register<IPerftRunner, PerftRunner>(Reuse.Transient);
 
             // Bind perft classes
             container.Register<IEpdParserSettings, EpdParserSettings>(Reuse.Singleton);
@@ -352,10 +143,6 @@ namespace Perft
                 .CreateLogger();
             AppDomain.CurrentDomain.ProcessExit += (s, e) => Log.CloseAndFlush();
             return Log.Logger;
-        }
-
-        private static void PrintData(PerftPrintData data)
-        {
         }
     }
 }

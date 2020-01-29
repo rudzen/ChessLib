@@ -57,6 +57,9 @@ namespace Rudz.Chess.Extensions
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static double Round(this double @this, int digits) => Math.Round(@this, digits);
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static unsafe byte AsByte(this bool @this) => *(byte*)&@this;
+
         /// <summary>
         /// Converts a string to an int.
         /// Approx. 17 times faster than int.Parse.
