@@ -458,7 +458,7 @@ namespace Rudz.Chess
                 to = castleType.GetKingCastleTo(State.SideToMove);
             }
 
-            var moveList = new MoveGenerator(this).Moves;
+            var moveList = this.GenerateMoves();
 
             var matchingMoves = moveList.Where(x => x.GetFromSquare() == from && x.GetToSquare() == to);
 
@@ -469,7 +469,7 @@ namespace Rudz.Chess
                     continue;
                 if (!move.IsPromotionMove())
                     return move;
-                if (char.ToLower(m[m.Length - 1]) != move.GetPromotedPiece().GetPromotionChar())
+                if (char.ToLower(m[^1]) != move.GetPromotedPiece().GetPromotionChar())
                     continue;
 
                 return move;
@@ -552,7 +552,7 @@ namespace Rudz.Chess
                 if (CanCastle(move.GetFromSquare() < to ? ECastleling.Short : ECastleling.Long))
                     return true;
 
-                return new MoveGenerator(this).Moves.Contains(move);
+                return this.GenerateMoves().Contains(move);
             }
             else if (move.IsEnPassantMove())
             {
@@ -592,7 +592,7 @@ namespace Rudz.Chess
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool IsMate()
         {
-            return !new MoveGenerator(this).Moves.Any(IsLegal);
+            return !this.GenerateMoves().Any(IsLegal);
         }
 
         /// <summary>

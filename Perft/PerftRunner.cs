@@ -29,12 +29,12 @@ namespace Perft
     using Chess.Perft;
     using Chess.Perft.Interfaces;
     using DryIoc;
-    using Extensions;
     using Microsoft.Extensions.Configuration;
     using Newtonsoft.Json;
     using Options;
     using Parsers;
     using Rudz.Chess;
+    using Rudz.Chess.Extensions;
     using Serilog;
     using System;
     using System.Collections.Generic;

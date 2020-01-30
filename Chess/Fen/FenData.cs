@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2019 Rudy Alex Kohn
+Copyright (c) 2017-2020 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,9 +24,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-// ReSharper disable PossibleNullReferenceException
-// ReSharper disable ExceptionNotDocumentedOptional
-
 namespace Rudz.Chess.Fen
 {
     using System;
@@ -40,83 +37,77 @@ namespace Rudz.Chess.Fen
     /// </summary>
     public sealed class FenData : EventArgs, IFenData
     {
-        static FenData() => FenComparer = new FenEqualityComparer();
+        private int _index;
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public FenData(string fen, int index = 0)
+        private readonly Queue<(int, int)> _splitPoints;
+
+        public FenData(ReadOnlyMemory<char> fen)
         {
+            _splitPoints = new Queue<(int, int)>(6);
             Fen = fen;
-            Index = index;
+            var start = 0;
+
+            var s = fen.Span;
+
+            // determine split points
+            for (var i = 0; i < s.Length; i++)
+            {
+                if (s[i] != ' ')
+                    continue;
+
+                _splitPoints.Enqueue((start, i));
+                start = i + 1;
+            }
+
+            // add last
+            _splitPoints.Enqueue((start, s.Length));
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public FenData() : this(string.Empty)
+        public FenData(char[] fen) : this(fen.AsMemory())
         { }
 
-        public static IEqualityComparer<FenData> FenComparer { get; }
+        public FenData(string fen) : this(fen.AsMemory())
+        { }
 
-        public string Fen { get; set; }
+        public int Index => _index;
 
-        public int Index { get; private set; }
+        public ReadOnlyMemory<char> Fen { get; }
 
-        public char GetAdvance => Fen[Index++];
-
-        public char Get => Fen[Index];
-
-        public char this[int index] => Fen[Index];
+        public char this[int index] => Fen.Span[index];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator FenData(int value) => new FenData(Chess.Fen.Fen.StartPositionFen, value);
+        public ReadOnlySpan<char> Chunk()
+        {
+            // ReSharper disable once InlineOutVariableDeclaration
+            (int start, int end) result;
+            _index++;
+            return _splitPoints.TryDequeue(out result)
+                ? Fen.Span.Slice(result.start, result.end - result.start)
+                : ReadOnlySpan<char>.Empty;
+        }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator FenData(string fen) => new FenData(fen);
+        public bool Equals(FenData other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator ==(FenData left, FenData right) => left.Equals(right);
+            if (_splitPoints.Count != other._splitPoints.Count)
+                return false;
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator !=(FenData left, FenData right) => !left.Equals(right);
+            if (Fen.Length != other.Fen.Length)
+                return false;
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Advance() => Index++;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Advance(int count) => Index += count;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public override int GetHashCode() => Fen.GetHashCode() ^ (Index << 24);
+            return Equals(_splitPoints, other._splitPoints) && Fen.Equals(other.Fen);
+        }
 
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj))
-                return false;
-            if (ReferenceEquals(this, obj))
-                return true;
-            return obj.GetType() == GetType() && Equals((FenData)obj);
+            return ReferenceEquals(this, obj) || obj is FenData other && Equals(other);
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool Equals(FenData other) => string.Equals(Fen, other.Fen);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public override string ToString() => Fen ?? string.Empty;
-
-        private sealed class FenEqualityComparer : IEqualityComparer<FenData>
+        public override int GetHashCode()
         {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public bool Equals(FenData x, FenData y)
-            {
-                if (ReferenceEquals(x, y))
-                    return true;
-                if (ReferenceEquals(x, null))
-                    return false;
-                if (ReferenceEquals(y, null))
-                    return false;
-                return x.GetType() == y.GetType() && string.Equals(x.Fen, y.Fen);
-            }
-
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public int GetHashCode(FenData obj) => obj.Fen != null ? obj.Fen.GetHashCode() : 0;
+            return HashCode.Combine(_splitPoints, Fen);
         }
     }
 }

@@ -96,7 +96,8 @@ No perft cache:
     {
         public static void Main(string[] args)
         {
-            var summary = BenchmarkRunner.Run<PerftBench>();
+            var summary = BenchmarkRunner.Run<FenBenchmark>();
+            //var summary = BenchmarkRunner.Run<PerftBench>();
         }
     }
 }

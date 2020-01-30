@@ -80,9 +80,6 @@ namespace Perft
              * fens -f "rnkq1bnr/p3ppp1/1ppp3p/3B4/6b1/2PQ3P/PP1PPP2/RNB1K1NR w KQ -" -d 6
              * fens -f "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1" -d 6
              * epd -f D:\perft-random.epd
-             *
-             * results in index out of bounds with PositionIndex: 
-             *
              */
 
             var returnValue = Parser.Default.ParseArguments<EpdOptions, FenOptions, TTOptions>(args)

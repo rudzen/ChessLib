@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2019 Rudy Alex Kohn
+Copyright (c) 2017-2020 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -26,24 +26,16 @@ SOFTWARE.
 
 namespace Rudz.Chess.Fen
 {
+    using System;
+
     public interface IFenData
     {
-        string Fen { get; set; }
-
         int Index { get; }
-
-        char GetAdvance { get; }
-
-        char Get { get; }
-
+        ReadOnlyMemory<char> Fen { get; }
         char this[int index] { get; }
-
-        void Advance();
-
-        void Advance(int count);
-
+        ReadOnlySpan<char> Chunk();
+        bool Equals(FenData other);
         bool Equals(object obj);
-
         int GetHashCode();
     }
 }

@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2019 Rudy Alex Kohn
+Copyright (c) 2017-2020 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -44,7 +44,7 @@ namespace Rudz.Chess
 
     public sealed class Game : IGame
     {
-        private const int MaxPositions = 4 << 10;
+        private const int MaxPositions = 2 << 11;
 
         /// <summary>
         /// [short/long, side] castle positional | array when altering castleling rights.
@@ -133,9 +133,9 @@ namespace Rudz.Chess
 
             State.Key = previous.Key;
             State.PawnStructureKey = previous.PawnStructureKey;
+            State.Material.MakeMove(move);
 
             UpdateKey(move);
-            State.Material.MakeMove(move);
 
             return true;
         }
@@ -144,15 +144,15 @@ namespace Rudz.Chess
         {
             // careful.. NO check for invalid PositionIndex.. make sure it's always counted correctly
             Position.TakeMove(State.LastMove);
+            if (PositionIndex == 0)
+                throw new Exception("fail");
             --PositionIndex;
             Position.State = _stateList[PositionIndex];
             State.HalfMoveCount = PositionIndex;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public FenError NewGame(string fen = Fen.Fen.StartPositionFen) => SetFen(fen);
-
-        public FenError SetFen(FenData fenData) => SetFen(fenData.Fen);
+        public FenError NewGame(string fen = Fen.Fen.StartPositionFen) => SetFen(new FenData(fen));
 
         /// <summary>
         /// Apply a FEN string board setup to the board structure.
@@ -169,14 +169,12 @@ namespace Rudz.Chess
         /// -6 = Error while parsing en-passant square
         /// -9 = FEN length exceeding maximum
         /// </returns>
-        public FenError SetFen(string fenString, bool validate = false)
+        public FenError SetFen(FenData fen, bool validate = false)
         {
-            // TODO : Replace with stream at some point
-
-            // basic validation, catches format errors
             if (validate)
-                Fen.Fen.Validate(fenString);
+                Fen.Fen.Validate(fen.Fen.ToString());
 
+            // correctly clear all pieces and invoke possible notification(s)
             var bb = Occupied;
             while (bb)
             {
@@ -185,96 +183,94 @@ namespace Rudz.Chess
                 BitBoards.ResetLsb(ref bb);
             }
 
-            Position.Clear();
+            var chunk = fen.Chunk();
 
-            var fen = new FenData(fenString);
-
-            Player player;
-            var c = fen.GetAdvance;
+            if (chunk.IsEmpty)
+                return new FenError();
 
             var f = 1; // file (column)
             var r = 8; // rank (row)
+            Player player;
 
-            // map pieces to data structure
-            while (c != 0 && !(f == 9 && r == 1))
+            foreach (var c in chunk)
             {
                 if (char.IsDigit(c))
                 {
                     f += c - '0';
                     if (f > 9)
                         return new FenError(-1, fen.Index);
-
-                    c = fen.GetAdvance;
-                    continue;
                 }
-
-                if (c == '/')
+                else if (c == '/')
                 {
                     if (f != 9)
                         return new FenError(-2, fen.Index);
 
                     r--;
                     f = 1;
-                    c = fen.GetAdvance;
-                    continue;
                 }
+                else
+                {
+                    var pieceIndex = PieceExtensions.PieceChars.IndexOf(c);
 
-                var pieceIndex = PieceExtensions.PieceChars.IndexOf(c);
+                    if (pieceIndex == -1)
+                        return new FenError(-3, fen.Index);
 
-                if (pieceIndex == -1)
-                    return new FenError(-3, fen.Index);
+                    player = char.IsLower(PieceExtensions.PieceChars[pieceIndex]);
 
-                player = char.IsLower(PieceExtensions.PieceChars[pieceIndex]);
+                    var square = new Square(r - 1, f - 1);
 
-                var square = new Square(r - 1, f - 1);
+                    AddPiece(square, player, (EPieceType)pieceIndex);
 
-                AddPiece(square, player, (EPieceType)pieceIndex);
-
-                c = fen.GetAdvance;
-
-                f++;
+                    f++;
+                }
             }
 
-            if (!Fen.Fen.IsDelimiter(c))
-                return new FenError(-4, fen.Index);
+            // player
+            chunk = fen.Chunk();
 
-            c = fen.GetAdvance;
+            if (chunk.IsEmpty || chunk.Length != 1)
+                return new FenError(-3, fen.Index);
 
-            player = c == 'w' ? 0 : 1;
+            player = (chunk[0] != 'w').ToInt();
 
-            if (player == -1)
-                return new FenError(-4, fen.Index);
+            // castleling
+            chunk = fen.Chunk();
 
-            if (!Fen.Fen.IsDelimiter(fen.GetAdvance))
+            if (!SetupCastleling(chunk))
                 return new FenError(-5, fen.Index);
 
-            if (!SetupCastleling(fen))
-                return new FenError(-5, fen.Index);
+            // en-passant
+            chunk = fen.Chunk();
 
-            if (!Fen.Fen.IsDelimiter(fen.GetAdvance))
-                return new FenError(-6, fen.Index);
+            if (chunk.Length == 1 || chunk[0] == '-' || !chunk[0].InBetween('a', 'h'))
+                State.EnPassantSquare = ESquare.none;
+            else
+                State.EnPassantSquare = chunk[1].InBetween('3', '6') ? ESquare.none : new Square(chunk[1] - '1', chunk[0] - 'a').Value;
 
-            State.EnPassantSquare = fen.GetEpSquare();
+            // move number
+            chunk = fen.Chunk();
 
-            // temporary.. the whole method should be using this, but this will do for now.
+            var moveNum = 0;
+            var halfMoveNum = 0;
 
-            var moveCounters = fen.Fen.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            if (!chunk.IsEmpty)
+            {
+                chunk.ToIntegral(out halfMoveNum);
 
-            var first = moveCounters[moveCounters.Length - 2];
-            var second = moveCounters[moveCounters.Length - 1];
+                if (halfMoveNum > 0)
+                    halfMoveNum--;
 
-            second.ToIntegral(out int number);
+                // half move number
+                chunk = fen.Chunk();
 
-            if (number > 0)
-                number -= 1;
+                chunk.ToIntegral(out moveNum);
+            }
 
-            PositionIndex = PositionStart = number;
-
-            first.ToIntegral(out number);
+            PositionIndex = PositionStart = moveNum;
 
             Position.State = _stateList[PositionIndex];
 
-            State.ReversibleHalfMoveCount = number;
+            State.ReversibleHalfMoveCount = halfMoveNum;
 
             State.SideToMove = player;
 
@@ -289,7 +285,7 @@ namespace Rudz.Chess
             if (State.EnPassantSquare != ESquare.none)
                 State.Key ^= State.EnPassantSquare.File().GetZobristEnPessant();
 
-            Position.InCheck = Position.IsAttacked(Position.GetPieceSquare(EPieceType.King, State.SideToMove), ~State.SideToMove);
+            Position.InCheck = Position.IsAttacked(Position.GetPieceSquare(EPieceType.King, player), ~player);
 
             return 0;
         }
@@ -332,7 +328,7 @@ namespace Rudz.Chess
             if (State.ReversibleHalfMoveCount >= 100)
                 gameEndType |= EGameEndType.FiftyMove;
 
-            var moveList = new MoveGenerator(Position).Moves;
+            var moveList = Position.GenerateMoves();
             if (!moveList.Any(move => Position.IsLegal(move)))
                 gameEndType |= EGameEndType.Pat;
 
@@ -378,29 +374,27 @@ namespace Rudz.Chess
         public ulong Perft(int depth)
         {
             var moveList = Position.GenerateMoves();
-
             if (depth == 1)
                 return (ulong)moveList.Count;
 
-            var (found, entry) = Table.Probe(Position.State.Key);
+            //var (found, entry) = Table.Probe(Position.State.Key);
 
-            if (found && entry.Key32 == (uint)(Position.State.Key >> 32) && entry.Depth == depth)
-                return (ulong)entry.Value;
+            //if (found && entry.Key32 == (uint)(Position.State.Key >> 32) && entry.Depth == depth && entry.StaticValue == int.MinValue)
+            //    return (ulong)entry.Value;
 
             var tot = 0ul;
 
-            var move = MoveExtensions.EmptyMove;
-
-            for (var i = 0; i < moveList.Count; ++i)
+            foreach (var move in moveList)
             {
-                move = moveList.GetMove(i);
-                MakeMove(move);
-                tot += Perft(depth - 1);
-                TakeMove();
+                if (MakeMove(move))
+                {
+                    tot += Perft(depth - 1);
+                    TakeMove();
+                }
             }
 
-            if (move != MoveExtensions.EmptyMove)
-                Table.Store(Position.State.Key, (int)tot, Bound.Exact, (sbyte)depth, move, 0);
+            //if (move != MoveExtensions.EmptyMove)
+            //    Table.Store(Position.State.Key, (int)tot, Bound.Exact, (sbyte)depth, move, int.MinValue);
 
             return tot;
         }
@@ -506,21 +500,16 @@ namespace Rudz.Chess
             return false;
         }
 
-        private bool SetupCastleling(IFenData fen)
+        private bool SetupCastleling(ReadOnlySpan<char> castlelingSpan)
         {
             // reset castleling rights to defaults
             _castleRightsMask.Fill(ECastlelingRights.Any);
 
-            if (fen.Get == '-')
-            {
-                fen.Advance();
+            if (castlelingSpan.Length == 1 && castlelingSpan[0] == '-')
                 return true;
-            }
 
-            while (fen.Get != 0 && fen.Get != ' ')
+            foreach (var c in castlelingSpan)
             {
-                var c = fen.Get;
-
                 if (c.InBetween('A', 'H'))
                 {
                     _chess960 = true;
@@ -572,8 +561,6 @@ namespace Rudz.Chess
                             return false;
                     }
                 }
-
-                fen.Advance();
             }
 
             return true;

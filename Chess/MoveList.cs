@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2019 Rudy Alex Kohn
+Copyright (c) 2017-2020 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -26,9 +26,6 @@ SOFTWARE.
 
 namespace Rudz.Chess
 {
-    using Extensions;
-    using System;
-    using System.Buffers;
     using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
@@ -43,22 +40,16 @@ namespace Rudz.Chess
 
         private int _moveIndex;
 
-        private bool _disposed;
-
-        private readonly ArrayPool<Move> _pool;
-
-        static MoveList()
-        {
-        }
-
         public MoveList()
         {
-            _pool = ArrayPool<Move>.Shared;
             _moveIndex = -1;
-            _moves = _pool.Rent(MaxPossibleMoves);// new Move[MaxPossibleMoves];
+            _moves = new Move[MaxPossibleMoves];
         }
 
         public int Count => _moveIndex + 1;
+
+        public Move this[int index] => _moves[index];
+
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static MoveList operator +(MoveList left, Move right)
@@ -78,12 +69,6 @@ namespace Rudz.Chess
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Add(Move move) => _moves[++_moveIndex] = move;
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Move GetMove(int index) =>
-            index.InBetween(0, _moveIndex)
-                ? _moves[index]
-                : MoveExtensions.EmptyMove;
-
         /// <summary>
         /// Primary use is for polyglot moves
         /// </summary>
@@ -92,19 +77,7 @@ namespace Rudz.Chess
         /// <returns>The first move that matches from and to squares</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Move GetMove(Square from, Square to)
-        {
-            foreach (var move in _moves)
-            {
-                if (move == MoveExtensions.EmptyMove)
-                    return MoveExtensions.EmptyMove;
-                if (move.GetFromSquare() == from & move.GetToSquare() == to)
-                    return move;
-            }
-
-            return MoveExtensions.EmptyMove;
-        }
-
-        public Move this[int index] => GetMove(index);
+            => _moves.FirstOrDefault(m => m.GetFromSquare() == @from && m.GetToSquare() == to);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public IEnumerator<Move> GetEnumerator()
@@ -112,21 +85,5 @@ namespace Rudz.Chess
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
-        private void ReleaseUnmanagedResources()
-        {
-            _pool.Return(_moves);
-        }
-
-        public void Dispose()
-        {
-            ReleaseUnmanagedResources();
-            //GC.SuppressFinalize(this);
-        }
-
-        ~MoveList()
-        {
-            ReleaseUnmanagedResources();
-        }
     }
 }
