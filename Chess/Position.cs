@@ -391,19 +391,19 @@ namespace Rudz.Chess
             switch (m)
             {
                 case "O-O":
+                case "e1g1" when IsPieceTypeOnSquare(ESquare.e1, EPieceType.King):
+                case "e8g8" when IsPieceTypeOnSquare(ESquare.e8, EPieceType.King):
                 case "OO":
                 case "0-0":
                 case "00":
-                case "e1g1" when IsPieceTypeOnSquare(ESquare.e1, EPieceType.King):
-                case "e8g8" when IsPieceTypeOnSquare(ESquare.e8, EPieceType.King):
                     return ECastleling.Short;
 
                 case "O-O-O":
+                case "e1c1" when IsPieceTypeOnSquare(ESquare.e1, EPieceType.King):
+                case "e8c8" when IsPieceTypeOnSquare(ESquare.e8, EPieceType.King):
                 case "OOO":
                 case "0-0-0":
                 case "000":
-                case "e1c1" when IsPieceTypeOnSquare(ESquare.e1, EPieceType.King):
-                case "e8c8" when IsPieceTypeOnSquare(ESquare.e8, EPieceType.King):
                     return ECastleling.Long;
             }
 

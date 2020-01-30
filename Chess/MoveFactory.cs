@@ -189,7 +189,7 @@ namespace Rudz.Chess
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static MoveList AddCastleMove(this IPosition pos, MoveList moves, Square from, Square to, Emgf flags)
-            => pos.AddMove(moves, EPieceType.King.MakePiece(pos.State.SideToMove), @from, to, PieceExtensions.EmptyPiece, flags, EMoveType.Castle);
+            => pos.AddMove(moves, EPieceType.King.MakePiece(pos.State.SideToMove), from, to, PieceExtensions.EmptyPiece, flags, EMoveType.Castle);
 
         /// <summary>
         /// Move generation leaf method.

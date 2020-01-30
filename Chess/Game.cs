@@ -44,7 +44,7 @@ namespace Rudz.Chess
 
     public sealed class Game : IGame
     {
-        private const int MaxPositions = 2048;
+        private const int MaxPositions = 4 << 10;
 
         /// <summary>
         /// [short/long, side] castle positional | array when altering castleling rights.

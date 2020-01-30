@@ -68,7 +68,7 @@ namespace Rudz.Chess.Fen
         {
             var f = fen.Trim().AsSpan();
 
-            if (f.Length <= MaxFenLen)
+            if (f.Length >= MaxFenLen)
                 throw new InvalidFenException($"Invalid length for fen {fen}.");
 
             if (!ValidFenRegex.Value.IsMatch(fen))

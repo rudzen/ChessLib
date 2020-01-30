@@ -28,7 +28,9 @@ namespace Perft
 {
     using Chess.Perft;
     using Chess.Perft.Interfaces;
+    using DryIoc;
     using Extensions;
+    using Microsoft.Extensions.Configuration;
     using Newtonsoft.Json;
     using Options;
     using Parsers;
@@ -59,7 +61,11 @@ namespace Perft
 
         private readonly IPerftResult _result;
 
-        public PerftRunner(IEpdParser parser, ILogger log, IBuildTimeStamp buildTimeStamp, IPerft perft, IPerftResult result)
+        private readonly IConfiguration _configuration;
+
+        private bool _usingEpd;
+
+        public PerftRunner(IEpdParser parser, ILogger log, IBuildTimeStamp buildTimeStamp, IPerft perft, IPerftResult result, IConfiguration configuration)
         {
             _epdParser = parser;
             _log = log;
@@ -67,14 +73,19 @@ namespace Perft
             _perft = perft;
             _perft.BoardPrintCallback = PrintBoard;
             _result = result;
+            _configuration = configuration;
             _runners = new Func<CancellationToken, IAsyncEnumerable<IPerftPosition>>[] { ParseEpd, ParseFen };
+
+            TranspositionTableOptions = Framework.IoC.Resolve<IOptions>(serviceKey: OptionType.TTOptions) as TTOptions;
+            TranspositionTableOptions.Use = configuration.GetValue<bool>("TranspositionTable:Use");
+            TranspositionTableOptions.Size = configuration.GetValue<int>("TranspositionTable:Size");
         }
 
         public bool SaveResults { get; set; }
 
         public IOptions Options { get; set; }
 
-        public IOptions TranspositionTableOptions { get; set; }
+        public TTOptions TranspositionTableOptions { get; set; }
 
         public Task<int> Run() => InternalRun(CancellationToken.None);
 
@@ -87,7 +98,10 @@ namespace Perft
             if (Options == null)
                 throw new ArgumentNullException(nameof(Options), "Cannot be null");
 
+            Game.Table.SetSize(TranspositionTableOptions.Size);
+
             var runnerIndex = (Options is FenOptions).ToInt();
+            _usingEpd = runnerIndex == 0;
             var positions = _runners[runnerIndex].Invoke(cancellationToken);
 
             _perft.Positions = new List<IPerftPosition>();
@@ -175,15 +189,15 @@ namespace Perft
 
                 var elapsedMs = sw.ElapsedMilliseconds;
 
-                await ComputeResults(result, depth, expected, elapsedMs, _result).ConfigureAwait(false);
+                await ComputeResults(result, depth, expected, elapsedMs, _result);
 
-                errors += await LogResults(_result).ConfigureAwait(false);
+                errors += await LogResults(_result);
 
                 if (!string.IsNullOrEmpty(baseFileName))
                     File.WriteAllText($"{baseFileName}{_result.Depth}].json", JsonConvert.SerializeObject(_result));
             }
 
-            _log.Information("EPD parsing complete. Encountered {0} errors.", errors);
+            _log.Information("{0} parsing complete. Encountered {1} errors.", _usingEpd ? "EPD" : "FEN", errors);
 
             _result.Errors = errors;
 
@@ -219,10 +233,16 @@ namespace Perft
             {
                 _log.Information("Time passed : {0}", result.ElapsedMs);
                 _log.Information("Nps         : {0}", result.Nps);
-                _log.Information("Result      : {0} - should be {1}", result.Result, result.CorrectResult);
+                if (_usingEpd)
+                    _log.Information("Result      : {0} - should be {1}", result.Result, result.CorrectResult);
+                else
+                    _log.Information("Result      : {0}", result.Result);
                 _log.Information("TT hits     : {0}", Game.Table.Hits);
 
                 int error = 0;
+
+                if (!_usingEpd)
+                    return error;
 
                 if (result.CorrectResult == result.Result)
                     _log.Information("Move count matches!");

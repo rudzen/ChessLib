@@ -51,30 +51,37 @@ namespace Perft
 
         public static async Task<int> Main(string[] args)
         {
+            OptionType optionsUsed = OptionType.None;
             IOptions options = null;
-            //FenOptions fenOptions = null;
-            //TTOptions ttOptions = null;
+            IOptions ttOptions = null;
 
             var setEdp = new Func<EpdOptions, int>(o =>
             {
+                optionsUsed |= OptionType.EdpOptions;
                 options = o;
                 return 0;
             });
 
             var setFen = new Func<FenOptions, int>(o =>
             {
+                optionsUsed |= OptionType.FenOptions;
                 options = o;
                 return 0;
             });
 
             var setTT = new Func<TTOptions, int>(o =>
             {
-                options = o;
+                optionsUsed |= OptionType.TTOptions;
+                ttOptions = o;
                 return 0;
             });
 
             /*
+             * fens -f "rnkq1bnr/p3ppp1/1ppp3p/3B4/6b1/2PQ3P/PP1PPP2/RNB1K1NR w KQ -" -d 6
              * fens -f "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1" -d 6
+             * epd -f D:\perft-random.epd
+             *
+             * results in index out of bounds with PositionIndex: 
              *
              */
 
@@ -119,6 +126,11 @@ namespace Perft
             container.Register<IMaterial, Material>(Reuse.Transient);
             container.Register<IPosition, Position>(Reuse.Transient);
             container.Register<IKillerMoves, KillerMoves>(Reuse.Transient);
+
+            // Bind options
+            container.Register<IOptions, EpdOptions>(Reuse.Singleton, serviceKey: OptionType.EdpOptions);
+            container.Register<IOptions, FenOptions>(Reuse.Singleton, serviceKey: OptionType.FenOptions);
+            container.Register<IOptions, TTOptions>(Reuse.Singleton, serviceKey: OptionType.TTOptions);
 
             // Bind chess perft classes
             container.Register<IPerftPosition, PerftPosition>(Reuse.Transient);

@@ -34,7 +34,7 @@ namespace Perft
     {
         bool SaveResults { get; set; }
         IOptions Options { get; set; }
-        IOptions TranspositionTableOptions { get; set; }
+        TTOptions TranspositionTableOptions { get; set; }
         Task<int> Run();
         Task<int> Run(CancellationToken cancellationToken);
     }
