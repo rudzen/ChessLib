@@ -28,6 +28,7 @@ namespace Chess.Perft
 {
     using Interfaces;
     using Rudz.Chess;
+    using Rudz.Chess.Fen;
     using System;
     using System.Collections.Generic;
     using System.Linq;
@@ -57,10 +58,14 @@ namespace Chess.Perft
     {
         public Perft(IGame game, IEnumerable<IPerftPosition> positions)
         {
+            if (positions.Any())
+                Positions = positions.ToList();
+            else
+                Positions = new List<IPerftPosition>();
             CurrentGame = game;
         }
 
-        public Action<string> BoardPrintCallback { get; }
+        public Action<string> BoardPrintCallback { get; set; }
 
         /// <summary>
         /// The positional data for the run
@@ -77,13 +82,12 @@ namespace Chess.Perft
             var total = 0ul;
 
             if (Positions.Count == 0)
-            {
                 return total;
-            }
 
             foreach (var position in Positions)
             {
-                CurrentGame.SetFen(position.Fen);
+                var fp = new FenData(position.Fen);
+                CurrentGame.SetFen(fp);
                 var res = CurrentGame.Perft(depth);
                 total += res;
                 BoardPrintCallback?.Invoke(position.Fen);
@@ -100,7 +104,10 @@ namespace Chess.Perft
             => CurrentGame.ToString();
 
         public void SetGamePosition(IPerftPosition pp)
-            => CurrentGame.SetFen(pp.Fen);
+        {
+            var fp = new FenData(pp.Fen);
+            CurrentGame.SetFen(fp);
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void ClearPositions() => Positions.Clear();

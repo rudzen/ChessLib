@@ -27,6 +27,7 @@ SOFTWARE.
 namespace Rudz.Chess
 {
     using Enums;
+    using Extensions;
     using System;
     using System.Runtime.CompilerServices;
     using Types;
@@ -54,7 +55,8 @@ namespace Rudz.Chess
             if (Equals(_killerMoves[depth, 0], move, fromPiece))
                 return 2;
 
-            return Equals(_killerMoves[depth, 1], move, fromPiece) ? 1 : 0;
+            var result = Equals(_killerMoves[depth, 1], move, fromPiece).AsByte();
+            return result;
         }
 
         public void UpdateValue(int depth, Move move, Piece fromPiece)

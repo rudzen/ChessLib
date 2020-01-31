@@ -11,6 +11,7 @@
     public sealed class FrameworkEnvironment : IFrameworkEnvironment
     {
         [DllImport("libc")]
+        // ReSharper disable once IdentifierTypo
         public static extern uint getuid();
 
         #region Public Properties
@@ -47,16 +48,12 @@
             try
             {
                 // Perform OS check
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                {
-                    using (var identity = WindowsIdentity.GetCurrent())
-                    {
-                        var principal = new WindowsPrincipal(identity);
-                        return principal.IsInRole(WindowsBuiltInRole.Administrator);
-                    }
-                }
+                if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    return getuid() == 0;
 
-                return getuid() == 0;
+                using var identity = WindowsIdentity.GetCurrent();
+                var principal = new WindowsPrincipal(identity);
+                return principal.IsInRole(WindowsBuiltInRole.Administrator);
             }
             catch (Exception ex)
             {

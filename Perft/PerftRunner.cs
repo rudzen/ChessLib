@@ -1,216 +1,269 @@
-﻿///*
-//Perft, a chess perft testing application
+﻿/*
+Perft, a chess perft testing application
 
-//MIT License
+MIT License
 
-//Copyright (c) 2017-2019 Rudy Alex Kohn
+Copyright (c) 2019-2020 Rudy Alex Kohn
 
-//Permission is hereby granted, free of charge, to any person obtaining a copy
-//of this software and associated documentation files (the "Software"), to deal
-//in the Software without restriction, including without limitation the rights
-//to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-//copies of the Software, and to permit persons to whom the Software is
-//furnished to do so, subject to the following conditions:
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-//The above copyright notice and this permission notice shall be included in all
-//copies or substantial portions of the Software.
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
-//THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-//OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-//SOFTWARE.
-//*/
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
 
-//using System;
-//using Chess.Perft;
-//using Chess.Perft.Interfaces;
-//using Perft.Options;
-//using Perft.Parsers;
-//using Serilog;
-//using System.Collections.Generic;
-//using System.Diagnostics;
-//using System.Linq;
-//using System.Reflection.Metadata.Ecma335;
-//using System.Threading;
-//using System.Threading.Tasks;
-//using System.Threading.Tasks.Dataflow;
-//using DryIoc;
+namespace Perft
+{
+    using Chess.Perft;
+    using Chess.Perft.Interfaces;
+    using DryIoc;
+    using Microsoft.Extensions.Configuration;
+    using Newtonsoft.Json;
+    using Options;
+    using Parsers;
+    using Rudz.Chess;
+    using Rudz.Chess.Extensions;
+    using Serilog;
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.IO;
+    using System.Linq;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using TimeStamp;
 
-//namespace Perft
-//{
-//    /// <summary>
-//    /// Main perft runner
-//    /// </summary>
-//    public sealed class PerftRunner
-//    {
-//        private TransformBlock<(string, int, ulong), IPerft> _epdDataFlow;
+    public sealed class PerftRunner : IPerftRunner
+    {
+        private static readonly string Line = new string('-', 65);
 
-//        private TransformBlock<string, PerftPrintData> _fenDataFlow;
+        private readonly Func<CancellationToken, IAsyncEnumerable<IPerftPosition>>[] _runners;
 
-//        private int _runErrors;
+        private readonly IEpdParser _epdParser;
 
-//        private object _printLocker = new object();
+        private readonly ILogger _log;
 
-//        private static ILogger _log;
+        private readonly IBuildTimeStamp _buildTimeStamp;
 
-//        public PerftRunner(ILogger log)
-//        {
-//            _log = log;
-//        }
+        private readonly IPerft _perft;
 
-//        public void Initialize()
-//        {
-//        }
+        private readonly IPerftResult _result;
 
-//        /// <summary>
-//        ///
-//        /// </summary>
-//        public async Task Run(EpdOptions epdOptions)
-//        {
-//            _log.Information("Parsing files");
+        private readonly IConfiguration _configuration;
 
-//            // generate settings
-//            var parserSettings = new List<IEpdParserSettings>(epdOptions.Epds.Select(e => new EpdParserSettings { Filename = e }));
+        private bool _usingEpd;
 
-//            // generate parsers
-//            var parsers = new List<EpdParser>(parserSettings.Select(ps => new EpdParser(ps)));
+        public PerftRunner(IEpdParser parser, ILogger log, IBuildTimeStamp buildTimeStamp, IPerft perft, IPerftResult result, IConfiguration configuration)
+        {
+            _epdParser = parser;
+            _log = log;
+            _buildTimeStamp = buildTimeStamp;
+            _perft = perft;
+            _perft.BoardPrintCallback = PrintBoard;
+            _result = result;
+            _configuration = configuration;
+            _runners = new Func<CancellationToken, IAsyncEnumerable<IPerftPosition>>[] { ParseEpd, ParseFen };
 
-//            // reset run error counter
-//            _runErrors = 0;
+            TranspositionTableOptions = Framework.IoC.Resolve<IOptions>(serviceKey: OptionType.TTOptions) as TTOptions;
+            TranspositionTableOptions.Use = configuration.GetValue<bool>("TranspositionTable:Use");
+            TranspositionTableOptions.Size = configuration.GetValue<int>("TranspositionTable:Size");
+        }
 
-//            var swTotal = Stopwatch.StartNew();
+        public bool SaveResults { get; set; }
 
-//            var totalParsed = 0ul;
+        public IOptions Options { get; set; }
 
-//            // start parsing..
-//            foreach (var epdParser in parsers)
-//            {
-//                var sw = Stopwatch.StartNew();
-//                var parsedCount = await epdParser.ParseAsync().ConfigureAwait(false);
-//                sw.Stop();
-//                totalParsed += parsedCount;
-//                _log.Information("Parsed {0} from {1} in {2} ms", parsedCount, epdParser.Settings.Filename, sw.ElapsedMilliseconds);
-//            }
+        public TTOptions TranspositionTableOptions { get; set; }
 
-//            swTotal.Stop();
+        public Task<int> Run() => InternalRun(CancellationToken.None);
 
-//            _log.Information("Parsed a total of {0} entries from {1} epd files in {2} ms", totalParsed, parsers.Count, swTotal.ElapsedMilliseconds);
-//            _log.Information("Building data flow engine");
+        public Task<int> Run(CancellationToken cancellationToken) => InternalRun(cancellationToken);
 
-//            if (_epdDataFlow == null)
-//                _epdDataFlow = CreateEpdDataFlow();
+        private async Task<int> InternalRun(CancellationToken cancellationToken)
+        {
+            LogInfoHeader();
 
-//            foreach (var epdParserSet in parsers.SelectMany(epdParser => epdParser.Sets))
-//                foreach (var (depth, expected) in epdParserSet.Perft)
-//                    _epdDataFlow.Post((epdParserSet.Epd, depth, expected));
+            if (Options == null)
+                throw new ArgumentNullException(nameof(Options), "Cannot be null");
 
-//            _epdDataFlow.Complete();
-//            await _epdDataFlow.Completion.ConfigureAwait(false);
-//        }
+            Game.Table.SetSize(TranspositionTableOptions.Size);
 
-//        public void Run(FenOptions fenOptions)
-//        {
-//            _runErrors = 0;
+            var runnerIndex = (Options is FenOptions).ToInt();
+            _usingEpd = runnerIndex == 0;
+            var positions = _runners[runnerIndex].Invoke(cancellationToken);
 
-//            ShowErrors();
-//        }
+            _perft.Positions = new List<IPerftPosition>();
 
-//        private TransformBlock<(string, int, ulong), IPerft> CreateEpdDataFlow()
-//        {
-//            //var linkOptions = new DataflowLinkOptions { PropagateCompletion = true };
-//            var blockOptions = new DataflowBlockOptions { EnsureOrdered = true };
-//            var executionDataflowBlockOptions = new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = 2 };
+            await foreach (var position in positions.WithCancellation(cancellationToken))
+            {
+                _perft.AddPosition(position);
+                var result = await ComputePerft(cancellationToken).ConfigureAwait(false);
+            }
 
-//            var createParserSettings = new TransformBlock<string, IEpdParserSettings>(
-//                _ =>
-//                {
-//                    var settings = Framework.IoC.Resolve<IEpdParserSettings>();
-//                    settings.Filename = _;
-//                    return settings;
-//                });
+            return 0;
+        }
 
-//            var createParsers = new TransformBlock<IEpdParserSettings, IEpdParser>(_ =>
-//            {
-//                var parser = Framework.IoC.Resolve<IEpdParser>();
-//                parser.Settings = _;
-//                return parser;
-//            });
+        private IAsyncEnumerable<IPerftPosition> ParseEpd(CancellationToken cancellationToken)
+        {
+            var options = Options as EpdOptions;
+            return ParseEpd(options);
+        }
 
-//            //var parseFiles = new TransformBlock<IEpdParser, IEpdParser>(_ =>
-//            //{
-//            //    var sw = Stopwatch.StartNew();
-//            //    var parsedCount = await epdParser.ParseAsync().ConfigureAwait(false);
-//            //    sw.Stop();
-//            //    totalParsed += parsedCount;
-//            //    _log.Information("Parsed {0} from {1} in {2} ms", parsedCount, epdParser.Settings.Filename, sw.ElapsedMilliseconds);
+        private IAsyncEnumerable<IPerftPosition> ParseFen(CancellationToken cancellationToken)
+        {
+            var options = Options as FenOptions;
+            return ParseFen(options);
+        }
 
-//            //});
+        private async IAsyncEnumerable<IPerftPosition> ParseEpd(EpdOptions options)
+        {
+            _epdParser.Settings.Filename = options.Epds.First();
+            var sw = Stopwatch.StartNew();
 
+            var parsedCount = await _epdParser.ParseAsync().ConfigureAwait(false);
 
-//            var createPerft = new TransformBlock<(string, int, ulong), IPerft>(set =>
-//            {
-//                var p = PerftFactory.Create();
-//                var (fen, depth, expected) = set;
-//                var pp = PerftPositionFactory.Create(fen, null);
-//                p.SetGamePosition(pp);
-//                p.Depth = depth;
-//                p.Expected = expected;
+            sw.Stop();
+            var elapsedMs = sw.ElapsedMilliseconds;
+            _log.Information("Parsed {0} epd entries in {1} ms", parsedCount, elapsedMs);
 
-//                return p;
-//            }, executionDataflowBlockOptions);
+            var perftPositions = _epdParser.Sets.Select(set => PerftPositionFactory.Create(set.Epd, set.Perft));
 
-//            var perftRun = new TransformBlock<IPerft, PerftPrintData>(async perft =>
-//            {
-//                var sw = Stopwatch.StartNew();
-//                var result = await perft.DoPerftAsync(perft.Depth).ConfigureAwait(false);
-//                sw.Stop();
-//                var elapsed = sw.ElapsedMilliseconds + 1;
-//                var pd = new PerftPrintData
-//                {
-//                    depth = perft.Depth,
-//                    expected = perft.Expected,
-//                    elapsed = elapsed,
-//                    result = result,
-//                    nps = 1000 * result / (ulong)elapsed
-//                };
+            foreach (var perftPosition in perftPositions)
+                yield return perftPosition;
+        }
 
-//                return pd;
-//            }, executionDataflowBlockOptions);
+        private async IAsyncEnumerable<IPerftPosition> ParseFen(FenOptions options)
+        {
+            const ulong zero = 0UL;
 
-//            var matchPredicate = new Func<ulong, ulong, bool>((actual, expected) => actual == expected);
+            var depths = options.Depths.Select(d => (d, zero)).ToList();
 
-//            var printBlock = new ActionBlock<PerftPrintData>(data =>
-//            {
-//                lock (_printLocker)
-//                {
-//                    _log.Information("Depth       : {0}", data.depth);
-//                    _log.Information("Time passed : {0}", data.elapsed);
-//                    _log.Information("Nps         : {0}", data.nps);
-//                    _log.Information("Result      : {0} - should be {1}", data.result, data.expected);
-//                    if (data.expected == data.result)
-//                        _log.Information("Move count matches!");
-//                    else
-//                    {
-//                        _log.Error("Move count failed!");
-//                        Interlocked.Increment(ref _runErrors);
-//                    }
-//                }
-//            }, executionDataflowBlockOptions);
+            var perftPositions = options.Fens.Select(f => PerftPositionFactory.Create(f, depths));
 
+            foreach (var perftPosition in perftPositions)
+                yield return perftPosition;
+        }
 
+        private async Task<IPerftResult> ComputePerft(CancellationToken cancellationToken)
+        {
+            _result.Clear();
 
-//            perftRun.LinkTo(printBlock);
-//            createPerft.LinkTo(perftRun);
+            var pp = _perft.Positions.Last();
 
-//            return createPerft;
-//        }
+            var baseFileName = SaveResults ? Path.Combine(System.Environment.CurrentDirectory, $"{FixFileName(pp.Fen)}[") : string.Empty;
 
-//        private void BoardPrint(string s) => _log.Information("Board:\n{0}", s);
+            var errors = 0;
 
-//        private void ShowErrors()
-//            => _log.Information("Finished - found a total of {0} errors.", _runErrors);
-//    }
-//}
+            var sw = new Stopwatch();
+
+            _result.Fen = pp.Fen;
+            _perft.SetGamePosition(pp);
+            PrintBoard(_perft.GetBoard());
+            _log.Information("Fen         : {0}", pp.Fen);
+            _log.Information(Line);
+
+            foreach (var (depth, expected) in pp.Value)
+            {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    _log.Information("Cancel requested.");
+                    break;
+                }
+
+                _log.Information("Depth       : {0}", depth);
+                sw.Restart();
+                var result = await _perft.DoPerftAsync(depth).ConfigureAwait(false);
+                sw.Stop();
+
+                var elapsedMs = sw.ElapsedMilliseconds;
+
+                await ComputeResults(result, depth, expected, elapsedMs, _result);
+
+                errors += await LogResults(_result);
+
+                if (!string.IsNullOrEmpty(baseFileName))
+                    File.WriteAllText($"{baseFileName}{_result.Depth}].json", JsonConvert.SerializeObject(_result));
+            }
+
+            _log.Information("{0} parsing complete. Encountered {1} errors.", _usingEpd ? "EPD" : "FEN", errors);
+
+            _result.Errors = errors;
+
+            return _result;
+        }
+
+        private static Task ComputeResults(ulong result, int depth, ulong expected, long elapsedMs, IPerftResult results)
+        {
+            return Task.Run(() =>
+            {
+                // compute results
+                results.Result = result;
+                results.Depth = depth;
+                // add 1 to avoid potential dbz
+                results.ElapsedMs = elapsedMs + 1;
+                results.Nps = 1000 * result / (ulong)results.ElapsedMs;
+                results.CorrectResult = expected;
+                results.Passed = expected == result;
+                results.TableHits = Game.Table.Hits;
+            });
+        }
+
+        private void LogInfoHeader()
+        {
+            _log.Information("ChessLib Perft test program {0} ({1})", "v0.1.1", _buildTimeStamp.TimeStamp);
+            _log.Information("High timer resolution : {0}", Stopwatch.IsHighResolution);
+            _log.Information("Initializing..");
+        }
+
+        private Task<int> LogResults(IPerftResult result)
+        {
+            return Task.Run(() =>
+            {
+                _log.Information("Time passed : {0}", result.ElapsedMs);
+                _log.Information("Nps         : {0}", result.Nps);
+                if (_usingEpd)
+                    _log.Information("Result      : {0} - should be {1}", result.Result, result.CorrectResult);
+                else
+                    _log.Information("Result      : {0}", result.Result);
+                _log.Information("TT hits     : {0}", Game.Table.Hits);
+
+                int error = 0;
+
+                if (!_usingEpd)
+                    return error;
+
+                if (result.CorrectResult == result.Result)
+                    _log.Information("Move count matches!");
+                else
+                {
+                    _log.Error("Move count failed!");
+                    error = 1;
+                }
+
+                return error;
+            });
+        }
+
+        private static string FixFileName(string input)
+        {
+            return input.Replace('/', '_');
+        }
+
+        private void PrintBoard(string board)
+        {
+            _log.Information("Board:\n{0}", board);
+        }
+    }
+}

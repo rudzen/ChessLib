@@ -3,7 +3,7 @@ Perft, a chess perft testing application
 
 MIT License
 
-Copyright (c) 2017-2019 Rudy Alex Kohn
+Copyright (c) 2019-2020 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -29,6 +29,7 @@ namespace Perft.Parsers
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
     using System.Threading.Tasks;
 
     /// <summary>
@@ -55,26 +56,20 @@ namespace Perft.Parsers
                 {
                     using (var sr = new StreamReader(bs))
                     {
-                        string s;
-                        string id = string.Empty, epd = string.Empty;
-                        bool idSet = false, epdSet = false;
+                        var id = string.Empty;
+                        var epd = string.Empty;
+                        var idSet = false;
+                        var epdSet = false;
                         var perftData = new List<string>(16);
-                        while ((s = await sr.ReadLineAsync()) != null)
+                        string s;
+                        while ((s = await sr.ReadLineAsync().ConfigureAwait(false)) != null)
                         {
                             // skip comments
                             if (s.Length < 4 || s[0] == '#')
                             {
                                 if (idSet && epdSet)
                                 {
-                                    var p = new List<(int, ulong)>(perftData.Count);
-                                    foreach (var pd in perftData)
-                                    {
-                                        var pp = ParsePerftLines(pd);
-                                        p.Add(pp);
-                                    }
-
-                                    Sets.Add(new EpdSet {Epd = epd, Id = id, Perft = p});
-
+                                    Sets.Add(new EpdSet { Epd = epd, Id = id, Perft = perftData.Select(ParsePerftLines).ToList() });
                                     id = epd = string.Empty;
                                     idSet = epdSet = false;
                                     perftData.Clear();

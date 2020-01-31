@@ -40,7 +40,7 @@ namespace Chess.Perft
             if (positions == null)
                 positions = Enumerable.Empty<IPerftPosition>();
 
-            var perft = new Perft(GameFactory.Create(new Position()), positions);
+            var perft = new Perft(GameFactory.Create(), positions);
             return perft;
         }
     }

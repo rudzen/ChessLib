@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2019 Rudy Alex Kohn
+Copyright (c) 2017-2020 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -27,8 +27,8 @@ SOFTWARE.
 namespace Rudz.Chess.Extensions
 {
     using System;
-    using System.Diagnostics.CodeAnalysis;
     using System.Runtime.CompilerServices;
+    using System.Runtime.InteropServices;
     using Types;
 
     public static class MathExtensions
@@ -56,6 +56,9 @@ namespace Rudz.Chess.Extensions
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static double Round(this double @this, int digits) => Math.Round(@this, digits);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static unsafe byte AsByte(this bool @this) => *(byte*)&@this;
 
         /// <summary>
         /// Converts a string to an int.
@@ -88,6 +91,7 @@ namespace Rudz.Chess.Extensions
             return neg ? -x : x;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool ToIntegral(this string str, out int result)
         {
             if (string.IsNullOrWhiteSpace(str))
@@ -122,6 +126,28 @@ namespace Rudz.Chess.Extensions
             return true;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool ToIntegral(this ReadOnlySpan<char> str, out int result)
+        {
+            if (str.IsEmpty)
+            {
+                result = 0;
+                return false;
+            }
+
+            var x = 0;
+            var pos = 0;
+            var max = str.Length - 1;
+            while (pos <= max && InBetween(str[pos], '0', '9'))
+            {
+                x = x * 10 + (str[pos] - '0');
+                pos++;
+            }
+
+            result = x;
+            return true;
+        }
+
         /// <summary>
         /// Modulo for pow^2 values...
         /// </summary>
@@ -136,5 +162,12 @@ namespace Rudz.Chess.Extensions
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsOdd(this int value) => !value.IsEven();
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int ToInt(this bool @this)
+        {
+            var myBoolSpan = MemoryMarshal.CreateReadOnlySpan(ref @this, 1);
+            return MemoryMarshal.AsBytes(myBoolSpan)[0];
+        }
     }
 }

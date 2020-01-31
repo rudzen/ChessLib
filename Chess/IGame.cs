@@ -55,8 +55,6 @@ namespace Rudz.Chess
 
         FenError NewGame(string fen = Fen.Fen.StartPositionFen);
 
-        FenError SetFen(FenData fenData);
-
         /// <summary>
         /// Apply a FEN string board setup to the board structure.
         /// </summary>
@@ -72,7 +70,7 @@ namespace Rudz.Chess
         /// -6 = Error while parsing en-passant square
         /// -9 = FEN length exceeding maximum
         /// </returns>
-        FenError SetFen(string fenString, bool validate = false);
+        FenError SetFen(FenData fenString, bool validate = false);
 
         FenData GetFen();
 

@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2019 Rudy Alex Kohn
+Copyright (c) 2017-2020 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -26,13 +26,11 @@ SOFTWARE.
 
 namespace Rudz.Chess.Fen
 {
-    using Enums;
     using Exceptions;
     using Extensions;
     using System;
     using System.Runtime.CompilerServices;
     using System.Text.RegularExpressions;
-    using Types;
 
     public static class Fen
     {
@@ -68,7 +66,7 @@ namespace Rudz.Chess.Fen
         {
             var f = fen.Trim().AsSpan();
 
-            if (f.Length <= MaxFenLen)
+            if (f.Length >= MaxFenLen)
                 throw new InvalidFenException($"Invalid length for fen {fen}.");
 
             if (!ValidFenRegex.Value.IsMatch(fen))
@@ -81,19 +79,6 @@ namespace Rudz.Chess.Fen
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsDelimiter(char c) => c == Space;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Square GetEpSquare(this FenData fen)
-        {
-            var c = fen.GetAdvance;
-
-            if (c == '-' || !c.InBetween('a', 'h'))
-                return ESquare.none;
-
-            var c2 = fen.GetAdvance;
-
-            return c.InBetween('3', '6') ? ESquare.none : new Square(c2 - '1', c - 'a').Value;
-        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static bool CountPieceValidity(ReadOnlySpan<char> str)

@@ -1,9 +1,9 @@
 ﻿/*
-Perft, a chess perft testing application
+ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2019 Rudy Alex Kohn
+Copyright (c) 2017-2020 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,14 +24,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Perft
+namespace Rudz.Chess.Fen
 {
-    public struct PerftPrintData
+    using System;
+
+    public interface IFenData
     {
-        public int depth;
-        public long elapsed;
-        public ulong nps;
-        public ulong result;
-        public ulong expected;
+        int Index { get; }
+        ReadOnlyMemory<char> Fen { get; }
+        char this[int index] { get; }
+        ReadOnlySpan<char> Chunk();
+        bool Equals(FenData other);
+        bool Equals(object obj);
+        int GetHashCode();
     }
 }

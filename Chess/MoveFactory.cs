@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2019 Rudy Alex Kohn
+Copyright (c) 2017-2020 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -27,6 +27,7 @@ SOFTWARE.
 namespace Rudz.Chess
 {
     using Enums;
+    using System;
     using System.Runtime.CompilerServices;
     using Types;
 
@@ -40,13 +41,13 @@ namespace Rudz.Chess
 
             var moves = new MoveList();
 
-            moves = pos.GenerateCapturesAndPromotions(moves, flags);
-            moves = pos.GenerateQuietMoves(moves, flags);
+            pos.GenerateCapturesAndPromotions(moves, flags);
+            pos.GenerateQuietMoves(moves, flags);
 
             return moves;
         }
 
-        private static MoveList GenerateCapturesAndPromotions(this IPosition pos, MoveList moves, Emgf flags)
+        private static void GenerateCapturesAndPromotions(this IPosition pos, MoveList moves, Emgf flags)
         {
             var currentSide = pos.State.SideToMove;
             var them = ~currentSide;
@@ -55,42 +56,38 @@ namespace Rudz.Chess
 
             var pawns = pos.Pieces(EPieceType.Pawn, currentSide);
 
-            moves = pos.AddPawnMoves(moves, currentSide.PawnPush(pawns & currentSide.Rank7()) & ~pos.Pieces(), currentSide.PawnPushDistance(), EMoveType.Quiet, flags);
-            moves = pos.AddPawnMoves(moves, pawns.Shift(northEast) & occupiedByThem, currentSide.PawnWestAttackDistance(), EMoveType.Capture, flags);
-            moves = pos.AddPawnMoves(moves, pawns.Shift(northWest) & occupiedByThem, currentSide.PawnEastAttackDistance(), EMoveType.Capture, flags);
+            pos.AddPawnMoves(moves, currentSide.PawnPush(pawns & currentSide.Rank7()) & ~pos.Pieces(), currentSide.PawnPushDistance(), EMoveType.Quiet, flags);
+            pos.AddPawnMoves(moves, pawns.Shift(northEast) & occupiedByThem, currentSide.PawnWestAttackDistance(), EMoveType.Capture, flags);
+            pos.AddPawnMoves(moves, pawns.Shift(northWest) & occupiedByThem, currentSide.PawnEastAttackDistance(), EMoveType.Capture, flags);
 
             if (pos.State.EnPassantSquare != ESquare.none)
             {
-                moves = pos.AddPawnMoves(moves, pawns.Shift(northEast) & pos.State.EnPassantSquare, currentSide.PawnWestAttackDistance(), EMoveType.Epcapture, flags);
-                moves = pos.AddPawnMoves(moves, pawns.Shift(northWest) & pos.State.EnPassantSquare, currentSide.PawnEastAttackDistance(), EMoveType.Epcapture, flags);
+                pos.AddPawnMoves(moves, pawns.Shift(northEast) & pos.State.EnPassantSquare, currentSide.PawnWestAttackDistance(), EMoveType.Epcapture, flags);
+                pos.AddPawnMoves(moves, pawns.Shift(northWest) & pos.State.EnPassantSquare, currentSide.PawnEastAttackDistance(), EMoveType.Epcapture, flags);
             }
 
-            moves = pos.AddMoves(moves, occupiedByThem, flags);
-
-            return moves;
+            pos.AddMoves(moves, occupiedByThem, flags);
         }
 
-        private static MoveList GenerateQuietMoves(this IPosition pos, MoveList moves, Emgf flags)
+        private static void GenerateQuietMoves(this IPosition pos, MoveList moves, Emgf flags)
         {
             var currentSide = pos.State.SideToMove;
             var up = currentSide == PlayerExtensions.White ? EDirection.North : EDirection.South;
             var notOccupied = ~pos.Pieces();
             var pushed = (pos.Pieces(EPieceType.Pawn, currentSide) & ~currentSide.Rank7()).Shift(up) & notOccupied;
-            moves = pos.AddPawnMoves(moves, pushed, currentSide.PawnPushDistance(), EMoveType.Quiet, flags);
+            pos.AddPawnMoves(moves, pushed, currentSide.PawnPushDistance(), EMoveType.Quiet, flags);
 
             pushed &= currentSide.Rank3();
-            moves = pos.AddPawnMoves(moves, pushed.Shift(up) & notOccupied, currentSide.PawnDoublePushDistance(), EMoveType.Doublepush, flags);
+            pos.AddPawnMoves(moves, pushed.Shift(up) & notOccupied, currentSide.PawnDoublePushDistance(), EMoveType.Doublepush, flags);
 
-            moves = pos.AddMoves(moves, notOccupied, flags);
+            pos.AddMoves(moves, notOccupied, flags);
 
             if (pos.InCheck)
-                return moves;
+                return;
 
             for (var castleType = ECastleling.Short; castleType < ECastleling.CastleNb; castleType++)
                 if (pos.CanCastle(castleType))
-                    moves = pos.AddCastleMove(moves, pos.GetKingCastleFrom(currentSide, castleType), castleType.GetKingCastleTo(currentSide), flags);
-
-            return moves;
+                    pos.AddCastleMove(moves, pos.GetKingCastleFrom(currentSide, castleType), castleType.GetKingCastleTo(currentSide), flags);
         }
 
         /// <summary>
@@ -100,7 +97,7 @@ namespace Rudz.Chess
         /// </summary>
         /// <param name="moves">The move list to add potential moves to.</param>
         /// <param name="targetSquares">The target squares to move to</param>
-        private static MoveList AddMoves(this IPosition pos, MoveList moves, BitBoard targetSquares, Emgf flags)
+        private static void AddMoves(this IPosition pos, MoveList moves, BitBoard targetSquares, Emgf flags)
         {
             var c = pos.State.SideToMove;
             var occupied = pos.Pieces();
@@ -112,22 +109,20 @@ namespace Rudz.Chess
                 while (pieces)
                 {
                     var from = pieces.Lsb();
-                    moves = pos.AddMoves(moves, pc, from, from.GetAttacks(pt, occupied) & targetSquares, flags);
+                    pos.AddMoves(moves, pc, from, from.GetAttacks(pt, occupied) & targetSquares, flags);
                     BitBoards.ResetLsb(ref pieces);
                 }
             }
-
-            return moves;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static MoveList AddMoves(this IPosition pos, MoveList moves, Piece piece, Square from, BitBoard attacks, Emgf flags)
+        private static void AddMoves(this IPosition pos, MoveList moves, Piece piece, Square from, BitBoard attacks, Emgf flags)
         {
             var target = pos.Pieces(~pos.State.SideToMove) & attacks;
             while (target)
             {
                 var to = target.Lsb();
-                moves = pos.AddMove(moves, piece, from, to, PieceExtensions.EmptyPiece, flags, EMoveType.Capture);
+                pos.AddMove(moves, piece, from, to, PieceExtensions.EmptyPiece, flags, EMoveType.Capture);
                 BitBoards.ResetLsb(ref target);
             }
 
@@ -135,17 +130,15 @@ namespace Rudz.Chess
             while (target)
             {
                 var to = target.Lsb();
-                moves = pos.AddMove(moves, piece, from, to, PieceExtensions.EmptyPiece, flags);
+                pos.AddMove(moves, piece, from, to, PieceExtensions.EmptyPiece, flags);
                 BitBoards.ResetLsb(ref target);
             }
-
-            return moves;
         }
 
-        private static MoveList AddPawnMoves(this IPosition pos, MoveList moves, BitBoard targetSquares, Direction direction, EMoveType type, Emgf flags)
+        private static void AddPawnMoves(this IPosition pos, MoveList moves, BitBoard targetSquares, Direction direction, EMoveType type, Emgf flags)
         {
             if (targetSquares.Empty())
-                return moves;
+                return;
 
             var stm = pos.State.SideToMove;
             var piece = EPieceType.Pawn.MakePiece(stm);
@@ -158,7 +151,7 @@ namespace Rudz.Chess
             {
                 var to = nonPromotionSquares.Lsb();
                 var from = to - direction;
-                moves = pos.AddMove(moves, piece, from, to, PieceExtensions.EmptyPiece, flags, type);
+                pos.AddMove(moves, piece, from, to, PieceExtensions.EmptyPiece, flags, type);
                 BitBoards.ResetLsb(ref nonPromotionSquares);
             }
 
@@ -168,7 +161,7 @@ namespace Rudz.Chess
             {
                 var sqTo = promotionSquares.Lsb();
                 var sqFrom = sqTo - direction;
-                moves = pos.AddMove(moves, piece, sqFrom, sqTo, EPieceType.Queen.MakePiece(stm), flags, type);
+                pos.AddMove(moves, piece, sqFrom, sqTo, EPieceType.Queen.MakePiece(stm), flags, type);
                 BitBoards.ResetLsb(ref promotionSquares);
             }
             else
@@ -178,18 +171,16 @@ namespace Rudz.Chess
                     var sqTo = promotionSquares.Lsb();
                     var sqFrom = sqTo - direction;
                     for (var promotedPiece = EPieceType.Queen; promotedPiece >= EPieceType.Knight; promotedPiece--)
-                        moves = pos.AddMove(moves, piece, sqFrom, sqTo, promotedPiece.MakePiece(stm), flags, type);
+                        pos.AddMove(moves, piece, sqFrom, sqTo, promotedPiece.MakePiece(stm), flags, type);
 
                     BitBoards.ResetLsb(ref promotionSquares);
                 }
             }
-
-            return moves;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static MoveList AddCastleMove(this IPosition pos, MoveList moves, Square from, Square to, Emgf flags)
-            => pos.AddMove(moves, EPieceType.King.MakePiece(pos.State.SideToMove), @from, to, PieceExtensions.EmptyPiece, flags, EMoveType.Castle);
+        private static void AddCastleMove(this IPosition pos, MoveList moves, Square from, Square to, Emgf flags)
+            => pos.AddMove(moves, EPieceType.King.MakePiece(pos.State.SideToMove), from, to, PieceExtensions.EmptyPiece, flags, EMoveType.Castle);
 
         /// <summary>
         /// Move generation leaf method.
@@ -202,7 +193,7 @@ namespace Rudz.Chess
         /// <param name="promoted">The promotion piece (if any, defaults to NoPiece type)</param>
         /// <param name="type">The move type</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static MoveList AddMove(this IPosition pos, MoveList moves, Piece piece, Square from, Square to, Piece promoted, Emgf flags, EMoveType type = EMoveType.Quiet)
+        private static void AddMove(this IPosition pos, MoveList moves, Piece piece, Square from, Square to, Piece promoted, Emgf flags, EMoveType type = EMoveType.Quiet)
         {
             Move move;
 
@@ -215,18 +206,16 @@ namespace Rudz.Chess
 
             // check if move is actual a legal move if the flag is enabled
             if (flags.HasFlagFast(Emgf.Legalmoves) && !pos.IsLegal(move, piece, from, type))
-                return moves;
+                return;
 
             moves.Add(move);
-            return moves;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static (Direction, Direction) GetPawnAttackDirections(this Player us)
         {
-            return us == PlayerExtensions.White
-                ? (EDirection.NorthEast, EDirection.NorthWest)
-                : (EDirection.SouthEast, EDirection.SouthWest);
+            Span<(EDirection, EDirection)> directions = stackalloc[] { (EDirection.NorthEast, EDirection.NorthWest), (EDirection.SouthEast, EDirection.SouthWest) };
+            return directions[us.Side];
         }
     }
 }
