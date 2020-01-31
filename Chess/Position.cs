@@ -606,7 +606,7 @@ namespace Rudz.Chess
         {
             var sv = new StringBuilder(Fen.Fen.MaxFenLen);
 
-            for (var rank = ERank.Rank8; rank >= ERank.Rank1; rank--)
+            for (var rank = Ranks.Rank8; rank >= Ranks.Rank1; rank--)
             {
                 var empty = 0;
 
@@ -633,7 +633,7 @@ namespace Rudz.Chess
                 if (empty != 0)
                     sv.Append(empty);
 
-                if (rank > ERank.Rank1)
+                if (rank > Ranks.Rank1)
                     sv.Append('/');
             }
 
