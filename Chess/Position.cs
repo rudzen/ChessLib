@@ -84,7 +84,7 @@ namespace Rudz.Chess
 
         public void Clear()
         {
-            BoardLayout.Fill(EPieces.NoPiece);
+            BoardLayout.Fill(Enums.Pieces.NoPiece);
             OccupiedBySide.Fill(Zero);
             BoardPieces.Fill(Zero);
         }
@@ -296,7 +296,7 @@ namespace Rudz.Chess
             BoardLayout[square.AsInt()] = PieceExtensions.EmptyPiece;
             if (IsProbing)
                 return;
-            PieceUpdated?.Invoke(EPieces.NoPiece, square);
+            PieceUpdated?.Invoke(Enums.Pieces.NoPiece, square);
         }
 
         public BitBoard AttacksTo(Square square, BitBoard occupied)
@@ -679,7 +679,7 @@ namespace Rudz.Chess
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private CastlelingSides ShredderFunc(Square fromSquare, Square toSquare) =>
-            GetPiece(fromSquare).Value == EPieces.WhiteKing && GetPiece(toSquare).Value == EPieces.WhiteRook || GetPiece(fromSquare).Value == EPieces.BlackKing && GetPiece(toSquare).Value == EPieces.BlackRook
+            GetPiece(fromSquare).Value == Enums.Pieces.WhiteKing && GetPiece(toSquare).Value == Enums.Pieces.WhiteRook || GetPiece(fromSquare).Value == Enums.Pieces.BlackKing && GetPiece(toSquare).Value == Enums.Pieces.BlackRook
                 ? toSquare > fromSquare
                     ? CastlelingSides.King
                     : CastlelingSides.Queen

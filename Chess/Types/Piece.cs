@@ -40,16 +40,16 @@ namespace Rudz.Chess.Types
     public struct Piece
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Piece(int piece) => Value = (EPieces)piece;
+        public Piece(int piece) => Value = (Pieces)piece;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Piece(Piece piece) => Value = piece.Value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Piece(EPieces piece) => Value = piece;
+        public Piece(Pieces piece) => Value = piece;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Piece(EPieceType pieceType) => Value = (EPieces)pieceType;
+        public Piece(EPieceType pieceType) => Value = (Pieces)pieceType;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Piece(EPieceType pieceType, Player side)
@@ -62,7 +62,7 @@ namespace Rudz.Chess.Types
         public static Comparer<Piece> PieceComparer { get; } = new PieceRelationalComparer();
 
         [FieldOffset(0)]
-        public EPieces Value;
+        public Pieces Value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator Piece(char value) => new Piece(GetPiece(value));
@@ -71,7 +71,7 @@ namespace Rudz.Chess.Types
         public static implicit operator Piece(int value) => new Piece(value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator Piece(EPieces value) => new Piece(value);
+        public static implicit operator Piece(Pieces value) => new Piece(value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator Piece(EPieceType pieceType) => new Piece(pieceType);
@@ -92,16 +92,16 @@ namespace Rudz.Chess.Types
         public static bool operator !=(Piece left, Piece right) => !left.Equals(right);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator ==(Piece left, EPieces right) => left.Value == right;
+        public static bool operator ==(Piece left, Pieces right) => left.Value == right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator !=(Piece left, EPieces right) => left.Value != right;
+        public static bool operator !=(Piece left, Pieces right) => left.Value != right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator <=(Piece left, EPieces right) => left.Value <= right;
+        public static bool operator <=(Piece left, Pieces right) => left.Value <= right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator >=(Piece left, EPieces right) => left.Value >= right;
+        public static bool operator >=(Piece left, Pieces right) => left.Value >= right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Piece operator ++(Piece left) => new Piece(++left.Value);
@@ -110,10 +110,10 @@ namespace Rudz.Chess.Types
         public static Piece operator --(Piece left) => new Piece(--left.Value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator true(Piece piece) => piece.Value != EPieces.NoPiece;
+        public static bool operator true(Piece piece) => piece.Value != Pieces.NoPiece;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator false(Piece piece) => piece.Value == EPieces.NoPiece;
+        public static bool operator false(Piece piece) => piece.Value == Pieces.NoPiece;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int ColorOf() => (int)Value >> 3;
@@ -135,43 +135,43 @@ namespace Rudz.Chess.Types
             switch (character)
             {
                 case 'P':
-                    return EPieces.WhitePawn;
+                    return Pieces.WhitePawn;
 
                 case 'N':
-                    return EPieces.WhiteKnight;
+                    return Pieces.WhiteKnight;
 
                 case 'B':
-                    return EPieces.WhiteBishop;
+                    return Pieces.WhiteBishop;
 
                 case 'R':
-                    return EPieces.WhiteRook;
+                    return Pieces.WhiteRook;
 
                 case 'Q':
-                    return EPieces.WhiteQueen;
+                    return Pieces.WhiteQueen;
 
                 case 'K':
-                    return EPieces.WhiteKing;
+                    return Pieces.WhiteKing;
 
                 case 'p':
-                    return EPieces.BlackPawn;
+                    return Pieces.BlackPawn;
 
                 case 'n':
-                    return EPieces.BlackKnight;
+                    return Pieces.BlackKnight;
 
                 case 'b':
-                    return EPieces.BlackBishop;
+                    return Pieces.BlackBishop;
 
                 case 'r':
-                    return EPieces.BlackRook;
+                    return Pieces.BlackRook;
 
                 case 'q':
-                    return EPieces.BlackQueen;
+                    return Pieces.BlackQueen;
 
                 case 'k':
-                    return EPieces.BlackKing;
+                    return Pieces.BlackKing;
 
                 default:
-                    return EPieces.NoPiece;
+                    return Pieces.NoPiece;
             }
         }
 

@@ -77,9 +77,9 @@ namespace Chess.Test.Move
             Square expectedFrom = ESquare.a2;
             Square expectedTo = ESquare.h8;
             const EPieceType expectedMovingPieceType = EPieceType.Pawn;
-            Piece expectedMovingPiece = EPieces.WhitePawn;
-            Piece expectedCapturedPiece = EPieces.BlackKnight;
-            Piece expectedPromotionPiece = EPieces.WhiteQueen;
+            Piece expectedMovingPiece = Pieces.WhitePawn;
+            Piece expectedCapturedPiece = Pieces.BlackKnight;
+            Piece expectedPromotionPiece = Pieces.WhiteQueen;
             const MoveTypes expectedMoveType = MoveTypes.Promotion;
 
             // full move spectrum

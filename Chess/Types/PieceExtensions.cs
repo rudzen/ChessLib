@@ -45,7 +45,7 @@ namespace Rudz.Chess.Types
 
         private const ushort BlackPieces = 32256;
 
-        public static readonly Piece EmptyPiece = EPieces.NoPiece;
+        public static readonly Piece EmptyPiece = Pieces.NoPiece;
 
         public static readonly EPieceValue[] PieceValues = { 0, EPieceValue.Pawn, EPieceValue.Knight, EPieceValue.Bishop, EPieceValue.Rook, EPieceValue.Queen, EPieceValue.King };
 
@@ -74,10 +74,10 @@ namespace Rudz.Chess.Types
 
         // Generic helper functions
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsWhite(this Piece p) => p.AsInt().InBetween((int)EPieces.WhitePawn, (int)EPieces.WhiteKing);
+        public static bool IsWhite(this Piece p) => p.AsInt().InBetween((int)Pieces.WhitePawn, (int)Pieces.WhiteKing);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsBlack(this Piece p) => p.AsInt().InBetween((int)EPieces.BlackPawn, (int)EPieces.BlackKing);
+        public static bool IsBlack(this Piece p) => p.AsInt().InBetween((int)Pieces.BlackPawn, (int)Pieces.BlackKing);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int AsInt(this Piece p) => (int)p.Value;
@@ -92,7 +92,7 @@ namespace Rudz.Chess.Types
         public static Piece MakePiece(this EPieceType @this, Player side) => (int)@this | (side.Side << 3);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsNoPiece(this Piece p) => p == EPieces.NoPiece;
+        public static bool IsNoPiece(this Piece p) => p == Pieces.NoPiece;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static char GetPieceChar(this Piece p) => PieceChars[p.AsInt()];

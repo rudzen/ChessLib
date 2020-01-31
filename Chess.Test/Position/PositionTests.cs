@@ -38,13 +38,13 @@ namespace Chess.Test.Position
         {
             var position = new Position();
 
-            position.AddPiece(EPieces.WhiteKing, ESquare.a7);
+            position.AddPiece(Pieces.WhiteKing, ESquare.a7);
             var pieces = position.Pieces();
             var square = pieces.Lsb();
             Assert.Equal(ESquare.a7, square.Value);
 
             var piece = position.GetPiece(square);
-            Assert.Equal(EPieces.WhiteKing, piece.Value);
+            Assert.Equal(Pieces.WhiteKing, piece.Value);
 
             // Test piece type overload
 
@@ -56,7 +56,7 @@ namespace Chess.Test.Position
             Assert.Equal(ESquare.d5, square.Value);
 
             piece = position.GetPiece(square);
-            Assert.Equal(EPieces.BlackKnight, piece.Value);
+            Assert.Equal(Pieces.BlackKnight, piece.Value);
         }
 
         [Fact]
@@ -66,11 +66,11 @@ namespace Chess.Test.Position
 
             var cb = new Position();
 
-            cb.AddPiece(EPieces.WhiteKing, ESquare.a6);
-            cb.AddPiece(EPieces.WhiteBishop, ESquare.d5);
+            cb.AddPiece(Pieces.WhiteKing, ESquare.a6);
+            cb.AddPiece(Pieces.WhiteBishop, ESquare.d5);
 
-            cb.AddPiece(EPieces.BlackKing, ESquare.b3);
-            cb.AddPiece(EPieces.BlackPawn, ESquare.c4); // this is a pinned pieces
+            cb.AddPiece(Pieces.BlackKing, ESquare.b3);
+            cb.AddPiece(Pieces.BlackPawn, ESquare.c4); // this is a pinned pieces
 
             var b = cb.GetPinnedPieces(ESquare.b3, PlayerExtensions.Black);
 

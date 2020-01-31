@@ -43,7 +43,7 @@ namespace Chess.Test.Move
             const string fen = "8/6k1/8/8/8/8/1K1N1N2/8 w - - 0 1";
             const MoveNotations notation = MoveNotations.Fan;
 
-            var movingPiece = new Piece(EPieces.WhiteKnight);
+            var movingPiece = new Piece(Pieces.WhiteKnight);
             var fromOneSquare = new Square(ESquare.d2);
             var fromTwoSquare = new Square(ESquare.f2);
             var toSquare = new Square(ESquare.e4);
@@ -76,7 +76,7 @@ namespace Chess.Test.Move
             const string fen = "8/6k1/8/8/8/8/1K1N1N2/8 w - - 0 1";
             const MoveNotations notation = MoveNotations.Fan;
 
-            var movingPiece = new Piece(EPieces.WhiteKnight);
+            var movingPiece = new Piece(Pieces.WhiteKnight);
             var fromOneSquare = new Square(ESquare.d2);
             var fromTwoSquare = new Square(ESquare.f2);
             var toSquare = new Square(ESquare.e4);
@@ -109,7 +109,7 @@ namespace Chess.Test.Move
             const string fen = "8/6k1/8/8/3N4/8/1K1N4/8 w - - 0 1";
             const MoveNotations notation = MoveNotations.Fan;
 
-            var movingPiece = new Piece(EPieces.WhiteKnight);
+            var movingPiece = new Piece(Pieces.WhiteKnight);
             var fromOneSquare = new Square(ESquare.d2);
             var fromTwoSquare = new Square(ESquare.d4);
             var toSquare = new Square(ESquare.f3);
@@ -142,7 +142,7 @@ namespace Chess.Test.Move
             const string fen = "8/6k1/8/8/8/8/1K1N1N2/8 w - - 0 1";
             const MoveNotations notation = MoveNotations.San;
 
-            var movingPiece = new Piece(EPieces.WhiteKnight);
+            var movingPiece = new Piece(Pieces.WhiteKnight);
             var fromOneSquare = new Square(ESquare.d2);
             var fromTwoSquare = new Square(ESquare.f2);
             var toSquare = new Square(ESquare.e4);
@@ -175,7 +175,7 @@ namespace Chess.Test.Move
             const string fen = "8/6k1/8/8/8/8/1K1N1N2/8 w - - 0 1";
             const MoveNotations notation = MoveNotations.San;
 
-            var movingPiece = new Piece(EPieces.WhiteKnight);
+            var movingPiece = new Piece(Pieces.WhiteKnight);
             var fromOneSquare = new Square(ESquare.d2);
             var fromTwoSquare = new Square(ESquare.f2);
             var toSquare = new Square(ESquare.e4);
@@ -208,7 +208,7 @@ namespace Chess.Test.Move
             const string fen = "8/6k1/8/8/3N4/8/1K1N4/8 w - - 0 1";
             const MoveNotations notation = MoveNotations.San;
 
-            var movingPiece = new Piece(EPieces.WhiteKnight);
+            var movingPiece = new Piece(Pieces.WhiteKnight);
             var fromOneSquare = new Square(ESquare.d2);
             var fromTwoSquare = new Square(ESquare.d4);
             var toSquare = new Square(ESquare.f3);
@@ -241,7 +241,7 @@ namespace Chess.Test.Move
             const string fen = "8/6k1/8/8/8/8/1K1N1N2/8 w - - 0 1";
             const MoveNotations notation = MoveNotations.Lan;
 
-            var movingPiece = new Piece(EPieces.WhiteKnight);
+            var movingPiece = new Piece(Pieces.WhiteKnight);
             var fromOneSquare = new Square(ESquare.d2);
             var fromTwoSquare = new Square(ESquare.f2);
             var toSquare = new Square(ESquare.e4);
@@ -274,7 +274,7 @@ namespace Chess.Test.Move
             const string fen = "8/6k1/8/8/8/8/1K1N1N2/8 w - - 0 1";
             const MoveNotations notation = MoveNotations.Lan;
 
-            var movingPiece = new Piece(EPieces.WhiteKnight);
+            var movingPiece = new Piece(Pieces.WhiteKnight);
             var fromOneSquare = new Square(ESquare.d2);
             var fromTwoSquare = new Square(ESquare.f2);
             var toSquare = new Square(ESquare.e4);
@@ -307,7 +307,7 @@ namespace Chess.Test.Move
             const string fen = "8/6k1/8/8/3N4/8/1K1N4/8 w - - 0 1";
             const MoveNotations notation = MoveNotations.Lan;
 
-            var movingPiece = new Piece(EPieces.WhiteKnight);
+            var movingPiece = new Piece(Pieces.WhiteKnight);
             var fromOneSquare = new Square(ESquare.d2);
             var fromTwoSquare = new Square(ESquare.d4);
             var toSquare = new Square(ESquare.f3);
@@ -340,7 +340,7 @@ namespace Chess.Test.Move
             const string fen = "8/6k1/8/8/8/8/1K1N1N2/8 w - - 0 1";
             const MoveNotations notation = MoveNotations.Ran;
 
-            var movingPiece = new Piece(EPieces.WhiteKnight);
+            var movingPiece = new Piece(Pieces.WhiteKnight);
             var fromOneSquare = new Square(ESquare.d2);
             var fromTwoSquare = new Square(ESquare.f2);
             var toSquare = new Square(ESquare.e4);
@@ -373,7 +373,7 @@ namespace Chess.Test.Move
             const string fen = "8/6k1/8/8/8/8/1K1N1N2/8 w - - 0 1";
             const MoveNotations notation = MoveNotations.Ran;
 
-            var movingPiece = new Piece(EPieces.WhiteKnight);
+            var movingPiece = new Piece(Pieces.WhiteKnight);
             var fromOneSquare = new Square(ESquare.d2);
             var fromTwoSquare = new Square(ESquare.f5);
             var toSquare = new Square(ESquare.e4);
@@ -406,7 +406,7 @@ namespace Chess.Test.Move
             const string fen = "8/6k1/8/8/3N4/8/1K1N4/8 w - - 0 1";
             const MoveNotations notation = MoveNotations.Ran;
 
-            var movingPiece = new Piece(EPieces.WhiteKnight);
+            var movingPiece = new Piece(Pieces.WhiteKnight);
             var fromOneSquare = new Square(ESquare.d2);
             var fromTwoSquare = new Square(ESquare.d4);
             var toSquare = new Square(ESquare.f3);

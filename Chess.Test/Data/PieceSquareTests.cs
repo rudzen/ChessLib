@@ -36,7 +36,7 @@ namespace Chess.Test.Data
         public void GetSquareTest()
         {
             const ESquare expected = ESquare.a5;
-            var ps = new PieceSquare(EPieces.NoPiece, expected);
+            var ps = new PieceSquare(Pieces.NoPiece, expected);
             var actual = ps.Square;
             var expectedSquare = new Square(expected);
             Assert.Equal(expectedSquare, actual);
@@ -45,7 +45,7 @@ namespace Chess.Test.Data
         [Fact]
         public void GetPieceTest()
         {
-            const EPieces expected = EPieces.BlackKnight;
+            const Pieces expected = Pieces.BlackKnight;
             var ps = new PieceSquare(expected, ESquare.none);
             var actual = ps.Piece;
             var expectedPiece = new Piece(expected);
@@ -55,7 +55,7 @@ namespace Chess.Test.Data
         [Fact]
         public void GetPieceAndSquareTest()
         {
-            for (var pc = EPieces.NoPiece; pc < EPieces.PieceNb; ++pc)
+            for (var pc = Pieces.NoPiece; pc < Pieces.PieceNb; ++pc)
             {
                 var expectedPiece = new Piece(pc);
                 foreach (var sq in BitBoards.AllSquares)

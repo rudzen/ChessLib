@@ -41,10 +41,10 @@ namespace Chess.Test.Gameplay
         {
             // generate moves
             var moves = new List<Move>(4) {
-                                                      new Move(EPieces.WhitePawn, ESquare.f2, ESquare.f3),
-                                                      new Move(EPieces.BlackPawn, ESquare.e7, ESquare.e5, MoveTypes.Doublepush, EPieces.NoPiece),
-                                                      new Move(EPieces.WhitePawn, ESquare.g2, ESquare.g4, MoveTypes.Doublepush, EPieces.NoPiece),
-                                                      new Move(EPieces.BlackQueen, ESquare.d8, ESquare.h4)
+                                                      new Move(Pieces.WhitePawn, ESquare.f2, ESquare.f3),
+                                                      new Move(Pieces.BlackPawn, ESquare.e7, ESquare.e5, MoveTypes.Doublepush, Pieces.NoPiece),
+                                                      new Move(Pieces.WhitePawn, ESquare.g2, ESquare.g4, MoveTypes.Doublepush, Pieces.NoPiece),
+                                                      new Move(Pieces.BlackQueen, ESquare.d8, ESquare.h4)
                                                   };
 
             // construct game and start a new game
