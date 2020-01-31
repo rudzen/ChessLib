@@ -33,7 +33,7 @@ namespace Rudz.Chess.Enums
     /// Move generation flag
     /// </summary>
     [Flags]
-    public enum Emgf
+    public enum MoveGenerationFlags
     {
         /// <summary>
         /// Generate capture moves
@@ -84,6 +84,6 @@ namespace Rudz.Chess.Enums
     public static class EmgfExtensions
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool HasFlagFast(this Emgf value, Emgf flag) => (value & flag) != 0;
+        public static bool HasFlagFast(this MoveGenerationFlags value, MoveGenerationFlags flag) => (value & flag) != 0;
     }
 }
