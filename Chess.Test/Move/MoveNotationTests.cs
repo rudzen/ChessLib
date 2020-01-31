@@ -41,7 +41,7 @@ namespace Chess.Test.Move
             // Tests both knights moving to same square for Rank ambiguity
 
             const string fen = "8/6k1/8/8/8/8/1K1N1N2/8 w - - 0 1";
-            const EMoveNotation notation = EMoveNotation.Fan;
+            const MoveNotations notation = MoveNotations.Fan;
 
             var movingPiece = new Piece(EPieces.WhiteKnight);
             var fromOneSquare = new Square(ESquare.d2);
@@ -74,7 +74,7 @@ namespace Chess.Test.Move
             // Tests both knights moving to same square for Rank ambiguity
 
             const string fen = "8/6k1/8/8/8/8/1K1N1N2/8 w - - 0 1";
-            const EMoveNotation notation = EMoveNotation.Fan;
+            const MoveNotations notation = MoveNotations.Fan;
 
             var movingPiece = new Piece(EPieces.WhiteKnight);
             var fromOneSquare = new Square(ESquare.d2);
@@ -107,7 +107,7 @@ namespace Chess.Test.Move
             // Tests both knights moving to same square for File ambiguity
 
             const string fen = "8/6k1/8/8/3N4/8/1K1N4/8 w - - 0 1";
-            const EMoveNotation notation = EMoveNotation.Fan;
+            const MoveNotations notation = MoveNotations.Fan;
 
             var movingPiece = new Piece(EPieces.WhiteKnight);
             var fromOneSquare = new Square(ESquare.d2);
@@ -140,7 +140,7 @@ namespace Chess.Test.Move
             // Tests both knights moving to same square for Rank ambiguity
 
             const string fen = "8/6k1/8/8/8/8/1K1N1N2/8 w - - 0 1";
-            const EMoveNotation notation = EMoveNotation.San;
+            const MoveNotations notation = MoveNotations.San;
 
             var movingPiece = new Piece(EPieces.WhiteKnight);
             var fromOneSquare = new Square(ESquare.d2);
@@ -173,7 +173,7 @@ namespace Chess.Test.Move
             // Tests both knights moving to same square for Rank ambiguity
 
             const string fen = "8/6k1/8/8/8/8/1K1N1N2/8 w - - 0 1";
-            const EMoveNotation notation = EMoveNotation.San;
+            const MoveNotations notation = MoveNotations.San;
 
             var movingPiece = new Piece(EPieces.WhiteKnight);
             var fromOneSquare = new Square(ESquare.d2);
@@ -206,7 +206,7 @@ namespace Chess.Test.Move
             // Tests both knights moving to same square for File ambiguity
 
             const string fen = "8/6k1/8/8/3N4/8/1K1N4/8 w - - 0 1";
-            const EMoveNotation notation = EMoveNotation.San;
+            const MoveNotations notation = MoveNotations.San;
 
             var movingPiece = new Piece(EPieces.WhiteKnight);
             var fromOneSquare = new Square(ESquare.d2);
@@ -239,7 +239,7 @@ namespace Chess.Test.Move
             // Tests both knights moving to same square for Rank ambiguity
 
             const string fen = "8/6k1/8/8/8/8/1K1N1N2/8 w - - 0 1";
-            const EMoveNotation notation = EMoveNotation.Lan;
+            const MoveNotations notation = MoveNotations.Lan;
 
             var movingPiece = new Piece(EPieces.WhiteKnight);
             var fromOneSquare = new Square(ESquare.d2);
@@ -272,7 +272,7 @@ namespace Chess.Test.Move
             // Tests both knights moving to same square for Rank ambiguity
 
             const string fen = "8/6k1/8/8/8/8/1K1N1N2/8 w - - 0 1";
-            const EMoveNotation notation = EMoveNotation.Lan;
+            const MoveNotations notation = MoveNotations.Lan;
 
             var movingPiece = new Piece(EPieces.WhiteKnight);
             var fromOneSquare = new Square(ESquare.d2);
@@ -305,7 +305,7 @@ namespace Chess.Test.Move
             // Tests both knights moving to same square for File ambiguity
 
             const string fen = "8/6k1/8/8/3N4/8/1K1N4/8 w - - 0 1";
-            const EMoveNotation notation = EMoveNotation.Lan;
+            const MoveNotations notation = MoveNotations.Lan;
 
             var movingPiece = new Piece(EPieces.WhiteKnight);
             var fromOneSquare = new Square(ESquare.d2);
@@ -338,7 +338,7 @@ namespace Chess.Test.Move
             // Tests both knights moving to same square for Rank ambiguity
 
             const string fen = "8/6k1/8/8/8/8/1K1N1N2/8 w - - 0 1";
-            const EMoveNotation notation = EMoveNotation.Ran;
+            const MoveNotations notation = MoveNotations.Ran;
 
             var movingPiece = new Piece(EPieces.WhiteKnight);
             var fromOneSquare = new Square(ESquare.d2);
@@ -371,7 +371,7 @@ namespace Chess.Test.Move
             // Tests both knights moving to same square for Rank ambiguity
 
             const string fen = "8/6k1/8/8/8/8/1K1N1N2/8 w - - 0 1";
-            const EMoveNotation notation = EMoveNotation.Ran;
+            const MoveNotations notation = MoveNotations.Ran;
 
             var movingPiece = new Piece(EPieces.WhiteKnight);
             var fromOneSquare = new Square(ESquare.d2);
@@ -404,7 +404,7 @@ namespace Chess.Test.Move
             // Tests both knights moving to same square for File ambiguity
 
             const string fen = "8/6k1/8/8/3N4/8/1K1N4/8 w - - 0 1";
-            const EMoveNotation notation = EMoveNotation.Ran;
+            const MoveNotations notation = MoveNotations.Ran;
 
             var movingPiece = new Piece(EPieces.WhiteKnight);
             var fromOneSquare = new Square(ESquare.d2);

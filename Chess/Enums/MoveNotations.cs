@@ -33,7 +33,7 @@ namespace Rudz.Chess.Enums
     // ICCF : https://en.wikipedia.org/wiki/ICCF_numeric_notation
 
     [Flags]
-    public enum EMoveNotation
+    public enum MoveNotations
     {
         /// <summary>
         /// Standard algebraic Notation [implemented]

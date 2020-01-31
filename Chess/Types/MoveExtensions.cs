@@ -43,17 +43,17 @@ namespace Rudz.Chess.Types
     {
         public static readonly Move EmptyMove = new Move();
 
-        private static readonly Dictionary<EMoveNotation, Func<Move, IPosition, string>> NotationFuncs = new Dictionary<EMoveNotation, Func<Move, IPosition, string>>
+        private static readonly Dictionary<MoveNotations, Func<Move, IPosition, string>> NotationFuncs = new Dictionary<MoveNotations, Func<Move, IPosition, string>>
         {
-            {EMoveNotation.Fan, ToFan},
-            {EMoveNotation.San, ToSan},
-            {EMoveNotation.Lan, ToLan},
-            {EMoveNotation.Ran, ToRan},
-            {EMoveNotation.Uci, ToUci}
+            {MoveNotations.Fan, ToFan},
+            {MoveNotations.San, ToSan},
+            {MoveNotations.Lan, ToLan},
+            {MoveNotations.Ran, ToRan},
+            {MoveNotations.Uci, ToUci}
         };
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string ToNotation(this Move move, IPosition pos, EMoveNotation notation = EMoveNotation.Fan)
+        public static string ToNotation(this Move move, IPosition pos, MoveNotations notation = MoveNotations.Fan)
         {
             if (move.IsNullMove())
                 return "(none)";

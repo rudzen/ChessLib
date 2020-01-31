@@ -24,10 +24,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Enums
+namespace Rudz.Chess.Extensions
 {
-    public static class EMoveNotaionExtensions
+    using Enums;
+
+    public static class MoveNotaionsExtensions
     {
-        public static bool HasFlagFast(this EMoveNotation value, EMoveNotation flag) => (value & flag) != 0;
+        public static bool HasFlagFast(this MoveNotations value, MoveNotations flag) => (value & flag) != 0;
     }
 }
