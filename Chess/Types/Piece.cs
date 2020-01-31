@@ -49,14 +49,14 @@ namespace Rudz.Chess.Types
         public Piece(Pieces piece) => Value = piece;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Piece(EPieceType pieceType) => Value = (Pieces)pieceType;
+        public Piece(PieceTypes pieceType) => Value = (Pieces)pieceType;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Piece(EPieceType pieceType, Player side)
+        public Piece(PieceTypes pieceType, Player side)
             : this(pieceType) => Value += (byte) (side.Side << 3);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Piece(EPieceType pieceType, int offset)
+        public Piece(PieceTypes pieceType, int offset)
             : this(pieceType) => Value += (byte) offset;
 
         public static Comparer<Piece> PieceComparer { get; } = new PieceRelationalComparer();
@@ -74,7 +74,7 @@ namespace Rudz.Chess.Types
         public static implicit operator Piece(Pieces value) => new Piece(value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator Piece(EPieceType pieceType) => new Piece(pieceType);
+        public static implicit operator Piece(PieceTypes pieceType) => new Piece(pieceType);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Piece operator +(Piece left, Player right) => new Piece(left.Value + (byte)(right << 3));
@@ -183,7 +183,7 @@ namespace Rudz.Chess.Types
                     return 0;
 
                 // this is dangerous (fear king leopold III ?), king has no value and is considered to be uniq
-                if (x.Type() == EPieceType.King || y.Type() == EPieceType.King)
+                if (x.Type() == PieceTypes.King || y.Type() == PieceTypes.King)
                     return 1;
 
                 if (x.PieceValue() < y.PieceValue())

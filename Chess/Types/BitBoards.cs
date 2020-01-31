@@ -158,7 +158,7 @@ namespace Rudz.Chess.Types
         /// The pawns are a special case, as index range 0,sq are for White and 1,sq are for Black.
         /// This is possible because index 0 is NoPiece type.
         /// </summary>
-        private static readonly BitBoard[,] PseudoAttacksBB = new BitBoard[EPieceType.PieceTypeNb.AsInt(), 64];
+        private static readonly BitBoard[,] PseudoAttacksBB = new BitBoard[PieceTypes.PieceTypeNb.AsInt(), 64];
 
         private static readonly BitBoard[] AdjacentFilesBB = { FILEB, FILEA | FILEC, FILEB | FILED, FILEC | FILEE, FILED | FILEF, FILEE | FILEG, FILEF | FILEH, FILEG };
 
@@ -194,7 +194,7 @@ namespace Rudz.Chess.Types
             int distanceFile(Square x, Square y) { return distance(x.File().AsInt(), y.File().AsInt()); }
             int distanceRank(Square x, Square y) { return distance(x.Rank().AsInt(), y.Rank().AsInt()); }
 
-            Span<EPieceType> validMagicPieces = stackalloc EPieceType[] { EPieceType.Bishop, EPieceType.Rook };
+            Span<PieceTypes> validMagicPieces = stackalloc PieceTypes[] { PieceTypes.Bishop, PieceTypes.Rook };
 
             // ForwardRanksBB population loop idea from sf
             for (var r = ERank.Rank1; r < ERank.RankNb; ++r)
@@ -247,22 +247,22 @@ namespace Rudz.Chess.Types
                 PseudoAttacksBB[0, sq] = b.NorthEastOne() | b.NorthWestOne();
                 PseudoAttacksBB[1, sq] = b.SouthWestOne() | b.SouthEastOne();
 
-                var pt = EPieceType.Knight.AsInt();
+                var pt = PieceTypes.Knight.AsInt();
                 PseudoAttacksBB[pt, sq] = ComputeKnightAttack(b);
 
                 var bishopAttacks = s1.BishopAttacks(EmptyBitBoard);
                 var rookAttacks = s1.RookAttacks(EmptyBitBoard);
 
-                pt = EPieceType.Bishop.AsInt();
+                pt = PieceTypes.Bishop.AsInt();
                 PseudoAttacksBB[pt, sq] = bishopAttacks;
 
-                pt = EPieceType.Rook.AsInt();
+                pt = PieceTypes.Rook.AsInt();
                 PseudoAttacksBB[pt, sq] = rookAttacks;
 
-                pt = EPieceType.Queen.AsInt();
+                pt = PieceTypes.Queen.AsInt();
                 PseudoAttacksBB[pt, sq] = bishopAttacks | rookAttacks;
 
-                pt = EPieceType.King.AsInt();
+                pt = PieceTypes.King.AsInt();
                 PseudoAttacksBB[pt, sq] = b.NorthOne() | b.SouthOne() | b.EastOne() | b.WestOne()
                                         | b.NorthEastOne() | b.NorthWestOne() | b.SouthEastOne() | b.SouthWestOne();
 
@@ -281,7 +281,7 @@ namespace Rudz.Chess.Types
                 }
 
                 // Compute KingRings
-                pt = EPieceType.King.AsInt();
+                pt = PieceTypes.King.AsInt();
                 for (var side = EPlayer.White; side < EPlayer.PlayerNb; ++side)
                 {
                     var c = (int)side;
@@ -315,15 +315,15 @@ namespace Rudz.Chess.Types
             return attacks ^ square.RookAttacks(occupied ^ blockers);
         }
 
-        public static BitBoard XrayAttacks(this Square square, EPieceType pieceType, BitBoard occupied, BitBoard blockers)
+        public static BitBoard XrayAttacks(this Square square, PieceTypes pieceType, BitBoard occupied, BitBoard blockers)
         {
             switch (pieceType)
             {
-                case EPieceType.Bishop:
+                case PieceTypes.Bishop:
                     return square.XrayBishopAttacks(occupied, blockers);
-                case EPieceType.Rook:
+                case PieceTypes.Rook:
                     return square.XrayRookAttacks(occupied, blockers);
-                case EPieceType.Queen:
+                case PieceTypes.Queen:
                     return XrayBishopAttacks(square, occupied, blockers) | XrayRookAttacks(square, occupied, blockers);
                 default:
                     return EmptyBitBoard;
@@ -331,27 +331,27 @@ namespace Rudz.Chess.Types
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static BitBoard KnightAttacks(this Square square) => PseudoAttacksBB[EPieceType.Knight.AsInt(), square.AsInt()];
+        public static BitBoard KnightAttacks(this Square square) => PseudoAttacksBB[PieceTypes.Knight.AsInt(), square.AsInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static BitBoard KingAttacks(this Square square) => PseudoAttacksBB[EPieceType.King.AsInt(), square.AsInt()];
+        public static BitBoard KingAttacks(this Square square) => PseudoAttacksBB[PieceTypes.King.AsInt(), square.AsInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static BitBoard GetAttacks(this Square square, EPieceType pieceType, BitBoard occupied = new BitBoard())
+        public static BitBoard GetAttacks(this Square square, PieceTypes pieceType, BitBoard occupied = new BitBoard())
         {
             switch (pieceType)
             {
-                case EPieceType.Knight:
-                case EPieceType.King:
+                case PieceTypes.Knight:
+                case PieceTypes.King:
                     return PseudoAttacksBB[pieceType.AsInt(), square.AsInt()];
 
-                case EPieceType.Bishop:
+                case PieceTypes.Bishop:
                     return square.BishopAttacks(occupied);
 
-                case EPieceType.Rook:
+                case PieceTypes.Rook:
                     return square.RookAttacks(occupied);
 
-                case EPieceType.Queen:
+                case PieceTypes.Queen:
                     return square.QueenAttacks(occupied);
 
                 default:
@@ -360,7 +360,7 @@ namespace Rudz.Chess.Types
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ref BitBoard PseudoAttack(this Square @this, EPieceType pieceType) => ref PseudoAttacksBB[pieceType.AsInt(), @this.AsInt()];
+        public static ref BitBoard PseudoAttack(this Square @this, PieceTypes pieceType) => ref PseudoAttacksBB[pieceType.AsInt(), @this.AsInt()];
 
         /// <summary>
         /// Attack for pawn.

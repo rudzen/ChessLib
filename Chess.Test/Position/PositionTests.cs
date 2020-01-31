@@ -50,7 +50,7 @@ namespace Chess.Test.Position
 
             position = new Position();
 
-            position.AddPiece(EPieceType.Knight, ESquare.d5, PlayerExtensions.Black);
+            position.AddPiece(PieceTypes.Knight, ESquare.d5, PlayerExtensions.Black);
             pieces = position.Pieces();
             square = pieces.Lsb();
             Assert.Equal(ESquare.d5, square.Value);

@@ -97,7 +97,7 @@ namespace Rudz.Chess.Types
             {
                 var pt = move.GetMovingPieceType();
 
-                if (pt != EPieceType.Pawn)
+                if (pt != PieceTypes.Pawn)
                 {
                     notation.Append(move.GetMovingPiece().GetUnicodeChar());
                     move.Disambiguation(from, pos, notation);
@@ -110,7 +110,7 @@ namespace Rudz.Chess.Types
                 }
                 else if (move.IsCaptureMove())
                 {
-                    if (pt == EPieceType.Pawn)
+                    if (pt == PieceTypes.Pawn)
                         notation.Append(from.FileChar());
                     notation.Append('x');
                 }
@@ -150,7 +150,7 @@ namespace Rudz.Chess.Types
             {
                 var pt = move.GetMovingPieceType();
 
-                if (pt != EPieceType.Pawn)
+                if (pt != PieceTypes.Pawn)
                 {
                     notation.Append(move.GetMovingPiece().GetPgnChar());
                     move.Disambiguation(from, pos, notation);
@@ -163,7 +163,7 @@ namespace Rudz.Chess.Types
                 }
                 else if (move.IsCaptureMove())
                 {
-                    if (pt == EPieceType.Pawn)
+                    if (pt == PieceTypes.Pawn)
                         notation.Append(from.FileChar());
 
                     notation.Append('x');
@@ -204,7 +204,7 @@ namespace Rudz.Chess.Types
             {
                 var pt = move.GetMovingPieceType();
 
-                if (pt != EPieceType.Pawn)
+                if (pt != PieceTypes.Pawn)
                     notation.Append(pt.GetPieceChar());
 
                 notation.Append(from.ToString());
@@ -216,7 +216,7 @@ namespace Rudz.Chess.Types
                 }
                 else if (move.IsCaptureMove())
                 {
-                    if (pt == EPieceType.Pawn)
+                    if (pt == PieceTypes.Pawn)
                         notation.Append(from.FileChar());
 
                     notation.Append('x');
@@ -259,7 +259,7 @@ namespace Rudz.Chess.Types
             {
                 var pt = move.GetMovingPieceType();
 
-                if (pt != EPieceType.Pawn)
+                if (pt != PieceTypes.Pawn)
                     notation.Append(pt.GetPieceChar());
 
                 notation.Append(from.ToString());
@@ -271,7 +271,7 @@ namespace Rudz.Chess.Types
                 }
                 else if (move.IsCaptureMove())
                 {
-                    if (pt == EPieceType.Pawn)
+                    if (pt == PieceTypes.Pawn)
                         notation.Append(from.FileChar());
 
                     notation.Append('x');
@@ -332,7 +332,7 @@ namespace Rudz.Chess.Types
         {
             var pt = move.GetMovingPieceType();
 
-            return pt == EPieceType.Pawn || pt == EPieceType.King
+            return pt == PieceTypes.Pawn || pt == PieceTypes.King
                 ? BitBoards.EmptyBitBoard
                 : move.GetToSquare().GetAttacks(pt, position.Pieces()) ^ move.GetFromSquare();
         }

@@ -88,7 +88,7 @@ namespace Rudz.Chess.Hash
 
             for (var side = EPlayer.White; side < EPlayer.PlayerNb; ++side)
             {
-                for (var pieceType = EPieceType.Pawn; pieceType < EPieceType.PieceTypeNb; ++pieceType)
+                for (var pieceType = PieceTypes.Pawn; pieceType < PieceTypes.PieceTypeNb; ++pieceType)
                 {
                     var piece = pieceType.MakePiece(side);
                     for (var square = ESquare.a1; square <= ESquare.h8; square++)

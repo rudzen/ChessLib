@@ -52,7 +52,7 @@ namespace Rudz.Chess
 
         void AddPiece(Piece piece, Square square);
 
-        void AddPiece(EPieceType pieceType, Square square, Player side);
+        void AddPiece(PieceTypes pieceType, Square square, Player side);
 
         bool MakeMove(Move move);
 
@@ -60,9 +60,9 @@ namespace Rudz.Chess
 
         Piece GetPiece(Square square);
 
-        EPieceType GetPieceType(Square square);
+        PieceTypes GetPieceType(Square square);
 
-        bool IsPieceTypeOnSquare(Square square, EPieceType pieceType);
+        bool IsPieceTypeOnSquare(Square square, PieceTypes pieceType);
 
         BitBoard GetPinnedPieces(Square square, Player side);
 
@@ -70,7 +70,7 @@ namespace Rudz.Chess
 
         bool IsAttacked(Square square, Player side);
 
-        BitBoard PieceAttacks(Square square, EPieceType pieceType);
+        BitBoard PieceAttacks(Square square, PieceTypes pieceType);
 
         BitBoard Pieces();
 
@@ -78,17 +78,17 @@ namespace Rudz.Chess
 
         BitBoard Pieces(Piece pc);
 
-        BitBoard Pieces(EPieceType type);
+        BitBoard Pieces(PieceTypes type);
 
-        BitBoard Pieces(EPieceType type1, EPieceType type2);
+        BitBoard Pieces(PieceTypes type1, PieceTypes type2);
 
-        BitBoard Pieces(EPieceType type, Player side);
+        BitBoard Pieces(PieceTypes type, Player side);
 
-        BitBoard Pieces(EPieceType type1, EPieceType type2, Player side);
+        BitBoard Pieces(PieceTypes type1, PieceTypes type2, Player side);
 
-        Square GetPieceSquare(EPieceType pt, Player color);
+        Square GetPieceSquare(PieceTypes pt, Player color);
 
-        bool PieceOnFile(Square square, Player side, EPieceType pieceType);
+        bool PieceOnFile(Square square, Player side, PieceTypes pieceType);
 
         bool PawnIsolated(Square square, Player side);
 

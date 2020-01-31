@@ -69,9 +69,9 @@ namespace Rudz.Chess
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void UpdateKey(Player side, EPieceType pieceType, int delta)
+        public void UpdateKey(Player side, PieceTypes pieceType, int delta)
         {
-            if (pieceType == EPieceType.King)
+            if (pieceType == PieceTypes.King)
                 return;
 
             var x = Count(side, pieceType) + delta;
@@ -98,7 +98,7 @@ namespace Rudz.Chess
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int Count(Player side, EPieceType pieceType) => (int)((_key[side.Side] >> PieceBitShift[(int)pieceType]) & 15u);
+        public int Count(Player side, PieceTypes pieceType) => (int)((_key[side.Side] >> PieceBitShift[(int)pieceType]) & 15u);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Clear()

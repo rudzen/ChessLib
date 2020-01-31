@@ -72,7 +72,7 @@ namespace Rudz.Chess.Types
         public static int operator >>(Player left, int right) => left.Side >> right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Pieces operator +(EPieceType pieceType, Player side) => (Pieces)pieceType + (byte)(side.Side << 3);
+        public static Pieces operator +(PieceTypes pieceType, Player side) => (Pieces)pieceType + (byte)(side.Side << 3);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override bool Equals(object obj) => obj is Player player && Equals(player);

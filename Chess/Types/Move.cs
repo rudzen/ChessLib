@@ -172,13 +172,13 @@ namespace Rudz.Chess.Types
         public void SetMovingPiece(Piece piece) => _data |= piece.AsInt() << MovePieceOffset;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public EPieceType GetMovingPieceType() => GetMovingPiece().Type();
+        public PieceTypes GetMovingPieceType() => GetMovingPiece().Type();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Piece GetCapturedPiece() => (_data >> CapturePieceOffset) & 0xF;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsCapturedPieceType(EPieceType pieceType) => GetCapturedPiece().Type() == pieceType;
+        public bool IsCapturedPieceType(PieceTypes pieceType) => GetCapturedPiece().Type() == pieceType;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetCapturedPiece(Piece piece) => _data |= piece.AsInt() << CapturePieceOffset;
@@ -190,7 +190,7 @@ namespace Rudz.Chess.Types
         public void SetPromotedPiece(Piece piece) => _data |= piece.AsInt() << PromotePieceOffset;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsQueenPromotion() => IsPromotionMove() && GetPromotedPiece().Type() == EPieceType.Queen;
+        public bool IsQueenPromotion() => IsPromotionMove() && GetPromotedPiece().Type() == PieceTypes.Queen;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Player GetMovingSide() => new Player((_data >> MoveSideOffset) & 0x1);

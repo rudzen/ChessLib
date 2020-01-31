@@ -113,7 +113,7 @@ namespace Chess.Test.Pieces
 
             foreach (var square in border)
             {
-                var attacks = square.GetAttacks(EPieceType.Rook, borderInner);
+                var attacks = square.GetAttacks(PieceTypes.Rook, borderInner);
                 Assert.False(attacks.Empty());
                 var expected = corners & square ? expectedCorner : expectedSide;
                 var actual = attacks.Count;
