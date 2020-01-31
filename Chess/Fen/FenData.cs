@@ -97,7 +97,15 @@ namespace Rudz.Chess.Fen
             if (Fen.Length != other.Fen.Length)
                 return false;
 
-            return Equals(_splitPoints, other._splitPoints) && Fen.Equals(other.Fen);
+            var span = Fen.Span;
+            for (int i = 0; i < span.Length; i++)
+            {
+                if (span[i] != other.Fen.Span[i])
+                    return false;
+            }
+
+            return true;
+//            return Equals(_splitPoints, other._splitPoints) && Fen.Equals(other.Fen);
         }
 
         public override bool Equals(object obj)

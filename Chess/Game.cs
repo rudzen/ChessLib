@@ -257,13 +257,13 @@ namespace Rudz.Chess
             {
                 chunk.ToIntegral(out halfMoveNum);
 
-                if (halfMoveNum > 0)
-                    halfMoveNum--;
-
                 // half move number
                 chunk = fen.Chunk();
 
                 chunk.ToIntegral(out moveNum);
+
+                if (moveNum > 0)
+                    moveNum--;
             }
 
             PositionIndex = PositionStart = moveNum;
