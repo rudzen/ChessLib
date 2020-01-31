@@ -47,11 +47,11 @@ namespace Rudz.Chess.Types
 
         public static readonly Piece EmptyPiece = Pieces.NoPiece;
 
-        public static readonly EPieceValue[] PieceValues = { 0, EPieceValue.Pawn, EPieceValue.Knight, EPieceValue.Bishop, EPieceValue.Rook, EPieceValue.Queen, EPieceValue.King };
-
         private static readonly string[] PieceStrings = { " ", "P", "N", "B", "R", "Q", "K", " ", " ", "p", "n", "b", "r", "q", "k" };
 
         private static readonly string[] PieceNames = { "None", "Pawn", "Knight", "Bishop", "Rook", "Queen", "King" };
+
+        private static readonly PieceValues[] Values = { 0, PieceValues.Pawn, PieceValues.Knight, PieceValues.Bishop, PieceValues.Rook, PieceValues.Queen, PieceValues.King };
 
         /*
  * white chess king 	♔ 	U+2654 	&#9812;
@@ -109,7 +109,7 @@ namespace Rudz.Chess.Types
         public static bool IsPieceBlack(int code) => (BlackPieces & code) != 0;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static EPieceValue PieceValue(this Piece p) => PieceValues[(int)p.Type()];
+        public static PieceValues PieceValue(this Piece p) => Values[p.Type().AsInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ref string GetName(this Piece p) => ref PieceNames[p.Type().AsInt()];

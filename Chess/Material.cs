@@ -33,13 +33,13 @@ namespace Rudz.Chess
 
     public sealed class Material : IMaterial
     {
-        public static readonly double MaxValueWithoutPawns = 2 * (2 * (double)PieceExtensions.PieceValues[1]) + 2 * (double)PieceExtensions.PieceValues[2] + 2 * (double)PieceExtensions.PieceValues[3] + (double)PieceExtensions.PieceValues[4];
-
-        public static readonly int MaxValue = (int)(MaxValueWithoutPawns + 2 * 8 * (int)PieceExtensions.PieceValues[0]);
-
         private static readonly int[] PieceBitShift = { 0, 4, 8, 12, 16, 20 };
 
         private readonly uint[] _key;
+
+        public static double MaxValueWithoutPawns { get; } = 2.0 * (2 * (int)PieceValues.Knight + 2 * (int)PieceValues.Bishop + 2 * (int)PieceValues.Rook + (int)PieceValues.Queen);
+
+        public static double MaxValue { get; } = (int)(MaxValueWithoutPawns + 2 * 8 * (int)PieceValues.Pawn);
 
         public int[] MaterialValue { get; }
 
