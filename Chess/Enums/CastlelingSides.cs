@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2019 Rudy Alex Kohn
+Copyright (c) 2017-2020 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -29,16 +29,16 @@ namespace Rudz.Chess.Enums
     using System;
 
     [Flags]
-    public enum ECastleling
+    public enum CastlelingSides
     {
         None = 0,
-        Short = 1,
-        Long = 2,
+        King = 1,
+        Queen = 2,
         CastleNb = 3
     }
 
     [Flags]
-    public enum ECastlelingRights
+    public enum CastlelingRights
     {
         None = 0,
         WhiteOo = 1,

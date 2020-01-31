@@ -27,6 +27,7 @@ SOFTWARE.
 namespace Rudz.Chess.Hash
 {
     using Enums;
+    using Extensions;
     using System.Runtime.CompilerServices;
     using Types;
 
@@ -109,7 +110,7 @@ namespace Rudz.Chess.Hash
         public static ulong GetZobristPst(this Piece piece, Square square) => ZobristPst[piece.AsInt(), square.AsInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ulong GetZobristCastleling(this ECastlelingRights index) => ZobristCastling[index.AsInt()];
+        public static ulong GetZobristCastleling(this CastlelingRights index) => ZobristCastling[index.AsInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ulong GetZobristSide() => ZobristSide;

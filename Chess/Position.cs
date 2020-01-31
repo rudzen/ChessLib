@@ -343,14 +343,14 @@ namespace Rudz.Chess
         public void SetRookCastleFrom(Square index, Square square) => _rookCastlesFrom[index.AsInt()] = square;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Square GetKingCastleFrom(Player side, ECastleling castleType)
+        public Square GetKingCastleFrom(Player side, CastlelingSides castleType)
         {
             switch (castleType)
             {
-                case ECastleling.Short:
+                case CastlelingSides.King:
                     return _castleShortKingFrom[side.Side];
 
-                case ECastleling.Long:
+                case CastlelingSides.Queen:
                     return _castleLongKingFrom[side.Side];
 
                 default:
@@ -359,15 +359,15 @@ namespace Rudz.Chess
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetKingCastleFrom(Player side, Square square, ECastleling castleType)
+        public void SetKingCastleFrom(Player side, Square square, CastlelingSides castleType)
         {
             switch (castleType)
             {
-                case ECastleling.Short:
+                case CastlelingSides.King:
                     _castleShortKingFrom[side.Side] = square;
                     break;
 
-                case ECastleling.Long:
+                case CastlelingSides.Queen:
                     _castleLongKingFrom[side.Side] = square;
                     break;
 
@@ -386,7 +386,7 @@ namespace Rudz.Chess
         /// <param name="m">The string containing the move</param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ECastleling IsCastleMove(string m)
+        public CastlelingSides IsCastleMove(string m)
         {
             switch (m)
             {
@@ -396,7 +396,7 @@ namespace Rudz.Chess
                 case "OO":
                 case "0-0":
                 case "00":
-                    return ECastleling.Short;
+                    return CastlelingSides.King;
 
                 case "O-O-O":
                 case "e1c1" when IsPieceTypeOnSquare(ESquare.e1, EPieceType.King):
@@ -404,10 +404,10 @@ namespace Rudz.Chess
                 case "OOO":
                 case "0-0-0":
                 case "000":
-                    return ECastleling.Long;
+                    return CastlelingSides.Queen;
             }
 
-            return ECastleling.None;
+            return CastlelingSides.None;
         }
 
         /// <summary>
@@ -435,7 +435,7 @@ namespace Rudz.Chess
 
             var castleType = IsCastleMove(m);
 
-            if (castleType == ECastleling.None && (!m[0].InBetween('a', 'h') || !m[1].InBetween('1', '8') || !m[2].InBetween('a', 'h') || !m[3].InBetween('1', '8')))
+            if (castleType == CastlelingSides.None && (!m[0].InBetween('a', 'h') || !m[1].InBetween('1', '8') || !m[2].InBetween('a', 'h') || !m[3].InBetween('1', '8')))
                 return MoveExtensions.EmptyMove;
 
             /*
@@ -448,11 +448,11 @@ namespace Rudz.Chess
             // local function to determine if the move is actually a castleling move by looking at the piece location of the squares
 
             // part one of pillaging the castleType.. detection of chess 960 - shredder fen
-            if (castleType == ECastleling.None)
+            if (castleType == CastlelingSides.None)
                 castleType = ShredderFunc(from, to); /* look for the air balloon */
 
             // part two of pillaging the castleType var, since it might have changed
-            if (castleType != ECastleling.None)
+            if (castleType != CastlelingSides.None)
             {
                 from = GetKingCastleFrom(State.SideToMove, castleType);
                 to = castleType.GetKingCastleTo(State.SideToMove);
@@ -465,7 +465,7 @@ namespace Rudz.Chess
             // ** untested area **
             foreach (var move in matchingMoves)
             {
-                if (castleType == ECastleling.None && move.IsCastlelingMove())
+                if (castleType == CastlelingSides.None && move.IsCastlelingMove())
                     continue;
                 if (!move.IsPromotionMove())
                     return move;
@@ -479,7 +479,7 @@ namespace Rudz.Chess
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool CanCastle(ECastleling type)
+        public bool CanCastle(CastlelingSides type)
             => State.CastlelingRights.HasFlagFast(type.GetCastleAllowedMask(State.SideToMove)) && IsCastleAllowed(type.GetKingCastleTo(State.SideToMove));
 
         public bool IsCastleAllowed(Square square)
@@ -549,7 +549,7 @@ namespace Rudz.Chess
             if (move.IsCastlelingMove())
             {
                 // TODO : Basic castleling verification
-                if (CanCastle(move.GetFromSquare() < to ? ECastleling.Short : ECastleling.Long))
+                if (CanCastle(move.GetFromSquare() < to ? CastlelingSides.King : CastlelingSides.Queen))
                     return true;
 
                 return this.GenerateMoves().Contains(move);
@@ -643,16 +643,16 @@ namespace Rudz.Chess
 
             if (castleRights != 0)
             {
-                if (castleRights.HasFlagFast(ECastlelingRights.WhiteOo))
+                if (castleRights.HasFlagFast(CastlelingRights.WhiteOo))
                     sv.Append('K');
 
-                if (castleRights.HasFlagFast(ECastlelingRights.WhiteOoo))
+                if (castleRights.HasFlagFast(CastlelingRights.WhiteOoo))
                     sv.Append('Q');
 
-                if (castleRights.HasFlagFast(ECastlelingRights.BlackOo))
+                if (castleRights.HasFlagFast(CastlelingRights.BlackOo))
                     sv.Append('k');
 
-                if (castleRights.HasFlagFast(ECastlelingRights.BlackOoo))
+                if (castleRights.HasFlagFast(CastlelingRights.BlackOoo))
                     sv.Append('q');
             }
             else
@@ -678,11 +678,11 @@ namespace Rudz.Chess
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private ECastleling ShredderFunc(Square fromSquare, Square toSquare) =>
+        private CastlelingSides ShredderFunc(Square fromSquare, Square toSquare) =>
             GetPiece(fromSquare).Value == EPieces.WhiteKing && GetPiece(toSquare).Value == EPieces.WhiteRook || GetPiece(fromSquare).Value == EPieces.BlackKing && GetPiece(toSquare).Value == EPieces.BlackRook
                 ? toSquare > fromSquare
-                    ? ECastleling.Short
-                    : ECastleling.Long
-                : ECastleling.None;
+                    ? CastlelingSides.King
+                    : CastlelingSides.Queen
+                : CastlelingSides.None;
     }
 }

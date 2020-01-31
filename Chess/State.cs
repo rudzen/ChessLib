@@ -47,7 +47,7 @@ namespace Rudz.Chess
 
         public ulong Key { get; set; }
 
-        public ECastlelingRights CastlelingRights { get; set; }
+        public CastlelingRights CastlelingRights { get; set; }
 
         public Square EnPassantSquare { get; set; }
 
@@ -59,7 +59,7 @@ namespace Rudz.Chess
         {
             LastMove = MoveExtensions.EmptyMove;
             Material = new Material();
-            CastlelingRights = ECastlelingRights.None;
+            CastlelingRights = CastlelingRights.None;
             EnPassantSquare = ESquare.none;
             SideToMove = PlayerExtensions.White;
         }
@@ -70,7 +70,7 @@ namespace Rudz.Chess
             Material.Clear();
             PawnStructureKey = Key = 0ul;
             ReversibleHalfMoveCount = NullMovesInRow = FiftyMoveRuleCounter = 0;
-            CastlelingRights = ECastlelingRights.None;
+            CastlelingRights = CastlelingRights.None;
             EnPassantSquare = ESquare.none;
             SideToMove = PlayerExtensions.White;
         }

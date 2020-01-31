@@ -27,6 +27,7 @@ SOFTWARE.
 namespace Rudz.Chess
 {
     using Enums;
+    using Extensions;
     using System;
     using System.Runtime.CompilerServices;
     using Types;
@@ -85,7 +86,7 @@ namespace Rudz.Chess
             if (pos.InCheck)
                 return;
 
-            for (var castleType = ECastleling.Short; castleType < ECastleling.CastleNb; castleType++)
+            for (var castleType = CastlelingSides.King; castleType < CastlelingSides.CastleNb; castleType++)
                 if (pos.CanCastle(castleType))
                     pos.AddCastleMove(moves, pos.GetKingCastleFrom(currentSide, castleType), castleType.GetKingCastleTo(currentSide), flags);
         }

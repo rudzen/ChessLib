@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2019 Rudy Alex Kohn
+Copyright (c) 2017-2020 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,31 +24,32 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Enums
+namespace Rudz.Chess.Extensions
 {
+    using Enums;
     using System;
     using System.Runtime.CompilerServices;
     using Types;
 
-    public static class ECastlelingExtensions
+    public static class CastlelingExtensions
     {
-        private static readonly ECastlelingRights[] OoAllowedMask = { ECastlelingRights.WhiteOo, ECastlelingRights.BlackOo };
+        private static readonly CastlelingRights[] OoAllowedMask = { CastlelingRights.WhiteOo, CastlelingRights.BlackOo };
 
-        private static readonly ECastlelingRights[] OooAllowedMask = { ECastlelingRights.WhiteOoo, ECastlelingRights.BlackOoo };
+        private static readonly CastlelingRights[] OooAllowedMask = { CastlelingRights.WhiteOoo, CastlelingRights.BlackOoo };
 
         private static readonly Square[] OoKingTo = { ESquare.g1, ESquare.g8 };
 
         private static readonly Square[] OooKingTo = { ESquare.c1, ESquare.c8 };
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Square GetKingCastleTo(this ECastleling castleType, Player side)
+        public static Square GetKingCastleTo(this CastlelingSides castleType, Player side)
         {
             switch (castleType)
             {
-                case ECastleling.Short:
+                case CastlelingSides.King:
                     return OoKingTo[side.Side];
 
-                case ECastleling.Long:
+                case CastlelingSides.Queen:
                     return OooKingTo[side.Side];
 
                 default:
@@ -57,14 +58,14 @@ namespace Rudz.Chess.Enums
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static ECastlelingRights GetCastleAllowedMask(this ECastleling castleType, Player side)
+        internal static CastlelingRights GetCastleAllowedMask(this CastlelingSides castleType, Player side)
         {
             switch (castleType)
             {
-                case ECastleling.Short:
+                case CastlelingSides.King:
                     return OoAllowedMask[side.Side];
 
-                case ECastleling.Long:
+                case CastlelingSides.Queen:
                     return OooAllowedMask[side.Side];
 
                 default:
@@ -73,20 +74,20 @@ namespace Rudz.Chess.Enums
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string GetCastlelingString(this ECastleling @this)
+        public static string GetCastlelingString(this CastlelingSides @this)
         {
             switch (@this)
             {
-                case ECastleling.Short:
+                case CastlelingSides.King:
                     return "O-O";
 
-                case ECastleling.Long:
+                case CastlelingSides.Queen:
                     return "O-O-O";
 
-                case ECastleling.None:
+                case CastlelingSides.None:
                     return string.Empty;
 
-                case ECastleling.CastleNb:
+                case CastlelingSides.CastleNb:
                     return string.Empty;
 
                 default:
@@ -98,12 +99,12 @@ namespace Rudz.Chess.Enums
         public static string GetCastlelingString(Square toSquare, Square fromSquare) => toSquare < fromSquare ? "O-O-O" : "O-O";
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool HasFlagFast(this ECastleling value, ECastleling flag) => (value & flag) != 0;
+        public static bool HasFlagFast(this CastlelingSides value, CastlelingSides flag) => (value & flag) != 0;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool HasFlagFast(this ECastlelingRights value, ECastlelingRights flag) => (value & flag) != 0;
+        public static bool HasFlagFast(this CastlelingRights value, CastlelingRights flag) => (value & flag) != 0;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int AsInt(this ECastlelingRights value) => (int) value;
+        public static int AsInt(this CastlelingRights value) => (int)value;
     }
 }

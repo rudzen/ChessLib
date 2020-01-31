@@ -112,15 +112,15 @@ namespace Rudz.Chess
 
         void SetRookCastleFrom(Square index, Square square);
 
-        Square GetKingCastleFrom(Player side, ECastleling castleType);
+        Square GetKingCastleFrom(Player side, CastlelingSides castleType);
 
-        void SetKingCastleFrom(Player side, Square square, ECastleling castleType);
+        void SetKingCastleFrom(Player side, Square square, CastlelingSides castleType);
 
-        ECastleling IsCastleMove(string m);
+        CastlelingSides IsCastleMove(string m);
 
         Move StringToMove(string m);
 
-        bool CanCastle(ECastleling type);
+        bool CanCastle(CastlelingSides type);
 
         bool IsCastleAllowed(Square square);
 
