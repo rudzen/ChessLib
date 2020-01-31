@@ -42,7 +42,7 @@ namespace Rudz.Chess
         int MoveNumber { get; }
         BitBoard Occupied { get; }
         IPosition Position { get; }
-        EGameEndType GameEndType { get; set; }
+        GameEndTypes GameEndType { get; set; }
 
         /// <summary>
         /// Makes a chess move in the data structure

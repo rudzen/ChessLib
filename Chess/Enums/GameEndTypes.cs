@@ -29,7 +29,7 @@ namespace Rudz.Chess.Enums
     using System;
 
     [Flags]
-    public enum EGameEndType
+    public enum GameEndTypes
     {
         None = 0,
         Repetition = 1,

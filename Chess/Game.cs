@@ -94,7 +94,7 @@ namespace Rudz.Chess
 
         public IPosition Position { get; }
 
-        public EGameEndType GameEndType { get; set; }
+        public GameEndTypes GameEndType { get; set; }
 
         public static TranspositionTable Table { get; set; } = new TranspositionTable(256);
 
@@ -320,17 +320,17 @@ namespace Rudz.Chess
 
         public void UpdateDrawTypes()
         {
-            var gameEndType = EGameEndType.None;
+            var gameEndType = GameEndTypes.None;
             if (IsRepetition())
-                gameEndType |= EGameEndType.Repetition;
+                gameEndType |= GameEndTypes.Repetition;
             if (State.Material[PlayerExtensions.White.Side] <= 300 && State.Material[PlayerExtensions.Black.Side] <= 300 && Position.BoardPieces[0].Empty() && Position.BoardPieces[8].Empty())
-                gameEndType |= EGameEndType.MaterialDrawn;
+                gameEndType |= GameEndTypes.MaterialDrawn;
             if (State.ReversibleHalfMoveCount >= 100)
-                gameEndType |= EGameEndType.FiftyMove;
+                gameEndType |= GameEndTypes.FiftyMove;
 
             var moveList = Position.GenerateMoves();
             if (!moveList.Any(move => Position.IsLegal(move)))
-                gameEndType |= EGameEndType.Pat;
+                gameEndType |= GameEndTypes.Pat;
 
             GameEndType = gameEndType;
         }
