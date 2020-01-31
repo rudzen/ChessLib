@@ -46,7 +46,7 @@ namespace Rudz.Chess.Types
             : this((ESquare)(rank << 3) + file) { }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Square(ERank rank, Files file)
+        public Square(Ranks rank, Files file)
             : this((int)rank, (int)file) { }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

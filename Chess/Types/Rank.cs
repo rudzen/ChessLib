@@ -31,13 +31,13 @@ namespace Rudz.Chess.Types
 
     public struct Rank
     {
-        public ERank Value;
+        public Ranks Value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Rank(int file) => Value = (ERank)file;
+        public Rank(int file) => Value = (Ranks)file;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Rank(ERank file) => Value = file;
+        public Rank(Ranks file) => Value = file;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Rank(Rank file) => Value = file.Value;
@@ -46,7 +46,7 @@ namespace Rudz.Chess.Types
         public static implicit operator Rank(int value) => new Rank(value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator Rank(ERank value) => new Rank(value);
+        public static implicit operator Rank(Ranks value) => new Rank(value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator ==(Rank left, Rank right) => left.Equals(right);
@@ -55,16 +55,16 @@ namespace Rudz.Chess.Types
         public static bool operator !=(Rank left, Rank right) => !left.Equals(right);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator ==(Rank left, ERank right) => left.Value == right;
+        public static bool operator ==(Rank left, Ranks right) => left.Value == right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator !=(Rank left, ERank right) => left.Value != right;
+        public static bool operator !=(Rank left, Ranks right) => left.Value != right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator ==(Rank left, int right) => left.Value == (ERank)right;
+        public static bool operator ==(Rank left, int right) => left.Value == (Ranks)right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator !=(Rank left, int right) => left.Value != (ERank)right;
+        public static bool operator !=(Rank left, int right) => left.Value != (Ranks)right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Rank operator +(Rank left, Rank right) => left.AsInt() + right.AsInt();
@@ -73,7 +73,7 @@ namespace Rudz.Chess.Types
         public static Rank operator +(Rank left, int right) => left.AsInt() + right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Rank operator +(Rank left, ERank right) => left.AsInt() + (int)right;
+        public static Rank operator +(Rank left, Ranks right) => left.AsInt() + (int)right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Rank operator -(Rank left, Rank right) => left.AsInt() - right.AsInt();
@@ -82,7 +82,7 @@ namespace Rudz.Chess.Types
         public static Rank operator -(Rank left, int right) => left.AsInt() - right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Rank operator -(Rank left, ERank right) => left.AsInt() - (int)right;
+        public static Rank operator -(Rank left, Ranks right) => left.AsInt() - (int)right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Rank operator ++(Rank rank) => ++rank.Value;
@@ -123,7 +123,7 @@ namespace Rudz.Chess.Types
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int AsInt() => (int)Value;
 
-        public bool IsValid() => Value < ERank.RankNb;
+        public bool IsValid() => Value < Ranks.RankNb;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override string ToString() => ((int) Value + 1).ToString();

@@ -63,7 +63,7 @@ namespace Chess.Test.Square
         {
             const ESquare expected = ESquare.h8;
 
-            var s = new Square(ERank.Rank1, Files.FileH);
+            var s = new Square(Ranks.Rank1, Files.FileH);
 
             var actual = s.Relative(PlayerExtensions.Black);
 
@@ -75,7 +75,7 @@ namespace Chess.Test.Square
         {
             const ESquare expected = ESquare.c3;
 
-            var s = new Square(ERank.Rank3, Files.FileC);
+            var s = new Square(Ranks.Rank3, Files.FileC);
 
             var actual = s.Relative(PlayerExtensions.White);
 

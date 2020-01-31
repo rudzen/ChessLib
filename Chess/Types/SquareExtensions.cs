@@ -74,10 +74,10 @@ namespace Rudz.Chess.Types
         public static bool IsValid(this Square s) => s.Value <= ESquare.h8;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsValidEp(this Square s) => s.Rank() == ERank.Rank3 || s.Rank() == ERank.Rank6;
+        public static bool IsValidEp(this Square s) => s.Rank() == Ranks.Rank3 || s.Rank() == Ranks.Rank6;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsValidEp(this Square s, Player c) => s.RelativeRank(c) == ERank.Rank3;
+        public static bool IsValidEp(this Square s, Player c) => s.RelativeRank(c) == Ranks.Rank3;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsDark(this Square s) => (s & BitBoards.DarkSquares) != 0;
@@ -86,7 +86,7 @@ namespace Rudz.Chess.Types
         public static int AsInt(this Square s) => (int)s.Value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Rank Rank(this Square s) => (ERank)(s.AsInt() >> 3);
+        public static Rank Rank(this Square s) => (Ranks)(s.AsInt() >> 3);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static char RankChar(this Square s) => s.Rank().RankChar();

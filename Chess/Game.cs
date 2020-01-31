@@ -342,7 +342,7 @@ namespace Rudz.Chess
             const char space = ' ';
             _output.Clear();
             _output.Append(separator);
-            for (var rank = ERank.Rank8; rank >= ERank.Rank1; rank--)
+            for (var rank = Ranks.Rank8; rank >= Ranks.Rank1; rank--)
             {
                 _output.Append((int)rank + 1);
                 _output.Append(space);

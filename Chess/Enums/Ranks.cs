@@ -26,7 +26,7 @@ SOFTWARE.
 
 namespace Rudz.Chess.Enums
 {
-    public enum ERank
+    public enum Ranks
     {
         Rank1 = 0,
         Rank2 = 1,

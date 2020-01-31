@@ -24,14 +24,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Enums
+namespace Rudz.Chess.Extensions
 {
+    using Enums;
     using System.Runtime.CompilerServices;
     using Types;
 
     public static class ERankExtensions
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Rank RelativeRank(this ERank rank, Player color) => (ERank)((int)rank ^ (color.Side * 7));
+        public static Rank RelativeRank(this Ranks rank, Player color) => (Ranks)((int)rank ^ (color.Side * 7));
     }
 }

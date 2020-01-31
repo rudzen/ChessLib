@@ -197,7 +197,7 @@ namespace Rudz.Chess.Types
             Span<PieceTypes> validMagicPieces = stackalloc PieceTypes[] { PieceTypes.Bishop, PieceTypes.Rook };
 
             // ForwardRanksBB population loop idea from sf
-            for (var r = ERank.Rank1; r < ERank.RankNb; ++r)
+            for (var r = Ranks.Rank1; r < Ranks.RankNb; ++r)
             {
                 var rank = (int)r;
                 ForwardRanksBB[0, rank] = ~(ForwardRanksBB[1, rank + 1] = ForwardRanksBB[1, rank] | RankBB[rank]);
@@ -286,7 +286,7 @@ namespace Rudz.Chess.Types
                 {
                     var c = (int)side;
                     KingRingBB[c, sq] = PseudoAttacksBB[pt, sq];
-                    if (s1.RelativeRank(side) == ERank.Rank1)
+                    if (s1.RelativeRank(side) == Ranks.Rank1)
                         KingRingBB[c, sq] |= KingRingBB[c, sq].Shift(side == Players.White ? Directions.North : Directions.South);
 
                     if (file == Files.FileH)
@@ -485,7 +485,7 @@ namespace Rudz.Chess.Types
             var s = new StringBuilder("+---+---+---+---+---+---+---+---+---+\n", 1024);
             if (!string.IsNullOrWhiteSpace(title))
                 s.AppendLine($"| {title}");
-            for (var r = ERank.Rank8; r >= ERank.Rank1; --r)
+            for (var r = Ranks.Rank8; r >= Ranks.Rank1; --r)
             {
                 s.AppendFormat("| {0} ", (int)r + 1);
                 for (var f = Files.FileA; f <= Files.FileH; ++f)
