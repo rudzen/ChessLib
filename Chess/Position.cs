@@ -517,9 +517,9 @@ namespace Rudz.Chess
         /// <param name="from">The from square</param>
         /// <param name="type">The move type</param>
         /// <returns>true if legal, otherwise false</returns>
-        public bool IsLegal(Move move, Piece piece, Square from, EMoveType type)
+        public bool IsLegal(Move move, Piece piece, Square from, MoveTypes type)
         {
-            if (!InCheck && piece.Type() != EPieceType.King && (State.Pinned & from).Empty() && !type.HasFlagFast(EMoveType.Epcapture))
+            if (!InCheck && piece.Type() != EPieceType.King && (State.Pinned & from).Empty() && !type.HasFlagFast(MoveTypes.Epcapture))
                 return true;
 
             IsProbing = true;

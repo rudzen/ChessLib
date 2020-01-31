@@ -57,14 +57,14 @@ namespace Rudz.Chess
 
             var pawns = pos.Pieces(EPieceType.Pawn, currentSide);
 
-            pos.AddPawnMoves(moves, currentSide.PawnPush(pawns & currentSide.Rank7()) & ~pos.Pieces(), currentSide.PawnPushDistance(), EMoveType.Quiet, flags);
-            pos.AddPawnMoves(moves, pawns.Shift(northEast) & occupiedByThem, currentSide.PawnWestAttackDistance(), EMoveType.Capture, flags);
-            pos.AddPawnMoves(moves, pawns.Shift(northWest) & occupiedByThem, currentSide.PawnEastAttackDistance(), EMoveType.Capture, flags);
+            pos.AddPawnMoves(moves, currentSide.PawnPush(pawns & currentSide.Rank7()) & ~pos.Pieces(), currentSide.PawnPushDistance(), MoveTypes.Quiet, flags);
+            pos.AddPawnMoves(moves, pawns.Shift(northEast) & occupiedByThem, currentSide.PawnWestAttackDistance(), MoveTypes.Capture, flags);
+            pos.AddPawnMoves(moves, pawns.Shift(northWest) & occupiedByThem, currentSide.PawnEastAttackDistance(), MoveTypes.Capture, flags);
 
             if (pos.State.EnPassantSquare != ESquare.none)
             {
-                pos.AddPawnMoves(moves, pawns.Shift(northEast) & pos.State.EnPassantSquare, currentSide.PawnWestAttackDistance(), EMoveType.Epcapture, flags);
-                pos.AddPawnMoves(moves, pawns.Shift(northWest) & pos.State.EnPassantSquare, currentSide.PawnEastAttackDistance(), EMoveType.Epcapture, flags);
+                pos.AddPawnMoves(moves, pawns.Shift(northEast) & pos.State.EnPassantSquare, currentSide.PawnWestAttackDistance(), MoveTypes.Epcapture, flags);
+                pos.AddPawnMoves(moves, pawns.Shift(northWest) & pos.State.EnPassantSquare, currentSide.PawnEastAttackDistance(), MoveTypes.Epcapture, flags);
             }
 
             pos.AddMoves(moves, occupiedByThem, flags);
@@ -76,10 +76,10 @@ namespace Rudz.Chess
             var up = currentSide == PlayerExtensions.White ? Directions.North : Directions.South;
             var notOccupied = ~pos.Pieces();
             var pushed = (pos.Pieces(EPieceType.Pawn, currentSide) & ~currentSide.Rank7()).Shift(up) & notOccupied;
-            pos.AddPawnMoves(moves, pushed, currentSide.PawnPushDistance(), EMoveType.Quiet, flags);
+            pos.AddPawnMoves(moves, pushed, currentSide.PawnPushDistance(), MoveTypes.Quiet, flags);
 
             pushed &= currentSide.Rank3();
-            pos.AddPawnMoves(moves, pushed.Shift(up) & notOccupied, currentSide.PawnDoublePushDistance(), EMoveType.Doublepush, flags);
+            pos.AddPawnMoves(moves, pushed.Shift(up) & notOccupied, currentSide.PawnDoublePushDistance(), MoveTypes.Doublepush, flags);
 
             pos.AddMoves(moves, notOccupied, flags);
 
@@ -123,7 +123,7 @@ namespace Rudz.Chess
             while (target)
             {
                 var to = target.Lsb();
-                pos.AddMove(moves, piece, from, to, PieceExtensions.EmptyPiece, flags, EMoveType.Capture);
+                pos.AddMove(moves, piece, from, to, PieceExtensions.EmptyPiece, flags, MoveTypes.Capture);
                 BitBoards.ResetLsb(ref target);
             }
 
@@ -136,7 +136,7 @@ namespace Rudz.Chess
             }
         }
 
-        private static void AddPawnMoves(this IPosition pos, MoveList moves, BitBoard targetSquares, Direction direction, EMoveType type, MoveGenerationFlags flags)
+        private static void AddPawnMoves(this IPosition pos, MoveList moves, BitBoard targetSquares, Direction direction, MoveTypes type, MoveGenerationFlags flags)
         {
             if (targetSquares.Empty())
                 return;
@@ -156,7 +156,7 @@ namespace Rudz.Chess
                 BitBoards.ResetLsb(ref nonPromotionSquares);
             }
 
-            type |= EMoveType.Promotion;
+            type |= MoveTypes.Promotion;
 
             if (flags.HasFlagFast(MoveGenerationFlags.Queenpromotion))
             {
@@ -181,7 +181,7 @@ namespace Rudz.Chess
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void AddCastleMove(this IPosition pos, MoveList moves, Square from, Square to, MoveGenerationFlags flags)
-            => pos.AddMove(moves, EPieceType.King.MakePiece(pos.State.SideToMove), from, to, PieceExtensions.EmptyPiece, flags, EMoveType.Castle);
+            => pos.AddMove(moves, EPieceType.King.MakePiece(pos.State.SideToMove), from, to, PieceExtensions.EmptyPiece, flags, MoveTypes.Castle);
 
         /// <summary>
         /// Move generation leaf method.
@@ -194,13 +194,13 @@ namespace Rudz.Chess
         /// <param name="promoted">The promotion piece (if any, defaults to NoPiece type)</param>
         /// <param name="type">The move type</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void AddMove(this IPosition pos, MoveList moves, Piece piece, Square from, Square to, Piece promoted, MoveGenerationFlags flags, EMoveType type = EMoveType.Quiet)
+        private static void AddMove(this IPosition pos, MoveList moves, Piece piece, Square from, Square to, Piece promoted, MoveGenerationFlags flags, MoveTypes type = MoveTypes.Quiet)
         {
             Move move;
 
-            if (type.HasFlagFast(EMoveType.Capture))
+            if (type.HasFlagFast(MoveTypes.Capture))
                 move = new Move(piece, pos.GetPiece(to), from, to, type, promoted);
-            else if (type.HasFlagFast(EMoveType.Epcapture))
+            else if (type.HasFlagFast(MoveTypes.Epcapture))
                 move = new Move(piece, EPieceType.Pawn.MakePiece(~pos.State.SideToMove), from, to, type, promoted);
             else
                 move = new Move(piece, from, to, type, promoted);

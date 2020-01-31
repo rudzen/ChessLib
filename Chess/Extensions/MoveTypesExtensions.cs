@@ -24,26 +24,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Enums
+namespace Rudz.Chess.Extensions
 {
-    using System;
+    using Enums;
     using System.Runtime.CompilerServices;
 
-    [Flags]
-    public enum EMoveType
-    {
-        Normal = 0,
-        Quiet = 1,
-        Doublepush = 2,
-        Castle = 4,
-        Epcapture = 8,
-        Promotion = 16,
-        Capture = 32
-    }
-
-    public static class EMoveTypeExtensions
+    public static class MoveTypesExtensions
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool HasFlagFast(this EMoveType value, EMoveType flag) => (value & flag) != 0;
+        public static bool HasFlagFast(this MoveTypes value, MoveTypes flag) => (value & flag) != 0;
     }
 }

@@ -80,7 +80,7 @@ namespace Chess.Test.Move
             Piece expectedMovingPiece = EPieces.WhitePawn;
             Piece expectedCapturedPiece = EPieces.BlackKnight;
             Piece expectedPromotionPiece = EPieces.WhiteQueen;
-            const EMoveType expectedMoveType = EMoveType.Promotion;
+            const MoveTypes expectedMoveType = MoveTypes.Promotion;
 
             // full move spectrum
             var move = new Move(expectedMovingPiece, expectedCapturedPiece, expectedFrom, expectedTo, expectedMoveType, expectedPromotionPiece);

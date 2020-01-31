@@ -42,8 +42,8 @@ namespace Chess.Test.Gameplay
             // generate moves
             var moves = new List<Move>(4) {
                                                       new Move(EPieces.WhitePawn, ESquare.f2, ESquare.f3),
-                                                      new Move(EPieces.BlackPawn, ESquare.e7, ESquare.e5, EMoveType.Doublepush, EPieces.NoPiece),
-                                                      new Move(EPieces.WhitePawn, ESquare.g2, ESquare.g4, EMoveType.Doublepush, EPieces.NoPiece),
+                                                      new Move(EPieces.BlackPawn, ESquare.e7, ESquare.e5, MoveTypes.Doublepush, EPieces.NoPiece),
+                                                      new Move(EPieces.WhitePawn, ESquare.g2, ESquare.g4, MoveTypes.Doublepush, EPieces.NoPiece),
                                                       new Move(EPieces.BlackQueen, ESquare.d8, ESquare.h4)
                                                   };
 

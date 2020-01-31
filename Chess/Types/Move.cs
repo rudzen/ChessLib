@@ -27,6 +27,7 @@ SOFTWARE.
 namespace Rudz.Chess.Types
 {
     using Enums;
+    using Extensions;
     using System;
     using System.Runtime.CompilerServices;
 
@@ -77,7 +78,7 @@ namespace Rudz.Chess.Types
         /// <param name="from">The from square</param>
         /// <param name="to">The to square</param>
         /// <param name="type">The move type</param>
-        public Move(Piece piece, Piece captured, Square from, Square to, EMoveType type)
+        public Move(Piece piece, Piece captured, Square from, Square to, MoveTypes type)
             : this(from, to)
         {
             SetMovingPiece(piece);
@@ -98,7 +99,7 @@ namespace Rudz.Chess.Types
             : this(from, to)
         {
             SetMovingPiece(piece);
-            SetMoveType(EMoveType.Quiet);
+            SetMoveType(MoveTypes.Quiet);
         }
 
         /// <summary>
@@ -111,7 +112,7 @@ namespace Rudz.Chess.Types
         /// <param name="to">The to square</param>
         /// <param name="type">The move type</param>
         /// <param name="promotedEPiece">The promotion piece</param>
-        public Move(Piece piece, Piece captured, Square from, Square to, EMoveType type, Piece promotedEPiece)
+        public Move(Piece piece, Piece captured, Square from, Square to, MoveTypes type, Piece promotedEPiece)
             : this(piece, captured, from, to, type) => SetPromotedPiece(promotedEPiece);
 
         /// <summary>
@@ -123,7 +124,7 @@ namespace Rudz.Chess.Types
         /// <param name="to">The to square</param>
         /// <param name="type">The move type</param>
         /// <param name="promoted">The promotion piece</param>
-        public Move(Piece piece, Square from, Square to, EMoveType type, Piece promoted)
+        public Move(Piece piece, Square from, Square to, MoveTypes type, Piece promoted)
             : this(from, to)
         {
             SetMovingPiece(piece);
@@ -195,28 +196,28 @@ namespace Rudz.Chess.Types
         public Player GetMovingSide() => new Player((_data >> MoveSideOffset) & 0x1);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public EMoveType GetMoveType() => (EMoveType)((_data >> MoveTypeOffset) & 0x3F);
+        public MoveTypes GetMoveType() => (MoveTypes)((_data >> MoveTypeOffset) & 0x3F);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetMoveType(EMoveType moveType) => _data |= (int)moveType << MoveTypeOffset;
+        public void SetMoveType(MoveTypes moveType) => _data |= (int)moveType << MoveTypeOffset;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsType(EMoveType moveType) => GetMoveType() == moveType;
+        public bool IsType(MoveTypes moveType) => GetMoveType() == moveType;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsCaptureMove() => GetMoveType().HasFlagFast(EMoveType.Epcapture | EMoveType.Capture);
+        public bool IsCaptureMove() => GetMoveType().HasFlagFast(MoveTypes.Epcapture | MoveTypes.Capture);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsEnPassantMove() => GetMoveType().HasFlagFast(EMoveType.Epcapture);
+        public bool IsEnPassantMove() => GetMoveType().HasFlagFast(MoveTypes.Epcapture);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsCastlelingMove() => GetMoveType().HasFlagFast(EMoveType.Castle);
+        public bool IsCastlelingMove() => GetMoveType().HasFlagFast(MoveTypes.Castle);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsPromotionMove() => GetMoveType().HasFlagFast(EMoveType.Promotion);
+        public bool IsPromotionMove() => GetMoveType().HasFlagFast(MoveTypes.Promotion);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsDoublePush() => GetMoveType().HasFlagFast(EMoveType.Doublepush);
+        public bool IsDoublePush() => GetMoveType().HasFlagFast(MoveTypes.Doublepush);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool IsNullMove() => _data == 0;

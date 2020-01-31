@@ -126,7 +126,7 @@ namespace Rudz.Chess
 
         bool IsPseudoLegal(Move move);
 
-        bool IsLegal(Move move, Piece piece, Square from, EMoveType type);
+        bool IsLegal(Move move, Piece piece, Square from, MoveTypes type);
 
         bool IsLegal(Move move);
 
