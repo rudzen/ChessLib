@@ -37,9 +37,9 @@ namespace Rudz.Chess.Extensions
 
         private static readonly CastlelingRights[] OooAllowedMask = { CastlelingRights.WhiteOoo, CastlelingRights.BlackOoo };
 
-        private static readonly Square[] OoKingTo = { ESquare.g1, ESquare.g8 };
+        private static readonly Square[] OoKingTo = { Squares.g1, Squares.g8 };
 
-        private static readonly Square[] OooKingTo = { ESquare.c1, ESquare.c8 };
+        private static readonly Square[] OooKingTo = { Squares.c1, Squares.c8 };
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Square GetKingCastleTo(this CastlelingSides castleType, Player side)

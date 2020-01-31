@@ -30,7 +30,7 @@ namespace Rudz.Chess.Extensions
     using System.Runtime.CompilerServices;
     using Types;
 
-    public static class ERankExtensions
+    public static class RanksExtensions
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Rank RelativeRank(this Ranks rank, Player color) => (Ranks)((int)rank ^ (color.Side * 7));

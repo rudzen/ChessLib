@@ -64,14 +64,14 @@ namespace Rudz.Chess.Types
             }
 
             // generate rook castleling destination squares for both sides
-            RookCastlesTo[Flip[PlayerExtensions.White.Side, (int)ESquare.g1].AsInt()] = Flip[PlayerExtensions.White.Side, (int)ESquare.f1];
-            RookCastlesTo[Flip[PlayerExtensions.White.Side, (int)ESquare.c1].AsInt()] = Flip[PlayerExtensions.White.Side, (int)ESquare.d1];
-            RookCastlesTo[Flip[PlayerExtensions.Black.Side, (int)ESquare.g1].AsInt()] = Flip[PlayerExtensions.Black.Side, (int)ESquare.f1];
-            RookCastlesTo[Flip[PlayerExtensions.Black.Side, (int)ESquare.c1].AsInt()] = Flip[PlayerExtensions.Black.Side, (int)ESquare.d1];
+            RookCastlesTo[Flip[PlayerExtensions.White.Side, (int)Squares.g1].AsInt()] = Flip[PlayerExtensions.White.Side, (int)Squares.f1];
+            RookCastlesTo[Flip[PlayerExtensions.White.Side, (int)Squares.c1].AsInt()] = Flip[PlayerExtensions.White.Side, (int)Squares.d1];
+            RookCastlesTo[Flip[PlayerExtensions.Black.Side, (int)Squares.g1].AsInt()] = Flip[PlayerExtensions.Black.Side, (int)Squares.f1];
+            RookCastlesTo[Flip[PlayerExtensions.Black.Side, (int)Squares.c1].AsInt()] = Flip[PlayerExtensions.Black.Side, (int)Squares.d1];
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsValid(this Square s) => s.Value <= ESquare.h8;
+        public static bool IsValid(this Square s) => s.Value <= Squares.h8;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsValidEp(this Square s) => s.Rank() == Ranks.Rank3 || s.Rank() == Ranks.Rank6;
@@ -116,7 +116,7 @@ namespace Rudz.Chess.Types
         public static BitBoard BitBoardSquare(this Square sq) => BitBoards.BbSquares[sq.AsInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static BitBoard BitBoardSquare(this ESquare sq) => BitBoards.BbSquares[(int)sq];
+        public static BitBoard BitBoardSquare(this Squares sq) => BitBoards.BbSquares[(int)sq];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static Square GetRookCastleTo(this Square square) => RookCastlesTo[square.AsInt()];

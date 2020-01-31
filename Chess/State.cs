@@ -60,7 +60,7 @@ namespace Rudz.Chess
             LastMove = MoveExtensions.EmptyMove;
             Material = new Material();
             CastlelingRights = CastlelingRights.None;
-            EnPassantSquare = ESquare.none;
+            EnPassantSquare = Squares.none;
             SideToMove = PlayerExtensions.White;
         }
 
@@ -71,7 +71,7 @@ namespace Rudz.Chess
             PawnStructureKey = Key = 0ul;
             ReversibleHalfMoveCount = NullMovesInRow = FiftyMoveRuleCounter = 0;
             CastlelingRights = CastlelingRights.None;
-            EnPassantSquare = ESquare.none;
+            EnPassantSquare = Squares.none;
             SideToMove = PlayerExtensions.White;
         }
     }

@@ -39,8 +39,8 @@ namespace Chess.Test.Pieces
         protected static readonly int[] KingExpected = { 5, 8, 8, 8 };
 
         protected static readonly BitBoard BoardCorners
-            = BitBoards.MakeBitboard(ESquare.a1) | BitBoards.MakeBitboard(ESquare.a8)
-            | BitBoards.MakeBitboard(ESquare.h1) | BitBoards.MakeBitboard(ESquare.h8);
+            = BitBoards.MakeBitboard(Squares.a1) | BitBoards.MakeBitboard(Squares.a8)
+            | BitBoards.MakeBitboard(Squares.h1) | BitBoards.MakeBitboard(Squares.h8);
 
         // pawn = 0 (N/A for now), knight = 1, king = 2
         protected readonly Func<Square, BitBoard>[] RegAttacks = { BitBoards.KnightAttacks, BitBoards.KnightAttacks, BitBoards.KingAttacks };

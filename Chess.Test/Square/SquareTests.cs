@@ -37,8 +37,8 @@ namespace Chess.Test.Square
         {
             const bool expected = true;
 
-            var sq1 = new Square(ESquare.a1);
-            var sq2 = new Square(ESquare.a2);
+            var sq1 = new Square(Squares.a1);
+            var sq2 = new Square(Squares.a2);
 
             var actual = sq1.IsOppositeColor(sq2);
 
@@ -50,8 +50,8 @@ namespace Chess.Test.Square
         {
             const bool expected = false;
 
-            var sq1 = new Square(ESquare.a1);
-            var sq2 = new Square(ESquare.a3);
+            var sq1 = new Square(Squares.a1);
+            var sq2 = new Square(Squares.a3);
 
             var actual = sq1.IsOppositeColor(sq2);
 
@@ -61,7 +61,7 @@ namespace Chess.Test.Square
         [Fact]
         public void RelativeSquareBlackTest()
         {
-            const ESquare expected = ESquare.h8;
+            const Squares expected = Squares.h8;
 
             var s = new Square(Ranks.Rank1, Files.FileH);
 
@@ -73,7 +73,7 @@ namespace Chess.Test.Square
         [Fact]
         public void RelativeSquareWhiteTest()
         {
-            const ESquare expected = ESquare.c3;
+            const Squares expected = Squares.c3;
 
             var s = new Square(Ranks.Rank3, Files.FileC);
 

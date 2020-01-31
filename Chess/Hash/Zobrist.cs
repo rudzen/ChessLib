@@ -91,7 +91,7 @@ namespace Rudz.Chess.Hash
                 for (var pieceType = PieceTypes.Pawn; pieceType < PieceTypes.PieceTypeNb; ++pieceType)
                 {
                     var piece = pieceType.MakePiece(side);
-                    for (var square = ESquare.a1; square <= ESquare.h8; square++)
+                    for (var square = Squares.a1; square <= Squares.h8; square++)
                         ZobristPst[piece.AsInt(), (int)square] = rnd.Rand();
                 }
             }

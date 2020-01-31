@@ -36,13 +36,13 @@ namespace Chess.Test.Bitboard
         public void MakeBitBoardTest()
         {
             // a few squares
-            var b1 = BitBoards.MakeBitboard(ESquare.a1, ESquare.b1, ESquare.a2, ESquare.b2);
-            var b2 = ESquare.a1.BitBoardSquare() | ESquare.b1.BitBoardSquare() | ESquare.a2.BitBoardSquare() | ESquare.b2.BitBoardSquare();
+            var b1 = BitBoards.MakeBitboard(Squares.a1, Squares.b1, Squares.a2, Squares.b2);
+            var b2 = Squares.a1.BitBoardSquare() | Squares.b1.BitBoardSquare() | Squares.a2.BitBoardSquare() | Squares.b2.BitBoardSquare();
             Assert.Equal(b1, b2);
 
             // a single square (not needed, but still has to work in case of list of squares etc)
-            var b3 = BitBoards.MakeBitboard(ESquare.h3);
-            var b4 = ESquare.h3.BitBoardSquare();
+            var b3 = BitBoards.MakeBitboard(Squares.h3);
+            var b4 = Squares.h3.BitBoardSquare();
             Assert.Equal(b3, b4);
         }
     }

@@ -39,9 +39,9 @@ namespace Chess.Test.Bitboard
         {
             const bool expected = true;
 
-            const ESquare sq1 = ESquare.a1;
-            const ESquare sq2 = ESquare.a2;
-            const ESquare sq3 = ESquare.a3;
+            const Squares sq1 = Squares.a1;
+            const Squares sq2 = Squares.a2;
+            const Squares sq3 = Squares.a3;
 
             var actual = BitBoards.Aligned(sq1, sq2, sq3);
 

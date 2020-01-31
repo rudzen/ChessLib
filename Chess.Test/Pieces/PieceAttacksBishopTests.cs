@@ -91,7 +91,7 @@ namespace Chess.Test.Pieces
         {
             BitBoard border = 0xff818181818181ff;
             BitBoard borderInner = 0x7e424242427e00;
-            var corners = BitBoards.MakeBitboard(ESquare.a1, ESquare.a8, ESquare.h1, ESquare.h8);
+            var corners = BitBoards.MakeBitboard(Squares.a1, Squares.a8, Squares.h1, Squares.h8);
 
             const int expectedCorner = 1; // just a single attack square no matter what
             const int expectedSide = 2;

@@ -391,16 +391,16 @@ namespace Rudz.Chess
             switch (m)
             {
                 case "O-O":
-                case "e1g1" when IsPieceTypeOnSquare(ESquare.e1, PieceTypes.King):
-                case "e8g8" when IsPieceTypeOnSquare(ESquare.e8, PieceTypes.King):
+                case "e1g1" when IsPieceTypeOnSquare(Squares.e1, PieceTypes.King):
+                case "e8g8" when IsPieceTypeOnSquare(Squares.e8, PieceTypes.King):
                 case "OO":
                 case "0-0":
                 case "00":
                     return CastlelingSides.King;
 
                 case "O-O-O":
-                case "e1c1" when IsPieceTypeOnSquare(ESquare.e1, PieceTypes.King):
-                case "e8c8" when IsPieceTypeOnSquare(ESquare.e8, PieceTypes.King):
+                case "e1c1" when IsPieceTypeOnSquare(Squares.e1, PieceTypes.King):
+                case "e8c8" when IsPieceTypeOnSquare(Squares.e8, PieceTypes.King):
                 case "OOO":
                 case "0-0-0":
                 case "000":
@@ -660,7 +660,7 @@ namespace Rudz.Chess
 
             sv.Append(' ');
 
-            if (State.EnPassantSquare == ESquare.none)
+            if (State.EnPassantSquare == Squares.none)
                 sv.Append('-');
             else
                 sv.Append(State.EnPassantSquare.ToString());

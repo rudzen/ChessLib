@@ -184,10 +184,10 @@ namespace Rudz.Chess.Types
 
         static BitBoards()
         {
-            CornerA1 = MakeBitboard(ESquare.a1, ESquare.b1, ESquare.a2, ESquare.b2);
-            CornerA8 = MakeBitboard(ESquare.a8, ESquare.b8, ESquare.a7, ESquare.b7);
-            CornerH1 = MakeBitboard(ESquare.h1, ESquare.g1, ESquare.h2, ESquare.g2);
-            CornerH8 = MakeBitboard(ESquare.h8, ESquare.g8, ESquare.h7, ESquare.g7);
+            CornerA1 = MakeBitboard(Squares.a1, Squares.b1, Squares.a2, Squares.b2);
+            CornerA8 = MakeBitboard(Squares.a8, Squares.b8, Squares.a7, Squares.b7);
+            CornerH1 = MakeBitboard(Squares.h1, Squares.g1, Squares.h2, Squares.g2);
+            CornerH8 = MakeBitboard(Squares.h8, Squares.g8, Squares.h7, Squares.g7);
 
             // local helper functions to calculate distance
             int distance(int x, int y) { return Math.Abs(x - y); }

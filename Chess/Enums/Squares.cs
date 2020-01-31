@@ -26,7 +26,7 @@ SOFTWARE.
 
 namespace Rudz.Chess.Enums
 {
-    public enum ESquare
+    public enum Squares
     {
         // ReSharper disable InconsistentNaming
         // ReSharper disable UnusedMember.Global

@@ -35,7 +35,7 @@ namespace Chess.Test.Data
         [Fact]
         public void GetSquareTest()
         {
-            const ESquare expected = ESquare.a5;
+            const Squares expected = Squares.a5;
             var ps = new PieceSquare(Pieces.NoPiece, expected);
             var actual = ps.Square;
             var expectedSquare = new Square(expected);
@@ -46,7 +46,7 @@ namespace Chess.Test.Data
         public void GetPieceTest()
         {
             const Pieces expected = Pieces.BlackKnight;
-            var ps = new PieceSquare(expected, ESquare.none);
+            var ps = new PieceSquare(expected, Squares.none);
             var actual = ps.Piece;
             var expectedPiece = new Piece(expected);
             Assert.Equal(expectedPiece, actual);

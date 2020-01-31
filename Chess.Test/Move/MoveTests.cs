@@ -74,8 +74,8 @@ namespace Chess.Test.Move
         [Fact]
         public void TestAllBasicMove()
         {
-            Square expectedFrom = ESquare.a2;
-            Square expectedTo = ESquare.h8;
+            Square expectedFrom = Squares.a2;
+            Square expectedTo = Squares.h8;
             const PieceTypes expectedMovingPieceType = PieceTypes.Pawn;
             Piece expectedMovingPiece = Pieces.WhitePawn;
             Piece expectedCapturedPiece = Pieces.BlackKnight;
@@ -128,9 +128,9 @@ namespace Chess.Test.Move
             var tmp = new StringBuilder(128);
 
             // build move list and expected result
-            for (Square s1 = ESquare.a1; s1; s1++)
+            for (Square s1 = Squares.a1; s1; s1++)
             {
-                for (Square s2 = ESquare.a2; s2; s2++)
+                for (Square s2 = Squares.a2; s2; s2++)
                 {
                     if (s1 == s2)
                         continue;
@@ -173,8 +173,8 @@ namespace Chess.Test.Move
             // generate 256 random moves
             for (var i = 0; i < 256; i++)
             {
-                Square rndSquareFrom = (ESquare)rngeezuz.Next((int)ESquare.a1, (int)ESquare.h8);
-                Square rndSquareTo = (ESquare)rngeezuz.Next((int)ESquare.a1, (int)ESquare.h8);
+                Square rndSquareFrom = (Squares)rngeezuz.Next((int)Squares.a1, (int)Squares.h8);
+                Square rndSquareTo = (Squares)rngeezuz.Next((int)Squares.a1, (int)Squares.h8);
                 moves.Add(new Move(rndSquareFrom, rndSquareTo));
 
                 expected.Append(' ');

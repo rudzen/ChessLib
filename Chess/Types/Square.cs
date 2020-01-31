@@ -36,29 +36,29 @@ namespace Rudz.Chess.Types
     public struct Square
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Square(int square) => Value = (ESquare)square;
+        public Square(int square) => Value = (Squares)square;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Square(Square square) => Value = square.Value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Square(int rank, int file)
-            : this((ESquare)(rank << 3) + file) { }
+            : this((Squares)(rank << 3) + file) { }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Square(Ranks rank, Files file)
             : this((int)rank, (int)file) { }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private Square(ESquare square) => Value = square;
+        private Square(Squares square) => Value = square;
 
-        public ESquare Value { get; private set; }
+        public Squares Value { get; private set; }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator Square(int value) => new Square(value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator Square(ESquare value) => new Square(value);
+        public static implicit operator Square(Squares value) => new Square(value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator ==(Square left, Square right) => left.Equals(right);
@@ -67,10 +67,10 @@ namespace Rudz.Chess.Types
         public static bool operator !=(Square left, Square right) => !left.Equals(right);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator ==(Square left, ESquare right) => left.Value == right;
+        public static bool operator ==(Square left, Squares right) => left.Value == right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator !=(Square left, ESquare right) => left.Value != right;
+        public static bool operator !=(Square left, Squares right) => left.Value != right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Square operator +(Square left, Square right) => left.AsInt() + right.AsInt();

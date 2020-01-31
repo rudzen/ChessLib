@@ -161,7 +161,7 @@ namespace Rudz.Chess.Types
         public void SetBit(int pos) => Value |= BitBoards.One << pos;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Square FirstOrDefault() => Empty() ? ESquare.none : this.Lsb();
+        public Square FirstOrDefault() => Empty() ? Squares.none : this.Lsb();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public BitBoard Xor(int pos) => Value ^ (uint)pos;

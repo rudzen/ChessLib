@@ -39,7 +39,7 @@ namespace Chess.Test.Data
             var chars = new StringBuilder(1024);
             var strings = new StringBuilder(1024);
 
-            for (Square sq = ESquare.a1; sq; ++sq)
+            for (Square sq = Squares.a1; sq; ++sq)
             {
                 chars.Clear();
                 strings.Clear();

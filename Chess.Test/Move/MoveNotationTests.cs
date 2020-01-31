@@ -44,9 +44,9 @@ namespace Chess.Test.Move
             const MoveNotations notation = MoveNotations.Fan;
 
             var movingPiece = new Piece(Pieces.WhiteKnight);
-            var fromOneSquare = new Square(ESquare.d2);
-            var fromTwoSquare = new Square(ESquare.f2);
-            var toSquare = new Square(ESquare.e4);
+            var fromOneSquare = new Square(Squares.d2);
+            var fromTwoSquare = new Square(Squares.f2);
+            var toSquare = new Square(Squares.e4);
 
             var uniChar = movingPiece.GetUnicodeChar();
             var toSquareString = toSquare.GetSquareString();
@@ -77,9 +77,9 @@ namespace Chess.Test.Move
             const MoveNotations notation = MoveNotations.Fan;
 
             var movingPiece = new Piece(Pieces.WhiteKnight);
-            var fromOneSquare = new Square(ESquare.d2);
-            var fromTwoSquare = new Square(ESquare.f2);
-            var toSquare = new Square(ESquare.e4);
+            var fromOneSquare = new Square(Squares.d2);
+            var fromTwoSquare = new Square(Squares.f2);
+            var toSquare = new Square(Squares.e4);
 
             var uniChar = movingPiece.GetUnicodeChar();
             var toSquareString = toSquare.GetSquareString();
@@ -110,9 +110,9 @@ namespace Chess.Test.Move
             const MoveNotations notation = MoveNotations.Fan;
 
             var movingPiece = new Piece(Pieces.WhiteKnight);
-            var fromOneSquare = new Square(ESquare.d2);
-            var fromTwoSquare = new Square(ESquare.d4);
-            var toSquare = new Square(ESquare.f3);
+            var fromOneSquare = new Square(Squares.d2);
+            var fromTwoSquare = new Square(Squares.d4);
+            var toSquare = new Square(Squares.f3);
 
             var uniChar = movingPiece.GetUnicodeChar();
             var toSquareString = toSquare.GetSquareString();
@@ -143,9 +143,9 @@ namespace Chess.Test.Move
             const MoveNotations notation = MoveNotations.San;
 
             var movingPiece = new Piece(Pieces.WhiteKnight);
-            var fromOneSquare = new Square(ESquare.d2);
-            var fromTwoSquare = new Square(ESquare.f2);
-            var toSquare = new Square(ESquare.e4);
+            var fromOneSquare = new Square(Squares.d2);
+            var fromTwoSquare = new Square(Squares.f2);
+            var toSquare = new Square(Squares.e4);
 
             var uniChar = movingPiece.GetPieceChar();
             var toSquareString = toSquare.GetSquareString();
@@ -176,9 +176,9 @@ namespace Chess.Test.Move
             const MoveNotations notation = MoveNotations.San;
 
             var movingPiece = new Piece(Pieces.WhiteKnight);
-            var fromOneSquare = new Square(ESquare.d2);
-            var fromTwoSquare = new Square(ESquare.f2);
-            var toSquare = new Square(ESquare.e4);
+            var fromOneSquare = new Square(Squares.d2);
+            var fromTwoSquare = new Square(Squares.f2);
+            var toSquare = new Square(Squares.e4);
 
             var uniChar = movingPiece.GetPieceChar();
             var toSquareString = toSquare.GetSquareString();
@@ -209,9 +209,9 @@ namespace Chess.Test.Move
             const MoveNotations notation = MoveNotations.San;
 
             var movingPiece = new Piece(Pieces.WhiteKnight);
-            var fromOneSquare = new Square(ESquare.d2);
-            var fromTwoSquare = new Square(ESquare.d4);
-            var toSquare = new Square(ESquare.f3);
+            var fromOneSquare = new Square(Squares.d2);
+            var fromTwoSquare = new Square(Squares.d4);
+            var toSquare = new Square(Squares.f3);
 
             var uniChar = movingPiece.GetPieceChar();
             var toSquareString = toSquare.GetSquareString();
@@ -242,9 +242,9 @@ namespace Chess.Test.Move
             const MoveNotations notation = MoveNotations.Lan;
 
             var movingPiece = new Piece(Pieces.WhiteKnight);
-            var fromOneSquare = new Square(ESquare.d2);
-            var fromTwoSquare = new Square(ESquare.f2);
-            var toSquare = new Square(ESquare.e4);
+            var fromOneSquare = new Square(Squares.d2);
+            var fromTwoSquare = new Square(Squares.f2);
+            var toSquare = new Square(Squares.e4);
 
             var uniChar = movingPiece.GetPieceChar();
             var toSquareString = toSquare.GetSquareString();
@@ -275,9 +275,9 @@ namespace Chess.Test.Move
             const MoveNotations notation = MoveNotations.Lan;
 
             var movingPiece = new Piece(Pieces.WhiteKnight);
-            var fromOneSquare = new Square(ESquare.d2);
-            var fromTwoSquare = new Square(ESquare.f2);
-            var toSquare = new Square(ESquare.e4);
+            var fromOneSquare = new Square(Squares.d2);
+            var fromTwoSquare = new Square(Squares.f2);
+            var toSquare = new Square(Squares.e4);
 
             var uniChar = movingPiece.GetPieceChar();
             var toSquareString = toSquare.GetSquareString();
@@ -308,9 +308,9 @@ namespace Chess.Test.Move
             const MoveNotations notation = MoveNotations.Lan;
 
             var movingPiece = new Piece(Pieces.WhiteKnight);
-            var fromOneSquare = new Square(ESquare.d2);
-            var fromTwoSquare = new Square(ESquare.d4);
-            var toSquare = new Square(ESquare.f3);
+            var fromOneSquare = new Square(Squares.d2);
+            var fromTwoSquare = new Square(Squares.d4);
+            var toSquare = new Square(Squares.f3);
 
             var uniChar = movingPiece.GetPieceChar();
             var toSquareString = toSquare.GetSquareString();
@@ -341,9 +341,9 @@ namespace Chess.Test.Move
             const MoveNotations notation = MoveNotations.Ran;
 
             var movingPiece = new Piece(Pieces.WhiteKnight);
-            var fromOneSquare = new Square(ESquare.d2);
-            var fromTwoSquare = new Square(ESquare.f2);
-            var toSquare = new Square(ESquare.e4);
+            var fromOneSquare = new Square(Squares.d2);
+            var fromTwoSquare = new Square(Squares.f2);
+            var toSquare = new Square(Squares.e4);
 
             var uniChar = movingPiece.GetPieceChar();
             var toSquareString = toSquare.GetSquareString();
@@ -374,9 +374,9 @@ namespace Chess.Test.Move
             const MoveNotations notation = MoveNotations.Ran;
 
             var movingPiece = new Piece(Pieces.WhiteKnight);
-            var fromOneSquare = new Square(ESquare.d2);
-            var fromTwoSquare = new Square(ESquare.f5);
-            var toSquare = new Square(ESquare.e4);
+            var fromOneSquare = new Square(Squares.d2);
+            var fromTwoSquare = new Square(Squares.f5);
+            var toSquare = new Square(Squares.e4);
 
             var uniChar = movingPiece.GetPieceChar();
             var toSquareString = toSquare.GetSquareString();
@@ -407,9 +407,9 @@ namespace Chess.Test.Move
             const MoveNotations notation = MoveNotations.Ran;
 
             var movingPiece = new Piece(Pieces.WhiteKnight);
-            var fromOneSquare = new Square(ESquare.d2);
-            var fromTwoSquare = new Square(ESquare.d4);
-            var toSquare = new Square(ESquare.f3);
+            var fromOneSquare = new Square(Squares.d2);
+            var fromTwoSquare = new Square(Squares.d4);
+            var toSquare = new Square(Squares.f3);
 
             var uniChar = movingPiece.GetPieceChar();
             var toSquareString = toSquare.GetSquareString();
