@@ -26,7 +26,7 @@ SOFTWARE.
 
 namespace Rudz.Chess.Enums
 {
-    public enum EFile
+    public enum Files
     {
         FileA = 0,
         FileB = 1,

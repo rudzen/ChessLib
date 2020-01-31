@@ -36,7 +36,7 @@ namespace Chess.Test.File
         public void FileStructureIntTest()
         {
             const int val = 3;
-            const EFile expected = (EFile)val;
+            const Files expected = (Files)val;
             var f = new F(val);
             var actual = f.Value;
             Assert.Equal(expected, actual);
@@ -49,7 +49,7 @@ namespace Chess.Test.File
         [Fact]
         public void FileStructureEFileTest()
         {
-            const EFile expected = EFile.FileG;
+            const Files expected = Files.FileG;
             var f = new F(expected);
             var actual = f.Value;
             Assert.Equal(expected, actual);

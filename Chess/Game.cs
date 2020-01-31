@@ -346,7 +346,7 @@ namespace Rudz.Chess
             {
                 _output.Append((int)rank + 1);
                 _output.Append(space);
-                for (var file = EFile.FileA; file <= EFile.FileH; file++)
+                for (var file = Files.FileA; file <= Files.FileH; file++)
                 {
                     var piece = Position.GetPiece(new Square(rank, file));
                     _output.AppendFormat("{0}{1}{2}{1}", splitter, space, piece.GetPieceChar());
@@ -570,7 +570,7 @@ namespace Rudz.Chess
         {
             if (rookFile == -1)
             {
-                for (var file = EFile.FileH; file >= EFile.FileA; file--)
+                for (var file = Files.FileH; file >= Files.FileA; file--)
                 {
                     if (Position.IsPieceTypeOnSquare((ESquare)((int)file + side.Side * 56), EPieceType.Rook))
                     {
@@ -606,7 +606,7 @@ namespace Rudz.Chess
         {
             if (rookFile == -1)
             {
-                for (var file = EFile.FileA; file <= EFile.FileH; file++)
+                for (var file = Files.FileA; file <= Files.FileH; file++)
                 {
                     if (Position.IsPieceTypeOnSquare((ESquare)(int)(file + side.Side * 56), EPieceType.Rook))
                     {

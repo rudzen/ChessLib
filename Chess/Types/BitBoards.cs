@@ -289,9 +289,9 @@ namespace Rudz.Chess.Types
                     if (s1.RelativeRank(side) == ERank.Rank1)
                         KingRingBB[c, sq] |= KingRingBB[c, sq].Shift(side == EPlayer.White ? Directions.North : Directions.South);
 
-                    if (file == EFile.FileH)
+                    if (file == Files.FileH)
                         KingRingBB[c, sq] |= KingRingBB[c, sq].WestOne();
-                    else if (file == EFile.FileA)
+                    else if (file == Files.FileA)
                         KingRingBB[c, sq] |= KingRingBB[c, sq].EastOne();
 
                     Debug.Assert(!KingRingBB[c, sq].Empty());
@@ -488,7 +488,7 @@ namespace Rudz.Chess.Types
             for (var r = ERank.Rank8; r >= ERank.Rank1; --r)
             {
                 s.AppendFormat("| {0} ", (int)r + 1);
-                for (var f = EFile.FileA; f <= EFile.FileH; ++f)
+                for (var f = Files.FileA; f <= Files.FileH; ++f)
                     s.AppendFormat("| {0} ", (b & new Square(r, f)).Empty() ? ' ' : 'X');
                 s.AppendLine("|\n+---+---+---+---+---+---+---+---+---+");
             }

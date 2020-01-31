@@ -610,7 +610,7 @@ namespace Rudz.Chess
             {
                 var empty = 0;
 
-                for (var file = EFile.FileA; file < EFile.FileNb; file++)
+                for (var file = Files.FileA; file < Files.FileNb; file++)
                 {
                     var square = new Square(rank, file);
                     var piece = BoardLayout[square.AsInt()];
