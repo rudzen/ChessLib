@@ -32,7 +32,7 @@ namespace Rudz.Chess.Enums
     /// This is not the game result you are looking for.
     /// </summary>
     [Flags]
-    public enum EGameResult
+    public enum GameResults
     {
         InProgress = 0,
         WhiteWon = 1,
