@@ -29,7 +29,7 @@ namespace Rudz.Chess.Enums
     using System;
 
     [Flags]
-    public enum EPlayerType
+    public enum PlayerTypes
     {
         Human = 1,
         Engine = 0
