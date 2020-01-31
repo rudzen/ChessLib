@@ -30,7 +30,7 @@ namespace Rudz.Chess.Enums
     using System.Runtime.CompilerServices;
 
     [Flags]
-    public enum EMoveAmbiguity
+    public enum MoveAmbiguities
     {
         None = 0,
         Move = 1,
@@ -41,6 +41,6 @@ namespace Rudz.Chess.Enums
     public static class EMoveAmbiguityExtensions
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool HasFlagFast(this EMoveAmbiguity value, EMoveAmbiguity flag) => (value & flag) != 0;
+        public static bool HasFlagFast(this MoveAmbiguities value, MoveAmbiguities flag) => (value & flag) != 0;
     }
 }

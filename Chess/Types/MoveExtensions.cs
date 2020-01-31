@@ -299,9 +299,9 @@ namespace Rudz.Chess.Types
         private static char GetCheckChar(this IPosition pos) => pos.GenerateMoves().Any() ? '+' : '#';
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static EMoveAmbiguity Ambiguity(this Move move, BitBoard similarTypeAttacks, IPosition position)
+        private static MoveAmbiguities Ambiguity(this Move move, BitBoard similarTypeAttacks, IPosition position)
         {
-            var ambiguity = EMoveAmbiguity.None;
+            var ambiguity = MoveAmbiguities.None;
 
             foreach (var square in similarTypeAttacks)
             {
@@ -316,11 +316,11 @@ namespace Rudz.Chess.Types
                 if (position.OccupiedBySide[move.GetMovingSide().Side] & square)
                 {
                     if (square.File() == move.GetFromSquare().File())
-                        ambiguity |= EMoveAmbiguity.File;
+                        ambiguity |= MoveAmbiguities.File;
                     else if (square.Rank() == move.GetFromSquare().Rank())
-                        ambiguity |= EMoveAmbiguity.Rank;
+                        ambiguity |= MoveAmbiguities.Rank;
 
-                    ambiguity |= EMoveAmbiguity.Move;
+                    ambiguity |= MoveAmbiguities.Move;
                 }
             }
 
@@ -353,12 +353,12 @@ namespace Rudz.Chess.Types
 
             var ambiguity = move.Ambiguity(simularTypeAttacks, position);
 
-            if (!ambiguity.HasFlagFast(EMoveAmbiguity.Move))
+            if (!ambiguity.HasFlagFast(MoveAmbiguities.Move))
                 return;
 
-            if (!ambiguity.HasFlagFast(EMoveAmbiguity.File))
+            if (!ambiguity.HasFlagFast(MoveAmbiguities.File))
                 sb.Append(from.FileChar());
-            else if (!ambiguity.HasFlagFast(EMoveAmbiguity.Rank))
+            else if (!ambiguity.HasFlagFast(MoveAmbiguities.Rank))
                 sb.Append(from.RankChar());
             else
                 sb.Append(from.ToString());
