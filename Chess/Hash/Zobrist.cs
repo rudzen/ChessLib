@@ -86,7 +86,7 @@ namespace Rudz.Chess.Hash
         {
             IRKiss rnd = new RKiss(DefaultRandomSeed);
 
-            for (var side = EPlayer.White; side < EPlayer.PlayerNb; ++side)
+            for (var side = Players.White; side < Players.PlayerNb; ++side)
             {
                 for (var pieceType = PieceTypes.Pawn; pieceType < PieceTypes.PieceTypeNb; ++pieceType)
                 {

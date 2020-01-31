@@ -39,7 +39,7 @@ namespace Rudz.Chess.Types
         public Player(Player side)
             : this() => Side = side.Side;
 
-        public Player(EPlayer side)
+        public Player(Players side)
             : this((int)side) { }
 
         public int Side;
@@ -51,7 +51,7 @@ namespace Rudz.Chess.Types
         public static implicit operator Player(uint value) => new Player((int)value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator Player(EPlayer value) => new Player(value);
+        public static implicit operator Player(Players value) => new Player(value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator Player(bool value) => new Player(value.AsByte());

@@ -203,7 +203,7 @@ namespace Rudz.Chess.Types
                 ForwardRanksBB[0, rank] = ~(ForwardRanksBB[1, rank + 1] = ForwardRanksBB[1, rank] | RankBB[rank]);
             }
 
-            for (var side = EPlayer.White; side < EPlayer.PlayerNb; ++side)
+            for (var side = Players.White; side < Players.PlayerNb; ++side)
             {
                 var c = (int)side;
                 foreach (var square in AllSquares)
@@ -282,12 +282,12 @@ namespace Rudz.Chess.Types
 
                 // Compute KingRings
                 pt = PieceTypes.King.AsInt();
-                for (var side = EPlayer.White; side < EPlayer.PlayerNb; ++side)
+                for (var side = Players.White; side < Players.PlayerNb; ++side)
                 {
                     var c = (int)side;
                     KingRingBB[c, sq] = PseudoAttacksBB[pt, sq];
                     if (s1.RelativeRank(side) == ERank.Rank1)
-                        KingRingBB[c, sq] |= KingRingBB[c, sq].Shift(side == EPlayer.White ? Directions.North : Directions.South);
+                        KingRingBB[c, sq] |= KingRingBB[c, sq].Shift(side == Players.White ? Directions.North : Directions.South);
 
                     if (file == Files.FileH)
                         KingRingBB[c, sq] |= KingRingBB[c, sq].WestOne();
@@ -574,7 +574,7 @@ namespace Rudz.Chess.Types
         /// <param name="side">The direction to fill in, white = north, black = south</param>
         /// <returns>Filled bitboard</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static BitBoard Fill(this BitBoard bb, Player side) => side == EPlayer.White ? bb.NorthFill() : bb.SouthFill();
+        public static BitBoard Fill(this BitBoard bb, Player side) => side == Players.White ? bb.NorthFill() : bb.SouthFill();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static BitBoard Shift(this BitBoard bb, Direction direction)

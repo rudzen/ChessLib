@@ -29,7 +29,7 @@ namespace Rudz.Chess.Enums
     using System;
 
     [Flags]
-    public enum EPlayer
+    public enum Players
     {
         White = 0,
         Black = 1,
