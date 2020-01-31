@@ -180,7 +180,7 @@ namespace Rudz.Chess.Types
 
         private static readonly BitBoard[,] DistanceRingBB = new BitBoard[64, 8];
 
-        private static readonly IDictionary<EDirection, Func<BitBoard, BitBoard>> ShiftFuncs = MakeShiftFuncs();
+        private static readonly IDictionary<Directions, Func<BitBoard, BitBoard>> ShiftFuncs = MakeShiftFuncs();
 
         static BitBoards()
         {
@@ -287,7 +287,7 @@ namespace Rudz.Chess.Types
                     var c = (int)side;
                     KingRingBB[c, sq] = PseudoAttacksBB[pt, sq];
                     if (s1.RelativeRank(side) == ERank.Rank1)
-                        KingRingBB[c, sq] |= KingRingBB[c, sq].Shift(side == EPlayer.White ? EDirection.North : EDirection.South);
+                        KingRingBB[c, sq] |= KingRingBB[c, sq].Shift(side == EPlayer.White ? Directions.North : Directions.South);
 
                     if (file == EFile.FileH)
                         KingRingBB[c, sq] |= KingRingBB[c, sq].WestOne();
@@ -630,23 +630,23 @@ namespace Rudz.Chess.Types
         /// Helper method to generate shift function dictionary for all directions.
         /// </summary>
         /// <returns>The generated shift dictionary</returns>
-        private static IDictionary<EDirection, Func<BitBoard, BitBoard>> MakeShiftFuncs()
+        private static IDictionary<Directions, Func<BitBoard, BitBoard>> MakeShiftFuncs()
         {
-            var sf = new Dictionary<EDirection, Func<BitBoard, BitBoard>>(13)
+            var sf = new Dictionary<Directions, Func<BitBoard, BitBoard>>(13)
             {
-                {EDirection.NoDirection, board => board},
-                {EDirection.North, board => board.NorthOne()},
-                {EDirection.NorthDouble, board => board.NorthOne().NorthOne()},
-                {EDirection.NorthEast, board => board.NorthEastOne()},
-                {EDirection.NorthWest, board => board.NorthWestOne()},
-                {EDirection.NorthFill, board => board.NorthFill()},
-                {EDirection.South, board => board.SouthOne()},
-                {EDirection.SouthDouble, board => board.SouthOne().SouthOne()},
-                {EDirection.SouthEast, board => board.SouthEastOne()},
-                {EDirection.SouthWest, board => board.SouthWestOne()},
-                {EDirection.SouthFill, board => board.SouthFill()},
-                {EDirection.East, board => board.EastOne()},
-                {EDirection.West, board => board.WestOne()}
+                {Directions.NoDirection, board => board},
+                {Directions.North, board => board.NorthOne()},
+                {Directions.NorthDouble, board => board.NorthOne().NorthOne()},
+                {Directions.NorthEast, board => board.NorthEastOne()},
+                {Directions.NorthWest, board => board.NorthWestOne()},
+                {Directions.NorthFill, board => board.NorthFill()},
+                {Directions.South, board => board.SouthOne()},
+                {Directions.SouthDouble, board => board.SouthOne().SouthOne()},
+                {Directions.SouthEast, board => board.SouthEastOne()},
+                {Directions.SouthWest, board => board.SouthWestOne()},
+                {Directions.SouthFill, board => board.SouthFill()},
+                {Directions.East, board => board.EastOne()},
+                {Directions.West, board => board.WestOne()}
             };
 
             return sf;

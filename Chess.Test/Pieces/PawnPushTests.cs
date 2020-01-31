@@ -36,7 +36,7 @@ namespace Chess.Test.Pieces
         public void PawnPushNorth()
         {
             BitBoard fullBoard = 0xffffffffffff00;
-            Direction direction = EDirection.North;
+            Direction direction = Directions.North;
 
             const int expected = 1;
 
@@ -52,7 +52,7 @@ namespace Chess.Test.Pieces
         public void PawnPushSouth()
         {
             BitBoard fullBoard = 0xffffffffffff00;
-            Direction direction = EDirection.South;
+            Direction direction = Directions.South;
 
             const int expected = 1;
 
@@ -68,7 +68,7 @@ namespace Chess.Test.Pieces
         public void PawnDoublePushNorth()
         {
             BitBoard fullBoard = BitBoards.RANK2;
-            Direction direction = EDirection.North;
+            Direction direction = Directions.North;
 
             const int expected = 2;
 
@@ -84,7 +84,7 @@ namespace Chess.Test.Pieces
         public void PawnDoublePushSouth()
         {
             BitBoard fullBoard = BitBoards.RANK7;
-            Direction direction = EDirection.South;
+            Direction direction = Directions.South;
 
             const int expected = 2;
 

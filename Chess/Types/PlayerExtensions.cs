@@ -37,13 +37,13 @@ namespace Rudz.Chess.Types
 
         public static readonly Player Black = 1;
 
-        private static readonly Direction[] PawnPushDist = { EDirection.North, EDirection.South };
+        private static readonly Direction[] PawnPushDist = { Directions.North, Directions.South };
 
-        private static readonly Direction[] PawnDoublePushDist = { EDirection.NorthDouble, EDirection.SouthDouble };
+        private static readonly Direction[] PawnDoublePushDist = { Directions.NorthDouble, Directions.SouthDouble };
 
-        private static readonly Direction[] PawnWestAttackDist = { EDirection.NorthEast, EDirection.SouthEast };
+        private static readonly Direction[] PawnWestAttackDist = { Directions.NorthEast, Directions.SouthEast };
 
-        private static readonly Direction[] PawnEastAttackDist = { EDirection.NorthWest, EDirection.SouthWest };
+        private static readonly Direction[] PawnEastAttackDist = { Directions.NorthWest, Directions.SouthWest };
 
         private static readonly string[] PlayerColors = { "White", "Black" };
 

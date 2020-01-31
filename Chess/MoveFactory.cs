@@ -73,7 +73,7 @@ namespace Rudz.Chess
         private static void GenerateQuietMoves(this IPosition pos, MoveList moves, Emgf flags)
         {
             var currentSide = pos.State.SideToMove;
-            var up = currentSide == PlayerExtensions.White ? EDirection.North : EDirection.South;
+            var up = currentSide == PlayerExtensions.White ? Directions.North : Directions.South;
             var notOccupied = ~pos.Pieces();
             var pushed = (pos.Pieces(EPieceType.Pawn, currentSide) & ~currentSide.Rank7()).Shift(up) & notOccupied;
             pos.AddPawnMoves(moves, pushed, currentSide.PawnPushDistance(), EMoveType.Quiet, flags);
@@ -215,7 +215,7 @@ namespace Rudz.Chess
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static (Direction, Direction) GetPawnAttackDirections(this Player us)
         {
-            Span<(EDirection, EDirection)> directions = stackalloc[] { (EDirection.NorthEast, EDirection.NorthWest), (EDirection.SouthEast, EDirection.SouthWest) };
+            Span<(Directions, Directions)> directions = stackalloc[] { (Directions.NorthEast, Directions.NorthWest), (Directions.SouthEast, Directions.SouthWest) };
             return directions[us.Side];
         }
     }
