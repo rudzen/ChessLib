@@ -100,7 +100,7 @@ namespace Rudz.Chess.Fen
             {
                 if (t == '/')
                 {
-                    if (++pieceCount[0] > 7)
+                    if (++pieceCount[0] > SeparatorCount)
                         throw new InvalidFenException($"Invalid fen (too many separators) {s.ToString()}");
                     continue;
                 }

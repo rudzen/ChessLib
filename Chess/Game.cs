@@ -395,10 +395,6 @@ namespace Rudz.Chess
                     tot += Perft(depth - 1);
                     TakeMove();
                 }
-                //else
-                //{
-                //    Console.WriteLine($"Failed to perform move {m}\n{ToString()}");
-                //}
             }
 
             if (move != MoveExtensions.EmptyMove)
