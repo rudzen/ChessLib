@@ -55,6 +55,29 @@ namespace Rudz.Chess
 
         public BitBoard Pinned { get; set; }
 
+        public BitBoard Checkers { get; set; }
+
+        public bool InCheck { get; set; }
+
+        public State(State s)
+        {
+            LastMove = s.LastMove;
+            Material = new Material();
+            Material.CopyFrom(s.Material);
+            PawnStructureKey = s.PawnStructureKey;
+            ReversibleHalfMoveCount = s.ReversibleHalfMoveCount;
+            HalfMoveCount = s.HalfMoveCount;
+            NullMovesInRow = s.NullMovesInRow;
+            FiftyMoveRuleCounter = s.FiftyMoveRuleCounter;
+            Key = s.Key;
+            CastlelingRights = s.CastlelingRights;
+            EnPassantSquare = s.EnPassantSquare;
+            SideToMove = s.SideToMove;
+            Pinned = s.Pinned;
+            Checkers = s.Checkers;
+            InCheck = s.InCheck;
+        }
+
         public State()
         {
             LastMove = MoveExtensions.EmptyMove;

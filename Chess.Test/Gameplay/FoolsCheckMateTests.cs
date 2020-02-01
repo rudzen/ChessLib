@@ -57,9 +57,9 @@ namespace Chess.Test.Gameplay
                 Assert.True(game.MakeMove(move));
 
             // verify in check is actually true
-            Assert.True(game.Position.InCheck);
+            Assert.True(game.State.InCheck);
 
-            var moveList = game.Position.GenerateMoves();
+            var moveList = game.Pos.GenerateMoves();
 
             // verify that no legal moves actually exists.
             Assert.Empty(moveList);

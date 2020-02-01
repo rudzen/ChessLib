@@ -1,4 +1,4 @@
-﻿/*
+/*
 ChessLib, a chess data structure library
 
 MIT License
@@ -83,7 +83,7 @@ namespace Rudz.Chess
 
             pos.AddMoves(moves, notOccupied, flags);
 
-            if (pos.InCheck)
+            if (pos.State.InCheck)
                 return;
 
             for (var castleType = CastlelingSides.King; castleType < CastlelingSides.CastleNb; castleType++)

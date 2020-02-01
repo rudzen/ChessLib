@@ -77,7 +77,7 @@ namespace Rudz.Chess
         /// <returns>The first move that matches from and to squares</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Move GetMove(Square from, Square to)
-            => _moves.FirstOrDefault(m => m.GetFromSquare() == @from && m.GetToSquare() == to);
+            => _moves.FirstOrDefault(m => m.GetFromSquare() == from && m.GetToSquare() == to);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public IEnumerator<Move> GetEnumerator()

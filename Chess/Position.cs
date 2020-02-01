@@ -60,7 +60,7 @@ namespace Rudz.Chess
             _rookCastlesFrom = new Square[64];
             _castleShortKingFrom = new Square[2];
             BoardLayout = new Piece[64];
-            BoardPieces = new BitBoard[2 << 3];
+            BoardPieces = new BitBoard[16];
             OccupiedBySide = new BitBoard[2];
             Clear();
         }
@@ -78,142 +78,139 @@ namespace Rudz.Chess
         /// </summary>
         public Action<Piece, Square> PieceUpdated { get; set; }
 
-        public bool InCheck { get; set; }
-
         public State State { get; set; }
 
         public void Clear()
         {
             BoardLayout.Fill(Enums.Pieces.NoPiece);
-            OccupiedBySide.Fill(Zero);
-            BoardPieces.Fill(Zero);
+            OccupiedBySide.Fill(BitBoards.EmptyBitBoard);
+            Array.Clear(BoardPieces, 0, BoardPieces.Length);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void AddPiece(Piece piece, Square square)
+        public void AddPiece(Piece pc, Square sq)
         {
-            BitBoard bbsq = square;
-            var color = piece.ColorOf();
-            BoardPieces[piece.AsInt()] |= bbsq;
-            OccupiedBySide[color] |= bbsq;
-            BoardLayout[square.AsInt()] = piece;
+            var color = pc.ColorOf();
+            BoardPieces[pc.AsInt()] |= sq;
+            OccupiedBySide[color] |= sq;
+            BoardLayout[sq.AsInt()] = pc;
 
             if (!IsProbing)
-                PieceUpdated?.Invoke(piece, square);
+                PieceUpdated?.Invoke(pc, sq);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void AddPiece(PieceTypes pieceType, Square square, Player side)
+        public void AddPiece(PieceTypes pt, Square sq, Player c)
         {
-            var piece = pieceType.MakePiece(side);
-            BoardPieces[piece.AsInt()] |= square;
-            OccupiedBySide[side.Side] |= square;
-            BoardLayout[square.AsInt()] = piece;
+            var piece = pt.MakePiece(c);
+            BoardPieces[piece.AsInt()] |= sq;
+            OccupiedBySide[c.Side] |= sq;
+            BoardLayout[sq.AsInt()] = piece;
 
             if (!IsProbing)
-                PieceUpdated?.Invoke(piece, square);
+                PieceUpdated?.Invoke(piece, sq);
         }
 
-        public bool MakeMove(Move move)
+        public bool MakeMove(Move m)
         {
-            if (move.IsNullMove())
+            if (m.IsNullMove())
                 return false;
 
-            var toSquare = move.GetToSquare();
-            var movingSide = move.GetMovingSide();
+            var to = m.GetToSquare();
+            var us = m.GetMovingSide();
+            var pc = m.GetMovingPiece();
 
-            if (move.IsCastlelingMove())
+            if (m.IsCastlelingMove())
             {
-                var rook = PieceTypes.Rook.MakePiece(movingSide);
-                var king = move.GetMovingPiece();
-                RemovePiece(_rookCastlesFrom[toSquare.AsInt()], rook);
-                RemovePiece(move.GetFromSquare(), king);
-                AddPiece(rook, toSquare.GetRookCastleTo());
-                AddPiece(king, toSquare);
+                var rook = PieceTypes.Rook.MakePiece(us);
+                RemovePiece(_rookCastlesFrom[to.AsInt()], rook);
+                RemovePiece(m.GetFromSquare(), pc);
+                AddPiece(rook, to.GetRookCastleTo());
+                AddPiece(pc, to);
                 return true;
             }
 
             // reverse sideToMove as it has not been changed yet.
-            if (IsAttacked(GetPieceSquare(PieceTypes.King, ~movingSide), movingSide))
+            if (IsAttacked(GetPieceSquare(PieceTypes.King, ~us), us))
                 return false;
 
-            RemovePiece(move.GetFromSquare(), move.GetMovingPiece());
+            RemovePiece(m.GetFromSquare(), pc);
 
-            if (move.IsEnPassantMove())
+            if (m.IsEnPassantMove())
             {
-                var t = EnPasCapturePos[movingSide.Side](toSquare).First();
-                RemovePiece(t, move.GetCapturedPiece());
+                var t = EnPasCapturePos[us.Side](to).Lsb();
+                RemovePiece(t, m.GetCapturedPiece());
             }
-            else if (move.IsCaptureMove())
-                RemovePiece(toSquare, move.GetCapturedPiece());
+            else if (m.IsCaptureMove())
+                RemovePiece(to, m.GetCapturedPiece());
 
-            AddPiece(move.IsPromotionMove() ? move.GetPromotedPiece() : move.GetMovingPiece(), toSquare);
+            AddPiece(m.IsPromotionMove() ? m.GetPromotedPiece() : pc, to);
 
             return true;
         }
 
-        public void TakeMove(Move move)
+        public void TakeMove(Move m)
         {
-            var toSquare = move.GetToSquare();
+            var to = m.GetToSquare();
+            var pc = m.GetMovingPiece();
 
-            if (move.IsCastlelingMove())
+            if (m.IsCastlelingMove())
             {
-                var rook = PieceTypes.Rook.MakePiece(move.GetMovingSide());
-                var king = move.GetMovingPiece();
-                RemovePiece(toSquare, king);
-                RemovePiece(toSquare.GetRookCastleTo(), rook);
-                AddPiece(king, move.GetFromSquare());
-                AddPiece(rook, _rookCastlesFrom[toSquare.AsInt()]);
+                var rook = PieceTypes.Rook.MakePiece(m.GetMovingSide());
+                RemovePiece(to, pc);
+                RemovePiece(to.GetRookCastleTo(), rook);
+                AddPiece(pc, m.GetFromSquare());
+                AddPiece(rook, _rookCastlesFrom[to.AsInt()]);
                 return;
             }
 
-            RemovePiece(toSquare, move.IsPromotionMove() ? move.GetPromotedPiece() : move.GetMovingPiece());
+            RemovePiece(to, m.IsPromotionMove() ? m.GetPromotedPiece() : pc);
 
-            if (move.IsEnPassantMove())
+            if (m.IsEnPassantMove())
             {
-                var t = EnPasCapturePos[move.GetMovingSide().Side](toSquare).First();
-                AddPiece(move.GetCapturedPiece(), t);
+                var t = EnPasCapturePos[m.GetMovingSide().Side](to).First();
+                AddPiece(m.GetCapturedPiece(), t);
             }
-            else if (move.IsCaptureMove())
-                AddPiece(move.GetCapturedPiece(), toSquare);
+            else if (m.IsCaptureMove())
+                AddPiece(m.GetCapturedPiece(), to);
 
-            AddPiece(move.GetMovingPiece(), move.GetFromSquare());
+            AddPiece(pc, m.GetFromSquare());
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Piece GetPiece(Square square) => BoardLayout[square.AsInt()];
+        public Piece GetPiece(Square sq) => BoardLayout[sq.AsInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public PieceTypes GetPieceType(Square square) => BoardLayout[square.AsInt()].Type();
+        public PieceTypes GetPieceType(Square sq) => BoardLayout[sq.AsInt()].Type();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsPieceTypeOnSquare(Square square, PieceTypes pieceType) => GetPieceType(square) == pieceType;
+        public bool IsPieceTypeOnSquare(Square sq, PieceTypes pt) => GetPieceType(sq) == pt;
 
         /// <summary>
         /// Detects any pinned pieces
         /// For more info : https://en.wikipedia.org/wiki/Pin_(chess)
         /// </summary>
-        /// <param name="square">The square</param>
-        /// <param name="side">The side</param>
+        /// <param name="sq">The square</param>
+        /// <param name="c">The side</param>
         /// <returns>Pinned pieces as BitBoard</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public BitBoard GetPinnedPieces(Square square, Player side)
+        public BitBoard GetPinnedPieces(Square sq, Player c)
         {
             // TODO : Move into state data structure instead of real-time calculation
 
             var pinnedPieces = BitBoards.EmptyBitBoard;
-            var them = ~side;
+            var them = ~c;
 
             var opponentQueens = Pieces(PieceTypes.Queen, them);
-            var ourPieces = Pieces(side);
+            var ourPieces = Pieces(c);
             var pieces = Pieces();
 
-            var pinners = square.XrayBishopAttacks(pieces, ourPieces) & (Pieces(PieceTypes.Bishop, them) | opponentQueens)
-                        | square.XrayRookAttacks(pieces, ourPieces) & (Pieces(PieceTypes.Rook, them) | opponentQueens);
+            var pinners = sq.XrayBishopAttacks(pieces, ourPieces) & (Pieces(PieceTypes.Bishop, them) | opponentQueens)
+                        | sq.XrayRookAttacks(pieces, ourPieces) & (Pieces(PieceTypes.Rook, them) | opponentQueens);
 
             while (pinners)
             {
-                pinnedPieces |= pinners.Lsb().BitboardBetween(square) & ourPieces;
+                pinnedPieces |= pinners.Lsb().BitboardBetween(sq) & ourPieces;
                 pinners--;
             }
 
@@ -221,158 +218,152 @@ namespace Rudz.Chess
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsOccupied(Square square) => (Pieces() & square) != 0;
+        public bool IsOccupied(Square sq) => (Pieces() & sq) != 0;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsAttacked(Square square, Player side) => AttackedBySlider(square, side) || AttackedByKnight(square, side) || AttackedByPawn(square, side) || AttackedByKing(square, side);
+        public bool IsAttacked(Square sq, Player c) => AttackedBySlider(sq, c) || AttackedByKnight(sq, c) || AttackedByPawn(sq, c) || AttackedByKing(sq, c);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public BitBoard PieceAttacks(Square square, PieceTypes pieceType) => square.GetAttacks(pieceType, Pieces());
+        public BitBoard PieceAttacks(Square sq, PieceTypes pt) => sq.GetAttacks(pt, Pieces());
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public BitBoard Pieces() => OccupiedBySide[PlayerExtensions.White.Side] | OccupiedBySide[PlayerExtensions.Black.Side];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public BitBoard Pieces(Player side) => OccupiedBySide[side.Side];
+        public BitBoard Pieces(Player c) => OccupiedBySide[c.Side];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public BitBoard Pieces(Piece pc) => BoardPieces[pc.AsInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public BitBoard Pieces(PieceTypes type) => BoardPieces[type.MakePiece(PlayerExtensions.White).AsInt()] | BoardPieces[type.MakePiece(PlayerExtensions.Black).AsInt()];
+        public BitBoard Pieces(PieceTypes pt) => BoardPieces[pt.MakePiece(PlayerExtensions.White).AsInt()] | BoardPieces[pt.MakePiece(PlayerExtensions.Black).AsInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public BitBoard Pieces(PieceTypes type1, PieceTypes type2) => Pieces(type1) | Pieces(type2);
+        public BitBoard Pieces(PieceTypes pt1, PieceTypes pt2) => Pieces(pt1) | Pieces(pt2);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public BitBoard Pieces(PieceTypes type, Player side) => BoardPieces[type.MakePiece(side).AsInt()];
+        public BitBoard Pieces(PieceTypes pt, Player side) => BoardPieces[pt.MakePiece(side).AsInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public BitBoard Pieces(PieceTypes type1, PieceTypes type2, Player side) => BoardPieces[type1.MakePiece(side).AsInt()] | BoardPieces[type2.MakePiece(side).AsInt()];
+        public BitBoard Pieces(PieceTypes pt1, PieceTypes pt2, Player c) => BoardPieces[pt1.MakePiece(c).AsInt()] | BoardPieces[pt2.MakePiece(c).AsInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Square GetPieceSquare(PieceTypes pt, Player color) => Pieces(pt, color).Lsb();
+        public Square GetPieceSquare(PieceTypes pt, Player c) => Pieces(pt, c).Lsb();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool PieceOnFile(Square square, Player side, PieceTypes pieceType) => (BoardPieces[(int)(pieceType + (side << 3))] & square) != 0;
+        public bool PieceOnFile(Square sq, Player c, PieceTypes pt) => (BoardPieces[(int)(pt + (c << 3))] & sq) != 0;
 
         /// <summary>
         /// Determine if a pawn is isolated e.i. no own pawns on either of it's neighboring files
         /// </summary>
-        /// <param name="square"></param>
-        /// <param name="side"></param>
+        /// <param name="sq"></param>
+        /// <param name="c"></param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool PawnIsolated(Square square, Player side)
+        public bool PawnIsolated(Square sq, Player c)
         {
-            var b = (square.PawnAttackSpan(side) | square.PawnAttackSpan(~side)) & Pieces(PieceTypes.Pawn, side);
+            var b = (sq.PawnAttackSpan(c) | sq.PawnAttackSpan(~c)) & Pieces(PieceTypes.Pawn, c);
             return b.Empty();
         }
 
         /// <summary>
         /// Determine if a specific square is a passed pawn
         /// </summary>
-        /// <param name="square"></param>
+        /// <param name="sq"></param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool PassedPawn(Square square)
+        public bool PassedPawn(Square sq)
         {
-            var pc = BoardLayout[square.AsInt()];
+            var pc = BoardLayout[sq.AsInt()];
 
             if (pc.Type() != PieceTypes.Pawn)
                 return false;
 
             Player c = pc.ColorOf();
 
-            return (square.PassedPawnFrontAttackSpan(c) & Pieces(PieceTypes.Pawn, c)).Empty();
+            return (sq.PassedPawnFrontAttackSpan(c) & Pieces(PieceTypes.Pawn, c)).Empty();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void RemovePiece(Square square, Piece piece)
+        public void RemovePiece(Square sq, Piece pc)
         {
-            var invertedSq = ~square;
-            BoardPieces[piece.AsInt()] &= invertedSq;
-            OccupiedBySide[piece.ColorOf()] &= invertedSq;
-            BoardLayout[square.AsInt()] = PieceExtensions.EmptyPiece;
-            if (IsProbing)
-                return;
-            PieceUpdated?.Invoke(Enums.Pieces.NoPiece, square);
+            var invertedSq = ~sq;
+            BoardPieces[pc.AsInt()] &= invertedSq;
+            OccupiedBySide[pc.ColorOf()] &= invertedSq;
+            BoardLayout[sq.AsInt()] = PieceExtensions.EmptyPiece;
+            if (!IsProbing)
+                PieceUpdated?.Invoke(Enums.Pieces.NoPiece, sq);
         }
 
-        public BitBoard AttacksTo(Square square, BitBoard occupied)
+        public BitBoard AttacksTo(Square sq, BitBoard occupied)
         {
             // TODO : needs testing
-            return (square.PawnAttack(PlayerExtensions.White) & OccupiedBySide[PlayerExtensions.Black.Side])
-                  | (square.PawnAttack(PlayerExtensions.Black) & OccupiedBySide[PlayerExtensions.White.Side])
-                  | (square.GetAttacks(PieceTypes.Knight) & Pieces(PieceTypes.Knight))
-                  | (square.GetAttacks(PieceTypes.Rook, occupied) & Pieces(PieceTypes.Rook, PieceTypes.Queen))
-                  | (square.GetAttacks(PieceTypes.Bishop, occupied) & Pieces(PieceTypes.Bishop, PieceTypes.Queen))
-                  | (square.GetAttacks(PieceTypes.King) & Pieces(PieceTypes.King));
+            return (sq.PawnAttack(PlayerExtensions.White) & OccupiedBySide[PlayerExtensions.Black.Side])
+                  | (sq.PawnAttack(PlayerExtensions.Black) & OccupiedBySide[PlayerExtensions.White.Side])
+                  | (sq.GetAttacks(PieceTypes.Knight) & Pieces(PieceTypes.Knight))
+                  | (sq.GetAttacks(PieceTypes.Rook, occupied) & Pieces(PieceTypes.Rook, PieceTypes.Queen))
+                  | (sq.GetAttacks(PieceTypes.Bishop, occupied) & Pieces(PieceTypes.Bishop, PieceTypes.Queen))
+                  | (sq.GetAttacks(PieceTypes.King) & Pieces(PieceTypes.King));
         }
 
-        public BitBoard AttacksTo(Square square) => AttacksTo(square, Pieces());
+        public BitBoard AttacksTo(Square sq) => AttacksTo(sq, Pieces());
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool AttackedBySlider(Square square, Player side)
+        public bool AttackedBySlider(Square sq, Player c)
         {
             var occupied = Pieces();
-            var rookAttacks = square.RookAttacks(occupied);
-            if (Pieces(PieceTypes.Rook, side) & rookAttacks)
+            var rookAttacks = sq.RookAttacks(occupied);
+            if (Pieces(PieceTypes.Rook, c) & rookAttacks)
                 return true;
 
-            var bishopAttacks = square.BishopAttacks(occupied);
-            if (Pieces(PieceTypes.Bishop, side) & bishopAttacks)
+            var bishopAttacks = sq.BishopAttacks(occupied);
+            if (Pieces(PieceTypes.Bishop, c) & bishopAttacks)
                 return true;
 
-            return (Pieces(PieceTypes.Queen, side) & (bishopAttacks | rookAttacks)) != 0;
+            return (Pieces(PieceTypes.Queen, c) & (bishopAttacks | rookAttacks)) != 0;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool AttackedByKnight(Square square, Player side) => (Pieces(PieceTypes.Knight, side) & square.GetAttacks(PieceTypes.Knight)) != 0;
+        public bool AttackedByKnight(Square sq, Player c) => (Pieces(PieceTypes.Knight, c) & sq.GetAttacks(PieceTypes.Knight)) != 0;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool AttackedByPawn(Square square, Player side) => (Pieces(PieceTypes.Pawn, side) & square.PawnAttack(~side)) != 0;
+        public bool AttackedByPawn(Square sq, Player c) => (Pieces(PieceTypes.Pawn, c) & sq.PawnAttack(~c)) != 0;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool AttackedByKing(Square square, Player side) => (Pieces(PieceTypes.King, side) & square.GetAttacks(PieceTypes.King)) != 0;
+        public bool AttackedByKing(Square sq, Player c) => (Pieces(PieceTypes.King, c) & sq.GetAttacks(PieceTypes.King)) != 0;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Square GetRookCastleFrom(Square index) => _rookCastlesFrom[index.AsInt()];
+        public Square GetRookCastleFrom(Square sq) => _rookCastlesFrom[sq.AsInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetRookCastleFrom(Square index, Square square) => _rookCastlesFrom[index.AsInt()] = square;
+        public void SetRookCastleFrom(Square indexSq, Square sq) => _rookCastlesFrom[indexSq.AsInt()] = sq;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Square GetKingCastleFrom(Player side, CastlelingSides castleType)
+        public Square GetKingCastleFrom(Player c, CastlelingSides sides)
         {
-            switch (castleType)
+            return sides switch
             {
-                case CastlelingSides.King:
-                    return _castleShortKingFrom[side.Side];
-
-                case CastlelingSides.Queen:
-                    return _castleLongKingFrom[side.Side];
-
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(castleType), castleType, null);
-            }
+                CastlelingSides.King => _castleShortKingFrom[c.Side],
+                CastlelingSides.Queen => _castleLongKingFrom[c.Side],
+                _ => throw new ArgumentOutOfRangeException(nameof(sides), sides, null)
+            };
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetKingCastleFrom(Player side, Square square, CastlelingSides castleType)
+        public void SetKingCastleFrom(Player c, Square sq, CastlelingSides sides)
         {
-            switch (castleType)
+            switch (sides)
             {
                 case CastlelingSides.King:
-                    _castleShortKingFrom[side.Side] = square;
+                    _castleShortKingFrom[c.Side] = sq;
                     break;
 
                 case CastlelingSides.Queen:
-                    _castleLongKingFrom[side.Side] = square;
+                    _castleLongKingFrom[c.Side] = sq;
                     break;
 
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(castleType), castleType, null);
+                    throw new ArgumentOutOfRangeException(nameof(sides), sides, null);
             }
         }
 
@@ -388,26 +379,22 @@ namespace Rudz.Chess
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public CastlelingSides IsCastleMove(string m)
         {
-            switch (m)
+            return m switch
             {
-                case "O-O":
-                case "e1g1" when IsPieceTypeOnSquare(Squares.e1, PieceTypes.King):
-                case "e8g8" when IsPieceTypeOnSquare(Squares.e8, PieceTypes.King):
-                case "OO":
-                case "0-0":
-                case "00":
-                    return CastlelingSides.King;
-
-                case "O-O-O":
-                case "e1c1" when IsPieceTypeOnSquare(Squares.e1, PieceTypes.King):
-                case "e8c8" when IsPieceTypeOnSquare(Squares.e8, PieceTypes.King):
-                case "OOO":
-                case "0-0-0":
-                case "000":
-                    return CastlelingSides.Queen;
-            }
-
-            return CastlelingSides.None;
+                "O-O" => CastlelingSides.King,
+                "e1g1" when IsPieceTypeOnSquare(Squares.e1, PieceTypes.King) => CastlelingSides.King,
+                "e8g8" when IsPieceTypeOnSquare(Squares.e8, PieceTypes.King) => CastlelingSides.King,
+                "OO" => CastlelingSides.King,
+                "0-0" => CastlelingSides.King,
+                "00" => CastlelingSides.King,
+                "O-O-O" => CastlelingSides.Queen,
+                "e1c1" when IsPieceTypeOnSquare(Squares.e1, PieceTypes.King) => CastlelingSides.Queen,
+                "e8c8" when IsPieceTypeOnSquare(Squares.e8, PieceTypes.King) => CastlelingSides.Queen,
+                "OOO" => CastlelingSides.Queen,
+                "0-0-0" => CastlelingSides.Queen,
+                "000" => CastlelingSides.Queen,
+                _ => CastlelingSides.None
+            };
         }
 
         /// <summary>
@@ -479,22 +466,22 @@ namespace Rudz.Chess
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool CanCastle(CastlelingSides type)
-            => State.CastlelingRights.HasFlagFast(type.GetCastleAllowedMask(State.SideToMove)) && IsCastleAllowed(type.GetKingCastleTo(State.SideToMove));
+        public bool CanCastle(CastlelingSides sides)
+            => State.CastlelingRights.HasFlagFast(sides.GetCastleAllowedMask(State.SideToMove)) && IsCastleAllowed(sides.GetKingCastleTo(State.SideToMove));
 
-        public bool IsCastleAllowed(Square square)
+        public bool IsCastleAllowed(Square sq)
         {
             var c = State.SideToMove;
             // The complexity of this function is mainly due to the support for Chess960 variant.
-            var rookTo = square.GetRookCastleTo();
-            var rookFrom = GetRookCastleFrom(square);
+            var rookTo = sq.GetRookCastleTo();
+            var rookFrom = GetRookCastleFrom(sq);
             var ksq = GetPieceSquare(PieceTypes.King, c);
 
             // The pieces in question.. rook and king
             var castlePieces = rookFrom | ksq;
 
             // The span between the rook and the king
-            var castleSpan = ksq.BitboardBetween(rookFrom) | rookFrom.BitboardBetween(rookTo) | castlePieces | rookTo | square;
+            var castleSpan = ksq.BitboardBetween(rookFrom) | rookFrom.BitboardBetween(rookTo) | castlePieces | rookTo | sq;
 
             // check that the span AND current occupied pieces are no different that the piece themselves.
             if ((castleSpan & Pieces()) != castlePieces)
@@ -505,82 +492,82 @@ namespace Rudz.Chess
 
             c = ~c;
 
-            castleSpan = ksq.BitboardBetween(square) | square;
+            castleSpan = ksq.BitboardBetween(sq) | sq;
             return !castleSpan.Any(x => IsAttacked(x, c));
         }
 
         /// <summary>
         /// Determine if a move is legal or not, by performing the move and checking if the king is under attack afterwards.
         /// </summary>
-        /// <param name="move">The move to check</param>
-        /// <param name="piece">The moving piece</param>
+        /// <param name="m">The move to check</param>
+        /// <param name="pc">The moving piece</param>
         /// <param name="from">The from square</param>
         /// <param name="type">The move type</param>
         /// <returns>true if legal, otherwise false</returns>
-        public bool IsLegal(Move move, Piece piece, Square from, MoveTypes type)
+        public bool IsLegal(Move m, Piece pc, Square from, MoveTypes type)
         {
-            if (!InCheck && piece.Type() != PieceTypes.King && (State.Pinned & from).Empty() && !type.HasFlagFast(MoveTypes.Epcapture))
+            if (!State.InCheck && pc.Type() != PieceTypes.King && (State.Pinned & from).Empty() && !type.HasFlagFast(MoveTypes.Epcapture))
                 return true;
 
             IsProbing = true;
-            MakeMove(move);
+            MakeMove(m);
             var opponentAttacking = IsAttacked(GetPieceSquare(PieceTypes.King, State.SideToMove), ~State.SideToMove);
-            TakeMove(move);
+            TakeMove(m);
             IsProbing = false;
             return !opponentAttacking;
         }
 
-        public bool IsLegal(Move move) => IsLegal(move, move.GetMovingPiece(), move.GetFromSquare(), move.GetMoveType());
+        public bool IsLegal(Move m) => IsLegal(m, m.GetMovingPiece(), m.GetFromSquare(), m.GetMoveType());
 
         /// <summary>
         /// <para>"Validates" a move using simple logic. For example that the piece actually being moved exists etc.</para>
         /// <para>This is basically only useful while developing and/or debugging</para>
         /// </summary>
-        /// <param name="move">The move to check for logical errors</param>
+        /// <param name="m">The move to check for logical errors</param>
         /// <returns>True if move "appears" to be legal, otherwise false</returns>
-        public bool IsPseudoLegal(Move move)
+        public bool IsPseudoLegal(Move m)
         {
             // Verify that the piece actually exists on the board at the location defined by the move struct
-            if ((Pieces(move.GetMovingPiece()) & move.GetFromSquare()).Empty())
+            if ((Pieces(m.GetMovingPiece()) & m.GetFromSquare()).Empty())
                 return false;
 
-            var to = move.GetToSquare();
+            var to = m.GetToSquare();
 
-            if (move.IsCastlelingMove())
+            if (m.IsCastlelingMove())
             {
                 // TODO : Basic castleling verification
-                if (CanCastle(move.GetFromSquare() < to ? CastlelingSides.King : CastlelingSides.Queen))
+                if (CanCastle(m.GetFromSquare() < to ? CastlelingSides.King : CastlelingSides.Queen))
                     return true;
 
-                return this.GenerateMoves().Contains(move);
+                return this.GenerateMoves().Contains(m);
             }
-            else if (move.IsEnPassantMove())
+            else if (m.IsEnPassantMove())
             {
                 // TODO : En-passant here
 
                 // TODO : Test with unit test
-                var opponent = ~move.GetMovingSide();
+                var opponent = ~m.GetMovingSide();
                 if (State.EnPassantSquare.PawnAttack(opponent) & Pieces(PieceTypes.Pawn, opponent))
                     return true;
             }
-            else if (move.IsCaptureMove())
+            else if (m.IsCaptureMove())
             {
-                var opponent = ~move.GetMovingSide();
+                var opponent = ~m.GetMovingSide();
                 if ((OccupiedBySide[opponent.Side] & to).Empty())
                     return false;
 
-                if ((Pieces(move.GetCapturedPiece()) & to).Empty())
+                if ((Pieces(m.GetCapturedPiece()) & to).Empty())
                     return false;
             }
             else if ((Pieces() & to) != 0)
                 return false;
 
-            switch (move.GetMovingPiece().Type())
+            switch (m.GetMovingPiece().Type())
             {
                 case PieceTypes.Bishop:
                 case PieceTypes.Rook:
                 case PieceTypes.Queen:
-                    if (move.GetFromSquare().BitboardBetween(to) & Pieces())
+                    if (m.GetFromSquare().BitboardBetween(to) & Pieces())
                         return false;
 
                     break;
@@ -592,7 +579,7 @@ namespace Rudz.Chess
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool IsMate()
         {
-            return !this.GenerateMoves().Any(IsLegal);
+            return this.GenerateMoves().Count == 0;
         }
 
         /// <summary>
@@ -604,7 +591,7 @@ namespace Rudz.Chess
         /// </returns>
         public FenData GenerateFen()
         {
-            var sv = new StringBuilder(Fen.Fen.MaxFenLen);
+            var sb = new StringBuilder(Fen.Fen.MaxFenLen);
 
             for (var rank = Ranks.Rank8; rank >= Ranks.Rank1; rank--)
             {
@@ -623,54 +610,54 @@ namespace Rudz.Chess
 
                     if (empty != 0)
                     {
-                        sv.Append(empty);
+                        sb.Append(empty);
                         empty = 0;
                     }
 
-                    sv.Append(piece.GetPieceChar());
+                    sb.Append(piece.GetPieceChar());
                 }
 
                 if (empty != 0)
-                    sv.Append(empty);
+                    sb.Append(empty);
 
                 if (rank > Ranks.Rank1)
-                    sv.Append('/');
+                    sb.Append('/');
             }
 
-            sv.Append(State.SideToMove.IsWhite() ? " w " : " b ");
+            sb.Append(State.SideToMove.IsWhite() ? " w " : " b ");
 
             var castleRights = State.CastlelingRights;
 
             if (castleRights != 0)
             {
                 if (castleRights.HasFlagFast(CastlelingRights.WhiteOo))
-                    sv.Append('K');
+                    sb.Append('K');
 
                 if (castleRights.HasFlagFast(CastlelingRights.WhiteOoo))
-                    sv.Append('Q');
+                    sb.Append('Q');
 
                 if (castleRights.HasFlagFast(CastlelingRights.BlackOo))
-                    sv.Append('k');
+                    sb.Append('k');
 
                 if (castleRights.HasFlagFast(CastlelingRights.BlackOoo))
-                    sv.Append('q');
+                    sb.Append('q');
             }
             else
-                sv.Append('-');
+                sb.Append('-');
 
-            sv.Append(' ');
+            sb.Append(' ');
 
             if (State.EnPassantSquare == Squares.none)
-                sv.Append('-');
+                sb.Append('-');
             else
-                sv.Append(State.EnPassantSquare.ToString());
+                sb.Append(State.EnPassantSquare.ToString());
 
-            sv.Append(' ');
+            sb.Append(' ');
 
-            sv.Append(State.ReversibleHalfMoveCount);
-            sv.Append(' ');
-            sv.Append(State.HalfMoveCount + 1);
-            return new FenData(sv.ToString());
+            sb.Append(State.ReversibleHalfMoveCount);
+            sb.Append(' ');
+            sb.Append(State.HalfMoveCount + 1);
+            return new FenData(sb.ToString());
         }
 
         public IEnumerator<Piece> GetEnumerator() => ((IEnumerable<Piece>) BoardLayout).GetEnumerator();
@@ -678,9 +665,9 @@ namespace Rudz.Chess
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private CastlelingSides ShredderFunc(Square fromSquare, Square toSquare) =>
-            GetPiece(fromSquare).Value == Enums.Pieces.WhiteKing && GetPiece(toSquare).Value == Enums.Pieces.WhiteRook || GetPiece(fromSquare).Value == Enums.Pieces.BlackKing && GetPiece(toSquare).Value == Enums.Pieces.BlackRook
-                ? toSquare > fromSquare
+        private CastlelingSides ShredderFunc(Square from, Square to) =>
+            GetPiece(from).Value == Enums.Pieces.WhiteKing && GetPiece(to).Value == Enums.Pieces.WhiteRook || GetPiece(from).Value == Enums.Pieces.BlackKing && GetPiece(to).Value == Enums.Pieces.BlackRook
+                ? to > from
                     ? CastlelingSides.King
                     : CastlelingSides.Queen
                 : CastlelingSides.None;

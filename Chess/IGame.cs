@@ -41,15 +41,15 @@ namespace Rudz.Chess
         int PositionStart { get; }
         int MoveNumber { get; }
         BitBoard Occupied { get; }
-        IPosition Position { get; }
+        IPosition Pos { get; }
         GameEndTypes GameEndType { get; set; }
 
         /// <summary>
         /// Makes a chess move in the data structure
         /// </summary>
-        /// <param name="move">The move to make</param>
+        /// <param name="m">The move to make</param>
         /// <returns>true if everything was fine, false if unable to progress - fx castleling position under attack</returns>
-        bool MakeMove(Move move);
+        bool MakeMove(Move m);
 
         void TakeMove();
 
@@ -78,15 +78,15 @@ namespace Rudz.Chess
         /// Converts a move data type to move notation string format which chess engines understand.
         /// e.g. "a2a4", "a7a8q"
         /// </summary>
-        /// <param name="move">The move to convert</param>
+        /// <param name="m">The move to convert</param>
         /// <param name="output">The string builder used to generate the string with</param>
-        void MoveToString(Move move, StringBuilder output);
+        void MoveToString(Move m, StringBuilder output);
 
         void UpdateDrawTypes();
 
         string ToString();
 
-        BitBoard OccupiedBySide(Player side);
+        BitBoard OccupiedBySide(Player c);
 
         Player CurrentPlayer();
 

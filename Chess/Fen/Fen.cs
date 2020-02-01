@@ -26,11 +26,13 @@ SOFTWARE.
 
 namespace Rudz.Chess.Fen
 {
+    using Enums;
     using Exceptions;
     using Extensions;
     using System;
     using System.Runtime.CompilerServices;
     using System.Text.RegularExpressions;
+    using Types;
 
     public static class Fen
     {
@@ -44,9 +46,9 @@ namespace Rudz.Chess.Fen
 
         private const int SpaceCount = 3;
 
-        private const char Seperator = '/';
+        private const char Separator = '/';
 
-        private const int SeperatorCount = 7;
+        private const int SeparatorCount = 7;
 
         private static readonly Lazy<Regex> ValidFenRegex = new Lazy<Regex>(() => new Regex(
            string.Format(@"^ \s* {0}/{0}/{0}/{0}/{0}/{0}/{0}/{0} \s+ (?:w|b) \s+ (?:[KkQq]+|\-) \s+ (?:[a-h][1-8]|\-) \s+ \d+ \s+ \d+ \s* $", FenRankRegexSnippet),
@@ -81,102 +83,80 @@ namespace Rudz.Chess.Fen
         public static bool IsDelimiter(char c) => c == Space;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static bool CountPieceValidity(ReadOnlySpan<char> str)
+        private static bool CountPieceValidity(ReadOnlySpan<char> s)
         {
-            var spaceIndex = str.IndexOf(' ');
+            var spaceIndex = s.IndexOf(Space);
             if (spaceIndex == -1)
-                throw new InvalidFenException($"Invalid fen {str.ToString()}");
+                throw new InvalidFenException($"Invalid fen {s.ToString()}");
 
-            var mainSection = str.Slice(0, spaceIndex);
+            var mainSection = s.Slice(0, spaceIndex);
 
-            short whitePawnCount = 0;
-            short whiteRookCount = 0;
-            short whiteQueenCount = 0;
-            short whiteKnightCount = 0;
-            short whiteKingCount = 0;
-            short whiteBishopCount = 0;
+            Span<int> limits = stackalloc int[] { 32, 8, 10, 10, 10, 9, 1 };
 
-            short blackPawnCount = 0;
-            short blackRookCount = 0;
-            short blackQueenCount = 0;
-            short blackKnightCount = 0;
-            short blackKingCount = 0;
-            short blackBishopCount = 0;
+            // piece count storage, using index 0 = '/' count
+            Span<int> pieceCount = stackalloc int[(int)Pieces.PieceNb];
 
-            foreach (var c in mainSection)
+            foreach (var t in mainSection)
             {
-                switch (c)
+                if (t == '/')
                 {
-                    case '\\':
-                        continue;
-
-                    case 'p':
-                        if (++whitePawnCount > 8 && whiteRookCount + whitePawnCount + whiteBishopCount + whiteKnightCount + whiteQueenCount < 15)
-                            return false;
-                        break;
-
-                    case 'r':
-                        if (++whiteRookCount > 10 && whiteRookCount + whitePawnCount + whiteBishopCount + whiteKnightCount + whiteQueenCount < 15)
-                            return false;
-                        break;
-
-                    case 'q':
-                        if (++whiteQueenCount > 9)
-                            return false;
-                        break;
-
-                    case 'n':
-                        if (++whiteKnightCount > 10 && whiteRookCount + whitePawnCount + whiteBishopCount + whiteKnightCount + whiteQueenCount < 15)
-                            return false;
-                        break;
-
-                    case 'k':
-                        if (++whiteKingCount > 1)
-                            return false;
-                        break;
-
-                    case 'b':
-                        if (++whiteBishopCount > 10 && whiteRookCount + whitePawnCount + whiteBishopCount + whiteKnightCount + whiteQueenCount < 15)
-                            return false;
-                        break;
-
-                    case 'P':
-                        if (++blackPawnCount > 8 && blackRookCount + blackPawnCount + blackBishopCount + blackKnightCount + blackQueenCount < 16)
-                            return false;
-                        break;
-
-                    case 'R':
-                        if (++blackRookCount > 10 && blackRookCount + blackPawnCount + blackBishopCount + blackKnightCount + blackQueenCount < 16)
-                            return false;
-                        break;
-
-                    case 'Q':
-                        if (++blackQueenCount > 9 && blackRookCount + blackPawnCount + blackBishopCount + blackKnightCount + blackQueenCount < 16)
-                            return false;
-                        break;
-
-                    case 'N':
-                        if (++blackKnightCount > 10 && blackRookCount + blackPawnCount + blackBishopCount + blackKnightCount + blackQueenCount < 16)
-                            return false;
-                        break;
-
-                    case 'K':
-                        if (++blackKingCount > 1)
-                            return false;
-                        break;
-
-                    case 'B':
-                        if (++blackBishopCount > 10 && blackRookCount + blackPawnCount + blackBishopCount + blackKnightCount + blackQueenCount < 16)
-                            return false;
-                        break;
+                    if (++pieceCount[0] > 7)
+                        throw new InvalidFenException($"Invalid fen (too many separators) {s.ToString()}");
+                    continue;
                 }
+
+                if (char.IsNumber(t))
+                {
+                    if (!t.InBetween('1', '8'))
+                        throw new InvalidFenException($"Invalid fen (not a valid square jump) {s.ToString()}");
+                    continue;
+                }
+
+                var pieceIndex = PieceExtensions.PieceChars.IndexOf(t);
+
+                if (pieceIndex == -1)
+                    throw new InvalidFenException($"Invalid fen (unknown piece) {s.ToString()}");
+
+                var pc = new Piece((Pieces)pieceIndex);
+                var pt = pc.Type();
+
+                pieceCount[pc.AsInt()]++;
+
+                var limit = limits[pt.AsInt()];
+
+                if (pieceCount[pc.AsInt()] > limit)
+                    throw new InvalidFenException($"Invalid fen (piece limit exceeded for {pc}) {s.ToString()}");
             }
 
-            spaceIndex = str.LastIndexOf(' ');
-            var endSection = str.Slice(spaceIndex);
+            // check for summed up values
+            static bool GetSpanSum(ReadOnlySpan<int> span, int limit)
+            {
+                var sum = 0;
+                foreach (var v in span)
+                    sum += v;
 
-            if (endSection.ToString().ToIntegral() <= 2048)
-                throw new InvalidFenException($"Invalid half move count for fen {str.ToString()}");
+                return sum <= limit;
+            }
+
+            var whitePieces = pieceCount.Slice(1, 5);
+
+            var valid = GetSpanSum(whitePieces, 15);
+
+            if (!valid)
+                throw new InvalidFenException($"Invalid fen (white piece count exceeds limit) {s.ToString()}");
+
+            var blackPieces = pieceCount.Slice(9, 5);
+
+            valid = GetSpanSum(blackPieces, 15);
+
+            if (!valid)
+                throw new InvalidFenException($"Invalid fen (black piece count exceeds limit) {s.ToString()}");
+
+            spaceIndex = s.LastIndexOf(' ');
+            var endSection = s.Slice(spaceIndex);
+
+            if (endSection.ToString().ToIntegral() >= 2048)
+                throw new InvalidFenException($"Invalid half move count for fen {s.ToString()}");
 
             return true;
         }
@@ -197,7 +177,7 @@ namespace Rudz.Chess.Fen
             {
                 switch (c)
                 {
-                    case Seperator:
+                    case Separator:
                         seperatorCount++;
                         break;
 
@@ -212,7 +192,7 @@ namespace Rudz.Chess.Fen
             if (!valid)
                 throw new InvalidFenException($"Invalid space character count in fen {str.ToString()}");
 
-            valid = seperatorCount == SeperatorCount;
+            valid = seperatorCount == SeparatorCount;
 
             if (!valid)
                 throw new InvalidFenException($"Invalid separator count in fen {str.ToString()}");

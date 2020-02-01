@@ -44,47 +44,45 @@ namespace Rudz.Chess
 
         Action<Piece, Square> PieceUpdated { get; set; }
 
-        bool InCheck { get; set; }
-
         State State { get; set; }
 
         void Clear();
 
-        void AddPiece(Piece piece, Square square);
+        void AddPiece(Piece pc, Square sq);
 
-        void AddPiece(PieceTypes pieceType, Square square, Player side);
+        void AddPiece(PieceTypes pt, Square sq, Player c);
 
-        bool MakeMove(Move move);
+        bool MakeMove(Move m);
 
-        void TakeMove(Move move);
+        void TakeMove(Move m);
 
-        Piece GetPiece(Square square);
+        Piece GetPiece(Square sq);
 
-        PieceTypes GetPieceType(Square square);
+        PieceTypes GetPieceType(Square sq);
 
-        bool IsPieceTypeOnSquare(Square square, PieceTypes pieceType);
+        bool IsPieceTypeOnSquare(Square sq, PieceTypes pt);
 
-        BitBoard GetPinnedPieces(Square square, Player side);
+        BitBoard GetPinnedPieces(Square sq, Player c);
 
-        bool IsOccupied(Square square);
+        bool IsOccupied(Square sq);
 
-        bool IsAttacked(Square square, Player side);
+        bool IsAttacked(Square sq, Player c);
 
-        BitBoard PieceAttacks(Square square, PieceTypes pieceType);
+        BitBoard PieceAttacks(Square sq, PieceTypes pt);
 
         BitBoard Pieces();
 
-        BitBoard Pieces(Player side);
+        BitBoard Pieces(Player c);
 
         BitBoard Pieces(Piece pc);
 
-        BitBoard Pieces(PieceTypes type);
+        BitBoard Pieces(PieceTypes pt);
 
-        BitBoard Pieces(PieceTypes type1, PieceTypes type2);
+        BitBoard Pieces(PieceTypes pt1, PieceTypes type2);
 
-        BitBoard Pieces(PieceTypes type, Player side);
+        BitBoard Pieces(PieceTypes pt, Player side);
 
-        BitBoard Pieces(PieceTypes type1, PieceTypes type2, Player side);
+        BitBoard Pieces(PieceTypes pt1, PieceTypes type2, Player side);
 
         Square GetPieceSquare(PieceTypes pt, Player color);
 
@@ -96,39 +94,39 @@ namespace Rudz.Chess
 
         void RemovePiece(Square square, Piece piece);
 
-        BitBoard AttacksTo(Square square, BitBoard occupied);
+        BitBoard AttacksTo(Square sq, BitBoard occupied);
 
-        BitBoard AttacksTo(Square square);
+        BitBoard AttacksTo(Square sq);
 
-        bool AttackedBySlider(Square square, Player side);
+        bool AttackedBySlider(Square sq, Player c);
 
-        bool AttackedByKnight(Square square, Player side);
+        bool AttackedByKnight(Square sq, Player c);
 
-        bool AttackedByPawn(Square square, Player side);
+        bool AttackedByPawn(Square sq, Player c);
 
-        bool AttackedByKing(Square square, Player side);
+        bool AttackedByKing(Square sq, Player c);
 
-        Square GetRookCastleFrom(Square index);
+        Square GetRookCastleFrom(Square sq);
 
-        void SetRookCastleFrom(Square index, Square square);
+        void SetRookCastleFrom(Square indexSq, Square sq);
 
-        Square GetKingCastleFrom(Player side, CastlelingSides castleType);
+        Square GetKingCastleFrom(Player c, CastlelingSides sides);
 
-        void SetKingCastleFrom(Player side, Square square, CastlelingSides castleType);
+        void SetKingCastleFrom(Player c, Square sq, CastlelingSides sides);
 
         CastlelingSides IsCastleMove(string m);
 
         Move StringToMove(string m);
 
-        bool CanCastle(CastlelingSides type);
+        bool CanCastle(CastlelingSides sides);
 
-        bool IsCastleAllowed(Square square);
+        bool IsCastleAllowed(Square sq);
 
-        bool IsPseudoLegal(Move move);
+        bool IsPseudoLegal(Move m);
 
-        bool IsLegal(Move move, Piece piece, Square from, MoveTypes type);
+        bool IsLegal(Move m, Piece pc, Square from, MoveTypes type);
 
-        bool IsLegal(Move move);
+        bool IsLegal(Move m);
 
         bool IsMate();
 

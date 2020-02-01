@@ -358,20 +358,14 @@ namespace Rudz.Chess.Types
 
         public static BitBoard XrayAttacks(this Square square, PieceTypes pieceType, BitBoard occupied, BitBoard blockers)
         {
-            switch (pieceType)
+            return pieceType switch
             {
-                case PieceTypes.Bishop:
-                    return square.XrayBishopAttacks(occupied, blockers);
-
-                case PieceTypes.Rook:
-                    return square.XrayRookAttacks(occupied, blockers);
-
-                case PieceTypes.Queen:
-                    return XrayBishopAttacks(square, occupied, blockers) | XrayRookAttacks(square, occupied, blockers);
-
-                default:
-                    return EmptyBitBoard;
-            }
+                PieceTypes.Bishop => square.XrayBishopAttacks(occupied, blockers),
+                PieceTypes.Rook => square.XrayRookAttacks(occupied, blockers),
+                PieceTypes.Queen => (XrayBishopAttacks(square, occupied, blockers) |
+                                     XrayRookAttacks(square, occupied, blockers)),
+                _ => EmptyBitBoard
+            };
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -637,6 +631,14 @@ namespace Rudz.Chess.Types
         /// <param name="bb">The bitboard as reference</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void ResetLsb(ref BitBoard bb) => bb &= bb - 1;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Square PopLsb(ref BitBoard bb)
+        {
+            var sq = bb.Lsb();
+            ResetLsb(ref bb);
+            return sq;
+        }
 
         /// <summary>
         /// Counts bit set in a specified BitBoard
