@@ -60,7 +60,7 @@ namespace Rudz.Chess.Hash
         /// <summary>
         /// Represents the piece index (as in EPieces), with each a square of the board value to match.
         /// </summary>
-        private static readonly ulong[,] ZobristPst = new ulong[16, 64];
+        private static readonly ulong[][] ZobristPst = new ulong[16][];
 
         /// <summary>
         /// Represents the castleling rights.
@@ -86,13 +86,16 @@ namespace Rudz.Chess.Hash
         {
             IRKiss rnd = new RKiss(DefaultRandomSeed);
 
+            for (var i = 0; i < ZobristPst.Length; i++)
+                ZobristPst[i] = new ulong[64];
+
             for (var side = Players.White; side < Players.PlayerNb; ++side)
             {
                 for (var pieceType = PieceTypes.Pawn; pieceType < PieceTypes.PieceTypeNb; ++pieceType)
                 {
                     var piece = pieceType.MakePiece(side);
                     for (var square = Squares.a1; square <= Squares.h8; square++)
-                        ZobristPst[piece.AsInt(), (int)square] = rnd.Rand();
+                        ZobristPst[piece.AsInt()][(int)square] = rnd.Rand();
                 }
             }
 
@@ -107,7 +110,7 @@ namespace Rudz.Chess.Hash
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ulong GetZobristPst(this Piece piece, Square square) => ZobristPst[piece.AsInt(), square.AsInt()];
+        public static ulong GetZobristPst(this Piece piece, Square square) => ZobristPst[piece.AsInt()][square.AsInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ulong GetZobristCastleling(this CastlelingRights index) => ZobristCastling[index.AsInt()];

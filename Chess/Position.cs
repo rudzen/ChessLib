@@ -660,7 +660,7 @@ namespace Rudz.Chess
             return new FenData(sb.ToString());
         }
 
-        public IEnumerator<Piece> GetEnumerator() => ((IEnumerable<Piece>) BoardLayout).GetEnumerator();
+        public IEnumerator<Piece> GetEnumerator() => BoardLayout.Cast<Piece>().GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
