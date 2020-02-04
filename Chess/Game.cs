@@ -184,7 +184,7 @@ namespace Rudz.Chess
             while (bb)
             {
                 var square = bb.Lsb();
-                Pos.RemovePiece(square, Pos.BoardLayout[square.AsInt()]);
+                Pos.RemovePiece(square);
                 BitBoards.ResetLsb(ref bb);
             }
 

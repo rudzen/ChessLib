@@ -123,8 +123,8 @@ namespace Rudz.Chess
             if (m.IsCastlelingMove())
             {
                 var rook = PieceTypes.Rook.MakePiece(us);
-                RemovePiece(_rookCastlesFrom[to.AsInt()], rook);
-                RemovePiece(m.GetFromSquare(), pc);
+                RemovePiece(_rookCastlesFrom[to.AsInt()]);
+                RemovePiece(m.GetFromSquare());
                 AddPiece(rook, to.GetRookCastleTo());
                 AddPiece(pc, to);
                 return true;
@@ -134,15 +134,15 @@ namespace Rudz.Chess
             if (IsAttacked(GetPieceSquare(PieceTypes.King, ~us), us))
                 return false;
 
-            RemovePiece(m.GetFromSquare(), pc);
+            RemovePiece(m.GetFromSquare());
 
             if (m.IsEnPassantMove())
             {
                 var t = EnPasCapturePos[us.Side](to).Lsb();
-                RemovePiece(t, m.GetCapturedPiece());
+                RemovePiece(t);
             }
             else if (m.IsCaptureMove())
-                RemovePiece(to, m.GetCapturedPiece());
+                RemovePiece(to);
 
             AddPiece(m.IsPromotionMove() ? m.GetPromotedPiece() : pc, to);
 
@@ -157,14 +157,14 @@ namespace Rudz.Chess
             if (m.IsCastlelingMove())
             {
                 var rook = PieceTypes.Rook.MakePiece(m.GetMovingSide());
-                RemovePiece(to, pc);
-                RemovePiece(to.GetRookCastleTo(), rook);
+                RemovePiece(to);
+                RemovePiece(to.GetRookCastleTo());
                 AddPiece(pc, m.GetFromSquare());
                 AddPiece(rook, _rookCastlesFrom[to.AsInt()]);
                 return;
             }
 
-            RemovePiece(to, m.IsPromotionMove() ? m.GetPromotedPiece() : pc);
+            RemovePiece(to);
 
             if (m.IsEnPassantMove())
             {
@@ -285,8 +285,9 @@ namespace Rudz.Chess
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void RemovePiece(Square sq, Piece pc)
+        public void RemovePiece(Square sq)
         {
+            Piece pc = BoardLayout[sq.AsInt()];
             var invertedSq = ~sq;
             BoardPieces[pc.AsInt()] &= invertedSq;
             OccupiedBySide[pc.ColorOf()] &= invertedSq;

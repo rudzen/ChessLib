@@ -92,7 +92,7 @@ namespace Rudz.Chess
 
         bool PassedPawn(Square square);
 
-        void RemovePiece(Square square, Piece piece);
+        void RemovePiece(Square square);
 
         BitBoard AttacksTo(Square sq, BitBoard occupied);
 
