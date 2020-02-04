@@ -111,5 +111,8 @@ namespace Rudz.Chess.Types
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static Square GetFlip(int fileIndex, Player player) => Flip[player.Side, fileIndex];
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Square RelativeSquare(this Squares sq, Player c) => (int)sq ^ (c.Side * 56);
     }
 }

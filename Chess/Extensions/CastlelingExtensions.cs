@@ -37,24 +37,11 @@ namespace Rudz.Chess.Extensions
 
         private static readonly CastlelingRights[] OooAllowedMask = { CastlelingRights.WhiteOoo, CastlelingRights.BlackOoo };
 
-        private static readonly Square[] OoKingTo = { Squares.g1, Squares.g8 };
-
-        private static readonly Square[] OooKingTo = { Squares.c1, Squares.c8 };
-
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Square GetKingCastleTo(this CastlelingSides castleType, Player side)
         {
-            switch (castleType)
-            {
-                case CastlelingSides.King:
-                    return OoKingTo[side.Side];
-
-                case CastlelingSides.Queen:
-                    return OooKingTo[side.Side];
-
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(castleType), castleType, null);
-            }
+            var isKingSide = castleType == CastlelingSides.King;
+            return (isKingSide ? Squares.g1 : Squares.c1).RelativeSquare(side);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
