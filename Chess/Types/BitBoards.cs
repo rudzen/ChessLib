@@ -114,10 +114,6 @@ namespace Rudz.Chess.Types
                 0x200000000000000, 0x400000000000000, 0x800000000000000, 0x1000000000000000, 0x2000000000000000, 0x4000000000000000, 0x8000000000000000
             };
 
-        private static readonly BitBoard[] FileBB = { FILEA, FILEB, FILEC, FILED, FILEE, FILEF, FILEG, FILEH };
-
-        private static readonly BitBoard[] RankBB = { RANK1, RANK2, RANK3, RANK4, RANK5, RANK6, RANK7, RANK8 };
-
         private static readonly BitBoard[] Rank1 = { RANK1, RANK8 };
 
         private static readonly BitBoard[] Rank3BitBoards = { RANK3, RANK6 };
@@ -239,7 +235,7 @@ namespace Rudz.Chess.Types
             for (var r = Ranks.Rank1; r < Ranks.RankNb; ++r)
             {
                 var rank = (int)r;
-                ForwardRanksBB[0][rank] = ~(ForwardRanksBB[1][rank + 1] = ForwardRanksBB[1][rank] | RankBB[rank]);
+                ForwardRanksBB[0][rank] = ~(ForwardRanksBB[1][rank + 1] = ForwardRanksBB[1][rank] | BitBoardRank(r));
             }
 
             for (var side = Players.White; side < Players.PlayerNb; ++side)
@@ -248,8 +244,10 @@ namespace Rudz.Chess.Types
                 foreach (var square in AllSquares)
                 {
                     var s = square.AsInt();
-                    ForwardFileBB[c][s] = ForwardRanksBB[c][square.Rank().AsInt()] & FileBB[square.File().AsInt()];
-                    PawnAttackSpanBB[c][s] = ForwardRanksBB[c][square.Rank().AsInt()] & AdjacentFilesBB[square.File().AsInt()];
+                    var file = square.File();
+                    var rank = square.Rank();
+                    ForwardFileBB[c][s] = ForwardRanksBB[c][rank.AsInt()] & file.BitBoardFile();
+                    PawnAttackSpanBB[c][s] = ForwardRanksBB[c][rank.AsInt()] & AdjacentFilesBB[file.AsInt()];
                     PassedPawnMaskBB[c][s] = ForwardFileBB[c][s] | PawnAttackSpanBB[c][s];
                 }
             }
@@ -415,7 +413,7 @@ namespace Rudz.Chess.Types
         /// <param name="sq">The square</param>
         /// <returns>The bitboard of square rank</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static BitBoard BitBoardRank(this Square sq) => RankBB[sq.Rank().AsInt()];
+        public static BitBoard BitBoardRank(this Square sq) => sq.Rank().BitBoardRank();
 
         /// <summary>
         /// Returns the bitboard representation of a rank.
@@ -423,7 +421,7 @@ namespace Rudz.Chess.Types
         /// <param name="r">The rank</param>
         /// <returns>The bitboard of square rank</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static BitBoard BitBoardRank(this Rank r) => RankBB[r.AsInt()];
+        public static BitBoard BitBoardRank(this Rank r) => RANK1 << (8 * r.AsInt());
 
         /// <summary>
         /// Returns the bitboard representation of the file of which the square is located.
@@ -431,7 +429,7 @@ namespace Rudz.Chess.Types
         /// <param name="this">The square</param>
         /// <returns>The bitboard of square file</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static BitBoard BitBoardFile(this Square @this) => FileBB[@this.File().AsInt()];
+        public static BitBoard BitBoardFile(this Square @this) => @this.File().BitBoardFile();
 
         /// <summary>
         /// Returns the bitboard representation of the file.
@@ -439,7 +437,7 @@ namespace Rudz.Chess.Types
         /// <param name="this">The file</param>
         /// <returns>The bitboard of file</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static BitBoard BitBoardFile(this File @this) => FileBB[@this.AsInt()];
+        public static BitBoard BitBoardFile(this File @this) => FILEA << @this.AsInt();
 
         /// <summary>
         /// Returns all squares in front of the square in the same file as bitboard

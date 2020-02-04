@@ -58,9 +58,9 @@ namespace Rudz.Chess.Types
             foreach (var square in BitBoards.AllSquares)
             {
                 var file = square.File().AsInt();
-                var rank = square.Rank();
-                Flip[0, square.AsInt()] = file + ((7 - rank.AsInt()) << 3);
-                Flip[1, square.AsInt()] = file + (rank.AsInt() << 3);
+                var rank = square.Rank().AsInt();
+                Flip[0, square.AsInt()] = file + ((7 - rank) << 3);
+                Flip[1, square.AsInt()] = file + (rank << 3);
             }
 
             // generate rook castleling destination squares for both sides
@@ -71,7 +71,7 @@ namespace Rudz.Chess.Types
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsValid(this Square s) => s.Value <= Squares.h8;
+        public static bool IsValid(this Square s) => s.Value >= Squares.a1 && s.Value <= Squares.h8;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsValidEp(this Square s) => s.Rank() == Ranks.Rank3 || s.Rank() == Ranks.Rank6;
@@ -83,28 +83,13 @@ namespace Rudz.Chess.Types
         public static bool IsDark(this Square s) => (s & BitBoards.DarkSquares) != 0;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int AsInt(this Square s) => (int)s.Value;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Rank Rank(this Square s) => (Ranks)(s.AsInt() >> 3);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static char RankChar(this Square s) => s.Rank().RankChar();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Rank RelativeRank(this Rank rank, Player color) => rank.AsInt() ^ (color.Side * 7);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Rank RelativeRank(this Square s, Player color) => s.Rank().RelativeRank(color);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static File File(this Square s) => s.AsInt() & 7;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static char FileChar(this Square s) => s.File().FileChar();
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsOppositeColor(this Square @this, Square other) => ((BitBoards.DarkSquares & @this) != 0) != ((BitBoards.DarkSquares & other) != 0);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string GetSquareString(this Square s) => SquareStrings[s.AsInt()];

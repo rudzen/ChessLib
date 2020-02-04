@@ -145,6 +145,21 @@ namespace Rudz.Chess.Types
         public override bool Equals(object obj) => obj is Square square && Equals(square);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public override int GetHashCode() => this.AsInt();
+        public override int GetHashCode() => AsInt();
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public int AsInt() => (int)Value;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public File File() => AsInt() & 7;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Rank Rank() => (Ranks)(AsInt() >> 3);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Rank RelativeRank(Player color) => Rank().RelativeRank(color);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool IsOppositeColor(Square other) => ((BitBoards.DarkSquares & Value) != 0) != ((BitBoards.DarkSquares & other) != 0);
     }
 }
