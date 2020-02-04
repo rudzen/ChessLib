@@ -411,10 +411,7 @@ namespace Rudz.Chess
         public Move StringToMove(string m)
         {
             // guards
-            if (string.IsNullOrWhiteSpace(m))
-                return MoveExtensions.EmptyMove;
-
-            if (m.Equals(@"\"))
+            if (m.IsNullOrWhiteSpace())
                 return MoveExtensions.EmptyMove;
 
             // only lengths of 4 and 5 are acceptable.

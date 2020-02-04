@@ -519,7 +519,7 @@ namespace Rudz.Chess.Types
         public static string PrintBitBoard(BitBoard b, string title = "")
         {
             var s = new StringBuilder("+---+---+---+---+---+---+---+---+---+\n", 1024);
-            if (!string.IsNullOrWhiteSpace(title))
+            if (!title.IsNullOrWhiteSpace())
                 s.AppendLine($"| {title}");
             for (var r = Ranks.Rank8; r >= Ranks.Rank1; --r)
             {

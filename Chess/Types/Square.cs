@@ -160,6 +160,6 @@ namespace Rudz.Chess.Types
         public Rank RelativeRank(Player color) => Rank().RelativeRank(color);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsOppositeColor(Square other) => ((BitBoards.DarkSquares & Value) != 0) != ((BitBoards.DarkSquares & other) != 0);
+        public bool IsOppositeColor(Square other) => (((int)Value + Rank().AsInt() + (int)other.Value + other.Rank().AsInt()) & 1) != 0;
     }
 }

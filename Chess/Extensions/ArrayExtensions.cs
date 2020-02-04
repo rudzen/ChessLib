@@ -34,8 +34,9 @@ namespace Rudz.Chess.Extensions
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Fill<T>(this T[] arr, T value)
         {
-            for (var i = 0; i < arr.Length; i++)
-                arr[i] = value;
+            if (arr == null)
+                throw new ArgumentNullException(nameof(arr));
+            Array.Fill(arr, value);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
