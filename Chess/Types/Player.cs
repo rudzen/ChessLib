@@ -82,5 +82,11 @@ namespace Rudz.Chess.Types
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override int GetHashCode() => Side << 24;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool IsWhite() => Side == 0;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool IsBlack() => Side != 0;
     }
 }

@@ -53,13 +53,7 @@ namespace Rudz.Chess.Types
         public static bool IsLegalPlayer(this Player player) => player.Side.InBetween(White.Side, Black.Side);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ref string GetName(this Player player) => ref PlayerColors[player.Side];
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsWhite(this Player player) => player.Side == 0;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsBlack(this Player player) => player.Side != 0;
+        public static string GetName(this Player player) => PlayerColors[player.Side];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Direction PawnPushDistance(this Player player) => PawnPushDist[player.Side];

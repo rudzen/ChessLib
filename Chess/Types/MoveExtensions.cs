@@ -95,11 +95,12 @@ namespace Rudz.Chess.Types
                 notation.Append(CastlelingExtensions.GetCastlelingString(to, from));
             else
             {
-                var pt = move.GetMovingPieceType();
+                var pc = move.GetMovingPiece();
+                var pt = pc.Type();
 
                 if (pt != PieceTypes.Pawn)
                 {
-                    notation.Append(move.GetMovingPiece().GetUnicodeChar());
+                    notation.Append(pc.GetUnicodeChar());
                     move.Disambiguation(from, pos, notation);
                 }
 
@@ -305,7 +306,8 @@ namespace Rudz.Chess.Types
 
             foreach (var square in similarTypeAttacks)
             {
-                var pinned = position.GetPinnedPieces(square, move.GetMovingSide());
+                var c = move.GetMovingSide();
+                var pinned = position.GetPinnedPieces(square, c);
 
                 if (similarTypeAttacks & pinned)
                     continue;
@@ -313,7 +315,7 @@ namespace Rudz.Chess.Types
                 if (move.GetMovingPieceType() != position.GetPieceType(square))
                     continue;
 
-                if (position.OccupiedBySide[move.GetMovingSide().Side] & square)
+                if (position.OccupiedBySide[c.Side] & square)
                 {
                     if (square.File() == move.GetFromSquare().File())
                         ambiguity |= MoveAmbiguities.File;
@@ -349,9 +351,9 @@ namespace Rudz.Chess.Types
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void Disambiguation(this Move move, Square from, IPosition position, StringBuilder sb)
         {
-            var simularTypeAttacks = position.GetSimilarAttacks(move);
+            var similarAttacks = position.GetSimilarAttacks(move);
 
-            var ambiguity = move.Ambiguity(simularTypeAttacks, position);
+            var ambiguity = move.Ambiguity(similarAttacks, position);
 
             if (!ambiguity.HasFlagFast(MoveAmbiguities.Move))
                 return;

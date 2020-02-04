@@ -175,6 +175,12 @@ namespace Rudz.Chess.Types
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public int AsInt() => (int)Value;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public PieceTypes Type() => (PieceTypes)(AsInt() & 0x7);
+
         private sealed class PieceRelationalComparer : Comparer<Piece>
         {
             public override int Compare(Piece x, Piece y)

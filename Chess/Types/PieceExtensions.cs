@@ -80,13 +80,7 @@ namespace Rudz.Chess.Types
         public static bool IsBlack(this Piece p) => p.AsInt().InBetween((int)Pieces.BlackPawn, (int)Pieces.BlackKing);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int AsInt(this Piece p) => (int)p.Value;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int AsInt(this PieceTypes p) => (int)p;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static PieceTypes Type(this Piece p) => (PieceTypes)(p.AsInt() & 0x7);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Piece MakePiece(this PieceTypes @this, Player side) => (int)@this | (side.Side << 3);

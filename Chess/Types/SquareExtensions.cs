@@ -86,9 +86,6 @@ namespace Rudz.Chess.Types
         public static char RankChar(this Square s) => s.Rank().RankChar();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Rank RelativeRank(this Rank rank, Player color) => rank.AsInt() ^ (color.Side * 7);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static char FileChar(this Square s) => s.File().FileChar();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
