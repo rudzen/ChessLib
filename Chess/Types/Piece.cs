@@ -192,13 +192,16 @@ namespace Rudz.Chess.Types
                 if (x.Type() == PieceTypes.King || y.Type() == PieceTypes.King)
                     return 1;
 
-                if (x.PieceValue() < y.PieceValue())
+                var xValue = x.PieceValue();
+                var yValue = y.PieceValue();
+
+                if (xValue < yValue)
                     return -1;
 
-                if (x.PieceValue() == y.PieceValue())
+                if (xValue == yValue)
                     return 0;
 
-                return x.PieceValue() > y.PieceValue() ? 1 : x.AsInt().CompareTo(y.AsInt());
+                return xValue > yValue ? 1 : x.AsInt().CompareTo(y.AsInt());
             }
         }
     }

@@ -78,7 +78,7 @@ namespace Rudz.Chess.Types
         public override bool Equals(object obj) => obj is Player player && Equals(player);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool Equals(Player other) => Side == other.Side;
+        public readonly bool Equals(Player other) => Side == other.Side;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override int GetHashCode() => Side << 24;

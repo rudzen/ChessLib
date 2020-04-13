@@ -225,7 +225,7 @@ namespace Rudz.Chess.Types
         public readonly bool IsValidMove() => GetFromSquare().AsInt() != GetToSquare().AsInt();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool Equals(Move other) => _data == other._data;
+        public readonly bool Equals(Move other) => _data == other._data;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override bool Equals(object obj) => obj is Move move && Equals(move);

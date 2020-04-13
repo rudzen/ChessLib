@@ -36,6 +36,10 @@ namespace Rudz.Chess
     {
         public static MoveList GenerateMoves(this IPosition pos, MoveGenerationFlags flags = MoveGenerationFlags.Legalmoves, bool useCache = true, bool force = false)
         {
+            pos.State.Pinned = flags.HasFlagFast(MoveGenerationFlags.Legalmoves)
+                ? pos.GetPinnedPieces(pos.GetPieceSquare(PieceTypes.King, pos.State.SideToMove), pos.State.SideToMove)
+                : BitBoards.EmptyBitBoard;
+
             var moves = new MoveList();
 
             pos.GenerateCapturesAndPromotions(moves, flags);
