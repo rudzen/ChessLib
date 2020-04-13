@@ -121,16 +121,16 @@ namespace Rudz.Chess.Types
         public static bool operator false(Rank sq) => !sq.IsValid();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int AsInt() => (int)_value;
+        public readonly int AsInt() => (int)_value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsValid() => _value < Ranks.RankNb;
+        public readonly bool IsValid() => _value < Ranks.RankNb;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override string ToString() => ((int) _value + 1).ToString();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool Equals(Rank other) => _value == other._value;
+        public readonly bool Equals(Rank other) => _value == other._value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override bool Equals(object obj) => obj is Rank file && Equals(file);
@@ -139,6 +139,6 @@ namespace Rudz.Chess.Types
         public override int GetHashCode() => AsInt();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Rank RelativeRank(Player color) => AsInt() ^ (color.Side * 7);
+        public readonly Rank RelativeRank(Player color) => AsInt() ^ (color.Side * 7);
     }
 }

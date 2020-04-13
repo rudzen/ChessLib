@@ -128,16 +128,16 @@ namespace Rudz.Chess.Types
         public static bool operator false(File f) => !f.IsValid();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int AsInt() => (int)Value;
+        public readonly int AsInt() => (int)Value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsValid() => Value <= Files.FileH;
+        public readonly bool IsValid() => Value <= Files.FileH;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override string ToString() => FileString();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool Equals(File other) => Value == other.Value;
+        public readonly bool Equals(File other) => Value == other.Value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override bool Equals(object obj) => obj is File file && Equals(file);
@@ -146,9 +146,9 @@ namespace Rudz.Chess.Types
         public override int GetHashCode() => AsInt();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public char FileChar() => FileChars[AsInt()];
+        public readonly char FileChar() => FileChars[AsInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public string FileString() => FileStrings[AsInt()];
+        public readonly string FileString() => FileStrings[AsInt()];
     }
 }

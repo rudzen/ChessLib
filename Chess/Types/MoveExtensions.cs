@@ -26,14 +26,7 @@ SOFTWARE.
 
 namespace Rudz.Chess.Types
 {
-    using Enums;
-    using Exceptions;
-    using Extensions;
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
     using System.Runtime.CompilerServices;
-    using System.Text;
 
     /// <summary>
     /// Made in a hurry.
@@ -53,7 +46,5 @@ namespace Rudz.Chess.Types
             var element = moveList.GetMove(move.GetFromSquare(), move.GetToSquare());
             return element == null ? (false, EmptyMove) : (true, element);
         }
-
-
     }
 }

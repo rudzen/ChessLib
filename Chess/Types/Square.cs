@@ -139,7 +139,7 @@ namespace Rudz.Chess.Types
         public override string ToString() => this.GetSquareString();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool Equals(Square other) => Value == other.Value;
+        public readonly bool Equals(Square other) => Value == other.Value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override bool Equals(object obj) => obj is Square square && Equals(square);
@@ -148,18 +148,18 @@ namespace Rudz.Chess.Types
         public override int GetHashCode() => AsInt();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int AsInt() => (int)Value;
+        public readonly int AsInt() => (int)Value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public File File() => AsInt() & 7;
+        public readonly File File() => AsInt() & 7;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Rank Rank() => (Ranks)(AsInt() >> 3);
+        public readonly Rank Rank() => (Ranks)(AsInt() >> 3);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Rank RelativeRank(Player color) => Rank().RelativeRank(color);
+        public readonly Rank RelativeRank(Player color) => Rank().RelativeRank(color);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsOppositeColor(Square other) => (((int)Value + Rank().AsInt() + (int)other.Value + other.Rank().AsInt()) & 1) != 0;
+        public readonly bool IsOppositeColor(Square other) => (((int)Value + Rank().AsInt() + (int)other.Value + other.Rank().AsInt()) & 1) != 0;
     }
 }

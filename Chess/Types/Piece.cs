@@ -116,7 +116,7 @@ namespace Rudz.Chess.Types
         public static bool operator false(Piece piece) => piece.Value == Pieces.NoPiece;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int ColorOf() => (int)Value >> 3;
+        public readonly int ColorOf() => (int)Value >> 3;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals(Piece other) => Value == other.Value;
@@ -176,10 +176,10 @@ namespace Rudz.Chess.Types
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int AsInt() => (int)Value;
+        public readonly int AsInt() => (int)Value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public PieceTypes Type() => (PieceTypes)(AsInt() & 0x7);
+        public readonly PieceTypes Type() => (PieceTypes)(AsInt() & 0x7);
 
         private sealed class PieceRelationalComparer : Comparer<Piece>
         {

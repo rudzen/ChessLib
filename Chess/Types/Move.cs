@@ -28,7 +28,6 @@ namespace Rudz.Chess.Types
 {
     using Enums;
     using Extensions;
-    using System;
     using System.Runtime.CompilerServices;
 
     /// <summary>
@@ -151,79 +150,79 @@ namespace Rudz.Chess.Types
         public static bool operator !=(Move left, Move right) => !left.Equals(right);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int GetData() => _data;
+        public readonly int GetData() => _data;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Square GetFromSquare() => new Square((_data >> MoveFromSquareOffset) & 0x3F);
+        public readonly Square GetFromSquare() => new Square((_data >> MoveFromSquareOffset) & 0x3F);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetFromSquare(Square square) => _data |= square.AsInt() << MoveFromSquareOffset;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Square GetToSquare() => new Square(_data & 0x3F);
+        public readonly Square GetToSquare() => new Square(_data & 0x3F);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetToSquare(Square square) => _data |= square.AsInt();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Piece GetMovingPiece() => (_data >> MovePieceOffset) & 0xF;
+        public readonly Piece GetMovingPiece() => (_data >> MovePieceOffset) & 0xF;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetMovingPiece(Piece piece) => _data |= piece.AsInt() << MovePieceOffset;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public PieceTypes GetMovingPieceType() => GetMovingPiece().Type();
+        public readonly PieceTypes GetMovingPieceType() => GetMovingPiece().Type();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Piece GetCapturedPiece() => (_data >> CapturePieceOffset) & 0xF;
+        public readonly Piece GetCapturedPiece() => (_data >> CapturePieceOffset) & 0xF;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsCapturedPieceType(PieceTypes pieceType) => GetCapturedPiece().Type() == pieceType;
+        public readonly bool IsCapturedPieceType(PieceTypes pieceType) => GetCapturedPiece().Type() == pieceType;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetCapturedPiece(Piece piece) => _data |= piece.AsInt() << CapturePieceOffset;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Piece GetPromotedPiece() => (_data >> PromotePieceOffset) & 0xF;
+        public readonly Piece GetPromotedPiece() => (_data >> PromotePieceOffset) & 0xF;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetPromotedPiece(Piece piece) => _data |= piece.AsInt() << PromotePieceOffset;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsQueenPromotion() => IsPromotionMove() && GetPromotedPiece().Type() == PieceTypes.Queen;
+        public readonly bool IsQueenPromotion() => IsPromotionMove() && GetPromotedPiece().Type() == PieceTypes.Queen;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Player GetMovingSide() => new Player((_data >> MoveSideOffset) & 0x1);
+        public readonly Player GetMovingSide() => new Player((_data >> MoveSideOffset) & 0x1);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public MoveTypes GetMoveType() => (MoveTypes)((_data >> MoveTypeOffset) & 0x3F);
+        public readonly MoveTypes GetMoveType() => (MoveTypes)((_data >> MoveTypeOffset) & 0x3F);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetMoveType(MoveTypes moveType) => _data |= (int)moveType << MoveTypeOffset;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsType(MoveTypes moveType) => GetMoveType() == moveType;
+        public readonly bool IsType(MoveTypes moveType) => GetMoveType() == moveType;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsCaptureMove() => GetMoveType().HasFlagFast(MoveTypes.Epcapture | MoveTypes.Capture);
+        public readonly bool IsCaptureMove() => GetMoveType().HasFlagFast(MoveTypes.Epcapture | MoveTypes.Capture);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsEnPassantMove() => GetMoveType().HasFlagFast(MoveTypes.Epcapture);
+        public readonly bool IsEnPassantMove() => GetMoveType().HasFlagFast(MoveTypes.Epcapture);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsCastlelingMove() => GetMoveType().HasFlagFast(MoveTypes.Castle);
+        public readonly bool IsCastlelingMove() => GetMoveType().HasFlagFast(MoveTypes.Castle);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsPromotionMove() => GetMoveType().HasFlagFast(MoveTypes.Promotion);
+        public readonly bool IsPromotionMove() => GetMoveType().HasFlagFast(MoveTypes.Promotion);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsDoublePush() => GetMoveType().HasFlagFast(MoveTypes.Doublepush);
+        public readonly bool IsDoublePush() => GetMoveType().HasFlagFast(MoveTypes.Doublepush);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsNullMove() => _data == 0;
+        public readonly bool IsNullMove() => _data == 0;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsValidMove() => GetFromSquare().AsInt() != GetToSquare().AsInt();
+        public readonly bool IsValidMove() => GetFromSquare().AsInt() != GetToSquare().AsInt();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals(Move other) => _data == other._data;

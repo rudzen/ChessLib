@@ -85,9 +85,9 @@ namespace Rudz.Chess.Types
         public void SetEg(int v) => _data.eg = v;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int Eg() => _data.eg;
+        public readonly int Eg() => _data.eg;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int Mg() => _data.mg;
+        public readonly int Mg() => _data.mg;
     }
 }
