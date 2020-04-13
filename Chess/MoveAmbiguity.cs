@@ -1,3 +1,29 @@
+/*
+ChessLib, a chess data structure library
+
+MIT License
+
+Copyright (c) 2017-2020 Rudy Alex Kohn
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
 namespace Rudz.Chess
 {
     using Enums;
@@ -48,7 +74,6 @@ namespace Rudz.Chess
         /// <para>Converts a move to FAN notation.</para>
         /// </summary>
         /// <param name="move">The move to convert</param>
-        /// <param name="pos">The position from where the move exist</param>
         /// <returns>FAN move string</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private string ToFan(Move move)
@@ -72,10 +97,7 @@ namespace Rudz.Chess
                 }
 
                 if (move.IsEnPassantMove())
-                {
-                    notation.Append("ep");
-                    notation.Append(from.FileChar());
-                }
+                    notation.Append("ep").Append(from.FileChar());
                 else if (move.IsCaptureMove())
                 {
                     if (pt == PieceTypes.Pawn)
@@ -86,10 +108,7 @@ namespace Rudz.Chess
                 notation.Append(to.ToString());
 
                 if (move.IsPromotionMove())
-                {
-                    notation.Append('=');
-                    notation.Append(move.GetPromotedPiece().GetUnicodeChar());
-                }
+                    notation.Append('=').Append(move.GetPromotedPiece().GetUnicodeChar());
             }
 
             if (_pos.State.InCheck)
@@ -102,7 +121,6 @@ namespace Rudz.Chess
         /// <para>Converts a move to SAN notation.</para>
         /// </summary>
         /// <param name="move">The move to convert</param>
-        /// <param name="pos">The position from where the move exist</param>
         /// <returns>SAN move string</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private string ToSan(Move move)
@@ -125,25 +143,18 @@ namespace Rudz.Chess
                 }
 
                 if (move.IsEnPassantMove())
-                {
-                    notation.Append("ep");
-                    notation.Append(from.FileChar());
-                }
+                    notation.Append("ep").Append(from.FileChar());
                 else if (move.IsCaptureMove())
                 {
                     if (pt == PieceTypes.Pawn)
                         notation.Append(from.FileChar());
-
                     notation.Append('x');
                 }
 
                 notation.Append(to.ToString());
 
                 if (move.IsPromotionMove())
-                {
-                    notation.Append('=');
-                    notation.Append(move.GetPromotedPiece().GetPgnChar());
-                }
+                    notation.Append('=').Append(move.GetPromotedPiece().GetPgnChar());
             }
 
             if (_pos.State.InCheck)
@@ -156,7 +167,6 @@ namespace Rudz.Chess
         /// <para>Converts a move to LAN notation.</para>
         /// </summary>
         /// <param name="move">The move to convert</param>
-        /// <param name="pos">The position from where the move exist</param>
         /// <returns>LAN move string</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private string ToLan(Move move)
@@ -178,10 +188,7 @@ namespace Rudz.Chess
                 notation.Append(from.ToString());
 
                 if (move.IsEnPassantMove())
-                {
-                    notation.Append("ep");
-                    notation.Append(from.FileChar());
-                }
+                    notation.Append("ep").Append(from.FileChar());
                 else if (move.IsCaptureMove())
                 {
                     if (pt == PieceTypes.Pawn)
@@ -195,10 +202,7 @@ namespace Rudz.Chess
                 notation.Append(to.ToString());
 
                 if (move.IsPromotionMove())
-                {
-                    notation.Append('=');
-                    notation.Append(move.GetPromotedPiece().GetUnicodeChar());
-                }
+                    notation.Append('=').Append(move.GetPromotedPiece().GetUnicodeChar());
             }
 
             if (_pos.State.InCheck)
@@ -211,7 +215,6 @@ namespace Rudz.Chess
         /// <para>Converts a move to RAN notation.</para>
         /// </summary>
         /// <param name="move">The move to convert</param>
-        /// <param name="pos">The position from where the move exist</param>
         /// <returns>RAN move string</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private string ToRan(Move move)
@@ -233,17 +236,13 @@ namespace Rudz.Chess
                 notation.Append(from.ToString());
 
                 if (move.IsEnPassantMove())
-                {
-                    notation.Append("ep");
-                    notation.Append(from.FileChar());
-                }
+                    notation.Append("ep").Append(from.FileChar());
                 else if (move.IsCaptureMove())
                 {
                     if (pt == PieceTypes.Pawn)
                         notation.Append(from.FileChar());
 
-                    notation.Append('x');
-                    notation.Append(move.GetCapturedPiece().Type().GetPieceChar());
+                    notation.Append('x').Append(move.GetCapturedPiece().Type().GetPieceChar());
                 }
                 else
                     notation.Append('-');
@@ -251,10 +250,7 @@ namespace Rudz.Chess
                 notation.Append(to.ToString());
 
                 if (move.IsPromotionMove())
-                {
-                    notation.Append('=');
-                    notation.Append(move.GetPromotedPiece().GetUnicodeChar());
-                }
+                    notation.Append('=').Append(move.GetPromotedPiece().GetUnicodeChar());
             }
 
             if (_pos.State.InCheck)
@@ -264,7 +260,8 @@ namespace Rudz.Chess
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private char GetCheckChar() => _pos.GenerateMoves().Any() ? '+' : '#';
+        private char GetCheckChar()
+            => _pos.GenerateMoves().Any() ? '+' : '#';
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private MoveAmbiguities Ambiguity(Move move, BitBoard similarTypeAttacks)
@@ -296,6 +293,11 @@ namespace Rudz.Chess
             return ambiguity;
         }
 
+        /// <summary>
+        /// Get similar attacks based on the move
+        /// </summary>
+        /// <param name="move">The move to get similar attacks from</param>
+        /// <returns>Squares for all similar attacks without the moves from square</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private BitBoard GetSimilarAttacks(Move move)
         {
@@ -313,13 +315,11 @@ namespace Rudz.Chess
         /// </summary>
         /// <param name="move">The move to check</param>
         /// <param name="from">The from square</param>
-        /// <param name="position">The current used position</param>
         /// <param name="sb">The StringBuilder to append to if needed</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void Disambiguation(Move move, Square from, StringBuilder sb)
         {
             var similarAttacks = GetSimilarAttacks(move);
-
             var ambiguity = Ambiguity(move, similarAttacks);
 
             if (!ambiguity.HasFlagFast(MoveAmbiguities.Move))
