@@ -58,10 +58,7 @@ namespace Chess.Perft
     {
         public Perft(IGame game, IEnumerable<IPerftPosition> positions)
         {
-            if (positions.Any())
-                Positions = positions.ToList();
-            else
-                Positions = new List<IPerftPosition>();
+            Positions = positions.Any() ? positions.ToList() : new List<IPerftPosition>();
             CurrentGame = game;
         }
 

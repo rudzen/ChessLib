@@ -544,7 +544,7 @@ namespace Rudz.Chess.Types
         {
             // @ C author Matt Taylor (2003)
             bb ^= bb - 1;
-            var folded = (uint)(bb ^ (bb >> 32));
+            var folded = (uint)(bb.Value ^ (bb.Value >> 32));
             return Lsb64Table[folded * 0x78291ACF >> 26];
         }
 

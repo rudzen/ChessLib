@@ -27,6 +27,12 @@ SOFTWARE.
 namespace Chess.Test.Material
 {
     using Xunit;
+    using Rudz.Chess.Enums;
+    using System;
+    using System.Collections.Generic;
+    using Rudz.Chess;
+    using Rudz.Chess.Types;
+    using Pieces;
 
     public sealed class MaterialTests
     {
@@ -36,43 +42,44 @@ namespace Chess.Test.Material
         public void MaterialValueTest()
         {
             Assert.True(true);
-            //Game game = new Game();
-            //game.NewGame();
+        //    var pos = new Position();
+        //    var game = new Game(pos);
+        //    game.NewGame();
 
-            //int startMaterial = game.State.Material.MaterialValueTotal;
+        //    var startMaterial = game.State.Material.MaterialValueTotal;
 
-            //// generate moves
-            //IList<Move> moves = new List<Move>(12) {
-            //                                          new Move(EPieces.WhitePawn, ESquare.f2, ESquare.f4, EMoveType.Doublepush, EPieces.NoPiece),
-            //                                          new Move(EPieces.BlackPawn, ESquare.e7, ESquare.e5, EMoveType.Doublepush, EPieces.NoPiece),
-            //                                          new Move(EPieces.WhitePawn, EPieces.BlackPawn, ESquare.f4, ESquare.e5, EMoveType.Capture),
-            //                                          new Move(EPieces.BlackPawn, ESquare.d7, ESquare.d5, EMoveType.Doublepush, EPieces.NoPiece),
-            //                                          new Move(EPieces.WhitePawn, ESquare.f5, ESquare.d6, EMoveType.Epcapture, EPieces.NoPiece)
-            //                                      };
+        //    // generate moves
+        //    IList<Move> moves = new List<Move>(12) {
+        //                                              new Move(Rudz.Chess.Enums.Pieces.WhitePawn, Squares.f2, Squares.f4, MoveTypes.Doublepush, Rudz.Chess.Enums.Pieces.NoPiece),
+        //                                              new Move(Rudz.Chess.Enums.Pieces.BlackPawn, Squares.e7, Squares.e5, MoveTypes.Doublepush, Rudz.Chess.Enums.Pieces.NoPiece),
+        //                                              new Move(Rudz.Chess.Enums.Pieces.WhitePawn, Rudz.Chess.Enums.Pieces.BlackPawn, Squares.f4, Squares.e5, MoveTypes.Capture),
+        //                                              new Move(Rudz.Chess.Enums.Pieces.BlackPawn, Squares.d7, Squares.d5, MoveTypes.Doublepush, Rudz.Chess.Enums.Pieces.NoPiece),
+        //                                              new Move(Rudz.Chess.Enums.Pieces.WhitePawn, Squares.f5, Squares.d6, MoveTypes.Epcapture, Rudz.Chess.Enums.Pieces.NoPiece)
+        //                                          };
 
-            //IList<int> lostMaterial = new List<int>(12)
-            //{
-            //    0,
-            //    0,
-            //    100,
-            //    100,
-            //    200
-            //};
+        //    var lostMaterial = new List<int>(12)
+        //    {
+        //        0,
+        //        0,
+        //        100,
+        //        100,
+        //        200
+        //    };
 
-            //IList<int> stepMaterial = new List<int>(12)
-            //{
-            //    startMaterial,
-            //    startMaterial,
-            //    startMaterial - 100,
-            //    startMaterial - 100,
-            //    startMaterial - 200
-            //};
+        //    var stepMaterial = new List<int>(12)
+        //    {
+        //        startMaterial,
+        //        startMaterial - 100,
+        //        startMaterial - 100,
+        //        startMaterial - 100,
+        //        startMaterial - 200
+        //    };
 
-            //for (int i = 0; i < moves.Count; i++)
-            //{
-            //    Assert.True(game.MakeMove(moves[i]));
-            //    Assert.Equal(lostMaterial[i], Math.Abs(game.State.Material.MaterialValueTotal));
-            //}
+        //    for (var i = 0; i < moves.Count; i++)
+        //    {
+        //        Assert.True(game.MakeMove(moves[i]));
+        //        Assert.Equal(lostMaterial[i], Math.Abs(game.State.Material.MaterialValueTotal));
+        //    }
         }
     }
 }

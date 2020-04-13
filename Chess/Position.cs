@@ -44,8 +44,6 @@ namespace Rudz.Chess
     /// </summary>
     public sealed class Position : IPosition
     {
-        private const ulong Zero = 0;
-
         private static readonly Func<BitBoard, BitBoard>[] EnPasCapturePos = { BitBoards.SouthOne, BitBoards.NorthOne };
 
         private readonly Square[] _rookCastlesFrom; // indexed by position of the king
@@ -84,7 +82,7 @@ namespace Rudz.Chess
         {
             BoardLayout.Fill(Enums.Pieces.NoPiece);
             OccupiedBySide.Fill(BitBoards.EmptyBitBoard);
-            Array.Clear(BoardPieces, 0, BoardPieces.Length);
+            Array.Fill(BoardPieces, BitBoards.EmptyBitBoard);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -118,6 +116,7 @@ namespace Rudz.Chess
 
             var to = m.GetToSquare();
             var us = m.GetMovingSide();
+            var them = ~us;
             var pc = m.GetMovingPiece();
 
             if (m.IsCastlelingMove())
@@ -131,7 +130,7 @@ namespace Rudz.Chess
             }
 
             // reverse sideToMove as it has not been changed yet.
-            if (IsAttacked(GetPieceSquare(PieceTypes.King, ~us), us))
+            if (IsAttacked(GetPieceSquare(PieceTypes.King, them), us))
                 return false;
 
             RemovePiece(m.GetFromSquare());

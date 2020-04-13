@@ -82,7 +82,7 @@ namespace Rudz.Chess
 
         public uint GetKey(int index)
         {
-            throw new System.NotImplementedException();
+            return _key[index];
         }
 
         public void MakeMove(Move move)

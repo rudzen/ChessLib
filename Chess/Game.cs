@@ -120,8 +120,10 @@ namespace Rudz.Chess
             State.HalfMoveCount = PositionIndex;
             State.LastMove = m;
 
+            var ksq = Pos.GetPieceSquare(PieceTypes.King, State.SideToMove);
+
             // compute in-check
-            State.InCheck = Pos.IsAttacked(Pos.GetPieceSquare(PieceTypes.King, State.SideToMove), ~State.SideToMove);
+            State.InCheck = Pos.IsAttacked(ksq, ~State.SideToMove);
 
             State.CastlelingRights = _stateList[PositionIndex - 1].CastlelingRights & _castleRightsMask[m.GetFromSquare().AsInt()] & _castleRightsMask[m.GetToSquare().AsInt()];
             State.NullMovesInRow = 0;
@@ -139,6 +141,7 @@ namespace Rudz.Chess
             State.Key = previous.Key;
             State.PawnStructureKey = previous.PawnStructureKey;
             State.Material.MakeMove(m);
+            State.Pinned = Pos.GetPinnedPieces(ksq, Pos.State.SideToMove);
 
             UpdateKey(m);
 

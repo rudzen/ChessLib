@@ -27,11 +27,18 @@ SOFTWARE.
 namespace Rudz.Chess.Types
 {
     using Enums;
+    using System.Linq;
     using System.Runtime.CompilerServices;
 
     public struct File
     {
+        private static readonly char[] FileChars = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' };
+
+        private static readonly string[] FileStrings;
+
         public Files Value;
+
+        static File() => FileStrings = FileChars.Select(x => x.ToString()).ToArray();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public File(int file) => Value = (Files)file;
@@ -115,18 +122,19 @@ namespace Rudz.Chess.Types
         public static bool operator <(File left, File right) => left.AsInt() < right.AsInt();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator true(File sq) => sq.IsValid();
+        public static bool operator true(File f) => f.IsValid();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator false(File sq) => !sq.IsValid();
+        public static bool operator false(File f) => !f.IsValid();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int AsInt() => (int)Value;
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool IsValid() => Value <= Files.FileH;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public override string ToString() => this.FileString();
+        public override string ToString() => FileString();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals(File other) => Value == other.Value;
@@ -136,5 +144,11 @@ namespace Rudz.Chess.Types
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override int GetHashCode() => AsInt();
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public char FileChar() => FileChars[AsInt()];
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public string FileString() => FileStrings[AsInt()];
     }
 }

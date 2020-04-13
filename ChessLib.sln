@@ -15,7 +15,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chess.Perft.Interfaces", "C
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Perft", "Perft\Perft.csproj", "{8BE6ADD1-7347-412E-B974-02C5866E59A4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chess.Perft.Framework", "Chess.Perft.Framework\Chess.Perft.Framework.csproj", "{55E449CF-B5AB-4405-8B64-2F1AB1346D90}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chess.Perft.Framework", "Chess.Perft.Framework\Chess.Perft.Framework.csproj", "{55E449CF-B5AB-4405-8B64-2F1AB1346D90}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

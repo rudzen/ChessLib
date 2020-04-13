@@ -35,7 +35,7 @@ namespace Rudz.Chess.Types
     /// Move struct. Contains a single int for move related information.
     /// Also includes set and get functions for the relevant data stored in the int bits.
     /// </summary>
-    public struct Move : ICloneable
+    public struct Move
     {
         // offsets for bit positions in move data
         private const int MoveSideOffset = 29;
@@ -224,9 +224,6 @@ namespace Rudz.Chess.Types
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool IsValidMove() => GetFromSquare().AsInt() != GetToSquare().AsInt();
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public object Clone() => new Move(_data);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals(Move other) => _data == other._data;
