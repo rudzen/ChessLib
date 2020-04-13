@@ -144,7 +144,7 @@ namespace Perft
                 yield return perftPosition;
         }
 
-        private async IAsyncEnumerable<IPerftPosition> ParseFen(FenOptions options)
+        private static async IAsyncEnumerable<IPerftPosition> ParseFen(FenOptions options)
         {
             const ulong zero = 0UL;
 
@@ -239,7 +239,7 @@ namespace Perft
                     _log.Information("Result      : {0}", result.Result);
                 _log.Information("TT hits     : {0}", Game.Table.Hits);
 
-                int error = 0;
+                var error = 0;
 
                 if (!_usingEpd)
                     return error;

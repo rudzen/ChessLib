@@ -255,7 +255,7 @@ namespace Rudz.Chess.Types
             // mini local helpers
             static BitBoard ComputeKnightAttack(BitBoard b)
             {
-                BitBoard res = (b & ~(FILEA | FILEB)) << 6;
+                var res = (b & ~(FILEA | FILEB)) << 6;
                 res |= (b & ~FILEA) << 15;
                 res |= (b & ~FILEH) << 17;
                 res |= (b & ~(FILEG | FILEH)) << 10;
@@ -375,24 +375,15 @@ namespace Rudz.Chess.Types
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static BitBoard GetAttacks(this Square square, PieceTypes pieceType, BitBoard occupied = new BitBoard())
         {
-            switch (pieceType)
+            return pieceType switch
             {
-                case PieceTypes.Knight:
-                case PieceTypes.King:
-                    return PseudoAttacksBB[pieceType.AsInt()][square.AsInt()];
-
-                case PieceTypes.Bishop:
-                    return square.BishopAttacks(occupied);
-
-                case PieceTypes.Rook:
-                    return square.RookAttacks(occupied);
-
-                case PieceTypes.Queen:
-                    return square.QueenAttacks(occupied);
-
-                default:
-                    return EmptyBitBoard;
-            }
+                PieceTypes.Knight => PseudoAttacksBB[pieceType.AsInt()][square.AsInt()],
+                PieceTypes.King => PseudoAttacksBB[pieceType.AsInt()][square.AsInt()],
+                PieceTypes.Bishop => square.BishopAttacks(occupied),
+                PieceTypes.Rook => square.RookAttacks(occupied),
+                PieceTypes.Queen => square.QueenAttacks(occupied),
+                _ => EmptyBitBoard
+            };
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

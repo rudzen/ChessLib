@@ -75,5 +75,5 @@ namespace Rudz.Chess.Transposition
             StaticValue = tte.StaticValue;
             Type = tte.Type;
         }
-    };
+    }
 }

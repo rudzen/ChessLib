@@ -286,7 +286,7 @@ namespace Rudz.Chess
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void RemovePiece(Square sq)
         {
-            Piece pc = BoardLayout[sq.AsInt()];
+            var pc = BoardLayout[sq.AsInt()];
             var invertedSq = ~sq;
             BoardPieces[pc.AsInt()] &= invertedSq;
             OccupiedBySide[pc.ColorOf()] &= invertedSq;

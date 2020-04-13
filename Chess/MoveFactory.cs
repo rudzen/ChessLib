@@ -48,7 +48,7 @@ namespace Rudz.Chess
             return moves;
         }
 
-        private static void GenerateCapturesAndPromotions(this IPosition pos, MoveList moves, MoveGenerationFlags flags)
+        private static void GenerateCapturesAndPromotions(this IPosition pos, IMoveList moves, MoveGenerationFlags flags)
         {
             var currentSide = pos.State.SideToMove;
             var them = ~currentSide;
@@ -70,7 +70,7 @@ namespace Rudz.Chess
             pos.AddMoves(moves, occupiedByThem, flags);
         }
 
-        private static void GenerateQuietMoves(this IPosition pos, MoveList moves, MoveGenerationFlags flags)
+        private static void GenerateQuietMoves(this IPosition pos, IMoveList moves, MoveGenerationFlags flags)
         {
             var currentSide = pos.State.SideToMove;
             var up = currentSide == PlayerExtensions.White ? Directions.North : Directions.South;
@@ -98,7 +98,7 @@ namespace Rudz.Chess
         /// </summary>
         /// <param name="moves">The move list to add potential moves to.</param>
         /// <param name="targetSquares">The target squares to move to</param>
-        private static void AddMoves(this IPosition pos, MoveList moves, BitBoard targetSquares, MoveGenerationFlags flags)
+        private static void AddMoves(this IPosition pos, IMoveList moves, BitBoard targetSquares, MoveGenerationFlags flags)
         {
             var c = pos.State.SideToMove;
             var occupied = pos.Pieces();
@@ -117,7 +117,7 @@ namespace Rudz.Chess
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void AddMoves(this IPosition pos, MoveList moves, Piece piece, Square from, BitBoard attacks, MoveGenerationFlags flags)
+        private static void AddMoves(this IPosition pos, IMoveList moves, Piece piece, Square from, BitBoard attacks, MoveGenerationFlags flags)
         {
             var target = pos.Pieces(~pos.State.SideToMove) & attacks;
             while (target)
@@ -136,7 +136,7 @@ namespace Rudz.Chess
             }
         }
 
-        private static void AddPawnMoves(this IPosition pos, MoveList moves, BitBoard targetSquares, Direction direction, MoveTypes type, MoveGenerationFlags flags)
+        private static void AddPawnMoves(this IPosition pos, IMoveList moves, BitBoard targetSquares, Direction direction, MoveTypes type, MoveGenerationFlags flags)
         {
             if (targetSquares.Empty())
                 return;
@@ -180,7 +180,7 @@ namespace Rudz.Chess
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void AddCastleMove(this IPosition pos, MoveList moves, Square from, Square to, MoveGenerationFlags flags)
+        private static void AddCastleMove(this IPosition pos, IMoveList moves, Square from, Square to, MoveGenerationFlags flags)
             => pos.AddMove(moves, PieceTypes.King.MakePiece(pos.State.SideToMove), from, to, PieceExtensions.EmptyPiece, flags, MoveTypes.Castle);
 
         /// <summary>
@@ -194,7 +194,7 @@ namespace Rudz.Chess
         /// <param name="promoted">The promotion piece (if any, defaults to NoPiece type)</param>
         /// <param name="type">The move type</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void AddMove(this IPosition pos, MoveList moves, Piece piece, Square from, Square to, Piece promoted, MoveGenerationFlags flags, MoveTypes type = MoveTypes.Quiet)
+        private static void AddMove(this IPosition pos, IMoveList moves, Piece piece, Square from, Square to, Piece promoted, MoveGenerationFlags flags, MoveTypes type = MoveTypes.Quiet)
         {
             Move move;
 

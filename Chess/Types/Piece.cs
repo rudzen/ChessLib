@@ -132,47 +132,22 @@ namespace Rudz.Chess.Types
 
         private static Piece GetPiece(char character)
         {
-            switch (character)
+            return character switch
             {
-                case 'P':
-                    return Pieces.WhitePawn;
-
-                case 'N':
-                    return Pieces.WhiteKnight;
-
-                case 'B':
-                    return Pieces.WhiteBishop;
-
-                case 'R':
-                    return Pieces.WhiteRook;
-
-                case 'Q':
-                    return Pieces.WhiteQueen;
-
-                case 'K':
-                    return Pieces.WhiteKing;
-
-                case 'p':
-                    return Pieces.BlackPawn;
-
-                case 'n':
-                    return Pieces.BlackKnight;
-
-                case 'b':
-                    return Pieces.BlackBishop;
-
-                case 'r':
-                    return Pieces.BlackRook;
-
-                case 'q':
-                    return Pieces.BlackQueen;
-
-                case 'k':
-                    return Pieces.BlackKing;
-
-                default:
-                    return Pieces.NoPiece;
-            }
+                'P' => Pieces.WhitePawn,
+                'N' => Pieces.WhiteKnight,
+                'B' => Pieces.WhiteBishop,
+                'R' => Pieces.WhiteRook,
+                'Q' => Pieces.WhiteQueen,
+                'K' => Pieces.WhiteKing,
+                'p' => Pieces.BlackPawn,
+                'n' => Pieces.BlackKnight,
+                'b' => Pieces.BlackBishop,
+                'r' => Pieces.BlackRook,
+                'q' => Pieces.BlackQueen,
+                'k' => Pieces.BlackKing,
+                _ => Pieces.NoPiece
+            };
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

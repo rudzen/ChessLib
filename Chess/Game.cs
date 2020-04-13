@@ -404,11 +404,8 @@ namespace Rudz.Chess
                 }
             }
 
-            if (move != MoveExtensions.EmptyMove)
-            {
-                if (tot <= int.MaxValue)
-                    Table.Store(Pos.State.Key, (int)tot, Bound.Exact, (sbyte)depth, move, 0);
-            }
+            if (tot <= int.MaxValue)
+                Table.Store(Pos.State.Key, (int)tot, Bound.Exact, (sbyte)depth, move, 0);
 
             return tot;
         }

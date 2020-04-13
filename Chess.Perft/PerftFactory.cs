@@ -27,7 +27,6 @@ SOFTWARE.
 namespace Chess.Perft
 {
     using Interfaces;
-    using Rudz.Chess;
     using Rudz.Chess.Factories;
     using System;
     using System.Collections.Generic;
@@ -37,9 +36,7 @@ namespace Chess.Perft
     {
         public static IPerft Create(Action<string> boardPrintCallback = null, IEnumerable<IPerftPosition> positions = null)
         {
-            if (positions == null)
-                positions = Enumerable.Empty<IPerftPosition>();
-
+            positions ??= Enumerable.Empty<IPerftPosition>();
             var perft = new Perft(GameFactory.Create(), positions);
             return perft;
         }

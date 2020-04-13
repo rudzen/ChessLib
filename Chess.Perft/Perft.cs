@@ -118,13 +118,15 @@ namespace Chess.Perft
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool HasPositionCount(int index, int depth)
         {
-            if (Positions[index].Value == null)
+            var pos = Positions[index];
+
+            if (pos.Value == null)
                 return false;
 
-            if (!Positions[index].Value.Any())
+            if (!pos.Value.Any())
                 return false;
 
-            var depthValue = Positions[index].Value.FirstOrDefault(v => v.Item1 == depth && v.Item2 > 0);
+            var depthValue = pos.Value.FirstOrDefault(v => v.Item1 == depth && v.Item2 > 0);
 
             return !depthValue.Equals(default);
         }

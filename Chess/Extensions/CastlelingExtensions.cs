@@ -47,39 +47,25 @@ namespace Rudz.Chess.Extensions
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static CastlelingRights GetCastleAllowedMask(this CastlelingSides castleType, Player side)
         {
-            switch (castleType)
+            return castleType switch
             {
-                case CastlelingSides.King:
-                    return OoAllowedMask[side.Side];
-
-                case CastlelingSides.Queen:
-                    return OooAllowedMask[side.Side];
-
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(castleType), castleType, null);
-            }
+                CastlelingSides.King => OoAllowedMask[side.Side],
+                CastlelingSides.Queen => OooAllowedMask[side.Side],
+                _ => throw new ArgumentOutOfRangeException(nameof(castleType), castleType, null)
+            };
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string GetCastlelingString(this CastlelingSides @this)
         {
-            switch (@this)
+            return @this switch
             {
-                case CastlelingSides.King:
-                    return "O-O";
-
-                case CastlelingSides.Queen:
-                    return "O-O-O";
-
-                case CastlelingSides.None:
-                    return string.Empty;
-
-                case CastlelingSides.CastleNb:
-                    return string.Empty;
-
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(@this), @this, null);
-            }
+                CastlelingSides.King => "O-O",
+                CastlelingSides.Queen => "O-O-O",
+                CastlelingSides.None => string.Empty,
+                CastlelingSides.CastleNb => string.Empty,
+                _ => throw new ArgumentOutOfRangeException(nameof(@this), @this, null)
+            };
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

@@ -67,7 +67,7 @@ namespace Chess.Test.Pieces
         [Fact]
         public void PawnDoublePushNorth()
         {
-            BitBoard fullBoard = BitBoards.RANK2;
+            var fullBoard = BitBoards.RANK2;
             Direction direction = Directions.North;
 
             const int expected = 2;
@@ -83,7 +83,7 @@ namespace Chess.Test.Pieces
         [Fact]
         public void PawnDoublePushSouth()
         {
-            BitBoard fullBoard = BitBoards.RANK7;
+            var fullBoard = BitBoards.RANK7;
             Direction direction = Directions.South;
 
             const int expected = 2;

@@ -16,19 +16,14 @@
     {
         #region Private Members
 
-        /// <summary>
-        /// The dependency injection service provider
-        /// </summary>
-        private static IContainer _dryContainer;
-
         #endregion Private Members
 
         #region Public Properties
 
         /// <summary>
-        /// The main ninject kernel
+        /// The main ioc container
         /// </summary>
-        public static IContainer IoC => _dryContainer;
+        public static IContainer IoC { get; private set; }
 
         /// <summary>
         /// Gets the configuration for the framework environment
@@ -58,11 +53,11 @@
         public static void Startup(Action<IConfigurationBuilder> configure = null, Action<IContainer, IConfiguration> injection = null)
         {
             // Process passed in module list
-            _dryContainer = new Container();
+            IoC = new Container();
 
             // Load internal based modules
             // This step is required as they contain information which are used from this point on
-            _dryContainer.Register<IFrameworkEnvironment, FrameworkEnvironment>(Reuse.Singleton);
+            IoC.Register<IFrameworkEnvironment, FrameworkEnvironment>(Reuse.Singleton);
 
             var configBuilder = ConfigurationBuilder();
 
@@ -70,10 +65,10 @@
             configure?.Invoke(configBuilder);
 
             // Construct a configuration binding
-            _dryContainer.Register(made: Made.Of(() => ConfigurationFactory.CreateConfiguration(configBuilder)), reuse: Reuse.Singleton);
+            IoC.Register(made: Made.Of(() => ConfigurationFactory.CreateConfiguration(configBuilder)), reuse: Reuse.Singleton);
 
             // Allow custom service injection
-            injection?.Invoke(_dryContainer, Configuration);
+            injection?.Invoke(IoC, Configuration);
 
             // Log the startup complete
             Logger.Information("Perft Framework started in {0}...", Environment.Configuration);

@@ -176,12 +176,12 @@ namespace Rudz.Chess.Transposition
 
             for (var i = 0; i < ttc.Cluster.Length; ++i)
             {
-                if (ttc.Cluster[i].Key32 == 0 || ttc.Cluster[i].Key32 == e.Key32)
-                {
-                    clusterIndex = i;
-                    found = true;
-                    break;
-                }
+                if (ttc.Cluster[i].Key32 != 0 && ttc.Cluster[i].Key32 != e.Key32)
+                    continue;
+                
+                clusterIndex = i;
+                found = true;
+                break;
             }
 
             if (!found)

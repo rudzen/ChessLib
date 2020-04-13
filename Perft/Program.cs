@@ -51,7 +51,7 @@ namespace Perft
 
         public static async Task<int> Main(string[] args)
         {
-            OptionType optionsUsed = OptionType.None;
+            var optionsUsed = OptionType.None;
             IOptions options = null;
             IOptions ttOptions = null;
 
@@ -89,14 +89,14 @@ namespace Perft
                     (TTOptions opts) => setTT(opts),
                     errs => 1);
 
-            if (returnValue == 0)
-            {
-                var perftRunner = Framework.IoC.Resolve<IPerftRunner>();
-                perftRunner.Options = options;
-                perftRunner.SaveResults = true;
+            if (returnValue != 0)
+                return returnValue;
+            
+            var perftRunner = Framework.IoC.Resolve<IPerftRunner>();
+            perftRunner.Options = options;
+            perftRunner.SaveResults = true;
 
-                returnValue = await perftRunner.Run().ConfigureAwait(false);
-            }
+            returnValue = await perftRunner.Run().ConfigureAwait(false);
 
             return returnValue;
         }

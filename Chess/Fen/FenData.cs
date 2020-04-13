@@ -37,8 +37,6 @@ namespace Rudz.Chess.Fen
     /// </summary>
     public sealed class FenData : EventArgs, IFenData
     {
-        private int _index;
-
         private readonly Queue<(int, int)> _splitPoints;
 
         public FenData(ReadOnlyMemory<char> fen)
@@ -69,7 +67,7 @@ namespace Rudz.Chess.Fen
         public FenData(string fen) : this(fen.AsMemory())
         { }
 
-        public int Index => _index;
+        public int Index { get; private set; }
 
         public ReadOnlyMemory<char> Fen { get; }
 
@@ -80,7 +78,7 @@ namespace Rudz.Chess.Fen
         {
             // ReSharper disable once InlineOutVariableDeclaration
             (int start, int end) result;
-            _index++;
+            Index++;
             return _splitPoints.TryDequeue(out result)
                 ? Fen.Span.Slice(result.start, result.end - result.start)
                 : ReadOnlySpan<char>.Empty;
@@ -98,24 +96,15 @@ namespace Rudz.Chess.Fen
                 return false;
 
             var span = Fen.Span;
-            for (int i = 0; i < span.Length; i++)
-            {
-                if (span[i] != other.Fen.Span[i])
-                    return false;
-            }
+            var otherSpan = other.Fen.Span;
 
-            return true;
-//            return Equals(_splitPoints, other._splitPoints) && Fen.Equals(other.Fen);
+            return span.Equals(otherSpan, StringComparison.Ordinal);
         }
 
         public override bool Equals(object obj)
-        {
-            return ReferenceEquals(this, obj) || obj is FenData other && Equals(other);
-        }
+            => ReferenceEquals(this, obj) || obj is FenData other && Equals(other);
 
         public override int GetHashCode()
-        {
-            return HashCode.Combine(_splitPoints, Fen);
-        }
+            => HashCode.Combine(_splitPoints, Fen);
     }
 }
