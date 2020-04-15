@@ -244,12 +244,10 @@ namespace Rudz.Chess.Transposition
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void PopulateTable()
         {
-            var defaultEntry = new TranspositionTableEntry();
-            defaultEntry.Defaults();
             for (var i = 0ul; i < _elements; ++i)
             {
                 var ttc = new TTCluster();
-                Array.Fill(ttc.Cluster, defaultEntry);
+                Array.Fill(ttc.Cluster, TTCluster.DefaultEntry);
                 _table.Add(ttc);
             }
         }

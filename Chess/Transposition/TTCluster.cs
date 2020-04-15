@@ -35,7 +35,7 @@ namespace Rudz.Chess.Transposition
     /// </summary>
     public sealed class TTCluster : ITTCluster
     {
-        private static readonly TranspositionTableEntry DefaultEntry = new TranspositionTableEntry(0, MoveExtensions.EmptyMove, 0, 0, 0, 0, Bound.Void);
+        public static readonly TranspositionTableEntry DefaultEntry = new TranspositionTableEntry(0, MoveExtensions.EmptyMove, 0, 0, 0, 0, Bound.Void);
 
         private static readonly TranspositionTableEntry[] Defaults = { DefaultEntry, DefaultEntry, DefaultEntry, DefaultEntry };
 
