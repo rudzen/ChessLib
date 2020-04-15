@@ -35,7 +35,6 @@ namespace Perft
         bool SaveResults { get; set; }
         IOptions Options { get; set; }
         TTOptions TranspositionTableOptions { get; set; }
-        Task<int> Run();
-        Task<int> Run(CancellationToken cancellationToken);
+        Task<int> Run(CancellationToken cancellationToken = default);
     }
 }
