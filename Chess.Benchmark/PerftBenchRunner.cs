@@ -94,11 +94,6 @@ No perft cache:
 
     public class PerftBenchRunner
     {
-        public static void Main(string[] args)
-        {
-            //var summary = BenchmarkRunner.Run<FenBenchmark>();
-            var summary = BenchmarkRunner.Run<PerftBench>();
-            //var summary = BenchmarkRunner.Run<SquareOppositeColorBenchmark>();
-        }
+        public static void Main(string[] args) => BenchmarkSwitcher.FromAssembly(typeof(PerftBenchRunner).Assembly).Run(args);
     }
 }

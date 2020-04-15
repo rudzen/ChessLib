@@ -192,7 +192,7 @@ namespace Chess.Test.Move
             Assert.Equal(expected.ToString(), result.ToString());
         }
 
-        private struct Movestrings
+        private readonly struct Movestrings
         {
             private readonly string _s;
 

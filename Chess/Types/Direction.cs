@@ -29,7 +29,7 @@ namespace Rudz.Chess.Types
     using Enums;
     using System.Runtime.CompilerServices;
 
-    public struct Direction
+    public readonly struct Direction
     {
         public Directions Value { get; }
 
@@ -74,5 +74,22 @@ namespace Rudz.Chess.Types
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Direction operator *(Direction left, int right) => (int)left.Value * right;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool operator ==(Direction left, Direction right) => left.Equals(right);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool operator !=(Direction left, Direction right) => !(left == right);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool Equals(Direction other) => Value == other.Value;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public override bool Equals(object obj) => obj is Direction other && Equals(other);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public override int GetHashCode() => AsInt();
+
+        public readonly int AsInt() => (int) Value;
     }
 }

@@ -35,6 +35,7 @@ namespace Rudz.Chess.Types
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
+    using System.Numerics;
     using System.Runtime.CompilerServices;
     using System.Text;
 
@@ -124,6 +125,7 @@ namespace Rudz.Chess.Types
 
         private static readonly BitBoard[] Rank7And8 = { RANK7 | RANK8, RANK1 | RANK2 };
 
+#if !NETCOREAPP3_1
         private static readonly int[] Lsb64Table =
             {
                 63, 30,  3, 32, 59, 14, 11, 33,
@@ -147,11 +149,12 @@ namespace Rudz.Chess.Types
                 25, 39, 14, 33, 19, 30,  9, 24,
                 13, 18,  8, 12,  7,  6,  5, 63
             };
+#endif
 
         /// <summary>
-        /// PseudoAttacks are just that, full attack range for all squares for all pieces.
-        /// The pawns are a special case, as index range 0,sq are for White and 1,sq are for Black.
-        /// This is possible because index 0 is NoPiece type.
+        /// PseudoAttacks are just that, full attack range for all squares for all pieces. The pawns
+        /// are a special case, as index range 0,sq are for White and 1,sq are for Black. This is
+        /// possible because index 0 is NoPiece type.
         /// </summary>
         private static readonly BitBoard[][] PseudoAttacksBB;
 
@@ -449,8 +452,8 @@ namespace Rudz.Chess.Types
         public static BitBoard PawnAttackSpan(this Square @this, Player side) => PawnAttackSpanBB[side.Side][@this.AsInt()];
 
         /// <summary>
-        /// Returns all square of both file and pawn attack pattern in front of square.
-        /// This is the same as ForwardFile() | PawnAttackSpan().
+        /// Returns all square of both file and pawn attack pattern in front of square. This is the
+        /// same as ForwardFile() | PawnAttackSpan().
         /// </summary>
         /// <param name="this">The square</param>
         /// <param name="side">White = north, Black = south</param>
@@ -533,15 +536,22 @@ namespace Rudz.Chess.Types
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Square Lsb(this BitBoard bb)
         {
+#if NETCOREAPP3_1
+            return BitOperations.TrailingZeroCount(bb.Value);
+#else
             // @ C author Matt Taylor (2003)
             bb ^= bb - 1;
             var folded = (uint)(bb.Value ^ (bb.Value >> 32));
             return Lsb64Table[folded * 0x78291ACF >> 26];
+#endif
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Square Msb(this BitBoard bb)
         {
+#if NETCOREAPP3_1
+            return 63 - BitOperations.LeadingZeroCount(bb.Value);
+#else
             const ulong debruijn64 = 0x03f79d71b4cb0a89UL;
             bb |= bb >> 1;
             bb |= bb >> 2;
@@ -550,6 +560,7 @@ namespace Rudz.Chess.Types
             bb |= bb >> 16;
             bb |= bb >> 32;
             return Msb64Table[(bb.Value * debruijn64) >> 58];
+#endif
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -637,6 +648,9 @@ namespace Rudz.Chess.Types
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int PopCount(BitBoard bb)
         {
+#if NETCOREAPP3_1
+            return BitOperations.PopCount(bb.Value);
+#else
             var y = 0;
             while (bb)
             {
@@ -645,6 +659,7 @@ namespace Rudz.Chess.Types
             }
 
             return y;
+#endif
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

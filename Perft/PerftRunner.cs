@@ -196,6 +196,7 @@ namespace Perft
                 if (string.IsNullOrEmpty(baseFileName))
                     continue;
 
+                // ReSharper disable once MethodHasAsyncOverload
                 var contents = JsonConvert.SerializeObject(_result);
                 await File.WriteAllTextAsync($"{baseFileName}{_result.Depth}].json", contents, cancellationToken).ConfigureAwait(false);
             }

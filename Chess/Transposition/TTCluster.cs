@@ -41,16 +41,21 @@ namespace Rudz.Chess.Transposition
 
         public TTCluster()
         {
-            Cluster = new TranspositionTableEntry[4];
-            Array.Copy(Defaults, Cluster, Defaults.Length);
+            Reset();
         }
 
-        public TranspositionTableEntry[] Cluster { get; }
+        public TranspositionTableEntry[] Cluster { get; private set; }
 
         public TranspositionTableEntry this[int key]
         {
             get => Cluster[key];
             set => Cluster[key] = value;
+        }
+
+        public void Reset()
+        {
+            Cluster = new TranspositionTableEntry[4];
+            Array.Copy(Defaults, Cluster, Defaults.Length);
         }
     }
 }

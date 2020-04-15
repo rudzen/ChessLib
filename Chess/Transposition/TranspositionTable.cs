@@ -234,11 +234,11 @@ namespace Rudz.Chess.Transposition
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Clear()
         {
-            for (var i = 0; i < _table.Count; ++i)
+            foreach (var t in _table)
             {
-                _table[i] = new TTCluster();
+                t.Reset();
                 for (var j = 0; j < _table[0].Cluster.Length; ++j)
-                    _table[i].Cluster[j].Defaults();
+                    t.Cluster[j].Defaults();
             }
         }
 

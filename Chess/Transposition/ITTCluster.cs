@@ -30,5 +30,7 @@ namespace Rudz.Chess.Transposition
     {
         TranspositionTableEntry[] Cluster { get; }
         TranspositionTableEntry this[int key] { get; set; }
+
+        public void Reset();
     }
 }
