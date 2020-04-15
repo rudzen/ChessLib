@@ -30,7 +30,6 @@ namespace Chess.Test.Move
     using Perft.Interfaces;
     using Rudz.Chess.Fen;
     using System.Collections.Generic;
-    using System.Threading.Tasks;
     using Xunit;
 
     public sealed class PerftTest
@@ -97,6 +96,7 @@ namespace Chess.Test.Move
         [Fact]
         public void PerftShort()
         {
+
             foreach (var perftPosition in Positions)
             {
                 var perft = PerftFactory.Create();

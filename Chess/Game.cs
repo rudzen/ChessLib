@@ -165,7 +165,7 @@ namespace Rudz.Chess
         /// <summary>
         /// Apply a FEN string board setup to the board structure.
         /// </summary>
-        /// <param name="fenString">The string to set</param>
+        /// <param name="fen">The fen data to set</param>
         /// <param name="validate">If true, the fen string is validated, otherwise not</param>
         /// <returns>
         /// 0 = all ok.
@@ -388,8 +388,12 @@ namespace Rudz.Chess
                 return (ulong)Pos.GenerateMoves().Count;
 
             var (found, entry) = Table.Probe(Pos.State.Key);
-            if (found && entry.Key32 == (uint)(Pos.State.Key >> 32) && entry.Depth == depth)
-                return (ulong)entry.Value;
+            if (found && entry.Depth == depth)
+            {
+                var stateKey = (uint) (Pos.State.Key >> 32);
+                if (entry.Key32 == stateKey)
+                    return (ulong)entry.Value;
+            }
 
             var tot = 0ul;
             var move = MoveExtensions.EmptyMove;
@@ -402,9 +406,14 @@ namespace Rudz.Chess
                     tot += Perft(depth - 1);
                     TakeMove();
                 }
+                else
+                {
+                    move = MoveExtensions.EmptyMove;
+                    break;
+                }
             }
 
-            if (tot <= int.MaxValue)
+            if (move != MoveExtensions.EmptyMove && tot <= int.MaxValue)
                 Table.Store(Pos.State.Key, (int)tot, Bound.Exact, (sbyte)depth, move, 0);
 
             return tot;

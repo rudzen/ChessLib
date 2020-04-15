@@ -131,7 +131,7 @@ namespace Rudz.Chess.Types
             SetPromotedPiece(promoted);
         }
 
-        private Move(int data) => _data = data;
+        public Move(int data) => _data = data;
 
         // ReSharper disable once ConvertToAutoPropertyWhenPossible
         public int Data

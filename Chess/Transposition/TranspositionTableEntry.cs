@@ -26,6 +26,7 @@ SOFTWARE.
 
 namespace Rudz.Chess.Transposition
 {
+    using System;
     using Types;
 
     public struct TranspositionTableEntry
@@ -50,9 +51,13 @@ namespace Rudz.Chess.Transposition
         }
 
         public TranspositionTableEntry(TranspositionTableEntry tte)
-        {
-            this = tte;
-        }
+            => this = tte;
+
+        public static bool operator ==(TranspositionTableEntry left, TranspositionTableEntry right)
+            => left.Equals(right);
+
+        public static bool operator !=(TranspositionTableEntry left, TranspositionTableEntry right)
+            => !(left == right);
 
         public void Defaults()
         {
@@ -75,5 +80,14 @@ namespace Rudz.Chess.Transposition
             StaticValue = tte.StaticValue;
             Type = tte.Type;
         }
+
+        public readonly bool Equals(TranspositionTableEntry other)
+            => Key32 == other.Key32 && Generation == other.Generation;
+
+        public override readonly bool Equals(object obj)
+            => obj is TranspositionTableEntry other && Equals(other);
+
+        public override readonly int GetHashCode()
+            => HashCode.Combine(Key32, Move, Depth, Generation, Value, StaticValue, Type);
     }
 }

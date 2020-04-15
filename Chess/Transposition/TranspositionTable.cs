@@ -104,7 +104,7 @@ namespace Rudz.Chess.Transposition
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ITTCluster FindCluster(ulong key)
         {
-            var idx = (int)((uint)(key) & (_elements - 1));
+            var idx = (int)((uint)key & (_elements - 1));
             return _table[idx];
         }
 
@@ -122,8 +122,8 @@ namespace Rudz.Chess.Transposition
             var keyH = (uint)(key >> 32);
             var g = _generation;
 
-            // Probing the Table will automatically update the generation of the entry
-            // in case the probing retrieves an element.
+            // Probing the Table will automatically update the generation of the entry in case the
+            // probing retrieves an element.
 
             TranspositionTableEntry e = default;
             var set = false;
@@ -153,10 +153,9 @@ namespace Rudz.Chess.Transposition
         public TranspositionTableEntry ProbeFirst(ulong key) => FindCluster(key)[0];
 
         /// <summary>
-        /// Stores a move in the transposition table.
-        /// It will automatically detect the best cluster location to store it in.
-        /// If a similar move already is present, a simple check if done to make sure
-        /// it actually is an improvement of the previous move.
+        /// Stores a move in the transposition table. It will automatically detect the best cluster
+        /// location to store it in. If a similar move already is present, a simple check if done to
+        /// make sure it actually is an improvement of the previous move.
         /// </summary>
         /// <param name="key">The position key</param>
         /// <param name="value">The value of the move</param>
@@ -167,7 +166,7 @@ namespace Rudz.Chess.Transposition
         public void Store(ulong key, int value, Bound type, sbyte depth, Move move, int statValue)
         {
             // Use the high 32 bits as key inside the cluster
-            var e = new TranspositionTableEntry((uint)(key >> 32), move, depth, _generation, value, statValue, type);
+            var keyH = (uint) (key >> 32);
 
             var ttc = FindCluster(key);
 
@@ -176,9 +175,9 @@ namespace Rudz.Chess.Transposition
 
             for (var i = 0; i < ttc.Cluster.Length; ++i)
             {
-                if (ttc.Cluster[i].Key32 != 0 && ttc.Cluster[i].Key32 != e.Key32)
+                if (ttc.Cluster[i].Key32 != 0 && ttc.Cluster[i].Key32 != keyH)
                     continue;
-                
+
                 clusterIndex = i;
                 found = true;
                 break;
@@ -208,12 +207,13 @@ namespace Rudz.Chess.Transposition
                 clusterIndex = index;
             }
 
+            var e = new TranspositionTableEntry(keyH, move, depth, _generation, value, statValue, type);
+
             ttc.Cluster[clusterIndex].Save(e);
         }
 
         /// <summary>
-        /// Get the approximation full % of the table
-        /// // todo : fix
+        /// Get the approximation full % of the table // todo : fix
         /// </summary>
         /// <returns>The % as integer value</returns>
         public int Fullness()
@@ -237,22 +237,19 @@ namespace Rudz.Chess.Transposition
             foreach (var t in _table)
             {
                 t.Reset();
-                for (var j = 0; j < _table[0].Cluster.Length; ++j)
-                    t.Cluster[j].Defaults();
+                Array.ForEach(t.Cluster, entry => entry.Defaults());
             }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void PopulateTable()
         {
+            var defaultEntry = new TranspositionTableEntry();
+            defaultEntry.Defaults();
             for (var i = 0ul; i < _elements; ++i)
             {
                 var ttc = new TTCluster();
-                for (var j = 0; j < ttc.Cluster.Length; j++)
-                {
-                    ttc.Cluster[j] = new TranspositionTableEntry();
-                    ttc.Cluster[j].Defaults();
-                }
+                Array.Fill(ttc.Cluster, defaultEntry);
                 _table.Add(ttc);
             }
         }
