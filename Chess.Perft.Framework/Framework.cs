@@ -1,6 +1,5 @@
 ﻿namespace Perft
 {
-    using Chess.Perft.Environment;
     using DryIoc;
     using Environment;
     using Factories;
@@ -14,10 +13,6 @@
     /// </summary>
     public static class Framework
     {
-        #region Private Members
-
-        #endregion Private Members
-
         #region Public Properties
 
         /// <summary>

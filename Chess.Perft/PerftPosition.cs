@@ -31,9 +31,6 @@ namespace Chess.Perft
 
     public sealed class PerftPosition : IPerftPosition
     {
-        public PerftPosition()
-        { }
-
         public string Fen { get; set; }
         public List<(int, ulong)> Value { get; set; }
     }

@@ -31,6 +31,7 @@ namespace Perft
     using CommandLine;
     using DryIoc;
     using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.ObjectPool;
     using Options;
     using Parsers;
     using Rudz.Chess;
@@ -91,7 +92,7 @@ namespace Perft
 
             if (returnValue != 0)
                 return returnValue;
-            
+
             var perftRunner = Framework.IoC.Resolve<IPerftRunner>();
             perftRunner.Options = options;
             perftRunner.SaveResults = true;
@@ -105,7 +106,6 @@ namespace Perft
         {
             // Read the configuration file for this assembly
             builder.SetBasePath(Directory.GetCurrentDirectory())
-                //.AddInMemoryCollection(new[] { new KeyValuePair<string, string>("ScannerName", scannerName) })
                 .AddJsonFile(ConfigFileName);
         }
 
@@ -132,13 +132,21 @@ namespace Perft
             // Bind chess perft classes
             container.Register<IPerftPosition, PerftPosition>(Reuse.Transient);
             container.Register<IPerft, Perft>(Reuse.Transient);
-            container.Register<IPerftResult, PerftResult>(Reuse.Transient);
             container.Register<IPerftRunner, PerftRunner>(Reuse.Transient);
 
             // Bind perft classes
             container.Register<IEpdParserSettings, EpdParserSettings>(Reuse.Singleton);
             container.Register<IEpdSet, EpdSet>(Reuse.Transient);
             container.Register<IEpdParser, EpdParser>(Reuse.Singleton);
+
+            // Bind object pool for perft result
+            container.Register<ObjectPoolProvider, DefaultObjectPoolProvider>(Reuse.Singleton);
+            container.RegisterDelegate(context =>
+            {
+                var provider = context.Resolve<ObjectPoolProvider>();
+                var policy = new DefaultPooledObjectPolicy<PerftResult>();
+                return provider.Create(policy);
+            });
         }
 
         private static ILogger ConfigureLogger(IConfiguration configuration)

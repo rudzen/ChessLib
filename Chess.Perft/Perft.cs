@@ -111,9 +111,7 @@ namespace Chess.Perft
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void AddPosition(IPerftPosition pp)
-        {
-            Positions.Add(pp);
-        }
+            => Positions.Add(pp);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool HasPositionCount(int index, int depth)

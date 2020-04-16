@@ -96,8 +96,10 @@ namespace Rudz.Chess
         /// It does not contain any checks for moves that are invalid, as the leaf methods
         /// contains implicit denial of move generation if the target bitboard is empty.
         /// </summary>
+        /// <param name="pos"></param>
         /// <param name="moves">The move list to add potential moves to.</param>
         /// <param name="targetSquares">The target squares to move to</param>
+        /// <param name="flags"></param>
         private static void AddMoves(this IPosition pos, IMoveList moves, BitBoard targetSquares, MoveGenerationFlags flags)
         {
             var c = pos.State.SideToMove;
@@ -187,11 +189,13 @@ namespace Rudz.Chess
         /// Move generation leaf method.
         /// Constructs the actual move based on the arguments.
         /// </summary>
+        /// <param name="pos"></param>
         /// <param name="moves">The move list to add the generated (if any) moves into</param>
         /// <param name="piece">The moving piece</param>
         /// <param name="from">The from square</param>
         /// <param name="to">The to square</param>
         /// <param name="promoted">The promotion piece (if any, defaults to NoPiece type)</param>
+        /// <param name="flags"></param>
         /// <param name="type">The move type</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void AddMove(this IPosition pos, IMoveList moves, Piece piece, Square from, Square to, Piece promoted, MoveGenerationFlags flags, MoveTypes type = MoveTypes.Quiet)

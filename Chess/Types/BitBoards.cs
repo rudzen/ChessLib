@@ -158,8 +158,6 @@ namespace Rudz.Chess.Types
         /// </summary>
         private static readonly BitBoard[][] PseudoAttacksBB;
 
-        private static readonly BitBoard[] AdjacentFilesBB;
-
         private static readonly BitBoard[][] PawnAttackSpanBB;
 
         private static readonly BitBoard[][] PassedPawnMaskBB;
@@ -186,7 +184,7 @@ namespace Rudz.Chess.Types
             for (var i = 0; i < PseudoAttacksBB.Length; i++)
                 PseudoAttacksBB[i] = new BitBoard[64];
 
-            AdjacentFilesBB = new[] { FILEB, FILEA | FILEC, FILEB | FILED, FILEC | FILEE, FILED | FILEF, FILEE | FILEG, FILEF | FILEH, FILEG };
+            Span<BitBoard> adjacentFilesBb = new[] { FILEB, FILEA | FILEC, FILEB | FILED, FILEC | FILEE, FILED | FILEF, FILEE | FILEG, FILEF | FILEH, FILEG };
 
             PawnAttackSpanBB = new BitBoard[2][];
             PawnAttackSpanBB[0] = new BitBoard[64];
@@ -250,7 +248,7 @@ namespace Rudz.Chess.Types
                     var file = square.File();
                     var rank = square.Rank();
                     ForwardFileBB[c][s] = ForwardRanksBB[c][rank.AsInt()] & file.BitBoardFile();
-                    PawnAttackSpanBB[c][s] = ForwardRanksBB[c][rank.AsInt()] & AdjacentFilesBB[file.AsInt()];
+                    PawnAttackSpanBB[c][s] = ForwardRanksBB[c][rank.AsInt()] & adjacentFilesBb[file.AsInt()];
                     PassedPawnMaskBB[c][s] = ForwardFileBB[c][s] | PawnAttackSpanBB[c][s];
                 }
             }

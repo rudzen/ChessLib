@@ -62,8 +62,8 @@ namespace Chess.Test.Move
 
             var ambiguity = new MoveAmbiguity(pos);
 
-            var actualPrimary = ambiguity.ToNotation(w1, notation);
-            var actualSecondary = ambiguity.ToNotation(w2, notation);
+            var actualPrimary = ambiguity.ToNotation(w1);
+            var actualSecondary = ambiguity.ToNotation(w2);
 
             Assert.Equal(expectedPrimary, actualPrimary);
             Assert.Equal(expectedSecondary, actualSecondary);
@@ -97,8 +97,8 @@ namespace Chess.Test.Move
 
             var ambiguity = new MoveAmbiguity(pos);
 
-            var actualPrimary = ambiguity.ToNotation(w1, notation);
-            var actualSecondary = ambiguity.ToNotation(w2, notation);
+            var actualPrimary = ambiguity.ToNotation(w1);
+            var actualSecondary = ambiguity.ToNotation(w2);
 
             Assert.Equal(expectedPrimary, actualPrimary);
             Assert.Equal(expectedSecondary, actualSecondary);
@@ -132,8 +132,8 @@ namespace Chess.Test.Move
 
             var ambiguity = new MoveAmbiguity(pos);
 
-            var actualPrimary = ambiguity.ToNotation(w1, notation);
-            var actualSecondary = ambiguity.ToNotation(w2, notation);
+            var actualPrimary = ambiguity.ToNotation(w1);
+            var actualSecondary = ambiguity.ToNotation(w2);
 
             Assert.Equal(expectedPrimary, actualPrimary);
             Assert.Equal(expectedSecondary, actualSecondary);

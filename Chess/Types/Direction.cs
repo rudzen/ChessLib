@@ -90,6 +90,6 @@ namespace Rudz.Chess.Types
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override int GetHashCode() => AsInt();
 
-        public readonly int AsInt() => (int) Value;
+        public int AsInt() => (int) Value;
     }
 }

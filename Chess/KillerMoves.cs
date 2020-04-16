@@ -36,9 +36,6 @@ namespace Rudz.Chess
     {
         private IPieceSquare[,] _killerMoves;
 
-        public KillerMoves()
-        { }
-
         public void Initialize(int maxDepth)
         {
             _killerMoves = new IPieceSquare[maxDepth + 1, 2];

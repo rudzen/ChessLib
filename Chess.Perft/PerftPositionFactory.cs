@@ -34,8 +34,6 @@ namespace Chess.Perft
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static IPerftPosition Create(string fen, List<(int, ulong)> values)
-        {
-            return new PerftPosition { Fen = fen, Value = values };
-        }
+            => new PerftPosition { Fen = fen, Value = values };
     }
 }

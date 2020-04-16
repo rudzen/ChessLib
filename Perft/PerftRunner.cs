@@ -30,6 +30,7 @@ namespace Perft
     using Chess.Perft.Interfaces;
     using DryIoc;
     using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.ObjectPool;
     using Newtonsoft.Json;
     using Options;
     using Parsers;
@@ -48,6 +49,8 @@ namespace Perft
 
     public sealed class PerftRunner : IPerftRunner
     {
+        private const string Version = "v0.1.3";
+
         private static readonly string Line = new string('-', 65);
 
         private readonly Func<CancellationToken, IAsyncEnumerable<IPerftPosition>>[] _runners;
@@ -60,22 +63,29 @@ namespace Perft
 
         private readonly IPerft _perft;
 
-        private readonly IPerftResult _result;
+        private readonly JsonSerializerSettings _outputSettings;
+
+        private readonly ObjectPool<PerftResult> _resultPool;
 
         private bool _usingEpd;
 
-        public PerftRunner(IEpdParser parser, ILogger log, IBuildTimeStamp buildTimeStamp, IPerft perft, IPerftResult result, IConfiguration configuration)
+        public PerftRunner(IEpdParser parser, ILogger log, IBuildTimeStamp buildTimeStamp, IPerft perft, IConfiguration configuration, ObjectPool<PerftResult> resultPool)
         {
             _epdParser = parser;
             _log = log;
             _buildTimeStamp = buildTimeStamp;
             _perft = perft;
-            _perft.BoardPrintCallback = PrintBoard;
-            _result = result;
+            _perft.BoardPrintCallback ??= s => _log.Information("Board:\n{0}", s);
+            _resultPool = resultPool;
             _runners = new Func<CancellationToken, IAsyncEnumerable<IPerftPosition>>[] { ParseEpd, ParseFen };
 
             TranspositionTableOptions = Framework.IoC.Resolve<IOptions>(OptionType.TTOptions) as TTOptions;
             configuration.Bind("TranspositionTable", TranspositionTableOptions);
+
+            _outputSettings = new JsonSerializerSettings
+            {
+                Formatting = Formatting.Indented
+            };
         }
 
         public bool SaveResults { get; set; }
@@ -96,6 +106,7 @@ namespace Perft
             if (TranspositionTableOptions.Use)
                 Game.Table.SetSize(TranspositionTableOptions.Size);
 
+            var errors = 0;
             var runnerIndex = (Options is FenOptions).ToInt();
             _usingEpd = runnerIndex == 0;
             var positions = _runners[runnerIndex].Invoke(cancellationToken);
@@ -108,15 +119,18 @@ namespace Perft
                 try
                 {
                     var result = await ComputePerft(cancellationToken).ConfigureAwait(false);
+                    errors = result.Errors;
+                    _resultPool.Return(result);
                 }
                 catch (Exception)
                 {
                     _log.Warning("Cancel requested.");
+                    errors = 1;
                     break;
                 }
             }
 
-            return 0;
+            return errors;
         }
 
         private IAsyncEnumerable<IPerftPosition> ParseEpd(CancellationToken cancellationToken)
@@ -148,7 +162,10 @@ namespace Perft
                 yield return perftPosition;
         }
 
+#pragma warning disable 1998
+
         private static async IAsyncEnumerable<IPerftPosition> ParseFen(FenOptions options)
+#pragma warning restore 1998
         {
             const ulong zero = 0UL;
 
@@ -160,9 +177,9 @@ namespace Perft
                 yield return perftPosition;
         }
 
-        private async Task<IPerftResult> ComputePerft(CancellationToken cancellationToken)
+        private async Task<PerftResult> ComputePerft(CancellationToken cancellationToken)
         {
-            _result.Clear();
+            var result = _resultPool.Get();
 
             var pp = _perft.Positions.Last();
 
@@ -172,9 +189,9 @@ namespace Perft
 
             var sw = new Stopwatch();
 
-            _result.Fen = pp.Fen;
+            result.Fen = pp.Fen;
             _perft.SetGamePosition(pp);
-            PrintBoard(_perft.GetBoard());
+            _perft.BoardPrintCallback(_perft.GetBoard());
             _log.Information("Fen         : {0}", pp.Fen);
             _log.Information(Line);
 
@@ -184,31 +201,37 @@ namespace Perft
 
                 _log.Information("Depth       : {0}", depth);
                 sw.Restart();
-                var result = await _perft.DoPerftAsync(depth).ConfigureAwait(false);
+                var perftResult = await _perft.DoPerftAsync(depth).ConfigureAwait(false);
                 sw.Stop();
 
                 var elapsedMs = sw.ElapsedMilliseconds;
 
-                await ComputeResults(result, depth, expected, elapsedMs, _result).ConfigureAwait(false);
+                await ComputeResultsAsync(perftResult, depth, expected, elapsedMs, result).ConfigureAwait(false);
 
-                errors += await LogResults(_result).ConfigureAwait(false);
+                errors += await LogResults(result).ConfigureAwait(false);
 
                 if (string.IsNullOrEmpty(baseFileName))
                     continue;
 
-                // ReSharper disable once MethodHasAsyncOverload
-                var contents = JsonConvert.SerializeObject(_result);
-                await File.WriteAllTextAsync($"{baseFileName}{_result.Depth}].json", contents, cancellationToken).ConfigureAwait(false);
+                await WriteOutput(result, baseFileName, cancellationToken);
             }
 
             _log.Information("{0} parsing complete. Encountered {1} errors.", _usingEpd ? "EPD" : "FEN", errors);
 
-            _result.Errors = errors;
+            result.Errors = errors;
 
-            return _result;
+            return result;
         }
 
-        private static Task ComputeResults(ulong result, int depth, ulong expected, long elapsedMs, IPerftResult results)
+        private async Task WriteOutput(IPerftResult result, string baseFileName, CancellationToken cancellationToken)
+        {
+            // ReSharper disable once MethodHasAsyncOverload
+            var contents = JsonConvert.SerializeObject(result, _outputSettings);
+            var outputFileName = $"{baseFileName}{result.Depth}].json";
+            await File.WriteAllTextAsync(outputFileName, contents, cancellationToken).ConfigureAwait(false);
+        }
+
+        private static Task ComputeResultsAsync(ulong result, int depth, ulong expected, long elapsedMs, IPerftResult results)
         {
             return Task.Run(() =>
             {
@@ -226,7 +249,7 @@ namespace Perft
 
         private void LogInfoHeader()
         {
-            _log.Information("ChessLib Perft test program {0} ({1})", "v0.1.2", _buildTimeStamp.TimeStamp);
+            _log.Information("ChessLib Perft test program {0} ({1})", Version, _buildTimeStamp.TimeStamp);
             _log.Information("High timer resolution : {0}", Stopwatch.IsHighResolution);
             _log.Information("Initializing..");
         }
@@ -263,9 +286,5 @@ namespace Perft
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static string FixFileName(string input)
             => input.Replace('/', '_');
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void PrintBoard(string board)
-            => _log.Information("Board:\n{0}", board);
     }
 }
