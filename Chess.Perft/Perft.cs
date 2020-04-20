@@ -58,7 +58,7 @@ namespace Chess.Perft
     {
         public Perft(IGame game, IEnumerable<IPerftPosition> positions)
         {
-            Positions = positions.Any() ? positions.ToList() : new List<IPerftPosition>();
+            Positions = positions.ToList();
             CurrentGame = game;
         }
 
@@ -74,23 +74,18 @@ namespace Chess.Perft
         public ulong Expected { get; set; }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ulong DoPerft(int depth)
+        public async IAsyncEnumerable<ulong> DoPerft(int depth)
         {
-            var total = 0ul;
-
             if (Positions.Count == 0)
-                return total;
+                yield return 0ul;
 
-            foreach (var position in Positions)
+            foreach (var fd in Positions.Select(p => new FenData(p.Fen)))
             {
-                var fp = new FenData(position.Fen);
-                CurrentGame.SetFen(fp);
+                CurrentGame.SetFen(fd);
                 var res = CurrentGame.Perft(depth);
-                total += res;
-                BoardPrintCallback?.Invoke(position.Fen);
+                BoardPrintCallback?.Invoke(fd.ToString());
+                yield return res;
             }
-
-            return total;
         }
 
         public Task<ulong> DoPerftAsync(int depth)

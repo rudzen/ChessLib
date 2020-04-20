@@ -109,7 +109,7 @@ namespace Perft
                 .AddJsonFile(ConfigFileName);
         }
 
-        public static void AddServices(IContainer container, IConfiguration configuration)
+        private static void AddServices(IContainer container, IConfiguration configuration)
         {
             // Bind logger with configuration
             container.Register(Made.Of(() => ConfigureLogger(configuration)), Reuse.Singleton);

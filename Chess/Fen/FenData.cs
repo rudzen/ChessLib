@@ -106,5 +106,8 @@ namespace Rudz.Chess.Fen
 
         public override int GetHashCode()
             => HashCode.Combine(_splitPoints, Fen);
+
+        public override string ToString()
+            => Fen.Span.ToString();
     }
 }

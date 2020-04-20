@@ -52,13 +52,15 @@ namespace Rudz.Chess
 
         private readonly Square[] _castleLongKingFrom;
 
+        private readonly BitBoard[] piecesBySide;
+
         public Position()
         {
             _castleLongKingFrom = new Square[2];
             _rookCastlesFrom = new Square[64];
             _castleShortKingFrom = new Square[2];
             BoardLayout = new Piece[64];
-            BoardPieces = new BitBoard[16];
+            BoardPieces = new BitBoard[PieceTypes.PieceTypeNb.AsInt()];
             OccupiedBySide = new BitBoard[2];
             Clear();
         }
@@ -89,7 +91,7 @@ namespace Rudz.Chess
         public void AddPiece(Piece pc, Square sq)
         {
             var color = pc.ColorOf();
-            BoardPieces[pc.AsInt()] |= sq;
+            BoardPieces[pc.Type().AsInt()] |= sq;
             OccupiedBySide[color] |= sq;
             BoardLayout[sq.AsInt()] = pc;
 
@@ -101,7 +103,7 @@ namespace Rudz.Chess
         public void AddPiece(PieceTypes pt, Square sq, Player c)
         {
             var piece = pt.MakePiece(c);
-            BoardPieces[piece.AsInt()] |= sq;
+            BoardPieces[pt.AsInt()] |= sq;
             OccupiedBySide[c.Side] |= sq;
             BoardLayout[sq.AsInt()] = piece;
 
@@ -180,7 +182,7 @@ namespace Rudz.Chess
         public Piece GetPiece(Square sq) => BoardLayout[sq.AsInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public PieceTypes GetPieceType(Square sq) => BoardLayout[sq.AsInt()].Type();
+        public PieceTypes GetPieceType(Square sq) => GetPiece(sq).Type();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool IsPieceTypeOnSquare(Square sq, PieceTypes pt) => GetPieceType(sq) == pt;
@@ -232,25 +234,25 @@ namespace Rudz.Chess
         public BitBoard Pieces(Player c) => OccupiedBySide[c.Side];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public BitBoard Pieces(Piece pc) => BoardPieces[pc.AsInt()];
+        public BitBoard Pieces(Piece pc) => BoardPieces[pc.Type().AsInt()] & OccupiedBySide[pc.ColorOf()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public BitBoard Pieces(PieceTypes pt) => BoardPieces[pt.MakePiece(PlayerExtensions.White).AsInt()] | BoardPieces[pt.MakePiece(PlayerExtensions.Black).AsInt()];
+        public BitBoard Pieces(PieceTypes pt) => BoardPieces[pt.AsInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public BitBoard Pieces(PieceTypes pt1, PieceTypes pt2) => Pieces(pt1) | Pieces(pt2);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public BitBoard Pieces(PieceTypes pt, Player side) => BoardPieces[pt.MakePiece(side).AsInt()];
+        public BitBoard Pieces(PieceTypes pt, Player side) => BoardPieces[pt.AsInt()] & OccupiedBySide[side.Side];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public BitBoard Pieces(PieceTypes pt1, PieceTypes pt2, Player c) => BoardPieces[pt1.MakePiece(c).AsInt()] | BoardPieces[pt2.MakePiece(c).AsInt()];
+        public BitBoard Pieces(PieceTypes pt1, PieceTypes pt2, Player c) => (BoardPieces[pt1.AsInt()] | BoardPieces[pt2.AsInt()]) & OccupiedBySide[c.Side];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Square GetPieceSquare(PieceTypes pt, Player c) => Pieces(pt, c).Lsb();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool PieceOnFile(Square sq, Player c, PieceTypes pt) => (BoardPieces[(int)(pt + (c << 3))] & sq) != 0;
+        public bool PieceOnFile(Square sq, Player c, PieceTypes pt) => (BoardPieces[pt.MakePiece(c).Type().AsInt()] & sq) != 0;
 
         /// <summary>
         /// Determine if a pawn is isolated e.i. no own pawns on either of it's neighboring files
@@ -288,7 +290,7 @@ namespace Rudz.Chess
         {
             var pc = BoardLayout[sq.AsInt()];
             var invertedSq = ~sq;
-            BoardPieces[pc.AsInt()] &= invertedSq;
+            BoardPieces[pc.Type().AsInt()] &= invertedSq;
             OccupiedBySide[pc.ColorOf()] &= invertedSq;
             BoardLayout[sq.AsInt()] = PieceExtensions.EmptyPiece;
             if (!IsProbing)

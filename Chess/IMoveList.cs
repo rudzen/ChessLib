@@ -31,7 +31,7 @@ namespace Rudz.Chess
 
     public interface IMoveList : IEnumerable<Move>
     {
-        int Count { get; }
+        ulong Count { get; }
 
         void Add(Move move);
 

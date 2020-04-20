@@ -385,12 +385,14 @@ namespace Rudz.Chess
         public ulong Perft(int depth)
         {
             if (depth == 1)
-                return (ulong)Pos.GenerateMoves().Count;
+                return Pos.GenerateMoves().Count;
 
-            var (found, entry) = Table.Probe(Pos.State.Key);
+            var posKey = Pos.State.Key;
+
+            var (found, entry) = Table.Probe(posKey);
             if (found && entry.Depth == depth)
             {
-                var stateKey = (uint) (Pos.State.Key >> 32);
+                var stateKey = (uint) (posKey >> 32);
                 if (entry.Key32 == stateKey)
                     return (ulong)entry.Value;
             }
@@ -400,21 +402,14 @@ namespace Rudz.Chess
 
             foreach (var m in Pos.GenerateMoves())
             {
-                if (MakeMove(m))
-                {
-                    move = m;
-                    tot += Perft(depth - 1);
-                    TakeMove();
-                }
-                else
-                {
-                    move = MoveExtensions.EmptyMove;
-                    break;
-                }
+                MakeMove(m);
+                move = m;
+                tot += Perft(depth - 1);
+                TakeMove();
             }
 
             if (move != MoveExtensions.EmptyMove && tot <= int.MaxValue)
-                Table.Store(Pos.State.Key, (int)tot, Bound.Exact, (sbyte)depth, move, 0);
+                Table.Store(posKey, (int)tot, Bound.Exact, (sbyte)depth, move, 0);
 
             return tot;
         }

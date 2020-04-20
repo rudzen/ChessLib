@@ -46,7 +46,7 @@ namespace Rudz.Chess
             _moves = new Move[MaxPossibleMoves];
         }
 
-        public int Count => _moveIndex + 1;
+        public ulong Count => (ulong) (_moveIndex + 1);
 
         public Move this[int index] => _moves[index];
 

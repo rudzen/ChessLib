@@ -24,6 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using System.Threading.Tasks;
+
 namespace Chess.Test.Move
 {
     using Perft;
@@ -94,7 +96,7 @@ namespace Chess.Test.Move
         };
 
         [Fact]
-        public void PerftShort()
+        public async Task PerftShort()
         {
 
             foreach (var perftPosition in Positions)
@@ -102,46 +104,66 @@ namespace Chess.Test.Move
                 var perft = PerftFactory.Create();
                 perft.AddPosition(perftPosition);
                 var expected = perft.GetPositionCount(0, ShortCount);
-                var actual = perft.DoPerft(ShortCount);
+                var perftResults = perft.DoPerft(ShortCount);
+
+                var actual = 0ul;
+                await foreach (var result in perftResults.ConfigureAwait(false))
+                    actual += result;
+
                 Assert.Equal(expected, actual);
             }
         }
 
         [Fact]
-        public void PerftMedium()
+        public async Task PerftMedium()
         {
             foreach (var perftPosition in Positions)
             {
                 var perft = PerftFactory.Create();
                 perft.AddPosition(perftPosition);
                 var expected = perft.GetPositionCount(0, MediumCount);
-                var actual = perft.DoPerft(MediumCount);
+                var perftResults = perft.DoPerft(MediumCount);
+
+                var actual = 0ul;
+                await foreach (var result in perftResults.ConfigureAwait(false))
+                    actual += result;
+
                 Assert.Equal(expected, actual);
             }
         }
 
         [Fact]
-        public void PerftFull()
+        public async Task PerftFull()
         {
             foreach (var perftPosition in Positions)
             {
                 var perft = PerftFactory.Create();
                 perft.AddPosition(perftPosition);
                 var expected = perft.GetPositionCount(0, Positions.Count);
-                var actual = perft.DoPerft(Positions.Count);
+                var perftResults = perft.DoPerft(Positions.Count);
+
+                var actual = 0ul;
+                await foreach (var result in perftResults.ConfigureAwait(false))
+                    actual += result;
+
                 Assert.Equal(expected, actual);
             }
         }
 
         [Fact]
-        public void PerftFull2()
+        public async Task PerftFull2()
         {
             foreach (var perftPosition in Positions)
             {
                 var perft = PerftFactory.Create();
                 perft.AddPosition(perftPosition);
                 var expected = perft.GetPositionCount(0, Positions.Count);
-                var actual = perft.DoPerft(Positions.Count);
+                var perftResult = perft.DoPerft(Positions.Count);
+
+                var actual = 0ul;
+                await foreach (var result in perftResult.ConfigureAwait(false))
+                    actual += result;
+
                 Assert.Equal(expected, actual);
             }
         }

@@ -24,17 +24,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System.Threading;
-using System.Threading.Tasks;
-using Perft.Options;
-
 namespace Perft
 {
+    using Options;
+    using System.Threading;
+    using System.Threading.Tasks;
+
     public interface IPerftRunner
     {
         bool SaveResults { get; set; }
         IOptions Options { get; set; }
         TTOptions TranspositionTableOptions { get; set; }
+
         Task<int> Run(CancellationToken cancellationToken = default);
     }
 }

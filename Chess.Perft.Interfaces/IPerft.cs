@@ -40,7 +40,7 @@ namespace Chess.Perft.Interfaces
 
         ulong Expected { get; set; }
 
-        ulong DoPerft(int depth);
+        IAsyncEnumerable<ulong> DoPerft(int depth);
 
         Task<ulong> DoPerftAsync(int depth);
 

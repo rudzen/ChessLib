@@ -25,6 +25,7 @@ SOFTWARE.
 */
 
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Rudz.Chess.Fen;
 
 namespace Chess.Benchmark
@@ -66,6 +67,21 @@ namespace Chess.Benchmark
         }
 
         [Benchmark]
-        public ulong Result() => _perft.DoPerft(N);
+        public async Task<ulong> PerftIAsync()
+        {
+            var total = 0ul;
+
+            await foreach (var res in _perft.DoPerft(N).ConfigureAwait(false))
+                total += res;
+
+            return total;
+        }
+
+        [Benchmark]
+        public async Task<ulong> Perft()
+        {
+            return await _perft.DoPerftAsync(N);
+        }
+
     }
 }
