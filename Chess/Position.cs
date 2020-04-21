@@ -117,6 +117,7 @@ namespace Rudz.Chess
                 return false;
 
             var to = m.GetToSquare();
+            var from = m.GetFromSquare();
             var us = m.GetMovingSide();
             var them = ~us;
             var pc = m.GetMovingPiece();
@@ -125,19 +126,11 @@ namespace Rudz.Chess
             {
                 var rook = PieceTypes.Rook.MakePiece(us);
                 RemovePiece(_rookCastlesFrom[to.AsInt()]);
-                RemovePiece(m.GetFromSquare());
                 AddPiece(rook, to.GetRookCastleTo());
-                AddPiece(pc, to);
-                return true;
             }
-
-            // reverse sideToMove as it has not been changed yet.
-            if (IsAttacked(GetPieceSquare(PieceTypes.King, them), us))
-                return false;
-
-            RemovePiece(m.GetFromSquare());
-
-            if (m.IsEnPassantMove())
+            else if (m.IsPromotionMove())
+                pc = m.GetPromotedPiece();
+            else if (m.IsEnPassantMove())
             {
                 var t = EnPasCapturePos[us.Side](to).Lsb();
                 RemovePiece(t);
@@ -145,7 +138,8 @@ namespace Rudz.Chess
             else if (m.IsCaptureMove())
                 RemovePiece(to);
 
-            AddPiece(m.IsPromotionMove() ? m.GetPromotedPiece() : pc, to);
+            RemovePiece(from);
+            AddPiece(pc, to);
 
             return true;
         }
