@@ -50,7 +50,6 @@ namespace Rudz.Chess
 
         public Move this[int index] => _moves[index];
 
-
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static MoveList operator +(MoveList left, Move right)
         {
@@ -81,7 +80,7 @@ namespace Rudz.Chess
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public IEnumerator<Move> GetEnumerator()
-            => _moves.TakeWhile(m => m != MoveExtensions.EmptyMove).GetEnumerator();
+            => _moves.TakeWhile(move => !move.IsNullMove()).GetEnumerator();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

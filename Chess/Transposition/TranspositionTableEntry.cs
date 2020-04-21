@@ -72,7 +72,7 @@ namespace Rudz.Chess.Transposition
         public void Save(TranspositionTableEntry tte)
         {
             Key32 = tte.Key32;
-            if (tte.Move != MoveExtensions.EmptyMove)
+            if (!tte.Move.IsNullMove())
                 Move = tte.Move;
             Depth = tte.Depth;
             Generation = tte.Generation;
