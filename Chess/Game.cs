@@ -636,8 +636,8 @@ namespace Rudz.Chess
             var them = ~us;
             var castlelingMask = castlelingSide.GetCastleAllowedMask(us);
             var ksq = Pos.GetPieceSquare(PieceTypes.King, us);
-            _castleRightsMask[SquareExtensions.GetFlip(rookFile, them).AsInt()] -= castlelingMask;
-            _castleRightsMask[SquareExtensions.GetFlip(ksq.File().AsInt(), them).AsInt()] -= castlelingMask;
+            _castleRightsMask[SquareExtensions.GetFlip(rookFile, them).AsInt()] ^= castlelingMask;
+            _castleRightsMask[SquareExtensions.GetFlip(ksq.File().AsInt(), them).AsInt()] ^= castlelingMask;
             var sq = isKingSideCastleling ? Squares.g1 : Squares.c1;
             Pos.SetRookCastleFrom(SquareExtensions.GetFlip((int)sq, them), SquareExtensions.GetFlip(rookFile, them));
             Pos.SetKingCastleFrom(us, ksq, castlelingSide);
