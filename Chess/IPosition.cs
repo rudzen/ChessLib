@@ -52,6 +52,8 @@ namespace Rudz.Chess
 
         void AddPiece(PieceTypes pt, Square sq, Player c);
 
+        void MovePiece(Square from, Square to);
+            
         bool MakeMove(Move m);
 
         void TakeMove(Move m);
@@ -131,7 +133,5 @@ namespace Rudz.Chess
         bool IsMate();
 
         FenData GenerateFen();
-
-        bool Empty(Square s);
     }
 }

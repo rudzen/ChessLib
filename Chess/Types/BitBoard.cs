@@ -70,55 +70,72 @@ namespace Rudz.Chess.Types
         public BitBoard this[int index] => this.Get(index);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator BitBoard(ulong value) => new BitBoard(value);
+        public static implicit operator BitBoard(ulong value)
+            => new BitBoard(value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator BitBoard(int value) => new BitBoard(value);
+        public static implicit operator BitBoard(int value)
+            => new BitBoard(value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator BitBoard(Square square) => new BitBoard(square.BitBoardSquare());
+        public static implicit operator BitBoard(Square square)
+            => new BitBoard(square.BitBoardSquare());
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static BitBoard operator *(BitBoard left, ulong right) => left.Value * right;
+        public static BitBoard operator *(BitBoard left, ulong right)
+            => left.Value * right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static BitBoard operator *(ulong left, BitBoard right) => left * right.Value;
+        public static BitBoard operator *(ulong left, BitBoard right)
+            => left * right.Value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static BitBoard operator -(BitBoard left, int right) => left.Value - (ulong)right;
+        public static BitBoard operator -(BitBoard left, int right)
+            => left.Value - (ulong)right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static BitBoard operator >>(BitBoard left, int right) => left.Value >> right;
+        public static BitBoard operator >>(BitBoard left, int right)
+            => left.Value >> right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static BitBoard operator <<(BitBoard left, int right) => left.Value << right;
+        public static BitBoard operator <<(BitBoard left, int right)
+            => left.Value << right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static BitBoard operator |(BitBoard left, Square right) => left.Value | right.BitBoardSquare();
+        public static BitBoard operator |(BitBoard left, Square right)
+            => left.Value | right.BitBoardSquare();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static BitBoard operator |(BitBoard left, BitBoard right) => left.Value | right.Value;
+        public static BitBoard operator |(BitBoard left, BitBoard right)
+            => left.Value | right.Value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ulong operator ^(BitBoard left, BitBoard right) => left.Value ^ right.Value;
+        public static ulong operator ^(BitBoard left, BitBoard right)
+            => left.Value ^ right.Value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static BitBoard operator &(BitBoard left, BitBoard right) => left.Value & right.Value;
+        public static BitBoard operator &(BitBoard left, BitBoard right)
+            => left.Value & right.Value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static BitBoard operator &(ulong left, BitBoard right) => left & right.Value;
+        public static BitBoard operator &(ulong left, BitBoard right)
+            => left & right.Value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static BitBoard operator &(BitBoard left, ulong right) => left.Value & right;
+        public static BitBoard operator &(BitBoard left, ulong right)
+            => left.Value & right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static BitBoard operator &(BitBoard left, Square right) => left.Value & right.BitBoardSquare();
+        public static BitBoard operator &(BitBoard left, Square right)
+            => left.Value & right.BitBoardSquare();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static BitBoard operator &(Square left, BitBoard right) => left.BitBoardSquare() & right.Value;
+        public static BitBoard operator &(Square left, BitBoard right)
+            => left.BitBoardSquare() & right.Value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static BitBoard operator ~(BitBoard bitBoard) => ~bitBoard.Value;
+        public static BitBoard operator ~(BitBoard bitBoard)
+            => ~bitBoard.Value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static BitBoard operator --(BitBoard bitBoard)
@@ -128,43 +145,55 @@ namespace Rudz.Chess.Types
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator ==(BitBoard left, BitBoard right) => left.Count == right.Count;
+        public static bool operator ==(BitBoard left, BitBoard right)
+            => left.Count == right.Count;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator <(BitBoard left, BitBoard right) => left.Count < right.Count;
+        public static bool operator <(BitBoard left, BitBoard right)
+            => left.Count < right.Count;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator >(BitBoard left, BitBoard right) => left.Count > right.Count;
+        public static bool operator >(BitBoard left, BitBoard right)
+            => left.Count > right.Count;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator >=(BitBoard left, BitBoard right) => left.Count >= right.Count;
+        public static bool operator >=(BitBoard left, BitBoard right)
+            => left.Count >= right.Count;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator <=(BitBoard left, BitBoard right) => left.Count <= right.Count;
+        public static bool operator <=(BitBoard left, BitBoard right)
+            => left.Count <= right.Count;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator !=(BitBoard left, BitBoard right) => left.Value != right.Value;
+        public static bool operator !=(BitBoard left, BitBoard right)
+            => left.Value != right.Value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator true(BitBoard bitBoard) => bitBoard.Value != 0;
+        public static bool operator true(BitBoard bitBoard)
+            => bitBoard.Value != 0;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator false(BitBoard bitBoard) => bitBoard.Value == 0;
+        public static bool operator false(BitBoard bitBoard)
+            => bitBoard.Value == 0;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Empty() => Value == 0;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Square FirstOrDefault() => Empty() ? Squares.none : this.Lsb();
+        public Square FirstOrDefault()
+            => Empty() ? Squares.none : this.Lsb();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public BitBoard Xor(int pos) => Value ^ (uint)pos;
+        public BitBoard Xor(int pos)
+            => Value ^ (uint)pos;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public BitBoard And(BitBoard other) => Value & other;
+        public BitBoard And(BitBoard other)
+            => Value & other;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public BitBoard Or(BitBoard other) => Value | other;
+        public BitBoard Or(BitBoard other)
+            => Value | other;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public BitBoard OrAll(params BitBoard[] bbs)
@@ -182,7 +211,8 @@ namespace Rudz.Chess.Types
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool MoreThanOne() => (Value & (Value - 1)) > 0;
+        public bool MoreThanOne()
+            => (Value & (Value - 1)) > 0;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public IEnumerator<Square> GetEnumerator()
@@ -199,18 +229,23 @@ namespace Rudz.Chess.Types
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator()
+            => GetEnumerator();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public override string ToString() => BitBoards.PrintBitBoard(this, Value.ToString());
+        public override string ToString()
+            => BitBoards.PrintBitBoard(this, Value.ToString());
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool Equals(BitBoard other) => Value == other.Value;
+        public bool Equals(BitBoard other)
+            => Value == other.Value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public override bool Equals(object obj) => !ReferenceEquals(null, obj) && obj is BitBoard board && Equals(board);
+        public override bool Equals(object obj)
+            => !ReferenceEquals(null, obj) && obj is BitBoard board && Equals(board);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public override int GetHashCode() => (int)(Value >> 32);
+        public override int GetHashCode()
+            => (int)(Value >> 32);
     }
 }
