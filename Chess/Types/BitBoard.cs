@@ -182,6 +182,9 @@ namespace Rudz.Chess.Types
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool MoreThanOne() => (Value & (Value - 1)) > 0;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public IEnumerator<Square> GetEnumerator()
         {
             if (Empty())

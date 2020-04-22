@@ -44,15 +44,13 @@ namespace Rudz.Chess
     /// </summary>
     public sealed class Position : IPosition
     {
-        private static readonly Func<BitBoard, BitBoard>[] EnPasCapturePos = { BitBoards.SouthOne, BitBoards.NorthOne };
+        private static readonly Func<Square, Square>[] EnPasCapturePos = { s => s + Directions.South, s => s + Directions.North };
 
         private readonly Square[] _rookCastlesFrom; // indexed by position of the king
 
         private readonly Square[] _castleShortKingFrom;
 
         private readonly Square[] _castleLongKingFrom;
-
-        private readonly BitBoard[] piecesBySide;
 
         public Position()
         {
@@ -139,7 +137,7 @@ namespace Rudz.Chess
 
             if (m.IsEnPassantMove())
             {
-                var t = EnPasCapturePos[us.Side](to).Lsb();
+                var t = EnPasCapturePos[us.Side](to);
                 RemovePiece(t);
             }
             else if (m.IsCaptureMove())
@@ -153,14 +151,16 @@ namespace Rudz.Chess
         public void TakeMove(Move m)
         {
             var to = m.GetToSquare();
+            var from = m.GetFromSquare();
             var pc = m.GetMovingPiece();
-
+            var us = m.GetMovingSide();
+            
             if (m.IsCastlelingMove())
             {
-                var rook = PieceTypes.Rook.MakePiece(m.GetMovingSide());
+                var rook = PieceTypes.Rook.MakePiece(us);
                 RemovePiece(to);
                 RemovePiece(to.GetRookCastleTo());
-                AddPiece(pc, m.GetFromSquare());
+                AddPiece(pc, from);
                 AddPiece(rook, _rookCastlesFrom[to.AsInt()]);
                 return;
             }
@@ -169,13 +169,13 @@ namespace Rudz.Chess
 
             if (m.IsEnPassantMove())
             {
-                var t = EnPasCapturePos[m.GetMovingSide().Side](to).First();
+                var t = EnPasCapturePos[us.Side](to);
                 AddPiece(m.GetCapturedPiece(), t);
             }
             else if (m.IsCaptureMove())
                 AddPiece(m.GetCapturedPiece(), to);
 
-            AddPiece(pc, m.GetFromSquare());
+            AddPiece(pc, from);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -446,11 +446,18 @@ namespace Rudz.Chess
 
             var moveList = this.GenerateMoves();
 
-            var matchingMoves = moveList.Where(x => x.GetFromSquare() == from && x.GetToSquare() == to);
+            var moves = moveList.GetMoves();
+            
+            // var matchingMoves = moveList.Where(x => x.GetFromSquare() == from && x.GetToSquare() == to);
 
             // ** untested area **
-            foreach (var move in matchingMoves)
+            foreach (var move in moves)
             {
+                if (move.GetFromSquare() != from)
+                    continue;
+                if (move.GetToSquare() != to)
+                    continue;
+                
                 if (castleType == CastlelingSides.None && move.IsCastlelingMove())
                     continue;
                 if (!move.IsPromotionMove())
@@ -516,7 +523,10 @@ namespace Rudz.Chess
             return !opponentAttacking;
         }
 
-        public bool IsLegal(Move m) => IsLegal(m, m.GetMovingPiece(), m.GetFromSquare(), m.GetMoveType());
+        public bool IsLegal(Move m)
+        {
+            return IsLegal(m, m.GetMovingPiece(), m.GetFromSquare(), m.GetMoveType());
+        }
 
         /// <summary>
         /// <para>"Validates" a move using simple logic. For example that the piece actually being moved exists etc.</para>
@@ -627,7 +637,7 @@ namespace Rudz.Chess
 
             var castleRights = State.CastlelingRights;
 
-            if (castleRights != 0)
+            if (castleRights != CastlelingRights.None)
             {
                 if (castleRights.HasFlagFast(CastlelingRights.WhiteOo))
                     sb.Append('K');
@@ -658,6 +668,9 @@ namespace Rudz.Chess
             sb.Append(State.HalfMoveCount + 1);
             return new FenData(sb.ToString());
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool Empty(Square s) => BoardLayout[s.AsInt()] == Enums.Pieces.NoPiece;
 
         public IEnumerator<Piece> GetEnumerator() => BoardLayout.Cast<Piece>().GetEnumerator();
 

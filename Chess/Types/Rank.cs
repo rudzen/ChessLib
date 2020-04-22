@@ -140,5 +140,9 @@ namespace Rudz.Chess.Types
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public readonly Rank RelativeRank(Player color) => AsInt() ^ (color.Side * 7);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Rank RelativeRank(Player color, Rank rank)
+            => rank.AsInt() ^ (color.Side * 7);
     }
 }

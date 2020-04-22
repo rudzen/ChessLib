@@ -339,9 +339,14 @@ namespace Rudz.Chess
             if (State.ReversibleHalfMoveCount >= 100)
                 gameEndType |= GameEndTypes.FiftyMove;
 
-            var moveList = Pos.GenerateMoves();
-            if (!moveList.Any(move => Pos.IsLegal(move)))
+            var moveList = Pos.GenerateMoves().GetMoves();
+            foreach (var move in moveList)
+            {
+                if (Pos.IsLegal(move))
+                    continue;
                 gameEndType |= GameEndTypes.Pat;
+                break;
+            }
 
             GameEndType = gameEndType;
         }
@@ -400,7 +405,8 @@ namespace Rudz.Chess
             var tot = 0ul;
             var move = MoveExtensions.EmptyMove;
 
-            foreach (var m in Pos.GenerateMoves())
+            var moves = Pos.GenerateMoves().GetMoves();
+            foreach (var m in moves)
             {
                 MakeMove(m);
                 move = m;

@@ -49,6 +49,8 @@ namespace Rudz.Chess.Types
 
         private const int MoveFromSquareOffset = 6;
 
+        private const MoveTypes EpCaptureCapture = MoveTypes.Epcapture | MoveTypes.Capture;
+        
         /// <summary>
         /// Contains ALL relevant move information.
         /// See the constant offsets for details about which bits contains what data.
@@ -204,7 +206,7 @@ namespace Rudz.Chess.Types
         public readonly bool IsType(MoveTypes moveType) => GetMoveType() == moveType;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly bool IsCaptureMove() => GetMoveType().HasFlagFast(MoveTypes.Epcapture | MoveTypes.Capture);
+        public readonly bool IsCaptureMove() => GetMoveType().HasFlagFast(EpCaptureCapture);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public readonly bool IsEnPassantMove() => GetMoveType().HasFlagFast(MoveTypes.Epcapture);

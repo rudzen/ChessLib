@@ -26,15 +26,21 @@ SOFTWARE.
 
 namespace Rudz.Chess
 {
-    using System.Collections.Generic;
+    using System;
     using Types;
 
-    public interface IMoveList : IEnumerable<Move>
+    public interface IMoveList
     {
         ulong Count { get; }
 
+        Move this[int index] { get; }
+
         void Add(Move move);
 
+        bool Contains(Move move);
+
+        bool Contains(Square from, Square to);
+        
         /// <summary>
         /// Primary use is for polyglot moves
         /// </summary>
@@ -43,6 +49,6 @@ namespace Rudz.Chess
         /// <returns>The first move that matches from and to squares</returns>
         Move GetMove(Square from, Square to);
 
-        Move this[int index] { get; }
+        ReadOnlySpan<Move> GetMoves();
     }
 }

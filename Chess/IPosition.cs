@@ -131,5 +131,7 @@ namespace Rudz.Chess
         bool IsMate();
 
         FenData GenerateFen();
+
+        bool Empty(Square s);
     }
 }

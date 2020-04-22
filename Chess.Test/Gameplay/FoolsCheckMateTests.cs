@@ -61,8 +61,10 @@ namespace Chess.Test.Gameplay
 
             var moveList = game.Pos.GenerateMoves();
 
+            var resultingMoves = moveList.GetMoves();
+            
             // verify that no legal moves actually exists.
-            Assert.Empty(moveList);
+            Assert.True(resultingMoves.IsEmpty);
         }
     }
 }

@@ -261,7 +261,7 @@ namespace Rudz.Chess
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private char GetCheckChar()
-            => _pos.GenerateMoves().Any() ? '+' : '#';
+            => !_pos.GenerateMoves().GetMoves().IsEmpty ? '+' : '#';
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private MoveAmbiguities Ambiguity(Move move, BitBoard similarTypeAttacks)

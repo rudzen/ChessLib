@@ -26,9 +26,7 @@ SOFTWARE.
 
 namespace Rudz.Chess
 {
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.Linq;
+    using System;
     using System.Runtime.CompilerServices;
     using Types;
 
@@ -36,19 +34,19 @@ namespace Rudz.Chess
     {
         private const int MaxPossibleMoves = 218;
 
-        private readonly Move[] _moves;
+        private readonly Memory<Move> _moves;
 
         private int _moveIndex;
 
         public MoveList()
         {
             _moveIndex = -1;
-            _moves = new Move[MaxPossibleMoves];
+            _moves = new Memory<Move>(new Move[MaxPossibleMoves]);
         }
 
         public ulong Count => (ulong) (_moveIndex + 1);
 
-        public Move this[int index] => _moves[index];
+        public Move this[int index] => _moves.Span[index];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static MoveList operator +(MoveList left, Move right)
@@ -60,13 +58,14 @@ namespace Rudz.Chess
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static MoveList operator +(MoveList left, MoveList right)
         {
-            foreach (var m in right)
-                left.Add(m);
+            var rightMoves = right.GetMoves();
+            foreach (var move in rightMoves)
+                left.Add(move);
             return left;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Add(Move move) => _moves[++_moveIndex] = move;
+        public void Add(Move move) => _moves.Span[++_moveIndex] = move;
 
         /// <summary>
         /// Primary use is for polyglot moves
@@ -76,13 +75,41 @@ namespace Rudz.Chess
         /// <returns>The first move that matches from and to squares</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Move GetMove(Square from, Square to)
-            => _moves.FirstOrDefault(m => m.GetFromSquare() == from && m.GetToSquare() == to);
+        {
+            var s = GetMoves();
+            var result = MoveExtensions.EmptyMove;
+            foreach (var m in s)
+            {
+                if (m.GetFromSquare() != from || m.GetToSquare() != to)
+                    continue;
+                result = m;
+                break;
+            }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public IEnumerator<Move> GetEnumerator()
-            => _moves.TakeWhile(move => !move.IsNullMove()).GetEnumerator();
+            return result;
+        }
 
+        public bool Contains(Move move)
+        {
+            var moves = GetMoves();
+            foreach (var m in moves)
+                if (m == move)
+                    return true;
+
+            return false;
+        }
+
+        public bool Contains(Square from, Square to)
+        {
+            var moves = GetMoves();
+            foreach (var m in moves)
+                if (m.GetFromSquare() == from && m.GetToSquare() == to)
+                    return true;
+
+            return false;
+        }
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        public ReadOnlySpan<Move> GetMoves() => _moves.Span.Slice(0, _moveIndex + 1);
     }
 }
