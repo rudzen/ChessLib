@@ -448,11 +448,8 @@ namespace Rudz.Chess
             }
 
             var moveList = this.GenerateMoves();
-
             var moves = moveList.GetMoves();
             
-            // var matchingMoves = moveList.Where(x => x.GetFromSquare() == from && x.GetToSquare() == to);
-
             // ** untested area **
             foreach (var move in moves)
             {
@@ -590,9 +587,7 @@ namespace Rudz.Chess
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool IsMate()
-        {
-            return this.GenerateMoves().Count == 0;
-        }
+            => this.GenerateMoves().Count == 0;
 
         /// <summary>
         /// Parses the board layout to a FEN representation..

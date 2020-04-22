@@ -45,7 +45,13 @@ namespace Rudz.Chess.Enums
         WhiteOoo = WhiteOo << 1,
         BlackOo = WhiteOo << 2,
         BlackOoo = WhiteOo << 3,
-        Any = WhiteOo | WhiteOoo | BlackOo | BlackOoo,
+        
+        KingSide = WhiteOo | BlackOo,
+        QueenSide = WhiteOoo | BlackOoo,
+        WhiteCastleling = WhiteOo | WhiteOoo,
+        BlackCastleling = BlackOo | BlackOoo,
+        
+        Any = WhiteCastleling | BlackCastleling,
         CastleRightsNb = 16
     }
 }

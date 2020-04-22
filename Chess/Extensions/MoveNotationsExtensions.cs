@@ -28,7 +28,7 @@ namespace Rudz.Chess.Extensions
 {
     using Enums;
 
-    public static class MoveNotaionsExtensions
+    public static class MoveNotationsExtensions
     {
         public static bool HasFlagFast(this MoveNotations value, MoveNotations flag) => (value & flag) != 0;
     }

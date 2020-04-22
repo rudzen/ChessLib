@@ -114,34 +114,45 @@ namespace Rudz.Chess
 
             // advances the position
             var previous = _stateList[PositionIndex++];
-            Pos.State = _stateList[PositionIndex];
-            State.SideToMove = ~previous.SideToMove;
-            State.Material = previous.Material;
-            State.HalfMoveCount = PositionIndex;
-            State.LastMove = m;
+            var state = _stateList[PositionIndex];
+            Pos.State = state;
+            state.Previous = previous;
+            state.SideToMove = ~previous.SideToMove;
+            state.Material = previous.Material;
+            state.HalfMoveCount = PositionIndex;
+            state.LastMove = m;
 
-            var ksq = Pos.GetPieceSquare(PieceTypes.King, State.SideToMove);
+            var to = m.GetToSquare();
+            var from = m.GetFromSquare();
+            var us = state.SideToMove;
+            var them = ~us;
+
+            var ksq = Pos.GetPieceSquare(PieceTypes.King, us);
 
             // compute in-check
-            State.InCheck = Pos.IsAttacked(ksq, ~State.SideToMove);
+            state.InCheck = Pos.IsAttacked(ksq, them);
 
-            State.CastlelingRights = _stateList[PositionIndex - 1].CastlelingRights & _castleRightsMask[m.GetFromSquare().AsInt()] & _castleRightsMask[m.GetToSquare().AsInt()];
-            State.NullMovesInRow = 0;
+            // compute checkers
+            state.Checkers = Pos.AttacksTo(ksq);
+            ksq = Pos.GetPieceSquare(PieceTypes.King, them);
+            state.HiddenCheckers = Pos.AttacksTo(ksq);
+            
+            state.CastlelingRights = previous.CastlelingRights & _castleRightsMask[from.AsInt()] & _castleRightsMask[to.AsInt()];
+            state.NullMovesInRow = 0;
 
             // compute reversible half move count
-            State.ReversibleHalfMoveCount = m.IsCaptureMove() || m.GetMovingPieceType() == PieceTypes.Pawn
+            state.ReversibleHalfMoveCount = m.IsCaptureMove() || m.GetMovingPieceType() == PieceTypes.Pawn
                 ? 0
                 : previous.ReversibleHalfMoveCount + 1;
 
             // compute en-passant if present
-            State.EnPassantSquare = m.IsDoublePush()
-                ? m.GetFromSquare() + m.GetMovingSide().PawnPushDistance()
+            state.EnPassantSquare = m.IsDoublePush()
+                ? from + m.GetMovingSide().PawnPushDistance()
                 : Squares.none;
 
-            State.Key = previous.Key;
-            State.PawnStructureKey = previous.PawnStructureKey;
-            State.Material.MakeMove(m);
-            //State.Pinned = Pos.GetPinnedPieces(ksq, Pos.State.SideToMove);
+            state.Key = previous.Key;
+            state.PawnStructureKey = previous.PawnStructureKey;
+            state.Material.MakeMove(m);
 
             UpdateKey(m);
 
@@ -295,8 +306,12 @@ namespace Rudz.Chess
 
             var ksq = Pos.GetPieceSquare(PieceTypes.King, player);
 
-            State.InCheck = Pos.IsAttacked(ksq, ~player);
             State.Checkers = Pos.AttacksTo(ksq);
+            State.InCheck = Pos.IsAttacked(ksq, ~player);
+
+            // Set hidden checkers
+            ksq = Pos.GetPieceSquare(PieceTypes.King, ~player);
+            State.HiddenCheckers = Pos.AttacksTo(ksq);
 
             return 0;
         }

@@ -55,10 +55,20 @@ namespace Rudz.Chess
 
         public BitBoard Pinned { get; set; }
 
+        /// <summary>
+        /// Represents checked squares for side to move
+        /// </summary>
         public BitBoard Checkers { get; set; }
 
+        /// <summary>
+        /// Represents checked squares for opposition
+        /// </summary>
+        public BitBoard HiddenCheckers { get; set; }
+        
         public bool InCheck { get; set; }
 
+        public State Previous { get; set; }
+        
         public State(State s)
         {
             LastMove = s.LastMove;
