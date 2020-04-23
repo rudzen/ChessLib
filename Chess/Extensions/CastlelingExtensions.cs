@@ -37,6 +37,16 @@ namespace Rudz.Chess.Extensions
 
         private static readonly CastlelingRights[] OooAllowedMask = { CastlelingRights.WhiteOoo, CastlelingRights.BlackOoo };
 
+        /// <summary>
+        /// [short/long, side] castle positional | array when altering castleling rights.
+        /// </summary>
+        private static readonly CastlelingRights[][] CastlePositionalOr
+            = new[]
+            {
+                new[] {CastlelingRights.WhiteOo, CastlelingRights.BlackOo},
+                new[] {CastlelingRights.WhiteOoo, CastlelingRights.BlackOoo}
+            };
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Square GetKingCastleTo(this CastlelingSides castleType, Player side)
         {
@@ -67,6 +77,9 @@ namespace Rudz.Chess.Extensions
                 _ => throw new ArgumentOutOfRangeException(nameof(@this), @this, null)
             };
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static CastlelingRights GetCastlePositionalOr(this Player c, int index) => CastlePositionalOr[index][c.Side];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string GetCastlelingString(Square toSquare, Square fromSquare) => toSquare < fromSquare ? "O-O-O" : "O-O";

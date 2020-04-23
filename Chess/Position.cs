@@ -83,7 +83,7 @@ namespace Rudz.Chess
         {
             BoardLayout.Fill(Enums.Pieces.NoPiece);
             OccupiedBySide.Fill(BitBoards.EmptyBitBoard);
-            Array.Fill(BoardPieces, BitBoards.EmptyBitBoard);
+            BoardPieces.Fill(BitBoards.EmptyBitBoard);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -122,9 +122,9 @@ namespace Rudz.Chess
                 return false;
 
             var to = m.GetToSquare();
+            var from = m.GetFromSquare();
             var us = m.GetMovingSide();
             var them = ~us;
-            var pc = m.GetMovingPiece();
 
             if (m.IsCastlelingMove())
             {
@@ -137,8 +137,6 @@ namespace Rudz.Chess
             if (IsAttacked(GetPieceSquare(PieceTypes.King, them), us))
                 return false;
 
-            RemovePiece(m.GetFromSquare());
-
             if (m.IsEnPassantMove())
             {
                 var t = EnPasCapturePos[us.Side](to);
@@ -147,7 +145,13 @@ namespace Rudz.Chess
             else if (m.IsCaptureMove())
                 RemovePiece(to);
 
-            AddPiece(m.IsPromotionMove() ? m.GetPromotedPiece() : pc, to);
+            MovePiece(from, to);
+
+            if (m.IsPromotionMove())
+            {
+                RemovePiece(to);
+                AddPiece(m.GetPromotedPiece(), to);
+            }
 
             return true;
         }

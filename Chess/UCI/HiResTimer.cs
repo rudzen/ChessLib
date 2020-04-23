@@ -115,7 +115,7 @@ namespace Rudz.Chess.UCI
 
             _cancellationTokenSource = new CancellationTokenSource();
             _cancellationTokenSource.Token.ThrowIfCancellationRequested();
-            _executer = Task.Factory.StartNew(() => ExecuteTimer(_cancellationTokenSource.Token), _cancellationTokenSource.Token);
+            _executer = Task.Run(() => ExecuteTimer(_cancellationTokenSource.Token), _cancellationTokenSource.Token);
         }
 
         public void Stop()

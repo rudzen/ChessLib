@@ -53,6 +53,8 @@ namespace Perft
 
         private static readonly string Line = new string('-', 65);
 
+        private static readonly Lazy<string> CurrentDirectory = new Lazy<string>(() => System.Environment.CurrentDirectory);
+        
         private readonly Func<CancellationToken, IAsyncEnumerable<IPerftPosition>>[] _runners;
 
         private readonly IEpdParser _epdParser;
@@ -183,7 +185,7 @@ namespace Perft
 
             var pp = _perft.Positions.Last();
 
-            var baseFileName = SaveResults ? Path.Combine(System.Environment.CurrentDirectory, $"{FixFileName(pp.Fen)}[") : string.Empty;
+            var baseFileName = SaveResults ? Path.Combine(CurrentDirectory.Value, $"{FixFileName(pp.Fen)}[") : string.Empty;
 
             var errors = 0;
 
@@ -206,7 +208,7 @@ namespace Perft
 
                 var elapsedMs = sw.ElapsedMilliseconds;
 
-                await ComputeResultsAsync(perftResult, depth, expected, elapsedMs, result).ConfigureAwait(false);
+                ComputeResultsAsync(perftResult, depth, expected, elapsedMs, result);
 
                 errors += await LogResults(result).ConfigureAwait(false);
 
@@ -223,7 +225,7 @@ namespace Perft
             return result;
         }
 
-        private async Task WriteOutput(IPerftResult result, string baseFileName, CancellationToken cancellationToken)
+        private async ValueTask WriteOutput(IPerftResult result, string baseFileName, CancellationToken cancellationToken)
         {
             // ReSharper disable once MethodHasAsyncOverload
             var contents = JsonConvert.SerializeObject(result, _outputSettings);
@@ -231,20 +233,17 @@ namespace Perft
             await File.WriteAllTextAsync(outputFileName, contents, cancellationToken).ConfigureAwait(false);
         }
 
-        private static Task ComputeResultsAsync(ulong result, int depth, ulong expected, long elapsedMs, IPerftResult results)
+        private void ComputeResultsAsync(ulong result, int depth, ulong expected, long elapsedMs, IPerftResult results)
         {
-            return Task.Run(() =>
-            {
-                // compute results
-                results.Result = result;
-                results.Depth = depth;
-                // add 1 to avoid potential dbz
-                results.ElapsedMs = elapsedMs + 1;
-                results.Nps = 1000 * result / (ulong)results.ElapsedMs;
-                results.CorrectResult = expected;
-                results.Passed = expected == result;
-                results.TableHits = Game.Table.Hits;
-            });
+            // compute results
+            results.Result = result;
+            results.Depth = depth;
+            // add 1 to avoid potential dbz
+            results.ElapsedMs = elapsedMs + 1;
+            results.Nps = 1000 * result / (ulong)results.ElapsedMs;
+            results.CorrectResult = expected;
+            results.Passed = expected == result;
+            results.TableHits = Game.Table.Hits;
         }
 
         private void LogInfoHeader()
