@@ -119,7 +119,7 @@ namespace Perft
 
             // Bind chess classes
             container.Register<IGame, Game>(Reuse.Transient);
-            container.Register<IMoveList, MoveList>(Reuse.Transient, setup: Setup.With(allowDisposableTransient: true));
+            container.Register<IMoveList, MoveList>(Reuse.Transient);
             container.Register<IMaterial, Material>(Reuse.Transient);
             container.Register<IPosition, Position>(Reuse.Transient);
             container.Register<IKillerMoves, KillerMoves>(Reuse.Transient);
