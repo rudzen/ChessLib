@@ -109,6 +109,8 @@ namespace Rudz.Chess
 
         public void CopyFrom(IMaterial material)
         {
+            if (material == null)
+                return;
             material.MaterialValue.CopyTo(MaterialValue, 0);
             _key[0] = material.GetKey(0);
             _key[1] = material.GetKey(1);

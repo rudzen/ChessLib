@@ -43,7 +43,7 @@ namespace Rudz.Chess
 
     public sealed class Game : IGame
     {
-        private const int MaxPositions = 1 << 11;
+        private const int MaxPositions = 256;
 
         private readonly CastlelingRights[] _castleRightsMask;
 
@@ -110,7 +110,7 @@ namespace Rudz.Chess
             Pos.State = state;
             state.Previous = previous;
             state.SideToMove = ~previous.SideToMove;
-            state.Material = previous.Material;
+            state.Material.CopyFrom(previous.Material);
             state.HalfMoveCount = PositionIndex;
             state.LastMove = m;
 

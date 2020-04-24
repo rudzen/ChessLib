@@ -44,13 +44,13 @@ namespace Rudz.Chess.Types
         [FieldOffset(0)]
         private ulong _key;
 
-        public HashKey(ulong key)
+        private HashKey(ulong key)
         {
             _lowerKey32 = _upperKey32 = 0;
             _key = key;
         }
 
-        public HashKey(uint key32)
+        private HashKey(uint key32)
         {
             _upperKey32 = 0;
             _key = 0;
