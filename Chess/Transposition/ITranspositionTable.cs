@@ -55,7 +55,7 @@ namespace Rudz.Chess.Transposition
         /// </summary>
         /// <param name="key">The position key</param>
         /// <returns>The cluster of the keys position in the table</returns>
-        ITTCluster FindCluster(ulong key);
+        ITTCluster FindCluster(HashKey key);
 
         void Refresh(TranspositionTableEntry tte);
 
@@ -64,14 +64,14 @@ namespace Rudz.Chess.Transposition
         /// </summary>
         /// <param name="key">The position key</param>
         /// <returns>(true, entry) if one was found, (false, empty) if not found</returns>
-        (bool, TranspositionTableEntry) Probe(ulong key);
+        (bool, TranspositionTableEntry) Probe(HashKey key);
 
         /// <summary>
         /// Probes the table for the first cluster index which matches the position key
         /// </summary>
         /// <param name="key">The position key</param>
         /// <returns>The cluster entry</returns>
-        TranspositionTableEntry ProbeFirst(ulong key);
+        TranspositionTableEntry ProbeFirst(HashKey key);
 
         /// <summary>
         /// Stores a move in the transposition table.
@@ -85,7 +85,7 @@ namespace Rudz.Chess.Transposition
         /// <param name="depth">The depth of the move</param>
         /// <param name="move">The move it self</param>
         /// <param name="statValue">The static value of the move</param>
-        void Store(ulong key, int value, Bound type, sbyte depth, Move move, int statValue);
+        void Store(HashKey key, int value, Bound type, sbyte depth, Move move, int statValue);
 
         /// <summary>
         /// Get the approximation full % of the table

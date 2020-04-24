@@ -102,9 +102,9 @@ namespace Rudz.Chess.Transposition
         /// <param name="key">The position key</param>
         /// <returns>The cluster of the keys position in the table</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ITTCluster FindCluster(ulong key)
+        public ITTCluster FindCluster(HashKey key)
         {
-            var idx = (int)((uint)key & (_elements - 1));
+            var idx = (int)(key.LowerKey & (_elements - 1));
             return _table[idx];
         }
 
@@ -116,20 +116,20 @@ namespace Rudz.Chess.Transposition
         /// </summary>
         /// <param name="key">The position key</param>
         /// <returns>(true, entry) if one was found, (false, empty) if not found</returns>
-        public (bool, TranspositionTableEntry) Probe(ulong key)
+        public (bool, TranspositionTableEntry) Probe(HashKey key)
         {
             var ttc = FindCluster(key);
-            var keyH = (uint)(key >> 32);
             var g = _generation;
 
             // Probing the Table will automatically update the generation of the entry in case the
             // probing retrieves an element.
 
             TranspositionTableEntry e = default;
+            e.Defaults();
             var set = false;
             for (var i = 0; i < ttc.Cluster.Length; ++i)
             {
-                if (ttc.Cluster[i].Key32 != 0 && ttc.Cluster[i].Key32 != keyH)
+                if (ttc.Cluster[i].Key32 != 0 && ttc.Cluster[i].Key32 != key.UpperKey)
                     continue;
 
                 ttc.Cluster[i].Generation = g;
@@ -150,7 +150,7 @@ namespace Rudz.Chess.Transposition
         /// <param name="key">The position key</param>
         /// <returns>The cluster entry</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public TranspositionTableEntry ProbeFirst(ulong key) => FindCluster(key)[0];
+        public TranspositionTableEntry ProbeFirst(HashKey key) => FindCluster(key)[0];
 
         /// <summary>
         /// Stores a move in the transposition table. It will automatically detect the best cluster
@@ -163,11 +163,8 @@ namespace Rudz.Chess.Transposition
         /// <param name="depth">The depth of the move</param>
         /// <param name="move">The move it self</param>
         /// <param name="statValue">The static value of the move</param>
-        public void Store(ulong key, int value, Bound type, sbyte depth, Move move, int statValue)
+        public void Store(HashKey key, int value, Bound type, sbyte depth, Move move, int statValue)
         {
-            // Use the high 32 bits as key inside the cluster
-            var keyH = (uint) (key >> 32);
-
             var ttc = FindCluster(key);
 
             var clusterIndex = 0;
@@ -175,7 +172,7 @@ namespace Rudz.Chess.Transposition
 
             for (var i = 0; i < ttc.Cluster.Length; ++i)
             {
-                if (ttc.Cluster[i].Key32 != 0 && ttc.Cluster[i].Key32 != keyH)
+                if (ttc.Cluster[i].Key32 != 0 && ttc.Cluster[i].Key32 != key.UpperKey)
                     continue;
 
                 clusterIndex = i;
@@ -207,7 +204,7 @@ namespace Rudz.Chess.Transposition
                 clusterIndex = index;
             }
 
-            var e = new TranspositionTableEntry(keyH, move, depth, _generation, value, statValue, type);
+            var e = new TranspositionTableEntry(key.UpperKey, move, depth, _generation, value, statValue, type);
 
             ttc.Cluster[clusterIndex].Save(e);
         }

@@ -35,7 +35,7 @@ namespace Rudz.Chess
 
         public IMaterial Material { get; set; }
 
-        public ulong PawnStructureKey { get; set; }
+        public HashKey PawnStructureKey { get; set; }
 
         public int ReversibleHalfMoveCount { get; set; }
 
@@ -45,7 +45,7 @@ namespace Rudz.Chess
 
         public int FiftyMoveRuleCounter { get; set; }
 
-        public ulong Key { get; set; }
+        public HashKey Key { get; set; }
 
         public CastlelingRights CastlelingRights { get; set; }
 

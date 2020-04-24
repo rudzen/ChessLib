@@ -27,17 +27,19 @@ SOFTWARE.
 namespace Rudz.Chess.Transposition
 {
     using System;
+    using System.Runtime.InteropServices;
     using Types;
 
+    [StructLayout(LayoutKind.Sequential, Pack=2)]
     public struct TranspositionTableEntry
     {
         public uint Key32;
         public Move Move;
-        public sbyte Depth;
-        public sbyte Generation;
         public int Value;
         public int StaticValue;
         public Bound Type;
+        public sbyte Depth;
+        public sbyte Generation;
 
         public TranspositionTableEntry(uint k, Move m, sbyte d, sbyte g, int v, int sv, Bound b)
         {
@@ -51,7 +53,9 @@ namespace Rudz.Chess.Transposition
         }
 
         public TranspositionTableEntry(TranspositionTableEntry tte)
-            => this = tte;
+        {
+            this = tte;
+        }
 
         public static bool operator ==(TranspositionTableEntry left, TranspositionTableEntry right)
             => left.Equals(right);

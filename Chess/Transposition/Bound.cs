@@ -26,7 +26,7 @@ SOFTWARE.
 
 namespace Rudz.Chess.Transposition
 {
-    public enum Bound : byte
+    public enum Bound : sbyte
     {
         Void = 0,
         Alpha = 1,

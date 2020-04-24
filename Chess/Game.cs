@@ -397,12 +397,8 @@ namespace Rudz.Chess
             var posKey = Pos.State.Key;
 
             var (found, entry) = Table.Probe(posKey);
-            if (found && entry.Depth == depth)
-            {
-                var stateKey = (uint) (posKey >> 32);
-                if (entry.Key32 == stateKey)
-                    return (ulong)entry.Value;
-            }
+            if (found && entry.Depth == depth && entry.Key32 == posKey.UpperKey)
+                return (ulong)entry.Value;
 
             var tot = 0ul;
             var move = MoveExtensions.EmptyMove;
