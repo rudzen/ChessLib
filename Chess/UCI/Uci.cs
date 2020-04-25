@@ -78,7 +78,7 @@ namespace Rudz.Chess.UCI
         }
 
         public int Nps(ulong nodes, TimeSpan time)
-            => (int) ((int) nodes * 1000.0 / time.TotalMilliseconds);
+            => (int) ((int) nodes * 1000.0 / time.Milliseconds);
 
         public Move MoveFromUci(IPosition pos, string uciMove)
         {
@@ -100,7 +100,7 @@ namespace Rudz.Chess.UCI
                 : $"bestmove {move}";
 
         public string CurrentMoveNum(int moveNumber, Move move, ulong visitedNodes, TimeSpan time)
-            => $"info currmovenumber {moveNumber} currmove {move} nodes {visitedNodes} time {time}";
+            => $"info currmovenumber {moveNumber} currmove {move} nodes {visitedNodes} time {time.Milliseconds}";
 
         public string Score(int value, int mateInMaxPly, int valueMate) =>
             Math.Abs(value) >= mateInMaxPly
