@@ -26,13 +26,15 @@ SOFTWARE.
 
 namespace Perft
 {
+    using System;
+
     public interface IPerftResult
     {
         string Fen { get; set; }
         int Depth { get; set; }
         ulong Result { get; set; }
         ulong CorrectResult { get; set; }
-        long ElapsedMs { get; set; }
+        TimeSpan Elapsed { get; set; }
         ulong Nps { get; set; }
         ulong TableHits { get; set; }
         bool Passed { get; set; }

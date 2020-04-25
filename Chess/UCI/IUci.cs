@@ -24,22 +24,24 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System.Collections.Generic;
-using System.Text;
-
 namespace Rudz.Chess.UCI
 {
     using System;
+    using System.Collections.Generic;
     using Types;
 
     public interface IUci
     {
+        public int MaxThreads { get; set; }
+        public IDictionary<string, IOption> O { get; set; }
         Action<IOption> OnLogger { get; set; }
         Action<IOption> OnEval { get; set; }
         Action<IOption> OnThreads { get; set; }
         Action<IOption> OnHashSize { get; set; }
         Action<IOption> OnClearHash { get; set; }
 
+        void Initialize(int maxThreads = 128);
+        
         int Nps(ulong nodes, TimeSpan time);
         
         Move MoveFromUci(IPosition pos, string uciMove);

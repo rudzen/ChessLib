@@ -26,13 +26,15 @@ SOFTWARE.
 
 namespace Perft
 {
+    using System;
+
     public sealed class PerftResult : IPerftResult
     {
         public string Fen { get; set; }
         public int Depth { get; set; }
         public ulong Result { get; set; }
         public ulong CorrectResult { get; set; }
-        public long ElapsedMs { get; set; }
+        public TimeSpan Elapsed { get; set; }
         public ulong Nps { get; set; }
         public ulong TableHits { get; set; }
         public bool Passed { get; set; }
@@ -42,7 +44,7 @@ namespace Perft
             Fen = string.Empty;
             Depth = Errors = 0;
             Result = CorrectResult = Nps = TableHits = 0UL;
-            ElapsedMs = 0L;
+            Elapsed = TimeSpan.Zero;
             Passed = false;
         }
     }

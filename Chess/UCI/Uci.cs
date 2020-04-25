@@ -34,27 +34,28 @@ namespace Rudz.Chess.UCI
 
     public class Uci : IUci
     {
-        protected readonly IDictionary<string, IOption> O;
-
         private static readonly OptionComparer OptionComparer;
 
         private static readonly string[] OptionTypeStrings;
 
         private readonly ObjectPool<StringBuilder> _pvPool;
-        
-        public Uci(IDictionary<string, IOption> options, int maxThreads = 128)
+
+        public Uci()
         {
             var policy = new StringBuilderPooledObjectPolicy();
             _pvPool = new DefaultObjectPool<StringBuilder>(policy, 128);
-            O = options;
-            Initialize(maxThreads);
+            O = new Dictionary<string, IOption>();
         }
-
+        
         static Uci()
         {
             OptionComparer = new OptionComparer();
             OptionTypeStrings = Enum.GetNames(typeof(UciOptionType));
         }
+
+        public int MaxThreads { get; set; }
+        
+        public IDictionary<string, IOption> O { get; set; }
 
         public Action<IOption> OnLogger { get; set; }
 
@@ -66,7 +67,7 @@ namespace Rudz.Chess.UCI
 
         public Action<IOption> OnClearHash { get; set; }
 
-        protected void Initialize(int maxThreads = 128)
+        public void Initialize(int maxThreads = 128)
         {
             O["Write Debug Log"] = new Option("Write Debug Log", O.Count, false, OnLogger);
             O["Write Search Log"] = new Option("Write Search Log", O.Count, false);

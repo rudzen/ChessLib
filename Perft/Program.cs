@@ -35,6 +35,7 @@ namespace Perft
     using Options;
     using Parsers;
     using Rudz.Chess;
+    using Rudz.Chess.UCI;
     using Serilog;
     using System;
     using System.IO;
@@ -123,6 +124,7 @@ namespace Perft
             container.Register<IMaterial, Material>(Reuse.Transient);
             container.Register<IPosition, Position>(Reuse.Transient);
             container.Register<IKillerMoves, KillerMoves>(Reuse.Transient);
+            container.Register<IUci, Uci>(Reuse.Singleton);
 
             // Bind options
             container.Register<IOptions, EpdOptions>(Reuse.Singleton, serviceKey: OptionType.EdpOptions);

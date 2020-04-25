@@ -36,6 +36,7 @@ namespace Perft
     using Parsers;
     using Rudz.Chess;
     using Rudz.Chess.Extensions;
+    using Rudz.Chess.UCI;
     using Serilog;
     using System;
     using System.Collections.Generic;
@@ -69,9 +70,11 @@ namespace Perft
 
         private readonly ObjectPool<PerftResult> _resultPool;
 
+        private readonly IUci _uci;
+        
         private bool _usingEpd;
 
-        public PerftRunner(IEpdParser parser, ILogger log, IBuildTimeStamp buildTimeStamp, IPerft perft, IConfiguration configuration, ObjectPool<PerftResult> resultPool)
+        public PerftRunner(IEpdParser parser, ILogger log, IBuildTimeStamp buildTimeStamp, IPerft perft, IConfiguration configuration, ObjectPool<PerftResult> resultPool, IUci uci)
         {
             _epdParser = parser;
             _log = log;
@@ -79,6 +82,10 @@ namespace Perft
             _perft = perft;
             _perft.BoardPrintCallback ??= s => _log.Information("Board:\n{0}", s);
             _resultPool = resultPool;
+            
+            _uci = uci;
+            _uci.Initialize();
+            
             _runners = new Func<CancellationToken, IAsyncEnumerable<IPerftPosition>>[] { ParseEpd, ParseFen };
 
             TranspositionTableOptions = Framework.IoC.Resolve<IOptions>(OptionType.TTOptions) as TTOptions;
@@ -207,7 +214,7 @@ namespace Perft
                 sw.Stop();
 
                 var elapsedMs = sw.ElapsedMilliseconds;
-
+                
                 ComputeResultsAsync(perftResult, depth, expected, elapsedMs, result);
 
                 errors += await LogResults(result).ConfigureAwait(false);
@@ -239,11 +246,13 @@ namespace Perft
             results.Result = result;
             results.Depth = depth;
             // add 1 to avoid potential dbz
-            results.ElapsedMs = elapsedMs + 1;
-            results.Nps = 1000 * result / (ulong)results.ElapsedMs;
+            results.Elapsed = TimeSpan.FromMilliseconds(elapsedMs + 1);
+            results.Nps = (ulong) _uci.Nps(result, results.Elapsed);
             results.CorrectResult = expected;
             results.Passed = expected == result;
             results.TableHits = Game.Table.Hits;
+
+            _uci.Depth(depth);
         }
 
         private void LogInfoHeader()
@@ -257,7 +266,7 @@ namespace Perft
         {
             return Task.Run(() =>
             {
-                _log.Information("Time passed : {0}", result.ElapsedMs);
+                _log.Information("Time passed : {0}", result.Elapsed);
                 _log.Information("Nps         : {0}", result.Nps);
                 if (_usingEpd)
                     _log.Information("Result      : {0} - should be {1}", result.Result, result.CorrectResult);
