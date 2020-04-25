@@ -100,6 +100,14 @@ namespace Rudz.Chess.UCI
         public string CurrentMoveNum(int moveNumber, Move move, ulong visitedNodes, TimeSpan time)
             => $"info currmovenumber {moveNumber} currmove {move} nodes {visitedNodes} time {time}";
 
+        public string Score(int value, int mateInMaxPly, int valueMate) =>
+            Math.Abs(value) >= mateInMaxPly
+                ? $"mate {(value > 0 ? valueMate - value + 1 : -valueMate - value) / 2}"
+                : $"cp {(value / 100)}";
+
+        public string ScoreCp(int value)
+            => $"info score cp {value / 100}";
+
         /// <summary>
         /// Print all the options default values in chronological
         /// insertion order (the idx field) and in the format defined by the UCI protocol.

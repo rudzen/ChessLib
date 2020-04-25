@@ -42,5 +42,9 @@ namespace Rudz.Chess.UCI
         string BestMove(Move move, Move ponderMove);
 
         string CurrentMoveNum(int moveNumber, Move move, ulong visitedNodes, TimeSpan time);
+
+        string Score(int value, int mateInMaxPly, int valueMate);
+
+        string ScoreCp(int value);
     }
 }
