@@ -53,7 +53,7 @@ namespace Rudz.Chess
         void AddPiece(PieceTypes pt, Square sq, Player c);
 
         void MovePiece(Square from, Square to);
-            
+
         bool MakeMove(Move m);
 
         void TakeMove(Move m);
@@ -80,11 +80,11 @@ namespace Rudz.Chess
 
         BitBoard Pieces(PieceTypes pt);
 
-        BitBoard Pieces(PieceTypes pt1, PieceTypes type2);
+        BitBoard Pieces(PieceTypes pt1, PieceTypes pt2);
 
         BitBoard Pieces(PieceTypes pt, Player side);
 
-        BitBoard Pieces(PieceTypes pt1, PieceTypes type2, Player side);
+        BitBoard Pieces(PieceTypes pt1, PieceTypes pt2, Player side);
 
         Square GetPieceSquare(PieceTypes pt, Player color);
 
@@ -118,7 +118,7 @@ namespace Rudz.Chess
 
         CastlelingSides IsCastleMove(string m);
 
-        Move StringToMove(string m);
+        Move StringToMove(string m, Player stm);
 
         bool CanCastle(CastlelingSides sides);
 
@@ -133,5 +133,9 @@ namespace Rudz.Chess
         bool IsMate();
 
         FenData GenerateFen();
+
+        HashKey GetPiecesKey();
+
+        HashKey GetPawnKey();
     }
 }

@@ -187,7 +187,6 @@ namespace Rudz.Chess
 
             // correctly clear all pieces and invoke possible notification(s)
             Pos.Clear();
-            Pos.State.Clear();
 
             var chunk = fen.Chunk();
 
@@ -225,7 +224,8 @@ namespace Rudz.Chess
 
                     var square = new Square(r - 1, f - 1);
 
-                    AddPiece(square, player, (PieceTypes)pieceIndex);
+                    var pc = ((PieceTypes) pieceIndex).MakePiece(player);
+                    Pos.AddPiece(pc, square);
 
                     f++;
                 }
@@ -242,16 +242,16 @@ namespace Rudz.Chess
             // castleling
             chunk = fen.Chunk();
 
-            if (!SetupCastleling(chunk))
+            var (castlelingOk, castlelingRights) = SetupCastleling(chunk);
+            if (!castlelingOk)
                 return new FenError(-5, fen.Index);
 
             // en-passant
             chunk = fen.Chunk();
 
-            if (chunk.Length == 1 || chunk[0] == '-' || !chunk[0].InBetween('a', 'h'))
-                State.EnPassantSquare = Squares.none;
-            else
-                State.EnPassantSquare = chunk[1].InBetween('3', '6') ? Squares.none : new Square(chunk[1] - '1', chunk[0] - 'a').Value;
+            Square enPessantSquare = chunk.Length == 1 || chunk[0] == '-' || !chunk[0].InBetween('a', 'h')
+                ? Squares.none
+                : chunk[1].InBetween('3', '6') ? Squares.none : new Square(chunk[1] - '1', chunk[0] - 'a').Value;
 
             // move number
             chunk = fen.Chunk();
@@ -272,33 +272,41 @@ namespace Rudz.Chess
                     moveNum--;
             }
 
-            PositionIndex = PositionStart = moveNum;
+            PositionStart = moveNum;
 
-            Pos.State = _stateList[PositionIndex];
-
-            State.ReversibleHalfMoveCount = halfMoveNum;
-
-            State.SideToMove = player;
+            var key = Pos.GetPiecesKey();
+            var pawnKey = Pos.GetPawnKey();
 
             if (player.IsBlack())
             {
-                State.Key ^= Zobrist.GetZobristSide();
-                State.PawnStructureKey ^= Zobrist.GetZobristSide();
+                var k = Zobrist.GetZobristSide();
+                key ^= k;
+                pawnKey ^= k;
             }
 
-            State.Key ^= State.CastlelingRights.GetZobristCastleling();
+            key ^= castlelingRights.GetZobristCastleling();
 
-            if (State.EnPassantSquare != Squares.none)
-                State.Key ^= State.EnPassantSquare.File().GetZobristEnPessant();
+            if (enPessantSquare != Squares.none)
+                key ^= enPessantSquare.File().GetZobristEnPessant();
 
             var ksq = Pos.GetPieceSquare(PieceTypes.King, player);
 
-            State.Checkers = Pos.AttacksTo(ksq);
-            State.InCheck = Pos.IsAttacked(ksq, ~player);
+            Pos.State = _stateList[PositionIndex];
+            var state = Pos.State;
+            state.EnPassantSquare = enPessantSquare;
+            state.ReversibleHalfMoveCount = halfMoveNum;
+            state.SideToMove = player;
+            state.CastlelingRights = castlelingRights;
+            state.Checkers = Pos.AttacksTo(ksq);
+            state.InCheck = Pos.IsAttacked(ksq, ~player);
+            state.Key = key;
+            state.PawnStructureKey = pawnKey;
 
             // Set hidden checkers
             ksq = Pos.GetPieceSquare(PieceTypes.King, ~player);
-            State.HiddenCheckers = Pos.AttacksTo(ksq);
+            state.HiddenCheckers = Pos.AttacksTo(ksq);
+
+            Pos.State = state;
 
             return 0;
         }
@@ -375,7 +383,7 @@ namespace Rudz.Chess
             }
 
             _output.AppendLine("    a   b   c   d   e   f   g   h");
-            _output.AppendLine($"Zobrist : 0x{State.Key:X}");
+            _output.AppendLine($"Zobrist : 0x{State.Key.Key:X}");
             return _output.ToString();
         }
 
@@ -416,22 +424,6 @@ namespace Rudz.Chess
                 Table.Store(posKey, (int)tot, Bound.Exact, (sbyte)depth, move, 0);
 
             return tot;
-        }
-
-        /// <summary>
-        /// Adds a piece to the board, and updates the hash keys if needed
-        /// </summary>
-        /// <param name="sq">The square for the piece</param>
-        /// <param name="c">For which side the piece is to be added</param>
-        /// <param name="pt">The type of piece to add</param>
-        private void AddPiece(Square sq, Player c, PieceTypes pt)
-        {
-            var pc = pt.MakePiece(c);
-            Pos.AddPiece(pc, sq);
-            State.Material.Add(pc);
-            State.Key ^= pc.GetZobristPst(sq);
-            if (pt == PieceTypes.Pawn)
-                State.PawnStructureKey ^= pc.GetZobristPst(sq);
         }
 
         /// <summary>
@@ -519,13 +511,15 @@ namespace Rudz.Chess
             return false;
         }
 
-        private bool SetupCastleling(ReadOnlySpan<char> castleling)
+        private (bool, CastlelingRights) SetupCastleling(ReadOnlySpan<char> castleling)
         {
             // reset castleling rights to defaults
             _castleRightsMask.Fill(CastlelingRights.Any);
 
             if (castleling.Length == 1 && castleling[0] == '-')
-                return true;
+                return (true, CastlelingRights.None);
+
+            var castlelingRights = CastlelingRights.None;
 
             foreach (var token in castleling)
             {
@@ -562,13 +556,13 @@ namespace Rudz.Chess
                 }
 
                 if (side != CastlelingSides.None)
-                    AddCastleRights(rookFile, player, side);
+                    castlelingRights |= AddCastleRights(rookFile, player, side);
             }
 
-            return true;
+            return (true, castlelingRights);
         }
 
-        private void AddCastleRights(int rookFile, Player us, CastlelingSides castlelingSide)
+        private CastlelingRights AddCastleRights(int rookFile, Player us, CastlelingSides castlelingSide)
         {
             var isKingSideCastleling = castlelingSide == CastlelingSides.King;
             var index = (!isKingSideCastleling).ToInt();
@@ -609,10 +603,10 @@ namespace Rudz.Chess
             if (rookFile < 0)
             {
                 _xfen = false;
-                return;
+                return CastlelingRights.None;
             }
 
-            State.CastlelingRights |= us.GetCastlePositionalOr(index);
+            var result = us.GetCastlePositionalOr(index);
             var castlelingMask = castlelingSide.GetCastleAllowedMask(us);
             var ksq = Pos.GetPieceSquare(PieceTypes.King, us);
             var them = ~us;
@@ -624,6 +618,8 @@ namespace Rudz.Chess
 
             if (ksq.File() != 4 || rookFile != (isKingSideCastleling ? 7 : 0))
                 _chess960 = true;
+
+            return result;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

@@ -29,6 +29,7 @@ namespace Rudz.Chess
     using Enums;
     using Extensions;
     using Fen;
+    using Hash;
     using System;
     using System.Collections;
     using System.Collections.Generic;
@@ -38,9 +39,9 @@ namespace Rudz.Chess
     using Types;
 
     /// <summary>
-    /// The main board representation class.
-    /// It stores all the information about the current board in a simple structure.
-    /// It also serves the purpose of being able to give the UI controller feedback on various things on the board
+    /// The main board representation class. It stores all the information about the current board
+    /// in a simple structure. It also serves the purpose of being able to give the UI controller
+    /// feedback on various things on the board
     /// </summary>
     public sealed class Position : IPosition
     {
@@ -162,7 +163,7 @@ namespace Rudz.Chess
             var from = m.GetFromSquare();
             var pc = m.GetMovingPiece();
             var us = m.GetMovingSide();
-            
+
             if (m.IsCastlelingMove())
             {
                 MovePiece(to, from);
@@ -193,8 +194,7 @@ namespace Rudz.Chess
         public bool IsPieceTypeOnSquare(Square sq, PieceTypes pt) => GetPieceType(sq) == pt;
 
         /// <summary>
-        /// Detects any pinned pieces
-        /// For more info : https://en.wikipedia.org/wiki/Pin_(chess)
+        /// Detects any pinned pieces For more info : https://en.wikipedia.org/wiki/Pin_(chess)
         /// </summary>
         /// <param name="sq">The square</param>
         /// <param name="c">The side</param>
@@ -339,7 +339,7 @@ namespace Rudz.Chess
         public bool AttackedByPawn(Square sq, Player c) => (Pieces(PieceTypes.Pawn, c) & sq.PawnAttack(~c)) != 0;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool AttackedByKing(Square sq, Player c) => (Pieces(PieceTypes.King, c) & sq.GetAttacks(PieceTypes.King)) != 0;
+        public bool AttackedByKing(Square sq, Player c) => (sq.GetAttacks(PieceTypes.King) & GetPieceSquare(PieceTypes.King, c)) != 0;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Square GetRookCastleFrom(Square sq) => _rookCastlesFrom[sq.AsInt()];
@@ -377,11 +377,9 @@ namespace Rudz.Chess
         }
 
         /// <summary>
-        /// Checks from a string if the move actually is a castle move.
-        /// Note:
-        /// - The unique cases with amended piece location check
-        ///   is a *shallow* detection, it should be the sender
-        ///   that guarantee that it's a real move.
+        /// Checks from a string if the move actually is a castle move. Note:
+        /// - The unique cases with amended piece location check is a *shallow* detection, it should
+        /// be the sender that guarantee that it's a real move.
         /// </summary>
         /// <param name="m">The string containing the move</param>
         /// <returns></returns>
@@ -407,16 +405,15 @@ namespace Rudz.Chess
         }
 
         /// <summary>
-        /// TODO : This method is incomplete, and is not meant to be used atm.
-        /// Parse a string and convert to a valid move. If the move is not valid.. hell breaks loose.
+        /// TODO : This method is incomplete, and is not meant to be used atm. Parse a string and
+        /// convert to a valid move. If the move is not valid.. hell breaks loose.
         /// * NO EXCEPTIONS IS ALLOWED IN THIS FUNCTION *
         /// </summary>
         /// <param name="m">string representation of the move to parse</param>
         /// <returns>
-        /// On fail : Move containing from and to squares as ESquare.none (empty move)
-        /// On Ok   : The move!
+        /// On fail : Move containing from and to squares as ESquare.none (empty move) On Ok : The move!
         /// </returns>
-        public Move StringToMove(string m)
+        public Move StringToMove(string m, Player stm)
         {
             // guards
             if (m.IsNullOrWhiteSpace())
@@ -438,7 +435,8 @@ namespace Rudz.Chess
             var from = new Square(m[1] - '1', m[0] - 'a');
             var to = new Square(m[3] - '1', m[2] - 'a');
 
-            // local function to determine if the move is actually a castleling move by looking at the piece location of the squares
+            // local function to determine if the move is actually a castleling move by looking at
+            // the piece location of the squares
 
             // part one of pillaging the castleType.. detection of chess 960 - shredder fen
             if (castleType == CastlelingSides.None)
@@ -447,13 +445,13 @@ namespace Rudz.Chess
             // part two of pillaging the castleType var, since it might have changed
             if (castleType != CastlelingSides.None)
             {
-                from = GetKingCastleFrom(State.SideToMove, castleType);
-                to = castleType.GetKingCastleTo(State.SideToMove);
+                from = GetKingCastleFrom(stm, castleType);
+                to = castleType.GetKingCastleTo(stm);
             }
 
             var moveList = this.GenerateMoves();
             var moves = moveList.GetMoves();
-            
+
             // ** untested area **
             foreach (var move in moves)
             {
@@ -461,7 +459,7 @@ namespace Rudz.Chess
                     continue;
                 if (move.GetToSquare() != to)
                     continue;
-                
+
                 if (castleType == CastlelingSides.None && move.IsCastlelingMove())
                     continue;
                 if (!move.IsPromotionMove())
@@ -497,8 +495,9 @@ namespace Rudz.Chess
             if ((castleSpan & Pieces()) != castlePieces)
                 return false;
 
-            // Check that no square between the king's initial and final squares (including the initial and final squares)
-            // may be under attack by an enemy piece. Initial square was already checked a this point.
+            // Check that no square between the king's initial and final squares (including the
+            // initial and final squares) may be under attack by an enemy piece. Initial square was
+            // already checked a this point.
 
             c = ~c;
 
@@ -507,7 +506,8 @@ namespace Rudz.Chess
         }
 
         /// <summary>
-        /// Determine if a move is legal or not, by performing the move and checking if the king is under attack afterwards.
+        /// Determine if a move is legal or not, by performing the move and checking if the king is
+        /// under attack afterwards.
         /// </summary>
         /// <param name="m">The move to check</param>
         /// <param name="pc">The moving piece</param>
@@ -533,14 +533,18 @@ namespace Rudz.Chess
         }
 
         /// <summary>
-        /// <para>"Validates" a move using simple logic. For example that the piece actually being moved exists etc.</para>
+        /// <para>
+        /// "Validates" a move using simple logic. For example that the piece actually being moved
+        /// exists etc.
+        /// </para>
         /// <para>This is basically only useful while developing and/or debugging</para>
         /// </summary>
         /// <param name="m">The move to check for logical errors</param>
         /// <returns>True if move "appears" to be legal, otherwise false</returns>
         public bool IsPseudoLegal(Move m)
         {
-            // Verify that the piece actually exists on the board at the location defined by the move struct
+            // Verify that the piece actually exists on the board at the location defined by the
+            // move struct
             if ((Pieces(m.GetMovingPiece()) & m.GetFromSquare()).Empty())
                 return false;
 
@@ -594,12 +598,9 @@ namespace Rudz.Chess
             => this.GenerateMoves().Count == 0;
 
         /// <summary>
-        /// Parses the board layout to a FEN representation..
-        /// Beware, goblins are a foot.
+        /// Parses the board layout to a FEN representation.. Beware, goblins are a foot.
         /// </summary>
-        /// <returns>
-        /// The FenData which contains the fen string that was generated.
-        /// </returns>
+        /// <returns>The FenData which contains the fen string that was generated.</returns>
         public FenData GenerateFen()
         {
             var sb = new StringBuilder(Fen.Fen.MaxFenLen);
@@ -669,6 +670,40 @@ namespace Rudz.Chess
             sb.Append(' ');
             sb.Append(State.HalfMoveCount + 1);
             return new FenData(sb.ToString());
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public HashKey GetPiecesKey()
+        {
+            var result = new HashKey();
+
+            var pieces = Pieces();
+            while (pieces)
+            {
+                var sq = pieces.Lsb();
+                var pc = GetPiece(sq);
+                result ^= pc.GetZobristPst(sq);
+                BitBoards.ResetLsb(ref pieces);
+            }
+
+            return result;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public HashKey GetPawnKey()
+        {
+            var result = Zobrist.ZobristNoPawn;
+
+            var pieces = Pieces(PieceTypes.Pawn);
+            while (pieces)
+            {
+                var sq = pieces.Lsb();
+                var pc = GetPiece(sq);
+                result ^= pc.GetZobristPst(sq);
+                BitBoards.ResetLsb(ref pieces);
+            }
+
+            return result;
         }
 
         public IEnumerator<Piece> GetEnumerator() => BoardLayout.Cast<Piece>().GetEnumerator();

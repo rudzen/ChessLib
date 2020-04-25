@@ -193,9 +193,9 @@ namespace Rudz.Chess.Transposition
                 var index = 0;
                 var candidate = ttc.Cluster[index];
                 var g = _generation;
-                for (var i = 0; i < ttc.Cluster.Length; ++i)
+                var i = 0;
+                foreach (var ttEntry in ttc.Cluster)
                 {
-                    var ttEntry = ttc.Cluster[i];
                     var (cc1, cc2, cc3, cc4) =
                         (candidate.Generation == g,
                             ttEntry.Generation == g,
@@ -207,6 +207,8 @@ namespace Rudz.Chess.Transposition
                         index = i;
                         candidate = ttEntry;
                     }
+
+                    i++;
                 }
 
                 clusterIndex = index;
