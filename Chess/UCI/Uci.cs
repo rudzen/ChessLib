@@ -77,6 +77,9 @@ namespace Rudz.Chess.UCI
             O["UCI_Chess960"] = new Option("UCI_Chess960", O.Count, false);
         }
 
+        public int Nps(ulong nodes, TimeSpan time)
+            => (int) ((int) nodes * 1000.0 / time.TotalMilliseconds);
+
         public Move MoveFromUci(IPosition pos, string uciMove)
         {
             var moveList = pos.GenerateMoves();
@@ -110,6 +113,22 @@ namespace Rudz.Chess.UCI
         public string Depth(int depth)
             => $"info depth {depth}";
 
+        public string Pv(int count, int score, int depth, int selectiveDepth, int alpha, int beta, TimeSpan time, IEnumerable<Move> pvLine, ulong nodes)
+        {
+            var sb = new StringBuilder(256);
+            sb.AppendFormat("info multipv {0} depth {1} seldepth {2} score {3} ", count + 1, depth, selectiveDepth, score);
+            
+            if (score >= beta)
+                sb.Append("lowerbound ");
+            else if (score <= alpha)
+                sb.Append("upperbound ");
+
+            sb.AppendFormat("nodes {0} nps {1} tbhits {2} time {3} ", nodes, Nps(nodes, time), Game.Table.Hits, time.Milliseconds);
+            sb.AppendJoin(' ', pvLine);
+
+            return sb.ToString();
+        }
+        
         /// <summary>
         /// Print all the options default values in chronological
         /// insertion order (the idx field) and in the format defined by the UCI protocol.

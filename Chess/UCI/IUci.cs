@@ -24,6 +24,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using System.Collections.Generic;
+using System.Text;
+
 namespace Rudz.Chess.UCI
 {
     using System;
@@ -37,6 +40,8 @@ namespace Rudz.Chess.UCI
         Action<IOption> OnHashSize { get; set; }
         Action<IOption> OnClearHash { get; set; }
 
+        int Nps(ulong nodes, TimeSpan time);
+        
         Move MoveFromUci(IPosition pos, string uciMove);
 
         string BestMove(Move move, Move ponderMove);
@@ -48,5 +53,7 @@ namespace Rudz.Chess.UCI
         string ScoreCp(int value);
 
         string Depth(int depth);
+
+        string Pv(int count, int score, int depth, int selectiveDepth, int alpha, int beta, TimeSpan time, IEnumerable<Move> pvLine, ulong nodes);
     }
 }
