@@ -118,8 +118,6 @@ namespace Rudz.Chess
 
         CastlelingSides IsCastleMove(string m);
 
-        Move StringToMove(string m, Player stm);
-
         bool CanCastle(CastlelingSides sides);
 
         bool IsCastleAllowed(Square sq);

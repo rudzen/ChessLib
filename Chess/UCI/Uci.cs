@@ -24,6 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using Rudz.Chess.Types;
+
 namespace Rudz.Chess.UCI
 {
     using System;
@@ -76,6 +78,20 @@ namespace Rudz.Chess.UCI
             O["UCI_Chess960"] = new Option("UCI_Chess960", O.Count, false);
         }
 
+        public Move MoveFromUci(IPosition pos, string uciMove)
+        {
+            var moveList = pos.GenerateMoves();
+            var moves = moveList.GetMoves();
+
+            foreach (var move in moves)
+            {
+                if (uciMove.Equals(move.ToString(), StringComparison.InvariantCultureIgnoreCase))
+                    return move;
+            }
+
+            return MoveExtensions.EmptyMove;
+        }
+        
         /// <summary>
         /// Print all the options default values in chronological
         /// insertion order (the idx field) and in the format defined by the UCI protocol.

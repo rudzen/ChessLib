@@ -27,6 +27,7 @@ SOFTWARE.
 namespace Rudz.Chess.UCI
 {
     using System;
+    using Types;
 
     public interface IUci
     {
@@ -35,5 +36,7 @@ namespace Rudz.Chess.UCI
         Action<IOption> OnThreads { get; set; }
         Action<IOption> OnHashSize { get; set; }
         Action<IOption> OnClearHash { get; set; }
+
+        Move MoveFromUci(IPosition pos, string uciMove);
     }
 }
