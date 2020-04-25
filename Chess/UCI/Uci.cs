@@ -24,13 +24,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using Rudz.Chess.Types;
-
 namespace Rudz.Chess.UCI
 {
     using System;
     using System.Collections.Generic;
     using System.Text;
+    using Types;
 
     public class Uci : IUci
     {
@@ -107,6 +106,9 @@ namespace Rudz.Chess.UCI
 
         public string ScoreCp(int value)
             => $"info score cp {value / 100}";
+
+        public string Depth(int depth)
+            => $"info depth {depth}";
 
         /// <summary>
         /// Print all the options default values in chronological

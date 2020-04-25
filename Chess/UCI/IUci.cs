@@ -46,5 +46,7 @@ namespace Rudz.Chess.UCI
         string Score(int value, int mateInMaxPly, int valueMate);
 
         string ScoreCp(int value);
+
+        string Depth(int depth);
     }
 }
