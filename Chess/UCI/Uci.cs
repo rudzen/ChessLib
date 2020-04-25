@@ -26,6 +26,7 @@ SOFTWARE.
 
 namespace Rudz.Chess.UCI
 {
+    using Microsoft.Extensions.ObjectPool;
     using System;
     using System.Collections.Generic;
     using System.Text;
@@ -39,8 +40,12 @@ namespace Rudz.Chess.UCI
 
         private static readonly string[] OptionTypeStrings;
 
+        private readonly ObjectPool<StringBuilder> _pvPool;
+        
         public Uci(IDictionary<string, IOption> options, int maxThreads = 128)
         {
+            var policy = new StringBuilderPooledObjectPolicy();
+            _pvPool = new DefaultObjectPool<StringBuilder>(policy, 128);
             O = options;
             Initialize(maxThreads);
         }
@@ -105,7 +110,7 @@ namespace Rudz.Chess.UCI
         public string Score(int value, int mateInMaxPly, int valueMate) =>
             Math.Abs(value) >= mateInMaxPly
                 ? $"mate {(value > 0 ? valueMate - value + 1 : -valueMate - value) / 2}"
-                : $"cp {(value / 100)}";
+                : $"cp {value / 100}";
 
         public string ScoreCp(int value)
             => $"info score cp {value / 100}";
@@ -115,7 +120,8 @@ namespace Rudz.Chess.UCI
 
         public string Pv(int count, int score, int depth, int selectiveDepth, int alpha, int beta, TimeSpan time, IEnumerable<Move> pvLine, ulong nodes)
         {
-            var sb = new StringBuilder(256);
+            var sb = _pvPool.Get();
+            
             sb.AppendFormat("info multipv {0} depth {1} seldepth {2} score {3} ", count + 1, depth, selectiveDepth, score);
             
             if (score >= beta)
@@ -126,7 +132,9 @@ namespace Rudz.Chess.UCI
             sb.AppendFormat("nodes {0} nps {1} tbhits {2} time {3} ", nodes, Nps(nodes, time), Game.Table.Hits, time.Milliseconds);
             sb.AppendJoin(' ', pvLine);
 
-            return sb.ToString();
+            var result = sb.ToString();
+            _pvPool.Return(sb);
+            return result;
         }
         
         /// <summary>
