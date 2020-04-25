@@ -219,7 +219,7 @@ namespace Perft
 
                 errors += await LogResults(result).ConfigureAwait(false);
 
-                if (string.IsNullOrEmpty(baseFileName))
+                if (baseFileName.IsNullOrEmpty())
                     continue;
 
                 await WriteOutput(result, baseFileName, cancellationToken);

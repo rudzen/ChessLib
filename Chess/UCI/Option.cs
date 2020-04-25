@@ -115,7 +115,7 @@ namespace Rudz.Chess.UCI
         /// <returns></returns>
         public IOption SetCurrentValue(string v)
         {
-            if (Type != UciOptionType.Button && (v == null || string.IsNullOrEmpty(v))
+            if (Type != UciOptionType.Button && (v == null || v.IsNullOrEmpty())
                 || Type == UciOptionType.Check && !bool.TryParse(v, out var r)
                 || Type == UciOptionType.Spin)
             {
