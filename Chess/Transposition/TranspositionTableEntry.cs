@@ -30,7 +30,7 @@ namespace Rudz.Chess.Transposition
     using System.Runtime.InteropServices;
     using Types;
 
-    [StructLayout(LayoutKind.Sequential, Pack=2)]
+    [StructLayout(LayoutKind.Sequential, Pack = 2)]
     public struct TranspositionTableEntry
     {
         public uint Key32;

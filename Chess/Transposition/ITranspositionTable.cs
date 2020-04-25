@@ -35,7 +35,6 @@ namespace Rudz.Chess.Transposition
         /// </summary>
         ulong Hits { get; }
 
-
         int Size { get; }
 
         /// <summary>
@@ -74,10 +73,9 @@ namespace Rudz.Chess.Transposition
         TranspositionTableEntry ProbeFirst(HashKey key);
 
         /// <summary>
-        /// Stores a move in the transposition table.
-        /// It will automatically detect the best cluster location to store it in.
-        /// If a similar move already is present, a simple check if done to make sure
-        /// it actually is an improvement of the previous move.
+        /// Stores a move in the transposition table. It will automatically detect the best cluster
+        /// location to store it in. If a similar move already is present, a simple check if done to
+        /// make sure it actually is an improvement of the previous move.
         /// </summary>
         /// <param name="key">The position key</param>
         /// <param name="value">The value of the move</param>
@@ -88,8 +86,7 @@ namespace Rudz.Chess.Transposition
         void Store(HashKey key, int value, Bound type, sbyte depth, Move move, int statValue);
 
         /// <summary>
-        /// Get the approximation full % of the table
-        /// // todo : fix
+        /// Get the approximation full % of the table // todo : fix
         /// </summary>
         /// <returns>The % as integer value</returns>
         int Fullness();

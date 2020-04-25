@@ -81,6 +81,7 @@ namespace Chess.Perft
 
             foreach (var fd in Positions.Select(p => new FenData(p.Fen)))
             {
+                Game.Table.NewSearch();
                 CurrentGame.SetFen(fd);
                 var res = CurrentGame.Perft(depth);
                 BoardPrintCallback?.Invoke(fd.ToString());

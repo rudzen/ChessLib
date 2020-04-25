@@ -26,8 +26,8 @@ SOFTWARE.
 
 namespace Rudz.Chess.Transposition
 {
+    using Exceptions;
     using System;
-    using System.Collections.Generic;
     using System.Linq;
     using System.Runtime.CompilerServices;
     using Types;
@@ -36,7 +36,7 @@ namespace Rudz.Chess.Transposition
     {
         private static readonly int ClusterSize;
 
-        private List<ITTCluster> _table;
+        private ITTCluster[] _table;
         private ulong _elements;
         private int _fullnessElements;
         private sbyte _generation;
@@ -51,6 +51,7 @@ namespace Rudz.Chess.Transposition
 
         public TranspositionTable(int mbSize)
         {
+            _table = Array.Empty<ITTCluster>();
             SetSize(mbSize);
         }
 
@@ -74,25 +75,30 @@ namespace Rudz.Chess.Transposition
         /// <returns>The number of clusters in the table</returns>
         public ulong SetSize(int mbSize)
         {
+            if (mbSize < 0)
+                throw new TranspositionTableException($"Unable to create table with negative size: {mbSize}");
+
             Size = mbSize;
             var size = (int)(((ulong)mbSize << 20) / (ulong)ClusterSize);
-            var trim = false;
-            if (_table == null)
-                _table = new List<ITTCluster>(size);
-            else if (_table.Count != size)
+            var resize = false;
+            var currentSize = _table.Length;
+            if (!_table.Any())
             {
-                trim = _table.Count > size;
-                _table.Capacity = size;
+                _table = new ITTCluster[size];
+                PopulateTable(0, size);
             }
-            
-            _elements = (ulong)size;
-            if (trim)
-                _table.TrimExcess();
-            else
-                _table.Clear();
+            else if (currentSize != size)
+                resize = true;
 
+            if (resize)
+            {
+                Array.Resize(ref _table, size);
+                if (currentSize < size)
+                    PopulateTable(currentSize, size);
+            }
+
+            _elements = (ulong)size;
             _generation = 1;
-            PopulateTable();
             _fullnessElements = Math.Min(size, 250);
 
             return (ulong)(size * ClusterSize);
@@ -127,7 +133,6 @@ namespace Rudz.Chess.Transposition
             // probing retrieves an element.
 
             TranspositionTableEntry e = default;
-            e.Defaults();
             var set = false;
             for (var i = 0; i < ttc.Cluster.Length; ++i)
             {
@@ -137,11 +142,12 @@ namespace Rudz.Chess.Transposition
                 ttc.Cluster[i].Generation = g;
                 e = ttc.Cluster[i];
                 set = true;
+                Hits++;
                 break;
             }
 
-            if (set)
-                Hits++;
+            if (!set)
+                e.Defaults();
 
             return (set, e);
         }
@@ -241,13 +247,13 @@ namespace Rudz.Chess.Transposition
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void PopulateTable()
+        private void PopulateTable(int from, int to)
         {
-            for (var i = 0ul; i < _elements; ++i)
+            for (var i = from; i < to; ++i)
             {
                 var ttc = new TTCluster();
                 Array.Fill(ttc.Cluster, TTCluster.DefaultEntry);
-                _table.Add(ttc);
+                _table[i] = ttc;
             }
         }
     }

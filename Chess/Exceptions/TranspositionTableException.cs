@@ -1,4 +1,4 @@
-﻿/*
+/*
 ChessLib, a chess data structure library
 
 MIT License
@@ -24,38 +24,30 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Transposition
+namespace Rudz.Chess.Exceptions
 {
     using System;
-    using Types;
+    using System.Runtime.Serialization;
 
-    /// <summary>
-    /// Stores an array of <see cref="TranspositionTableEntry"/>. In essence it acts like a entry
-    /// bucket of 4 elements for each position stored in the <see cref="TranspositionTable"/>
-    /// </summary>
-    public sealed class TTCluster : ITTCluster
+    [Serializable]
+    public class TranspositionTableException : ArgumentException
     {
-        public static readonly TranspositionTableEntry DefaultEntry = new TranspositionTableEntry(0, MoveExtensions.EmptyMove, 0, 0, 0, 0, Bound.Void);
-
-        private static readonly TranspositionTableEntry[] Defaults = { DefaultEntry, DefaultEntry, DefaultEntry, DefaultEntry };
-
-        public TTCluster()
+        public TranspositionTableException()
         {
-            Reset();
         }
 
-        public TranspositionTableEntry[] Cluster { get; private set; }
-
-        public TranspositionTableEntry this[int key]
+        public TranspositionTableException(string message) : base(message)
         {
-            get => Cluster[key];
-            set => Cluster[key] = value;
         }
 
-        public void Reset()
+        public TranspositionTableException(string message, Exception inner) : base(message, inner)
         {
-            Cluster = new TranspositionTableEntry[4];
-            Array.Copy(Defaults, Cluster, Defaults.Length);
+        }
+
+        protected TranspositionTableException(
+            SerializationInfo info,
+            StreamingContext context) : base(info, context)
+        {
         }
     }
 }
