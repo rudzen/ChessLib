@@ -33,7 +33,7 @@ namespace Rudz.Chess.Types
     /// Square data struct.
     /// Contains a single enum value which represents a square on the board.
     /// </summary>
-    public struct Square
+    public readonly struct Square
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Square(int square) => Value = (Squares)square;
@@ -52,7 +52,7 @@ namespace Rudz.Chess.Types
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private Square(Squares square) => Value = square;
 
-        public Squares Value { get; private set; }
+        public readonly Squares Value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator Square(int value) => new Square(value);
@@ -73,31 +73,31 @@ namespace Rudz.Chess.Types
         public static bool operator !=(Square left, Squares right) => left.Value != right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Square operator +(Square left, Square right) => left.AsInt() + right.AsInt();
+        public static Square operator +(Square left, Square right) => left.Value + right.AsInt();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Square operator +(Square left, int right) => left.AsInt() + right;
+        public static Square operator +(Square left, int right) => left.Value + right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Square operator +(Square left, Direction right) => left.AsInt() + (int)right.Value;
+        public static Square operator +(Square left, Direction right) => left.Value + (int)right.Value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Square operator +(Square left, Directions right) => left.AsInt() + (int)right;
+        public static Square operator +(Square left, Directions right) => left.Value + (int)right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Square operator -(Square left, Square right) => left.AsInt() - right.AsInt();
+        public static Square operator -(Square left, Square right) => left.Value - right.Value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Square operator -(Square left, int right) => left.AsInt() - right;
+        public static Square operator -(Square left, int right) => left.Value - right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Square operator -(Square left, Direction right) => left.AsInt() - (int)right.Value;
+        public static Square operator -(Square left, Direction right) => left.Value - (int)right.Value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Square operator -(Square left, Directions right) => left.AsInt() - (int)right;
+        public static Square operator -(Square left, Directions right) => left.Value - (int)right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Square operator ++(Square square) => ++square.Value;
+        public static Square operator ++(Square square) => new Square(square.Value + 1);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static BitBoard operator &(Square left, ulong right) => left.BitBoardSquare() & right;
@@ -121,10 +121,16 @@ namespace Rudz.Chess.Types
         public static int operator >>(Square left, int right) => left.AsInt() >> right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator >(Square left, Square right) => left.AsInt() > right.AsInt();
+        public static bool operator >(Square left, Square right) => left.Value > right.Value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator <(Square left, Square right) => left.AsInt() < right.AsInt();
+        public static bool operator <(Square left, Square right) => left.Value < right.Value;
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool operator <=(Square left, Square right) => left.Value <= right.Value;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool operator >=(Square left, Square right) => left.Value >= right.Value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator true(Square sq) => sq.IsValid();
@@ -134,6 +140,12 @@ namespace Rudz.Chess.Types
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Square Relative(Player p) => (int) Value ^ (p.Side * 56);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Square Max(Square other) => Value > other.Value ? this : other;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Square Min(Square other) => Value <= other.Value ? this : other;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override string ToString() => this.GetSquareString();
