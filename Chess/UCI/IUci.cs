@@ -38,5 +38,7 @@ namespace Rudz.Chess.UCI
         Action<IOption> OnClearHash { get; set; }
 
         Move MoveFromUci(IPosition pos, string uciMove);
+
+        string BestMove(Move move, Move ponderMove);
     }
 }

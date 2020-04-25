@@ -91,7 +91,14 @@ namespace Rudz.Chess.UCI
 
             return MoveExtensions.EmptyMove;
         }
-        
+
+        public string BestMove(Move move, Move ponderMove)
+        {
+            return !ponderMove.IsNullMove()
+                ? $"bestmove {move} ponder {ponderMove}"
+                : $"bestmove {move}";
+        }
+
         /// <summary>
         /// Print all the options default values in chronological
         /// insertion order (the idx field) and in the format defined by the UCI protocol.
