@@ -40,5 +40,7 @@ namespace Rudz.Chess.UCI
         Move MoveFromUci(IPosition pos, string uciMove);
 
         string BestMove(Move move, Move ponderMove);
+
+        string CurrentMoveNum(int moveNumber, Move move, ulong visitedNodes, TimeSpan time);
     }
 }

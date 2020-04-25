@@ -92,12 +92,13 @@ namespace Rudz.Chess.UCI
             return MoveExtensions.EmptyMove;
         }
 
-        public string BestMove(Move move, Move ponderMove)
-        {
-            return !ponderMove.IsNullMove()
+        public string BestMove(Move move, Move ponderMove) =>
+            !ponderMove.IsNullMove()
                 ? $"bestmove {move} ponder {ponderMove}"
                 : $"bestmove {move}";
-        }
+
+        public string CurrentMoveNum(int moveNumber, Move move, ulong visitedNodes, TimeSpan time)
+            => $"info currmovenumber {moveNumber} currmove {move} nodes {visitedNodes} time {time}";
 
         /// <summary>
         /// Print all the options default values in chronological
