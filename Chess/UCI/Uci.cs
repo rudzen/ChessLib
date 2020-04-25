@@ -137,7 +137,10 @@ namespace Rudz.Chess.UCI
             _pvPool.Return(sb);
             return result;
         }
-        
+
+        public string Fullness(ulong tbHits, ulong nodes, TimeSpan time)
+            => $"info hashfull {Game.Table.Fullness()} tbhits {tbHits} nodes {nodes} time {time.Milliseconds} nps {Nps(nodes, time)}";
+
         /// <summary>
         /// Print all the options default values in chronological
         /// insertion order (the idx field) and in the format defined by the UCI protocol.
