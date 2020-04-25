@@ -76,18 +76,20 @@ namespace Rudz.Chess.Transposition
         {
             Size = mbSize;
             var size = (int)(((ulong)mbSize << 20) / (ulong)ClusterSize);
+            var trim = false;
             if (_table == null)
-            {
                 _table = new List<ITTCluster>(size);
-                _elements = (ulong)size;
-            }
             else if (_table.Count != size)
             {
-                _elements = (ulong)size;
-                _table.Clear();
+                trim = _table.Count > size;
                 _table.Capacity = size;
-                _table.TrimExcess();
             }
+            
+            _elements = (ulong)size;
+            if (trim)
+                _table.TrimExcess();
+            else
+                _table.Clear();
 
             _generation = 1;
             PopulateTable();
