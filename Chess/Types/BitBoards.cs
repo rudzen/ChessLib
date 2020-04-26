@@ -340,6 +340,10 @@ namespace Rudz.Chess.Types
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static BitBoard PseudoAttacks(this PieceTypes pt, Square sq)
+            => PseudoAttacksBB[pt.AsInt()][sq.AsInt()];
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static BitBoard XrayBishopAttacks(this Square square, BitBoard occupied, BitBoard blockers)
         {
             var attacks = square.BishopAttacks(occupied);

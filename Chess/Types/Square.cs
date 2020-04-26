@@ -48,6 +48,9 @@ namespace Rudz.Chess.Types
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Square(Ranks rank, Files file)
             : this((int)rank, (int)file) { }
+        
+        public Square(Rank rank, File file)
+            : this(rank.AsInt(), file.AsInt()) { }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private Square(Squares square) => Value = square;
@@ -98,6 +101,9 @@ namespace Rudz.Chess.Types
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Square operator ++(Square square) => new Square(square.Value + 1);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Square operator --(Square square) => new Square(square.Value - 1);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static BitBoard operator &(Square left, ulong right) => left.BitBoardSquare() & right;
@@ -151,7 +157,7 @@ namespace Rudz.Chess.Types
         public override string ToString() => this.GetSquareString();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly bool Equals(Square other) => Value == other.Value;
+        public bool Equals(Square other) => Value == other.Value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override bool Equals(object obj) => obj is Square square && Equals(square);
@@ -160,18 +166,18 @@ namespace Rudz.Chess.Types
         public override int GetHashCode() => AsInt();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly int AsInt() => (int)Value;
+        public int AsInt() => (int)Value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly File File() => AsInt() & 7;
+        public File File() => AsInt() & 7;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly Rank Rank() => (Ranks)(AsInt() >> 3);
+        public Rank Rank() => (Ranks)(AsInt() >> 3);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly Rank RelativeRank(Player color) => Rank().RelativeRank(color);
+        public Rank RelativeRank(Player color) => Rank().RelativeRank(color);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly bool IsOppositeColor(Square other) => (((int)Value + Rank().AsInt() + (int)other.Value + other.Rank().AsInt()) & 1) != 0;
+        public bool IsOppositeColor(Square other) => (((int)Value + Rank().AsInt() + (int)other.Value + other.Rank().AsInt()) & 1) != 0;
     }
 }

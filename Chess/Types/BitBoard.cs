@@ -110,7 +110,7 @@ namespace Rudz.Chess.Types
             => left.Value | right.Value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ulong operator ^(BitBoard left, BitBoard right)
+        public static BitBoard operator ^(BitBoard left, BitBoard right)
             => left.Value ^ right.Value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
