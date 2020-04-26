@@ -27,6 +27,7 @@ SOFTWARE.
 namespace Rudz.Chess
 {
     using Enums;
+    using Extensions;
     using System;
     using Types;
 
@@ -61,10 +62,12 @@ namespace Rudz.Chess
         /// </summary>
         public BitBoard Checkers { get; set; }
 
+        public BitBoard[] CheckedSquares { get; set; }
+        
         /// <summary>
-        /// Represents checked squares for opposition
+        /// Represents discovered checked squares
         /// </summary>
-        public BitBoard HiddenCheckers { get; set; }
+        public BitBoard DicoveredCheckers { get; set; }
 
         public bool InCheck { get; set; }
 
@@ -86,6 +89,7 @@ namespace Rudz.Chess
             SideToMove = s.SideToMove;
             Pinned = s.Pinned;
             Checkers = s.Checkers;
+            Array.Copy(s.CheckedSquares, CheckedSquares, s.CheckedSquares.Length);
             InCheck = s.InCheck;
         }
 
@@ -96,6 +100,8 @@ namespace Rudz.Chess
             CastlelingRights = CastlelingRights.None;
             EnPassantSquare = Squares.none;
             SideToMove = PlayerExtensions.White;
+            Checkers = BitBoards.EmptyBitBoard;
+            CheckedSquares = new BitBoard[PieceTypes.PieceTypeNb.AsInt()];
         }
 
         public void Clear()
@@ -107,6 +113,7 @@ namespace Rudz.Chess
             CastlelingRights = CastlelingRights.None;
             EnPassantSquare = Squares.none;
             SideToMove = PlayerExtensions.White;
+            CheckedSquares.Fill(BitBoards.EmptyBitBoard);
         }
 
         public bool Equals(State other)
@@ -126,7 +133,7 @@ namespace Rudz.Chess
                    && SideToMove.Equals(other.SideToMove)
                    && Pinned.Equals(other.Pinned)
                    && Checkers.Equals(other.Checkers)
-                   && HiddenCheckers.Equals(other.HiddenCheckers)
+                   && DicoveredCheckers.Equals(other.DicoveredCheckers)
                    && InCheck == other.InCheck
                    && Equals(Previous, other.Previous);
         }
@@ -152,9 +159,11 @@ namespace Rudz.Chess
             hashCode.Add(SideToMove);
             hashCode.Add(Pinned);
             hashCode.Add(Checkers);
-            hashCode.Add(HiddenCheckers);
+            hashCode.Add(DicoveredCheckers);
             hashCode.Add(InCheck);
             hashCode.Add(Previous);
+            foreach (var checkedSquare in CheckedSquares)
+                hashCode.Add(checkedSquare);
             return hashCode.ToHashCode();
         }
     }

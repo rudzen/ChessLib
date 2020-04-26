@@ -30,6 +30,7 @@ namespace Rudz.Chess
     using Fen;
     using System;
     using System.Collections.Generic;
+    using System.Text;
     using Types;
 
     public interface IPosition : IEnumerable<Piece>
@@ -45,6 +46,8 @@ namespace Rudz.Chess
         Action<Piece, Square> PieceUpdated { get; set; }
 
         State State { get; set; }
+
+        bool Chess960 { get; }
 
         void Clear();
 
@@ -66,10 +69,14 @@ namespace Rudz.Chess
 
         BitBoard GetPinnedPieces(Square sq, Player c);
 
+        BitBoard CheckedSquares(PieceTypes pt);
+        
         bool IsOccupied(Square sq);
 
         bool IsAttacked(Square sq, Player c);
 
+        bool GivesCheck(Move m);
+        
         BitBoard PieceAttacks(Square sq, PieceTypes pt);
 
         BitBoard Pieces();
@@ -108,19 +115,27 @@ namespace Rudz.Chess
 
         bool AttackedByKing(Square sq, Player c);
 
-        Square GetRookCastleFrom(Square sq);
+        bool CanCastle(CastlelingRights cr);
 
-        void SetRookCastleFrom(Square indexSq, Square sq);
+        bool CanCastle(Player color);
 
-        Square GetKingCastleFrom(Player c, CastlelingSides sides);
+        bool CastlingImpeded(CastlelingRights cr);
 
-        void SetKingCastleFrom(Player c, Square sq, CastlelingSides sides);
+        Square CastlingRookSquare(CastlelingRights cr);
 
-        CastlelingSides IsCastleMove(string m);
+        //Square GetRookCastleFrom(Square sq);
 
-        bool CanCastle(CastlelingSides sides);
+        //void SetRookCastleFrom(Square indexSq, Square sq);
 
-        bool IsCastleAllowed(Square sq);
+        //Square GetKingCastleFrom(Player c, CastlelingSides sides);
+
+        //void SetKingCastleFrom(Player c, Square sq, CastlelingSides sides);
+
+        //CastlelingSides IsCastleMove(string m);
+
+        //bool CanCastle(CastlelingSides sides);
+
+        //bool IsCastleAllowed(Square sq);
 
         bool IsPseudoLegal(Move m);
 
@@ -135,5 +150,9 @@ namespace Rudz.Chess
         HashKey GetPiecesKey();
 
         HashKey GetPawnKey();
+
+        CastlelingRights SetCastlingRight(Player stm, Square rookFrom);
+
+        void MoveToString(Move m, StringBuilder output);
     }
 }

@@ -30,7 +30,6 @@ namespace Rudz.Chess
     using Fen;
     using System;
     using System.Collections.Generic;
-    using System.Text;
     using Types;
 
     public interface IGame : IEnumerable<Piece>
@@ -73,14 +72,6 @@ namespace Rudz.Chess
         FenError SetFen(FenData fenString, bool validate = false);
 
         FenData GetFen();
-
-        /// <summary>
-        /// Converts a move data type to move notation string format which chess engines understand.
-        /// e.g. "a2a4", "a7a8q"
-        /// </summary>
-        /// <param name="m">The move to convert</param>
-        /// <param name="output">The string builder used to generate the string with</param>
-        void MoveToString(Move m, StringBuilder output);
 
         void UpdateDrawTypes();
 

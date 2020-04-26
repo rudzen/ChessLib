@@ -150,7 +150,7 @@ namespace Chess.Test.Move
             {
                 result.Clear();
                 result.Append(' ');
-                game.MoveToString(moves[i], result);
+                game.Pos.MoveToString(moves[i], result);
                 Assert.Equal(result.ToString(), movesString[i].ToString());
             }
         }
@@ -186,7 +186,7 @@ namespace Chess.Test.Move
             foreach (var move in moves)
             {
                 result.Append(' ');
-                game.MoveToString(move, result);
+                game.Pos.MoveToString(move, result);
             }
 
             Assert.Equal(expected.ToString(), result.ToString());

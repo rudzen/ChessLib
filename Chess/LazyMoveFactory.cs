@@ -25,6 +25,7 @@ SOFTWARE.
 */
 
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace Rudz.Chess
@@ -90,13 +91,38 @@ namespace Rudz.Chess
             if (pos.State.InCheck)
                 yield break;
 
-            for (var castleType = CastlelingSides.King; castleType < CastlelingSides.CastleNb; castleType++)
-                if (pos.CanCastle(castleType))
-                {
-                    var (valid, move) = pos.AddCastleMove(pos.GetKingCastleFrom(currentSide, castleType), castleType.GetKingCastleTo(currentSide), flags);
-                    if (valid)
-                        yield return move;
-                }
+            if (!pos.CanCastle(currentSide))
+                yield break;
+
+            //IPosition pos, Player us, CastlelingRights Cr, bool checks, bool chess960, MoveGenerationFlags flags
+
+            var (ok, castlelingMove) = generate_castling(pos, currentSide, CastlelingSides.King.MakeCastlelingRights(currentSide), flags);
+            if (ok)
+                yield return castlelingMove;
+
+            (ok, castlelingMove) = generate_castling(pos, currentSide, CastlelingSides.Queen.MakeCastlelingRights(currentSide), flags);
+            if (ok)
+                yield return castlelingMove;
+
+
+            //mPos = generate_castling(pos, currentSide, new MakeCastlingS(us, CastlingSideS.QUEEN_SIDE).right, Checks, true);
+
+            //if (pos.is_chess960() != 0)
+            //{
+            //}
+            //else
+            //{
+            //    mPos = generate_castling(pos, mlist, mPos, us, ci, new MakeCastlingS(us, CastlingSideS.KING_SIDE).right, Checks, false);
+            //    mPos = generate_castling(pos, mlist, mPos, us, ci, new MakeCastlingS(us, CastlingSideS.QUEEN_SIDE).right, Checks, false);
+            //}
+
+            //for (var castleType = CastlelingSides.King; castleType < CastlelingSides.CastleNb; castleType++)
+            //    if (pos.CanCastle(castleType))
+            //    {
+            //        var (valid, move) = pos.AddCastleMove(pos.GetKingCastleFrom(currentSide, castleType), castleType.GetKingCastleTo(currentSide), flags);
+            //        if (valid)
+            //            yield return move;
+            //    }
         }
 
         /// <summary>
@@ -244,6 +270,53 @@ namespace Rudz.Chess
         {
             Span<(Directions, Directions)> directions = stackalloc[] { (Directions.NorthEast, Directions.NorthWest), (Directions.SouthEast, Directions.SouthWest) };
             return directions[us.Side];
+        }
+
+        private static (bool, Move) generate_castling(IPosition pos, Player us, CastlelingRights cr, MoveGenerationFlags flags)
+        {
+            var result = (ok: false, move: MoveExtensions.EmptyMove);
+            
+            if (pos.CastlingImpeded(cr) || !pos.CanCastle(cr))
+                return result;
+
+            var kingSide = cr.HasFlagFast(CastlelingRights.WhiteOo | CastlelingRights.BlackOo);
+
+            // After castling, the rook and king final positions are the same in Chess960 as they
+            // would be in standard chess.
+            var kfrom = pos.GetPieceSquare(PieceTypes.King, us);
+            var rfrom = pos.CastlingRookSquare(cr);
+            var kto = (kingSide ? Squares.g1 : Squares.c1).RelativeSquare(us);
+            var enemies = pos.Pieces(~us);
+
+            //Debug.Assert(0 == pos.checkers());
+
+            var k = pos.Chess960 ? kto > kfrom ? Directions.West : Directions.East
+                : kingSide ? Directions.West : Directions.East;
+
+            for (var s = kto; s != kfrom; s += k)
+                if ((pos.AttacksTo(s) & enemies) != 0)
+                    return result;
+
+            // Because we generate only legal castling moves we need to verify that when moving the
+            // castling rook we do not discover some hidden checker. For instance an enemy queen in
+            // SQ_A1 when castling rook is in SQ_B1.
+            if (pos.Chess960 && (kto.GetAttacks(PieceTypes.Rook, pos.Pieces() ^ rfrom) & pos.Pieces(PieceTypes.Rook, PieceTypes.Queen, ~us)) != 0)
+                return result;
+
+            //Piece piece, Square from, Square to, MoveTypes type, Piece promoted
+            result = pos.MakeMove(PieceTypes.King.MakePiece(pos.State.SideToMove), kfrom, rfrom, PieceExtensions.EmptyPiece, flags, MoveTypes.Castle);
+
+            return result;
+
+            //var m = new Move();
+            //var m = Types.make(kfrom, rfrom, MoveTypeS.CASTLING);
+
+            //if (Checks && !pos.gives_check(m, ci))
+            //    return mPos;
+
+            //mlist[mPos++].move = m;
+
+            //return mPos;
         }
     }
 }

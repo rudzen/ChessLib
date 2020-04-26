@@ -47,18 +47,26 @@ namespace Rudz.Chess
     {
         private static readonly Func<Square, Square>[] EnPasCapturePos = { s => s + Directions.South, s => s + Directions.North };
 
-        private readonly Square[] _rookCastlesFrom; // indexed by position of the king
+        private readonly CastlelingRights[] castlingRightsMask;
+        private readonly Square[] castlingRookSquare;
+        private readonly BitBoard[] castlingPath;
 
-        private readonly Square[] _castleShortKingFrom;
 
-        private readonly Square[] _castleLongKingFrom;
+        // private readonly Square[] _rookCastlesFrom; // indexed by position of the king
+        //
+        // private readonly Square[] _castleShortKingFrom;
+        //
+        // private readonly Square[] _castleLongKingFrom;
 
         public Position()
         {
-            _castleLongKingFrom = new Square[2];
-            _rookCastlesFrom = new Square[64];
-            _castleShortKingFrom = new Square[2];
+            // _castleLongKingFrom = new Square[2];
+            // _rookCastlesFrom = new Square[64];
+            // _castleShortKingFrom = new Square[2];
             BoardLayout = new Piece[64];
+            castlingPath = new BitBoard[CastlelingRights.CastleRightsNb.AsInt()];
+            castlingRookSquare = new Square[CastlelingRights.CastleRightsNb.AsInt()];
+            castlingRightsMask = new CastlelingRights[64];
             BoardPieces = new BitBoard[PieceTypes.PieceTypeNb.AsInt()];
             OccupiedBySide = new BitBoard[2];
             IsProbing = true;
@@ -80,11 +88,16 @@ namespace Rudz.Chess
 
         public State State { get; set; }
 
+        public bool Chess960 { get; private set; }
+
         public void Clear()
         {
             BoardLayout.Fill(Enums.Pieces.NoPiece);
             OccupiedBySide.Fill(BitBoards.EmptyBitBoard);
             BoardPieces.Fill(BitBoards.EmptyBitBoard);
+            castlingPath.Fill(BitBoards.EmptyBitBoard);
+            castlingRightsMask.Fill(CastlelingRights.None);
+            castlingRookSquare.Fill(Squares.none);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -129,8 +142,15 @@ namespace Rudz.Chess
 
             if (m.IsCastlelingMove())
             {
-                MovePiece(_rookCastlesFrom[to.AsInt()], to.GetRookCastleTo());
-                MovePiece(m.GetFromSquare(), to);
+                DoCastleling(from, ref to, out var rfrom, out var rto, true, us);
+
+                var rook = PieceTypes.Rook.MakePiece(us);
+                var king = PieceTypes.King.MakePiece(us);
+                
+                State.Key ^= rook.GetZobristPst(rfrom) ^ rook.GetZobristPst(rto);
+                
+                // MovePiece(_rookCastlesFrom[to.AsInt()], to.GetRookCastleTo());
+                // MovePiece(m.GetFromSquare(), to);
                 return true;
             }
 
@@ -166,8 +186,10 @@ namespace Rudz.Chess
 
             if (m.IsCastlelingMove())
             {
-                MovePiece(to, from);
-                MovePiece(to.GetRookCastleTo(), _rookCastlesFrom[to.AsInt()]);
+                DoCastleling(from, ref to, out _, out _, false, us);
+
+                //MovePiece(to, from);
+                //MovePiece(to.GetRookCastleTo(), _rookCastlesFrom[to.AsInt()]);
                 return;
             }
 
@@ -224,11 +246,78 @@ namespace Rudz.Chess
             return pinnedPieces;
         }
 
+        public BitBoard CheckedSquares(PieceTypes pt)
+        {
+            return State.CheckedSquares[pt.AsInt()];
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool IsOccupied(Square sq) => BoardLayout[sq.AsInt()] != Enums.Pieces.NoPiece;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool IsAttacked(Square sq, Player c) => AttackedBySlider(sq, c) || AttackedByKnight(sq, c) || AttackedByPawn(sq, c) || AttackedByKing(sq, c);
+
+        public bool GivesCheck(Move m)
+        {
+            var from = m.GetFromSquare();
+            var to = m.GetToSquare();
+            var pt = GetPieceType(from);
+            var us = State.SideToMove;
+            
+            // Is there a direct check?
+            if ((CheckedSquares(pt) & to) != 0)
+                return true;
+
+            var ksq = GetPieceSquare(PieceTypes.King, us);
+            
+            // Is there a discovered check?
+            if (State.DicoveredCheckers != 0
+                && (State.DicoveredCheckers & from) != 0
+                && !from.Aligned(to, ksq))
+                return true;
+
+            switch (m.GetMoveType())
+            {
+                case MoveTypes.Normal:
+                    return false;
+
+                case MoveTypes.Promotion:
+                    return (to.GetAttacks(m.GetPromotedPiece().Type(), Pieces() ^ from) & ksq) != 0;
+
+                // En passant capture with check? We have already handled the case of direct checks
+                // and ordinary discovered check, so the only case we need to handle is the unusual
+                // case of a discovered check through the captured pawn.
+                case MoveTypes.Epcapture:
+                    {
+                        var capsq = new Square(from.Rank(), to.File());
+                        var b = Pieces();
+                        b ^= from;
+                        b ^= capsq;
+                        b |= to;
+
+                        return ((ksq.GetAttacks(PieceTypes.Rook, b) & Pieces(PieceTypes.Rook, PieceTypes.Queen, us))
+                            | (ksq.GetAttacks(PieceTypes.Bishop, b) & Pieces(PieceTypes.Bishop, PieceTypes.Queen, us))) != 0;
+                    }
+
+                case MoveTypes.Castle:
+                    {
+                        var kfrom = from;
+                        var rfrom = to; // Castling is encoded as 'King captures the rook'
+                        var kingSide = rfrom > kfrom;
+                        var (kto, rto) = kingSide
+                            ? (Squares.g1.RelativeSquare(us), Squares.f1.RelativeSquare(us))
+                            : (Squares.c1.RelativeSquare(us), Squares.d1.RelativeSquare(us));
+
+                        return (BitBoards.PseudoAttacks(PieceTypes.Rook, rto) & ksq) != 0
+                                && (rto.GetAttacks(PieceTypes.Rook, (Pieces() ^ kfrom ^ rfrom) | rto | kto) & ksq) != 0;
+                    }
+
+                default:
+                    {
+                        return false;
+                    }
+            }
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public BitBoard PieceAttacks(Square sq, PieceTypes pt) => sq.GetAttacks(pt, Pieces());
@@ -333,108 +422,35 @@ namespace Rudz.Chess
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool AttackedByKnight(Square sq, Player c) => (Pieces(PieceTypes.Knight, c) & sq.GetAttacks(PieceTypes.Knight)) != 0;
+        public bool AttackedByKnight(Square sq, Player c)
+            => (Pieces(PieceTypes.Knight, c) & sq.GetAttacks(PieceTypes.Knight)) != 0;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool AttackedByPawn(Square sq, Player c) => (Pieces(PieceTypes.Pawn, c) & sq.PawnAttack(~c)) != 0;
+        public bool AttackedByPawn(Square sq, Player c) =>
+            (Pieces(PieceTypes.Pawn, c) & sq.PawnAttack(~c)) != 0;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool AttackedByKing(Square sq, Player c) => (sq.GetAttacks(PieceTypes.King) & GetPieceSquare(PieceTypes.King, c)) != 0;
+        public bool AttackedByKing(Square sq, Player c)
+            => (sq.GetAttacks(PieceTypes.King) & GetPieceSquare(PieceTypes.King, c)) != 0;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Square GetRookCastleFrom(Square sq) => _rookCastlesFrom[sq.AsInt()];
+        public bool CanCastle(CastlelingRights cr)
+            => State.CastlelingRights.HasFlagFast(cr);
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetRookCastleFrom(Square indexSq, Square sq) => _rookCastlesFrom[indexSq.AsInt()] = sq;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Square GetKingCastleFrom(Player c, CastlelingSides sides)
+        public bool CanCastle(Player color)
         {
-            return sides switch
-            {
-                CastlelingSides.King => _castleShortKingFrom[c.Side],
-                CastlelingSides.Queen => _castleLongKingFrom[c.Side],
-                _ => throw new ArgumentOutOfRangeException(nameof(sides), sides, null)
-            };
+            var c = (CastlelingRights) ((int)(CastlelingRights.WhiteOo | CastlelingRights.WhiteOoo) << (2 * color.Side));
+            return State.CastlelingRights.HasFlagFast(c);
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetKingCastleFrom(Player c, Square sq, CastlelingSides sides)
+        public bool CastlingImpeded(CastlelingRights cr)
         {
-            switch (sides)
-            {
-                case CastlelingSides.King:
-                    _castleShortKingFrom[c.Side] = sq;
-                    break;
-
-                case CastlelingSides.Queen:
-                    _castleLongKingFrom[c.Side] = sq;
-                    break;
-
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(sides), sides, null);
-            }
+            var v = cr.AsInt();
+            return (Pieces() & castlingPath[v]) != 0;
         }
 
-        /// <summary>
-        /// Checks from a string if the move actually is a castle move. Note:
-        /// - The unique cases with amended piece location check is a *shallow* detection, it should
-        /// be the sender that guarantee that it's a real move.
-        /// </summary>
-        /// <param name="m">The string containing the move</param>
-        /// <returns></returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public CastlelingSides IsCastleMove(string m)
-        {
-            return m switch
-            {
-                "O-O" => CastlelingSides.King,
-                "e1g1" when IsPieceTypeOnSquare(Squares.e1, PieceTypes.King) => CastlelingSides.King,
-                "e8g8" when IsPieceTypeOnSquare(Squares.e8, PieceTypes.King) => CastlelingSides.King,
-                "OO" => CastlelingSides.King,
-                "0-0" => CastlelingSides.King,
-                "00" => CastlelingSides.King,
-                "O-O-O" => CastlelingSides.Queen,
-                "e1c1" when IsPieceTypeOnSquare(Squares.e1, PieceTypes.King) => CastlelingSides.Queen,
-                "e8c8" when IsPieceTypeOnSquare(Squares.e8, PieceTypes.King) => CastlelingSides.Queen,
-                "OOO" => CastlelingSides.Queen,
-                "0-0-0" => CastlelingSides.Queen,
-                "000" => CastlelingSides.Queen,
-                _ => CastlelingSides.None
-            };
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool CanCastle(CastlelingSides sides)
-            => State.CastlelingRights.HasFlagFast(sides.GetCastleAllowedMask(State.SideToMove)) && IsCastleAllowed(sides.GetKingCastleTo(State.SideToMove));
-
-        public bool IsCastleAllowed(Square sq)
-        {
-            var c = State.SideToMove;
-            // The complexity of this function is mainly due to the support for Chess960 variant.
-            var rookTo = sq.GetRookCastleTo();
-            var rookFrom = GetRookCastleFrom(sq);
-            var ksq = GetPieceSquare(PieceTypes.King, c);
-
-            // The pieces in question.. rook and king
-            var castlePieces = rookFrom | ksq;
-
-            // The span between the rook and the king
-            var castleSpan = ksq.BitboardBetween(rookFrom) | rookFrom.BitboardBetween(rookTo) | castlePieces | rookTo | sq;
-
-            // check that the span AND current occupied pieces are no different that the piece themselves.
-            if ((castleSpan & Pieces()) != castlePieces)
-                return false;
-
-            // Check that no square between the king's initial and final squares (including the
-            // initial and final squares) may be under attack by an enemy piece. Initial square was
-            // already checked a this point.
-
-            c = ~c;
-
-            castleSpan = ksq.BitboardBetween(sq) | sq;
-            return !castleSpan.Any(x => IsAttacked(x, c));
-        }
+        public Square CastlingRookSquare(CastlelingRights cr)
+            => castlingRookSquare[cr.AsInt()];
 
         /// <summary>
         /// Determine if a move is legal or not, by performing the move and checking if the king is
@@ -459,9 +475,7 @@ namespace Rudz.Chess
         }
 
         public bool IsLegal(Move m)
-        {
-            return IsLegal(m, m.GetMovingPiece(), m.GetFromSquare(), m.GetMoveType());
-        }
+            => IsLegal(m, m.GetMovingPiece(), m.GetFromSquare(), m.GetMoveType());
 
         /// <summary>
         /// <para>
@@ -484,8 +498,8 @@ namespace Rudz.Chess
             if (m.IsCastlelingMove())
             {
                 // TODO : Basic castleling verification
-                if (CanCastle(m.GetFromSquare() < to ? CastlelingSides.King : CastlelingSides.Queen))
-                    return true;
+                //if (CanCastle(m.GetFromSquare() < to ? CastlelingSides.King : CastlelingSides.Queen))
+                //    return true;
 
                 return this.GenerateMoves().Contains(m);
             }
@@ -637,10 +651,87 @@ namespace Rudz.Chess
             return result;
         }
 
+        /// Position::set_castle_right() is an helper function used to set castling rights given the
+        /// corresponding color and the rook starting square.
+        public CastlelingRights SetCastlingRight(Player stm, Square rookFrom)
+        {
+            var ksq = GetPieceSquare(PieceTypes.King, stm);
+            var cs = ksq < rookFrom ? CastlelingSides.King : CastlelingSides.Queen;
+            var cr = OrCastlingRight(stm, cs);
+
+            castlingRightsMask[ksq.AsInt()] |= cr;
+            castlingRightsMask[rookFrom.AsInt()] |= cr;
+            castlingRookSquare[cr.AsInt()] = rookFrom;
+
+            var kingTo = (cs == CastlelingSides.King ? Squares.g1 : Squares.c1).RelativeSquare(stm);
+            var rookTo = (cs == CastlelingSides.King ? Squares.f1 : Squares.d1).RelativeSquare(stm);
+
+            var maxSquare = rookFrom.Max(rookTo);
+            for (var s = rookFrom.Min(rookTo); s <= maxSquare; ++s)
+                if (s != ksq && s != rookFrom)
+                    castlingPath[cr.AsInt()] |= s;
+
+            maxSquare = ksq.Max(kingTo);
+            for (var s = ksq.Min(kingTo); s <= maxSquare; ++s)
+                if (s != ksq && s != rookFrom)
+                    castlingPath[cr.AsInt()] |= s;
+
+            return cr;
+        }
+
+        /// <summary>
+        /// Converts a move data type to move notation string format which chess engines understand.
+        /// e.g. "a2a4", "a7a8q"
+        /// </summary>
+        /// <param name="m">The move to convert</param>
+        /// <param name="output">The string builder used to generate the string with</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void MoveToString(Move m, StringBuilder output)
+        {
+            if (m.IsNullMove())
+            {
+                output.Append("(none)");
+                return;
+            }
+
+            var from = m.GetFromSquare();
+            var to = m.GetToSquare();
+
+            if (m.IsCastlelingMove() && !Chess960)
+            {
+                var file = to > from ? Files.FileG : Files.FileC;
+                to = new Square(from.Rank(), file);
+            }
+
+            output.Append(from.ToString()).Append(to.ToString());
+
+            if (m.IsPromotionMove())
+                output.Append(char.ToLower(m.GetPromotedPiece().Type().GetPieceChar()));
+        }
+        private void DoCastleling(Square from, ref Square to, out Square rfrom, out Square rto, bool doCastleling, Player stm)
+        {
+            var kingSide = to > from;
+            rfrom = to; // Castling is encoded as "king captures friendly rook"
+            rto = (kingSide ? Squares.f1 : Squares.d1).RelativeSquare(stm);
+            to = (kingSide ? Squares.g1 : Squares.c1).RelativeSquare(stm);
+
+            // Remove both pieces first since squares could overlap in Chess960
+            RemovePiece(doCastleling ? from : to);
+            RemovePiece(doCastleling ? rfrom : rto);
+            BoardLayout[(doCastleling ? from : to).AsInt()] = BoardLayout[(doCastleling ? rfrom : rto).AsInt()] = Enums.Pieces.NoPiece;
+            AddPiece(PieceTypes.King, doCastleling ? to : from, stm);
+            AddPiece(PieceTypes.Rook, doCastleling ? rto : rfrom, stm);
+        }
+        
         public IEnumerator<Piece> GetEnumerator() => BoardLayout.Cast<Piece>().GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
+        private static CastlelingRights OrCastlingRight(Player c, CastlelingSides s)
+        {
+            return (CastlelingRights)((int) CastlelingRights.WhiteOo << (s == CastlelingSides.Queen ? 1 : 0) + 2 * c.Side);
+        }
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private CastlelingSides ShredderFunc(Square from, Square to) =>
             GetPiece(from).Value == Enums.Pieces.WhiteKing && GetPiece(to).Value == Enums.Pieces.WhiteRook || GetPiece(from).Value == Enums.Pieces.BlackKing && GetPiece(to).Value == Enums.Pieces.BlackRook
