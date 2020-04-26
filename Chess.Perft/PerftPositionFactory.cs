@@ -33,7 +33,7 @@ namespace Chess.Perft
     public static class PerftPositionFactory
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static IPerftPosition Create(string fen, List<(int, ulong)> values)
-            => new PerftPosition { Fen = fen, Value = values };
+        public static IPerftPosition Create(string id, string fen, List<(int, ulong)> values)
+            => new PerftPosition { Id = id, Fen = fen, Value = values };
     }
 }

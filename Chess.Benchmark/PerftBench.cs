@@ -24,6 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Rudz.Chess.Fen;
@@ -44,7 +45,9 @@ namespace Chess.Benchmark
 
         public PerftBench()
         {
-            _pp = PerftPositionFactory.Create(Fen.StartPositionFen,
+            _pp = PerftPositionFactory.Create(
+                Guid.NewGuid().ToString(),
+                Fen.StartPositionFen,
                 new List<(int, ulong)>(6)
                 {
                     (1, 20),

@@ -30,6 +30,7 @@ namespace Chess.Perft.Interfaces
 
     public interface IPerftPosition
     {
+        string Id { get; set; }
         string Fen { get; set; }
         List<(int, ulong)> Value { get; set; }
     }

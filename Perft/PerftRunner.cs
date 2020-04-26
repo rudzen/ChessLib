@@ -55,7 +55,7 @@ namespace Perft
         private static readonly string Line = new string('-', 65);
 
         private static readonly Lazy<string> CurrentDirectory = new Lazy<string>(() => System.Environment.CurrentDirectory);
-        
+
         private readonly Func<CancellationToken, IAsyncEnumerable<IPerftPosition>>[] _runners;
 
         private readonly IEpdParser _epdParser;
@@ -71,7 +71,7 @@ namespace Perft
         private readonly ObjectPool<PerftResult> _resultPool;
 
         private readonly IUci _uci;
-        
+
         private bool _usingEpd;
 
         public PerftRunner(IEpdParser parser, ILogger log, IBuildTimeStamp buildTimeStamp, IPerft perft, IConfiguration configuration, ObjectPool<PerftResult> resultPool, IUci uci)
@@ -82,11 +82,11 @@ namespace Perft
             _perft = perft;
             _perft.BoardPrintCallback ??= s => _log.Information("Board:\n{0}", s);
             _resultPool = resultPool;
-            
+
             _uci = uci;
             _uci.Initialize();
-            
-            _runners = new Func<CancellationToken, IAsyncEnumerable<IPerftPosition>>[] { ParseEpd, ParseFen };
+
+            _runners = new Func<CancellationToken, IAsyncEnumerable<IPerftPosition>>[] {ParseEpd, ParseFen};
 
             TranspositionTableOptions = Framework.IoC.Resolve<IOptions>(OptionType.TTOptions) as TTOptions;
             configuration.Bind("TranspositionTable", TranspositionTableOptions);
@@ -129,6 +129,8 @@ namespace Perft
                 {
                     var result = await ComputePerft(cancellationToken).ConfigureAwait(false);
                     errors = result.Errors;
+                    if (errors != 0)
+                        _log.Error("Parsing failed for Id={0}", position.Id);
                     _resultPool.Return(result);
                 }
                 catch (Exception)
@@ -165,7 +167,7 @@ namespace Perft
             var elapsedMs = sw.ElapsedMilliseconds;
             _log.Information("Parsed {0} epd entries in {1} ms", parsedCount, elapsedMs);
 
-            var perftPositions = _epdParser.Sets.Select(set => PerftPositionFactory.Create(set.Epd, set.Perft));
+            var perftPositions = _epdParser.Sets.Select(set => PerftPositionFactory.Create(set.Id, set.Epd, set.Perft));
 
             foreach (var perftPosition in perftPositions)
                 yield return perftPosition;
@@ -180,7 +182,7 @@ namespace Perft
 
             var depths = options.Depths.Select(d => (d, zero)).ToList();
 
-            var perftPositions = options.Fens.Select(f => PerftPositionFactory.Create(f, depths));
+            var perftPositions = options.Fens.Select(f => PerftPositionFactory.Create(Guid.NewGuid().ToString(),f, depths));
 
             foreach (var perftPosition in perftPositions)
                 yield return perftPosition;
@@ -214,7 +216,7 @@ namespace Perft
                 sw.Stop();
 
                 var elapsedMs = sw.ElapsedMilliseconds;
-                
+
                 ComputeResultsAsync(perftResult, depth, expected, elapsedMs, result);
 
                 errors += await LogResults(result).ConfigureAwait(false);
@@ -283,7 +285,7 @@ namespace Perft
                     _log.Information("Move count matches!");
                 else
                 {
-                    _log.Error("Move count failed!");
+                    _log.Error("Failed for position: {0}", _perft.CurrentGame.Pos.GenerateFen());
                     error = 1;
                 }
 

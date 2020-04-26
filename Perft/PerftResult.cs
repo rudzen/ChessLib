@@ -30,6 +30,7 @@ namespace Perft
 
     public sealed class PerftResult : IPerftResult
     {
+        public string Id { get; set; }
         public string Fen { get; set; }
         public int Depth { get; set; }
         public ulong Result { get; set; }

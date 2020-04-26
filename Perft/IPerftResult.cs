@@ -30,6 +30,7 @@ namespace Perft
 
     public interface IPerftResult
     {
+        string Id { get; set; }
         string Fen { get; set; }
         int Depth { get; set; }
         ulong Result { get; set; }
