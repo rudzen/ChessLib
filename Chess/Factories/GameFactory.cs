@@ -36,7 +36,7 @@ namespace Rudz.Chess.Factories
         {
             var g = Create();
             var fenData = new FenData(fen);
-            g.SetFen(fenData);
+            g.Pos.SetFen(fenData);
             return g;
         }
 

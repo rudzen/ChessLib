@@ -36,6 +36,7 @@ namespace Perft
     using Parsers;
     using Rudz.Chess;
     using Rudz.Chess.Extensions;
+    using Rudz.Chess.Types;
     using Rudz.Chess.UCI;
     using Serilog;
     using System;
@@ -56,6 +57,8 @@ namespace Perft
 
         private static readonly Lazy<string> CurrentDirectory = new Lazy<string>(() => System.Environment.CurrentDirectory);
 
+        private readonly IDictionary<HashKey, ulong> _resultCache;
+        
         private readonly Func<CancellationToken, IAsyncEnumerable<IPerftPosition>>[] _runners;
 
         private readonly IEpdParser _epdParser;
@@ -91,6 +94,8 @@ namespace Perft
             TranspositionTableOptions = Framework.IoC.Resolve<IOptions>(OptionType.TTOptions) as TTOptions;
             configuration.Bind("TranspositionTable", TranspositionTableOptions);
 
+            _resultCache = new Dictionary<HashKey, ulong>(256);
+            
             _outputSettings = new JsonSerializerSettings
             {
                 Formatting = Formatting.Indented
@@ -239,7 +244,7 @@ namespace Perft
             // ReSharper disable once MethodHasAsyncOverload
             var contents = JsonConvert.SerializeObject(result, _outputSettings);
             var outputFileName = $"{baseFileName}{result.Depth}].json";
-            await File.WriteAllTextAsync(outputFileName, contents, cancellationToken).ConfigureAwait(false);
+            await System.IO.File.WriteAllTextAsync(outputFileName, contents, cancellationToken).ConfigureAwait(false);
         }
 
         private void ComputeResultsAsync(ulong result, int depth, ulong expected, long elapsedMs, IPerftResult results)

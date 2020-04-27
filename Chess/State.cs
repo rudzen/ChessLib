@@ -53,9 +53,7 @@ namespace Rudz.Chess
 
         public Square EnPassantSquare { get; set; }
 
-        public Player SideToMove { get; set; }
-
-        public BitBoard Pinned { get; set; }
+        public BitBoard[] Pinners { get; set; }
 
         /// <summary>
         /// Represents checked squares for side to move
@@ -86,8 +84,7 @@ namespace Rudz.Chess
             Key = s.Key;
             CastlelingRights = s.CastlelingRights;
             EnPassantSquare = s.EnPassantSquare;
-            SideToMove = s.SideToMove;
-            Pinned = s.Pinned;
+            Array.Copy(s.Pinners, Pinners, s.Pinners.Length);
             Checkers = s.Checkers;
             Array.Copy(s.CheckedSquares, CheckedSquares, s.CheckedSquares.Length);
             InCheck = s.InCheck;
@@ -99,7 +96,6 @@ namespace Rudz.Chess
             Material = new Material();
             CastlelingRights = CastlelingRights.None;
             EnPassantSquare = Squares.none;
-            SideToMove = PlayerExtensions.White;
             Checkers = BitBoards.EmptyBitBoard;
             CheckedSquares = new BitBoard[PieceTypes.PieceTypeNb.AsInt()];
         }
@@ -112,8 +108,8 @@ namespace Rudz.Chess
             ReversibleHalfMoveCount = NullMovesInRow = FiftyMoveRuleCounter = 0;
             CastlelingRights = CastlelingRights.None;
             EnPassantSquare = Squares.none;
-            SideToMove = PlayerExtensions.White;
             CheckedSquares.Fill(BitBoards.EmptyBitBoard);
+            Pinners.Fill(BitBoards.EmptyBitBoard);
         }
 
         public bool Equals(State other)
@@ -130,8 +126,7 @@ namespace Rudz.Chess
                    && HalfMoveCount == other.HalfMoveCount
                    && NullMovesInRow == other.NullMovesInRow
                    && FiftyMoveRuleCounter == other.FiftyMoveRuleCounter
-                   && SideToMove.Equals(other.SideToMove)
-                   && Pinned.Equals(other.Pinned)
+                   && Pinners.Equals(other.Pinners)
                    && Checkers.Equals(other.Checkers)
                    && DicoveredCheckers.Equals(other.DicoveredCheckers)
                    && InCheck == other.InCheck
@@ -156,12 +151,12 @@ namespace Rudz.Chess
             hashCode.Add(Key);
             hashCode.Add((int)CastlelingRights);
             hashCode.Add(EnPassantSquare);
-            hashCode.Add(SideToMove);
-            hashCode.Add(Pinned);
             hashCode.Add(Checkers);
             hashCode.Add(DicoveredCheckers);
             hashCode.Add(InCheck);
             hashCode.Add(Previous);
+            foreach (var pinner in Pinners)
+                hashCode.Add(pinner);
             foreach (var checkedSquare in CheckedSquares)
                 hashCode.Add(checkedSquare);
             return hashCode.ToHashCode();

@@ -267,10 +267,10 @@ namespace Rudz.Chess
         private MoveAmbiguities Ambiguity(Move move, BitBoard similarTypeAttacks)
         {
             var ambiguity = MoveAmbiguities.None;
+            var c = _pos.SideToMove;
 
             foreach (var square in similarTypeAttacks)
             {
-                var c = move.GetMovingSide();
                 var pinned = _pos.GetPinnedPieces(square, c);
 
                 if (similarTypeAttacks & pinned)

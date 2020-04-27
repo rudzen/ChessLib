@@ -39,6 +39,7 @@
     <PackageReference Include="System.Memory" Version="4.5.4" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="NewFolder\" />
     <Folder Include="Properties\" />
   </ItemGroup>
 

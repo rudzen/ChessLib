@@ -36,19 +36,9 @@ namespace Rudz.Chess
     {
         State State { get; }
         Action<Piece, Square> PieceUpdated { get; }
-        int PositionIndex { get; }
-        int PositionStart { get; }
-        int MoveNumber { get; }
         BitBoard Occupied { get; }
         IPosition Pos { get; }
         GameEndTypes GameEndType { get; set; }
-
-        /// <summary>
-        /// Makes a chess move in the data structure
-        /// </summary>
-        /// <param name="m">The move to make</param>
-        /// <returns>true if everything was fine, false if unable to progress - fx castleling position under attack</returns>
-        bool MakeMove(Move m);
 
         void TakeMove();
 
@@ -69,7 +59,7 @@ namespace Rudz.Chess
         /// -6 = Error while parsing en-passant square
         /// -9 = FEN length exceeding maximum
         /// </returns>
-        FenError SetFen(FenData fenString, bool validate = false);
+        // FenError SetFen(FenData fenString, bool validate = false);
 
         FenData GetFen();
 

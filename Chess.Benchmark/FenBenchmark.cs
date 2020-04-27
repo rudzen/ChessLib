@@ -27,7 +27,7 @@ namespace Chess.Benchmark
             for (var i = 0; i < N; ++i)
             {
                 var fp = new FenData(F);
-                _game.SetFen(fp);
+                _game.Pos.SetFen(fp);
             }
         }
 
@@ -37,7 +37,7 @@ namespace Chess.Benchmark
             for (var i = 0; i < N; ++i)
             {
                 var fp = new FenData(F);
-                _game.SetFen(fp);
+                _game.Pos.SetFen(fp);
             }
         }
     }

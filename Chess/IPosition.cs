@@ -49,15 +49,19 @@ namespace Rudz.Chess
 
         bool Chess960 { get; }
 
+        Player SideToMove { get; }
+
+        Square EnPassantSquare { get; }
+        
         void Clear();
 
         void AddPiece(Piece pc, Square sq);
 
         void AddPiece(PieceTypes pt, Square sq, Player c);
 
-        void MovePiece(Square from, Square to);
+        // void MovePiece(Square from, Square to);
 
-        bool MakeMove(Move m);
+        void MakeMove(Move m);
 
         void TakeMove(Move m);
 
@@ -147,11 +151,11 @@ namespace Rudz.Chess
 
         FenData GenerateFen();
 
+        FenError SetFen(FenData fen, bool validate = false);
+        
         HashKey GetPiecesKey();
 
         HashKey GetPawnKey();
-
-        CastlelingRights SetCastlingRight(Player stm, Square rookFrom);
 
         void MoveToString(Move m, StringBuilder output);
     }

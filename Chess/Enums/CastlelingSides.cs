@@ -67,4 +67,10 @@ namespace Rudz.Chess.Enums
                     ? CastlelingRights.BlackOoo
                     : CastlelingRights.BlackOo;
     }
+
+    public enum CastlelingPerform
+    {
+        Do,
+        Undo
+    }
 }

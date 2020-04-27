@@ -1,4 +1,4 @@
-/*
+/*/*
 ChessLib, a chess data structure library
 
 MIT License
@@ -22,7 +22,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-*/
+#1#
 
 namespace Rudz.Chess
 {
@@ -37,13 +37,15 @@ namespace Rudz.Chess
         public static MoveList GenerateMoves(this IPosition pos, MoveGenerationFlags flags = MoveGenerationFlags.Legalmoves, bool useCache = true, bool force = false)
         {
             pos.State.Pinned = flags.HasFlagFast(MoveGenerationFlags.Legalmoves)
-                ? pos.GetPinnedPieces(pos.GetPieceSquare(PieceTypes.King, pos.State.SideToMove), pos.State.SideToMove)
+                ? pos.GetPinnedPieces(pos.GetPieceSquare(PieceTypes.King, pos.SideToMove), pos.SideToMove)
                 : BitBoards.EmptyBitBoard;
 
             var moves = new MoveList();
 
-            pos.GenerateCapturesAndPromotions(moves, flags);
-            pos.GenerateQuietMoves(moves, flags);
+            var stm = pos.SideToMove;
+            
+            pos.GenerateCapturesAndPromotions(moves, flags, stm);
+            pos.GenerateQuietMoves(moves, flags, stm);
 
             var tMoves = moves.GetMoves();
             foreach (var move in tMoves)
@@ -57,49 +59,50 @@ namespace Rudz.Chess
             return moves;
         }
 
-        private static void GenerateCapturesAndPromotions(this IPosition pos, IMoveList moves, MoveGenerationFlags flags)
+        private static void GenerateCapturesAndPromotions(this IPosition pos, IMoveList moves, MoveGenerationFlags flags, Player stm)
         {
-            var currentSide = pos.State.SideToMove;
-            var them = ~currentSide;
-            var occupiedByThem = pos.OccupiedBySide[them.Side];
-            var (northEast, northWest) = currentSide.GetPawnAttackDirections();
+            var them = ~stm;
+            var occupiedByThem = pos.Pieces(them);
+            var (northEast, northWest) = stm.GetPawnAttackDirections();
 
-            var pawns = pos.Pieces(PieceTypes.Pawn, currentSide);
+            var pawns = pos.Pieces(PieceTypes.Pawn, stm);
 
-            pos.AddPawnMoves(moves, currentSide.PawnPush(pawns & currentSide.Rank7()) & ~pos.Pieces(), currentSide.PawnPushDistance(), MoveTypes.Quiet, flags);
-            pos.AddPawnMoves(moves, pawns.Shift(northEast) & occupiedByThem, currentSide.PawnWestAttackDistance(), MoveTypes.Capture, flags);
-            pos.AddPawnMoves(moves, pawns.Shift(northWest) & occupiedByThem, currentSide.PawnEastAttackDistance(), MoveTypes.Capture, flags);
+            pos.AddPawnMoves(moves, stm.PawnPush(pawns & stm.Rank7()) & ~pos.Pieces(), stm.PawnPushDistance(), MoveTypes.Quiet, flags, stm);
+            pos.AddPawnMoves(moves, pawns.Shift(northEast) & occupiedByThem, stm.PawnWestAttackDistance(), MoveTypes.Capture, flags, stm);
+            pos.AddPawnMoves(moves, pawns.Shift(northWest) & occupiedByThem, stm.PawnEastAttackDistance(), MoveTypes.Capture, flags, stm);
 
             if (pos.State.EnPassantSquare != Squares.none)
             {
-                pos.AddPawnMoves(moves, pawns.Shift(northEast) & pos.State.EnPassantSquare, currentSide.PawnWestAttackDistance(), MoveTypes.Epcapture, flags);
-                pos.AddPawnMoves(moves, pawns.Shift(northWest) & pos.State.EnPassantSquare, currentSide.PawnEastAttackDistance(), MoveTypes.Epcapture, flags);
+                pos.AddPawnMoves(moves, pawns.Shift(northEast) & pos.State.EnPassantSquare, stm.PawnWestAttackDistance(), MoveTypes.Epcapture, flags, stm);
+                pos.AddPawnMoves(moves, pawns.Shift(northWest) & pos.State.EnPassantSquare, stm.PawnEastAttackDistance(), MoveTypes.Epcapture, flags, stm);
             }
 
-            pos.AddMoves(moves, occupiedByThem, flags);
+            pos.AddMoves(moves, occupiedByThem, flags, stm);
         }
 
-        private static void GenerateQuietMoves(this IPosition pos, IMoveList moves, MoveGenerationFlags flags)
+        private static void GenerateQuietMoves(this IPosition pos, IMoveList moves, MoveGenerationFlags flags, Player stm)
         {
-            var currentSide = pos.State.SideToMove;
-            var up = currentSide == PlayerExtensions.White ? Directions.North : Directions.South;
+            var up = stm.PawnPushDistance();
             var notOccupied = ~pos.Pieces();
-            var pushed = (pos.Pieces(PieceTypes.Pawn, currentSide) & ~currentSide.Rank7()).Shift(up) & notOccupied;
-            pos.AddPawnMoves(moves, pushed, currentSide.PawnPushDistance(), MoveTypes.Quiet, flags);
+            var pushed = (pos.Pieces(PieceTypes.Pawn, stm) & ~stm.Rank7()).Shift(up) & notOccupied;
+            pos.AddPawnMoves(moves, pushed, stm.PawnPushDistance(), MoveTypes.Quiet, flags, stm);
 
-            pushed &= currentSide.Rank3();
-            pos.AddPawnMoves(moves, pushed.Shift(up) & notOccupied, currentSide.PawnDoublePushDistance(), MoveTypes.Doublepush, flags);
+            pushed &= stm.Rank3();
+            pos.AddPawnMoves(moves, pushed.Shift(up) & notOccupied, stm.PawnDoublePushDistance(), MoveTypes.Doublepush, flags, stm);
 
-            pos.AddMoves(moves, notOccupied, flags);
+            pos.AddMoves(moves, notOccupied, flags, stm);
 
             if (pos.State.InCheck)
                 return;
 
-            if (!pos.CanCastle(currentSide))
+            if (!pos.CanCastle(stm))
                 return;
 
-            generate_castling(pos, moves, currentSide, CastlelingSides.King.MakeCastlelingRights(currentSide), false, flags);
-            generate_castling(pos, moves, currentSide, CastlelingSides.Queen.MakeCastlelingRights(currentSide), false, flags);
+            for (var castleType = CastlelingSides.King; castleType < CastlelingSides.CastleNb; castleType++)
+                GenerateCastling(pos, moves, stm, castleType.MakeCastlelingRights(stm), false, flags);
+            
+            // GenerateCastling(pos, moves, stm, CastlelingSides.King.MakeCastlelingRights(stm), false, flags);
+            // GenerateCastling(pos, moves, stm, CastlelingSides.Queen.MakeCastlelingRights(stm), false, flags);
 
             //for (var castleType = CastlelingSides.King; castleType < CastlelingSides.CastleNb; castleType++)
             //    if (pos.CanCastle(castleType))
@@ -115,28 +118,50 @@ namespace Rudz.Chess
         /// <param name="moves">The move list to add potential moves to.</param>
         /// <param name="targetSquares">The target squares to move to</param>
         /// <param name="flags"></param>
-        private static void AddMoves(this IPosition pos, IMoveList moves, BitBoard targetSquares, MoveGenerationFlags flags)
+        private static void AddMoves(this IPosition pos, IMoveList moves, BitBoard targetSquares, MoveGenerationFlags flags, Player stm)
         {
-            var c = pos.State.SideToMove;
             var occupied = pos.Pieces();
+            var ourPieces = pos.Pieces(stm);
+            // Console.WriteLine(BitBoards.PrintBitBoard(occupied, "occupied"));
+            // Console.WriteLine(BitBoards.PrintBitBoard(targetSquares, "targetSquares"));
 
+            var wat = false;
+            ulong c = 0;
+            
             for (var pt = PieceTypes.Knight; pt <= PieceTypes.King; ++pt)
             {
-                var pc = pt.MakePiece(c);
+                if (pt == PieceTypes.Rook && stm.IsBlack())
+                {
+                    wat = true;
+                    Console.WriteLine("hdjksahkj");
+                }
+                var pc = pt.MakePiece(stm);
                 var pieces = pos.Pieces(pc);
+                c = moves.Count;
                 while (pieces)
                 {
                     var from = pieces.Lsb();
-                    pos.AddMoves(moves, pc, from, from.GetAttacks(pt, occupied) & targetSquares, flags);
+                    var attacks = from.GetAttacks(pt, occupied) & ~ourPieces;
+                    // if (wat && from == Squares.h8)
+                    // {
+                    //     Console.WriteLine(BitBoards.PrintBitBoard(attacks, "rook attacks"));
+                    // }
+                    pos.AddMoves(moves, pc, from, attacks & targetSquares, flags, stm);
+                    // if (wat && c != moves.Count)
+                    // {
+                    //     Console.WriteLine(BitBoards.PrintBitBoard(attacks, "rook attacks"));
+                    // }
                     BitBoards.ResetLsb(ref pieces);
                 }
+
+                
             }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void AddMoves(this IPosition pos, IMoveList moves, Piece piece, Square from, BitBoard attacks, MoveGenerationFlags flags)
+        private static void AddMoves(this IPosition pos, IMoveList moves, Piece piece, Square from, BitBoard attacks, MoveGenerationFlags flags, Player stm)
         {
-            var target = pos.Pieces(~pos.State.SideToMove) & attacks;
+            var target = pos.Pieces(~stm) & attacks;
             while (target)
             {
                 var to = target.Lsb();
@@ -153,12 +178,11 @@ namespace Rudz.Chess
             }
         }
 
-        private static void AddPawnMoves(this IPosition pos, IMoveList moves, BitBoard targetSquares, Direction direction, MoveTypes type, MoveGenerationFlags flags)
+        private static void AddPawnMoves(this IPosition pos, IMoveList moves, BitBoard targetSquares, Direction direction, MoveTypes type, MoveGenerationFlags flags, Player stm)
         {
             if (targetSquares.Empty())
                 return;
 
-            var stm = pos.State.SideToMove;
             var piece = PieceTypes.Pawn.MakePiece(stm);
 
             var promotionRank = stm.PromotionRank();
@@ -198,7 +222,7 @@ namespace Rudz.Chess
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void AddCastleMove(this IPosition pos, IMoveList moves, Square from, Square to, MoveGenerationFlags flags)
-            => pos.AddMove(moves, PieceTypes.King.MakePiece(pos.State.SideToMove), from, to, PieceExtensions.EmptyPiece, flags, MoveTypes.Castle);
+            => pos.AddMove(moves, PieceTypes.King.MakePiece(pos.SideToMove), from, to, PieceExtensions.EmptyPiece, flags, MoveTypes.Castle);
 
         /// <summary>
         /// Move generation leaf method.
@@ -220,12 +244,12 @@ namespace Rudz.Chess
             if (type.HasFlagFast(MoveTypes.Capture))
                 move = new Move(piece, pos.GetPiece(to), from, to, type, promoted);
             else if (type.HasFlagFast(MoveTypes.Epcapture))
-                move = new Move(piece, PieceTypes.Pawn.MakePiece(~pos.State.SideToMove), from, to, type, promoted);
+                move = new Move(piece, PieceTypes.Pawn.MakePiece(~pos.SideToMove), from, to, type, promoted);
             else
                 move = new Move(piece, from, to, type, promoted);
 
             // check if move is actual a legal move if the flag is enabled
-            if (!type.HasFlagFast(MoveTypes.Castle) && flags.HasFlagFast(MoveGenerationFlags.Legalmoves) && !pos.IsLegal(move, piece, from, type))
+            if (flags.HasFlagFast(MoveGenerationFlags.Legalmoves) && !pos.IsLegal(move, piece, from, type))
                 return;
 
             moves.Add(move);
@@ -238,7 +262,7 @@ namespace Rudz.Chess
             return directions[us.Side];
         }
 
-        private static void generate_castling(IPosition pos, IMoveList moveList, Player us, CastlelingRights cr, bool checks, MoveGenerationFlags flags)
+        private static void GenerateCastling(IPosition pos, IMoveList moveList, Player us, CastlelingRights cr, bool checks, MoveGenerationFlags flags)
         {
             if (pos.CastlingImpeded(cr) || !pos.CanCastle(cr))
                 return;
@@ -289,4 +313,4 @@ namespace Rudz.Chess
             //return mPos;
         }
     }
-}
+}*/

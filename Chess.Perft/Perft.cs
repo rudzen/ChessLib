@@ -24,6 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using Rudz.Chess.Types;
+
 namespace Chess.Perft
 {
     using Interfaces;
@@ -56,10 +58,13 @@ namespace Chess.Perft
 
     public sealed class Perft : IPerft
     {
+        private readonly IDictionary<HashKey, ulong> _results;
+        
         public Perft(IGame game, IEnumerable<IPerftPosition> positions)
         {
             Positions = positions.ToList();
             CurrentGame = game;
+            _results = new Dictionary<HashKey, ulong>(Positions.Count);
         }
 
         public Action<string> BoardPrintCallback { get; set; }
@@ -77,15 +82,17 @@ namespace Chess.Perft
         public async IAsyncEnumerable<ulong> DoPerft(int depth)
         {
             if (Positions.Count == 0)
-                yield return 0ul;
+                yield break;
 
             foreach (var fd in Positions.Select(p => new FenData(p.Fen)))
             {
                 Game.Table.NewSearch();
-                CurrentGame.SetFen(fd);
-                var res = CurrentGame.Perft(depth);
-                BoardPrintCallback?.Invoke(fd.ToString());
-                yield return res;
+                CurrentGame.Pos.SetFen(fd);
+
+                var result = CurrentGame.Perft(depth);
+                
+                // BoardPrintCallback?.Invoke(fd.ToString());
+                yield return result;
             }
         }
 
@@ -99,7 +106,7 @@ namespace Chess.Perft
         public void SetGamePosition(IPerftPosition pp)
         {
             var fp = new FenData(pp.Fen);
-            CurrentGame.SetFen(fp);
+            CurrentGame.Pos.SetFen(fp);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

@@ -54,12 +54,14 @@ namespace Chess.Test.Gameplay
 
             // make the moves necessary to create a mate
             foreach (var move in moves)
-                Assert.True(game.MakeMove(move));
+                position.MakeMove(move);
 
             // verify in check is actually true
-            Assert.True(game.State.InCheck);
+            Assert.True(position.State.InCheck);
 
-            var moveList = game.Pos.GenerateMoves();
+            var b = position.GenerateFen().Fen.ToString();
+            
+            var moveList = position.GenerateMoves();
 
             var resultingMoves = moveList.GetMoves();
             
