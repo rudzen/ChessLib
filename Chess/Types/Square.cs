@@ -179,5 +179,8 @@ namespace Rudz.Chess.Types
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool IsOppositeColor(Square other) => (((int)Value + Rank().AsInt() + (int)other.Value + other.Rank().AsInt()) & 1) != 0;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool IsOk() => Value >= Squares.a1 && Value <= Squares.h8;
     }
 }

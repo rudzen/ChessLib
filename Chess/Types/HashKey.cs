@@ -118,5 +118,8 @@ namespace Rudz.Chess.Types
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override readonly int GetHashCode() => _key.GetHashCode();
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public override string ToString() => $"0x{Key:X}";
     }
 }

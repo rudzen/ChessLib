@@ -88,5 +88,8 @@ namespace Rudz.Chess.Types
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public readonly bool IsBlack() => Side != 0;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public override string ToString() => Side == 0 ? "White" : "Black";
     }
 }
