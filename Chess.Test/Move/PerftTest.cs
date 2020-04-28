@@ -109,7 +109,6 @@ namespace Chess.Test.Move
         [Fact]
         public async Task PerftShort()
         {
-
             foreach (var perftPosition in Positions)
             {
                 var perft = PerftFactory.Create();

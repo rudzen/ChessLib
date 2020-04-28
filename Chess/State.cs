@@ -53,7 +53,7 @@ namespace Rudz.Chess
 
         public Square EnPassantSquare { get; set; }
         
-        public Piece CapturedPiece { get; set; }
+        public PieceTypes CapturedPiece { get; set; }
         
         public BitBoard[] BlockersForKing { get; set; }
         
@@ -93,6 +93,7 @@ namespace Rudz.Chess
             Checkers = s.Checkers;
             Array.Copy(s.CheckedSquares, CheckedSquares, s.CheckedSquares.Length);
             InCheck = s.InCheck;
+            CapturedPiece = s.CapturedPiece;
         }
 
         public State()
@@ -105,6 +106,7 @@ namespace Rudz.Chess
             CheckedSquares = new BitBoard[PieceTypes.PieceTypeNb.AsInt()];
             Pinners = new BitBoard[2];
             BlockersForKing = new BitBoard[2];
+            CapturedPiece = PieceTypes.NoPieceType;
         }
 
         public void Clear()
@@ -118,6 +120,7 @@ namespace Rudz.Chess
             CheckedSquares.Fill(BitBoards.EmptyBitBoard);
             Pinners.Fill(BitBoards.EmptyBitBoard);
             BlockersForKing.Fill(BitBoards.EmptyBitBoard);
+            CapturedPiece = PieceTypes.NoPieceType;
         }
 
         public bool Equals(State other)
@@ -138,13 +141,12 @@ namespace Rudz.Chess
                    && Checkers.Equals(other.Checkers)
                    && DicoveredCheckers.Equals(other.DicoveredCheckers)
                    && InCheck == other.InCheck
+                   && CapturedPiece == other.CapturedPiece
                    && Equals(Previous, other.Previous);
         }
 
         public override bool Equals(object obj)
-        {
-            return ReferenceEquals(this, obj) || obj is State other && Equals(other);
-        }
+            => ReferenceEquals(this, obj) || obj is State other && Equals(other);
 
         public override int GetHashCode()
         {
@@ -163,6 +165,7 @@ namespace Rudz.Chess
             hashCode.Add(DicoveredCheckers);
             hashCode.Add(InCheck);
             hashCode.Add(Previous);
+            hashCode.Add(CapturedPiece);
             foreach (var pinner in Pinners)
                 hashCode.Add(pinner);
             foreach (var checkedSquare in CheckedSquares)

@@ -48,7 +48,7 @@ namespace Chess.Test.Position
 
             // test overload
             pieces = position.Pieces(piece);
-            Assert.False((pieces & square).Empty());
+            Assert.False((pieces & square).Empty);
 
             // Test piece type overload
 

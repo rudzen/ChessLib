@@ -41,10 +41,10 @@ namespace Chess.Test.Gameplay
         {
             // generate moves
             var moves = new List<Move>(4) {
-                                                      new Move(Pieces.WhitePawn, Squares.f2, Squares.f3),
-                                                      new Move(Pieces.BlackPawn, Squares.e7, Squares.e5, MoveTypes.Doublepush, Pieces.NoPiece),
-                                                      new Move(Pieces.WhitePawn, Squares.g2, Squares.g4, MoveTypes.Doublepush, Pieces.NoPiece),
-                                                      new Move(Pieces.BlackQueen, Squares.d8, Squares.h4)
+                                                      Move.MakeMove(Squares.f2, Squares.f3),
+                                                      Move.MakeMove(Squares.e7, Squares.e5),
+                                                      Move.MakeMove(Squares.g2, Squares.g4),
+                                                      Move.MakeMove(Squares.d8, Squares.h4)
                                                   };
 
             // construct game and start a new game
@@ -62,7 +62,8 @@ namespace Chess.Test.Gameplay
             var b = position.GenerateFen().Fen.ToString();
             
             var moveList = position.GenerateMoves();
-
+            
+            
             var resultingMoves = moveList.GetMoves();
             
             // verify that no legal moves actually exists.

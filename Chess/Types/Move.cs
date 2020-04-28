@@ -48,6 +48,10 @@ namespace Rudz.Chess.Types
             => new Move(new Square(value[1] - '1', value[0] - 'a'), new Square(value[3] - '1', value[2] - 'a'));
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static implicit operator Move(ExtMove extMove)
+            => extMove.Move;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Move MakeMove(Square from, Square to)
             => new Move(from, to);
 

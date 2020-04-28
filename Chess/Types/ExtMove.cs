@@ -43,8 +43,8 @@ namespace Rudz.Chess.Types
         {
             Empty = new ExtMove();
         }
-        
-        public ExtMove(Move m, Score s)
+
+        private ExtMove(Move m, Score s)
         {
             Move = m;
             Score = s;
@@ -55,5 +55,7 @@ namespace Rudz.Chess.Types
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator ExtMove(Score s) => new ExtMove(MoveExtensions.EmptyMove, s);
+
+        public override string ToString() => $"{Move}, {Score}";
     }
 }

@@ -57,8 +57,8 @@ namespace Chess.Test.Move
             var g = GameFactory.Create(pos);
             g.NewGame(fen);
 
-            var w1 = new Move(movingPiece, fromOneSquare, toSquare);
-            var w2 = new Move(movingPiece, fromTwoSquare, toSquare);
+            var w1 = new Move(fromOneSquare, toSquare);
+            var w2 = new Move(fromTwoSquare, toSquare);
 
             var ambiguity = new MoveAmbiguity(pos);
 
@@ -92,8 +92,8 @@ namespace Chess.Test.Move
             var g = GameFactory.Create(pos);
             g.NewGame(fen);
 
-            var w1 = new Move(movingPiece, fromOneSquare, toSquare);
-            var w2 = new Move(movingPiece, fromTwoSquare, toSquare);
+            var w1 = new Move(fromOneSquare, toSquare);
+            var w2 = new Move(fromTwoSquare, toSquare);
 
             var ambiguity = new MoveAmbiguity(pos);
 
@@ -127,8 +127,8 @@ namespace Chess.Test.Move
             var g = GameFactory.Create(pos);
             g.NewGame(fen);
 
-            var w1 = new Move(movingPiece, fromOneSquare, toSquare);
-            var w2 = new Move(movingPiece, fromTwoSquare, toSquare);
+            var w1 = new Move(fromOneSquare, toSquare);
+            var w2 = new Move(fromTwoSquare, toSquare);
 
             var ambiguity = new MoveAmbiguity(pos);
 
@@ -162,8 +162,8 @@ namespace Chess.Test.Move
             var g = GameFactory.Create(pos);
             g.NewGame(fen);
 
-            var w1 = new Move(movingPiece, fromOneSquare, toSquare);
-            var w2 = new Move(movingPiece, fromTwoSquare, toSquare);
+            var w1 = new Move(fromOneSquare, toSquare);
+            var w2 = new Move(fromTwoSquare, toSquare);
 
             var ambiguity = new MoveAmbiguity(pos);
 
@@ -197,8 +197,8 @@ namespace Chess.Test.Move
             var g = GameFactory.Create(pos);
             g.NewGame(fen);
 
-            var w1 = new Move(movingPiece, fromOneSquare, toSquare);
-            var w2 = new Move(movingPiece, fromTwoSquare, toSquare);
+            var w1 = new Move(fromOneSquare, toSquare);
+            var w2 = new Move(fromTwoSquare, toSquare);
 
             var ambiguity = new MoveAmbiguity(pos);
 
@@ -232,8 +232,8 @@ namespace Chess.Test.Move
             var g = GameFactory.Create(pos);
             g.NewGame(fen);
 
-            var w1 = new Move(movingPiece, fromOneSquare, toSquare);
-            var w2 = new Move(movingPiece, fromTwoSquare, toSquare);
+            var w1 = new Move(fromOneSquare, toSquare);
+            var w2 = new Move(fromTwoSquare, toSquare);
 
             var ambiguity = new MoveAmbiguity(pos);
 
@@ -267,8 +267,8 @@ namespace Chess.Test.Move
             var g = GameFactory.Create(pos);
             g.NewGame(fen);
 
-            var w1 = new Move(movingPiece, fromOneSquare, toSquare);
-            var w2 = new Move(movingPiece, fromTwoSquare, toSquare);
+            var w1 = new Move(fromOneSquare, toSquare);
+            var w2 = new Move(fromTwoSquare, toSquare);
 
             var ambiguity = new MoveAmbiguity(pos);
 
@@ -302,8 +302,8 @@ namespace Chess.Test.Move
             var g = GameFactory.Create(pos);
             g.NewGame(fen);
 
-            var w1 = new Move(movingPiece, fromOneSquare, toSquare);
-            var w2 = new Move(movingPiece, fromTwoSquare, toSquare);
+            var w1 = new Move(fromOneSquare, toSquare);
+            var w2 = new Move(fromTwoSquare, toSquare);
 
             var ambiguity = new MoveAmbiguity(pos);
 
@@ -337,8 +337,8 @@ namespace Chess.Test.Move
             var g = GameFactory.Create(pos);
             g.NewGame(fen);
 
-            var w1 = new Move(movingPiece, fromOneSquare, toSquare);
-            var w2 = new Move(movingPiece, fromTwoSquare, toSquare);
+            var w1 = new Move(fromOneSquare, toSquare);
+            var w2 = new Move(fromTwoSquare, toSquare);
 
             var ambiguity = new MoveAmbiguity(pos);
 
@@ -372,8 +372,8 @@ namespace Chess.Test.Move
             var g = GameFactory.Create(pos);
             g.NewGame(fen);
 
-            var w1 = new Move(movingPiece, fromOneSquare, toSquare);
-            var w2 = new Move(movingPiece, fromTwoSquare, toSquare);
+            var w1 = new Move(fromOneSquare, toSquare);
+            var w2 = new Move(fromTwoSquare, toSquare);
 
             var ambiguity = new MoveAmbiguity(pos);
 
@@ -407,8 +407,8 @@ namespace Chess.Test.Move
             var g = GameFactory.Create(pos);
             g.NewGame(fen);
 
-            var w1 = new Move(movingPiece, fromOneSquare, toSquare);
-            var w2 = new Move(movingPiece, fromTwoSquare, toSquare);
+            var w1 = new Move(fromOneSquare, toSquare);
+            var w2 = new Move(fromTwoSquare, toSquare);
 
             var ambiguity = new MoveAmbiguity(pos);
 
@@ -442,8 +442,8 @@ namespace Chess.Test.Move
             var g = GameFactory.Create(pos);
             g.NewGame(fen);
 
-            var w1 = new Move(movingPiece, fromOneSquare, toSquare);
-            var w2 = new Move(movingPiece, fromTwoSquare, toSquare);
+            var w1 = new Move(fromOneSquare, toSquare);
+            var w2 = new Move(fromTwoSquare, toSquare);
 
             var ambiguity = new MoveAmbiguity(pos);
 

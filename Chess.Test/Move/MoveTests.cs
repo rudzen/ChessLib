@@ -79,18 +79,15 @@ namespace Chess.Test.Move
             const PieceTypes expectedMovingPieceType = PieceTypes.Pawn;
             Piece expectedMovingPiece = Pieces.WhitePawn;
             Piece expectedCapturedPiece = Pieces.BlackKnight;
-            Piece expectedPromotionPiece = Pieces.WhiteQueen;
+            var expectedPromotionPiece = PieceTypes.Queen;
             const MoveTypes expectedMoveType = MoveTypes.Promotion;
 
             // full move spectrum
-            var move = new Move(expectedMovingPiece, expectedCapturedPiece, expectedFrom, expectedTo, expectedMoveType, expectedPromotionPiece);
+            var move = Move.MakeMove(expectedFrom, expectedTo, MoveTypes.Promotion, expectedPromotionPiece);
 
             var actualFrom = move.GetFromSquare();
             var actualTo = move.GetToSquare();
-            var actualMovingEPieceType = move.GetMovingPieceType();
-            var actualMovingPiece = move.GetMovingPiece();
-            var actualCapturedPiece = move.GetCapturedPiece();
-            var actualPromotionPiece = move.GetPromotedPiece();
+            var actualPromotionPiece = move.GetPromotedPieceType();
             var actualEMoveType = move.GetMoveType();
 
             // test promotion status
@@ -101,16 +98,14 @@ namespace Chess.Test.Move
             Assert.Equal(expectedFrom, actualFrom);
             Assert.Equal(expectedTo, actualTo);
 
-            // test pieces
-            Assert.Equal(expectedMovingPieceType, actualMovingEPieceType);
-            Assert.Equal(expectedMovingPiece, actualMovingPiece);
-            Assert.Equal(expectedCapturedPiece, actualCapturedPiece);
+            // test promotion pieces
             Assert.Equal(expectedPromotionPiece, actualPromotionPiece);
 
             // move type
+            Assert.True(move.IsQueenPromotion());
+            Assert.True(move.IsPromotionMove());
             Assert.Equal(expectedMoveType, actualEMoveType);
             Assert.False(move.IsCastlelingMove());
-            Assert.False(move.IsDoublePush());
             Assert.False(move.IsEnPassantMove());
         }
 

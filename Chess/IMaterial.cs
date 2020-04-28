@@ -45,7 +45,7 @@ namespace Rudz.Chess
 
         uint GetKey(int index);
 
-        void MakeMove(Move move);
+        void MakeMove(IPosition pos, Move move);
 
         int Count(Player side, PieceTypes pieceType);
 

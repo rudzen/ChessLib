@@ -36,15 +36,14 @@ namespace Rudz.Chess.Types
     {
         public static readonly Move EmptyMove = new Move();
 
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static (bool, Move) Locate(this Move move, IPosition pos)
-        {
-            // force position to contain the latest moves for the position moves to be searched in
-            var moveList = pos.GenerateMoves();
-
-            var element = moveList.GetMove(move.GetFromSquare(), move.GetToSquare());
-            return element == null ? (false, EmptyMove) : (true, element);
-        }
+        // [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        // public static (bool, Move) Locate(this Move move, IPosition pos)
+        // {
+        //     // force position to contain the latest moves for the position moves to be searched in
+        //     var moveList = pos.GenerateMoves();
+        //
+        //     var element = moveList.GetMove(move.GetFromSquare(), move.GetToSquare());
+        //     return element == null ? (false, EmptyMove) : (true, element);
+        // }
     }
 }

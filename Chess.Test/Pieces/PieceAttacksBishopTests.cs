@@ -112,7 +112,7 @@ namespace Chess.Test.Pieces
             foreach (var square in border)
             {
                 var attacks = square.BishopAttacks(borderInner);
-                Assert.False(attacks.Empty());
+                Assert.False(attacks.Empty);
                 var expected = corners & square ? expectedCorner : expectedSide;
                 var actual = attacks.Count;
                 Assert.Equal(expected, actual);

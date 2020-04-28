@@ -88,7 +88,7 @@ namespace Rudz.Chess
             var gameEndType = GameEndTypes.None;
             if (IsRepetition())
                 gameEndType |= GameEndTypes.Repetition;
-            if (State.Material[PlayerExtensions.White.Side] <= 300 && State.Material[PlayerExtensions.Black.Side] <= 300 && Pos.BoardPieces[0].Empty() && Pos.BoardPieces[8].Empty())
+            if (State.Material[PlayerExtensions.White.Side] <= 300 && State.Material[PlayerExtensions.Black.Side] <= 300 && Pos.BoardPieces[0].Empty && Pos.BoardPieces[8].Empty)
                 gameEndType |= GameEndTypes.MaterialDrawn;
             if (State.ReversibleHalfMoveCount >= 100)
                 gameEndType |= GameEndTypes.FiftyMove;
@@ -162,9 +162,9 @@ namespace Rudz.Chess
             var moves = Pos.GenerateMoves().GetMoves();
             foreach (var m in moves)
             {
-                Console.WriteLine(m);
+                Console.WriteLine(m.Move);
                 Console.WriteLine($"Before MakeMove: {Pos.GenerateFen().Fen.ToString()}");
-                Pos.MakeMove(m);
+                Pos.MakeMove(m.Move);
                 Console.WriteLine($"After MakeMove: {Pos.GenerateFen().Fen.ToString()}");
                 move = m;
                 tot += Perft(depth - 1);

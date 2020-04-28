@@ -103,6 +103,8 @@ namespace Rudz.Chess
 
         Square GetPieceSquare(PieceTypes pt, Player color);
 
+        Piece MovedPiece(Move m);
+        
         bool PieceOnFile(Square square, Player side, PieceTypes pieceType);
 
         bool PawnIsolated(Square square, Player side);
@@ -131,26 +133,10 @@ namespace Rudz.Chess
 
         Square CastlingRookSquare(CastlelingRights cr);
 
-        //Square GetRookCastleFrom(Square sq);
-
-        //void SetRookCastleFrom(Square indexSq, Square sq);
-
-        //Square GetKingCastleFrom(Player c, CastlelingSides sides);
-
-        //void SetKingCastleFrom(Player c, Square sq, CastlelingSides sides);
-
-        //CastlelingSides IsCastleMove(string m);
-
-        //bool CanCastle(CastlelingSides sides);
-
-        //bool IsCastleAllowed(Square sq);
-
         bool IsPseudoLegal(Move m);
 
-        bool IsLegal(Move m, Piece pc, Square from, MoveTypes type);
-
         bool IsLegal(Move m);
-
+        
         bool IsMate();
 
         FenData GenerateFen();

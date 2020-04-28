@@ -111,10 +111,13 @@ namespace Chess.Test.Pieces
              *
              */
 
+            // just to get the attacks
+            var pos = new Rudz.Chess.Position();
+            
             foreach (var square in border)
             {
-                var attacks = square.GetAttacks(PieceTypes.Rook, borderInner);
-                Assert.False(attacks.Empty());
+                var attacks = pos.GetAttacks(square, PieceTypes.Rook, borderInner);
+                Assert.False(attacks.Empty);
                 var expected = corners & square ? expectedCorner : expectedSide;
                 var actual = attacks.Count;
                 Assert.Equal(expected, actual);

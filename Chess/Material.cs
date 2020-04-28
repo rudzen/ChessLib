@@ -65,7 +65,7 @@ namespace Rudz.Chess
         public void Add(Piece piece)
         {
             UpdateKey(piece.ColorOf(), piece.Type(), 1);
-            MaterialValue[piece.ColorOf()] += (int)piece.PieceValue();
+            MaterialValue[piece.ColorOf().Side] += (int)piece.PieceValue();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -85,15 +85,19 @@ namespace Rudz.Chess
             return _key[index];
         }
 
-        public void MakeMove(Move move)
+        public void MakeMove(IPosition pos, Move move)
         {
-            if (move.IsCaptureMove())
-                Remove(move.GetCapturedPiece());
+            var capturedPiece = move.IsEnPassantMove()
+                ? PieceTypes.Pawn.MakePiece(pos.SideToMove)
+                : pos.GetPiece(move.GetToSquare());
+            
+            if (capturedPiece != Pieces.NoPiece)
+                Remove(capturedPiece);
 
             if (move.IsPromotionMove())
             {
-                Remove(move.GetMovingPiece());
-                Add(move.GetPromotedPiece());
+                Remove(pos.GetPiece(move.GetFromSquare()));
+                Add(move.GetPromotedPieceType().MakePiece(pos.SideToMove));
             }
         }
 
@@ -120,7 +124,7 @@ namespace Rudz.Chess
         private void Remove(Piece piece)
         {
             UpdateKey(piece.ColorOf(), piece.Type(), -1);
-            MaterialValue[piece.ColorOf()] -= (int)piece.PieceValue();
+            MaterialValue[piece.ColorOf().Side] -= (int)piece.PieceValue();
         }
     }
 }

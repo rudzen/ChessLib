@@ -26,27 +26,37 @@ SOFTWARE.
 
 namespace Rudz.Chess.Types
 {
+    using System;
     using System.Runtime.CompilerServices;
     using System.Runtime.InteropServices;
 
     /// <summary>
     /// Score type with support for Eg/Mg values
     /// </summary>
-    public struct Score
+    public struct Score : IEquatable<Score>
     {
         [StructLayout(LayoutKind.Explicit)]
-        private struct ScoreUnion
+        private struct ScoreUnion : IEquatable<ScoreUnion>
         {
             [FieldOffset(0)]
             public int mg;
             [FieldOffset(16)]
             public int eg;
+
+            public bool Equals(ScoreUnion other)
+                => mg == other.mg && eg == other.eg;
+
+            public override bool Equals(object obj)
+                => obj is ScoreUnion other && Equals(other);
+
+            public override int GetHashCode()
+                => HashCode.Combine(mg, eg);
         }
 
         private ScoreUnion _data;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Score(int value)
+        private Score(int value)
         {
             _data.mg = value;
             _data.eg = 0;
@@ -60,36 +70,59 @@ namespace Rudz.Chess.Types
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Score(Score s) => _data = s._data;
+        public Score(Score s)
+            => _data = s._data;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Score(ExtMove em) => _data = em.Score._data;
+        public Score(ExtMove em)
+            => _data = em.Score._data;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator Score(int v) => new Score(v);
+        public static implicit operator Score(int v)
+            => new Score(v);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator Score(ExtMove em) => new Score(em.Score._data.mg, em.Score._data.eg);
+        public static implicit operator Score(ExtMove em)
+            => new Score(em.Score._data.mg, em.Score._data.eg);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Score operator *(Score s, int v) => new Score(s.Mg() * v, s.Eg() * v);
+        public static Score operator *(Score s, int v)
+            => new Score(s.Mg() * v, s.Eg() * v);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Score operator +(Score s1, Score s2) => new Score(s1.Mg() + s2.Mg(), s1.Eg() + s2.Eg());
+        public static Score operator +(Score s1, Score s2)
+            => new Score(s1.Mg() + s2.Mg(), s1.Eg() + s2.Eg());
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Score operator +(Score s, int v) => new Score(s.Mg() + v, s.Eg() + v);
+        public static Score operator +(Score s, int v)
+            => new Score(s.Mg() + v, s.Eg() + v);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetMg(int v) => _data.mg = v;
+        public void SetMg(int v)
+            => _data.mg = v;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetEg(int v) => _data.eg = v;
+        public void SetEg(int v)
+            => _data.eg = v;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly int Eg() => _data.eg;
+        public readonly int Eg()
+            => _data.eg;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly int Mg() => _data.mg;
+        public readonly int Mg()
+            => _data.mg;
+
+        public override string ToString()
+            => $"Mg:{_data.mg}, Eg:{_data.eg}";
+
+        public bool Equals(Score other)
+            => _data.Equals(other._data);
+
+        public override bool Equals(object obj)
+            => obj is Score other && Equals(other);
+
+        public override int GetHashCode()
+            => _data.GetHashCode();
     }
 }

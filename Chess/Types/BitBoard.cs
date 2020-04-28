@@ -216,7 +216,7 @@ namespace Rudz.Chess.Types
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public IEnumerator<Square> GetEnumerator()
         {
-            if (Empty())
+            if (Empty)
                 yield break;
 
             BitBoard bb = Value;
