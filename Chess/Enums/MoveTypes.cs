@@ -26,17 +26,26 @@ SOFTWARE.
 
 namespace Rudz.Chess.Enums
 {
-    using System;
+    using System.Runtime.CompilerServices;
 
-    [Flags]
-    public enum MoveTypes
+    public enum MoveTypes : ushort
     {
         Normal = 0,
-        Quiet = 1,
-        Doublepush = 2,
-        Castle = 4,
-        Epcapture = 8,
-        Promotion = 16,
-        Capture = 32
+        Promotion = 1 << 14,
+        Enpassant = 2 << 14,
+        Castling = 3 << 14
+        // Normal = 0,
+        // Quiet = 1,
+        // Doublepush = 2,
+        // Castle = 4,
+        // Epcapture = 8,
+        // Promotion = 16,
+        // Capture = 32
+    }
+
+    public static class MoveTypesExtensions
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int AsInt(this MoveTypes @this) => (int) @this;
     }
 }

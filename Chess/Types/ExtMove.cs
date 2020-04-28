@@ -37,6 +37,13 @@ namespace Rudz.Chess.Types
 
         public Score Score;
 
+        public static readonly ExtMove Empty;
+
+        static ExtMove()
+        {
+            Empty = new ExtMove();
+        }
+        
         public ExtMove(Move m, Score s)
         {
             Move = m;

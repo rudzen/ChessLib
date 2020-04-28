@@ -82,7 +82,7 @@ namespace Rudz.Chess.Types
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int AsInt(this PieceTypes p) => (int)p;
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static Piece MakePiece(this PieceTypes @this, Player side) => (int)@this | (side.Side << 3);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

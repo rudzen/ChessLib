@@ -27,214 +27,84 @@ SOFTWARE.
 namespace Rudz.Chess.Types
 {
     using Enums;
-    using Extensions;
     using System.Runtime.CompilerServices;
 
     /// <summary>
-    /// Move struct. Contains a single int for move related information.
-    /// Also includes set and get functions for the relevant data stored in the int bits.
+    /// Move struct. Contains a single ushort for move related information.
+    /// Also includes set and get functions for the relevant data stored in the bits.
     /// </summary>
-    public struct Move
+    public readonly struct Move
     {
-        // offsets for bit positions in move data
-        private const int MoveSideOffset = 29;
+        private readonly ushort _data;
 
-        private const int MovePieceOffset = 26;
-
-        private const int CapturePieceOffset = 22;
-
-        private const int PromotePieceOffset = 18;
-
-        private const int MoveTypeOffset = 12;
-
-        private const int MoveFromSquareOffset = 6;
-
-        private const MoveTypes EpCaptureCapture = MoveTypes.Epcapture | MoveTypes.Capture;
-        
-        /// <summary>
-        /// Contains ALL relevant move information.
-        /// See the constant offsets for details about which bits contains what data.
-        /// </summary>
-        private int _data;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Move"/> struct.
-        /// Necessary extra constructor as it can sometimes be required to only created a basic move.
-        /// </summary>
-        /// <param name="from">The from square/// </param>
-        /// <param name="to">The to square</param>
         public Move(Square from, Square to)
-            : this()
-        {
-            SetFromSquare(from);
-            SetToSquare(to);
-        }
+            => _data = (ushort) (to | (from.AsInt() << 6));
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Move"/> struct.
-        /// Constructor for capture moves
-        /// </summary>
-        /// <param name="piece">The moving piece</param>
-        /// <param name="captured">The captured piece</param>
-        /// <param name="from">The from square</param>
-        /// <param name="to">The to square</param>
-        /// <param name="type">The move type</param>
-        public Move(Piece piece, Piece captured, Square from, Square to, MoveTypes type)
-            : this(from, to)
-        {
-            SetMovingPiece(piece);
-            SetCapturedPiece(captured);
-            SetMoveType(type);
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Move"/> struct.
-        /// Constructor mainly for use with UI quiet move generation.
-        /// It contains implicit no capture piece or promotion piece.
-        /// Type is implicit Quiet.
-        /// </summary>
-        /// <param name="piece">The piece to move</param>
-        /// <param name="from">The from square</param>
-        /// <param name="to">The to square</param>
-        public Move(Piece piece, Square from, Square to)
-            : this(from, to)
-        {
-            SetMovingPiece(piece);
-            SetMoveType(MoveTypes.Quiet);
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Move"/> struct.
-        /// Constructor for capture+promotion moves
-        /// </summary>
-        /// <param name="piece">The moving piece</param>
-        /// <param name="captured">The captured piece</param>
-        /// <param name="from">The from square</param>
-        /// <param name="to">The to square</param>
-        /// <param name="type">The move type</param>
-        /// <param name="promotedEPiece">The promotion piece</param>
-        public Move(Piece piece, Piece captured, Square from, Square to, MoveTypes type, Piece promotedEPiece)
-            : this(piece, captured, from, to, type) => SetPromotedPiece(promotedEPiece);
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Move"/> struct.
-        /// Constructor for quiet promotion moves
-        /// </summary>
-        /// <param name="piece">The moving piece</param>
-        /// <param name="from">The from square</param>
-        /// <param name="to">The to square</param>
-        /// <param name="type">The move type</param>
-        /// <param name="promoted">The promotion piece</param>
-        public Move(Piece piece, Square from, Square to, MoveTypes type, Piece promoted)
-            : this(from, to)
-        {
-            SetMovingPiece(piece);
-            SetMoveType(type);
-            SetPromotedPiece(promoted);
-        }
-
-        public Move(int data) => _data = data;
-
-        // ReSharper disable once ConvertToAutoPropertyWhenPossible
-        public int Data
-        {
-            get => _data;
-            set => _data = value;
-        }
+        public Move(Square from, Square to, MoveTypes moveType, PieceTypes promoPt = PieceTypes.Knight)
+            => _data = (ushort) (to | (from.AsInt() << 6) | moveType.AsInt() | ((promoPt - PieceTypes.Knight) << 12));
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator Move(string value) => new Move(new Square(value[1] - '1', value[0] - 'a'), new Square(value[3] - '1', value[2] - 'a'));
+        public static implicit operator Move(string value)
+            => new Move(new Square(value[1] - '1', value[0] - 'a'), new Square(value[3] - '1', value[2] - 'a'));
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator ==(Move left, Move right) => left.Equals(right);
+        public static Move MakeMove(Square from, Square to)
+            => new Move(from, to);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator !=(Move left, Move right) => !left.Equals(right);
+        public static Move MakeMove(Square from, Square to, MoveTypes moveType, PieceTypes promoPt = PieceTypes.Knight)
+            => new Move(from, to, moveType, promoPt);
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool operator ==(Move left, Move right) => left._data == right._data;
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool operator !=(Move left, Move right) => left._data != right._data;
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Square GetFromSquare() => (_data >> 6) & 0x3F;
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Square GetToSquare() => new Square(_data & 0x3F);
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public readonly PieceTypes GetPromotedPieceType() => (PieceTypes) (((_data >> 12) & 3) + 2);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly int GetData() => _data;
+        public readonly bool IsQueenPromotion() => GetPromotedPieceType() == PieceTypes.Queen;
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public readonly MoveTypes GetMoveType()
+            => (MoveTypes) (_data & (3 << 14));
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly Square GetFromSquare() => new Square((_data >> MoveFromSquareOffset) & 0x3F);
-
+        public readonly bool IsType(MoveTypes moveType)
+            => GetMoveType() == moveType;
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetFromSquare(Square square) => _data |= square.AsInt() << MoveFromSquareOffset;
-
+        public readonly bool IsEnPassantMove() => GetMoveType() == MoveTypes.Enpassant;
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly Square GetToSquare() => new Square(_data & 0x3F);
-
+        public readonly bool IsCastlelingMove() => GetMoveType() == MoveTypes.Castling;
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetToSquare(Square square) => _data |= square.AsInt();
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly Piece GetMovingPiece() => (_data >> MovePieceOffset) & 0xF;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetMovingPiece(Piece piece) => _data |= piece.AsInt() << MovePieceOffset;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly PieceTypes GetMovingPieceType() => GetMovingPiece().Type();
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly Piece GetCapturedPiece() => (_data >> CapturePieceOffset) & 0xF;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly bool IsCapturedPieceType(PieceTypes pieceType) => GetCapturedPiece().Type() == pieceType;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetCapturedPiece(Piece piece) => _data |= piece.AsInt() << CapturePieceOffset;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly Piece GetPromotedPiece() => (_data >> PromotePieceOffset) & 0xF;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetPromotedPiece(Piece piece) => _data |= piece.AsInt() << PromotePieceOffset;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly bool IsQueenPromotion() => IsPromotionMove() && GetPromotedPiece().Type() == PieceTypes.Queen;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly Player GetMovingSide() => new Player((_data >> MoveSideOffset) & 0x1);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly MoveTypes GetMoveType() => (MoveTypes)((_data >> MoveTypeOffset) & 0x3F);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetMoveType(MoveTypes moveType) => _data |= (int)moveType << MoveTypeOffset;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly bool IsType(MoveTypes moveType) => GetMoveType() == moveType;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly bool IsCaptureMove() => GetMoveType().HasFlagFast(EpCaptureCapture);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly bool IsEnPassantMove() => GetMoveType().HasFlagFast(MoveTypes.Epcapture);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly bool IsCastlelingMove() => GetMoveType().HasFlagFast(MoveTypes.Castle);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly bool IsPromotionMove() => GetMoveType().HasFlagFast(MoveTypes.Promotion);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly bool IsDoublePush() => GetMoveType().HasFlagFast(MoveTypes.Doublepush);
-
+        public readonly bool IsPromotionMove() => GetMoveType() == MoveTypes.Promotion;
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public readonly bool IsNullMove() => _data == 0;
-
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public readonly bool IsValidMove() => GetFromSquare().AsInt() != GetToSquare().AsInt();
-
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public readonly bool Equals(Move other) => _data == other._data;
-
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override bool Equals(object obj) => obj is Move move && Equals(move);
-
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override int GetHashCode() => _data;
-
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override string ToString() =>
             IsNullMove()

@@ -52,7 +52,11 @@ namespace Rudz.Chess
         public CastlelingRights CastlelingRights { get; set; }
 
         public Square EnPassantSquare { get; set; }
-
+        
+        public Piece CapturedPiece { get; set; }
+        
+        public BitBoard[] BlockersForKing { get; set; }
+        
         public BitBoard[] Pinners { get; set; }
 
         /// <summary>
@@ -85,6 +89,7 @@ namespace Rudz.Chess
             CastlelingRights = s.CastlelingRights;
             EnPassantSquare = s.EnPassantSquare;
             Array.Copy(s.Pinners, Pinners, s.Pinners.Length);
+            Array.Copy(s.BlockersForKing, BlockersForKing, s.BlockersForKing.Length);
             Checkers = s.Checkers;
             Array.Copy(s.CheckedSquares, CheckedSquares, s.CheckedSquares.Length);
             InCheck = s.InCheck;
@@ -98,6 +103,8 @@ namespace Rudz.Chess
             EnPassantSquare = Squares.none;
             Checkers = BitBoards.EmptyBitBoard;
             CheckedSquares = new BitBoard[PieceTypes.PieceTypeNb.AsInt()];
+            Pinners = new BitBoard[2];
+            BlockersForKing = new BitBoard[2];
         }
 
         public void Clear()
@@ -110,6 +117,7 @@ namespace Rudz.Chess
             EnPassantSquare = Squares.none;
             CheckedSquares.Fill(BitBoards.EmptyBitBoard);
             Pinners.Fill(BitBoards.EmptyBitBoard);
+            BlockersForKing.Fill(BitBoards.EmptyBitBoard);
         }
 
         public bool Equals(State other)

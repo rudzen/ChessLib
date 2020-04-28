@@ -116,7 +116,7 @@ namespace Rudz.Chess.Types
         public static bool operator false(Piece piece) => piece.Value == Pieces.NoPiece;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly int ColorOf() => (int)Value >> 3;
+        public readonly Player ColorOf() => (int)Value >> 3;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals(Piece other) => Value == other.Value;

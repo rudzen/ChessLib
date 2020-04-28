@@ -379,24 +379,6 @@ namespace Rudz.Chess.Types
         public static BitBoard KingAttacks(this Square square)
             => PseudoAttacksBB[PieceTypes.King.AsInt()][square.AsInt()];
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static BitBoard GetAttacks(this Square square, PieceTypes pieceType, BitBoard occupied = new BitBoard())
-        {
-            return pieceType switch
-            {
-                PieceTypes.Knight => PseudoAttacksBB[pieceType.AsInt()][square.AsInt()],
-                PieceTypes.King => PseudoAttacksBB[pieceType.AsInt()][square.AsInt()],
-                PieceTypes.Bishop => square.BishopAttacks(occupied),
-                PieceTypes.Rook => square.RookAttacks(occupied),
-                PieceTypes.Queen => square.QueenAttacks(occupied),
-                _ => EmptyBitBoard
-            };
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static BitBoard PseudoAttack(this Square @this, PieceTypes pieceType)
-            => PseudoAttacksBB[pieceType.AsInt()][@this.AsInt()];
-
         /// <summary>
         /// Attack for pawn.
         /// </summary>

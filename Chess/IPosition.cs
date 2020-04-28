@@ -81,8 +81,6 @@ namespace Rudz.Chess
 
         bool GivesCheck(Move m);
         
-        BitBoard PieceAttacks(Square sq, PieceTypes pt);
-
         BitBoard Pieces();
 
         BitBoard Pieces(Player c);
@@ -157,6 +155,10 @@ namespace Rudz.Chess
 
         HashKey GetPawnKey();
 
+        BitBoard GetAttacks(Square square, PieceTypes pt, BitBoard occupied);
+
+        BitBoard GetAttacks(Square square, PieceTypes pt);
+        
         void MoveToString(Move m, StringBuilder output);
     }
 }

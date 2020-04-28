@@ -37,8 +37,10 @@ namespace Rudz.Chess.Types
         [StructLayout(LayoutKind.Explicit)]
         private struct ScoreUnion
         {
-            [FieldOffset(0)] public int mg;
-            [FieldOffset(16)] public int eg;
+            [FieldOffset(0)]
+            public int mg;
+            [FieldOffset(16)]
+            public int eg;
         }
 
         private ScoreUnion _data;
