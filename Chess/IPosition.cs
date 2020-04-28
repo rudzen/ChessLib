@@ -74,6 +74,12 @@ namespace Rudz.Chess
         BitBoard GetPinnedPieces(Square sq, Player c);
 
         BitBoard CheckedSquares(PieceTypes pt);
+
+        BitBoard Checkers();
+
+        BitBoard PinnedPieces(Player c);
+
+        BitBoard BlockersForKing(Player c);
         
         bool IsOccupied(Square sq);
 

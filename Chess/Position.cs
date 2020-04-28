@@ -51,17 +51,14 @@ namespace Rudz.Chess
         private readonly CastlelingRights[] _castlingRightsMask;
         private readonly Square[] _castlingRookSquare;
         private readonly BitBoard[] _castlingPath;
-
         private readonly List<State> _stateStack;
-
-        private readonly State _startState;
 
         public Position()
         {
-            _startState = new State();
+            var startState = new State();
             _stateStack = new List<State>(256)
             {
-                _startState
+                startState
             };
             BoardLayout = new Piece[64];
             _castlingPath = new BitBoard[CastlelingRights.CastleRightsNb.AsInt()];
@@ -276,7 +273,7 @@ namespace Rudz.Chess
             
             // Update checkers bitboard
             State.Checkers = AttacksTo(ksq);
-            State.InCheck = !State.Checkers.Empty();
+            State.InCheck = !State.Checkers.Empty;
 
             SideToMove = ~SideToMove;
         }
@@ -379,15 +376,24 @@ namespace Rudz.Chess
         }
 
         public BitBoard CheckedSquares(PieceTypes pt)
-        {
-            return State.CheckedSquares[pt.AsInt()];
-        }
+            => State.CheckedSquares[pt.AsInt()];
+
+        public BitBoard Checkers()
+            => State.Checkers;
+
+        public BitBoard PinnedPieces(Player c)
+            => State.Pinners[c.Side];
+
+        public BitBoard BlockersForKing(Player c)
+            => State.BlockersForKing[c.Side];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsOccupied(Square sq) => BoardLayout[sq.AsInt()] != Enums.Pieces.NoPiece;
+        public bool IsOccupied(Square sq)
+            => BoardLayout[sq.AsInt()] != Enums.Pieces.NoPiece;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsAttacked(Square sq, Player c) => AttackedBySlider(sq, c) || AttackedByKnight(sq, c) || AttackedByPawn(sq, c) || AttackedByKing(sq, c);
+        public bool IsAttacked(Square sq, Player c)
+            => AttackedBySlider(sq, c) || AttackedByKnight(sq, c) || AttackedByPawn(sq, c) || AttackedByKing(sq, c);
 
         public bool GivesCheck(Move m)
         {
@@ -440,8 +446,8 @@ namespace Rudz.Chess
                         ? (Squares.g1.RelativeSquare(us), Squares.f1.RelativeSquare(us))
                         : (Squares.c1.RelativeSquare(us), Squares.d1.RelativeSquare(us));
 
-                    return (BitBoards.PseudoAttacks(PieceTypes.Rook, rto) & ksq) != 0
-                           && (rto.GetAttacks(PieceTypes.Rook, (Pieces() ^ kfrom ^ rfrom) | rto | kto) & ksq) != 0;
+                    return !(PieceTypes.Rook.PseudoAttacks(rto) & ksq).Empty
+                           && (GetAttacks(rto, PieceTypes.Rook, (Pieces() ^ kfrom ^ rfrom) | rto | kto) & ksq) != 0;
                 }
 
                 default:
@@ -452,31 +458,40 @@ namespace Rudz.Chess
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public BitBoard Pieces() => BoardPieces[PieceTypes.AllPieces.AsInt()];
+        public BitBoard Pieces()
+            => BoardPieces[PieceTypes.AllPieces.AsInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public BitBoard Pieces(Player c) => OccupiedBySide[c.Side];
+        public BitBoard Pieces(Player c)
+            => OccupiedBySide[c.Side];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public BitBoard Pieces(Piece pc) => BoardPieces[pc.Type().AsInt()] & OccupiedBySide[pc.ColorOf().Side];
+        public BitBoard Pieces(Piece pc)
+            => BoardPieces[pc.Type().AsInt()] & OccupiedBySide[pc.ColorOf().Side];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public BitBoard Pieces(PieceTypes pt) => BoardPieces[pt.AsInt()];
+        public BitBoard Pieces(PieceTypes pt)
+            => BoardPieces[pt.AsInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public BitBoard Pieces(PieceTypes pt1, PieceTypes pt2) => Pieces(pt1) | Pieces(pt2);
+        public BitBoard Pieces(PieceTypes pt1, PieceTypes pt2)
+            => Pieces(pt1) | Pieces(pt2);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public BitBoard Pieces(PieceTypes pt, Player side) => BoardPieces[pt.AsInt()] & OccupiedBySide[side.Side];
+        public BitBoard Pieces(PieceTypes pt, Player side)
+            => BoardPieces[pt.AsInt()] & OccupiedBySide[side.Side];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public BitBoard Pieces(PieceTypes pt1, PieceTypes pt2, Player c) => (BoardPieces[pt1.AsInt()] | BoardPieces[pt2.AsInt()]) & OccupiedBySide[c.Side];
+        public BitBoard Pieces(PieceTypes pt1, PieceTypes pt2, Player c)
+            => (BoardPieces[pt1.AsInt()] | BoardPieces[pt2.AsInt()]) & OccupiedBySide[c.Side];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Square GetPieceSquare(PieceTypes pt, Player c) => Pieces(pt, c).Lsb();
+        public Square GetPieceSquare(PieceTypes pt, Player c)
+            => Pieces(pt, c).Lsb();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool PieceOnFile(Square sq, Player c, PieceTypes pt) => (BoardPieces[pt.MakePiece(c).Type().AsInt()] & sq) != 0;
+        public bool PieceOnFile(Square sq, Player c, PieceTypes pt)
+            => !(BoardPieces[pt.MakePiece(c).Type().AsInt()] & sq).Empty;
 
         /// <summary>
         /// Determine if a pawn is isolated e.i. no own pawns on either of it's neighboring files
@@ -486,10 +501,7 @@ namespace Rudz.Chess
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool PawnIsolated(Square sq, Player c)
-        {
-            var b = (sq.PawnAttackSpan(c) | sq.PawnAttackSpan(~c)) & Pieces(PieceTypes.Pawn, c);
-            return b.Empty();
-        }
+            => ((sq.PawnAttackSpan(c) | sq.PawnAttackSpan(~c)) & Pieces(PieceTypes.Pawn, c)).Empty;
 
         /// <summary>
         /// Determine if a specific square is a passed pawn
@@ -506,7 +518,7 @@ namespace Rudz.Chess
 
             var c = pc.ColorOf();
 
-            return (sq.PassedPawnFrontAttackSpan(c) & Pieces(PieceTypes.Pawn, c)).Empty();
+            return (sq.PassedPawnFrontAttackSpan(c) & Pieces(PieceTypes.Pawn, c)).Empty;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -516,7 +528,7 @@ namespace Rudz.Chess
             var invertedSq = ~sq;
             BoardPieces[PieceTypes.AllPieces.AsInt()] &= invertedSq;
             BoardPieces[pc.Type().AsInt()] &= invertedSq;
-            OccupiedBySide[pc.ColorOf()] &= invertedSq;
+            OccupiedBySide[pc.ColorOf().Side] &= invertedSq;
             BoardLayout[sq.AsInt()] = PieceExtensions.EmptyPiece;
             if (!IsProbing)
                 PieceUpdated?.Invoke(Enums.Pieces.NoPiece, sq);
@@ -530,10 +542,10 @@ namespace Rudz.Chess
 
             return (sq.PawnAttack(PlayerExtensions.White) & OccupiedBySide[PlayerExtensions.Black.Side])
                   | (sq.PawnAttack(PlayerExtensions.Black) & OccupiedBySide[PlayerExtensions.White.Side])
-                  | (sq.GetAttacks(PieceTypes.Knight) & Pieces(PieceTypes.Knight))
-                  | (sq.GetAttacks(PieceTypes.Rook, occupied) & Pieces(PieceTypes.Rook, PieceTypes.Queen))
-                  | (sq.GetAttacks(PieceTypes.Bishop, occupied) & Pieces(PieceTypes.Bishop, PieceTypes.Queen))
-                  | (sq.GetAttacks(PieceTypes.King) & Pieces(PieceTypes.King));
+                  | (GetAttacks(sq, PieceTypes.Knight) & Pieces(PieceTypes.Knight))
+                  | (GetAttacks(sq, PieceTypes.Rook, occupied) & Pieces(PieceTypes.Rook, PieceTypes.Queen))
+                  | (GetAttacks(sq, PieceTypes.Bishop, occupied) & Pieces(PieceTypes.Bishop, PieceTypes.Queen))
+                  | (GetAttacks(sq, PieceTypes.King) & Pieces(PieceTypes.King));
         }
 
         public BitBoard AttacksTo(Square sq) => AttacksTo(sq, Pieces());
@@ -555,15 +567,15 @@ namespace Rudz.Chess
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool AttackedByKnight(Square sq, Player c)
-            => (Pieces(PieceTypes.Knight, c) & sq.GetAttacks(PieceTypes.Knight)) != 0;
+            => !(Pieces(PieceTypes.Knight, c) & GetAttacks(sq, PieceTypes.Knight)).Empty;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool AttackedByPawn(Square sq, Player c) =>
-            (Pieces(PieceTypes.Pawn, c) & sq.PawnAttack(~c)) != 0;
+            !(Pieces(PieceTypes.Pawn, c) & sq.PawnAttack(~c)).Empty;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool AttackedByKing(Square sq, Player c)
-            => (sq.GetAttacks(PieceTypes.King) & GetPieceSquare(PieceTypes.King, c)) != 0;
+            => !(GetAttacks(sq, PieceTypes.King) & GetPieceSquare(PieceTypes.King, c)).Empty;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool CanCastle(CastlelingRights cr)
@@ -625,7 +637,7 @@ namespace Rudz.Chess
             // move struct
             var from = m.GetFromSquare();
             
-            if ((Pieces(GetPiece(from)) & m.GetFromSquare()).Empty())
+            if ((Pieces(GetPiece(from)) & m.GetFromSquare()).Empty)
                 return false;
 
             var to = m.GetToSquare();
@@ -650,10 +662,10 @@ namespace Rudz.Chess
             }
             else if (m.IsCaptureMove())
             {
-                if ((OccupiedBySide[them.Side] & to).Empty())
+                if ((OccupiedBySide[them.Side] & to).Empty)
                     return false;
 
-                if ((Pieces(m.GetCapturedPiece()) & to).Empty())
+                if ((Pieces(m.GetCapturedPiece()) & to).Empty)
                     return false;
             }
             else if ((Pieces() & to) != 0)
@@ -886,7 +898,7 @@ namespace Rudz.Chess
             State.EnPassantSquare = enPessantSquare;
             State.ReversibleHalfMoveCount = halfMoveNum;
             State.Checkers = AttacksTo(ksq);
-            State.InCheck = !State.Checkers.Empty();
+            State.InCheck = !State.Checkers.Empty;
             State.Key = key;
             State.PawnStructureKey = pawnKey;
 
@@ -1075,7 +1087,7 @@ namespace Rudz.Chess
                 var sniperSq = BitBoards.PopLsb(ref snipers);
                 var b = s.BitboardBetween(sniperSq) & occupancy;
 
-                if (b.Empty() || b.MoreThanOne())
+                if (b.Empty || b.MoreThanOne())
                     continue;
                 
                 blockers |= b;

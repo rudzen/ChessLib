@@ -68,8 +68,6 @@ namespace Rudz.Chess.Types
  * black chess pawn 	♟ 	U+265F 	&#9823;
          */
 
-        private static readonly string[] PieceUnicode = { " ", "\u2659", "\u2658", "\u2657", "\u2656", "\u2655", "\u2654", " ", " ", "\u265F", "\u265E", "\u265D", "\u265C", "\u265B", "\u265A", " " };
-
         private static readonly char[] PieceUnicodeChar = { ' ', '\u2659', '\u2658', '\u2657', '\u2656', '\u2655', '\u2654', ' ', ' ', '\u265F', '\u265E', '\u265D', '\u265C', '\u265B', '\u265A', ' ' };
 
         // Generic helper functions
@@ -109,7 +107,7 @@ namespace Rudz.Chess.Types
         public static ref string GetName(this Piece p) => ref PieceNames[p.Type().AsInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static char GetPromotionChar(this Piece p) => PromotionPieceNotation[(int)p.Type()];
+        public static char GetPromotionChar(this PieceTypes p) => PromotionPieceNotation[p.AsInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static char GetPgnChar(this Piece p) => PgnPieceChars[(int)p.Type()];

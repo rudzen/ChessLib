@@ -56,54 +56,68 @@ namespace Rudz.Chess.Types
             => new Move(from, to, moveType, promoPt);
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator ==(Move left, Move right) => left._data == right._data;
+        public static bool operator ==(Move left, Move right)
+            => left._data == right._data;
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator !=(Move left, Move right) => left._data != right._data;
+        public static bool operator !=(Move left, Move right)
+            => left._data != right._data;
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Square GetFromSquare() => (_data >> 6) & 0x3F;
+        public Square GetFromSquare()
+            => (_data >> 6) & 0x3F;
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Square GetToSquare() => new Square(_data & 0x3F);
+        public Square GetToSquare()
+            => new Square(_data & 0x3F);
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly PieceTypes GetPromotedPieceType() => (PieceTypes) (((_data >> 12) & 3) + 2);
+        public PieceTypes GetPromotedPieceType()
+            => (PieceTypes) (((_data >> 12) & 3) + 2);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly bool IsQueenPromotion() => GetPromotedPieceType() == PieceTypes.Queen;
+        public bool IsQueenPromotion()
+            => GetPromotedPieceType() == PieceTypes.Queen;
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly MoveTypes GetMoveType()
+        public MoveTypes GetMoveType()
             => (MoveTypes) (_data & (3 << 14));
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly bool IsType(MoveTypes moveType)
+        public bool IsType(MoveTypes moveType)
             => GetMoveType() == moveType;
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly bool IsEnPassantMove() => GetMoveType() == MoveTypes.Enpassant;
+        public bool IsEnPassantMove()
+            => GetMoveType() == MoveTypes.Enpassant;
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly bool IsCastlelingMove() => GetMoveType() == MoveTypes.Castling;
+        public bool IsCastlelingMove()
+            => GetMoveType() == MoveTypes.Castling;
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly bool IsPromotionMove() => GetMoveType() == MoveTypes.Promotion;
+        public bool IsPromotionMove()
+            => GetMoveType() == MoveTypes.Promotion;
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly bool IsNullMove() => _data == 0;
+        public bool IsNullMove()
+            => _data == 0;
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly bool IsValidMove() => GetFromSquare().AsInt() != GetToSquare().AsInt();
+        public bool IsValidMove()
+            => GetFromSquare().AsInt() != GetToSquare().AsInt();
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly bool Equals(Move other) => _data == other._data;
+        public bool Equals(Move other)
+            => _data == other._data;
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public override bool Equals(object obj) => obj is Move move && Equals(move);
+        public override bool Equals(object obj)
+            => obj is Move move && Equals(move);
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public override int GetHashCode() => _data;
+        public override int GetHashCode()
+            => _data;
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override string ToString() =>
@@ -111,6 +125,6 @@ namespace Rudz.Chess.Types
                 ? ".."
                 : !IsPromotionMove()
                     ? $"{GetFromSquare().GetSquareString()}{GetToSquare().GetSquareString()}"
-                    : $"{GetFromSquare().GetSquareString()}{GetToSquare().GetSquareString()}{GetPromotedPiece().GetPromotionChar()}";
+                    : $"{GetFromSquare().GetSquareString()}{GetToSquare().GetSquareString()}{GetPromotedPieceType().GetPromotionChar()}";
     }
 }
