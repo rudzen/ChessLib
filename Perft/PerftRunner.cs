@@ -138,9 +138,9 @@ namespace Perft
                         _log.Error("Parsing failed for Id={0}", position.Id);
                     _resultPool.Return(result);
                 }
-                catch (Exception)
+                catch (AggregateException e)
                 {
-                    _log.Warning("Cancel requested.");
+                    _log.Error(e.GetBaseException(),"Cancel requested.");
                     errors = 1;
                     break;
                 }

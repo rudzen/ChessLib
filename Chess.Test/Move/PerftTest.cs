@@ -119,6 +119,11 @@ namespace Chess.Test.Move
                 await foreach (var result in perftResults.ConfigureAwait(false))
                     actual += result;
 
+                if (expected != actual)
+                {
+                    
+                }
+                
                 Assert.Equal(expected, actual);
             }
         }

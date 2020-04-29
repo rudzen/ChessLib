@@ -90,7 +90,7 @@ namespace Rudz.Chess
                 gameEndType |= GameEndTypes.Repetition;
             if (State.Material[PlayerExtensions.White.Side] <= 300 && State.Material[PlayerExtensions.Black.Side] <= 300 && Pos.BoardPieces[0].Empty && Pos.BoardPieces[8].Empty)
                 gameEndType |= GameEndTypes.MaterialDrawn;
-            if (State.ReversibleHalfMoveCount >= 100)
+            if (State.PliesFromNull >= 100)
                 gameEndType |= GameEndTypes.FiftyMove;
 
             var moveList = Pos.GenerateMoves().GetMoves();
@@ -148,8 +148,8 @@ namespace Rudz.Chess
 
             var key = Pos.State.Key;
 
-            if (_perftCache.TryGetValue((key, depth), out var tot))
-                return tot;
+            // if (_perftCache.TryGetValue((key, depth), out var tot))
+            //     return tot;
             
             // var posKey = Pos.State.Key;
             //
@@ -159,21 +159,30 @@ namespace Rudz.Chess
 
             var move = MoveExtensions.EmptyMove;
 
-            var moves = Pos.GenerateMoves().GetMoves();
-            foreach (var m in moves)
+            if (depth == 3)
             {
-                Console.WriteLine($"{depth}:{m.Move}");
-                Console.WriteLine($"{depth}:Before MakeMove: {Pos.GenerateFen().Fen.ToString()}");
-                Pos.MakeMove(m.Move);
-                Console.WriteLine($"{depth}:After MakeMove: {Pos.GenerateFen().Fen.ToString()}");
-                move = m;
-                tot += Perft(depth - 1);
-                Console.WriteLine($"{depth}:Before TakeMove: {Pos.GenerateFen().Fen.ToString()}");
-                Pos.TakeMove(m);
-                Console.WriteLine($"{depth}:After TakeMove: {Pos.GenerateFen().Fen.ToString()}");
+                var f = Pos.GenerateFen().Fen.ToString();
             }
 
-            _perftCache.Add((key, depth), tot);
+            var tot = 0ul;
+
+            var ml = Pos.GenerateMoves();
+            
+            var moves = ml.GetMoves();
+            foreach (var m in moves)
+            {
+                // Console.WriteLine($"{depth}:{m.Move}");
+                // Console.WriteLine($"{depth}:Before MakeMove: {Pos.GenerateFen().Fen.ToString()}");
+                Pos.MakeMove(m.Move);
+                // Console.WriteLine($"{depth}:After MakeMove: {Pos.GenerateFen().Fen.ToString()}");
+                move = m;
+                tot += Perft(depth - 1);
+                // Console.WriteLine($"{depth}:Before TakeMove: {Pos.GenerateFen().Fen.ToString()}");
+                Pos.TakeMove(m);
+                // Console.WriteLine($"{depth}:After TakeMove: {Pos.GenerateFen().Fen.ToString()}");
+            }
+
+            // _perftCache.Add((key, depth), tot);
             
             // if (!move.IsNullMove() && tot <= int.MaxValue)
             //     Table.Store(posKey, (int)tot, Bound.Exact, (sbyte)depth, move, 0);
@@ -202,7 +211,7 @@ namespace Rudz.Chess
         private int HalfMoveCount()
         {
             // TODO : This is WRONG!? :)
-            return State.HalfMoveCount;
+            return State.Rule50;
         }
     }
 }

@@ -53,6 +53,8 @@ namespace Rudz.Chess
 
         Square EnPassantSquare { get; }
         
+        string FenNotation { get; }
+        
         void Clear();
 
         void AddPiece(Piece pc, Square sq);

@@ -39,9 +39,9 @@ namespace Rudz.Chess
 
         public HashKey PawnStructureKey { get; set; }
 
-        public int ReversibleHalfMoveCount { get; set; }
+        public int PliesFromNull { get; set; }
 
-        public int HalfMoveCount { get; set; }
+        public int Rule50 { get; set; }
 
         public int NullMovesInRow { get; set; }
 
@@ -81,8 +81,8 @@ namespace Rudz.Chess
             Material = new Material();
             Material.CopyFrom(s.Material);
             PawnStructureKey = s.PawnStructureKey;
-            ReversibleHalfMoveCount = s.ReversibleHalfMoveCount;
-            HalfMoveCount = s.HalfMoveCount;
+            PliesFromNull = s.PliesFromNull;
+            Rule50 = s.Rule50;
             NullMovesInRow = s.NullMovesInRow;
             FiftyMoveRuleCounter = s.FiftyMoveRuleCounter;
             Key = s.Key;
@@ -114,7 +114,7 @@ namespace Rudz.Chess
             LastMove = MoveExtensions.EmptyMove;
             Material.Clear();
             PawnStructureKey = Key = 0ul;
-            ReversibleHalfMoveCount = NullMovesInRow = FiftyMoveRuleCounter = 0;
+            PliesFromNull = NullMovesInRow = FiftyMoveRuleCounter = 0;
             CastlelingRights = CastlelingRights.None;
             EnPassantSquare = Squares.none;
             CheckedSquares.Fill(BitBoards.EmptyBitBoard);
@@ -133,8 +133,8 @@ namespace Rudz.Chess
                    && EnPassantSquare.Equals(other.EnPassantSquare)
                    && CastlelingRights == other.CastlelingRights
                    && Equals(Material, other.Material)
-                   && ReversibleHalfMoveCount == other.ReversibleHalfMoveCount
-                   && HalfMoveCount == other.HalfMoveCount
+                   && PliesFromNull == other.PliesFromNull
+                   && Rule50 == other.Rule50
                    && NullMovesInRow == other.NullMovesInRow
                    && FiftyMoveRuleCounter == other.FiftyMoveRuleCounter
                    && Pinners.Equals(other.Pinners)
@@ -154,8 +154,8 @@ namespace Rudz.Chess
             hashCode.Add(LastMove);
             hashCode.Add(Material);
             hashCode.Add(PawnStructureKey);
-            hashCode.Add(ReversibleHalfMoveCount);
-            hashCode.Add(HalfMoveCount);
+            hashCode.Add(PliesFromNull);
+            hashCode.Add(Rule50);
             hashCode.Add(NullMovesInRow);
             hashCode.Add(FiftyMoveRuleCounter);
             hashCode.Add(Key);
