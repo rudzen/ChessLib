@@ -24,6 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using System;
 using Rudz.Chess.Extensions;
 
 namespace Rudz.Chess.Types
@@ -31,24 +32,28 @@ namespace Rudz.Chess.Types
     using Enums;
     using System.Runtime.CompilerServices;
 
-    public struct Player
+    public readonly struct Player : IEquatable<Player>
     {
-        public Player(int side)
+        public Player(byte side)
             : this() => Side = side;
 
         public Player(Player side)
             : this() => Side = side.Side;
 
         public Player(Players side)
-            : this((int)side) { }
+            : this((byte)side) { }
 
-        public int Side;
+        public readonly byte Side;
+
+        public bool IsWhite => Side == 0;
+
+        public bool IsBlack => Side != 0;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator Player(int value) => new Player(value);
+        public static implicit operator Player(int value) => new Player((byte)value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator Player(uint value) => new Player((int)value);
+        public static implicit operator Player(uint value) => new Player((byte)value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator Player(Players value) => new Player(value);
@@ -78,16 +83,10 @@ namespace Rudz.Chess.Types
         public override bool Equals(object obj) => obj is Player player && Equals(player);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly bool Equals(Player other) => Side == other.Side;
+        public bool Equals(Player other) => Side == other.Side;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override int GetHashCode() => Side << 24;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly bool IsWhite() => Side == 0;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly bool IsBlack() => Side != 0;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override string ToString() => Side == 0 ? "White" : "Black";

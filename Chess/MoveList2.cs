@@ -157,9 +157,9 @@ namespace Rudz.Chess
             while (b != 0)
             {
                 var to = BitBoards.PopLsb(ref b);
-                if (type == MoveGenerationType.CAPTURES || type == MoveGenerationType.EVASIONS || type == MoveGenerationType.NON_EVASIONS)
+                if (type == MoveGenerationType.Captures || type == MoveGenerationType.Evasions || type == MoveGenerationType.NonEvasions)
                     moveList[index++] = Move.MakeMove(to - delta, to, MoveTypes.Promotion, PieceTypes.Queen);
-                if (type == MoveGenerationType.QUIETS || type == MoveGenerationType.EVASIONS || type == MoveGenerationType.NON_EVASIONS)
+                if (type == MoveGenerationType.Quiets || type == MoveGenerationType.Evasions || type == MoveGenerationType.NonEvasions)
                 {
                     moveList[index++] = Move.MakeMove(to - delta, to, MoveTypes.Promotion, PieceTypes.Rook);
                     moveList[index++] = Move.MakeMove(to - delta, to, MoveTypes.Promotion, PieceTypes.Bishop);
@@ -168,7 +168,7 @@ namespace Rudz.Chess
 
                 // Knight promotion is the only promotion that can give a direct check that's not
                 // already included in the queen promotion.
-                if (type == MoveGenerationType.QUIET_CHECKS && (PieceTypes.Knight.PseudoAttacks(to) & ksq) != 0)
+                if (type == MoveGenerationType.QuietChecks && (PieceTypes.Knight.PseudoAttacks(to) & ksq) != 0)
                     moveList[index++] = Move.MakeMove(to - delta, to, MoveTypes.Promotion, PieceTypes.Knight);
             }
 
@@ -184,7 +184,7 @@ namespace Rudz.Chess
             var rank7Bb = us.Rank7();
             var rank3Bb = us.Rank3();
             var up = us.PawnPushDistance();
-            var (right, left) = us.IsWhite()
+            var (right, left) = us.IsWhite
                 ? (Directions.NorthEast, Directions.NorthWest)
                 : (Directions.SouthWest, Directions.SouthEast);
             
@@ -200,15 +200,15 @@ namespace Rudz.Chess
 
             var enemies = type switch
             {
-                MoveGenerationType.EVASIONS => pos.Pieces(them) & target,
-                MoveGenerationType.CAPTURES => target,
+                MoveGenerationType.Evasions => pos.Pieces(them) & target,
+                MoveGenerationType.Captures => target,
                 _ => pos.Pieces(them)
             };
             
             // Single and double pawn pushes, no promotions
-            if (type != MoveGenerationType.CAPTURES)
+            if (type != MoveGenerationType.Captures)
             {
-                emptySquares = type == MoveGenerationType.QUIETS || type == MoveGenerationType.QUIET_CHECKS
+                emptySquares = type == MoveGenerationType.Quiets || type == MoveGenerationType.QuietChecks
                     ? target
                     : ~pos.Pieces();
                 
@@ -218,11 +218,11 @@ namespace Rudz.Chess
                 switch (type)
                 {
                     // Consider only blocking squares
-                    case MoveGenerationType.EVASIONS:
+                    case MoveGenerationType.Evasions:
                         pawnOne &= target;
                         pawnTwo &= target;
                         break;
-                    case MoveGenerationType.QUIET_CHECKS:
+                    case MoveGenerationType.QuietChecks:
                     {
                         pawnOne &= ksq.PawnAttack(them);
                         pawnTwo &= ksq.PawnAttack(them);
@@ -259,14 +259,14 @@ namespace Rudz.Chess
             }
 
             // Promotions and underpromotions
-            if (pawnsOn7 != 0 && (type != MoveGenerationType.EVASIONS || (target & rank8Bb) != 0))
+            if (pawnsOn7 != 0 && (type != MoveGenerationType.Evasions || (target & rank8Bb) != 0))
             {
                 switch (type)
                 {
-                    case MoveGenerationType.CAPTURES:
+                    case MoveGenerationType.Captures:
                         emptySquares = ~pos.Pieces();
                         break;
-                    case MoveGenerationType.EVASIONS:
+                    case MoveGenerationType.Evasions:
                         emptySquares &= target;
                         break;
                 }
@@ -277,7 +277,7 @@ namespace Rudz.Chess
             }
 
             // Standard and en-passant captures
-            if (type != MoveGenerationType.CAPTURES && type != MoveGenerationType.EVASIONS && type != MoveGenerationType.NON_EVASIONS)
+            if (type != MoveGenerationType.Captures && type != MoveGenerationType.Evasions && type != MoveGenerationType.NonEvasions)
                 return index;
             
             pawnOne = pawnsNotOn7.Shift(right) & enemies;
@@ -302,7 +302,7 @@ namespace Rudz.Chess
             // An en passant capture can be an evasion only if the checking piece is the
             // double pushed pawn and so is in the target. Otherwise this is a discovery
             // check and we are forced to do otherwise.
-            if (type == MoveGenerationType.EVASIONS && (target & (pos.EnPassantSquare - up)) == 0)
+            if (type == MoveGenerationType.Evasions && (target & (pos.EnPassantSquare - up)) == 0)
                 return index;
                 
             pawnOne = pawnsNotOn7 & pos.State.EnPassantSquare.PawnAttack(them);
@@ -350,7 +350,7 @@ namespace Rudz.Chess
 
         private static int GenerateAll(IPosition pos, Span<ExtMove> moves, int index, BitBoard target, Player us, MoveGenerationType type)
         {
-            var checks = type == MoveGenerationType.QUIET_CHECKS;
+            var checks = type == MoveGenerationType.QuietChecks;
             index = GeneratePawnMoves(pos, moves, index, target, us, type);
 
             for (var pt = PieceTypes.Knight; pt <= PieceTypes.Queen; ++pt)
@@ -361,7 +361,7 @@ namespace Rudz.Chess
             // mPos = generate_moves(pos, mlist, mPos, us, target, ci, PieceTypes.Rook, checks);
             // mPos = generate_moves(pos, mlist, mPos, us, target, ci, PieceTypes.Queen, checks);
 
-            if (!checks && type != MoveGenerationType.EVASIONS)
+            if (!checks && type != MoveGenerationType.Evasions)
             {
                 var ksq = pos.GetPieceSquare(PieceTypes.King, us);
                 var b = pos.GetAttacks(ksq, PieceTypes.King) & target;
@@ -369,7 +369,7 @@ namespace Rudz.Chess
                     moves[index++] = Move.MakeMove(ksq, BitBoards.PopLsb(ref b));
             }
 
-            if (type == MoveGenerationType.CAPTURES || type == MoveGenerationType.EVASIONS || !pos.CanCastle(us))
+            if (type == MoveGenerationType.Captures || type == MoveGenerationType.Evasions || !pos.CanCastle(us))
                 return index;
             
             index = GenerateCastling(pos, moves, index, us, CastlelingSides.King.MakeCastlelingRights(us));
@@ -388,14 +388,14 @@ namespace Rudz.Chess
         /// pointer to the end of the move list.
         private static int GenerateCapturesQuietsNonEvasions(IPosition pos, Span<ExtMove> moves, int index, MoveGenerationType type)
         {
-            Debug.Assert(type == MoveGenerationType.CAPTURES || type == MoveGenerationType.QUIETS || type == MoveGenerationType.NON_EVASIONS);
+            Debug.Assert(type == MoveGenerationType.Captures || type == MoveGenerationType.Quiets || type == MoveGenerationType.NonEvasions);
             Debug.Assert(pos.Checkers().Empty);
             var us = pos.SideToMove;
             var target = type switch
             {
-                MoveGenerationType.CAPTURES => pos.Pieces(~us),
-                MoveGenerationType.QUIETS => ~pos.Pieces(),
-                MoveGenerationType.NON_EVASIONS => ~pos.Pieces(us),
+                MoveGenerationType.Captures => pos.Pieces(~us),
+                MoveGenerationType.Quiets => ~pos.Pieces(),
+                MoveGenerationType.NonEvasions => ~pos.Pieces(us),
                 _ => 0
             };
             
@@ -432,7 +432,7 @@ namespace Rudz.Chess
             // Generate blocking evasions or captures of the checking piece
             var checksq2 = pos.Checkers().Lsb();
             var target = checksq2.BitboardBetween(ksq) | checksq2;
-            return GenerateAll(pos, moves, index, target, us, MoveGenerationType.EVASIONS);
+            return GenerateAll(pos, moves, index, target, us, MoveGenerationType.Evasions);
         }
 
         /// generate<LEGAL> generates all the legal moves in the given position
@@ -443,7 +443,7 @@ namespace Rudz.Chess
             var ksq = pos.GetPieceSquare(PieceTypes.King, pos.SideToMove);
             var end = !pos.Checkers().Empty
                 ? GenerateEvasions(pos, moves, index)
-                : Generate(pos, moves, index, MoveGenerationType.NON_EVASIONS);
+                : Generate(pos, moves, index, MoveGenerationType.NonEvasions);
             while (cur != end)
                 if ((!pinned.Empty || moves[cur].Move.GetFromSquare() == ksq || moves[cur].Move.IsEnPassantMove())
                     && !pos.IsLegal(moves[cur].Move))
@@ -475,7 +475,7 @@ namespace Rudz.Chess
                     moves[index++] = Move.MakeMove(from, BitBoards.PopLsb(ref b));
             }
 
-            return GenerateAll(pos, moves, index, ~pos.Pieces(), us, MoveGenerationType.QUIET_CHECKS);
+            return GenerateAll(pos, moves, index, ~pos.Pieces(), us, MoveGenerationType.QuietChecks);
         }
 
         private static int Generate(IPosition pos, Span<ExtMove> moves, int index, MoveGenerationType type)
@@ -483,22 +483,22 @@ namespace Rudz.Chess
             int result;
             switch (type)
             {
-                case MoveGenerationType.LEGAL:
+                case MoveGenerationType.Legal:
                     result = GenerateLegal(pos, moves, index);
                     break;
-                case MoveGenerationType.CAPTURES:
+                case MoveGenerationType.Captures:
                     result = GenerateCapturesQuietsNonEvasions(pos, moves, index, type);
                     break;
-                case MoveGenerationType.QUIETS:
+                case MoveGenerationType.Quiets:
                     result = GenerateCapturesQuietsNonEvasions(pos, moves, index, type);
                     break;
-                case MoveGenerationType.NON_EVASIONS:
+                case MoveGenerationType.NonEvasions:
                     result = GenerateCapturesQuietsNonEvasions(pos, moves, index, type);
                     break;
-                case MoveGenerationType.EVASIONS:
+                case MoveGenerationType.Evasions:
                     result = GenerateEvasions(pos, moves, index);
                     break;
-                case MoveGenerationType.QUIET_CHECKS:
+                case MoveGenerationType.QuietChecks:
                 {
                     var ksq = pos.GetPieceSquare(PieceTypes.King, pos.SideToMove);
                     result = GenerateQuietChecks(pos, moves, index, ksq);

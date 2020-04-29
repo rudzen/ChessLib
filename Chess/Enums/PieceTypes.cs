@@ -26,12 +26,8 @@ SOFTWARE.
 
 namespace Rudz.Chess.Enums
 {
-    using System;
-
-    [Flags]
     public enum PieceTypes
     {
-        AllPieces = 0,
         NoPieceType = 0,
         Pawn = 1,
         Knight = 2,
@@ -39,6 +35,7 @@ namespace Rudz.Chess.Enums
         Rook = 4,
         Queen = 5,
         King = 6,
-        PieceTypeNb = 7
+        PieceTypeNb = 7,
+        AllPieces = 0
     }
 }

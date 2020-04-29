@@ -29,7 +29,6 @@ namespace Rudz.Chess.Enums
     using System;
     using Types;
 
-    [Flags]
     public enum CastlelingSides
     {
         None = 0,
@@ -59,7 +58,7 @@ namespace Rudz.Chess.Enums
     public static class CastlelingSideExtensions
     {
         public static CastlelingRights MakeCastlelingRights(this CastlelingSides cs, Player p)
-            => p.IsWhite()
+            => p.IsWhite
                 ? cs == CastlelingSides.Queen
                     ? CastlelingRights.WhiteOoo
                     : CastlelingRights.WhiteOo

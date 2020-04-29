@@ -29,9 +29,9 @@ namespace Rudz.Chess.Types
     using Enums;
     using System.Runtime.CompilerServices;
 
-    public struct Rank
+    public readonly struct Rank
     {
-        private Ranks _value;
+        private readonly Ranks _value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Rank(int file) => _value = (Ranks)file;
@@ -85,7 +85,9 @@ namespace Rudz.Chess.Types
         public static Rank operator -(Rank left, Ranks right) => left.AsInt() - (int)right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Rank operator ++(Rank rank) => ++rank._value;
+        public static Rank operator ++(Rank rank) => rank._value + 1;
+
+        public static Rank operator --(Rank rank) => rank._value - 1;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static BitBoard operator &(Rank left, ulong right) => left.BitBoardRank() & right;
@@ -121,16 +123,16 @@ namespace Rudz.Chess.Types
         public static bool operator false(Rank sq) => !sq.IsValid();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly int AsInt() => (int)_value;
+        public int AsInt() => (int)_value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly bool IsValid() => _value < Ranks.RankNb;
+        public bool IsValid() => _value < Ranks.RankNb;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override string ToString() => ((int) _value + 1).ToString();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly bool Equals(Rank other) => _value == other._value;
+        public bool Equals(Rank other) => _value == other._value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override bool Equals(object obj) => obj is Rank file && Equals(file);
@@ -139,7 +141,7 @@ namespace Rudz.Chess.Types
         public override int GetHashCode() => AsInt();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly Rank RelativeRank(Player color) => AsInt() ^ (color.Side * 7);
+        public Rank RelativeRank(Player color) => AsInt() ^ (color.Side * 7);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Rank RelativeRank(Player color, Rank rank)

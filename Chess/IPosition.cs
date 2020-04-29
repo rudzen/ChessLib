@@ -63,6 +63,8 @@ namespace Rudz.Chess
 
         void MakeMove(Move m);
 
+        void MakeMove(Move m, bool givesCheck);
+        
         void TakeMove(Move m);
 
         Piece GetPiece(Square sq);

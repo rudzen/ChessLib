@@ -36,7 +36,7 @@ namespace Rudz.Chess.Enums
     {
         InProgress = 0,
         WhiteWon = 1,
-        BlackWon = 2,
-        Draw = 4
+        BlackWon = 1 << 1,
+        Draw = 1 << 2
     }
 }

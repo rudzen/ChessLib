@@ -37,6 +37,9 @@ namespace Rudz.Chess.Extensions
         public static bool InBetween(this int v, int min, int max) => (uint)v - (uint)min <= (uint)max - (uint)min;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool InBetween(this byte v, byte min, byte max) => (uint)v - (uint)min <= (uint)max - (uint)min;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool InBetween(this char v, char min, char max) => v - (uint)min <= max - min;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

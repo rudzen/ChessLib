@@ -33,10 +33,10 @@ namespace Rudz.Chess.Enums
     {
         None = 0,
         Repetition = 1,
-        Pat = 2,
-        FiftyMove = 4,
-        MaterialDrawn = 8,
-        CheckMate = 16,
-        TimeIsUp = 32
+        Pat = 1 << 1,
+        FiftyMove = 1 << 2,
+        MaterialDrawn = 1 << 3,
+        CheckMate = 1 << 4,
+        TimeIsUp = 1 << 5
     }
 }

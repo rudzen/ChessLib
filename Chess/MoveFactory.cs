@@ -35,7 +35,7 @@ namespace Rudz.Chess
 
     public static class MoveFactory
     {
-        public static MoveList2 GenerateMoves(this IPosition pos, MoveGenerationType type = MoveGenerationType.LEGAL)
+        public static MoveList2 GenerateMoves(this IPosition pos, MoveGenerationType type = MoveGenerationType.Legal)
         {
             var ml = new MoveList2();
             ml.Generate(pos, type);

@@ -134,6 +134,11 @@ namespace Rudz.Chess
 
         public void MakeMove(Move m)
         {
+            MakeMove(m, GivesCheck(m));
+        }
+        
+        public void MakeMove(Move m, bool givesCheck)
+        {
             StateAdd();
 
             var previousState = State.Previous;
@@ -264,19 +269,20 @@ namespace Rudz.Chess
             Debug.Assert(GetPieceSquare(PieceTypes.King, us).IsOk());
 
             // flip local players, as the rest of the functionality is towards "them"
-            (us, them) = (them, us);
+            // (us, them) = (them, us);
             
-            var ksq = GetPieceSquare(PieceTypes.King, us);
+            var ksq = GetPieceSquare(PieceTypes.King, them);
 
-            // TODO : Add set checkers info method
-            // TODO : Update pinners
-            
             // Update checkers bitboard
-            State.Checkers = AttacksTo(ksq);
+            State.Checkers = givesCheck ? AttacksTo(ksq) & Pieces(us) : BitBoards.EmptyBitBoard;
             State.InCheck = !State.Checkers.Empty;
             State.CapturedPiece = capturedPieceType;
-            
+
             SideToMove = ~SideToMove;
+            
+            // TODO : Add set checkers info method
+            // TODO : Update pinners
+            SetCheckInfo(State);
         }
 
         public void TakeMove(Move m)
@@ -793,7 +799,7 @@ namespace Rudz.Chess
                     sb.Append('/');
             }
 
-            sb.Append(SideToMove.IsWhite() ? " w " : " b ");
+            sb.Append(SideToMove.IsWhite ? " w " : " b ");
 
             var castleRights = State.CastlelingRights;
 
@@ -945,7 +951,7 @@ namespace Rudz.Chess
             var key = GetPiecesKey();
             var pawnKey = GetPawnKey();
 
-            if (player.IsBlack())
+            if (player.IsBlack)
             {
                 var k = Zobrist.GetZobristSide();
                 key ^= k;
@@ -1096,8 +1102,6 @@ namespace Rudz.Chess
 
         private void SetupCastleling(ReadOnlySpan<char> castleling)
         {
-            var castlelingRights = CastlelingRights.None;
-
             foreach (var ca in castleling)
             {
                 Square rsq;
@@ -1165,7 +1169,6 @@ namespace Rudz.Chess
 
         private void SetCheckInfo(State state)
         {
-            
             var white = PlayerExtensions.White;
             var black = PlayerExtensions.Black;
             
