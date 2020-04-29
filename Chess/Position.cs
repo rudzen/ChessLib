@@ -106,9 +106,11 @@ namespace Rudz.Chess
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void AddPiece(Piece pc, Square sq)
         {
-            BoardPieces[PieceTypes.AllPieces.AsInt()] |= sq;
-            BoardPieces[pc.Type().AsInt()] |= sq;
-            OccupiedBySide[pc.ColorOf().Side] |= sq;
+            var sqBb = sq.BitBoardSquare();
+            BoardPieces[PieceTypes.AllPieces.AsInt()] |= sqBb;
+            BoardPieces[pc.Type().AsInt()] |= sqBb;
+            OccupiedBySide[pc.ColorOf().Side] |= sqBb;
+            var sqi = sq.AsInt();
             BoardLayout[sq.AsInt()] = pc;
 
             if (!IsProbing)
@@ -164,9 +166,7 @@ namespace Rudz.Chess
             var fens = GenerateFen().ToString();
             Console.WriteLine($"MakeMove FEN:{fens}");
             
-            if (us != GetPiece(from).ColorOf())
-                Debug.Assert(us == GetPiece(from).ColorOf());
-            
+            Debug.Assert(us == GetPiece(from).ColorOf());
             Debug.Assert(GetPieceSquare(PieceTypes.King, them).IsOk());
             Debug.Assert(GetPieceSquare(PieceTypes.King, us).IsOk());
 
@@ -177,6 +177,9 @@ namespace Rudz.Chess
                 var rook = PieceTypes.Rook.MakePiece(us);
 
                 k ^= rook.GetZobristPst(rfrom) ^ rook.GetZobristPst(rto);
+
+                // reset captured piece type as castleling is "king-captures-rook"
+                capturedPieceType = PieceTypes.NoPieceType;
             }
 
             if (m.IsEnPassantMove())
@@ -188,8 +191,6 @@ namespace Rudz.Chess
             {
                 var capturedPiece = capturedPieceType.MakePiece(them);
                 
-                Debug.Assert(GetPiece(to).ColorOf() == them);
-                
                 RemovePiece(to);
 
                 if (capturedPieceType == PieceTypes.Pawn)
@@ -200,6 +201,8 @@ namespace Rudz.Chess
                 State.ReversibleHalfMoveCount = 0;
             }
 
+            
+            
             // update key with moved piece
             k ^= pc.GetZobristPst(from) ^ pc.GetZobristPst(to);
 
@@ -215,14 +218,16 @@ namespace Rudz.Chess
             {
                 var cr = _castlingRightsMask[from.AsInt()] | _castlingRightsMask[to.AsInt()];
                 k ^= (State.CastlelingRights & cr).GetZobristCastleling();
+                State.Previous.CastlelingRights = State.CastlelingRights;
                 State.CastlelingRights &= ~cr;
             }
 
             // Move the piece. The tricky Chess960 castle is handled earlier
             if (!m.IsCastlelingMove())
             {
-                RemovePiece(from);
-                AddPiece(pc, to);
+                MovePiece(from, to);
+                // RemovePiece(from);
+                // AddPiece(pc, from);
                 
                 //var f2 = GenerateFen().ToString();
             }
@@ -289,23 +294,21 @@ namespace Rudz.Chess
         {
             Debug.Assert(!m.IsNullMove());
 
+            // flip sides
             var us = ~SideToMove;
             SideToMove = us;
 
             var from = m.GetFromSquare();
             var to = m.GetToSquare();
-            var pt = GetPiece(from).Type();
+            var pt = GetPiece(to).Type();
 
-            var capturedPieceType = State.CapturedPiece;
-            
-            // Debug.Assert(empty(from) || Types.type_of_move(m) == MoveTypeS.CASTLING);
-            Debug.Assert(capturedPieceType != PieceTypes.King);
+            Debug.Assert(!IsOccupied(from) || m.IsCastlelingMove());
 
             if (m.IsPromotionMove())
             {
-                //Debug.Assert(pt == m.GetPromotedPiece().Type());
+                Debug.Assert(pt == m.GetPromotedPieceType());
                 Debug.Assert(to.RelativeRank(us) == Ranks.Rank8);
-                // Debug.Assert(Types.promotion_type(m) >= PieceTypeS.KNIGHT && Types.promotion_type(m) <= PieceTypeS.QUEEN);
+                Debug.Assert(m.GetPromotedPieceType() >= PieceTypes.Knight && m.GetPromotedPieceType() <= PieceTypes.Queen);
 
                 RemovePiece(to);
                 AddPiece(PieceTypes.Pawn, to, us);
@@ -314,20 +317,29 @@ namespace Rudz.Chess
             }
 
             if (m.IsCastlelingMove())
-                DoCastleling(from, ref to, out _, out _, CastlelingPerform.Undo);
+            {
+                DoCastleling(from, ref to, out var rfrom, out _, CastlelingPerform.Undo);
+            }
             else
             {
-                RemovePiece(to);
-                AddPiece(pt, from, us);
+                MovePiece(to, from);
 
-                if (capturedPieceType != PieceTypes.NoPieceType)
+                if (State.CapturedPiece != PieceTypes.NoPieceType)
                 {
-                    var capsq = to;
+                    var captureSquare = to;
 
+                    // En-Passant capture is not located on move square
                     if (m.IsEnPassantMove())
-                        capsq -= us.PawnPushDistance();
-                    
-                    AddPiece(capturedPieceType, capsq, ~us);
+                    {
+                        captureSquare -= us.PawnPushDistance();
+
+                        Debug.Assert(pt == PieceTypes.Pawn);
+                        Debug.Assert(to == State.Previous.EnPassantSquare);
+                        Debug.Assert(to.RelativeRank(us) == Ranks.Rank6);
+                        Debug.Assert(!IsOccupied(captureSquare));
+                    }
+
+                    AddPiece(State.CapturedPiece, captureSquare, ~us);
                 }
             }
 
@@ -1068,6 +1080,10 @@ namespace Rudz.Chess
             BoardLayout[(doCastleling ? from : to).AsInt()] = BoardLayout[(doCastleling ? rfrom : rto).AsInt()] = PieceExtensions.EmptyPiece;
             AddPiece(PieceTypes.King, doCastleling ? to : from, stm);
             AddPiece(PieceTypes.Rook, doCastleling ? rto : rfrom, stm);
+            
+            // finally update state in case the move was undone
+            // if (!doCastleling)
+            //     SetCastlingRight(stm, rfrom);
         }
 
         private static CastlelingRights OrCastlingRight(Player c, CastlelingSides s)

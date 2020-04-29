@@ -17,11 +17,6 @@ namespace Rudz.Chess
             _moves = new ExtMove[256].AsMemory();
         }
 
-        public bool Remove(ExtMove item)
-        {
-            throw new NotImplementedException();
-        }
-
         public ulong Count => (ulong) last;
 
         public bool IsReadOnly => true;
@@ -53,11 +48,11 @@ namespace Rudz.Chess
 
         public bool Contains(Move item)
         {
-            foreach (var em in _moves.Span)
+            var s = GetMoves();
+            
+            foreach (var em in s)
             {
-                if (em.Move.IsNullMove())
-                    break;
-                if (em.Move == Move)
+                if (em.Move == item)
                     return true;
             }
 
@@ -73,9 +68,9 @@ namespace Rudz.Chess
 
         public ReadOnlySpan<ExtMove> GetMoves()
         {
-            return last == 0
+            return last == 0 || _moves.Span[0].Move.IsNullMove()
                 ? ReadOnlySpan<ExtMove>.Empty
-                : _moves.Span.Slice(0, last - 1);
+                : _moves.Span.Slice(0, last);
         }
 
         private static int GenerateCastling(IPosition pos, Span<ExtMove> moves, int index, Player us, CastlelingRights cr)

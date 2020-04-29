@@ -162,15 +162,15 @@ namespace Rudz.Chess
             var moves = Pos.GenerateMoves().GetMoves();
             foreach (var m in moves)
             {
-                Console.WriteLine(m.Move);
-                Console.WriteLine($"Before MakeMove: {Pos.GenerateFen().Fen.ToString()}");
+                Console.WriteLine($"{depth}:{m.Move}");
+                Console.WriteLine($"{depth}:Before MakeMove: {Pos.GenerateFen().Fen.ToString()}");
                 Pos.MakeMove(m.Move);
-                Console.WriteLine($"After MakeMove: {Pos.GenerateFen().Fen.ToString()}");
+                Console.WriteLine($"{depth}:After MakeMove: {Pos.GenerateFen().Fen.ToString()}");
                 move = m;
                 tot += Perft(depth - 1);
-                Console.WriteLine($"Before TakeMove: {Pos.GenerateFen().Fen.ToString()}");
+                Console.WriteLine($"{depth}:Before TakeMove: {Pos.GenerateFen().Fen.ToString()}");
                 Pos.TakeMove(m);
-                Console.WriteLine($"After TakeMove: {Pos.GenerateFen().Fen.ToString()}");
+                Console.WriteLine($"{depth}:After TakeMove: {Pos.GenerateFen().Fen.ToString()}");
             }
 
             _perftCache.Add((key, depth), tot);
