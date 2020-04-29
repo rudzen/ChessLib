@@ -98,8 +98,8 @@ namespace Rudz.Chess
             BoardPieces.Fill(BitBoards.EmptyBitBoard);
             _castlingPath.Fill(BitBoards.EmptyBitBoard);
             _castlingRightsMask.Fill(CastlelingRights.None);
-            Array.Clear(_castlingRookSquare, 0, _castlingRookSquare.Length);
-            // _castlingRookSquare.Fill(Squares.none);
+            //Array.Clear(_castlingRookSquare, 0, _castlingRookSquare.Length);
+             _castlingRookSquare.Fill(Squares.none);
             SideToMove = Players.White;
         }
 
@@ -162,6 +162,7 @@ namespace Rudz.Chess
             var capturedPieceType = m.IsEnPassantMove() ? PieceTypes.Pawn : GetPieceType(to);
             
             var fens = GenerateFen().ToString();
+            Console.WriteLine($"MakeMove FEN:{fens}");
             
             if (us != GetPiece(from).ColorOf())
                 Debug.Assert(us == GetPiece(from).ColorOf());
@@ -265,7 +266,6 @@ namespace Rudz.Chess
 
             State.Key = k;
 
-
             Debug.Assert(GetPieceSquare(PieceTypes.King, us).IsOk());
 
             // flip local players, as the rest of the functionality is towards "them"
@@ -297,11 +297,6 @@ namespace Rudz.Chess
             var pt = GetPiece(from).Type();
 
             var capturedPieceType = State.CapturedPiece;
-            
-            if (pt == PieceTypes.Rook)
-            {
-                
-            }
             
             // Debug.Assert(empty(from) || Types.type_of_move(m) == MoveTypeS.CASTLING);
             Debug.Assert(capturedPieceType != PieceTypes.King);
@@ -609,32 +604,6 @@ namespace Rudz.Chess
             => _castlingRookSquare[cr.AsInt()];
 
         /// <summary>
-        /// Determine if a move is legal or not, by performing the move and checking if the king is
-        /// under attack afterwards.
-        /// </summary>
-        /// <param name="m">The move to check</param>
-        /// <param name="pc">The moving piece</param>
-        /// <param name="from">The from square</param>
-        /// <param name="type">The move type</param>
-        /// <returns>true if legal, otherwise false</returns>
-        // public bool IsLegal(Move m, Piece pc, Square from, MoveTypes type)
-        // {
-        //     if (!State.InCheck && pc.Type() != PieceTypes.King && (State.Pinned & from).Empty() && type != MoveTypes.Enpassant)
-        //         return true;
-        //
-        //     return IsPseudoLegal(m);
-        //     // IsProbing = true;
-        //     // MakeMove(m);
-        //     // var opponentAttacking = IsAttacked(GetPieceSquare(PieceTypes.King, ~SideToMove), SideToMove);
-        //     // TakeMove(m);
-        //     // IsProbing = false;
-        //     // return !opponentAttacking;
-        // }
-        //
-        // public bool IsLegal(Move m)
-        //     => IsLegal(m, m.GetMovingPiece(), m.GetFromSquare(), m.GetMoveType());
-
-        /// <summary>
         /// <para>
         /// "Validates" a move using simple logic. For example that the piece actually being moved
         /// exists etc.
@@ -908,7 +877,7 @@ namespace Rudz.Chess
             if (chunk.IsEmpty || chunk.Length != 1)
                 return new FenError(-3, fen.Index);
 
-            player = (chunk[0] != 'w').ToInt();
+            SideToMove = (chunk[0] != 'w').ToInt();
 
             // castleling
             chunk = fen.Chunk();
@@ -921,7 +890,7 @@ namespace Rudz.Chess
             // en-passant
             chunk = fen.Chunk();
 
-            Square enPessantSquare = chunk.Length == 1 || chunk[0] == '-' || !chunk[0].InBetween('a', 'h')
+            State.EnPassantSquare = chunk.Length == 1 || chunk[0] == '-' || !chunk[0].InBetween('a', 'h')
                 ? Squares.none
                 : chunk[1].InBetween('3', '6')
                     ? Squares.none
@@ -948,37 +917,48 @@ namespace Rudz.Chess
 
             // PositionStart = moveNum;
 
-            var key = GetPiecesKey();
-            var pawnKey = GetPawnKey();
+            SetState(halfMoveNum);
 
-            if (player.IsBlack)
+            return 0;
+        }
+
+        private void SetState(int halfMoveNum)
+        {
+            var key = State.Key;
+            var pawnKey = Zobrist.ZobristNoPawn;
+
+            State.Checkers = AttacksTo(GetPieceSquare(PieceTypes.King, SideToMove)) & Pieces(~SideToMove);
+            SetCheckInfo(State);
+
+            // compute hash keys
+            for (var b = Pieces(); !b.Empty;)
             {
-                var k = Zobrist.GetZobristSide();
-                key ^= k;
-                pawnKey ^= k;
+                var sq = BitBoards.PopLsb(ref b);
+                var pc = GetPiece(sq);
+                var pt = pc.Type();
+                
+                key ^= pc.GetZobristPst(sq);
+                
+                if (pt == PieceTypes.Pawn)
+                    pawnKey ^= pc.GetZobristPst(sq);
+                else if (pt != PieceTypes.King)
+                {
+                    // something
+                }
             }
+
+            if (State.EnPassantSquare != Squares.none)
+                key ^= State.EnPassantSquare.File().GetZobristEnPessant();
+
+            if (SideToMove.IsBlack)
+                key ^= Zobrist.GetZobristSide();
 
             key ^= State.CastlelingRights.GetZobristCastleling();
 
-            if (enPessantSquare != Squares.none)
-                key ^= enPessantSquare.File().GetZobristEnPessant();
-
-            var ksq = GetPieceSquare(PieceTypes.King, player);
-
-            SideToMove = player;
-            State.EnPassantSquare = enPessantSquare;
             State.ReversibleHalfMoveCount = halfMoveNum;
-            State.Checkers = AttacksTo(ksq);
             State.InCheck = !State.Checkers.Empty;
             State.Key = key;
             State.PawnStructureKey = pawnKey;
-
-            // Set hidden checkers
-            ksq = GetPieceSquare(PieceTypes.King, ~player);
-            // TODO : Discover
-            State.DicoveredCheckers = AttacksTo(ksq);
-
-            return 0;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
