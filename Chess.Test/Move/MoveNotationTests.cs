@@ -394,7 +394,7 @@ namespace Chess.Test.Move
 
             var movingPiece = new Piece(Pieces.WhiteKnight);
             var fromOneSquare = new Square(Squares.d2);
-            var fromTwoSquare = new Square(Squares.f5);
+            var fromTwoSquare = new Square(Squares.f2);
             var toSquare = new Square(Squares.e4);
 
             var uniChar = movingPiece.GetPieceChar();
