@@ -56,11 +56,7 @@ namespace Rudz.Chess
         
         public Position()
         {
-            var startState = new State();
-            _stateStack = new List<State>(256)
-            {
-                startState
-            };
+            _stateStack = new List<State>(256);
             BoardLayout = new Piece[64];
             _castlingPath = new BitBoard[CastlelingRights.CastleRightsNb.AsInt()];
             _castlingRookSquare = new Square[CastlelingRights.CastleRightsNb.AsInt()];
@@ -148,7 +144,7 @@ namespace Rudz.Chess
             StateAdd();
 
             var previousState = State.Previous;
-            var k = previousState.Key;
+            var k = new HashKey();
 
             State.CastlelingRights = previousState.CastlelingRights;
             State.PliesFromNull = previousState.PliesFromNull;
@@ -309,8 +305,6 @@ namespace Rudz.Chess
 
             SideToMove = ~SideToMove;
             
-            // TODO : Add set checkers info method
-            // TODO : Update pinners
             SetCheckInfo(State);
         }
 
@@ -1116,9 +1110,9 @@ namespace Rudz.Chess
 
         private void StateAdd()
         {
-            _stateStack.Add(new State());
-            State = _stateStack[^1];
-            State.Previous = _stateStack.Count > 1 ? _stateStack[^2] : null;
+            var previous = State;
+            State = new State {Previous = previous};
+            _stateStack.Add(State);
         }
 
         private void SetupCastleling(ReadOnlySpan<char> castleling)

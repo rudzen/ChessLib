@@ -90,7 +90,7 @@ namespace Rudz.Chess
                 gameEndType |= GameEndTypes.Repetition;
             if (State.Material[PlayerExtensions.White.Side] <= 300 && State.Material[PlayerExtensions.Black.Side] <= 300 && Pos.BoardPieces[0].Empty && Pos.BoardPieces[8].Empty)
                 gameEndType |= GameEndTypes.MaterialDrawn;
-            if (State.PliesFromNull >= 100)
+            if (State.Rule50 >= 100)
                 gameEndType |= GameEndTypes.FiftyMove;
 
             var moveList = Pos.GenerateMoves().GetMoves();
@@ -148,11 +148,11 @@ namespace Rudz.Chess
 
             var key = Pos.State.Key;
 
-            // if (_perftCache.TryGetValue((key, depth), out var tot))
-            //     return tot;
-            
+            // var tot = 0ul;
+            if (_perftCache.TryGetValue((key, depth), out var tot))
+                return tot;
+
             // var posKey = Pos.State.Key;
-            //
             // var (found, entry) = Table.Probe(posKey);
             // if (found && entry.Depth == depth && entry.Key32 == posKey.UpperKey)
             //     return (ulong)entry.Value;
@@ -164,7 +164,6 @@ namespace Rudz.Chess
                 var f = Pos.GenerateFen().Fen.ToString();
             }
 
-            var tot = 0ul;
 
             var ml = Pos.GenerateMoves();
             
@@ -182,7 +181,7 @@ namespace Rudz.Chess
                 // Console.WriteLine($"{depth}:After TakeMove: {Pos.GenerateFen().Fen.ToString()}");
             }
 
-            // _perftCache.Add((key, depth), tot);
+            _perftCache.Add((key, depth), tot);
             
             // if (!move.IsNullMove() && tot <= int.MaxValue)
             //     Table.Store(posKey, (int)tot, Bound.Exact, (sbyte)depth, move, 0);
