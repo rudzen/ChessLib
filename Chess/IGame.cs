@@ -71,6 +71,6 @@ namespace Rudz.Chess
 
         Player CurrentPlayer();
 
-        ulong Perft(int depth);
+        ulong Perft(int depth, bool root);
     }
 }

@@ -89,7 +89,7 @@ namespace Chess.Perft
                 Game.Table.NewSearch();
                 CurrentGame.Pos.SetFen(fd);
 
-                var result = CurrentGame.Perft(depth);
+                var result = CurrentGame.Perft(depth, true);
                 
                 // BoardPrintCallback?.Invoke(fd.ToString());
                 yield return result;
@@ -98,7 +98,7 @@ namespace Chess.Perft
 
         public Task<ulong> DoPerftAsync(int depth)
             => Task.Run(()
-                => CurrentGame.Perft(depth));
+                => CurrentGame.Perft(depth, true));
 
         public string GetBoard()
             => CurrentGame.ToString();

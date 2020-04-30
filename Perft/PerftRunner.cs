@@ -276,7 +276,14 @@ namespace Perft
                 _log.Information("Time passed : {0}", result.Elapsed);
                 _log.Information("Nps         : {0}", result.Nps);
                 if (_usingEpd)
+                {
                     _log.Information("Result      : {0} - should be {1}", result.Result, result.CorrectResult);
+                    if (result.Result != result.CorrectResult)
+                    {
+                        var difference = (long) (result.CorrectResult - result.Result);
+                        _log.Information("Difference  : {0}", difference < 0 ? -difference : difference);
+                    }
+                }
                 else
                     _log.Information("Result      : {0}", result.Result);
                 _log.Information("TT hits     : {0}", Game.Table.Hits);

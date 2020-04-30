@@ -141,76 +141,113 @@ namespace Rudz.Chess
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Player CurrentPlayer() => Pos.SideToMove;
 
-        public ulong Perft(int depth)
+        public ulong Perft(int depth, bool root)
         {
-            if (depth == 1)
-                return Pos.GenerateMoves().Count;
-
-            var key = Pos.State.Key;
-
-            // var tot = 0ul;
-            if (_perftCache.TryGetValue((key, depth), out var tot))
-                return tot;
-
-            // var posKey = Pos.State.Key;
-            // var (found, entry) = Table.Probe(posKey);
-            // if (found && entry.Depth == depth && entry.Key32 == posKey.UpperKey)
-            //     return (ulong)entry.Value;
-
-            var move = MoveExtensions.EmptyMove;
-
-            if (depth == 3)
-            {
-                var f = Pos.GenerateFen().Fen.ToString();
-            }
-
+            ulong cnt, nodes = 0;
+            bool leaf = (depth == 2);
 
             var ml = Pos.GenerateMoves();
-            
+
             var moves = ml.GetMoves();
-            foreach (var m in moves)
+
+            foreach (var move in moves)
             {
-                // Console.WriteLine($"{depth}:{m.Move}");
-                // Console.WriteLine($"{depth}:Before MakeMove: {Pos.GenerateFen().Fen.ToString()}");
-                Pos.MakeMove(m.Move);
-                // Console.WriteLine($"{depth}:After MakeMove: {Pos.GenerateFen().Fen.ToString()}");
-                move = m;
-                tot += Perft(depth - 1);
-                // Console.WriteLine($"{depth}:Before TakeMove: {Pos.GenerateFen().Fen.ToString()}");
-                Pos.TakeMove(m);
-                // Console.WriteLine($"{depth}:After TakeMove: {Pos.GenerateFen().Fen.ToString()}");
+                if (root && depth <= 1)
+                {
+                    cnt = 1;
+                    nodes++;
+                }
+                else
+                {
+                    Pos.MakeMove(move);
+                    cnt = leaf ? (ulong) Pos.GenerateMoves().GetMoves().Length : Perft(depth - 1, false);
+                    nodes += cnt;
+                    Pos.TakeMove(move);
+                }
+                
+                if (root)
+                    Console.WriteLine($"{move.Move}: {cnt}");
             }
 
-            _perftCache.Add((key, depth), tot);
-            
-            // if (!move.IsNullMove() && tot <= int.MaxValue)
-            //     Table.Store(posKey, (int)tot, Bound.Exact, (sbyte)depth, move, 0);
+            return nodes;
 
-            return tot;
+            // for (const auto& m : MoveList<LEGAL>(pos))
+            // {
+            //     if (Root && depth <= 1)
+            //         cnt = 1, nodes++;
+            //     else
+            //     {
+            //         pos.do_move(m, st);
+            //         cnt = leaf ? MoveList<LEGAL>(pos).size() : perft<false>(pos, depth - 1);
+            //         nodes += cnt;
+            //         pos.undo_move(m);
+            //     }
+            //     if (Root)
+            //         sync_cout << UCI::move(m, pos.is_chess960()) << ": " << cnt << sync_endl;
+            // }
+            // return nodes;
+
+            // if (depth == 1)
+            //     return Pos.GenerateMoves().Count;
+            //
+            // var key = Pos.State.Key;
+            //
+            // // var tot = 0ul;
+            // if (_perftCache.TryGetValue((key, depth), out var tot))
+            //     return tot;
+            //
+            // // var posKey = Pos.State.Key;
+            // // var (found, entry) = Table.Probe(posKey);
+            // // if (found && entry.Depth == depth && entry.Key32 == posKey.UpperKey)
+            // //     return (ulong)entry.Value;
+            //
+            // var move = MoveExtensions.EmptyMove;
+            //
+            // if (depth == 3)
+            // {
+            //     var f = Pos.GenerateFen().Fen.ToString();
+            // }
+            //
+            // var ml = Pos.GenerateMoves();
+            //
+            // var moves = ml.GetMoves();
+            // foreach (var m in moves)
+            // {
+            //     // Console.WriteLine($"{depth}:{m.Move}");
+            //     Console.WriteLine($"{depth}:Before MakeMove: {Pos.GenerateFen().Fen.ToString()}");
+            //     Pos.MakeMove(m.Move);
+            //     // Console.WriteLine($"{depth}:After MakeMove: {Pos.GenerateFen().Fen.ToString()}");
+            //     move = m;
+            //     tot += Perft(depth - 1);
+            //     // Console.WriteLine($"{depth}:Before TakeMove: {Pos.GenerateFen().Fen.ToString()}");
+            //     Pos.TakeMove(m);
+            //     // Console.WriteLine($"{depth}:After TakeMove: {Pos.GenerateFen().Fen.ToString()}");
+            // }
+            //
+            // _perftCache.Add((key, depth), tot);
+            //
+            // // if (!move.IsNullMove() && tot <= int.MaxValue)
+            // //     Table.Store(posKey, (int)tot, Bound.Exact, (sbyte)depth, move, 0);
+            //
+            // return tot;
         }
 
         private bool IsRepetition()
         {
-            var repetitionCounter = 0;
-
-            var current = Pos.State;
-            var backPos = current?.Previous?.Previous;
-            while (backPos != null)
-            {
-                if (current.Key == backPos.Key && ++repetitionCounter == 3)
-                    return true;
-                
-                backPos = current.Previous?.Previous;
-            }
-
-            return false;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private int HalfMoveCount()
-        {
-            // TODO : This is WRONG!? :)
-            return State.Rule50;
+            return Pos.State.Repetition >= 3;
+            // var repetitionCounter = 0;
+            //
+            // var current = Pos.State;
+            // var backPos = current?.Previous?.Previous;
+            // while (backPos != null)
+            // {
+            //     if (current.Key == backPos.Key && ++repetitionCounter == 3)
+            //         return true;
+            //     
+            //     backPos = current.Previous?.Previous;
+            // }
+            //
+            // return false;
         }
     }
 }

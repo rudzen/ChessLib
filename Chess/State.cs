@@ -43,17 +43,13 @@ namespace Rudz.Chess
 
         public int Rule50 { get; set; }
 
-        public int NullMovesInRow { get; set; }
-
-        public int FiftyMoveRuleCounter { get; set; }
-
         public HashKey Key { get; set; }
 
         public CastlelingRights CastlelingRights { get; set; }
 
         public Square EnPassantSquare { get; set; }
         
-        public PieceTypes CapturedPiece { get; set; }
+        public Piece CapturedPiece { get; set; }
         
         public BitBoard[] BlockersForKing { get; set; }
         
@@ -75,25 +71,29 @@ namespace Rudz.Chess
 
         public State Previous { get; set; }
 
-        public State(State s)
+        public int Repetition { get; set; }
+
+        /// <summary>
+        /// Partial copy from existing state
+        /// The properties not copied are re-calculated
+        /// </summary>
+        /// <param name="other">The current state</param>
+        public State(State other)
         {
-            LastMove = s.LastMove;
+            PawnStructureKey = other.PawnStructureKey;
+            CastlelingRights = other.CastlelingRights;
+            Rule50 = other.Rule50;
+            PliesFromNull = other.PliesFromNull;
+            EnPassantSquare = other.EnPassantSquare;
+
+            Previous = other;
+            
             Material = new Material();
-            Material.CopyFrom(s.Material);
-            PawnStructureKey = s.PawnStructureKey;
-            PliesFromNull = s.PliesFromNull;
-            Rule50 = s.Rule50;
-            NullMovesInRow = s.NullMovesInRow;
-            FiftyMoveRuleCounter = s.FiftyMoveRuleCounter;
-            Key = s.Key;
-            CastlelingRights = s.CastlelingRights;
-            EnPassantSquare = s.EnPassantSquare;
-            Array.Copy(s.Pinners, Pinners, s.Pinners.Length);
-            Array.Copy(s.BlockersForKing, BlockersForKing, s.BlockersForKing.Length);
-            Checkers = s.Checkers;
-            Array.Copy(s.CheckedSquares, CheckedSquares, s.CheckedSquares.Length);
-            InCheck = s.InCheck;
-            CapturedPiece = s.CapturedPiece;
+            Material.CopyFrom(other.Material);
+            
+            CheckedSquares = new BitBoard[PieceTypes.PieceTypeNb.AsInt()];
+            Pinners = new BitBoard[2];
+            BlockersForKing = new BitBoard[2];
         }
 
         public State()
@@ -114,13 +114,14 @@ namespace Rudz.Chess
             LastMove = MoveExtensions.EmptyMove;
             Material.Clear();
             PawnStructureKey = Key = 0ul;
-            PliesFromNull = NullMovesInRow = FiftyMoveRuleCounter = 0;
+            PliesFromNull = Repetition = 0;
             CastlelingRights = CastlelingRights.None;
             EnPassantSquare = Squares.none;
             CheckedSquares.Fill(BitBoards.EmptyBitBoard);
             Pinners.Fill(BitBoards.EmptyBitBoard);
             BlockersForKing.Fill(BitBoards.EmptyBitBoard);
             CapturedPiece = PieceTypes.NoPieceType;
+            Previous = null;
         }
 
         public bool Equals(State other)
@@ -135,8 +136,6 @@ namespace Rudz.Chess
                    && Equals(Material, other.Material)
                    && PliesFromNull == other.PliesFromNull
                    && Rule50 == other.Rule50
-                   && NullMovesInRow == other.NullMovesInRow
-                   && FiftyMoveRuleCounter == other.FiftyMoveRuleCounter
                    && Pinners.Equals(other.Pinners)
                    && Checkers.Equals(other.Checkers)
                    && DicoveredCheckers.Equals(other.DicoveredCheckers)
@@ -156,8 +155,6 @@ namespace Rudz.Chess
             hashCode.Add(PawnStructureKey);
             hashCode.Add(PliesFromNull);
             hashCode.Add(Rule50);
-            hashCode.Add(NullMovesInRow);
-            hashCode.Add(FiftyMoveRuleCounter);
             hashCode.Add(Key);
             hashCode.Add((int)CastlelingRights);
             hashCode.Add(EnPassantSquare);
