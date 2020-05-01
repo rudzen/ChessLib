@@ -104,6 +104,27 @@ namespace Rudz.Chess
             CapturedPiece = Piece.EmptyPiece;
         }
 
+        public void CopyTo(State other, Move lastMove)
+        {
+            // copy over preserved values
+            other.PawnStructureKey = PawnStructureKey;
+            other.CastlelingRights = CastlelingRights;
+            other.Rule50 = Rule50;
+            other.PliesFromNull = PliesFromNull;
+            other.EnPassantSquare = EnPassantSquare;
+            other.Previous = this;
+            other.LastMove = lastMove;
+
+            // copy over material
+            other.Material = new Material();
+            Material.CopyTo(other.Material);
+
+            // initialize the rest of the values
+            other.CheckedSquares = new BitBoard[PieceTypes.PieceTypeNb.AsInt()];
+            other.Pinners = new BitBoard[2];
+            other.BlockersForKing = new BitBoard[2];
+        }
+
         public void Clear()
         {
             LastMove = Move.EmptyMove;

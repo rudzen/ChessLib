@@ -81,9 +81,10 @@ namespace Rudz.Chess
         }
 
         public uint GetKey(int index)
-        {
-            return _key[index];
-        }
+            => _key[index];
+        
+        public void SetKey(int index, uint value)
+            => _key[index] = value;
 
         public void MakeMove(IPosition pos, Move move)
         {
@@ -118,6 +119,13 @@ namespace Rudz.Chess
             material.MaterialValue.CopyTo(MaterialValue, 0);
             _key[0] = material.GetKey(0);
             _key[1] = material.GetKey(1);
+        }
+
+        public void CopyTo(IMaterial material)
+        {
+            MaterialValue.CopyTo(material.MaterialValue, 0);
+            material.SetKey(0, _key[0]);
+            material.SetKey(1, _key[1]);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

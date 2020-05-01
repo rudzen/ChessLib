@@ -34,7 +34,6 @@ namespace Rudz.Chess
     using System.Collections;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Linq;
     using System.Runtime.CompilerServices;
     using System.Text;
     using Types;
@@ -100,36 +99,43 @@ namespace Rudz.Chess
             _castlingRookSquare.Fill(Square.None);
             _sideToMove = Players.White;
             Chess960 = false;
-            State = null;
+            State?.Clear();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void AddPiece(Piece pc, Square sq)
         {
             _board.AddPiece(pc, sq);
-            if (!IsProbing)
-                PieceUpdated?.Invoke(pc, sq);
+            
+            if (IsProbing)
+                return;
+            
+            PieceUpdated?.Invoke(pc, sq);
         }
 
         public void MovePiece(Square from, Square to)
         {
             _board.MovePiece(from, to);
-            if (!IsProbing)
-            {
-                var pc = _board.PieceAt(from);                
-                PieceUpdated?.Invoke(pc, to);
-            }
+            
+            if (IsProbing)
+                return;
+            
+            var pc = _board.PieceAt(from);                
+            PieceUpdated?.Invoke(pc, to);
         }
 
-        public void MakeMove(Move m)
+        public void MakeMove(Move m, State newState)
         {
-            MakeMove(m, GivesCheck(m));
+            var givesCheck = GivesCheck(m);
+            MakeMove(m, newState, givesCheck);
         }
         
-        public void MakeMove(Move m, bool givesCheck)
+        public void MakeMove(Move m, State newState, bool givesCheck)
         {
-            StateAdd(State);
-            State.LastMove = m;
+            State.CopyTo(newState, m);
+            State = newState;
+            
+            // StateAdd(State);
             
             var k = State.Key ^ Zobrist.GetZobristSide();
 
@@ -229,7 +235,7 @@ namespace Rudz.Chess
             {
                 // Set en-passant square, only if moved pawn can be captured
                 if (((int) to.Value ^ (int) from.Value) == 16
-                    && ((to - us.PawnPushDistance()).PawnAttack(us) & Pieces(PieceTypes.Pawn, them)) != 0)
+                    && !((to - us.PawnPushDistance()).PawnAttack(us) & Pieces(PieceTypes.Pawn, them)).IsEmpty)
                 {
                     State.EnPassantSquare = to - us.PawnPushDistance();
                     k ^= State.EnPassantSquare.File().GetZobristEnPessant();
@@ -259,21 +265,27 @@ namespace Rudz.Chess
             }
 
             // TODO : Update piece values here
-            // Potential set of captured piece in state when move is refactored
 
             Debug.Assert(GetPieceSquare(PieceTypes.King, us).IsOk());
             Debug.Assert(GetPieceSquare(PieceTypes.King, them).IsOk());
 
+            if (pt == PieceTypes.Queen && us == Player.White && to == Enums.Squares.a4)
+            {
+                var a = 1;
+            }
+            
             // Update state properties
             State.Key = k;
             State.CapturedPiece = capturedPiece;
 
             var ksq = GetPieceSquare(PieceTypes.King, them);
 
-            State.Checkers = AttacksTo(ksq);// givesCheck ? AttacksTo(ksq) & Pieces(us) : BitBoard.Empty;
-            
+            State.Checkers = AttacksTo(ksq) & Pieces(us);// givesCheck ? AttacksTo(ksq) & Pieces(us) : BitBoard.Empty;
             State.InCheck = !State.Checkers.IsEmpty;
 
+
+                
+            
             _sideToMove = ~_sideToMove;
 
             SetCheckInfo(State);

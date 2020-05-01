@@ -143,58 +143,16 @@ namespace Rudz.Chess
 
         public ulong Perft(int depth, bool root = false)
         {
-            // ulong cnt, nodes = 0;
-            // bool leaf = (depth == 2);
-            //
-            // var ml = Pos.GenerateMoves();
-            //
-            // var moves = ml.GetMoves();
-            //
-            // foreach (var move in moves)
-            // {
-            //     if (root && depth <= 1)
-            //     {
-            //         cnt = 1;
-            //         nodes++;
-            //     }
-            //     else
-            //     {
-            //         Pos.MakeMove(move);
-            //         cnt = leaf ? (ulong) Pos.GenerateMoves().GetMoves().Length : Perft(depth - 1, false);
-            //         nodes += cnt;
-            //         Pos.TakeMove(move);
-            //     }
-            //     
-            //     if (root)
-            //         Console.WriteLine($"{move.Move}: {cnt}");
-            // }
-            //
-            // return nodes;
-
-            // for (const auto& m : MoveList<LEGAL>(pos))
-            // {
-            //     if (Root && depth <= 1)
-            //         cnt = 1, nodes++;
-            //     else
-            //     {
-            //         pos.do_move(m, st);
-            //         cnt = leaf ? MoveList<LEGAL>(pos).size() : perft<false>(pos, depth - 1);
-            //         nodes += cnt;
-            //         pos.undo_move(m);
-            //     }
-            //     if (Root)
-            //         sync_cout << UCI::move(m, pos.is_chess960()) << ": " << cnt << sync_endl;
-            // }
-            // return nodes;
+            var ml = Pos.GenerateMoves();
 
             if (depth == 1)
-                return Pos.GenerateMoves().Count;
+                return (ulong) ml.GetMoves().Length;
             
             var key = Pos.State.Key;
             
-            // var tot = 0ul;
-            if (_perftCache.TryGetValue((key, depth), out var tot))
-                return tot;
+            var tot = 0ul;
+            // if (_perftCache.TryGetValue((key, depth), out var tot))
+            //     return tot;
             
             // var posKey = Pos.State.Key;
             // var (found, entry) = Table.Probe(posKey);
@@ -208,14 +166,14 @@ namespace Rudz.Chess
                 var f = Pos.GenerateFen().Fen.ToString();
             }
             
-            var ml = Pos.GenerateMoves();
+            var state = new State();
             
             var moves = ml.GetMoves();
             foreach (var m in moves)
             {
                 // Console.WriteLine($"{depth}:{m.Move}");
-                Console.WriteLine($"{depth}:Before MakeMove: {Pos.GenerateFen().Fen.ToString()}");
-                Pos.MakeMove(m.Move);
+                // Console.WriteLine($"{depth}:Before MakeMove: {Pos.GenerateFen().Fen.ToString()}");
+                Pos.MakeMove(m.Move, state);
                 // Console.WriteLine($"{depth}:After MakeMove: {Pos.GenerateFen().Fen.ToString()}");
                 move = m;
                 tot += Perft(depth - 1);
@@ -224,7 +182,7 @@ namespace Rudz.Chess
                 // Console.WriteLine($"{depth}:After TakeMove: {Pos.GenerateFen().Fen.ToString()}");
             }
             
-            _perftCache.Add((key, depth), tot);
+            // _perftCache.Add((key, depth), tot);
             
             // if (!move.IsNullMove() && tot <= int.MaxValue)
             //     Table.Store(posKey, (int)tot, Bound.Exact, (sbyte)depth, move, 0);
@@ -233,21 +191,6 @@ namespace Rudz.Chess
         }
 
         private bool IsRepetition()
-        {
-            return Pos.State.Repetition >= 3;
-            // var repetitionCounter = 0;
-            //
-            // var current = Pos.State;
-            // var backPos = current?.Previous?.Previous;
-            // while (backPos != null)
-            // {
-            //     if (current.Key == backPos.Key && ++repetitionCounter == 3)
-            //         return true;
-            //     
-            //     backPos = current.Previous?.Previous;
-            // }
-            //
-            // return false;
-        }
+            => Pos.State.Repetition >= 3;
     }
 }

@@ -51,10 +51,11 @@ namespace Chess.Test.Gameplay
             var position = new Position();
             var game = GameFactory.Create(position);
             game.NewGame();
-
+            var state = new State();
+            
             // make the moves necessary to create a mate
             foreach (var move in moves)
-                position.MakeMove(move);
+                position.MakeMove(move, state);
 
             // verify in check is actually true
             Assert.True(position.State.InCheck);

@@ -57,9 +57,9 @@ namespace Rudz.Chess
 
         void AddPiece(Piece pc, Square sq);
 
-        void MakeMove(Move m);
+        void MakeMove(Move m, State newState);
 
-        void MakeMove(Move m, bool givesCheck);
+        void MakeMove(Move m, State newState, bool givesCheck);
         
         void TakeMove(Move m);
 
