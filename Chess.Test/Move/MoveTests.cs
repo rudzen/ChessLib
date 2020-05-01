@@ -24,8 +24,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using Rudz.Chess.Factories;
-
 namespace Chess.Test.Move
 {
     using System;
@@ -33,6 +31,7 @@ namespace Chess.Test.Move
     using System.Text;
     using Rudz.Chess;
     using Rudz.Chess.Enums;
+    using Rudz.Chess.Factories;
     using Rudz.Chess.Types;
     using Xunit;
 
@@ -76,7 +75,7 @@ namespace Chess.Test.Move
         {
             Square expectedFrom = Squares.a2;
             Square expectedTo = Squares.h8;
-            var expectedPromotionPiece = PieceTypes.Rook;
+            var expectedPromotionPiece = PieceTypes.Queen;
             const MoveTypes expectedMoveType = MoveTypes.Promotion;
 
             // full move spectrum

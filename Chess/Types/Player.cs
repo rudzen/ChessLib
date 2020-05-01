@@ -24,16 +24,28 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System;
-using Rudz.Chess.Extensions;
-
 namespace Rudz.Chess.Types
 {
     using Enums;
+    using Extensions;
+    using System;
     using System.Runtime.CompilerServices;
-
+    
     public readonly struct Player : IEquatable<Player>
     {
+        private static readonly Direction[] PawnPushDist = { Directions.North, Directions.South };
+
+        private static readonly Direction[] PawnDoublePushDist = { Directions.NorthDouble, Directions.SouthDouble };
+
+        private static readonly Direction[] PawnWestAttackDist = { Directions.NorthEast, Directions.SouthEast };
+
+        private static readonly Direction[] PawnEastAttackDist = { Directions.NorthWest, Directions.SouthWest };
+
+        private static readonly string[] PlayerColors = { "White", "Black" };
+
+        private static readonly Func<BitBoard, BitBoard>[] PawnPushModifiers = { BitBoards.NorthOne, BitBoards.SouthOne };
+        
+        
         public Player(byte side)
             : this() => Side = side;
 
@@ -97,5 +109,23 @@ namespace Rudz.Chess.Types
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool IsOk() => Side.InBetween(White.Side, Black.Side);
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public string GetName() => PlayerColors[Side];
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Direction PawnPushDistance() => PawnPushDist[Side];
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Direction PawnDoublePushDistance() => PawnDoublePushDist[Side];
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Direction PawnWestAttackDistance() => PawnWestAttackDist[Side];
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Direction PawnEastAttackDistance() => PawnEastAttackDist[Side];
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public  BitBoard PawnPush(BitBoard bitBoard) => PawnPushModifiers[Side](bitBoard);
     }
 }

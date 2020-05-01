@@ -54,7 +54,7 @@ namespace Chess.Test.Position
 
             position = new Position();
 
-            position.AddPiece(PieceTypes.Knight.MakePiece(PlayerExtensions.Black), Squares.d5);
+            position.AddPiece(PieceTypes.Knight.MakePiece(Player.Black), Squares.d5);
             pieces = position.Pieces();
             square = pieces.Lsb();
             Assert.Equal(Squares.d5, square.Value);
@@ -76,7 +76,7 @@ namespace Chess.Test.Position
             cb.AddPiece(Pieces.BlackKing, Squares.b3);
             cb.AddPiece(Pieces.BlackPawn, Squares.c4); // this is a pinned pieces
 
-            var b = cb.GetPinnedPieces(Squares.b3, PlayerExtensions.Black);
+            var b = cb.GetPinnedPieces(Squares.b3, Player.Black);
 
             // b must contain one square at this point
             var pinnedCount = b.Count;
