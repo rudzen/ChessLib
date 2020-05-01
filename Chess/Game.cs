@@ -88,7 +88,7 @@ namespace Rudz.Chess
             var gameEndType = GameEndTypes.None;
             if (IsRepetition())
                 gameEndType |= GameEndTypes.Repetition;
-            if (State.Material[PlayerExtensions.White.Side] <= 300 && State.Material[PlayerExtensions.Black.Side] <= 300 && Pos.BoardPieces[0].Empty && Pos.BoardPieces[8].Empty)
+            if (State.Material[Player.White.Side] <= 300 && State.Material[Player.Black.Side] <= 300)//&& Pos.BoardPieces[0].Empty && Pos.BoardPieces[8].Empty)
                 gameEndType |= GameEndTypes.MaterialDrawn;
             if (State.Rule50 >= 100)
                 gameEndType |= GameEndTypes.FiftyMove;
@@ -136,40 +136,40 @@ namespace Rudz.Chess
         public IEnumerator<Piece> GetEnumerator() => Pos.GetEnumerator();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public BitBoard OccupiedBySide(Player c) => Pos.OccupiedBySide[c.Side];
+        public BitBoard OccupiedBySide(Player c) => Pos.Pieces(c);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Player CurrentPlayer() => Pos.SideToMove;
 
-        public ulong Perft(int depth, bool root)
+        public ulong Perft(int depth, bool root = false)
         {
-            ulong cnt, nodes = 0;
-            bool leaf = (depth == 2);
-
-            var ml = Pos.GenerateMoves();
-
-            var moves = ml.GetMoves();
-
-            foreach (var move in moves)
-            {
-                if (root && depth <= 1)
-                {
-                    cnt = 1;
-                    nodes++;
-                }
-                else
-                {
-                    Pos.MakeMove(move);
-                    cnt = leaf ? (ulong) Pos.GenerateMoves().GetMoves().Length : Perft(depth - 1, false);
-                    nodes += cnt;
-                    Pos.TakeMove(move);
-                }
-                
-                if (root)
-                    Console.WriteLine($"{move.Move}: {cnt}");
-            }
-
-            return nodes;
+            // ulong cnt, nodes = 0;
+            // bool leaf = (depth == 2);
+            //
+            // var ml = Pos.GenerateMoves();
+            //
+            // var moves = ml.GetMoves();
+            //
+            // foreach (var move in moves)
+            // {
+            //     if (root && depth <= 1)
+            //     {
+            //         cnt = 1;
+            //         nodes++;
+            //     }
+            //     else
+            //     {
+            //         Pos.MakeMove(move);
+            //         cnt = leaf ? (ulong) Pos.GenerateMoves().GetMoves().Length : Perft(depth - 1, false);
+            //         nodes += cnt;
+            //         Pos.TakeMove(move);
+            //     }
+            //     
+            //     if (root)
+            //         Console.WriteLine($"{move.Move}: {cnt}");
+            // }
+            //
+            // return nodes;
 
             // for (const auto& m : MoveList<LEGAL>(pos))
             // {
@@ -187,49 +187,49 @@ namespace Rudz.Chess
             // }
             // return nodes;
 
-            // if (depth == 1)
-            //     return Pos.GenerateMoves().Count;
-            //
-            // var key = Pos.State.Key;
-            //
-            // // var tot = 0ul;
-            // if (_perftCache.TryGetValue((key, depth), out var tot))
-            //     return tot;
-            //
-            // // var posKey = Pos.State.Key;
-            // // var (found, entry) = Table.Probe(posKey);
-            // // if (found && entry.Depth == depth && entry.Key32 == posKey.UpperKey)
-            // //     return (ulong)entry.Value;
-            //
-            // var move = MoveExtensions.EmptyMove;
-            //
-            // if (depth == 3)
-            // {
-            //     var f = Pos.GenerateFen().Fen.ToString();
-            // }
-            //
-            // var ml = Pos.GenerateMoves();
-            //
-            // var moves = ml.GetMoves();
-            // foreach (var m in moves)
-            // {
-            //     // Console.WriteLine($"{depth}:{m.Move}");
-            //     Console.WriteLine($"{depth}:Before MakeMove: {Pos.GenerateFen().Fen.ToString()}");
-            //     Pos.MakeMove(m.Move);
-            //     // Console.WriteLine($"{depth}:After MakeMove: {Pos.GenerateFen().Fen.ToString()}");
-            //     move = m;
-            //     tot += Perft(depth - 1);
-            //     // Console.WriteLine($"{depth}:Before TakeMove: {Pos.GenerateFen().Fen.ToString()}");
-            //     Pos.TakeMove(m);
-            //     // Console.WriteLine($"{depth}:After TakeMove: {Pos.GenerateFen().Fen.ToString()}");
-            // }
-            //
-            // _perftCache.Add((key, depth), tot);
-            //
-            // // if (!move.IsNullMove() && tot <= int.MaxValue)
-            // //     Table.Store(posKey, (int)tot, Bound.Exact, (sbyte)depth, move, 0);
-            //
-            // return tot;
+            if (depth == 1)
+                return Pos.GenerateMoves().Count;
+            
+            var key = Pos.State.Key;
+            
+            // var tot = 0ul;
+            if (_perftCache.TryGetValue((key, depth), out var tot))
+                return tot;
+            
+            // var posKey = Pos.State.Key;
+            // var (found, entry) = Table.Probe(posKey);
+            // if (found && entry.Depth == depth && entry.Key32 == posKey.UpperKey)
+            //     return (ulong)entry.Value;
+            
+            var move = Move.EmptyMove;
+            
+            if (depth == 3)
+            {
+                var f = Pos.GenerateFen().Fen.ToString();
+            }
+            
+            var ml = Pos.GenerateMoves();
+            
+            var moves = ml.GetMoves();
+            foreach (var m in moves)
+            {
+                // Console.WriteLine($"{depth}:{m.Move}");
+                Console.WriteLine($"{depth}:Before MakeMove: {Pos.GenerateFen().Fen.ToString()}");
+                Pos.MakeMove(m.Move);
+                // Console.WriteLine($"{depth}:After MakeMove: {Pos.GenerateFen().Fen.ToString()}");
+                move = m;
+                tot += Perft(depth - 1);
+                // Console.WriteLine($"{depth}:Before TakeMove: {Pos.GenerateFen().Fen.ToString()}");
+                Pos.TakeMove(m);
+                // Console.WriteLine($"{depth}:After TakeMove: {Pos.GenerateFen().Fen.ToString()}");
+            }
+            
+            _perftCache.Add((key, depth), tot);
+            
+            // if (!move.IsNullMove() && tot <= int.MaxValue)
+            //     Table.Store(posKey, (int)tot, Bound.Exact, (sbyte)depth, move, 0);
+            
+            return tot;
         }
 
         private bool IsRepetition()

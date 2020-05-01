@@ -323,7 +323,7 @@ namespace Rudz.Chess
             var pt = _pos.GetPieceType(from);
 
             return pt == PieceTypes.Pawn || pt == PieceTypes.King
-                ? BitBoards.EmptyBitBoard
+                ? BitBoard.Empty
                 : _pos.GetAttacks(move.GetToSquare(), pt, _pos.Pieces()) ^ from;
         }
 

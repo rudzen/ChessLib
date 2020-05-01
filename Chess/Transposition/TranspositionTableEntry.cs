@@ -66,7 +66,7 @@ namespace Rudz.Chess.Transposition
         public void Defaults()
         {
             Key32 = 0;
-            Move = MoveExtensions.EmptyMove;
+            Move = Move.EmptyMove;
             Depth = sbyte.MinValue;
             Generation = 1;
             Value = StaticValue = int.MaxValue;

@@ -41,8 +41,8 @@ namespace Rudz.Chess
             _killerMoves = new IPieceSquare[maxDepth + 1, 2];
             for (var depth = 0; depth <= maxDepth; depth++)
             {
-                _killerMoves[depth, 0] = new PieceSquare(Pieces.NoPiece, Squares.none);
-                _killerMoves[depth, 1] = new PieceSquare(Pieces.NoPiece, Squares.none);
+                _killerMoves[depth, 0] = new PieceSquare(Pieces.NoPiece, Square.None);
+                _killerMoves[depth, 1] = new PieceSquare(Pieces.NoPiece, Square.None);
             }
             Reset();
         }
@@ -89,9 +89,9 @@ namespace Rudz.Chess
             for (var i = lastDepth + 1; i < _killerMoves.Length; i++)
             {
                 _killerMoves[i, 0].Piece = Pieces.NoPiece;
-                _killerMoves[i, 0].Square = Squares.none;
+                _killerMoves[i, 0].Square = Square.None;
                 _killerMoves[i, 1].Piece = Pieces.NoPiece;
-                _killerMoves[i, 1].Square = Squares.none;
+                _killerMoves[i, 1].Square = Square.None;
             }
         }
 
@@ -101,9 +101,9 @@ namespace Rudz.Chess
             for (var i = 0; i < _killerMoves.Length; i++)
             {
                 _killerMoves[i, 0].Piece = Pieces.NoPiece;
-                _killerMoves[i, 0].Square = Squares.none;
+                _killerMoves[i, 0].Square = Square.None;
                 _killerMoves[i, 1].Piece = Pieces.NoPiece;
-                _killerMoves[i, 1].Square = Squares.none;
+                _killerMoves[i, 1].Square = Square.None;
             }
         }
     }

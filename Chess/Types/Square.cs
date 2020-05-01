@@ -57,6 +57,8 @@ namespace Rudz.Chess.Types
 
         public readonly Squares Value;
 
+        public static readonly Square None = new Square(Squares.none);
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator Square(int value) => new Square(value);
 

@@ -42,7 +42,9 @@ namespace Rudz.Chess.Types
 
         public Move(Square from, Square to, MoveTypes moveType, PieceTypes promoPt = PieceTypes.Knight)
             => _data = (ushort) (to | (from.AsInt() << 6) | moveType.AsInt() | ((promoPt - PieceTypes.Knight) << 12));
-
+        
+        public static readonly Move EmptyMove = new Move();
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator Move(string value)
             => new Move(new Square(value[1] - '1', value[0] - 'a'), new Square(value[3] - '1', value[2] - 'a'));

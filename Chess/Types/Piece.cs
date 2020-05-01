@@ -63,7 +63,7 @@ namespace Rudz.Chess.Types
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator Piece(Pieces value) => new Piece(value);
-
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator Piece(PieceTypes pieceType) => new Piece(pieceType);
 

@@ -48,13 +48,13 @@ namespace Chess.Test.Position
 
             // test overload
             pieces = position.Pieces(piece);
-            Assert.False((pieces & square).Empty);
+            Assert.False((pieces & square).IsEmpty);
 
             // Test piece type overload
 
             position = new Position();
 
-            position.AddPiece(PieceTypes.Knight, Squares.d5, PlayerExtensions.Black);
+            position.AddPiece(PieceTypes.Knight.MakePiece(PlayerExtensions.Black), Squares.d5);
             pieces = position.Pieces();
             square = pieces.Lsb();
             Assert.Equal(Squares.d5, square.Value);

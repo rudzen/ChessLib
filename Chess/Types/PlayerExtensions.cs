@@ -33,10 +33,6 @@ namespace Rudz.Chess.Types
 
     public static class PlayerExtensions
     {
-        public static readonly Player White = 0;
-
-        public static readonly Player Black = 1;
-
         private static readonly Direction[] PawnPushDist = { Directions.North, Directions.South };
 
         private static readonly Direction[] PawnDoublePushDist = { Directions.NorthDouble, Directions.SouthDouble };
@@ -48,9 +44,6 @@ namespace Rudz.Chess.Types
         private static readonly string[] PlayerColors = { "White", "Black" };
 
         private static readonly Func<BitBoard, BitBoard>[] PawnPushModifiers = { BitBoards.NorthOne, BitBoards.SouthOne };
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsLegalPlayer(this Player player) => player.Side.InBetween(White.Side, Black.Side);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string GetName(this Player player) => PlayerColors[player.Side];

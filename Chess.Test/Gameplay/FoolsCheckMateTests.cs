@@ -62,8 +62,6 @@ namespace Chess.Test.Gameplay
             var b = position.GenerateFen().Fen.ToString();
             
             var moveList = position.GenerateMoves();
-            
-            
             var resultingMoves = moveList.GetMoves();
             
             // verify that no legal moves actually exists.

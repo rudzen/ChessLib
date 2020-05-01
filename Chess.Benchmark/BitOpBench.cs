@@ -102,7 +102,7 @@ namespace Chess.Benchmark
             yield return BitBoards.CornerA8;
             yield return BitBoards.CornerH1;
             yield return BitBoards.CornerH8;
-            yield return BitBoards.EmptyBitBoard;
+            yield return BitBoard.Empty;
         }
     }
 }

@@ -24,13 +24,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using Rudz.Chess.Types;
-
 namespace Chess.Perft
 {
     using Interfaces;
     using Rudz.Chess;
     using Rudz.Chess.Fen;
+    using Rudz.Chess.Types;
     using System;
     using System.Collections.Generic;
     using System.Linq;

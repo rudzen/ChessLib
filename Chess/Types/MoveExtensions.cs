@@ -34,8 +34,6 @@ namespace Rudz.Chess.Types
     /// </summary>
     public static class MoveExtensions
     {
-        public static readonly Move EmptyMove = new Move();
-
         // [MethodImpl(MethodImplOptions.AggressiveInlining)]
         // public static (bool, Move) Locate(this Move move, IPosition pos)
         // {

@@ -60,7 +60,9 @@ namespace Rudz.Chess.Types
 
         public int Count => BitBoards.PopCount(Value);
 
-        public bool Empty => Value == 0;
+        public bool IsEmpty => Value == 0;
+
+        public static BitBoard Empty = BitBoards.EmptyBitBoard;
         
         public string String => Convert.ToString((long)Value, 2).PadLeft(64, '0');
 
@@ -180,7 +182,7 @@ namespace Rudz.Chess.Types
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Square FirstOrDefault()
-            => Empty ? Squares.none : this.Lsb();
+            => IsEmpty ? Square.None : this.Lsb();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public BitBoard Xor(int pos)
@@ -216,7 +218,7 @@ namespace Rudz.Chess.Types
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public IEnumerator<Square> GetEnumerator()
         {
-            if (Empty)
+            if (IsEmpty)
                 yield break;
 
             BitBoard bb = Value;

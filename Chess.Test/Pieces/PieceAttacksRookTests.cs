@@ -39,7 +39,7 @@ namespace Chess.Test.Pieces
             const int index = (int)EBands.Alpha;
             const int sliderIndex = 1;
             var expected = RookExpected[index];
-            var actuals = Bands[index].Select(x => SlideAttacks[sliderIndex](sliderIndex, BitBoards.EmptyBitBoard).Count);
+            var actuals = Bands[index].Select(x => SlideAttacks[sliderIndex](sliderIndex, BitBoard.Empty).Count);
 
             foreach (var actual in actuals)
                 Assert.Equal(expected, actual);
@@ -51,7 +51,7 @@ namespace Chess.Test.Pieces
             const int index = (int)EBands.Beta;
             const int sliderIndex = 1;
             var expected = RookExpected[index];
-            var actuals = Bands[index].Select(x => SlideAttacks[sliderIndex](sliderIndex, BitBoards.EmptyBitBoard).Count);
+            var actuals = Bands[index].Select(x => SlideAttacks[sliderIndex](sliderIndex, BitBoard.Empty).Count);
 
             foreach (var actual in actuals)
                 Assert.Equal(expected, actual);
@@ -63,7 +63,7 @@ namespace Chess.Test.Pieces
             const int index = (int)EBands.Gamma;
             const int sliderIndex = 1;
             var expected = RookExpected[index];
-            var actuals = Bands[index].Select(x => SlideAttacks[sliderIndex](sliderIndex, BitBoards.EmptyBitBoard).Count);
+            var actuals = Bands[index].Select(x => SlideAttacks[sliderIndex](sliderIndex, BitBoard.Empty).Count);
 
             foreach (var actual in actuals)
                 Assert.Equal(expected, actual);
@@ -75,7 +75,7 @@ namespace Chess.Test.Pieces
             const int index = (int)EBands.Delta;
             const int sliderIndex = 1;
             var expected = RookExpected[index];
-            var actuals = Bands[index].Select(x => SlideAttacks[sliderIndex](sliderIndex, BitBoards.EmptyBitBoard).Count);
+            var actuals = Bands[index].Select(x => SlideAttacks[sliderIndex](sliderIndex, BitBoard.Empty).Count);
 
             foreach (var actual in actuals)
                 Assert.Equal(expected, actual);
@@ -117,7 +117,7 @@ namespace Chess.Test.Pieces
             foreach (var square in border)
             {
                 var attacks = pos.GetAttacks(square, PieceTypes.Rook, borderInner);
-                Assert.False(attacks.Empty);
+                Assert.False(attacks.IsEmpty);
                 var expected = corners & square ? expectedCorner : expectedSide;
                 var actual = attacks.Count;
                 Assert.Equal(expected, actual);

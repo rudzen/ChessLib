@@ -49,6 +49,10 @@ namespace Rudz.Chess.Types
 
         public bool IsBlack => Side != 0;
 
+        public static readonly Player White = 0;
+
+        public static readonly Player Black = 1;
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator Player(int value) => new Player((byte)value);
 
@@ -90,5 +94,8 @@ namespace Rudz.Chess.Types
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override string ToString() => Side == 0 ? "White" : "Black";
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool IsOk() => Side.InBetween(White.Side, Black.Side);
     }
 }

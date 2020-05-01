@@ -97,7 +97,7 @@ namespace Rudz.Chess.UCI
                     return move;
             }
 
-            return MoveExtensions.EmptyMove;
+            return Move.EmptyMove;
         }
 
         public string BestMove(Move move, Move ponderMove) =>

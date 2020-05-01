@@ -35,13 +35,7 @@ namespace Rudz.Chess
 
     public interface IPosition : IEnumerable<Piece>
     {
-        BitBoard[] BoardPieces { get; }
-
-        BitBoard[] OccupiedBySide { get; }
-
         bool IsProbing { get; set; }
-
-        Piece[] BoardLayout { get; }
 
         Action<Piece, Square> PieceUpdated { get; set; }
 
@@ -55,13 +49,11 @@ namespace Rudz.Chess
         
         string FenNotation { get; }
         
+        Board Board { get; }
+        
         void Clear();
 
         void AddPiece(Piece pc, Square sq);
-
-        void AddPiece(PieceTypes pt, Square sq, Player c);
-
-        // void MovePiece(Square from, Square to);
 
         void MakeMove(Move m);
 
@@ -105,6 +97,8 @@ namespace Rudz.Chess
 
         BitBoard Pieces(PieceTypes pt1, PieceTypes pt2, Player side);
 
+        ReadOnlySpan<Square> Squares(PieceTypes pt, Player c);
+        
         Square GetPieceSquare(PieceTypes pt, Player color);
 
         Piece MovedPiece(Move m);

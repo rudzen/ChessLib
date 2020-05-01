@@ -312,7 +312,7 @@ namespace Rudz.Chess.Types
                     pt = validMagicPiece.AsInt();
                     foreach (var s2 in AllSquares)
                     {
-                        if ((PseudoAttacksBB[pt][sq] & s2).Empty)
+                        if ((PseudoAttacksBB[pt][sq] & s2).IsEmpty)
                             continue;
 
                         LineBB[sq][s2.AsInt()] = GetAttacks(s1, validMagicPiece, EmptyBitBoard) & GetAttacks(s2, validMagicPiece, EmptyBitBoard) | s1 | s2;
@@ -334,7 +334,7 @@ namespace Rudz.Chess.Types
                     else if (file == Files.FileA)
                         KingRingBB[c][sq] |= KingRingBB[c][sq].EastOne();
 
-                    Debug.Assert(!KingRingBB[c][sq].Empty);
+                    Debug.Assert(!KingRingBB[c][sq].IsEmpty);
                 }
             }
         }
@@ -526,7 +526,7 @@ namespace Rudz.Chess.Types
             {
                 s.AppendFormat("| {0} ", (int)r + 1);
                 for (var f = Files.FileA; f <= Files.FileH; ++f)
-                    s.AppendFormat("| {0} ", (b & new Square(r, f)).Empty ? ' ' : 'X');
+                    s.AppendFormat("| {0} ", (b & new Square(r, f)).IsEmpty ? ' ' : 'X');
                 s.AppendLine("|\n+---+---+---+---+---+---+---+---+---+");
             }
 

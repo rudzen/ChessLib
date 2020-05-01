@@ -46,7 +46,7 @@ namespace Chess.Test.Data
         public void GetPieceTest()
         {
             const Pieces expected = Pieces.BlackKnight;
-            var ps = new PieceSquare(expected, Squares.none);
+            var ps = new PieceSquare(expected, Square.None);
             var actual = ps.Piece;
             var expectedPiece = new Piece(expected);
             Assert.Equal(expectedPiece, actual);
