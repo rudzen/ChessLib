@@ -45,8 +45,6 @@ namespace Rudz.Chess.Types
 
         private const ushort BlackPieces = 32256;
 
-        public static readonly Piece EmptyPiece = Pieces.NoPiece;
-
         private static readonly string[] PieceStrings = { " ", "P", "N", "B", "R", "Q", "K", " ", " ", "p", "n", "b", "r", "q", "k" };
 
         private static readonly string[] PieceNames = { "None", "Pawn", "Knight", "Bishop", "Rook", "Queen", "King" };
@@ -83,9 +81,6 @@ namespace Rudz.Chess.Types
         public static Piece MakePiece(this PieceTypes @this, Player side) => (int)@this | (side.Side << 3);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsNoPiece(this Piece p) => p == Pieces.NoPiece;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static char GetPieceChar(this Piece p) => PieceChars[p.AsInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -93,11 +88,6 @@ namespace Rudz.Chess.Types
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string GetPieceString(this Piece p) => PieceStrings[p.AsInt()];
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsPieceWhite(int code) => (WhitePieces & code) != 0;
-
-        public static bool IsPieceBlack(int code) => (BlackPieces & code) != 0;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static PieceValues PieceValue(this Piece p) => Values[p.Type().AsInt()];

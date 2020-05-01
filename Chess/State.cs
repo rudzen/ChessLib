@@ -101,7 +101,7 @@ namespace Rudz.Chess
             CheckedSquares = new BitBoard[PieceTypes.PieceTypeNb.AsInt()];
             Pinners = new BitBoard[2];
             BlockersForKing = new BitBoard[2];
-            CapturedPiece = PieceTypes.NoPieceType;
+            CapturedPiece = Piece.EmptyPiece;
         }
 
         public void Clear()
@@ -115,8 +115,9 @@ namespace Rudz.Chess
             CheckedSquares.Fill(BitBoard.Empty);
             Pinners.Fill(BitBoard.Empty);
             BlockersForKing.Fill(BitBoard.Empty);
-            CapturedPiece = PieceTypes.NoPieceType;
+            CapturedPiece = Piece.EmptyPiece;
             Previous = null;
+            InCheck = false;
         }
 
         public bool Equals(State other)

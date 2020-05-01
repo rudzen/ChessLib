@@ -47,13 +47,12 @@ namespace Rudz.Chess.Types
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Piece(Pieces piece) => Value = piece;
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private Piece(PieceTypes pieceType) => Value = (Pieces)pieceType;
-        
         public static Comparer<Piece> PieceComparer { get; } = new PieceRelationalComparer();
 
         [FieldOffset(0)]
         public readonly Pieces Value;
+
+        public static readonly Piece EmptyPiece = Pieces.NoPiece;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator Piece(char value) => new Piece(GetPiece(value));
@@ -64,9 +63,6 @@ namespace Rudz.Chess.Types
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator Piece(Pieces value) => new Piece(value);
         
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator Piece(PieceTypes pieceType) => new Piece(pieceType);
-
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Piece operator +(Piece left, Player right) => new Piece(left.Value + (byte)(right << 3));
 

@@ -97,7 +97,7 @@ namespace Rudz.Chess
         }
 
         public void ClearPiece(Square sq)
-            => _pieces[sq.AsInt()] = PieceExtensions.EmptyPiece;
+            => _pieces[sq.AsInt()] = Piece.EmptyPiece;
 
         public void MovePiece(Square from, Square to)
         {
@@ -108,7 +108,7 @@ namespace Rudz.Chess
             _byType[PieceTypes.AllPieces.AsInt()] ^= fromTo;
             _byType[pc.Type().AsInt()] ^= fromTo;
             _bySide[pc.ColorOf().Side] ^= fromTo;
-            _pieces[from.AsInt()] = PieceExtensions.EmptyPiece;
+            _pieces[from.AsInt()] = Piece.EmptyPiece;
             _pieces[to.AsInt()] = pc;
             _index[to.AsInt()] = _index[from.AsInt()];
             _pieceList.Span[pc.AsInt()][_index[to.AsInt()]] = to;

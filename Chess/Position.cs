@@ -759,7 +759,7 @@ namespace Rudz.Chess
                     var square = new Square(rank, file);
                     var piece = _board.PieceAt(square);
 
-                    if (piece.IsNoPiece())
+                    if (piece == Piece.EmptyPiece)
                     {
                         empty++;
                         continue;
