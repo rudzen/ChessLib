@@ -21,7 +21,7 @@ namespace Rudz.Chess
 
         private readonly int[] _pieceCount;
 
-        private readonly Memory<Square[]> _pieceList;
+        private readonly Square[][] _pieceList;
 
         private readonly int[] _index;
 
@@ -39,11 +39,13 @@ namespace Rudz.Chess
             _bySide = new BitBoard[2];
             _byType = new BitBoard[PieceTypes.PieceTypeNb.AsInt()];
             _pieceCount = new int[(int) Enums.Pieces.PieceNb];
-            _pieceList = new Memory<Square[]>(new Square[(int) Enums.Pieces.PieceNb][]);
+            var mem = new Memory<Square>(new Square[(int) Enums.Pieces.PieceNb]);
+            _pieceList = new Square[64][];
             for (var i = 0; i < _pieceList.Length; i++)
             {
-                _pieceList.Span[i] = new Square[16];
-                _pieceList.Span[i].Fill(Types.Square.None);
+                var arr = new Square[16];
+                arr.Fill(Types.Square.None);
+                _pieceList[i] = arr;
             }
 
             _index = new int[64];
@@ -55,8 +57,8 @@ namespace Rudz.Chess
             _bySide.Clear();
             _byType.Clear();
             _pieceCount.Clear();
-            for (var i = 0; i < _pieceList.Length; i++)
-                _pieceList.Span[i].Fill(Types.Square.None);
+            foreach (var s in _pieceList)
+                s.Fill(Types.Square.None);
             _index.Clear();
         }
         
@@ -73,7 +75,7 @@ namespace Rudz.Chess
             _byType[pc.Type().AsInt()] |= sq;
             _bySide[pc.ColorOf().Side] |= sq;
             _index[sq.AsInt()] = _pieceCount[pc.AsInt()]++;
-            _pieceList.Span[pc.AsInt()][_index[sq.AsInt()]] = sq;
+            _pieceList[pc.AsInt()][_index[sq.AsInt()]] = sq;
             _pieceCount[PieceTypes.AllPieces.MakePiece(pc.ColorOf()).AsInt()]++;
         }
 
@@ -88,11 +90,10 @@ namespace Rudz.Chess
             _byType[pc.Type().AsInt()] ^= sq;
             _bySide[pc.ColorOf().Side] ^= sq;
             /* board[s] = NO_PIECE;  Not needed, overwritten by the capturing one */
-            var lastSquare = _pieceList.Span[pc.AsInt()][--_pieceCount[pc.AsInt()]];
+            var lastSquare = _pieceList[pc.AsInt()][--_pieceCount[pc.AsInt()]];
             _index[lastSquare.AsInt()] = _index[sq.AsInt()];
-            var plSpan = _pieceList.Span;
-            plSpan[pc.AsInt()][_index[lastSquare.AsInt()]] = lastSquare;
-            plSpan[pc.AsInt()][_pieceCount[pc.AsInt()]] = Types.Square.None;
+            _pieceList[pc.AsInt()][_index[lastSquare.AsInt()]] = lastSquare;
+            _pieceList[pc.AsInt()][_pieceCount[pc.AsInt()]] = Types.Square.None;
             _pieceCount[PieceTypes.AllPieces.MakePiece(pc.ColorOf()).AsInt()]--;
         }
 
@@ -111,7 +112,7 @@ namespace Rudz.Chess
             _pieces[from.AsInt()] = Piece.EmptyPiece;
             _pieces[to.AsInt()] = pc;
             _index[to.AsInt()] = _index[from.AsInt()];
-            _pieceList.Span[pc.AsInt()][_index[to.AsInt()]] = to;
+            _pieceList[pc.AsInt()][_index[to.AsInt()]] = to;
         }
 
         public Piece MovedPiece(Move move)
@@ -138,12 +139,16 @@ namespace Rudz.Chess
         public Square Square(PieceTypes pt, Player c)
         {
             Debug.Assert(_pieceCount[pt.MakePiece(c).AsInt()] == 1);
-            return _pieceList.Span[pt.MakePiece(c).AsInt()][0];
+            return _pieceList[pt.MakePiece(c).AsInt()][0];
         }
 
         public ReadOnlySpan<Square> Squares(PieceTypes pt, Player c)
         {
-            return _pieceList.Span[pt.MakePiece(c).AsInt()].AsSpan();
+            var pc = pt.MakePiece(c).AsInt();
+            return _pieceList[pc].TakeWhile(s => s != Types.Square.None).ToArray().AsSpan();
+            // var squares = _pieceList[pc];
+            // var idx = Array.IndexOf(squares, Types.Square.None);
+            // return _pieceList[pt.MakePiece(c).AsInt()].AsSpan();
         }
 
         public int PieceCount(PieceTypes pt, Player c)

@@ -77,14 +77,21 @@ namespace Rudz.Chess
 
         public bool Chess960 { get; private set; }
 
-        public Player SideToMove => _sideToMove;
+        public Player SideToMove
+            => _sideToMove;
         
-        public Square EnPassantSquare => State.EnPassantSquare;
+        public Square EnPassantSquare
+            => State.EnPassantSquare;
 
-        public string FenNotation => GenerateFen().ToString();
+        public string FenNotation
+            => GenerateFen().ToString();
 
-        public Board Board => _board;
+        public Board Board
+            => _board;
         
+        public BitBoard Checkers
+            => State.Checkers;
+
         public void Clear()
         {
             _board.Clear();
@@ -122,7 +129,8 @@ namespace Rudz.Chess
         public void MakeMove(Move m, bool givesCheck)
         {
             StateAdd(State);
-
+            State.LastMove = m;
+            
             var k = State.Key ^ Zobrist.GetZobristSide();
 
             _ply++;
@@ -254,6 +262,7 @@ namespace Rudz.Chess
             // Potential set of captured piece in state when move is refactored
 
             Debug.Assert(GetPieceSquare(PieceTypes.King, us).IsOk());
+            Debug.Assert(GetPieceSquare(PieceTypes.King, them).IsOk());
 
             // Update state properties
             State.Key = k;
@@ -261,7 +270,8 @@ namespace Rudz.Chess
 
             var ksq = GetPieceSquare(PieceTypes.King, them);
 
-            State.Checkers = givesCheck ? AttacksTo(ksq) & Pieces(us) : BitBoard.Empty;
+            State.Checkers = AttacksTo(ksq);// givesCheck ? AttacksTo(ksq) & Pieces(us) : BitBoard.Empty;
+            
             State.InCheck = !State.Checkers.IsEmpty;
 
             _sideToMove = ~_sideToMove;
@@ -394,9 +404,6 @@ namespace Rudz.Chess
 
         public BitBoard CheckedSquares(PieceTypes pt)
             => State.CheckedSquares[pt.AsInt()];
-
-        public BitBoard Checkers()
-            => State.Checkers;
 
         public BitBoard PinnedPieces(Player c)
             => State.Pinners[c.Side];
@@ -553,15 +560,15 @@ namespace Rudz.Chess
 
             Debug.Assert(sq >= Enums.Squares.a1 && sq <= Enums.Squares.h8);
 
-            return (sq.PawnAttack(Player.White) & _board.Pieces(Player.Black))
-                  | (sq.PawnAttack(Player.Black) & _board.Pieces(Player.White))
+            return (sq.PawnAttack(Player.White) & _board.Pieces(Player.Black, PieceTypes.Pawn))
+                  | (sq.PawnAttack(Player.Black) & _board.Pieces(Player.White, PieceTypes.Pawn))
                   | (GetAttacks(sq, PieceTypes.Knight) & _board.Pieces(PieceTypes.Knight))
                   | (GetAttacks(sq, PieceTypes.Rook, occupied) & _board.Pieces(PieceTypes.Rook, PieceTypes.Queen))
                   | (GetAttacks(sq, PieceTypes.Bishop, occupied) & _board.Pieces(PieceTypes.Bishop, PieceTypes.Queen))
                   | (GetAttacks(sq, PieceTypes.King) & _board.Pieces(PieceTypes.King));
         }
 
-        public BitBoard AttacksTo(Square sq) => AttacksTo(sq, Pieces());
+        public BitBoard AttacksTo(Square sq) => AttacksTo(sq, _board.Pieces());
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool AttackedBySlider(Square sq, Player c)
@@ -667,16 +674,16 @@ namespace Rudz.Chess
             // Evasions generator already takes care to avoid some kind of illegal moves
             // and legal() relies on this. We therefore have to take care that the same
             // kind of moves are filtered out here.
-            if (!Checkers().IsEmpty)
+            if (!Checkers.IsEmpty)
             {
                 if (pc.Type() != PieceTypes.King)
                 {
                     // Double check? In this case a king move is required
-                    if (Checkers().MoreThanOne())
+                    if (Checkers.MoreThanOne())
                         return false;
 
                     // Our move must be a blocking evasion or a capture of the checking piece
-                    if (((Checkers().Lsb().BitboardBetween(GetPieceSquare(PieceTypes.King, us)) | Checkers()) & to).IsEmpty)
+                    if (((Checkers.Lsb().BitboardBetween(GetPieceSquare(PieceTypes.King, us)) | Checkers) & to).IsEmpty)
                         return false;
                 }
                 // In case of king moves under check we have to remove king so to catch

@@ -51,6 +51,8 @@ namespace Rudz.Chess
         
         Board Board { get; }
         
+        BitBoard Checkers { get; }
+        
         void Clear();
 
         void AddPiece(Piece pc, Square sq);
@@ -70,8 +72,6 @@ namespace Rudz.Chess
         BitBoard GetPinnedPieces(Square sq, Player c);
 
         BitBoard CheckedSquares(PieceTypes pt);
-
-        BitBoard Checkers();
 
         BitBoard PinnedPieces(Player c);
 

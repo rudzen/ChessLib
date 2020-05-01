@@ -47,29 +47,6 @@ namespace Rudz.Chess.Types
             "a8", "b8", "c8", "d8", "e8", "f8", "g8", "h8"
         };
 
-        // TODO : Replace with relative methods
-        // private static readonly Square[,] Flip = new Square[2, 64];
-        //
-        // private static readonly Square[] RookCastlesTo = new Square[64]; // indexed by position of the king
-
-        // static SquareExtensions()
-        // {
-        //     // generate square flipping array for both sides
-        //     foreach (var square in BitBoards.AllSquares)
-        //     {
-        //         var file = square.File().AsInt();
-        //         var rank = square.Rank().AsInt();
-        //         Flip[0, square.AsInt()] = file + ((7 - rank) << 3);
-        //         Flip[1, square.AsInt()] = file + (rank << 3);
-        //     }
-        //
-        //     // generate rook castleling destination squares for both sides
-        //     RookCastlesTo[Flip[PlayerExtensions.White.Side, (int)Squares.g1].AsInt()] = Flip[PlayerExtensions.White.Side, (int)Squares.f1];
-        //     RookCastlesTo[Flip[PlayerExtensions.White.Side, (int)Squares.c1].AsInt()] = Flip[PlayerExtensions.White.Side, (int)Squares.d1];
-        //     RookCastlesTo[Flip[PlayerExtensions.Black.Side, (int)Squares.g1].AsInt()] = Flip[PlayerExtensions.Black.Side, (int)Squares.f1];
-        //     RookCastlesTo[Flip[PlayerExtensions.Black.Side, (int)Squares.c1].AsInt()] = Flip[PlayerExtensions.Black.Side, (int)Squares.d1];
-        // }
-
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsValid(this Square s) => s.Value >= Squares.a1 && s.Value <= Squares.h8;
 
@@ -99,18 +76,6 @@ namespace Rudz.Chess.Types
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static BitBoard BitBoardSquare(this Squares sq) => BitBoards.BbSquares[(int)sq];
-
-        // [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        // internal static Square GetRookCastleTo(this Square square) => RookCastlesTo[square.AsInt()];
-
-        // /// <summary>
-        // /// Uses a file(column) index and not a square
-        // /// </summary>
-        // /// <param name="fileIndex">The file</param>
-        // /// <param name="player">The player</param>
-        // /// <returns></returns>
-        // [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        // internal static Square GetFlip(int fileIndex, Player player) => Flip[player.Side, fileIndex];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Square RelativeSquare(this Squares sq, Player c) => (int)sq ^ (c.Side * 56);

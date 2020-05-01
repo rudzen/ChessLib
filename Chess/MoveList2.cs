@@ -156,7 +156,7 @@ namespace Rudz.Chess
             }
 
             // Promotions and underpromotions
-            if (!pawnsOn7.IsEmpty && (type != MoveGenerationType.Evasions || !(target & rank8Bb).IsEmpty))
+            if (!pawnsOn7.IsEmpty)// && (type != MoveGenerationType.Evasions || !(target & rank8Bb).IsEmpty))
             {
                 switch (type)
                 {
@@ -243,7 +243,14 @@ namespace Rudz.Chess
                         continue;
                 }
 
+                var ksq = pos.GetPieceSquare(PieceTypes.King, ~pos.SideToMove);
+
                 var b = pos.GetAttacks(from, pt) & target;
+
+                if (b & ksq)
+                {
+                    var f = pos.GenerateFen().ToString();
+                }
 
                 if (checks)
                     b &= pos.CheckedSquares(pt);
@@ -266,7 +273,7 @@ namespace Rudz.Chess
             for (var pt = PieceTypes.Knight; pt <= PieceTypes.Queen; ++pt)
                 index = GenerateMoves(pos, moves, index, us, target, pt, checks);
 
-            if (type == MoveGenerationType.QuietChecks || type == MoveGenerationType.Evasions)
+            if (checks || type == MoveGenerationType.Evasions)
                 return index;
             
             var ksq = pos.GetPieceSquare(PieceTypes.King, us);
@@ -304,14 +311,14 @@ namespace Rudz.Chess
         private static int GenerateCapturesQuietsNonEvasions(IPosition pos, Span<ExtMove> moves, int index, MoveGenerationType type)
         {
             Debug.Assert(type == MoveGenerationType.Captures || type == MoveGenerationType.Quiets || type == MoveGenerationType.NonEvasions);
-            Debug.Assert(pos.Checkers().IsEmpty);
+            Debug.Assert(pos.Checkers.IsEmpty);
             var us = pos.SideToMove;
             var target = type switch
             {
                 MoveGenerationType.Captures => pos.Pieces(~us),
                 MoveGenerationType.Quiets => ~pos.Pieces(),
                 MoveGenerationType.NonEvasions => ~pos.Pieces(us),
-                _ => 0
+                _ => BitBoard.Empty
             };
             
             return GenerateAll(pos, moves, index, target, us, type);
@@ -321,11 +328,11 @@ namespace Rudz.Chess
         /// check. Returns a pointer to the end of the move list.
         private static int GenerateEvasions(IPosition pos, Span<ExtMove> moves, int index)
         {
-            Debug.Assert(!pos.Checkers().IsEmpty);
+            Debug.Assert(!pos.Checkers.IsEmpty);
             var us = pos.SideToMove;
             var ksq = pos.GetPieceSquare(PieceTypes.King, us);
             var sliderAttacks = BitBoard.Empty;
-            var sliders = pos.Checkers() & ~pos.Pieces(PieceTypes.Pawn, PieceTypes.Knight);
+            var sliders = pos.Checkers & ~pos.Pieces(PieceTypes.Pawn, PieceTypes.Knight);
             Square checksq;
 
             // Find all the squares attacked by slider checkers. We will remove them from
@@ -342,11 +349,11 @@ namespace Rudz.Chess
             while (!b.IsEmpty)
                 moves[index++].Move = Move.MakeMove(ksq, BitBoards.PopLsb(ref b));
 
-            if (pos.Checkers().MoreThanOne())
+            if (pos.Checkers.MoreThanOne())
                 return index; // Double check, only a king move can save the day
 
             // Generate blocking evasions or captures of the checking piece
-            checksq = pos.Checkers().Lsb();
+            checksq = pos.Checkers.Lsb();
             var target = checksq.BitboardBetween(ksq) | checksq.BitBoardSquare();
 
             return GenerateAll(pos, moves, index, target, us, MoveGenerationType.Evasions);
@@ -360,7 +367,7 @@ namespace Rudz.Chess
             var pinned = pos.BlockersForKing(us) & pos.Pieces(us);// pos.PinnedPieces(pos.SideToMove);
             var ksq = pos.GetPieceSquare(PieceTypes.King, us);
             
-            var end = !pos.Checkers().IsEmpty
+            var end = !pos.Checkers.IsEmpty
                 ? GenerateEvasions(pos, moves, index)
                 : Generate(pos, moves, index, MoveGenerationType.NonEvasions);
             
@@ -377,7 +384,7 @@ namespace Rudz.Chess
         /// underpromotions that give check. Returns a pointer to the end of the move list.
         private static int GenerateQuietChecks(IPosition pos, Span<ExtMove> moves, int index)
         {
-            Debug.Assert(pos.Checkers().IsEmpty);
+            Debug.Assert(pos.Checkers.IsEmpty);
             var us = pos.SideToMove;
             var dc = pos.BlockersForKing(~us) & pos.Pieces(us);
             
