@@ -131,7 +131,7 @@ namespace Rudz.Chess.Types
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static BitBoard operator &(BitBoard left, Square right)
-            => left.Value & right.BitBoardSquare();
+            => left.Value & right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static BitBoard operator &(Square left, BitBoard right)

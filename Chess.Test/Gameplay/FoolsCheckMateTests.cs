@@ -24,14 +24,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using Rudz.Chess.Factories;
-
 namespace Chess.Test.Gameplay
 {
-    using System.Collections.Generic;
     using Rudz.Chess;
     using Rudz.Chess.Enums;
+    using Rudz.Chess.Factories;
     using Rudz.Chess.Types;
+    using System.Collections.Generic;
     using Xunit;
 
     public sealed class FoolsCheckMateTests
@@ -52,7 +51,7 @@ namespace Chess.Test.Gameplay
             var game = GameFactory.Create(position);
             game.NewGame();
             var state = new State();
-            
+
             // make the moves necessary to create a mate
             foreach (var move in moves)
                 position.MakeMove(move, state);
@@ -61,10 +60,10 @@ namespace Chess.Test.Gameplay
             Assert.True(position.State.InCheck);
 
             var b = position.GenerateFen().Fen.ToString();
-            
+
             var moveList = position.GenerateMoves();
             var resultingMoves = moveList.GetMoves();
-            
+
             // verify that no legal moves actually exists.
             Assert.True(resultingMoves.IsEmpty);
         }

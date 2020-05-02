@@ -101,6 +101,8 @@ namespace Rudz.Chess
         
         Square GetPieceSquare(PieceTypes pt, Player color);
 
+        Square GetKingSquare(Player color);
+
         Piece MovedPiece(Move m);
         
         bool PieceOnFile(Square square, Player side, PieceTypes pieceType);

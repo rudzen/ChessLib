@@ -48,11 +48,11 @@ namespace Rudz.Chess
         public CastlelingRights CastlelingRights { get; set; }
 
         public Square EnPassantSquare { get; set; }
-        
+
         public Piece CapturedPiece { get; set; }
-        
+
         public BitBoard[] BlockersForKing { get; set; }
-        
+
         public BitBoard[] Pinners { get; set; }
 
         /// <summary>
@@ -61,7 +61,7 @@ namespace Rudz.Chess
         public BitBoard Checkers { get; set; }
 
         public BitBoard[] CheckedSquares { get; set; }
-        
+
         public bool InCheck { get; set; }
 
         public State Previous { get; set; }
@@ -69,8 +69,7 @@ namespace Rudz.Chess
         public int Repetition { get; set; }
 
         /// <summary>
-        /// Partial copy from existing state
-        /// The properties not copied are re-calculated
+        /// Partial copy from existing state The properties not copied are re-calculated
         /// </summary>
         /// <param name="other">The current state</param>
         public State(State other)
@@ -82,10 +81,10 @@ namespace Rudz.Chess
             EnPassantSquare = other.EnPassantSquare;
 
             Previous = other;
-            
+
             Material = new Material();
             Material.CopyFrom(other.Material);
-            
+
             CheckedSquares = new BitBoard[PieceTypes.PieceTypeNb.AsInt()];
             Pinners = new BitBoard[2];
             BlockersForKing = new BitBoard[2];

@@ -121,9 +121,9 @@ namespace Chess.Test.Move
 
                 if (expected != actual)
                 {
-                    
+                    var a = 1;
                 }
-                
+
                 Assert.Equal(expected, actual);
             }
         }

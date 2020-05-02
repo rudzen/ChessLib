@@ -45,7 +45,7 @@ namespace Rudz.Chess
         private readonly StringBuilder _output;
 
         private static readonly IDictionary<(HashKey, int), ulong> _perftCache;
-        
+
         public Game(IPosition pos)
         {
             Pos = pos;
@@ -146,33 +146,30 @@ namespace Rudz.Chess
             var ml = Pos.GenerateMoves();
 
             if (depth == 1)
-                return (ulong) ml.GetMoves().Length;
-            
+                return (ulong)ml.GetMoves().Length;
+
             var key = Pos.State.Key;
-            
+
             var tot = 0ul;
-            // if (_perftCache.TryGetValue((key, depth), out var tot))
-            //     return tot;
-            
-            // var posKey = Pos.State.Key;
-            // var (found, entry) = Table.Probe(posKey);
-            // if (found && entry.Depth == depth && entry.Key32 == posKey.UpperKey)
-            //     return (ulong)entry.Value;
-            
+            // if (_perftCache.TryGetValue((key, depth), out var tot)) return tot;
+
+            // var posKey = Pos.State.Key; var (found, entry) = Table.Probe(posKey); if (found &&
+            // entry.Depth == depth && entry.Key32 == posKey.UpperKey) return (ulong)entry.Value;
+
             var move = Move.EmptyMove;
-            
+
             if (depth == 3)
             {
                 var f = Pos.GenerateFen().Fen.ToString();
             }
-            
-            var state = new State();
-            
+
             var moves = ml.GetMoves();
             foreach (var m in moves)
             {
-                // Console.WriteLine($"{depth}:{m.Move}");
-                // Console.WriteLine($"{depth}:Before MakeMove: {Pos.GenerateFen().Fen.ToString()}");
+                var state = new State();
+                
+                // Console.WriteLine($"{depth}:{m.Move}"); Console.WriteLine($"{depth}:Before
+                // MakeMove: {Pos.GenerateFen().Fen.ToString()}");
                 Pos.MakeMove(m.Move, state);
                 // Console.WriteLine($"{depth}:After MakeMove: {Pos.GenerateFen().Fen.ToString()}");
                 move = m;
@@ -181,12 +178,12 @@ namespace Rudz.Chess
                 Pos.TakeMove(m);
                 // Console.WriteLine($"{depth}:After TakeMove: {Pos.GenerateFen().Fen.ToString()}");
             }
-            
+
             // _perftCache.Add((key, depth), tot);
-            
-            // if (!move.IsNullMove() && tot <= int.MaxValue)
-            //     Table.Store(posKey, (int)tot, Bound.Exact, (sbyte)depth, move, 0);
-            
+
+            // if (!move.IsNullMove() && tot <= int.MaxValue) Table.Store(posKey, (int)tot,
+            // Bound.Exact, (sbyte)depth, move, 0);
+
             return tot;
         }
 
