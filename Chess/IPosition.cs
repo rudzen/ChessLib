@@ -49,7 +49,7 @@ namespace Rudz.Chess
         
         string FenNotation { get; }
         
-        Board Board { get; }
+        IBoard Board { get; }
         
         BitBoard Checkers { get; }
         

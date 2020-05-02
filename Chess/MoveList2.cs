@@ -343,7 +343,7 @@ namespace Rudz.Chess
             while (!sliders.IsEmpty)
             {
                 checksq = BitBoards.PopLsb(ref sliders);
-                sliderAttacks |= checksq.Line(ksq) ^ checksq.BitBoardSquare();
+                sliderAttacks |= checksq.Line(ksq) ^ checksq;
             }
 
             // Generate evasions for king, capture and non capture moves
@@ -356,17 +356,23 @@ namespace Rudz.Chess
 
             // Generate blocking evasions or captures of the checking piece
             checksq = pos.Checkers.Lsb();
-            var target = checksq.BitboardBetween(ksq) | checksq.BitBoardSquare();
+            var target = checksq.BitboardBetween(ksq) | checksq;
 
             return GenerateAll(pos, moves, index, target, us, MoveGenerationType.Evasions);
         }
 
-        /// generate<LEGAL> generates all the legal moves in the given position
+        /// <summary>
+        /// Generates all the legal moves in the given position
+        /// </summary>
+        /// <param name="pos"></param>
+        /// <param name="moves"></param>
+        /// <param name="index"></param>
+        /// <returns></returns>
         private static int GenerateLegal(IPosition pos, Span<ExtMove> moves, int index)
         {
             var cur = index;
             var us = pos.SideToMove;
-            var pinned = pos.BlockersForKing(us) & pos.Pieces(us);// pos.PinnedPieces(pos.SideToMove);
+            var pinned = pos.BlockersForKing(us) & pos.Pieces(us);
             var ksq = pos.GetKingSquare(us);
 
             var end = pos.State.InCheck

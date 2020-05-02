@@ -24,6 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using System.Runtime.Versioning;
+using Perft;
 using Rudz.Chess.Factories;
 
 namespace Chess.Test.FEN
@@ -37,8 +39,9 @@ namespace Chess.Test.FEN
         [Fact]
         public void SetFenTest()
         {
+            
             var expected = new FenError(0, 0);
-            var position = new Position();
+            var position = new Position(new Board());
             var game = GameFactory.Create(position);
             var actual = game.NewGame();
 

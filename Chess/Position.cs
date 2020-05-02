@@ -52,11 +52,11 @@ namespace Rudz.Chess
         private Player _sideToMove;
         private int _ply;
 
-        private readonly Board _board;
-
-        public Position()
+        private readonly IBoard _board;
+        
+        public Position(IBoard board)
         {
-            _board = new Board();
+            _board = board;
             _stateStack = new List<State>(256);
             _castlingPath = new BitBoard[CastlelingRights.CastleRightsNb.AsInt()];
             _castlingRookSquare = new Square[CastlelingRights.CastleRightsNb.AsInt()];
@@ -85,7 +85,7 @@ namespace Rudz.Chess
         public string FenNotation
             => GenerateFen().ToString();
 
-        public Board Board
+        public IBoard Board
             => _board;
 
         public BitBoard Checkers
@@ -126,6 +126,11 @@ namespace Rudz.Chess
 
         public void MakeMove(Move m, State newState)
         {
+            if (m.GetFromSquare() == Enums.Squares.d1 && m.GetToSquare() == Enums.Squares.a4 && (GetAttacks(Enums.Squares.a4, PieceTypes.Queen) & GetKingSquare(~_sideToMove)) != 0)
+            {
+                var a = 1;
+            }
+            
             var givesCheck = GivesCheck(m);
             MakeMove(m, newState, givesCheck);
         }
@@ -402,10 +407,7 @@ namespace Rudz.Chess
                   | sq.XrayRookAttacks(pieces, ourPieces) & (Pieces(PieceTypes.Rook, them) | opponentQueens);
 
             while (pinners)
-            {
-                pinnedPieces |= pinners.Lsb().BitboardBetween(sq) & ourPieces;
-                pinners--;
-            }
+                pinnedPieces |= BitBoards.PopLsb(ref pinners).BitboardBetween(sq) & ourPieces;
 
             return pinnedPieces;
         }
@@ -449,7 +451,7 @@ namespace Rudz.Chess
             }
 
             // Is there a direct check?
-            if (!(State.CheckedSquares[pt.AsInt()] & from).IsEmpty)
+            if (!(State.CheckedSquares[pt.AsInt()] & to).IsEmpty)
                 return true;
 
             var us = _sideToMove;
@@ -729,14 +731,14 @@ namespace Rudz.Chess
             var to = m.GetToSquare();
             var ksq = GetKingSquare(us);
 
-            var movedPiece = MovedPiece(m);
+            // var movedPiece = MovedPiece(m);
+            //
+            // if (movedPiece.ColorOf() != us)
+            // {
+            //     movedPiece = Enums.Pieces.BlackBishop;
+            // }
 
-            if (movedPiece.ColorOf() != us)
-            {
-                movedPiece = Enums.Pieces.BlackBishop;
-            }
-
-            Debug.Assert(movedPiece.ColorOf() == us);
+            // Debug.Assert(movedPiece.ColorOf() == us);
             Debug.Assert(GetPiece(GetKingSquare(us)) == PieceTypes.King.MakePiece(us));
 
             // En passant captures are a tricky special case. Because they are rather uncommon, we
@@ -1033,10 +1035,9 @@ namespace Rudz.Chess
             var pieces = Pieces();
             while (pieces)
             {
-                var sq = pieces.Lsb();
+                var sq = BitBoards.PopLsb(ref pieces);
                 var pc = GetPiece(sq);
                 result ^= pc.GetZobristPst(sq);
-                BitBoards.ResetLsb(ref pieces);
             }
 
             return result;
@@ -1050,10 +1051,9 @@ namespace Rudz.Chess
             var pieces = Pieces(PieceTypes.Pawn);
             while (pieces)
             {
-                var sq = pieces.Lsb();
+                var sq = BitBoards.PopLsb(ref pieces);
                 var pc = GetPiece(sq);
                 result ^= pc.GetZobristPst(sq);
-                BitBoards.ResetLsb(ref pieces);
             }
 
             return result;

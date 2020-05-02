@@ -102,7 +102,7 @@ namespace Rudz.Chess
             {
                 _killerMoves[i, 0].Piece = Piece.EmptyPiece;
                 _killerMoves[i, 0].Square = Square.None;
-                _killerMoves[i, 1].Piece = Piece.EmptyPiecee;
+                _killerMoves[i, 1].Piece = Piece.EmptyPiece;
                 _killerMoves[i, 1].Square = Square.None;
             }
         }

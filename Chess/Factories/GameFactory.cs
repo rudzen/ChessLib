@@ -42,7 +42,7 @@ namespace Rudz.Chess.Factories
 
         public static IGame Create()
         {
-            return new Game(new Position());
+            return new Game(new Position(new Board()));
         }
     }
 }

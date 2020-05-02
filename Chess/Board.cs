@@ -9,7 +9,7 @@ using Rudz.Chess.Types;
 
 namespace Rudz.Chess
 {
-    public sealed class Board : IEnumerable<Piece>
+    public sealed class Board : IBoard
     {
         #region base piece information
 

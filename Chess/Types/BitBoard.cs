@@ -223,10 +223,7 @@ namespace Rudz.Chess.Types
 
             BitBoard bb = Value;
             while (bb)
-            {
-                yield return bb.Lsb();
-                BitBoards.ResetLsb(ref bb);
-            }
+                yield return BitBoards.PopLsb(ref bb);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
