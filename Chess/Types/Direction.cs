@@ -34,13 +34,10 @@ namespace Rudz.Chess.Types
         public Directions Value { get; }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Direction(Directions d) => Value = d;
+        private Direction(Directions d) => Value = d;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Direction(int d) => Value = (Directions)d;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Direction(Direction d) => Value = d.Value;
+        private Direction(int d) => Value = (Directions)d;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator Direction(int value) => new Direction(value);
@@ -90,6 +87,6 @@ namespace Rudz.Chess.Types
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override int GetHashCode() => AsInt();
 
-        public int AsInt() => (int) Value;
+        private int AsInt() => (int) Value;
     }
 }

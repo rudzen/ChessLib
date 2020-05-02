@@ -60,7 +60,7 @@ namespace Rudz.Chess.Types
         public static bool IsDark(this Square s) => (s & BitBoards.DarkSquares) != 0;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static char RankChar(this Square s) => s.Rank().RankChar();
+        public static char RankChar(this Square s) => s.Rank().Char;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static char FileChar(this Square s) => s.File().FileChar();

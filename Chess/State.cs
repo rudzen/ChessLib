@@ -103,7 +103,7 @@ namespace Rudz.Chess
             CapturedPiece = Piece.EmptyPiece;
         }
 
-        public void CopyTo(State other, Move lastMove)
+        public State CopyTo(State other, Move lastMove)
         {
             // copy over preserved values
             other.PawnStructureKey = PawnStructureKey;
@@ -122,6 +122,8 @@ namespace Rudz.Chess
             other.CheckedSquares = new BitBoard[PieceTypes.PieceTypeNb.AsInt()];
             other.Pinners = new BitBoard[2];
             other.BlockersForKing = new BitBoard[2];
+
+            return other;
         }
 
         public void Clear()

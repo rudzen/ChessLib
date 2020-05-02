@@ -92,7 +92,7 @@ namespace Rudz.Chess
                 ? PieceTypes.Pawn.MakePiece(pos.SideToMove)
                 : pos.GetPiece(move.GetToSquare());
             
-            if (capturedPiece != Pieces.NoPiece)
+            if (capturedPiece != Piece.EmptyPiece)
                 Remove(capturedPiece);
 
             if (move.IsPromotionMove())

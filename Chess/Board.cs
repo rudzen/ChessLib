@@ -66,7 +66,7 @@ namespace Rudz.Chess
             => _pieces[sq.AsInt()];
 
         public bool IsEmpty(Square sq)
-            => _pieces[sq.AsInt()] == Enums.Pieces.NoPiece;
+            => _pieces[sq.AsInt()] == Piece.EmptyPiece;
 
         public void AddPiece(Piece pc, Square sq)
         {
@@ -159,7 +159,7 @@ namespace Rudz.Chess
 
         public IEnumerator<Piece> GetEnumerator()
         {
-            return _pieces.Where(piece => piece != Enums.Pieces.NoPiece).GetEnumerator();
+            return _pieces.Where(piece => piece != Piece.EmptyPiece).GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()

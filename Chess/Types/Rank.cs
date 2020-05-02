@@ -31,6 +31,8 @@ namespace Rudz.Chess.Types
 
     public readonly struct Rank
     {
+        private static readonly char[] RankChars = { '1', '2', '3', '4', '5', '6', '7', '8' };
+
         private readonly Ranks _value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -42,6 +44,8 @@ namespace Rudz.Chess.Types
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Rank(Rank file) => _value = file._value;
 
+        public char Char => RankChars[AsInt()];
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator Rank(int value) => new Rank(value);
 

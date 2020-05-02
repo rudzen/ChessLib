@@ -132,8 +132,7 @@ namespace Rudz.Chess
 
         public void MakeMove(Move m, State newState, bool givesCheck)
         {
-            State.CopyTo(newState, m);
-            State = newState;
+            State = State.CopyTo(newState, m);
 
             // StateAdd(State);
 
@@ -155,7 +154,7 @@ namespace Rudz.Chess
                 : GetPiece(to);
 
             Debug.Assert(pc.ColorOf() == us);
-            //Debug.Assert(capturedPiece == Enums.Pieces.NoPiece || capturedPiece.ColorOf() == (!m.IsCastlelingMove() ? them : us));
+            Debug.Assert(capturedPiece == Piece.EmptyPiece || capturedPiece.ColorOf() == (!m.IsCastlelingMove() ? them : us));
             Debug.Assert(capturedPiece.Type() != PieceTypes.King);
 
             if (m.IsCastlelingMove())
@@ -168,10 +167,10 @@ namespace Rudz.Chess
                 k ^= capturedPiece.GetZobristPst(rookFrom) ^ capturedPiece.GetZobristPst(rookTo);
 
                 // reset captured piece type as castleling is "king-captures-rook"
-                capturedPiece = Enums.Pieces.NoPiece;
+                capturedPiece = Piece.EmptyPiece;
             }
 
-            if (capturedPiece != Enums.Pieces.NoPiece)
+            if (capturedPiece != Piece.EmptyPiece)
             {
                 var captureSquare = to;
 
@@ -344,7 +343,7 @@ namespace Rudz.Chess
             {
                 MovePiece(to, from);
 
-                if (State.CapturedPiece != Enums.Pieces.NoPiece)
+                if (State.CapturedPiece != Piece.EmptyPiece)
                 {
                     var captureSquare = to;
 
@@ -576,13 +575,11 @@ namespace Rudz.Chess
         {
             _board.RemovePiece(sq);
             if (!IsProbing)
-                PieceUpdated?.Invoke(Enums.Pieces.NoPiece, sq);
+                PieceUpdated?.Invoke(Piece.EmptyPiece, sq);
         }
 
         public BitBoard AttacksTo(Square sq, BitBoard occupied)
         {
-            // TODO : needs testing
-
             Debug.Assert(sq >= Enums.Squares.a1 && sq <= Enums.Squares.h8);
 
             return (sq.PawnAttack(Player.White) & _board.Pieces(Player.Black, PieceTypes.Pawn))
@@ -671,7 +668,7 @@ namespace Rudz.Chess
 
             // If the from square is not occupied by a piece belonging to the side to move, the move
             // is obviously not legal.
-            if (pc == Enums.Pieces.NoPiece || pc.ColorOf() != us)
+            if (pc == Piece.EmptyPiece || pc.ColorOf() != us)
                 return false;
 
             // The destination square cannot be occupied by a friendly piece
@@ -752,7 +749,7 @@ namespace Rudz.Chess
                 Debug.Assert(to == EnPassantSquare);
                 Debug.Assert(MovedPiece(m) == PieceTypes.Pawn.MakePiece(us));
                 Debug.Assert(GetPiece(capsq) == PieceTypes.Pawn.MakePiece(~us));
-                Debug.Assert(GetPiece(to) == Enums.Pieces.NoPiece);
+                Debug.Assert(GetPiece(to) == Piece.EmptyPiece);
 
                 return (GetAttacks(ksq, PieceTypes.Rook, occ) & Pieces(PieceTypes.Rook, PieceTypes.Queen, ~us)).IsEmpty
                     && (GetAttacks(ksq, PieceTypes.Bishop, occ) & Pieces(PieceTypes.Bishop, PieceTypes.Queen, ~us)).IsEmpty;

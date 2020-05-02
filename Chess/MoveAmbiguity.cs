@@ -101,7 +101,7 @@ namespace Rudz.Chess
                 else
                 {
                     var capturedPiece = _pos.GetPiece(to);
-                    if (capturedPiece != Pieces.NoPiece)
+                    if (capturedPiece != Piece.EmptyPiece)
                     {
                         if (pt == PieceTypes.Pawn)
                             notation.Append(from.FileChar());
@@ -151,7 +151,7 @@ namespace Rudz.Chess
                 else
                 {
                     var capturedPiece = _pos.GetPiece(to);
-                    if (capturedPiece != Pieces.NoPiece)
+                    if (capturedPiece != Piece.EmptyPiece)
                     {
                         if (pt == PieceTypes.Pawn)
                             notation.Append(from.FileChar());
@@ -201,7 +201,7 @@ namespace Rudz.Chess
                 else
                 {
                     var capturedPiece = _pos.GetPiece(to);
-                    if (capturedPiece != Pieces.NoPiece)
+                    if (capturedPiece != Piece.EmptyPiece)
                     {
                         if (pt == PieceTypes.Pawn)
                             notation.Append(from.FileChar());
@@ -253,7 +253,7 @@ namespace Rudz.Chess
                 else
                 {
                     var capturedPiece = _pos.GetPiece(to);
-                    if (capturedPiece != Pieces.NoPiece)
+                    if (capturedPiece != Piece.EmptyPiece)
                     {
                         if (pt == PieceTypes.Pawn)
                             notation.Append(from.FileChar());
