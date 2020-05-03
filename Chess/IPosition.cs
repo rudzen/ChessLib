@@ -39,8 +39,6 @@ namespace Rudz.Chess
 
         Action<Piece, Square> PieceUpdated { get; set; }
 
-        State State { get; set; }
-
         bool Chess960 { get; }
 
         Player SideToMove { get; }
@@ -52,6 +50,14 @@ namespace Rudz.Chess
         IBoard Board { get; }
         
         BitBoard Checkers { get; }
+        
+        int Rule50 { get; }
+        
+        int Ply { get; }
+        
+        bool InCheck { get; }
+
+        bool IsRepetition { get; }
         
         void Clear();
 

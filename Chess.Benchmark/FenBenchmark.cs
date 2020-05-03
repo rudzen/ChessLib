@@ -17,7 +17,8 @@ namespace Chess.Benchmark
         [GlobalSetup]
         public void Setup()
         {
-            var pos = new Position();
+            var board = new Board();
+            var pos = new Position(board);
             _game = new Game(pos);
         }
 

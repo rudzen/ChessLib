@@ -53,7 +53,8 @@ namespace Chess.Test.Move
             var expectedPrimary = $"{uniChar}{fromOneSquare.FileChar()}{toSquareString}";
             var expectedSecondary = $"{uniChar}{fromTwoSquare.FileChar()}{toSquareString}";
 
-            var pos = new Position();
+            var board = new Board();
+            var pos = new Position(board);
             var g = GameFactory.Create(pos);
             g.NewGame(fen);
 
@@ -88,7 +89,8 @@ namespace Chess.Test.Move
             var expectedPrimary = $"{uniChar}{fromOneSquare.FileChar()}{toSquareString}";
             var expectedSecondary = $"{uniChar}{fromTwoSquare.FileChar()}{toSquareString}";
 
-            var pos = new Position();
+            var board = new Board();
+            var pos = new Position(board);
             var g = GameFactory.Create(pos);
             g.NewGame(fen);
 
@@ -123,7 +125,8 @@ namespace Chess.Test.Move
             var expectedPrimary = $"{uniChar}{fromOneSquare.RankChar()}{toSquareString}";
             var expectedSecondary = $"{uniChar}{fromTwoSquare.RankChar()}{toSquareString}";
 
-            var pos = new Position();
+            var board = new Board();
+            var pos = new Position(board);
             var g = GameFactory.Create(pos);
             g.NewGame(fen);
 
@@ -158,7 +161,8 @@ namespace Chess.Test.Move
             var expectedPrimary = $"{uniChar}{fromOneSquare.FileChar()}{toSquareString}";
             var expectedSecondary = $"{uniChar}{fromTwoSquare.FileChar()}{toSquareString}";
 
-            var pos = new Position();
+            var board = new Board();
+            var pos = new Position(board);
             var g = GameFactory.Create(pos);
             g.NewGame(fen);
 
@@ -193,7 +197,8 @@ namespace Chess.Test.Move
             var expectedPrimary = $"{uniChar}{fromOneSquare.FileChar()}{toSquareString}";
             var expectedSecondary = $"{uniChar}{fromTwoSquare.FileChar()}{toSquareString}";
 
-            var pos = new Position();
+            var board = new Board();
+            var pos = new Position(board);
             var g = GameFactory.Create(pos);
             g.NewGame(fen);
 
@@ -228,7 +233,8 @@ namespace Chess.Test.Move
             var expectedPrimary = $"{uniChar}{fromOneSquare.RankChar()}{toSquareString}";
             var expectedSecondary = $"{uniChar}{fromTwoSquare.RankChar()}{toSquareString}";
 
-            var pos = new Position();
+            var board = new Board();
+            var pos = new Position(board);
             var g = GameFactory.Create(pos);
             g.NewGame(fen);
 
@@ -263,7 +269,8 @@ namespace Chess.Test.Move
             var expectedPrimary = $"{uniChar}{fromOneSquare.GetSquareString()}-{toSquareString}";
             var expectedSecondary = $"{uniChar}{fromTwoSquare.GetSquareString()}-{toSquareString}";
 
-            var pos = new Position();
+            var board = new Board();
+            var pos = new Position(board);
             var g = GameFactory.Create(pos);
             g.NewGame(fen);
 
@@ -298,7 +305,8 @@ namespace Chess.Test.Move
             var expectedPrimary = $"{uniChar}{fromOneSquare.GetSquareString()}-{toSquareString}";
             var expectedSecondary = $"{uniChar}{fromTwoSquare.GetSquareString()}-{toSquareString}";
 
-            var pos = new Position();
+            var board = new Board();
+            var pos = new Position(board);
             var g = GameFactory.Create(pos);
             g.NewGame(fen);
 
@@ -333,7 +341,8 @@ namespace Chess.Test.Move
             var expectedPrimary = $"{uniChar}{fromOneSquare.GetSquareString()}-{toSquareString}";
             var expectedSecondary = $"{uniChar}{fromTwoSquare.GetSquareString()}-{toSquareString}";
 
-            var pos = new Position();
+            var board = new Board();
+            var pos = new Position(board);
             var g = GameFactory.Create(pos);
             g.NewGame(fen);
 
@@ -368,7 +377,8 @@ namespace Chess.Test.Move
             var expectedPrimary = $"{uniChar}{fromOneSquare.GetSquareString()}-{toSquareString}";
             var expectedSecondary = $"{uniChar}{fromTwoSquare.GetSquareString()}-{toSquareString}";
 
-            var pos = new Position();
+            var board = new Board();
+            var pos = new Position(board);
             var g = GameFactory.Create(pos);
             g.NewGame(fen);
 
@@ -403,7 +413,8 @@ namespace Chess.Test.Move
             var expectedPrimary = $"{uniChar}{fromOneSquare.GetSquareString()}-{toSquareString}";
             var expectedSecondary = $"{uniChar}{fromTwoSquare.GetSquareString()}-{toSquareString}";
 
-            var pos = new Position();
+            var board = new Board();
+            var pos = new Position(board);
             var g = GameFactory.Create(pos);
             g.NewGame(fen);
 
@@ -438,7 +449,8 @@ namespace Chess.Test.Move
             var expectedPrimary = $"{uniChar}{fromOneSquare.GetSquareString()}-{toSquareString}";
             var expectedSecondary = $"{uniChar}{fromTwoSquare.GetSquareString()}-{toSquareString}";
 
-            var pos = new Position();
+            var board = new Board();
+            var pos = new Position(board);
             var g = GameFactory.Create(pos);
             g.NewGame(fen);
 

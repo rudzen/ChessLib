@@ -38,7 +38,7 @@ namespace Rudz.Chess
         public static MoveList2 GenerateMoves(this IPosition pos, MoveGenerationType type = MoveGenerationType.Legal)
         {
             var ml = new MoveList2();
-            if (type == MoveGenerationType.Legal && pos.State.InCheck)
+            if (type == MoveGenerationType.Legal && pos.InCheck)
                 type = MoveGenerationType.Evasions;
             ml.Generate(pos, type);
             return ml;

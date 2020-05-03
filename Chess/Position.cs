@@ -51,7 +51,8 @@ namespace Rudz.Chess
         private readonly List<State> _stateStack;
         private Player _sideToMove;
         private int _ply;
-
+        private State _state;
+        
         private readonly IBoard _board;
         
         public Position(IBoard board)
@@ -72,15 +73,13 @@ namespace Rudz.Chess
         /// </summary>
         public Action<Piece, Square> PieceUpdated { get; set; }
 
-        public State State { get; set; }
-
         public bool Chess960 { get; private set; }
 
         public Player SideToMove
             => _sideToMove;
 
         public Square EnPassantSquare
-            => State.EnPassantSquare;
+            => _state.EnPassantSquare;
 
         public string FenNotation
             => GenerateFen().ToString();
@@ -89,7 +88,15 @@ namespace Rudz.Chess
             => _board;
 
         public BitBoard Checkers
-            => State.Checkers;
+            => _state.Checkers;
+
+        public int Rule50 => _state.Rule50;
+
+        public int Ply => _ply;
+
+        public bool InCheck => _state.InCheck;
+
+        public bool IsRepetition => _state.Repetition >= 3;
 
         public void Clear()
         {
@@ -99,7 +106,7 @@ namespace Rudz.Chess
             _castlingRookSquare.Fill(Square.None);
             _sideToMove = Players.White;
             Chess960 = false;
-            State?.Clear();
+            _state?.Clear();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -137,15 +144,15 @@ namespace Rudz.Chess
 
         public void MakeMove(Move m, State newState, bool givesCheck)
         {
-            State = State.CopyTo(newState, m);
+            _state = _state.CopyTo(newState, m);
 
             // StateAdd(State);
 
-            var k = State.Key ^ Zobrist.GetZobristSide();
+            var k = _state.Key ^ Zobrist.GetZobristSide();
 
             _ply++;
-            State.Rule50++;
-            State.PliesFromNull++;
+            _state.Rule50++;
+            _state.PliesFromNull++;
 
             var us = _sideToMove;
             var them = ~us;
@@ -186,13 +193,13 @@ namespace Rudz.Chess
                         captureSquare -= us.PawnPushDistance();
 
                         Debug.Assert(pt == PieceTypes.Pawn);
-                        Debug.Assert(to == State.EnPassantSquare);
+                        Debug.Assert(to == _state.EnPassantSquare);
                         Debug.Assert(to.RelativeRank(us) == Ranks.Rank6);
                         Debug.Assert(!IsOccupied(to));
                         Debug.Assert(GetPiece(captureSquare) == pt.MakePiece(them));
                     }
 
-                    State.PawnStructureKey ^= capturedPiece.GetZobristPst(captureSquare);
+                    _state.PawnStructureKey ^= capturedPiece.GetZobristPst(captureSquare);
                 }
                 else
                 {
@@ -209,25 +216,25 @@ namespace Rudz.Chess
                 // TODO : Update other depending keys and psq values here
 
                 // Reset rule 50 counter
-                State.Rule50 = 0;
+                _state.Rule50 = 0;
             }
 
             // update key with moved piece
             k ^= pc.GetZobristPst(from) ^ pc.GetZobristPst(to);
 
             // reset en-passant square if it is set
-            if (State.EnPassantSquare != Square.None)
+            if (_state.EnPassantSquare != Square.None)
             {
-                k ^= State.EnPassantSquare.File().GetZobristEnPessant();
-                State.EnPassantSquare = Square.None;
+                k ^= _state.EnPassantSquare.File().GetZobristEnPessant();
+                _state.EnPassantSquare = Square.None;
             }
 
             // Update castling rights if needed
-            if (State.CastlelingRights != CastlelingRights.None && (_castlingRightsMask[from.AsInt()] | _castlingRightsMask[to.AsInt()]) != 0)
+            if (_state.CastlelingRights != CastlelingRights.None && (_castlingRightsMask[from.AsInt()] | _castlingRightsMask[to.AsInt()]) != 0)
             {
                 var cr = _castlingRightsMask[from.AsInt()] | _castlingRightsMask[to.AsInt()];
-                k ^= (State.CastlelingRights & cr).GetZobristCastleling();
-                State.CastlelingRights &= ~cr;
+                k ^= (_state.CastlelingRights & cr).GetZobristCastleling();
+                _state.CastlelingRights &= ~cr;
             }
 
             // Move the piece. The tricky Chess960 castle is handled earlier
@@ -241,8 +248,8 @@ namespace Rudz.Chess
                 if (((int)to.Value ^ (int)from.Value) == 16
                     && !((to - us.PawnPushDistance()).PawnAttack(us) & Pieces(PieceTypes.Pawn, them)).IsEmpty)
                 {
-                    State.EnPassantSquare = to - us.PawnPushDistance();
-                    k ^= State.EnPassantSquare.File().GetZobristEnPessant();
+                    _state.EnPassantSquare = to - us.PawnPushDistance();
+                    k ^= _state.EnPassantSquare.File().GetZobristEnPessant();
                 }
                 else if (m.IsPromotionMove())
                 {
@@ -256,16 +263,16 @@ namespace Rudz.Chess
 
                     // Update hash keys
                     k ^= pc.GetZobristPst(to) ^ promotionPiece.GetZobristPst(to);
-                    State.PawnStructureKey ^= pc.GetZobristPst(to);
+                    _state.PawnStructureKey ^= pc.GetZobristPst(to);
 
                     // TODO : Update values and other keys here
                 }
 
                 // Update pawn hash key
-                State.PawnStructureKey ^= pc.GetZobristPst(from) ^ pc.GetZobristPst(to);
+                _state.PawnStructureKey ^= pc.GetZobristPst(from) ^ pc.GetZobristPst(to);
 
                 // Reset rule 50 draw counter
-                State.Rule50 = 0;
+                _state.Rule50 = 0;
             }
 
             // TODO : Update piece values here
@@ -279,18 +286,18 @@ namespace Rudz.Chess
             }
 
             // Update state properties
-            State.Key = k;
-            State.CapturedPiece = capturedPiece;
+            _state.Key = k;
+            _state.CapturedPiece = capturedPiece;
 
             var ksq = GetKingSquare(them);
 
-            State.Checkers = AttacksTo(ksq) & Pieces(us);// givesCheck ? AttacksTo(ksq) & Pieces(us) : BitBoard.Empty;
-            State.InCheck = !State.Checkers.IsEmpty;
+            _state.Checkers = AttacksTo(ksq) & Pieces(us);// givesCheck ? AttacksTo(ksq) & Pieces(us) : BitBoard.Empty;
+            _state.InCheck = !_state.Checkers.IsEmpty;
 
             _sideToMove = ~_sideToMove;
 
-            SetCheckInfo(State);
-            UpdateRepetition(State);
+            SetCheckInfo(_state);
+            UpdateRepetition(_state);
         }
 
         private static void UpdateRepetition(State state)
@@ -329,7 +336,7 @@ namespace Rudz.Chess
             var pc = GetPiece(to);
 
             Debug.Assert(!IsOccupied(from) || m.IsCastlelingMove());
-            Debug.Assert(State.CapturedPiece.Type() != PieceTypes.King);
+            Debug.Assert(_state.CapturedPiece.Type() != PieceTypes.King);
 
             if (m.IsPromotionMove())
             {
@@ -348,7 +355,7 @@ namespace Rudz.Chess
             {
                 MovePiece(to, from);
 
-                if (State.CapturedPiece != Piece.EmptyPiece)
+                if (_state.CapturedPiece != Piece.EmptyPiece)
                 {
                     var captureSquare = to;
 
@@ -358,12 +365,12 @@ namespace Rudz.Chess
                         captureSquare -= us.PawnPushDistance();
 
                         Debug.Assert(pc.Type() == PieceTypes.Pawn);
-                        Debug.Assert(to == State.Previous.EnPassantSquare);
+                        Debug.Assert(to == _state.Previous.EnPassantSquare);
                         Debug.Assert(to.RelativeRank(us) == Ranks.Rank6);
                         Debug.Assert(!IsOccupied(captureSquare));
                     }
 
-                    AddPiece(State.CapturedPiece, captureSquare);
+                    AddPiece(_state.CapturedPiece, captureSquare);
                 }
             }
 
@@ -371,7 +378,7 @@ namespace Rudz.Chess
             Debug.Assert(GetKingSquare(us).IsOk());
 
             // Set state to previous state
-            State = State.Previous;
+            _state = _state.Previous;
             _ply--;
         }
 
@@ -413,13 +420,13 @@ namespace Rudz.Chess
         }
 
         public BitBoard CheckedSquares(PieceTypes pt)
-            => State.CheckedSquares[pt.AsInt()];
+            => _state.CheckedSquares[pt.AsInt()];
 
         public BitBoard PinnedPieces(Player c)
-            => State.Pinners[c.Side];
+            => _state.Pinners[c.Side];
 
         public BitBoard BlockersForKing(Player c)
-            => State.BlockersForKing[c.Side];
+            => _state.BlockersForKing[c.Side];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool IsOccupied(Square sq)
@@ -445,20 +452,20 @@ namespace Rudz.Chess
             if (isKingTarget)
             {
                 var a = 1;
-                var checkedSquares = State.CheckedSquares[pt.AsInt()];
+                var checkedSquares = _state.CheckedSquares[pt.AsInt()];
                 var cTo = to.BitBoardSquare();
-                var isDirectCheck = State.CheckedSquares[pt.AsInt()] & from.BitBoardSquare();
+                var isDirectCheck = _state.CheckedSquares[pt.AsInt()] & from.BitBoardSquare();
             }
 
             // Is there a direct check?
-            if (!(State.CheckedSquares[pt.AsInt()] & to).IsEmpty)
+            if (!(_state.CheckedSquares[pt.AsInt()] & to).IsEmpty)
                 return true;
 
             var us = _sideToMove;
             var them = ~us;
 
             // Is there a discovered check?
-            if (!(State.BlockersForKing[them.Side] & from).IsEmpty
+            if (!(_state.BlockersForKing[them.Side] & from).IsEmpty
                    && !from.Aligned(to, GetKingSquare(them)))
                 return true;
 
@@ -623,12 +630,12 @@ namespace Rudz.Chess
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool CanCastle(CastlelingRights cr)
-            => State.CastlelingRights.HasFlagFast(cr);
+            => _state.CastlelingRights.HasFlagFast(cr);
 
         public bool CanCastle(Player color)
         {
             var c = (CastlelingRights)((int)(CastlelingRights.WhiteOo | CastlelingRights.WhiteOoo) << (2 * color.Side));
-            return State.CastlelingRights.HasFlagFast(c);
+            return _state.CastlelingRights.HasFlagFast(c);
         }
 
         public bool CastlingImpeded(CastlelingRights cr)
@@ -815,7 +822,7 @@ namespace Rudz.Chess
 
             sb.Append(_sideToMove.IsWhite ? " w " : " b ");
 
-            var castleRights = State.CastlelingRights;
+            var castleRights = _state.CastlelingRights;
 
             if (castleRights != CastlelingRights.None)
             {
@@ -858,14 +865,14 @@ namespace Rudz.Chess
 
             sb.Append(' ');
 
-            if (State.EnPassantSquare == Square.None)
+            if (_state.EnPassantSquare == Square.None)
                 sb.Append('-');
             else
-                sb.Append(State.EnPassantSquare.ToString());
+                sb.Append(_state.EnPassantSquare.ToString());
 
             sb.Append(' ');
 
-            sb.Append(State.Rule50);
+            sb.Append(_state.Rule50);
             sb.Append(' ');
             sb.Append(1 + (_ply - (_sideToMove.IsBlack.AsByte()) / 2));
 
@@ -956,7 +963,7 @@ namespace Rudz.Chess
             // en-passant
             chunk = fen.Chunk();
 
-            State.EnPassantSquare = chunk.Length == 1 || chunk[0] == '-' || !chunk[0].InBetween('a', 'h')
+            _state.EnPassantSquare = chunk.Length == 1 || chunk[0] == '-' || !chunk[0].InBetween('a', 'h')
                 ? Square.None
                 : chunk[1].InBetween('3', '6')
                     ? Square.None
@@ -981,20 +988,21 @@ namespace Rudz.Chess
                     moveNum--;
             }
 
-            // PositionStart = moveNum;
-
-            SetState(halfMoveNum);
+            _state.Rule50 = halfMoveNum;
+            _ply = moveNum;
+            
+            SetState();
 
             return 0;
         }
 
-        private void SetState(int halfMoveNum)
+        private void SetState()
         {
-            var key = State.Key;
+            var key = _state.Key;
             var pawnKey = Zobrist.ZobristNoPawn;
 
-            State.Checkers = AttacksTo(GetKingSquare(_sideToMove)) & Pieces(~_sideToMove);
-            SetCheckInfo(State);
+            _state.Checkers = AttacksTo(GetKingSquare(_sideToMove)) & Pieces(~_sideToMove);
+            SetCheckInfo(_state);
 
             // compute hash keys
             for (var b = Pieces(); !b.IsEmpty;)
@@ -1013,18 +1021,17 @@ namespace Rudz.Chess
                 }
             }
 
-            if (State.EnPassantSquare != Square.None)
-                key ^= State.EnPassantSquare.File().GetZobristEnPessant();
+            if (_state.EnPassantSquare != Square.None)
+                key ^= _state.EnPassantSquare.File().GetZobristEnPessant();
 
             if (_sideToMove.IsBlack)
                 key ^= Zobrist.GetZobristSide();
 
-            key ^= State.CastlelingRights.GetZobristCastleling();
+            key ^= _state.CastlelingRights.GetZobristCastleling();
 
-            State.PliesFromNull = halfMoveNum;
-            State.InCheck = !State.Checkers.IsEmpty;
-            State.Key = key;
-            State.PawnStructureKey = pawnKey;
+            _state.InCheck = !_state.Checkers.IsEmpty;
+            _state.Key = key;
+            _state.PawnStructureKey = pawnKey;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1067,7 +1074,7 @@ namespace Rudz.Chess
             var cs = ksq < rookFrom ? CastlelingSides.King : CastlelingSides.Queen;
             var cr = OrCastlingRight(stm, cs);
 
-            State.CastlelingRights |= cr;
+            _state.CastlelingRights |= cr;
             _castlingRightsMask[ksq.AsInt()] |= cr;
             _castlingRightsMask[rookFrom.AsInt()] |= cr;
             _castlingRookSquare[cr.AsInt()] = rookFrom;
@@ -1143,7 +1150,7 @@ namespace Rudz.Chess
         private void StateAdd(State currentState)
         {
             var newState = new State(currentState);
-            State = newState;
+            _state = newState;
             _stateStack.Add(newState);
         }
 
@@ -1188,6 +1195,32 @@ namespace Rudz.Chess
         public BitBoard GetAttacks(Square square, PieceTypes pt)
             => GetAttacks(square, pt, Pieces());
 
+        public override string ToString()
+        {
+            const string separator = "\n  +---+---+---+---+---+---+---+---+\n";
+            const char splitter = '|';
+            const char space = ' ';
+            var output = new StringBuilder();
+            output.Append(separator);
+            for (var rank = Ranks.Rank8; rank >= Ranks.Rank1; rank--)
+            {
+                output.Append((int)rank + 1);
+                output.Append(space);
+                for (var file = Files.FileA; file <= Files.FileH; file++)
+                {
+                    var piece = GetPiece(new Square(rank, file));
+                    output.AppendFormat("{0}{1}{2}{1}", splitter, space, piece.GetPieceChar());
+                }
+
+                output.Append(splitter);
+                output.Append(separator);
+            }
+
+            output.AppendLine("    a   b   c   d   e   f   g   h");
+            output.AppendLine($"Zobrist : 0x{_state.Key.Key:X}");
+            return output.ToString();
+        }
+        
         private (BitBoard, BitBoard) SliderBlockers(BitBoard sliders, Square s)
         {
             var result = (blockers : BitBoard.Empty, pinners : BitBoard.Empty);

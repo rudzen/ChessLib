@@ -115,7 +115,7 @@ namespace Rudz.Chess
                     notation.Append('=').Append(move.GetPromotedPieceType().MakePiece(_pos.SideToMove).GetUnicodeChar());
             }
 
-            if (_pos.State.InCheck)
+            if (_pos.InCheck)
                 notation.Append(GetCheckChar());
 
             return notation.ToString();
@@ -166,7 +166,7 @@ namespace Rudz.Chess
                     notation.Append('=').Append(move.GetPromotedPieceType().MakePiece(_pos.SideToMove).GetPgnChar());
             }
 
-            if (_pos.State.InCheck)
+            if (_pos.InCheck)
                 notation.Append(GetCheckChar());
 
             return notation.ToString();
@@ -218,7 +218,7 @@ namespace Rudz.Chess
                     notation.Append('=').Append(move.GetPromotedPieceType().MakePiece(_pos.SideToMove).GetUnicodeChar());
             }
 
-            if (_pos.State.InCheck)
+            if (_pos.InCheck)
                 notation.Append(GetCheckChar());
 
             return notation.ToString();
@@ -270,7 +270,7 @@ namespace Rudz.Chess
                     notation.Append('=').Append(move.GetPromotedPieceType().MakePiece(_pos.SideToMove).GetUnicodeChar());
             }
 
-            if (_pos.State.InCheck)
+            if (_pos.InCheck)
                 notation.Append(GetCheckChar());
 
             return notation.ToString();

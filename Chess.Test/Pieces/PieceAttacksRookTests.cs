@@ -24,6 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using Rudz.Chess;
+
 namespace Chess.Test.Pieces
 {
     using Rudz.Chess.Enums;
@@ -112,7 +114,8 @@ namespace Chess.Test.Pieces
              */
 
             // just to get the attacks
-            var pos = new Rudz.Chess.Position();
+            var board = new Board();
+            var pos = new Rudz.Chess.Position(board);
             
             foreach (var square in border)
             {

@@ -34,14 +34,13 @@ namespace Rudz.Chess
 
     public interface IGame : IEnumerable<Piece>
     {
-        State State { get; }
         Action<Piece, Square> PieceUpdated { get; }
         BitBoard Occupied { get; }
         IPosition Pos { get; }
         GameEndTypes GameEndType { get; set; }
 
-        void TakeMove();
-
+        bool IsRepetition { get; }
+        
         FenError NewGame(string fen = Fen.Fen.StartPositionFen);
 
         /// <summary>

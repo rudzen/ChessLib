@@ -25,7 +25,6 @@ SOFTWARE.
 */
 
 using System.Runtime.Versioning;
-using Perft;
 using Rudz.Chess.Factories;
 
 namespace Chess.Test.FEN
@@ -51,7 +50,7 @@ namespace Chess.Test.FEN
         [Fact]
         public void GetFenTest()
         {
-            var position = new Position();
+            var position = new Position(new Board());
             var game = GameFactory.Create(position);
             var expectedError = new FenError(0, 0);
             var actualError = game.NewGame();

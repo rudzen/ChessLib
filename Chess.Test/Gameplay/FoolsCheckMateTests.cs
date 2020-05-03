@@ -47,7 +47,8 @@ namespace Chess.Test.Gameplay
                                                   };
 
             // construct game and start a new game
-            var position = new Position();
+            var board = new Board();
+            var position = new Position(board);
             var game = GameFactory.Create(position);
             game.NewGame();
             var state = new State();
@@ -57,7 +58,7 @@ namespace Chess.Test.Gameplay
                 position.MakeMove(move, state);
 
             // verify in check is actually true
-            Assert.True(position.State.InCheck);
+            Assert.True(position.InCheck);
 
             var b = position.GenerateFen().Fen.ToString();
 

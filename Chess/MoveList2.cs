@@ -204,7 +204,7 @@ namespace Rudz.Chess
                 moves[index++].Move = Move.MakeMove(to - left, to);
             }
 
-            if (pos.State.EnPassantSquare == Square.None)
+            if (pos.EnPassantSquare == Square.None)
                 return index;
 
             Debug.Assert(pos.EnPassantSquare.Rank() == Ranks.Rank6.RelativeRank(us));
@@ -214,7 +214,7 @@ namespace Rudz.Chess
             if (type == MoveGenerationType.Evasions && (target & (pos.EnPassantSquare - up)) == 0)
                 return index;
 
-            pawnOne = pawnsNotOn7 & pos.State.EnPassantSquare.PawnAttack(them);
+            pawnOne = pawnsNotOn7 & pos.EnPassantSquare.PawnAttack(them);
             Debug.Assert(!pawnOne.IsEmpty);
             while (!pawnOne.IsEmpty)
                 moves[index++].Move = Move.MakeMove(BitBoards.PopLsb(ref pawnOne), pos.EnPassantSquare, MoveTypes.Enpassant);
@@ -313,7 +313,7 @@ namespace Rudz.Chess
         private static int GenerateCapturesQuietsNonEvasions(IPosition pos, Span<ExtMove> moves, int index, MoveGenerationType type)
         {
             Debug.Assert(type == MoveGenerationType.Captures || type == MoveGenerationType.Quiets || type == MoveGenerationType.NonEvasions);
-            Debug.Assert(!pos.State.InCheck);
+            Debug.Assert(!pos.InCheck);
             var us = pos.SideToMove;
             var target = type switch
             {
@@ -330,7 +330,7 @@ namespace Rudz.Chess
         /// check. Returns a pointer to the end of the move list.
         private static int GenerateEvasions(IPosition pos, Span<ExtMove> moves, int index)
         {
-            Debug.Assert(pos.State.InCheck);
+            Debug.Assert(pos.InCheck);
             var us = pos.SideToMove;
             var ksq = pos.GetKingSquare(us);
             var sliderAttacks = BitBoard.Empty;
@@ -375,7 +375,7 @@ namespace Rudz.Chess
             var pinned = pos.BlockersForKing(us) & pos.Pieces(us);
             var ksq = pos.GetKingSquare(us);
 
-            var end = pos.State.InCheck
+            var end = pos.InCheck
                 ? GenerateEvasions(pos, moves, index)
                 : Generate(pos, moves, index, MoveGenerationType.NonEvasions);
 
@@ -392,7 +392,7 @@ namespace Rudz.Chess
         /// underpromotions that give check. Returns a pointer to the end of the move list.
         private static int GenerateQuietChecks(IPosition pos, Span<ExtMove> moves, int index)
         {
-            Debug.Assert(!pos.State.InCheck);
+            Debug.Assert(!pos.InCheck);
             var us = pos.SideToMove;
             var dc = pos.BlockersForKing(~us) & pos.Pieces(us);
 
