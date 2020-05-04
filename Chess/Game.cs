@@ -24,6 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using System.Linq;
+
 namespace Rudz.Chess
 {
     using Enums;
@@ -89,13 +91,8 @@ namespace Rudz.Chess
                 gameEndType |= GameEndTypes.FiftyMove;
 
             var moveList = Pos.GenerateMoves().GetMoves();
-            foreach (var move in moveList)
-            {
-                if (Pos.IsLegal(move))
-                    continue;
+            if (moveList.Any(move => !Pos.IsLegal(move)))
                 gameEndType |= GameEndTypes.Pat;
-                break;
-            }
 
             GameEndType = gameEndType;
         }
@@ -118,107 +115,25 @@ namespace Rudz.Chess
 
         public ulong Perft(int depth, bool root = false)
         {
+            if (depth == 1)
+                return Pos.GenerateMoves().Count;
+            
             var state = new State();
-            ulong cnt, nodes = 0;
-            var leaf = (depth == 2);
+            ulong tot = 0;
+            var leaf = depth == 2;
 
-            var ml = Pos.GenerateMoves();
-            var moves = ml.GetMoves();
-
-            foreach (var move in moves)
+            for (var ml = Pos.GenerateMoves(); !ml.Move.IsNullMove(); ++ml)
             {
-                if (root && depth <= 1)
+                var move = ml.Move;
+                if (move.IsNullMove())
                 {
-                    cnt = 1;
-                    nodes++;
+                    continue;
                 }
-                else
-                {
-                    Pos.MakeMove(move, state);
-                    cnt = leaf ? (ulong) Pos.GenerateMoves().GetMoves().Length : Perft(depth - 1, false);
-                    nodes += cnt;
-                    Pos.TakeMove(move);
-                }
-
-                if (root)
-                    Console.WriteLine($"{move}: {cnt}");
+                Pos.MakeMove(move, state);
+                tot += leaf ? Pos.GenerateMoves().Count : Perft(depth - 1);
+                Pos.TakeMove(move);
             }
-            
-            return nodes;
-
+            return tot;
         }
-        
-        //     for (const auto& m : MoveList<LEGAL>(pos))
-            //     {
-            //         if (Root && depth <= 1)
-            //             cnt = 1, nodes++;
-            //         else
-            //         {
-            //             pos.do_move(m, st);
-            //             cnt = leaf ? MoveList<LEGAL>(pos).size() : perft<false>(pos, depth - 1);
-            //             nodes += cnt;
-            //             pos.undo_move(m);
-            //         }
-            //         if (Root)
-            //             sync_cout << UCI::move(m, pos.is_chess960()) << ": " << cnt << sync_endl;
-            //     }
-            //     return nodes;
-            // }
-            
-            // var ml = Pos.GenerateMoves();
-            //
-            // if (depth == 1)
-            //     return (ulong)ml.GetMoves().Length;
-            //
-            // var key = Pos.State.Key;
-            //
-            // var tot = 0ul;
-            // // if (_perftCache.TryGetValue((key, depth), out var tot)) return tot;
-            //
-            // // var posKey = Pos.State.Key; var (found, entry) = Table.Probe(posKey); if (found &&
-            // // entry.Depth == depth && entry.Key32 == posKey.UpperKey) return (ulong)entry.Value;
-            //
-            // var move = Move.EmptyMove;
-            //
-            // if (depth == 3)
-            // {
-            //     var f = Pos.GenerateFen().Fen.ToString();
-            // }
-            //
-            // var state = new State();
-            //
-            // var moves = ml.GetMoves();
-            // foreach (var m in moves)
-            // {
-            //     if (Pos.GetPiece(m.Move.GetToSquare()) == PieceTypes.King.MakePiece(~Pos.SideToMove))
-            //     {
-            //         var a = 1;
-            //     }
-            //
-            //     // Console.WriteLine($"{depth}:{m.Move}"); Console.WriteLine($"{depth}:Before
-            //     // MakeMove: {Pos.GenerateFen().Fen.ToString()}");
-            //     Pos.MakeMove(m.Move, state);
-            //     
-            //     if (Pos.SideToMove.IsWhite && Pos.GetPiece(Squares.a4) == Pieces.WhiteQueen && (Pos.GetAttacks(Squares.a4, PieceTypes.Queen) & Pos.GetKingSquare(Player.White)) != 0)
-            //     {
-            //         var a = 1;
-            //     }
-            //     
-            //     // Console.WriteLine($"{depth}:After MakeMove: {Pos.GenerateFen().Fen.ToString()}");
-            //     move = m;
-            //     tot += Perft(depth - 1);
-            //     // Console.WriteLine($"{depth}:Before TakeMove: {Pos.GenerateFen().Fen.ToString()}");
-            //     Pos.TakeMove(m);
-            //
-            //     //state = Pos.State;
-            //     // Console.WriteLine($"{depth}:After TakeMove: {Pos.GenerateFen().Fen.ToString()}");
-            // }
-            //
-            // // _perftCache.Add((key, depth), tot);
-            //
-            // // if (!move.IsNullMove() && tot <= int.MaxValue) Table.Store(posKey, (int)tot,
-            // // Bound.Exact, (sbyte)depth, move, 0);
-            //
-            // return tot;
     }
 }

@@ -1,3 +1,5 @@
+using System.Linq;
+
 namespace Rudz.Chess
 {
     using Enums;
@@ -8,19 +10,19 @@ namespace Rudz.Chess
 
     public class MoveList2
     {
-        private readonly Memory<ExtMove> _moves;
+        private readonly ExtMove[] _moves;
         public int cur, last;
 
         public MoveList2()
         {
-            _moves = new ExtMove[256].AsMemory();
+            _moves = new ExtMove[256];
         }
 
         public ulong Count => (ulong)last;
 
         public bool IsReadOnly => true;
 
-        public Move Move => _moves.Span[cur].Move;
+        public Move Move => _moves[cur].Move;
 
         public static MoveList2 operator ++(MoveList2 moveList)
         {
@@ -28,9 +30,9 @@ namespace Rudz.Chess
             return moveList;
         }
 
-        public void Add(ExtMove item) => _moves.Span[last++] = item;
+        public void Add(ExtMove item) => _moves[last++] = item;
 
-        public void Add(Move item) => _moves.Span[last++] = item;
+        public void Add(Move item) => _moves[last++] = item;
 
         /// <summary>
         /// Clears the move generated data
@@ -38,8 +40,7 @@ namespace Rudz.Chess
         public void Clear()
         {
             cur = last = 0;
-            _moves.Span.Clear();
-            // _moves.Fill(ExtMove.Empty);
+            _moves.Fill(ExtMove.Empty);
         }
 
         public bool Contains(ExtMove item)
@@ -47,38 +48,27 @@ namespace Rudz.Chess
 
         public bool Contains(Move item)
         {
-            var s = GetMoves();
-
-            foreach (var em in s)
-            {
-                if (em.Move == item)
-                    return true;
-            }
-
-            return false;
+            return _moves.TakeWhile(extMove => !extMove.Move.IsNullMove()).Any(extMove => extMove.Move == item);
         }
 
         public void Generate(IPosition pos, MoveGenerationType type)
         {
             cur = 0;
-            last = Generate(pos, _moves.Span, 0, type);
-            _moves.Span[last] = Move.EmptyMove;
+            last = Generate(pos, _moves, 0, type);
+            _moves[last] = Move.EmptyMove;
         }
 
-        public ReadOnlySpan<ExtMove> GetMoves()
+        public ExtMove[] GetMoves()
         {
-            return last == 0 || _moves.Span[0].Move.IsNullMove()
-                ? ReadOnlySpan<ExtMove>.Empty
-                : _moves.Span.Slice(0, last);
+            return _moves.TakeWhile(m => !m.Move.IsNullMove()).ToArray();
         }
 
-        private static int GeneratePawnMoves(IPosition pos, Span<ExtMove> moves, int index, BitBoard target, Player us, MoveGenerationType type)
+        private static int GeneratePawnMoves(IPosition pos, ExtMove[] moves, int index, BitBoard target, Player us, MoveGenerationType type)
         {
             // Compute our parametrized parameters at compile time, named according to the point of
             // view of white side.
 
             var them = ~us;
-            var rank8Bb = us.PromotionRank();
             var rank7Bb = us.Rank7();
             var rank3Bb = us.Rank3();
             var up = us.PawnPushDistance();
@@ -158,7 +148,7 @@ namespace Rudz.Chess
             }
 
             // Promotions and underpromotions
-            if (!pawnsOn7.IsEmpty)// && (type != MoveGenerationType.Evasions || !(target & rank8Bb).IsEmpty))
+            if (!pawnsOn7.IsEmpty)
             {
                 switch (type)
                 {
@@ -222,7 +212,7 @@ namespace Rudz.Chess
             return index;
         }
 
-        private static int GenerateMoves(IPosition pos, Span<ExtMove> moves, int index, Player us, BitBoard target, PieceTypes pt, bool checks)
+        private static int GenerateMoves(IPosition pos, ExtMove[] moves, int index, Player us, BitBoard target, PieceTypes pt, bool checks)
         {
             Debug.Assert(pt != PieceTypes.King && pt != PieceTypes.Pawn);
 
@@ -248,12 +238,6 @@ namespace Rudz.Chess
 
                 var b = pos.GetAttacks(from, pt) & target;
 
-                var ksq = pos.GetKingSquare(~us);
-                if (b & ksq)
-                {
-                    var f = pos.GenerateFen().ToString();
-                }
-
                 if (checks)
                     b &= pos.CheckedSquares(pt);
 
@@ -267,7 +251,7 @@ namespace Rudz.Chess
             return index;
         }
 
-        private static int GenerateAll(IPosition pos, Span<ExtMove> moves, int index, BitBoard target, Player us, MoveGenerationType type)
+        private static int GenerateAll(IPosition pos, ExtMove[] moves, int index, BitBoard target, Player us, MoveGenerationType type)
         {
             var checks = type == MoveGenerationType.QuietChecks;
             index = GeneratePawnMoves(pos, moves, index, target, us, type);
@@ -278,7 +262,7 @@ namespace Rudz.Chess
             if (checks || type == MoveGenerationType.Evasions)
                 return index;
 
-            var ksq = pos.GetPieceSquare(PieceTypes.King, us);
+            var ksq = pos.GetKingSquare(us);
             var b = pos.GetAttacks(ksq, PieceTypes.King) & target;
             while (!b.IsEmpty)
                 moves[index++].Move = Move.MakeMove(ksq, BitBoards.PopLsb(ref b));
@@ -310,7 +294,7 @@ namespace Rudz.Chess
         ///
         /// generate<NON_EVASIONS> generates all pseudo-legal captures and non-captures. Returns a
         /// pointer to the end of the move list.
-        private static int GenerateCapturesQuietsNonEvasions(IPosition pos, Span<ExtMove> moves, int index, MoveGenerationType type)
+        private static int GenerateCapturesQuietsNonEvasions(IPosition pos, ExtMove[] moves, int index, MoveGenerationType type)
         {
             Debug.Assert(type == MoveGenerationType.Captures || type == MoveGenerationType.Quiets || type == MoveGenerationType.NonEvasions);
             Debug.Assert(!pos.InCheck);
@@ -328,7 +312,7 @@ namespace Rudz.Chess
 
         /// generate<EVASIONS> generates all pseudo-legal check evasions when the side to move is in
         /// check. Returns a pointer to the end of the move list.
-        private static int GenerateEvasions(IPosition pos, Span<ExtMove> moves, int index)
+        private static int GenerateEvasions(IPosition pos, ExtMove[] moves, int index)
         {
             Debug.Assert(pos.InCheck);
             var us = pos.SideToMove;
@@ -343,7 +327,10 @@ namespace Rudz.Chess
             while (!sliders.IsEmpty)
             {
                 checksq = BitBoards.PopLsb(ref sliders);
-                sliderAttacks |= checksq.Line(ksq) ^ checksq;
+                var fullLine = checksq.Line(ksq);
+                fullLine ^= checksq;
+                fullLine ^= ksq;
+                sliderAttacks |= fullLine;
             }
 
             // Generate evasions for king, capture and non capture moves
@@ -368,7 +355,7 @@ namespace Rudz.Chess
         /// <param name="moves"></param>
         /// <param name="index"></param>
         /// <returns></returns>
-        private static int GenerateLegal(IPosition pos, Span<ExtMove> moves, int index)
+        private static int GenerateLegal(IPosition pos, ExtMove[] moves, int index)
         {
             var cur = index;
             var us = pos.SideToMove;
@@ -380,17 +367,20 @@ namespace Rudz.Chess
                 : Generate(pos, moves, index, MoveGenerationType.NonEvasions);
 
             while (cur != end)
-                if ((!pinned.IsEmpty || moves[cur].Move.GetFromSquare() == ksq || moves[cur].Move.IsEnPassantMove())
+            {
+                var pinnedIsEmpty = pinned.IsEmpty;
+                if ((!pinnedIsEmpty || moves[cur].Move.GetFromSquare() == ksq || moves[cur].Move.IsEnPassantMove())
                     && !pos.IsLegal(moves[cur].Move))
                     moves[cur].Move = moves[--end].Move;
                 else
                     ++cur;
+            }
             return end;
         }
 
         /// generate<QUIET_CHECKS> generates all pseudo-legal non-captures and knight
         /// underpromotions that give check. Returns a pointer to the end of the move list.
-        private static int GenerateQuietChecks(IPosition pos, Span<ExtMove> moves, int index)
+        private static int GenerateQuietChecks(IPosition pos, ExtMove[] moves, int index)
         {
             Debug.Assert(!pos.InCheck);
             var us = pos.SideToMove;
@@ -416,7 +406,7 @@ namespace Rudz.Chess
             return GenerateAll(pos, moves, index, ~pos.Pieces(), us, MoveGenerationType.QuietChecks);
         }
 
-        private static int Generate(IPosition pos, Span<ExtMove> moves, int index, MoveGenerationType type)
+        private static int Generate(IPosition pos, ExtMove[] moves, int index, MoveGenerationType type)
         {
             int result;
             switch (type)
@@ -447,7 +437,7 @@ namespace Rudz.Chess
             return result;
         }
 
-        private static int MakePromotions(Span<ExtMove> moves, int index, Square to, Square ksq, Direction direction, MoveGenerationType Type)
+        private static int MakePromotions(ExtMove[] moves, int index, Square to, Square ksq, Direction direction, MoveGenerationType Type)
         {
             if (Type == MoveGenerationType.Captures || Type == MoveGenerationType.Evasions || Type == MoveGenerationType.NonEvasions)
                 moves[index++].Move = Move.MakeMove(to - direction, to, MoveTypes.Promotion, PieceTypes.Queen);

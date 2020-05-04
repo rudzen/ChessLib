@@ -62,8 +62,6 @@ namespace Rudz.Chess
 
         public BitBoard[] CheckedSquares { get; set; }
 
-        public bool InCheck { get; set; }
-
         public State Previous { get; set; }
 
         public int Repetition { get; set; }
@@ -103,7 +101,7 @@ namespace Rudz.Chess
             CapturedPiece = Piece.EmptyPiece;
         }
 
-        public State CopyTo(State other, Move lastMove)
+        public State CopyTo(State other)
         {
             // copy over preserved values
             other.PawnStructureKey = PawnStructureKey;
@@ -112,7 +110,6 @@ namespace Rudz.Chess
             other.PliesFromNull = PliesFromNull;
             other.EnPassantSquare = EnPassantSquare;
             other.Previous = this;
-            other.LastMove = lastMove;
 
             // copy over material
             other.Material = new Material();
@@ -139,13 +136,34 @@ namespace Rudz.Chess
             BlockersForKing.Fill(BitBoard.Empty);
             CapturedPiece = Piece.EmptyPiece;
             Previous = null;
-            InCheck = false;
         }
 
+        public void UpdateRepetition()
+        {
+            var end = Rule50 < PliesFromNull
+                ? Rule50
+                : PliesFromNull;
+
+            Repetition = 0;
+
+            if (end < 4)
+                return;
+
+            var statePrevious = Previous.Previous;
+            for (var i = 4; i <= end; i += 2)
+            {
+                statePrevious = statePrevious.Previous.Previous;
+                if (statePrevious.Key != Key)
+                    continue;
+                Repetition = statePrevious.Repetition != 0 ? -i : i;
+                break;
+            }
+        }
+        
         public bool Equals(State other)
         {
             if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
+            // if (ReferenceEquals(this, other)) return true;
             return LastMove.Equals(other.LastMove)
                    && Key.Equals(other.Key)
                    && PawnStructureKey.Equals(other.PawnStructureKey)
@@ -156,7 +174,6 @@ namespace Rudz.Chess
                    && Rule50 == other.Rule50
                    && Pinners.Equals(other.Pinners)
                    && Checkers.Equals(other.Checkers)
-                   && InCheck == other.InCheck
                    && CapturedPiece == other.CapturedPiece
                    && Equals(Previous, other.Previous);
         }
@@ -176,7 +193,6 @@ namespace Rudz.Chess
             hashCode.Add((int)CastlelingRights);
             hashCode.Add(EnPassantSquare);
             hashCode.Add(Checkers);
-            hashCode.Add(InCheck);
             hashCode.Add(Previous);
             hashCode.Add(CapturedPiece);
             foreach (var pinner in Pinners)

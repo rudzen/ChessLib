@@ -59,6 +59,8 @@ namespace Rudz.Chess
 
         bool IsRepetition { get; }
         
+        State State { get; }
+        
         void Clear();
 
         void AddPiece(Piece pc, Square sq);
@@ -158,5 +160,7 @@ namespace Rudz.Chess
         BitBoard GetAttacks(Square square, PieceTypes pt);
         
         void MoveToString(Move m, StringBuilder output);
+
+        (bool, string) IsOk(bool fast = true);
     }
 }

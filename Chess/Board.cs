@@ -113,7 +113,7 @@ namespace Rudz.Chess
             _pieces[to.AsInt()] = pc;
             _index[to.AsInt()] = _index[from.AsInt()];
             _pieceList[pc.AsInt()][_index[to.AsInt()]] = to;
-        }
+       }
 
         public Piece MovedPiece(Move move)
             => PieceAt(move.GetFromSquare());

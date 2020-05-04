@@ -24,6 +24,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using System;
+using System.Collections.Generic;
+
 namespace Rudz.Chess.Types
 {
     using Enums;
@@ -33,7 +36,7 @@ namespace Rudz.Chess.Types
     /// Square data struct.
     /// Contains a single enum value which represents a square on the board.
     /// </summary>
-    public readonly struct Square
+    public readonly struct Square : IComparable<Square>
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Square(int square) => Value = (Squares)square;
@@ -184,5 +187,10 @@ namespace Rudz.Chess.Types
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool IsOk() => Value >= Squares.a1 && Value <= Squares.h8;
+
+        public int CompareTo(Square other)
+        {
+            return Value.CompareTo(other.Value);
+        }
     }
 }

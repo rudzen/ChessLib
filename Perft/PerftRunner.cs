@@ -217,12 +217,12 @@ namespace Perft
 
                 _log.Information("Depth       : {0}", depth);
                 sw.Restart();
-                var perftResult = 0ul;
-                await foreach (var res in _perft.DoPerft(depth).ConfigureAwait(false))
-                {
-                    perftResult += res;
-                }
-                // var perftResult = await _perft.DoPerftAsync(depth).ConfigureAwait(false);
+                // var perftResult = 0ul;
+                // await foreach (var res in _perft.DoPerft(depth).ConfigureAwait(false))
+                // {
+                //     perftResult += res;
+                // }
+                var perftResult = await _perft.DoPerftAsync(depth).ConfigureAwait(false);
                 sw.Stop();
 
                 var elapsedMs = sw.ElapsedMilliseconds;

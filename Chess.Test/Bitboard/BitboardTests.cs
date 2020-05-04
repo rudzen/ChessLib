@@ -24,6 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using System;
+
 namespace Chess.Test.Bitboard
 {
     using Rudz.Chess.Enums;
@@ -44,6 +46,19 @@ namespace Chess.Test.Bitboard
             var b3 = BitBoards.MakeBitboard(Squares.h3);
             var b4 = Squares.h3.BitBoardSquare();
             Assert.Equal(b3, b4);
+        }
+
+        [Fact]
+        public void BitBoardOrALlTest()
+        {
+            var baseSquares = new Square[] {Squares.a1, Squares.a2, Squares.a3, Squares.a4, Squares.a5, Squares.a6, Squares.a7, Squares.a8};
+            var bb = BitBoard.Empty.OrAll(baseSquares);
+            while (!bb.IsEmpty)
+            {
+                var s = BitBoards.PopLsb(ref bb);
+                var valid = Array.BinarySearch(baseSquares, s) > -1;
+                Assert.True(valid);
+            }
         }
     }
 }
