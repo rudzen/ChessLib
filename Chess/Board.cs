@@ -1,14 +1,40 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using Rudz.Chess.Enums;
-using Rudz.Chess.Extensions;
-using Rudz.Chess.Types;
+/*
+ChessLib, a chess data structure library
+
+MIT License
+
+Copyright (c) 2017-2020 Rudy Alex Kohn
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
 
 namespace Rudz.Chess
 {
+    using Enums;
+    using Extensions;
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Linq;
+    using Types;
+
     public sealed class Board : IBoard
     {
         #region base piece information
@@ -145,10 +171,9 @@ namespace Rudz.Chess
         public ReadOnlySpan<Square> Squares(PieceTypes pt, Player c)
         {
             var pc = pt.MakePiece(c).AsInt();
-            return _pieceList[pc].TakeWhile(s => s != Types.Square.None).ToArray().AsSpan();
-            // var squares = _pieceList[pc];
-            // var idx = Array.IndexOf(squares, Types.Square.None);
-            // return _pieceList[pt.MakePiece(c).AsInt()].AsSpan();
+            var squares = _pieceList[pc];
+            var idx = Array.IndexOf(squares, Types.Square.None);
+            return squares.AsSpan().Slice(0, idx);
         }
 
         public int PieceCount(PieceTypes pt, Player c)

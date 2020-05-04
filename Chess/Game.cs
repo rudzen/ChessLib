@@ -24,8 +24,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System.Linq;
-
 namespace Rudz.Chess
 {
     using Enums;
@@ -33,6 +31,7 @@ namespace Rudz.Chess
     using System;
     using System.Collections;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Runtime.CompilerServices;
     using System.Text;
     using Transposition;
@@ -117,22 +116,30 @@ namespace Rudz.Chess
         {
             if (depth == 1)
                 return Pos.GenerateMoves().Count;
+
+            var posKey = Pos.State.Key;
+            
+            var (found, entry) = Table.Probe(posKey);
+            if (found && entry.Key32 == posKey.LowerKey)
+                return (ulong)entry.Value;
             
             var state = new State();
             ulong tot = 0;
-            var leaf = depth == 2;
+            // var leaf = depth == 2;
+
+            var move = Move.EmptyMove;
 
             for (var ml = Pos.GenerateMoves(); !ml.Move.IsNullMove(); ++ml)
             {
-                var move = ml.Move;
-                if (move.IsNullMove())
-                {
-                    continue;
-                }
+                move = ml.Move;
                 Pos.MakeMove(move, state);
-                tot += leaf ? Pos.GenerateMoves().Count : Perft(depth - 1);
+                tot += Perft(depth - 1);
                 Pos.TakeMove(move);
             }
+            
+            if (tot <= int.MaxValue)
+                Table.Store(posKey.Key, (int)tot, Bound.Exact, (sbyte)depth, move, 0);
+            
             return tot;
         }
     }

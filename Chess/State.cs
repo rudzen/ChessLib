@@ -77,7 +77,6 @@ namespace Rudz.Chess
             Rule50 = other.Rule50;
             PliesFromNull = other.PliesFromNull;
             EnPassantSquare = other.EnPassantSquare;
-
             Previous = other;
 
             Material = new Material();

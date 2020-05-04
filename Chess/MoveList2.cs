@@ -15,7 +15,7 @@ namespace Rudz.Chess
 
         public MoveList2()
         {
-            _moves = new ExtMove[256];
+            _moves = new ExtMove[218];
         }
 
         public ulong Count => (ulong)last;
@@ -223,8 +223,8 @@ namespace Rudz.Chess
 
             foreach (var from in squares)
             {
-                if (from == Square.None)
-                    return index;
+                // if (from == Square.None)
+                //     return index;
 
                 if (checks)
                 {

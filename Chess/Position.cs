@@ -375,11 +375,8 @@ namespace Rudz.Chess
         /// <param name="c">The side</param>
         /// <returns>Pinned pieces as BitBoard</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [Obsolete]
         public BitBoard GetPinnedPieces(Square sq, Player c)
         {
-            // TODO : Move into state data structure instead of real-time calculation
-
             var pinnedPieces = BitBoard.Empty;
             var them = ~c;
 
