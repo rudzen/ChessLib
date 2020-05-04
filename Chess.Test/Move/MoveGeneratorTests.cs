@@ -12,7 +12,7 @@ namespace Chess.Test.Move
         public void InCheckMoveGenerationTest()
         {
             const string fen = "rnbqkbnr/1ppQpppp/p2p4/8/8/2P5/PP1PPPPP/RNB1KBNR b KQkq - 1 6";
-            const int expectedMoves = 4;
+            const ulong expectedMoves = 4;
             
             var board = new Board();
             var pos = new Rudz.Chess.Position(board);
@@ -25,8 +25,7 @@ namespace Chess.Test.Move
             
             // generate moves for black
             var mg = pos.GenerateMoves();
-            var moves = mg.GetMoves();
-            var actualMoves = moves.Length;
+            var actualMoves = mg.Length;
             
             Assert.Equal(expectedMoves, actualMoves);
         }

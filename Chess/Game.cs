@@ -24,6 +24,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using Microsoft.Extensions.ObjectPool;
+using Rudz.Chess.ObjectPoolPolicies;
+
 namespace Rudz.Chess
 {
     using Enums;
@@ -43,20 +46,20 @@ namespace Rudz.Chess
     {
         private const int MaxPositions = 256;
 
+        private readonly ObjectPool<IMoveList> _moveLists;
+        
         private readonly StringBuilder _output;
-
-        private static readonly IDictionary<(HashKey, int), ulong> _perftCache;
 
         public Game(IPosition pos)
         {
             Pos = pos;
             _output = new StringBuilder(256);
+            _moveLists = new DefaultObjectPool<IMoveList>(new MoveListPolicy());
         }
 
         static Game()
         {
             Table = new TranspositionTable(256);
-            _perftCache = new Dictionary<(HashKey, int), ulong>(256);
         }
 
         public Action<Piece, Square> PieceUpdated => Pos.PieceUpdated;
@@ -89,7 +92,8 @@ namespace Rudz.Chess
             if (Pos.Rule50 >= 100)
                 gameEndType |= GameEndTypes.FiftyMove;
 
-            var moveList = Pos.GenerateMoves().GetMoves();
+            var moveList = _moveLists.Get();
+            moveList.Generate(Pos);
             if (moveList.Any(move => !Pos.IsLegal(move)))
                 gameEndType |= GameEndTypes.Pat;
 
@@ -114,28 +118,36 @@ namespace Rudz.Chess
 
         public ulong Perft(int depth, bool root = false)
         {
-            if (depth == 1)
-                return Pos.GenerateMoves().Count;
-
             var posKey = Pos.State.Key;
-            
+
             var (found, entry) = Table.Probe(posKey);
             if (found && entry.Key32 == posKey.LowerKey)
                 return (ulong)entry.Value;
-            
+
+            var ml = _moveLists.Get();
+            ml.Generate(Pos, MoveGenerationType.Legal);
+
+            if (depth == 1)
+            {
+                var res = ml.Count;
+                _moveLists.Return(ml);
+                return (ulong) res;
+            }
+
             var state = new State();
             ulong tot = 0;
-            // var leaf = depth == 2;
 
             var move = Move.EmptyMove;
 
-            for (var ml = Pos.GenerateMoves(); !ml.Move.IsNullMove(); ++ml)
+            foreach (var em in ml)
             {
-                move = ml.Move;
+                move = em.Move;
                 Pos.MakeMove(move, state);
                 tot += Perft(depth - 1);
                 Pos.TakeMove(move);
             }
+            
+            _moveLists.Return(ml);
             
             if (tot <= int.MaxValue)
                 Table.Store(posKey.Key, (int)tot, Bound.Exact, (sbyte)depth, move, 0);

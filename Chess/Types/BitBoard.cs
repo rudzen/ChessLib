@@ -50,7 +50,7 @@ namespace Rudz.Chess.Types
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public BitBoard(Square square)
-            : this(square.BitBoardSquare()) { }
+            : this(square.AsBb()) { }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public BitBoard(int value)
@@ -83,7 +83,7 @@ namespace Rudz.Chess.Types
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator BitBoard(Square square)
-            => new BitBoard(square.BitBoardSquare());
+            => new BitBoard(square.AsBb());
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static BitBoard operator *(BitBoard left, ulong right)
@@ -107,7 +107,7 @@ namespace Rudz.Chess.Types
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static BitBoard operator |(BitBoard left, Square right)
-            => left.Value | right.BitBoardSquare();
+            => left.Value | right.AsBb();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static BitBoard operator |(BitBoard left, BitBoard right)
@@ -131,11 +131,11 @@ namespace Rudz.Chess.Types
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static BitBoard operator &(BitBoard left, Square right)
-            => left.Value & right;
+            => left.Value & right.AsBb();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static BitBoard operator &(Square left, BitBoard right)
-            => left.BitBoardSquare() & right.Value;
+            => left.AsBb() & right.Value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static BitBoard operator ~(BitBoard bitBoard)

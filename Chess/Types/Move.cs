@@ -130,7 +130,7 @@ namespace Rudz.Chess.Types
             IsNullMove()
                 ? ".."
                 : !IsPromotionMove()
-                    ? $"{GetFromSquare().GetSquareString()}{GetToSquare().GetSquareString()}"
-                    : $"{GetFromSquare().GetSquareString()}{GetToSquare().GetSquareString()}{GetPromotedPieceType().GetPromotionChar()}";
+                    ? $"{GetFromSquare()}{GetToSquare()}"
+                    : $"{GetFromSquare()}{GetToSquare()}{GetPromotedPieceType().GetPromotionChar()}";
     }
 }

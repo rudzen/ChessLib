@@ -24,12 +24,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System;
-using System.Collections.Generic;
-
 namespace Rudz.Chess.Types
 {
     using Enums;
+    using System;
     using System.Runtime.CompilerServices;
 
     /// <summary>
@@ -38,6 +36,18 @@ namespace Rudz.Chess.Types
     /// </summary>
     public readonly struct Square : IComparable<Square>
     {
+        private static readonly string[] SquareStrings =
+        {
+            "a1", "b1", "c1", "d1", "e1", "f1", "g1", "h1",
+            "a2", "b2", "c2", "d2", "e2", "f2", "g2", "h2",
+            "a3", "b3", "c3", "d3", "e3", "f3", "g3", "h3",
+            "a4", "b4", "c4", "d4", "e4", "f4", "g4", "h4",
+            "a5", "b5", "c5", "d5", "e5", "f5", "g5", "h5",
+            "a6", "b6", "c6", "d6", "e6", "f6", "g6", "h6",
+            "a7", "b7", "c7", "d7", "e7", "f7", "g7", "h7",
+            "a8", "b8", "c8", "d8", "e8", "f8", "g8", "h8"
+        };
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Square(int square) => Value = (Squares)square;
 
@@ -60,6 +70,14 @@ namespace Rudz.Chess.Types
 
         public readonly Squares Value;
 
+        public Rank Rank => (Ranks)(AsInt() >> 3);
+        
+        public File File => AsInt() & 7;
+
+        public char FileChar => File.FileChar();
+        
+        public bool IsOk => Value >= Squares.a1 && Value <= Squares.h8;
+        
         public static readonly Square None = new Square(Squares.none);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -111,22 +129,22 @@ namespace Rudz.Chess.Types
         public static Square operator --(Square square) => new Square(square.Value - 1);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static BitBoard operator &(Square left, ulong right) => left.BitBoardSquare() & right;
+        public static BitBoard operator &(Square left, ulong right) => left.AsBb() & right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static BitBoard operator &(ulong left, Square right) => left & right.BitBoardSquare();
+        public static BitBoard operator &(ulong left, Square right) => left & right.AsBb();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static BitBoard operator |(Square left, Square right) => left.BitBoardSquare() | right.BitBoardSquare();
+        public static BitBoard operator |(Square left, Square right) => left.AsBb() | right.AsBb();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static BitBoard operator |(ulong left, Square right) => left | right.BitBoardSquare();
+        public static BitBoard operator |(ulong left, Square right) => left | right.AsBb();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int operator |(Square left, int right) => left.AsInt() | right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static BitBoard operator ~(Square left) => ~left.BitBoardSquare();
+        public static BitBoard operator ~(Square left) => ~left.AsBb();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int operator >>(Square left, int right) => left.AsInt() >> right;
@@ -144,10 +162,10 @@ namespace Rudz.Chess.Types
         public static bool operator >=(Square left, Square right) => left.Value >= right.Value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator true(Square sq) => sq.IsValid();
+        public static bool operator true(Square sq) => sq.IsOk;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator false(Square sq) => !sq.IsValid();
+        public static bool operator false(Square sq) => !sq.IsOk;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Square Relative(Player p) => (int) Value ^ (p.Side * 56);
@@ -159,7 +177,7 @@ namespace Rudz.Chess.Types
         public Square Min(Square other) => Value <= other.Value ? this : other;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public override string ToString() => this.GetSquareString();
+        public override string ToString() => SquareStrings[AsInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals(Square other) => Value == other.Value;
@@ -174,19 +192,19 @@ namespace Rudz.Chess.Types
         public int AsInt() => (int)Value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public File File() => AsInt() & 7;
+        public BitBoard AsBb() => BitBoards.BbSquares[AsInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Rank Rank() => (Ranks)(AsInt() >> 3);
+        public char RankChar() => Rank.Char;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Rank RelativeRank(Player color) => Rank().RelativeRank(color);
+        public Rank RelativeRank(Player color) => Rank.RelativeRank(color);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsOppositeColor(Square other) => (((int)Value + Rank().AsInt() + (int)other.Value + other.Rank().AsInt()) & 1) != 0;
+        public bool IsOppositeColor(Square other) => (((int)Value + Rank.AsInt() + (int)other.Value + other.Rank.AsInt()) & 1) != 0;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsOk() => Value >= Squares.a1 && Value <= Squares.h8;
+        public bool IsDark(Square s) => !(s.AsBb() & BitBoards.DarkSquares).IsEmpty;
 
         public int CompareTo(Square other)
         {

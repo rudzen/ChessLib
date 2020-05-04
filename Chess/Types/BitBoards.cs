@@ -227,8 +227,8 @@ namespace Rudz.Chess.Types
 
             // local helper functions to calculate distance
             static int distance(int x, int y) { return Math.Abs(x - y); }
-            static int distanceFile(Square x, Square y) { return distance(x.File().AsInt(), y.File().AsInt()); }
-            static int distanceRank(Square x, Square y) { return distance(x.Rank().AsInt(), y.Rank().AsInt()); }
+            static int distanceFile(Square x, Square y) { return distance(x.File.AsInt(), y.File.AsInt()); }
+            static int distanceRank(Square x, Square y) { return distance(x.Rank.AsInt(), y.Rank.AsInt()); }
 
             // ForwardRanksBB population loop idea from sf
             for (var r = Ranks.Rank1; r < Ranks.RankNb; ++r)
@@ -245,10 +245,10 @@ namespace Rudz.Chess.Types
                 foreach (var square in AllSquares)
                 {
                     var s = square.AsInt();
-                    var file = square.File();
-                    var rank = square.Rank();
-                    ForwardFileBB[c][s] = ForwardRanksBB[c][rank.AsInt()] & file.BitBoardFile();
-                    PawnAttackSpanBB[c][s] = ForwardRanksBB[c][rank.AsInt()] & adjacentFilesBb[file.AsInt()];
+                    var file = square.File;
+                    var rank = square.Rank.AsInt();
+                    ForwardFileBB[c][s] = ForwardRanksBB[c][rank] & file.BitBoardFile();
+                    PawnAttackSpanBB[c][s] = ForwardRanksBB[c][rank] & adjacentFilesBb[file.AsInt()];
                     PassedPawnMaskBB[c][s] = ForwardFileBB[c][s] | PawnAttackSpanBB[c][s];
                 }
             }
@@ -273,9 +273,9 @@ namespace Rudz.Chess.Types
             foreach (var s1 in AllSquares)
             {
                 var sq = s1.AsInt();
-                var b = s1.BitBoardSquare();
+                var b = s1.AsBb();
 
-                var file = s1.File();
+                var file = s1.File;
 
                 // distance computation
                 foreach (var s2 in AllSquares)
@@ -396,7 +396,7 @@ namespace Rudz.Chess.Types
         /// <returns>The bitboard of square rank</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static BitBoard BitBoardRank(this Square sq)
-            => sq.Rank().BitBoardRank();
+            => sq.Rank.BitBoardRank();
 
         /// <summary>
         /// Returns the bitboard representation of a rank.
@@ -414,7 +414,7 @@ namespace Rudz.Chess.Types
         /// <returns>The bitboard of square file</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static BitBoard BitBoardFile(this Square @this)
-            => @this.File().BitBoardFile();
+            => @this.File.BitBoardFile();
 
         /// <summary>
         /// Returns the bitboard representation of the file.

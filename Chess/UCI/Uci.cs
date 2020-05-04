@@ -89,9 +89,9 @@ namespace Rudz.Chess.UCI
         public Move MoveFromUci(IPosition pos, string uciMove)
         {
             var moveList = pos.GenerateMoves();
-            var moves = moveList.GetMoves();
+            // var moves = moveList.GetMoves();
 
-            foreach (var move in moves)
+            foreach (var move in moveList)
             {
                 if (uciMove.Equals(move.ToString(), StringComparison.InvariantCultureIgnoreCase))
                     return move;

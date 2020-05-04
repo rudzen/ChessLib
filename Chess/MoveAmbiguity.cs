@@ -97,14 +97,14 @@ namespace Rudz.Chess
                 }
 
                 if (move.IsEnPassantMove())
-                    notation.Append("ep").Append(from.FileChar());
+                    notation.Append("ep").Append(from.FileChar);
                 else
                 {
                     var capturedPiece = _pos.GetPiece(to);
                     if (capturedPiece != Piece.EmptyPiece)
                     {
                         if (pt == PieceTypes.Pawn)
-                            notation.Append(from.FileChar());
+                            notation.Append(from.FileChar);
                         notation.Append('x');
                     }
                 }
@@ -147,14 +147,14 @@ namespace Rudz.Chess
                 }
 
                 if (move.IsEnPassantMove())
-                    notation.Append("ep").Append(from.FileChar());
+                    notation.Append("ep").Append(from.FileChar);
                 else
                 {
                     var capturedPiece = _pos.GetPiece(to);
                     if (capturedPiece != Piece.EmptyPiece)
                     {
                         if (pt == PieceTypes.Pawn)
-                            notation.Append(from.FileChar());
+                            notation.Append(from.FileChar);
                         notation.Append('x');
                     }
                 }
@@ -197,14 +197,14 @@ namespace Rudz.Chess
                 notation.Append(from.ToString());
 
                 if (move.IsEnPassantMove())
-                    notation.Append("ep").Append(from.FileChar());
+                    notation.Append("ep").Append(from.FileChar);
                 else
                 {
                     var capturedPiece = _pos.GetPiece(to);
                     if (capturedPiece != Piece.EmptyPiece)
                     {
                         if (pt == PieceTypes.Pawn)
-                            notation.Append(from.FileChar());
+                            notation.Append(from.FileChar);
 
                         notation.Append('x');
                     }
@@ -249,14 +249,14 @@ namespace Rudz.Chess
                 notation.Append(from.ToString());
 
                 if (move.IsEnPassantMove())
-                    notation.Append("ep").Append(from.FileChar());
+                    notation.Append("ep").Append(from.FileChar);
                 else
                 {
                     var capturedPiece = _pos.GetPiece(to);
                     if (capturedPiece != Piece.EmptyPiece)
                     {
                         if (pt == PieceTypes.Pawn)
-                            notation.Append(from.FileChar());
+                            notation.Append(from.FileChar);
 
                         notation.Append('x').Append(capturedPiece.Type().GetPieceChar());
                     }
@@ -278,7 +278,7 @@ namespace Rudz.Chess
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private char GetCheckChar()
-            => _pos.GenerateMoves().GetMoves().Any() ? '+' : '#';
+            => _pos.GenerateMoves().Any() ? '+' : '#';
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private MoveAmbiguities Ambiguity(Move move, BitBoard similarTypeAttacks)
@@ -299,9 +299,9 @@ namespace Rudz.Chess
 
                 if (_pos.Pieces(c) & square)
                 {
-                    if (square.File() == from.File())
+                    if (square.File == from.File)
                         ambiguity |= MoveAmbiguities.File;
-                    else if (square.Rank() == from.Rank())
+                    else if (square.Rank == from.Rank)
                         ambiguity |= MoveAmbiguities.Rank;
 
                     ambiguity |= MoveAmbiguities.Move;
@@ -345,7 +345,7 @@ namespace Rudz.Chess
                 return;
 
             if (!ambiguity.HasFlagFast(MoveAmbiguities.File))
-                sb.Append(from.FileChar());
+                sb.Append(from.FileChar);
             else if (!ambiguity.HasFlagFast(MoveAmbiguities.Rank))
                 sb.Append(from.RankChar());
             else

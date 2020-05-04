@@ -48,10 +48,10 @@ namespace Chess.Test.Move
             var toSquare = new Square(Squares.e4);
 
             var uniChar = movingPiece.GetUnicodeChar();
-            var toSquareString = toSquare.GetSquareString();
+            var toSquareString = toSquare.ToString();
 
-            var expectedPrimary = $"{uniChar}{fromOneSquare.FileChar()}{toSquareString}";
-            var expectedSecondary = $"{uniChar}{fromTwoSquare.FileChar()}{toSquareString}";
+            var expectedPrimary = $"{uniChar}{fromOneSquare.FileChar}{toSquareString}";
+            var expectedSecondary = $"{uniChar}{fromTwoSquare.FileChar}{toSquareString}";
 
             var board = new Board();
             var pos = new Position(board);
@@ -84,10 +84,10 @@ namespace Chess.Test.Move
             var toSquare = new Square(Squares.e4);
 
             var uniChar = movingPiece.GetUnicodeChar();
-            var toSquareString = toSquare.GetSquareString();
+            var toSquareString = toSquare.ToString();
 
-            var expectedPrimary = $"{uniChar}{fromOneSquare.FileChar()}{toSquareString}";
-            var expectedSecondary = $"{uniChar}{fromTwoSquare.FileChar()}{toSquareString}";
+            var expectedPrimary = $"{uniChar}{fromOneSquare.FileChar}{toSquareString}";
+            var expectedSecondary = $"{uniChar}{fromTwoSquare.FileChar}{toSquareString}";
 
             var board = new Board();
             var pos = new Position(board);
@@ -120,7 +120,7 @@ namespace Chess.Test.Move
             var toSquare = new Square(Squares.f3);
 
             var uniChar = movingPiece.GetUnicodeChar();
-            var toSquareString = toSquare.GetSquareString();
+            var toSquareString = toSquare.ToString();
 
             var expectedPrimary = $"{uniChar}{fromOneSquare.RankChar()}{toSquareString}";
             var expectedSecondary = $"{uniChar}{fromTwoSquare.RankChar()}{toSquareString}";
@@ -156,10 +156,10 @@ namespace Chess.Test.Move
             var toSquare = new Square(Squares.e4);
 
             var uniChar = movingPiece.GetPieceChar();
-            var toSquareString = toSquare.GetSquareString();
+            var toSquareString = toSquare.ToString();
 
-            var expectedPrimary = $"{uniChar}{fromOneSquare.FileChar()}{toSquareString}";
-            var expectedSecondary = $"{uniChar}{fromTwoSquare.FileChar()}{toSquareString}";
+            var expectedPrimary = $"{uniChar}{fromOneSquare.FileChar}{toSquareString}";
+            var expectedSecondary = $"{uniChar}{fromTwoSquare.FileChar}{toSquareString}";
 
             var board = new Board();
             var pos = new Position(board);
@@ -192,10 +192,10 @@ namespace Chess.Test.Move
             var toSquare = new Square(Squares.e4);
 
             var uniChar = movingPiece.GetPieceChar();
-            var toSquareString = toSquare.GetSquareString();
+            var toSquareString = toSquare.ToString();
 
-            var expectedPrimary = $"{uniChar}{fromOneSquare.FileChar()}{toSquareString}";
-            var expectedSecondary = $"{uniChar}{fromTwoSquare.FileChar()}{toSquareString}";
+            var expectedPrimary = $"{uniChar}{fromOneSquare.FileChar}{toSquareString}";
+            var expectedSecondary = $"{uniChar}{fromTwoSquare.FileChar}{toSquareString}";
 
             var board = new Board();
             var pos = new Position(board);
@@ -228,7 +228,7 @@ namespace Chess.Test.Move
             var toSquare = new Square(Squares.f3);
 
             var uniChar = movingPiece.GetPieceChar();
-            var toSquareString = toSquare.GetSquareString();
+            var toSquareString = toSquare.ToString();
 
             var expectedPrimary = $"{uniChar}{fromOneSquare.RankChar()}{toSquareString}";
             var expectedSecondary = $"{uniChar}{fromTwoSquare.RankChar()}{toSquareString}";
@@ -264,10 +264,10 @@ namespace Chess.Test.Move
             var toSquare = new Square(Squares.e4);
 
             var uniChar = movingPiece.GetPieceChar();
-            var toSquareString = toSquare.GetSquareString();
+            var toSquareString = toSquare.ToString();
 
-            var expectedPrimary = $"{uniChar}{fromOneSquare.GetSquareString()}-{toSquareString}";
-            var expectedSecondary = $"{uniChar}{fromTwoSquare.GetSquareString()}-{toSquareString}";
+            var expectedPrimary = $"{uniChar}{fromOneSquare.ToString()}-{toSquareString}";
+            var expectedSecondary = $"{uniChar}{fromTwoSquare.ToString()}-{toSquareString}";
 
             var board = new Board();
             var pos = new Position(board);
@@ -300,10 +300,10 @@ namespace Chess.Test.Move
             var toSquare = new Square(Squares.e4);
 
             var uniChar = movingPiece.GetPieceChar();
-            var toSquareString = toSquare.GetSquareString();
+            var toSquareString = toSquare.ToString();
 
-            var expectedPrimary = $"{uniChar}{fromOneSquare.GetSquareString()}-{toSquareString}";
-            var expectedSecondary = $"{uniChar}{fromTwoSquare.GetSquareString()}-{toSquareString}";
+            var expectedPrimary = $"{uniChar}{fromOneSquare.ToString()}-{toSquareString}";
+            var expectedSecondary = $"{uniChar}{fromTwoSquare.ToString()}-{toSquareString}";
 
             var board = new Board();
             var pos = new Position(board);
@@ -336,10 +336,10 @@ namespace Chess.Test.Move
             var toSquare = new Square(Squares.f3);
 
             var uniChar = movingPiece.GetPieceChar();
-            var toSquareString = toSquare.GetSquareString();
+            var toSquareString = toSquare.ToString();
 
-            var expectedPrimary = $"{uniChar}{fromOneSquare.GetSquareString()}-{toSquareString}";
-            var expectedSecondary = $"{uniChar}{fromTwoSquare.GetSquareString()}-{toSquareString}";
+            var expectedPrimary = $"{uniChar}{fromOneSquare.ToString()}-{toSquareString}";
+            var expectedSecondary = $"{uniChar}{fromTwoSquare.ToString()}-{toSquareString}";
 
             var board = new Board();
             var pos = new Position(board);
@@ -372,10 +372,10 @@ namespace Chess.Test.Move
             var toSquare = new Square(Squares.e4);
 
             var uniChar = movingPiece.GetPieceChar();
-            var toSquareString = toSquare.GetSquareString();
+            var toSquareString = toSquare.ToString();
 
-            var expectedPrimary = $"{uniChar}{fromOneSquare.GetSquareString()}-{toSquareString}";
-            var expectedSecondary = $"{uniChar}{fromTwoSquare.GetSquareString()}-{toSquareString}";
+            var expectedPrimary = $"{uniChar}{fromOneSquare.ToString()}-{toSquareString}";
+            var expectedSecondary = $"{uniChar}{fromTwoSquare.ToString()}-{toSquareString}";
 
             var board = new Board();
             var pos = new Position(board);
@@ -408,10 +408,10 @@ namespace Chess.Test.Move
             var toSquare = new Square(Squares.e4);
 
             var uniChar = movingPiece.GetPieceChar();
-            var toSquareString = toSquare.GetSquareString();
+            var toSquareString = toSquare.ToString();
 
-            var expectedPrimary = $"{uniChar}{fromOneSquare.GetSquareString()}-{toSquareString}";
-            var expectedSecondary = $"{uniChar}{fromTwoSquare.GetSquareString()}-{toSquareString}";
+            var expectedPrimary = $"{uniChar}{fromOneSquare.ToString()}-{toSquareString}";
+            var expectedSecondary = $"{uniChar}{fromTwoSquare.ToString()}-{toSquareString}";
 
             var board = new Board();
             var pos = new Position(board);
@@ -444,10 +444,10 @@ namespace Chess.Test.Move
             var toSquare = new Square(Squares.f3);
 
             var uniChar = movingPiece.GetPieceChar();
-            var toSquareString = toSquare.GetSquareString();
+            var toSquareString = toSquare.ToString();
 
-            var expectedPrimary = $"{uniChar}{fromOneSquare.GetSquareString()}-{toSquareString}";
-            var expectedSecondary = $"{uniChar}{fromTwoSquare.GetSquareString()}-{toSquareString}";
+            var expectedPrimary = $"{uniChar}{fromOneSquare.ToString()}-{toSquareString}";
+            var expectedSecondary = $"{uniChar}{fromTwoSquare.ToString()}-{toSquareString}";
 
             var board = new Board();
             var pos = new Position(board);
