@@ -27,6 +27,7 @@ SOFTWARE.
 namespace Rudz.Chess.Types
 {
     using Enums;
+    using System;
     using System.Collections.Generic;
     using System.Runtime.CompilerServices;
     using System.Runtime.InteropServices;
@@ -36,7 +37,7 @@ namespace Rudz.Chess.Types
     /// Contains the piece type which indicate what type and color the piece is
     /// </summary>
     [StructLayout(LayoutKind.Explicit, Size = 1)]
-    public readonly struct Piece
+    public readonly struct Piece : IEquatable<Piece>
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private Piece(int piece) => Value = (Pieces)piece;

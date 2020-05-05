@@ -24,6 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using System;
+
 namespace Rudz.Chess.Types
 {
     using System.Runtime.CompilerServices;
@@ -31,7 +33,7 @@ namespace Rudz.Chess.Types
     /// <summary>
     /// Extended move structure which combines Move and Score
     /// </summary>
-    public struct ExtMove
+    public struct ExtMove : IEquatable<ExtMove>
     {
         public Move Move;
 
@@ -57,5 +59,20 @@ namespace Rudz.Chess.Types
         public static implicit operator ExtMove(Score s) => new ExtMove(Move.EmptyMove, s);
 
         public override string ToString() => $"{Move}, {Score}";
+
+        public bool Equals(ExtMove other)
+        {
+            return Move.Equals(other.Move);
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is ExtMove other && Equals(other);
+        }
+
+        public override int GetHashCode()
+        {
+            return Move.GetHashCode();
+        }
     }
 }

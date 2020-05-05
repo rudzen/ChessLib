@@ -26,7 +26,9 @@ SOFTWARE.
 
 namespace Rudz.Chess.Types
 {
-    public interface IPieceSquare
+    using System;
+
+    public interface IPieceSquare : IEquatable<IPieceSquare>
     {
         Piece Piece { get; set; }
 

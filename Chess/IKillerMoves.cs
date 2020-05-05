@@ -24,16 +24,20 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using System;
+
 namespace Rudz.Chess
 {
     using Types;
 
-    public interface IKillerMoves
+    public interface IKillerMoves : IEquatable<IKillerMoves>
     {
         void Initialize(int maxDepth);
 
         int GetValue(int depth, Move move, Piece fromPiece);
 
+        IPieceSquare Get(int depth, int index);
+        
         void UpdateValue(int depth, Move move, Piece fromPiece);
 
         void Shift(int depth);

@@ -35,9 +35,11 @@ namespace Rudz.Chess
     public sealed class KillerMoves : IKillerMoves
     {
         private IPieceSquare[,] _killerMoves;
+        private int _maxDepth;
 
         public void Initialize(int maxDepth)
         {
+            _maxDepth = maxDepth;
             _killerMoves = new IPieceSquare[maxDepth + 1, 2];
             for (var depth = 0; depth <= maxDepth; depth++)
             {
@@ -73,6 +75,11 @@ namespace Rudz.Chess
         private bool Equals(IPieceSquare killerMove, Move move, Piece fromPiece)
             => killerMove.Piece == fromPiece && killerMove.Square == move.GetToSquare();
 
+        public IPieceSquare Get(int depth, int index)
+        {
+            return _killerMoves[depth, index];
+        }
+        
         public void Shift(int depth)
         {
             // Shift killer moves closer to root position.
@@ -105,6 +112,33 @@ namespace Rudz.Chess
                 _killerMoves[i, 1].Piece = Piece.EmptyPiece;
                 _killerMoves[i, 1].Square = Square.None;
             }
+        }
+
+        public bool Equals(IKillerMoves other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            for (var j = 0; j < _maxDepth; ++j)
+            {
+                var otherKm = other.Get(j, 0);
+                if (otherKm.Piece != _killerMoves[j, 0].Piece || otherKm.Square != _killerMoves[j, 0].Square)
+                    return false;
+                otherKm = other.Get(j, 1);
+                if (otherKm.Piece != _killerMoves[j, 1].Piece || otherKm.Square != _killerMoves[j, 1].Square)
+                    return false;
+            }
+
+            return false;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return ReferenceEquals(this, obj) || obj is KillerMoves other && Equals(other);
+        }
+
+        public override int GetHashCode()
+        {
+            return (_killerMoves != null ? _killerMoves.GetHashCode() : 0);
         }
     }
 }

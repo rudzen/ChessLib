@@ -38,7 +38,7 @@ namespace Rudz.Chess.Types
     /// Enumeration will yield each set bit as a Square struct.
     /// <para>For more information - please see https://github.com/rudzen/ChessLib/wiki/BitBoard</para>
     /// </summary>
-    public readonly struct BitBoard : IEnumerable<Square>
+    public readonly struct BitBoard : IEnumerable<Square>, IEquatable<BitBoard>
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public BitBoard(ulong value)

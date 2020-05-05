@@ -24,6 +24,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using FluentAssertions;
+using Rudz.Chess.Extensions;
+
 namespace Chess.Test.Position
 {
     using Rudz.Chess;
@@ -84,12 +87,14 @@ namespace Chess.Test.Position
             // b must contain one square at this point
             var pinnedCount = b.Count;
 
-            Assert.Equal(expected, pinnedCount);
+            pinnedCount.Should().Be(expected);
 
             // test for correct square
             var pinnedSquare = b.Lsb();
 
-            Assert.Equal(Squares.c4, pinnedSquare.Value);
+            var expectedSquare = new Square(Ranks.Rank4, Files.FileC);
+            
+            pinnedSquare.Should().Be(expectedSquare);
         }
 
         // TODO : Add test functions for the rest of the methods and properties in position class

@@ -24,13 +24,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using Microsoft.Extensions.ObjectPool;
-using Rudz.Chess.ObjectPoolPolicies;
-
 namespace Rudz.Chess
 {
     using Enums;
     using Fen;
+    using Microsoft.Extensions.ObjectPool;
+    using ObjectPoolPolicies;
     using System;
     using System.Collections;
     using System.Collections.Generic;

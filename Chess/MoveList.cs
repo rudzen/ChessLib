@@ -415,6 +415,8 @@ namespace Rudz.Chess
                 ? GenerateEvasions(pos, moves, index)
                 : Generate(pos, moves, index, MoveGenerationType.NonEvasions);
 
+            // In case there exists pinned pieces, the move is a king move (including castleling) or it's an en-pessant move
+            // the move is checked, otherwise we assume the move is legal.
             while (cur != end)
             {
                 var pinnedIsEmpty = pinned.IsEmpty;

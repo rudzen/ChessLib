@@ -24,6 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using System;
+
 namespace Rudz.Chess.Types
 {
     using Enums;
@@ -33,7 +35,7 @@ namespace Rudz.Chess.Types
     /// Move struct. Contains a single ushort for move related information.
     /// Also includes set and get functions for the relevant data stored in the bits.
     /// </summary>
-    public readonly struct Move
+    public readonly struct Move : IEquatable<Move>
     {
         private readonly ushort _data;
 

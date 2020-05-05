@@ -24,12 +24,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using System;
+
 namespace Rudz.Chess.Types
 {
     using Enums;
     using System.Runtime.CompilerServices;
 
-    public readonly struct Direction
+    public readonly struct Direction : IEquatable<Direction>
     {
         public Directions Value { get; }
 

@@ -27,9 +27,10 @@ SOFTWARE.
 namespace Rudz.Chess.Types
 {
     using Enums;
+    using System;
     using System.Runtime.CompilerServices;
 
-    public readonly struct Rank
+    public readonly struct Rank : IEquatable<Rank>
     {
         private static readonly char[] RankChars = { '1', '2', '3', '4', '5', '6', '7', '8' };
 

@@ -24,13 +24,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using System;
+
 namespace Rudz.Chess.Types
 {
     using Enums;
     using System.Linq;
     using System.Runtime.CompilerServices;
 
-    public readonly struct File
+    public readonly struct File : IEquatable<File>
     {
         private static readonly char[] FileChars = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' };
 
