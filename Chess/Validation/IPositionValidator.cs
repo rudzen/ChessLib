@@ -24,27 +24,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Factories
+namespace Rudz.Chess.Validation
 {
-    using Fen;
-
-    public static class GameFactory
+    public interface IPositionValidator
     {
-        public static IGame Create(IPosition position) => new Game(position);
-
-        public static IGame Create(string fen)
-        {
-            var g = Create();
-            var fenData = new FenData(fen);
-            g.Pos.SetFen(fenData);
-            return g;
-        }
-
-        public static IGame Create()
-        {
-            var board = new Board();
-            var pos = new Position(board);
-            return new Game(pos);
-        }
+        string ErrorMsg { get; }
+        bool IsOk { get; }
+        IPositionValidator Validate(PositionValidationTypes type = PositionValidationTypes.All);
     }
 }

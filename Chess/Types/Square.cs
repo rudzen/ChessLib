@@ -31,8 +31,7 @@ namespace Rudz.Chess.Types
     using System.Runtime.CompilerServices;
 
     /// <summary>
-    /// Square data struct.
-    /// Contains a single enum value which represents a square on the board.
+    /// Square data struct. Contains a single enum value which represents a square on the board.
     /// </summary>
     public readonly struct Square : IComparable<Square>
     {
@@ -47,7 +46,7 @@ namespace Rudz.Chess.Types
             "a7", "b7", "c7", "d7", "e7", "f7", "g7", "h7",
             "a8", "b8", "c8", "d8", "e8", "f8", "g8", "h8"
         };
-        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Square(int square) => Value = (Squares)square;
 
@@ -61,7 +60,7 @@ namespace Rudz.Chess.Types
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Square(Ranks rank, Files file)
             : this((int)rank, (int)file) { }
-        
+
         public Square(Rank rank, File file)
             : this(rank.AsInt(), file.AsInt()) { }
 
@@ -71,13 +70,17 @@ namespace Rudz.Chess.Types
         public readonly Squares Value;
 
         public Rank Rank => (Ranks)(AsInt() >> 3);
-        
+
+        public char RankChar => Rank.Char;
+
         public File File => AsInt() & 7;
 
         public char FileChar => File.FileChar();
-        
+
         public bool IsOk => Value >= Squares.a1 && Value <= Squares.h8;
-        
+
+        public bool IsDark => !(BitBoards.DarkSquares & this).IsEmpty;
+
         public static readonly Square None = new Square(Squares.none);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -154,7 +157,7 @@ namespace Rudz.Chess.Types
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator <(Square left, Square right) => left.Value < right.Value;
-        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator <=(Square left, Square right) => left.Value <= right.Value;
 
@@ -168,7 +171,7 @@ namespace Rudz.Chess.Types
         public static bool operator false(Square sq) => !sq.IsOk;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Square Relative(Player p) => (int) Value ^ (p.Side * 56);
+        public Square Relative(Player p) => (int)Value ^ (p.Side * 56);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Square Max(Square other) => Value > other.Value ? this : other;
@@ -186,29 +189,30 @@ namespace Rudz.Chess.Types
         public override bool Equals(object obj) => obj is Square square && Equals(square);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public override int GetHashCode() => AsInt();
+        public override int GetHashCode()
+            => AsInt();
+
+        public int AsInt() => (int) Value;
+
+        public BitBoard AsBb()
+            => BitBoards.BbSquares[AsInt()];
+
+        public Rank RelativeRank(Player color)
+            => Rank.RelativeRank(color);
+
+        public bool IsOppositeColor(Square other)
+            => (((int)Value + Rank.AsInt() + (int)other.Value + other.Rank.AsInt()) & 1) != 0;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int AsInt() => (int)Value;
+        public bool IsValidEp() => Rank == Ranks.Rank3 || Rank == Ranks.Rank6;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public BitBoard AsBb() => BitBoards.BbSquares[AsInt()];
+        public bool IsValidEp(Player c) => RelativeRank(c) == Ranks.Rank3;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public char RankChar() => Rank.Char;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Rank RelativeRank(Player color) => Rank.RelativeRank(color);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsOppositeColor(Square other) => (((int)Value + Rank.AsInt() + (int)other.Value + other.Rank.AsInt()) & 1) != 0;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsDark(Square s) => !(s.AsBb() & BitBoards.DarkSquares).IsEmpty;
-
+        public bool IsPromotionRank() => !(BitBoards.PromotionRanksBB & this).IsEmpty;
+        
         public int CompareTo(Square other)
-        {
-            return Value.CompareTo(other.Value);
-        }
+            => Value.CompareTo(other.Value);
     }
 }

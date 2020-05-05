@@ -24,30 +24,28 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System.Runtime.CompilerServices;
-
-[assembly: InternalsVisibleTo("Chess.Test")]
-
-namespace Rudz.Chess.Types
+namespace Rudz.Chess.Validation
 {
-    using Enums;
-    using System.Runtime.CompilerServices;
+    using System;
 
-    public static class SquareExtensions
+    [Flags]
+    public enum PositionValidationTypes
     {
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsValidEp(this Square s) => s.Rank == Ranks.Rank3 || s.Rank == Ranks.Rank6;
+        None = 0,
+        Basic = 1,
+        Castleling = 1 << 1,
+        Kings = 1 << 2,
+        Pawns = 1 << 3,
+        PieceConsistency = 1 << 4,
+        PieceCount = 1 << 5,
+        PieceTypes = 1 << 6,
+        State = 1 << 7,
+        All = Basic | Castleling | Kings | Pawns | PieceConsistency | PieceCount | PieceTypes | State
+    }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsValidEp(this Square s, Player c) => s.RelativeRank(c) == Ranks.Rank3;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsPromotionRank(this Square square) => (BitBoards.PromotionRanksBB & square) != 0;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static BitBoard BitBoardSquare(this Squares sq) => BitBoards.BbSquares[(int)sq];
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Square RelativeSquare(this Squares sq, Player c) => (int)sq ^ (c.Side * 56);
+    public static class PositionValidationTypesExtensions
+    {
+        public static bool HasFlagFast(this PositionValidationTypes @this, PositionValidationTypes flag)
+            => (@this & flag) != 0;
     }
 }

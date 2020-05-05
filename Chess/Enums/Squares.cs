@@ -26,6 +26,10 @@ SOFTWARE.
 
 namespace Rudz.Chess.Enums
 {
+
+    using System.Runtime.CompilerServices;
+    using Types;
+
     public enum Squares
     {
         // ReSharper disable InconsistentNaming
@@ -41,5 +45,14 @@ namespace Rudz.Chess.Enums
         none = 65
         // ReSharper restore InconsistentNaming
         // ReSharper restore UnusedMember.Global
+    }
+
+    public static class SquaresExtensions
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static BitBoard BitBoardSquare(this Squares sq) => BitBoards.BbSquares[(int)sq];
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Square RelativeSquare(this Squares sq, Player c) => (int)sq ^ (c.Side * 56);
     }
 }

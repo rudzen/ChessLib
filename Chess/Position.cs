@@ -38,6 +38,7 @@ namespace Rudz.Chess
     using System.Runtime.CompilerServices;
     using System.Text;
     using Types;
+    using Validation;
 
     /// <summary>
     /// The main board representation class. It stores all the information about the current board
@@ -52,12 +53,14 @@ namespace Rudz.Chess
         private Player _sideToMove;
         private int _ply;
         private State _state;
-        
+
         private readonly IBoard _board;
-        
+        private readonly IPositionValidator _positionValidator;
+
         public Position(IBoard board)
         {
             _board = board;
+            _positionValidator = new PositionValidator(this, _board);
             _castlingPath = new BitBoard[CastlelingRights.CastleRightsNb.AsInt()];
             _castlingRookSquare = new Square[CastlelingRights.CastleRightsNb.AsInt()];
             _castlingRightsMask = new CastlelingRights[64];
@@ -72,7 +75,7 @@ namespace Rudz.Chess
         /// </summary>
         public Action<Piece, Square> PieceUpdated { get; set; }
 
-        public bool Chess960 { get; private set; }
+        public bool Chess960 { get; set; }
 
         public Player SideToMove
             => _sideToMove;
@@ -98,6 +101,8 @@ namespace Rudz.Chess
         public bool IsRepetition => _state.Repetition >= 3;
 
         public State State => _state;
+
+        public bool IsMate => !this.GenerateMoves().Any();
 
         public void Clear()
         {
@@ -164,7 +169,6 @@ namespace Rudz.Chess
             var capturedPiece = m.IsEnPassantMove()
                 ? PieceTypes.Pawn.MakePiece(them)
                 : GetPiece(to);
-
 
             Debug.Assert(pc.ColorOf() == us);
             Debug.Assert(capturedPiece == Piece.EmptyPiece || capturedPiece.ColorOf() == (!m.IsCastlelingMove() ? them : us));
@@ -295,7 +299,7 @@ namespace Rudz.Chess
             SetCheckInfo(_state);
             _state.UpdateRepetition();
 
-            Debug.Assert(IsOk().Item1);
+            //Debug.Assert(_positionValidator.Validate().IsOk);
         }
 
         public void TakeMove(Move m)
@@ -304,7 +308,7 @@ namespace Rudz.Chess
 
             // flip sides
             _sideToMove = ~_sideToMove;
-            
+
             var us = _sideToMove;
             var from = m.GetFromSquare();
             var to = m.GetToSquare();
@@ -355,8 +359,8 @@ namespace Rudz.Chess
             // Set state to previous state
             _state = _state.Previous;
             _ply--;
-            
-            Debug.Assert(IsOk().Item1);
+
+            //Debug.Assert(_positionValidator.Validate().IsOk);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -524,7 +528,7 @@ namespace Rudz.Chess
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool PawnIsolated(Square sq, Player c)
-            => ((sq.PawnAttackSpan(c) | sq.PawnAttackSpan(~c)) & Pieces(PieceTypes.Pawn, c)).IsEmpty;
+            => ((sq.PawnAttackSpan(c) | sq.PawnAttackSpan(~c)) & _board.Pieces(c, PieceTypes.Pawn)).IsEmpty;
 
         /// <summary>
         /// Determine if a specific square is a passed pawn
@@ -541,7 +545,7 @@ namespace Rudz.Chess
 
             var c = pc.ColorOf();
 
-            return (sq.PassedPawnFrontAttackSpan(c) & Pieces(PieceTypes.Pawn, c)).IsEmpty;
+            return (sq.PassedPawnFrontAttackSpan(c) & _board.Pieces(c, PieceTypes.Pawn)).IsEmpty;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -616,6 +620,10 @@ namespace Rudz.Chess
             return _castlingRookSquare[cr.AsInt()];
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public CastlelingRights GetCastlelingRightsMask(Square sq)
+            => _castlingRightsMask[sq.AsInt()];
+
         /// <summary>
         /// <para>
         /// "Validates" a move using simple logic. For example that the piece actually being moved
@@ -670,26 +678,28 @@ namespace Rudz.Chess
                 if ((GetAttacks(from, pc.Type()) & to).IsEmpty)
                 return false;
 
+            // if king is not in check no need to proceed
+            if (Checkers.IsEmpty)
+                return true;
+
             // Evasions generator already takes care to avoid some kind of illegal moves and legal()
             // relies on this. We therefore have to take care that the same kind of moves are
             // filtered out here.
-            if (!Checkers.IsEmpty)
-            {
-                if (pc.Type() != PieceTypes.King)
-                {
-                    // Double check? In this case a king move is required
-                    if (Checkers.MoreThanOne())
-                        return false;
 
-                    // Our move must be a blocking evasion or a capture of the checking piece
-                    if (((Checkers.Lsb().BitboardBetween(GetKingSquare(us)) | Checkers) & to).IsEmpty)
-                        return false;
-                }
-                // In case of king moves under check we have to remove king so to catch as invalid
-                // moves like b1a1 when opposite queen is on c1.
-                else if (!(AttacksTo(to, Pieces() ^ from) & Pieces(~us)).IsEmpty)
+            if (pc.Type() != PieceTypes.King)
+            {
+                // Double check? In this case a king move is required
+                if (Checkers.MoreThanOne())
+                    return false;
+
+                // Our move must be a blocking evasion or a capture of the checking piece
+                if (((Checkers.Lsb().BitboardBetween(GetKingSquare(us)) | Checkers) & to).IsEmpty)
                     return false;
             }
+            // In case of king moves under check we have to remove king so to catch as invalid
+            // moves like b1a1 when opposite queen is on c1.
+            else if (!(AttacksTo(to, Pieces() ^ @from) & Pieces(~us)).IsEmpty)
+                return false;
 
             return true;
         }
@@ -725,8 +735,8 @@ namespace Rudz.Chess
             // Check for legal castleling move
             if (m.IsCastlelingMove())
             {
-                // After castling, the rook and king final positions are the same in
-                // Chess960 as they would be in standard chess.
+                // After castling, the rook and king final positions are the same in Chess960 as
+                // they would be in standard chess.
 
                 to = (to > from ? Enums.Squares.g1 : Enums.Squares.c1).RelativeSquare(us);
                 var step = to > from ? Directions.West : Directions.East;
@@ -735,27 +745,23 @@ namespace Rudz.Chess
                     if (AttacksTo(s) & _board.Pieces(~us))
                         return false;
 
-                // In case of Chess960, verify that when moving the castling rook we do
-                // not discover some hidden checker.
-                // For instance an enemy queen in SQ_A1 when castling rook is in SQ_B1.
-                return   !Chess960
+                // In case of Chess960, verify that when moving the castling rook we do not discover
+                // some hidden checker. For instance an enemy queen in SQ_A1 when castling rook is
+                // in SQ_B1.
+                return !Chess960
                          || (GetAttacks(to, PieceTypes.Rook, _board.Pieces() ^ m.GetToSquare()) & _board.Pieces(~us, PieceTypes.Rook, PieceTypes.Queen)).IsEmpty;
             }
-            
+
             // If the moving piece is a king, check whether the destination square is attacked by
             // the opponent.
             if (MovedPiece(m).Type() == PieceTypes.King)
                 return m.IsCastlelingMove() || (AttacksTo(to) & _board.Pieces(~us)).IsEmpty;
-            
-            // A non-king move is legal if and only if it is not pinned or it
-            // is moving along the ray towards or away from the king.
-            return   (BlockersForKing(us) & from).IsEmpty
+
+            // A non-king move is legal if and only if it is not pinned or it is moving along the
+            // ray towards or away from the king.
+            return (BlockersForKing(us) & from).IsEmpty
                      || from.Aligned(to, ksq);
         }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsMate()
-            => !this.GenerateMoves().Any();
 
         /// <summary>
         /// Parses the board layout to a FEN representation.. Beware, goblins are a foot.
@@ -965,7 +971,7 @@ namespace Rudz.Chess
 
             _state.Rule50 = halfMoveNum;
             _ply = moveNum;
-            
+
             SetState();
 
             return 0;
@@ -1095,116 +1101,9 @@ namespace Rudz.Chess
                 output.Append(char.ToLower(m.GetPromotedPieceType().GetPieceChar()));
         }
 
-        /// <summary>
-        /// Validates the current position
-        /// </summary>
-        /// <returns>true if validation passes otherwise false</returns>
-        public (bool, string) IsOk(bool fast = true)
+        public IPositionValidator Validate(PositionValidationTypes type = PositionValidationTypes.Basic)
         {
-            if (_sideToMove != Player.White && _sideToMove != Player.Black)
-                return (false, "Player is not a valid color");
-
-            if (_board.PieceAt(GetKingSquare(Player.White)) != Enums.Pieces.WhiteKing)
-                return (false, "White king position is not a white king");
-            
-            if (_board.PieceAt(GetKingSquare(Player.Black)) != Enums.Pieces.BlackKing)
-                return (false, "Black king position is not a black king");
-
-            if (EnPassantSquare != Square.None && EnPassantSquare.RelativeRank(_sideToMove) != Ranks.Rank6)
-                return (false, "EnPassant square is not on Rank 6");
-
-            if (fast)
-                return (true, "Fast validation ok");
-
-            if (!(_board.Pieces(PieceTypes.Pawn) & (BitBoards.RANK1 | BitBoards.RANK8)).IsEmpty
-                || _board.PieceCount(PieceTypes.Pawn, Player.White) > 8
-                || _board.PieceCount(PieceTypes.Pawn, Player.Black) > 8)
-            {
-                Debug.Print("Failed pawn validation");
-                return (false, "Failed pawn validation");
-            }
-
-            if (!(_board.Pieces(Player.White) & _board.Pieces(Player.Black)).IsEmpty
-                || (_board.Pieces(Player.White) | _board.Pieces(Player.Black)) != _board.Pieces()
-                || _board.Pieces(Player.White).Count > 16
-                || _board.Pieces(Player.Black).Count > 16)
-            {
-                Debug.Print("Failed piece bitboard validation");
-                return (false, "Failed piece bitboard validation");
-            }
-
-            for (var p1 = PieceTypes.Pawn; p1 <= PieceTypes.King; ++p1)
-            {
-                for (var p2 = PieceTypes.Pawn; p2 <= PieceTypes.King; ++p2)
-                {
-                    if (p1 == p2 || (_board.Pieces(p1) & _board.Pieces(p2)).IsEmpty)
-                        continue;
-                    Debug.Print("Failed piece bitboard #2 validation");
-                    return (false, "Failed piece bitboard #2 validation");
-                }
-            }
-
-            var pieces = new Piece[] { Enums.Pieces.WhitePawn, Enums.Pieces.WhiteKnight, Enums.Pieces.WhiteBishop, Enums.Pieces.WhiteRook, Enums.Pieces.WhiteQueen, Enums.Pieces.WhiteKing,
-                Enums.Pieces.BlackPawn, Enums.Pieces.BlackKnight, Enums.Pieces.BlackBishop, Enums.Pieces.BlackRook, Enums.Pieces.BlackQueen, Enums.Pieces.BlackKing };
-
-            foreach (var pc in pieces)
-            {
-                var pt = pc.Type();
-                var c = pc.ColorOf();
-                if (_board.PieceCount(pt, c) != _board.Pieces(c, pt).Count)
-                {
-                    Debug.Print("Failed piece count validation");
-                    return (false, "Failed piece count validation");
-                }
-
-                for (var i = 0; i < _board.PieceCount(pt, c); ++i)
-                {
-                    // todo : make some clever way of validating pieceList
-                }
-            }
-
-            foreach (var c in new[] { Player.White, Player.Black, })
-            {
-                var crs = new[] {CastlelingSides.King.MakeCastlelingRights(c), CastlelingSides.Queen.MakeCastlelingRights(c)}.Where(CanCastle);
-                foreach (var cr in crs)
-                {
-                    var rookSq = _castlingRookSquare[cr.AsInt()];
-                    if (_board.PieceAt(rookSq) == PieceTypes.Rook.MakePiece(c)
-                        && _castlingRightsMask[rookSq.AsInt()] == cr
-                        && (_castlingRightsMask[GetKingSquare(c).AsInt()] & cr) == cr)
-                        continue;
-                    Debug.Print("Failed castleling data validation");
-                    return (false, "Failed castleling data validation");
-                }
-            }
-            
-            if (_board.PieceCount(PieceTypes.King, Player.White) != 1
-                || _board.PieceCount(PieceTypes.King, Player.Black) != 1
-                || !(AttacksTo(GetKingSquare(~_sideToMove)) & _board.Pieces(_sideToMove)).IsEmpty)
-            {
-                Debug.Print("Failed king validation");
-                return (false, "Failed king validation");
-            }
-            
-  // StateInfo si = *st;
-  // set_state(&si);
-  // if (std::memcmp(&si, st, sizeof(StateInfo)))
-  //     assert(0 && "pos_is_ok: State");
-  
-  // for (Piece pc : Pieces)
-  // {
-  //     if (   pieceCount[pc] != popcount(pieces(color_of(pc), type_of(pc)))
-  //         || pieceCount[pc] != std::count(board, board + SQUARE_NB, pc))
-  //         assert(0 && "pos_is_ok: Pieces");
-  //
-  //     for (int i = 0; i < pieceCount[pc]; ++i)
-  //         if (board[pieceList[pc][i]] != pc || index[pieceList[pc][i]] != i)
-  //             assert(0 && "pos_is_ok: Index");
-  // }
-
-
-
-            return (true, string.Empty);
+            return _positionValidator.Validate(type);
         }
 
         private void DoCastleling(Player us, Square from, ref Square to, out Square rookFrom, out Square rookTo, CastlelingPerform castlelingPerform)
@@ -1257,7 +1156,7 @@ namespace Rudz.Chess
         public BitBoard GetAttacks(Square square, PieceTypes pt, BitBoard occupied)
         {
             Debug.Assert(pt != PieceTypes.Pawn, "Pawns need player");
-            
+
             return pt switch
             {
                 PieceTypes.Knight => pt.PseudoAttacks(square),
@@ -1297,10 +1196,10 @@ namespace Rudz.Chess
             output.AppendLine($"Zobrist : 0x{_state.Key.Key:X}");
             return output.ToString();
         }
-        
+
         private (BitBoard, BitBoard) SliderBlockers(BitBoard sliders, Square s)
         {
-            var result = (blockers : BitBoard.Empty, pinners : BitBoard.Empty);
+            var result = (blockers: BitBoard.Empty, pinners: BitBoard.Empty);
 
             try
             {

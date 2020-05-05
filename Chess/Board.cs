@@ -53,19 +53,13 @@ namespace Rudz.Chess
 
         #endregion base piece information
 
-        private readonly CastlelingRights[] _castlingRightsMask;
-
-        private readonly Square[] _castlingRookSquare;
-
-        private readonly BitBoard[] _castlingPath;
-
         public Board()
         {
             _pieces = new Piece[64];
             _bySide = new BitBoard[2];
             _byType = new BitBoard[PieceTypes.PieceTypeNb.AsInt()];
-            _pieceCount = new int[(int) Enums.Pieces.PieceNb];
-            var mem = new Memory<Square>(new Square[(int) Enums.Pieces.PieceNb]);
+            _pieceCount = new int[(int)Enums.Pieces.PieceNb];
+            var mem = new Memory<Square>(new Square[(int)Enums.Pieces.PieceNb]);
             _pieceList = new Square[64][];
             for (var i = 0; i < _pieceList.Length; i++)
             {
@@ -87,7 +81,7 @@ namespace Rudz.Chess
                 s.Fill(Types.Square.None);
             _index.Clear();
         }
-        
+
         public Piece PieceAt(Square sq)
             => _pieces[sq.AsInt()];
 
@@ -107,10 +101,10 @@ namespace Rudz.Chess
 
         public void RemovePiece(Square sq)
         {
-            // WARNING: This is not a reversible operation. If we remove a piece in
-            // do_move() and then replace it in undo_move() we will put it at the end of
-            // the list and not in its original place, it means index[] and pieceList[]
-            // are not invariant to a do_move() + undo_move() sequence.
+            // WARNING: This is not a reversible operation. If we remove a piece in MakeMove() and
+            // then replace it in TakeMove() we will put it at the end of the list and not in its
+            // original place, it means index[] and pieceList[] are not invariant to a MakeMove() +
+            // TakeMove() sequence.
             var pc = _pieces[sq.AsInt()];
             _byType[PieceTypes.AllPieces.AsInt()] ^= sq;
             _byType[pc.Type().AsInt()] ^= sq;
@@ -128,8 +122,8 @@ namespace Rudz.Chess
 
         public void MovePiece(Square from, Square to)
         {
-            // index[from] is not updated and becomes stale. This works as long as index[]
-            // is accessed just by known occupied squares.
+            // _index[from] is not updated and becomes stale. This works as long as _index[] is
+            // accessed just by known occupied squares.
             var pc = _pieces[from.AsInt()];
             var fromTo = from | to;
             _byType[PieceTypes.AllPieces.AsInt()] ^= fromTo;
@@ -139,7 +133,7 @@ namespace Rudz.Chess
             _pieces[to.AsInt()] = pc;
             _index[to.AsInt()] = _index[from.AsInt()];
             _pieceList[pc.AsInt()][_index[to.AsInt()]] = to;
-       }
+        }
 
         public Piece MovedPiece(Move move)
             => PieceAt(move.GetFromSquare());
@@ -170,8 +164,8 @@ namespace Rudz.Chess
 
         public ReadOnlySpan<Square> Squares(PieceTypes pt, Player c)
         {
-            var pc = pt.MakePiece(c).AsInt();
-            var squares = _pieceList[pc];
+            var pc = pt.MakePiece(c);
+            var squares = _pieceList[pc.AsInt()];
             var idx = Array.IndexOf(squares, Types.Square.None);
             return squares.AsSpan().Slice(0, idx);
         }

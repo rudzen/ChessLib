@@ -122,8 +122,8 @@ namespace Chess.Test.Move
             var uniChar = movingPiece.GetUnicodeChar();
             var toSquareString = toSquare.ToString();
 
-            var expectedPrimary = $"{uniChar}{fromOneSquare.RankChar()}{toSquareString}";
-            var expectedSecondary = $"{uniChar}{fromTwoSquare.RankChar()}{toSquareString}";
+            var expectedPrimary = $"{uniChar}{fromOneSquare.RankChar}{toSquareString}";
+            var expectedSecondary = $"{uniChar}{fromTwoSquare.RankChar}{toSquareString}";
 
             var board = new Board();
             var pos = new Position(board);
@@ -230,8 +230,8 @@ namespace Chess.Test.Move
             var uniChar = movingPiece.GetPieceChar();
             var toSquareString = toSquare.ToString();
 
-            var expectedPrimary = $"{uniChar}{fromOneSquare.RankChar()}{toSquareString}";
-            var expectedSecondary = $"{uniChar}{fromTwoSquare.RankChar()}{toSquareString}";
+            var expectedPrimary = $"{uniChar}{fromOneSquare.RankChar}{toSquareString}";
+            var expectedSecondary = $"{uniChar}{fromTwoSquare.RankChar}{toSquareString}";
 
             var board = new Board();
             var pos = new Position(board);

@@ -44,7 +44,7 @@ namespace Chess.Test.Data
                 chars.Clear();
                 strings.Clear();
                 chars.Append(sq.FileChar);
-                chars.Append(sq.RankChar());
+                chars.Append(sq.RankChar);
                 strings.Append(sq.ToString());
                 Assert.Equal(chars.ToString(), strings.ToString());
             }

@@ -159,7 +159,6 @@ namespace Rudz.Chess
                     }
                 }
 
-
                 notation.Append(to.ToString());
 
                 if (move.IsPromotionMove())
@@ -286,7 +285,9 @@ namespace Rudz.Chess
             var ambiguity = MoveAmbiguities.None;
             var c = _pos.SideToMove;
             var from = move.GetFromSquare();
-            
+
+
+
             foreach (var square in similarTypeAttacks)
             {
                 var pinned = _pos.GetPinnedPieces(square, c);
@@ -347,7 +348,7 @@ namespace Rudz.Chess
             if (!ambiguity.HasFlagFast(MoveAmbiguities.File))
                 sb.Append(from.FileChar);
             else if (!ambiguity.HasFlagFast(MoveAmbiguities.Rank))
-                sb.Append(from.RankChar());
+                sb.Append(from.RankChar);
             else
                 sb.Append(from.ToString());
         }

@@ -30,13 +30,13 @@ namespace Rudz.Chess.Types
     using System.Linq;
     using System.Runtime.CompilerServices;
 
-    public struct File
+    public readonly struct File
     {
         private static readonly char[] FileChars = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' };
 
         private static readonly string[] FileStrings;
 
-        public Files Value;
+        public readonly Files Value;
 
         static File() => FileStrings = FileChars.Select(x => x.ToString()).ToArray();
 
@@ -92,7 +92,7 @@ namespace Rudz.Chess.Types
         public static File operator -(File left, Files right) => left.AsInt() - (int)right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static File operator ++(File file) => ++file.Value;
+        public static File operator ++(File file) => file.Value + 1;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static BitBoard operator &(File left, ulong right) => left.BitBoardFile() & right;
@@ -128,16 +128,16 @@ namespace Rudz.Chess.Types
         public static bool operator false(File f) => !f.IsValid();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly int AsInt() => (int)Value;
+        public int AsInt() => (int)Value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly bool IsValid() => Value <= Files.FileH;
+        public bool IsValid() => Value <= Files.FileH;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override string ToString() => FileString();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly bool Equals(File other) => Value == other.Value;
+        public bool Equals(File other) => Value == other.Value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override bool Equals(object obj) => obj is File file && Equals(file);
@@ -146,9 +146,9 @@ namespace Rudz.Chess.Types
         public override int GetHashCode() => AsInt();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly char FileChar() => FileChars[AsInt()];
+        public char FileChar() => FileChars[AsInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly string FileString() => FileStrings[AsInt()];
+        public string FileString() => FileStrings[AsInt()];
     }
 }
