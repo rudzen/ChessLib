@@ -305,6 +305,33 @@ namespace Rudz.Chess
             //Debug.Assert(_positionValidator.Validate().IsOk);
         }
 
+        public void MakeNullMove(State newState)
+        {
+            Debug.Assert(!InCheck);
+
+            _state = _state.CopyTo(newState);
+
+            if (_state.EnPassantSquare != Square.None)
+            {
+                var enPassantFile = _state.EnPassantSquare.File;
+                _state.Key ^= enPassantFile.GetZobristEnPessant();
+                _state.EnPassantSquare = Square.None;
+            }
+
+            _state.Key ^= Zobrist.GetZobristSide();
+
+            ++_state.Rule50;
+            _state.PliesFromNull = 0;
+
+            _sideToMove = ~_sideToMove;
+            
+            SetCheckInfo(_state);
+
+            _state.Repetition = 0;
+            
+            Debug.Assert(_positionValidator.Validate(PositionValidationTypes.Basic).IsOk);
+        }
+
         public void TakeMove(Move m)
         {
             Debug.Assert(!m.IsNullMove());
@@ -364,6 +391,13 @@ namespace Rudz.Chess
             _ply--;
 
             //Debug.Assert(_positionValidator.Validate().IsOk);
+        }
+
+        public void TakeNullMove()
+        {
+            Debug.Assert(!InCheck);
+            _state = _state.Previous;
+            _sideToMove = ~_sideToMove;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

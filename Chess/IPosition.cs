@@ -72,8 +72,12 @@ namespace Rudz.Chess
 
         void MakeMove(Move m, State newState, bool givesCheck);
 
+        void MakeNullMove(State newState);
+        
         void TakeMove(Move m);
 
+        void TakeNullMove();
+        
         Piece GetPiece(Square sq);
 
         PieceTypes GetPieceType(Square sq);
