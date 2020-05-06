@@ -45,7 +45,6 @@ namespace Rudz.Chess.Types
 
         private static readonly Func<BitBoard, BitBoard>[] PawnPushModifiers = { BitBoards.NorthOne, BitBoards.SouthOne };
         
-        
         public Player(byte side)
             : this() => Side = side;
 

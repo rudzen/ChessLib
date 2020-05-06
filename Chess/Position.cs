@@ -30,6 +30,7 @@ namespace Rudz.Chess
     using Extensions;
     using Fen;
     using Hash;
+    using Microsoft.Extensions.ObjectPool;
     using System;
     using System.Collections;
     using System.Collections.Generic;
@@ -47,6 +48,7 @@ namespace Rudz.Chess
     /// </summary>
     public sealed class Position : IPosition
     {
+        private readonly ObjectPool<StringBuilder> _outputObjectPool;
         private readonly CastlelingRights[] _castlingRightsMask;
         private readonly Square[] _castlingRookSquare;
         private readonly BitBoard[] _castlingPath;
@@ -60,6 +62,7 @@ namespace Rudz.Chess
         public Position(IBoard board)
         {
             _board = board;
+            _outputObjectPool = new DefaultObjectPool<StringBuilder>(new StringBuilderPooledObjectPolicy());
             _positionValidator = new PositionValidator(this, _board);
             _castlingPath = new BitBoard[CastlelingRights.CastleRightsNb.AsInt()];
             _castlingRookSquare = new Square[CastlelingRights.CastleRightsNb.AsInt()];
@@ -610,8 +613,7 @@ namespace Rudz.Chess
         public bool CastlingImpeded(CastlelingRights cr)
         {
             Debug.Assert(cr == CastlelingRights.WhiteOo || cr == CastlelingRights.WhiteOoo || cr == CastlelingRights.BlackOo || cr == CastlelingRights.BlackOoo);
-            var v = cr.AsInt();
-            return !(_board.Pieces() & _castlingPath[v]).IsEmpty;
+            return !(_board.Pieces() & _castlingPath[cr.AsInt()]).IsEmpty;
         }
 
         public Square CastlingRookSquare(CastlelingRights cr)
@@ -635,11 +637,6 @@ namespace Rudz.Chess
         /// <returns>True if move "appears" to be legal, otherwise false</returns>
         public bool IsPseudoLegal(Move m)
         {
-            var us = _sideToMove;
-            var from = m.GetFromSquare();
-            var to = m.GetToSquare();
-            var pc = MovedPiece(m);
-
             // Use a slower but simpler function for uncommon cases
             if (m.GetMoveType() != MoveTypes.Normal)
                 return this.GenerateMoves().Contains(m);
@@ -647,6 +644,11 @@ namespace Rudz.Chess
             // Is not a promotion, so promotion piece must be empty
             if (m.GetPromotedPieceType() - 2 != PieceTypes.NoPieceType)
                 return false;
+
+            var us = _sideToMove;
+            var pc = MovedPiece(m);
+            var from = m.GetFromSquare();
+            var to = m.GetToSquare();
 
             // If the from square is not occupied by a piece belonging to the side to move, the move
             // is obviously not legal.
@@ -1122,9 +1124,6 @@ namespace Rudz.Chess
             _board.ClearPiece(doCastleling ? rookFrom : rookTo);
             AddPiece(PieceTypes.King.MakePiece(us), doCastleling ? to : from);
             AddPiece(PieceTypes.Rook.MakePiece(us), doCastleling ? rookTo : rookFrom);
-
-            // finally update state in case the move was undone if (!doCastleling)
-            // SetCastlingRight(stm, rfrom);
         }
 
         private static CastlelingRights OrCastlingRight(Player c, CastlelingSides s)
@@ -1176,7 +1175,7 @@ namespace Rudz.Chess
             const string separator = "\n  +---+---+---+---+---+---+---+---+\n";
             const char splitter = '|';
             const char space = ' ';
-            var output = new StringBuilder();
+            var output = _outputObjectPool.Get();
             output.Append(separator);
             for (var rank = Ranks.Rank8; rank >= Ranks.Rank1; rank--)
             {
@@ -1194,7 +1193,9 @@ namespace Rudz.Chess
 
             output.AppendLine("    a   b   c   d   e   f   g   h");
             output.AppendLine($"Zobrist : 0x{_state.Key.Key:X}");
-            return output.ToString();
+            var result = output.ToString();
+            _outputObjectPool.Return(output);
+            return result;
         }
 
         private (BitBoard, BitBoard) SliderBlockers(BitBoard sliders, Square s)

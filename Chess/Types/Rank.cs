@@ -95,16 +95,16 @@ namespace Rudz.Chess.Types
         public static Rank operator --(Rank rank) => rank._value - 1;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static BitBoard operator &(Rank left, ulong right) => left.BitBoardRank() & right;
+        public static BitBoard operator &(Rank left, ulong right) => left.BitBoardRank().Value & right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static BitBoard operator &(ulong left, Rank right) => left & right.BitBoardRank();
+        public static BitBoard operator &(ulong left, Rank right) => left & right.BitBoardRank().Value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static BitBoard operator |(Rank left, Rank right) => left.BitBoardRank() | right.BitBoardRank();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static BitBoard operator |(ulong left, Rank right) => left | right.BitBoardRank();
+        public static BitBoard operator |(ulong left, Rank right) => left | right.BitBoardRank().Value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int operator |(Rank left, int right) => left.AsInt() | right;

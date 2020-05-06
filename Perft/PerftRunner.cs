@@ -75,6 +75,8 @@ namespace Perft
 
         private readonly IUci _uci;
 
+        private readonly CPU _cpu;
+        
         private bool _usingEpd;
 
         public PerftRunner(IEpdParser parser, ILogger log, IBuildTimeStamp buildTimeStamp, IPerft perft, IConfiguration configuration, ObjectPool<PerftResult> resultPool, IUci uci)
@@ -100,6 +102,8 @@ namespace Perft
             {
                 Formatting = Formatting.Indented
             };
+            
+            _cpu = new CPU();
         }
 
         public bool SaveResults { get; set; }
@@ -217,11 +221,7 @@ namespace Perft
 
                 _log.Information("Depth       : {0}", depth);
                 sw.Restart();
-                // var perftResult = 0ul;
-                // await foreach (var res in _perft.DoPerft(depth).ConfigureAwait(false))
-                // {
-                //     perftResult += res;
-                // }
+                
                 var perftResult = await _perft.DoPerftAsync(depth).ConfigureAwait(false);
                 sw.Stop();
 

@@ -24,11 +24,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System;
-
 namespace Rudz.Chess.Types
 {
     using Enums;
+    using System;
     using System.Linq;
     using System.Runtime.CompilerServices;
 
@@ -136,7 +135,7 @@ namespace Rudz.Chess.Types
         public bool IsValid() => Value <= Files.FileH;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public override string ToString() => FileString();
+        public override string ToString() => FileStrings[AsInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals(File other) => Value == other.Value;
@@ -149,8 +148,5 @@ namespace Rudz.Chess.Types
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public char FileChar() => FileChars[AsInt()];
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public string FileString() => FileStrings[AsInt()];
     }
 }

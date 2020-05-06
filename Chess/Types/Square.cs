@@ -75,120 +75,158 @@ namespace Rudz.Chess.Types
 
         public bool IsOk => Value >= Squares.a1 && Value <= Squares.h8;
 
+        public bool IsPromotionRank => !(BitBoards.PromotionRanksBB & this).IsEmpty;
+        
         public bool IsDark => !(BitBoards.DarkSquares & this).IsEmpty;
 
         public static readonly Square None = new Square(Squares.none);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator Square(int value) => new Square(value);
+        public static implicit operator Square(int value)
+            => new Square(value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator Square(Squares value) => new Square(value);
+        public static implicit operator Square(Squares value)
+            => new Square(value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator ==(Square left, Square right) => left.Equals(right);
+        public static bool operator ==(Square left, Square right)
+            => left.Equals(right);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator !=(Square left, Square right) => !left.Equals(right);
+        public static bool operator !=(Square left, Square right)
+            => !left.Equals(right);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator ==(Square left, Squares right) => left.Value == right;
+        public static bool operator ==(Square left, Squares right)
+            => left.Value == right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator !=(Square left, Squares right) => left.Value != right;
+        public static bool operator !=(Square left, Squares right)
+            => left.Value != right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Square operator +(Square left, Square right) => left.Value + right.AsInt();
+        public static Square operator +(Square left, Square right)
+            => left.Value + right.AsInt();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Square operator +(Square left, int right) => left.Value + right;
+        public static Square operator +(Square left, int right)
+            => left.Value + right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Square operator +(Square left, Direction right) => left.Value + (int)right.Value;
+        public static Square operator +(Square left, Direction right)
+            => left.Value + (int)right.Value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Square operator +(Square left, Directions right) => left.Value + (int)right;
+        public static Square operator +(Square left, Directions right)
+            => left.Value + (int)right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Square operator -(Square left, Square right) => left.Value - right.Value;
+        public static Square operator -(Square left, Square right)
+            => left.Value - right.Value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Square operator -(Square left, int right) => left.Value - right;
+        public static Square operator -(Square left, int right)
+            => left.Value - right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Square operator -(Square left, Direction right) => left.Value - (int)right.Value;
+        public static Square operator -(Square left, Direction right)
+            => left.Value - (int)right.Value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Square operator -(Square left, Directions right) => left.Value - (int)right;
+        public static Square operator -(Square left, Directions right)
+            => left.Value - (int)right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Square operator ++(Square square) => new Square(square.Value + 1);
+        public static Square operator ++(Square square)
+            => new Square(square.Value + 1);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Square operator --(Square square) => new Square(square.Value - 1);
+        public static Square operator --(Square square)
+            => new Square(square.Value - 1);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static BitBoard operator &(Square left, ulong right) => left.AsBb() & right;
+        public static BitBoard operator &(Square left, ulong right)
+            => left.AsBb().Value & right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static BitBoard operator &(ulong left, Square right) => left & right.AsBb();
+        public static BitBoard operator &(ulong left, Square right)
+            => left & right.AsBb();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static BitBoard operator |(Square left, Square right) => left.AsBb() | right.AsBb();
+        public static BitBoard operator |(Square left, Square right)
+            => left.AsBb().Value | right.AsBb().Value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static BitBoard operator |(ulong left, Square right) => left | right.AsBb();
+        public static BitBoard operator |(ulong left, Square right)
+            => left | right.AsBb().Value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int operator |(Square left, int right) => left.AsInt() | right;
+        public static int operator |(Square left, int right)
+            => left.AsInt() | right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static BitBoard operator ~(Square left) => ~left.AsBb();
+        public static BitBoard operator ~(Square left)
+            => ~left.AsBb();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int operator >>(Square left, int right) => left.AsInt() >> right;
+        public static int operator >>(Square left, int right)
+            => left.AsInt() >> right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator >(Square left, Square right) => left.Value > right.Value;
+        public static bool operator >(Square left, Square right)
+            => left.Value > right.Value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator <(Square left, Square right) => left.Value < right.Value;
+        public static bool operator <(Square left, Square right)
+            => left.Value < right.Value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator <=(Square left, Square right) => left.Value <= right.Value;
+        public static bool operator <=(Square left, Square right)
+            => left.Value <= right.Value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator >=(Square left, Square right) => left.Value >= right.Value;
+        public static bool operator >=(Square left, Square right)
+            => left.Value >= right.Value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator true(Square sq) => sq.IsOk;
+        public static bool operator true(Square sq)
+            => sq.IsOk;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator false(Square sq) => !sq.IsOk;
+        public static bool operator false(Square sq)
+            => !sq.IsOk;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Square Relative(Player p) => (int)Value ^ (p.Side * 56);
+        public Square Relative(Player p)
+            => (int)Value ^ (p.Side * 56);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Square Max(Square other) => Value > other.Value ? this : other;
+        public Square Max(Square other)
+            => Value > other.Value ? this : other;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Square Min(Square other) => Value <= other.Value ? this : other;
+        public Square Min(Square other)
+            => Value <= other.Value ? this : other;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public override string ToString() => SquareStrings[AsInt()];
+        public override string ToString()
+            => SquareStrings[AsInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool Equals(Square other) => Value == other.Value;
+        public bool Equals(Square other)
+            => Value == other.Value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public override bool Equals(object obj) => obj is Square square && Equals(square);
+        public override bool Equals(object obj)
+            => obj is Square square && Equals(square);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override int GetHashCode()
             => AsInt();
 
-        public int AsInt() => (int) Value;
+        public int AsInt()
+            => (int) Value;
 
         public BitBoard AsBb()
             => BitBoards.BbSquares[AsInt()];
@@ -199,15 +237,6 @@ namespace Rudz.Chess.Types
         public bool IsOppositeColor(Square other)
             => (((int)Value + Rank.AsInt() + (int)other.Value + other.Rank.AsInt()) & 1) != 0;
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsValidEp() => Rank == Ranks.Rank3 || Rank == Ranks.Rank6;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsValidEp(Player c) => RelativeRank(c) == Ranks.Rank3;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsPromotionRank() => !(BitBoards.PromotionRanksBB & this).IsEmpty;
-        
         public int CompareTo(Square other)
             => Value.CompareTo(other.Value);
     }

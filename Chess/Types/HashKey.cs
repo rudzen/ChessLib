@@ -36,10 +36,10 @@ namespace Rudz.Chess.Types
     public struct HashKey : IEquatable<HashKey>
     {
         [FieldOffset(0)]
-        private uint _lowerKey32;
+        private readonly uint _lowerKey32;
 
         [FieldOffset(4)]
-        private uint _upperKey32;
+        private readonly uint _upperKey32;
 
         [FieldOffset(0)]
         private ulong _key;
