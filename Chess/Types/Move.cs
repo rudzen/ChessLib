@@ -134,11 +134,15 @@ namespace Rudz.Chess.Types
             => _data;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public override string ToString() =>
-            IsNullMove()
-                ? ".."
-                : !IsPromotionMove()
+        public override string ToString()
+        {
+            return IsNullMove()
+                ? "(null)"
+                : GetMoveType() == MoveTypes.Normal
                     ? $"{GetFromSquare()}{GetToSquare()}"
-                    : $"{GetFromSquare()}{GetToSquare()}{GetPromotedPieceType().GetPromotionChar()}";
+                    : GetMoveType() == MoveTypes.Castling
+                        ? GetFromSquare() < GetToSquare() ? "0-0" : "0-0-0"
+                        : $"{GetFromSquare()}{GetToSquare()}{GetPromotedPieceType().GetPromotionChar()}";
+        }
     }
 }

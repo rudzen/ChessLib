@@ -39,12 +39,19 @@ namespace Rudz.Chess.UCI
         Action<IOption> OnThreads { get; set; }
         Action<IOption> OnHashSize { get; set; }
         Action<IOption> OnClearHash { get; set; }
+        bool IsDebugModeEnabled { get; set; }
 
         void Initialize(int maxThreads = 128);
-        
+
         int Nps(ulong nodes, TimeSpan time);
-        
+
         Move MoveFromUci(IPosition pos, string uciMove);
+
+        string UciOk();
+
+        string ReadyOk();
+
+        string CopyProtection(CopyProtections copyProtections);
 
         string BestMove(Move move, Move ponderMove);
 

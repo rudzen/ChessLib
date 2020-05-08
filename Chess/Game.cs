@@ -35,7 +35,6 @@ namespace Rudz.Chess
     using System.Collections.Generic;
     using System.Linq;
     using System.Runtime.CompilerServices;
-    using System.Text;
     using Transposition;
     using Types;
     using Piece = Types.Piece;
@@ -44,7 +43,7 @@ namespace Rudz.Chess
     public sealed class Game : IGame
     {
         private readonly ObjectPool<IMoveList> _moveLists;
-        
+
         public Game(IPosition pos)
         {
             Pos = pos;
@@ -81,8 +80,8 @@ namespace Rudz.Chess
             var gameEndType = GameEndTypes.None;
             if (IsRepetition)
                 gameEndType |= GameEndTypes.Repetition;
-            // if (State.Material[Player.White.Side] <= 300 && State.Material[Player.Black.Side] <= 300)//&& Pos.BoardPieces[0].Empty && Pos.BoardPieces[8].Empty)
-            //     gameEndType |= GameEndTypes.MaterialDrawn;
+            // if (State.Material[Player.White.Side] <= 300 && State.Material[Player.Black.Side] <=
+            // 300)//&& Pos.BoardPieces[0].Empty && Pos.BoardPieces[8].Empty) gameEndType |= GameEndTypes.MaterialDrawn;
             if (Pos.Rule50 >= 100)
                 gameEndType |= GameEndTypes.FiftyMove;
 
@@ -125,7 +124,7 @@ namespace Rudz.Chess
             {
                 var res = ml.Count;
                 _moveLists.Return(ml);
-                return (ulong) res;
+                return (ulong)res;
             }
 
             var state = new State();
@@ -140,12 +139,12 @@ namespace Rudz.Chess
                 tot += Perft(depth - 1);
                 Pos.TakeMove(move);
             }
-            
+
             _moveLists.Return(ml);
-            
+
             if (tot <= int.MaxValue)
                 Table.Store(posKey.Key, (int)tot, Bound.Exact, (sbyte)depth, move, 0);
-            
+
             return tot;
         }
     }

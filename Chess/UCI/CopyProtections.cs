@@ -24,34 +24,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Transposition
+namespace Rudz.Chess.UCI
 {
-    using Types;
-
-    /// <summary>
-    /// Stores an array of <see cref="TranspositionTableEntry"/>. In essence it acts like a entry
-    /// bucket of 4 elements for each position stored in the <see cref="TranspositionTable"/>
-    /// </summary>
-    public sealed class TTCluster : ITTCluster
+    public enum CopyProtections
     {
-        public static readonly TranspositionTableEntry DefaultEntry = new TranspositionTableEntry(0, Move.EmptyMove, 0, 1, int.MaxValue, int.MaxValue, Bound.Void);
-
-        private static readonly TranspositionTableEntry[] Defaults = { DefaultEntry, DefaultEntry, DefaultEntry, DefaultEntry };
-
-        public TTCluster()
-        {
-            Reset();
-        }
-
-        public TranspositionTableEntry[] Cluster { get; private set; }
-
-        public TranspositionTableEntry this[int key]
-        {
-            get => Cluster[key];
-            set => Cluster[key] = value;
-        }
-
-        public void Reset()
-            => Cluster = new[] { DefaultEntry, DefaultEntry, DefaultEntry, DefaultEntry };
+        Checking,
+        Ok,
+        Error
     }
 }
