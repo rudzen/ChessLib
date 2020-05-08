@@ -56,8 +56,63 @@ namespace Rudz.Chess
         private int _ply;
         private State _state;
 
+#region cuckoo
+        // Marcel van Kervinck's cuckoo algorithm for fast detection of "upcoming repetition"
+        // situations. https://marcelk.net/2013-04-06/paper/upcoming-rep-v2.pdf
+        private static readonly HashKey[] Cuckoo;
+        private static readonly Move[] CuckooMove;
+
+        private static readonly Func<HashKey, int> CuckooHashOne = key => (int) (key.Key & 0x1FFF);
+        private static readonly Func<HashKey, int> CuckooHashTwo = key => (int) ((key.Key >> 16) & 0x1FFF);
+#endregion cuckoo
+
         private readonly IBoard _board;
         private readonly IPositionValidator _positionValidator;
+
+        static Position()
+        {
+            // initialize cuckoo tables
+            Cuckoo = new HashKey[8192];
+            CuckooMove = new Move[8192];
+
+            Span<Piece> pieces = stackalloc Piece[]
+            {
+                Enums.Pieces.WhitePawn, Enums.Pieces.WhiteKnight, Enums.Pieces.WhiteBishop, Enums.Pieces.WhiteRook, Enums.Pieces.WhiteQueen, Enums.Pieces.WhiteKing,
+                Enums.Pieces.BlackPawn, Enums.Pieces.BlackKnight, Enums.Pieces.BlackBishop, Enums.Pieces.BlackRook, Enums.Pieces.BlackQueen, Enums.Pieces.BlackKing
+            };
+
+            var count = 0;
+            foreach (var pc in pieces)
+            {
+                foreach (var sq1 in BitBoards.AllSquares)
+                {
+                    foreach (var sq2 in BitBoards.AllSquares)
+                    {
+                        if ((pc.Type().PseudoAttacks(sq1) & sq2).IsEmpty)
+                            continue;
+
+                        var move = Move.MakeMove(sq1, sq2);
+                        var key = pc.GetZobristPst(sq1) ^ pc.GetZobristPst(sq2) ^ Zobrist.GetZobristSide();
+                        var i = CuckooHashOne(key);
+                        while (true)
+                        {
+                            (Cuckoo[i], key) = (key, Cuckoo[i].Key);
+                            (CuckooMove[i], move) = (move, CuckooMove[i]);
+
+                            // check for empty slot
+                            if (move.IsNullMove())
+                                break;
+
+                            // Push victim to alternative slot
+                            i = i == CuckooHashOne(key) ? CuckooHashTwo(key) : CuckooHashOne(key);
+                        }
+                        count++;
+                    }
+                }
+            }
+
+            Debug.Assert(count == 3668);
+        }
 
         public Position(IBoard board)
         {
@@ -318,7 +373,7 @@ namespace Rudz.Chess
                 _state.EnPassantSquare = Square.None;
             }
 
-            _state.Key ^= Zobrist.GetZobristSide();
+            _state.Key.HashSide();
 
             ++_state.Rule50;
             _state.PliesFromNull = 0;
@@ -1015,7 +1070,7 @@ namespace Rudz.Chess
 
         private void SetState()
         {
-            var key = 0ul;
+            var key = new HashKey();
             var pawnKey = Zobrist.ZobristNoPawn;
 
             _state.Checkers = AttacksTo(GetKingSquare(_sideToMove)) & _board.Pieces(~_sideToMove);
@@ -1042,7 +1097,7 @@ namespace Rudz.Chess
                 key ^= _state.EnPassantSquare.File.GetZobristEnPessant();
 
             if (_sideToMove.IsBlack)
-                key ^= Zobrist.GetZobristSide();
+                key.HashSide();
 
             key ^= _state.CastlelingRights.GetZobristCastleling();
 
@@ -1135,6 +1190,57 @@ namespace Rudz.Chess
 
             if (m.IsPromotionMove())
                 output.Append(char.ToLower(m.GetPromotedPieceType().GetPieceChar()));
+        }
+
+        public bool HasGameCycle(int ply)
+        {
+            var end = _state.Rule50 < _state.PliesFromNull ? _state.Rule50 : _state.PliesFromNull;
+
+            if (end < 3)
+                return false;
+
+            var originalKey = _state.Key;
+            var statePrevious = _state.Previous;
+
+            for (var i = 3; i <= end; i += 2)
+            {
+                statePrevious = statePrevious.Previous.Previous;
+                var moveKey = originalKey ^ statePrevious.Key;
+
+                var j = CuckooHashOne(moveKey);
+                var found = Cuckoo[j] == moveKey;
+
+                if (!found)
+                {
+                    j = CuckooHashTwo(moveKey);
+                    found = Cuckoo[j] == moveKey;
+                }
+
+                if (!found)
+                    continue;
+
+                var move = CuckooMove[j];
+                var s1 = move.GetFromSquare();
+                var s2 = move.GetToSquare();
+
+                if ((s1.BitboardBetween(s2) & _board.Pieces()).IsEmpty)
+                    continue;
+
+                if (ply > i)
+                    return true;
+
+                // For nodes before or at the root, check that the move is a
+                // repetition rather than a move to the current position.
+                // In the cuckoo table, both moves Rc1c5 and Rc5c1 are stored in
+                // the same location, so we have to select which square to check.
+                if (GetPiece(!IsOccupied(s1) ? s2 : s1).ColorOf() != _sideToMove)
+                    continue;
+
+                // For repetitions before or at the root, require one more
+                if (_state.Repetition > 0)
+                    return true;
+            }
+            return false;
         }
 
         public IPositionValidator Validate(PositionValidationTypes type = PositionValidationTypes.Basic)
