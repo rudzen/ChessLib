@@ -47,11 +47,10 @@ namespace Perft
      *    TODO: Fens to investigate:
      * r2n3r/1bNk2pp/6P1/pP3p2/3pPqnP/1P1P1p1R/2P3B1/Q1B1bKN1 b - e3
      *
-     * 
-     * 
+     *
+     *
      */
-    
-    
+
     internal static class Program
     {
         private const string ConfigFileName = "appsettings.json";

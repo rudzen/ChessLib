@@ -24,11 +24,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System;
-
 namespace Rudz.Chess.Types
 {
     using Enums;
+    using System;
     using System.Runtime.CompilerServices;
 
     public readonly struct Direction : IEquatable<Direction>
@@ -89,6 +88,6 @@ namespace Rudz.Chess.Types
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override int GetHashCode() => AsInt();
 
-        private int AsInt() => (int) Value;
+        private int AsInt() => (int)Value;
     }
 }

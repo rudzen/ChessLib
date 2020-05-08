@@ -26,12 +26,10 @@ SOFTWARE.
 
 namespace Rudz.Chess.Enums
 {
-    using System;
 
-    [Flags]
     public enum PlayerTypes
     {
-        Human = 1,
-        Engine = 0
+        Engine = 0,
+        Human = 1
     }
 }

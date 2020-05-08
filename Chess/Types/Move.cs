@@ -24,29 +24,31 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System;
-
 namespace Rudz.Chess.Types
 {
     using Enums;
+    using System;
     using System.Runtime.CompilerServices;
 
     /// <summary>
-    /// Move struct. Contains a single ushort for move related information.
-    /// Also includes set and get functions for the relevant data stored in the bits.
+    /// Move struct. Contains a single ushort for move related information. Also includes set and
+    /// get functions for the relevant data stored in the bits.
     /// </summary>
     public readonly struct Move : IEquatable<Move>
     {
         private readonly ushort _data;
 
+        private Move(ushort value)
+            => _data = value;
+
         public Move(Square from, Square to)
-            => _data = (ushort) (to | (from.AsInt() << 6));
+            => _data = (ushort)(to | (from.AsInt() << 6));
 
         public Move(Square from, Square to, MoveTypes moveType, PieceTypes promoPt = PieceTypes.Knight)
-            => _data = (ushort) (to | (from.AsInt() << 6) | moveType.AsInt() | ((promoPt - PieceTypes.Knight) << 12));
-        
+            => _data = (ushort)(to | (from.AsInt() << 6) | moveType.AsInt() | ((promoPt - PieceTypes.Knight) << 12));
+
         public static readonly Move EmptyMove = new Move();
-        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator Move(string value)
             => new Move(new Square(value[1] - '1', value[0] - 'a'), new Square(value[3] - '1', value[2] - 'a'));
@@ -56,77 +58,81 @@ namespace Rudz.Chess.Types
             => extMove.Move;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static implicit operator Move(ushort value)
+            => new Move(value);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Move MakeMove(Square from, Square to)
             => new Move(from, to);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Move MakeMove(Square from, Square to, MoveTypes moveType, PieceTypes promoPt = PieceTypes.Knight)
             => new Move(from, to, moveType, promoPt);
-        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator ==(Move left, Move right)
             => left._data == right._data;
-        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator !=(Move left, Move right)
             => left._data != right._data;
-        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Square GetFromSquare()
             => (_data >> 6) & 0x3F;
-        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Square GetToSquare()
             => new Square(_data & 0x3F);
-        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public PieceTypes GetPromotedPieceType()
-            => (PieceTypes) (((_data >> 12) & 3) + 2);
+            => (PieceTypes)(((_data >> 12) & 3) + 2);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool IsQueenPromotion()
             => GetPromotedPieceType() == PieceTypes.Queen;
-        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public MoveTypes GetMoveType()
-            => (MoveTypes) (_data & (3 << 14));
+            => (MoveTypes)(_data & (3 << 14));
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool IsType(MoveTypes moveType)
             => GetMoveType() == moveType;
-        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool IsEnPassantMove()
             => GetMoveType() == MoveTypes.Enpassant;
-        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool IsCastlelingMove()
             => GetMoveType() == MoveTypes.Castling;
-        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool IsPromotionMove()
             => GetMoveType() == MoveTypes.Promotion;
-        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool IsNullMove()
             => _data == 0;
-        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool IsValidMove()
             => GetFromSquare().AsInt() != GetToSquare().AsInt();
-        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals(Move other)
             => _data == other._data;
-        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override bool Equals(object obj)
             => obj is Move move && Equals(move);
-        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override int GetHashCode()
             => _data;
-        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override string ToString() =>
             IsNullMove()

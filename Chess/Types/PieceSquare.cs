@@ -29,8 +29,8 @@ namespace Rudz.Chess.Types
     using System;
 
     /// <summary>
-    /// Model for data transfer of piece and square
-    /// Used for notification when a piece is updated in the chess structure
+    /// Model for data transfer of piece and square Used for notification when a piece is updated in
+    /// the chess structure
     /// </summary>
     public class PieceSquare : EventArgs, IPieceSquare
     {
@@ -56,7 +56,7 @@ namespace Rudz.Chess.Types
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
-            return Equals((PieceSquare) obj);
+            return Equals((PieceSquare)obj);
         }
 
         public override int GetHashCode()

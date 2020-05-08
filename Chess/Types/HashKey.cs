@@ -89,7 +89,7 @@ namespace Rudz.Chess.Types
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static HashKey operator ^(HashKey left, int right)
-            => left._key ^ (ulong) right;
+            => left._key ^ (ulong)right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static HashKey operator ^(HashKey left, HashKey right)
@@ -109,7 +109,7 @@ namespace Rudz.Chess.Types
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void HashSide() => _key ^= Zobrist.GetZobristSide();
-        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public readonly bool Equals(HashKey other) => _key == other._key;
 

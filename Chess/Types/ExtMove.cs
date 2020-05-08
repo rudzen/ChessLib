@@ -24,10 +24,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System;
-
 namespace Rudz.Chess.Types
 {
+    using System;
     using System.Runtime.CompilerServices;
 
     /// <summary>
@@ -35,16 +34,13 @@ namespace Rudz.Chess.Types
     /// </summary>
     public struct ExtMove : IEquatable<ExtMove>
     {
+        public static readonly ExtMove Empty;
         public Move Move;
 
         public Score Score;
 
-        public static readonly ExtMove Empty;
-
         static ExtMove()
-        {
-            Empty = new ExtMove();
-        }
+            => Empty = new ExtMove();
 
         private ExtMove(Move m, Score s)
         {
@@ -53,26 +49,29 @@ namespace Rudz.Chess.Types
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator ExtMove(Move m) => new ExtMove(m, 0);
+        public static implicit operator ExtMove(Move m)
+            => new ExtMove(m, 0);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator ExtMove(Score s) => new ExtMove(Move.EmptyMove, s);
+        public static implicit operator ExtMove(Score s)
+            => new ExtMove(Move.EmptyMove, s);
 
-        public override string ToString() => $"{Move}, {Score}";
+        public static bool operator !=(ExtMove left, ExtMove right)
+            => !(left == right);
+
+        public static bool operator ==(ExtMove left, ExtMove right)
+            => left.Equals(right);
 
         public bool Equals(ExtMove other)
-        {
-            return Move.Equals(other.Move);
-        }
+            => Move.Equals(other.Move);
 
         public override bool Equals(object obj)
-        {
-            return obj is ExtMove other && Equals(other);
-        }
+            => obj is ExtMove other && Equals(other);
 
         public override int GetHashCode()
-        {
-            return Move.GetHashCode();
-        }
+            => Move.GetHashCode();
+
+        public override string ToString()
+            => $"{Move}, {Score}";
     }
 }

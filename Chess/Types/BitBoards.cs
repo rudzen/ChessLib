@@ -125,32 +125,6 @@ namespace Rudz.Chess.Types
 
         private static readonly BitBoard[] Rank7And8 = { RANK7 | RANK8, RANK1 | RANK2 };
 
-#if !NETCOREAPP3_1
-        private static readonly int[] Lsb64Table =
-            {
-                63, 30,  3, 32, 59, 14, 11, 33,
-                60, 24, 50,  9, 55, 19, 21, 34,
-                61, 29,  2, 53, 51, 23, 41, 18,
-                56, 28,  1, 43, 46, 27,  0, 35,
-                62, 31, 58,  4,  5, 49, 54,  6,
-                15, 52, 12, 40,  7, 42, 45, 16,
-                25, 57, 48, 13, 10, 39,  8, 44,
-                20, 47, 38, 22, 17, 37, 36, 26
-            };
-
-        private static readonly int[] Msb64Table =
-            {
-                 0, 47,  1, 56, 48, 27,  2, 60,
-                57, 49, 41, 37, 28, 16,  3, 61,
-                54, 58, 35, 52, 50, 42, 21, 44,
-                38, 32, 29, 23, 17, 11,  4, 62,
-                46, 55, 26, 59, 40, 36, 15, 53,
-                34, 51, 20, 43, 31, 22, 10, 45,
-                25, 39, 14, 33, 19, 30,  9, 24,
-                13, 18,  8, 12,  7,  6,  5, 63
-            };
-#endif
-
         /// <summary>
         /// PseudoAttacks are just that, full attack range for all squares for all pieces. The pawns
         /// are a special case, as index range 0,sq are for White and 1,sq are for Black. This is
@@ -226,9 +200,9 @@ namespace Rudz.Chess.Types
             CornerH8 = MakeBitboard(Squares.h8, Squares.g8, Squares.h7, Squares.g7);
 
             // local helper functions to calculate distance
-            static int distance(int x, int y) { return Math.Abs(x - y); }
-            static int distanceFile(Square x, Square y) { return distance(x.File.AsInt(), y.File.AsInt()); }
-            static int distanceRank(Square x, Square y) { return distance(x.Rank.AsInt(), y.Rank.AsInt()); }
+            static int distance(int x, int y) => Math.Abs(x - y);
+            static int distanceFile(Square x, Square y) => distance(x.File.AsInt(), y.File.AsInt());
+            static int distanceRank(Square x, Square y) => distance(x.Rank.AsInt(), y.Rank.AsInt());
 
             // ForwardRanksBB population loop idea from sf
             for (var r = Ranks.Rank1; r < Ranks.RankNb; ++r)
@@ -238,18 +212,18 @@ namespace Rudz.Chess.Types
             }
 
             Span<BitBoard> adjacentFilesBb = stackalloc BitBoard[] { FILEB, FILEA | FILEC, FILEB | FILED, FILEC | FILEE, FILED | FILEF, FILEE | FILEG, FILEF | FILEH, FILEG };
+            Span<Player> players = stackalloc Player[] { Player.White, Player.Black };
 
-            for (var side = Players.White; side < Players.PlayerNb; ++side)
+            foreach (var player in players)
             {
-                var c = (int)side;
                 foreach (var square in AllSquares)
                 {
                     var s = square.AsInt();
                     var file = square.File;
                     var rank = square.Rank.AsInt();
-                    ForwardFileBB[c][s] = ForwardRanksBB[c][rank] & file.BitBoardFile();
-                    PawnAttackSpanBB[c][s] = ForwardRanksBB[c][rank] & adjacentFilesBb[file.AsInt()];
-                    PassedPawnMaskBB[c][s] = ForwardFileBB[c][s] | PawnAttackSpanBB[c][s];
+                    ForwardFileBB[player.Side][s] = ForwardRanksBB[player.Side][rank] & file.BitBoardFile();
+                    PawnAttackSpanBB[player.Side][s] = ForwardRanksBB[player.Side][rank] & adjacentFilesBb[file.AsInt()];
+                    PassedPawnMaskBB[player.Side][s] = ForwardFileBB[player.Side][s] | PawnAttackSpanBB[player.Side][s];
                 }
             }
 
@@ -280,8 +254,11 @@ namespace Rudz.Chess.Types
                 // distance computation
                 foreach (var s2 in AllSquares)
                 {
-                    SquareDistance[sq][s2.AsInt()] = (byte)distanceFile(s1, s2).Max(distanceRank(s1, s2));
-                    DistanceRingBB[sq][SquareDistance[sq][s2.AsInt()]] |= s2;
+                    if (s1 == s2)
+                        continue;
+                    var dist = (byte)distanceFile(s1, s2).Max(distanceRank(s1, s2));
+                    SquareDistance[sq][s2.AsInt()] = dist;
+                    DistanceRingBB[sq][dist] |= s2;
                 }
 
                 PseudoAttacksBB[0][sq] = b.NorthEastOne() | b.NorthWestOne();
@@ -303,7 +280,7 @@ namespace Rudz.Chess.Types
                 PseudoAttacksBB[pt][sq] = bishopAttacks | rookAttacks;
 
                 pt = PieceTypes.King.AsInt();
-                PseudoAttacksBB[pt][sq] = b.NorthOne() | b.SouthOne() | b.EastOne() | b.WestOne()
+                PseudoAttacksBB[pt][sq] = b.NorthOne()     | b.SouthOne()     | b.EastOne()      | b.WestOne()
                                         | b.NorthEastOne() | b.NorthWestOne() | b.SouthEastOne() | b.SouthWestOne();
 
                 // Compute lines and betweens
@@ -315,26 +292,28 @@ namespace Rudz.Chess.Types
                         if ((PseudoAttacksBB[pt][sq] & s2).IsEmpty)
                             continue;
 
-                        LineBB[sq][s2.AsInt()] = GetAttacks(s1, validMagicPiece, EmptyBitBoard) & GetAttacks(s2, validMagicPiece, EmptyBitBoard) | s1 | s2;
-                        BetweenBB[sq][s2.AsInt()] = GetAttacks(s1, validMagicPiece, BbSquares[s2.AsInt()]) & GetAttacks(s2, validMagicPiece, BbSquares[sq]);
+                        var sq2 = s2.AsInt();
+
+                        LineBB[sq][sq2] = GetAttacks(s1, validMagicPiece, EmptyBitBoard) & GetAttacks(s2, validMagicPiece, EmptyBitBoard) | s1 | s2;
+                        BetweenBB[sq][sq2] = GetAttacks(s1, validMagicPiece, BbSquares[sq2]) & GetAttacks(s2, validMagicPiece, BbSquares[sq]);
                     }
                 }
 
                 // Compute KingRings
                 pt = PieceTypes.King.AsInt();
-                for (var side = Players.White; side < Players.PlayerNb; ++side)
+
+                foreach (var player in players)
                 {
-                    var c = (int)side;
-                    KingRingBB[c][sq] = PseudoAttacksBB[pt][sq];
-                    if (s1.RelativeRank(side) == Ranks.Rank1)
-                        KingRingBB[c][sq] |= KingRingBB[c][sq].Shift(side == Players.White ? Directions.North : Directions.South);
+                    KingRingBB[player.Side][sq] = PseudoAttacksBB[pt][sq];
+                    if (s1.RelativeRank(player) == Ranks.Rank1)
+                        KingRingBB[player.Side][sq] |= KingRingBB[player.Side][sq].Shift(player.IsWhite ? Directions.North : Directions.South);
 
                     if (file == Files.FileH)
-                        KingRingBB[c][sq] |= KingRingBB[c][sq].WestOne();
+                        KingRingBB[player.Side][sq] |= KingRingBB[player.Side][sq].WestOne();
                     else if (file == Files.FileA)
-                        KingRingBB[c][sq] |= KingRingBB[c][sq].EastOne();
+                        KingRingBB[player.Side][sq] |= KingRingBB[player.Side][sq].EastOne();
 
-                    Debug.Assert(!KingRingBB[c][sq].IsEmpty);
+                    Debug.Assert(!KingRingBB[player.Side][sq].IsEmpty);
                 }
             }
         }
@@ -465,7 +444,7 @@ namespace Rudz.Chess.Types
             => BetweenBB[firstSquare.AsInt()][secondSquare.AsInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Square Get(this BitBoard bb, int pos)
+        public static Square Get(this in BitBoard bb, int pos)
             => (int)(bb.Value >> pos) & 0x1;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -542,33 +521,11 @@ namespace Rudz.Chess.Types
         /// <returns>The index of the found bit</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Square Lsb(this BitBoard bb)
-        {
-#if NETCOREAPP3_1
-            return BitOperations.TrailingZeroCount(bb.Value);
-#else
-            // @ C author Matt Taylor (2003)
-            bb ^= bb - 1;
-            var folded = (uint)(bb.Value ^ (bb.Value >> 32));
-            return Lsb64Table[folded * 0x78291ACF >> 26];
-#endif
-        }
+            => BitOperations.TrailingZeroCount(bb.Value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Square Msb(this BitBoard bb)
-        {
-#if NETCOREAPP3_1
-            return 63 - BitOperations.LeadingZeroCount(bb.Value);
-#else
-            const ulong debruijn64 = 0x03f79d71b4cb0a89UL;
-            bb |= bb >> 1;
-            bb |= bb >> 2;
-            bb |= bb >> 4;
-            bb |= bb >> 8;
-            bb |= bb >> 16;
-            bb |= bb >> 32;
-            return Msb64Table[(bb.Value * debruijn64) >> 58];
-#endif
-        }
+            => 63 - BitOperations.LeadingZeroCount(bb.Value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static BitBoard NorthOne(this BitBoard bb)
@@ -664,20 +621,7 @@ namespace Rudz.Chess.Types
         /// <returns>The number of bits found</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int PopCount(BitBoard bb)
-        {
-#if NETCOREAPP3_1
-            return BitOperations.PopCount(bb.Value);
-#else
-            var y = 0;
-            while (bb)
-            {
-                y++;
-                ResetLsb(ref bb);
-            }
-
-            return y;
-#endif
-        }
+            => BitOperations.PopCount(bb.Value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static BitBoard Rank7(this Player player)
@@ -721,8 +665,8 @@ namespace Rudz.Chess.Types
 
             return sf;
         }
-        
-        private static BitBoard GetAttacks(this Square square, PieceTypes pieceType, BitBoard occupied = new BitBoard())
+
+        private static BitBoard GetAttacks(this Square square, PieceTypes pieceType, BitBoard occupied = default)
         {
             return pieceType switch
             {

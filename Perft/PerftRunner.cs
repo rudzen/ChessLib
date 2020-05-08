@@ -58,7 +58,7 @@ namespace Perft
         private static readonly Lazy<string> CurrentDirectory = new Lazy<string>(() => System.Environment.CurrentDirectory);
 
         private readonly IDictionary<HashKey, ulong> _resultCache;
-        
+
         private readonly Func<CancellationToken, IAsyncEnumerable<IPerftPosition>>[] _runners;
 
         private readonly IEpdParser _epdParser;
@@ -76,7 +76,7 @@ namespace Perft
         private readonly IUci _uci;
 
         private readonly CPU _cpu;
-        
+
         private bool _usingEpd;
 
         public PerftRunner(IEpdParser parser, ILogger log, IBuildTimeStamp buildTimeStamp, IPerft perft, IConfiguration configuration, ObjectPool<PerftResult> resultPool, IUci uci)
@@ -91,18 +91,18 @@ namespace Perft
             _uci = uci;
             _uci.Initialize();
 
-            _runners = new Func<CancellationToken, IAsyncEnumerable<IPerftPosition>>[] {ParseEpd, ParseFen};
+            _runners = new Func<CancellationToken, IAsyncEnumerable<IPerftPosition>>[] { ParseEpd, ParseFen };
 
             TranspositionTableOptions = Framework.IoC.Resolve<IOptions>(OptionType.TTOptions) as TTOptions;
             configuration.Bind("TranspositionTable", TranspositionTableOptions);
 
             _resultCache = new Dictionary<HashKey, ulong>(256);
-            
+
             _outputSettings = new JsonSerializerSettings
             {
                 Formatting = Formatting.Indented
             };
-            
+
             _cpu = new CPU();
         }
 
@@ -144,7 +144,7 @@ namespace Perft
                 }
                 catch (AggregateException e)
                 {
-                    _log.Error(e.GetBaseException(),"Cancel requested.");
+                    _log.Error(e.GetBaseException(), "Cancel requested.");
                     errors = 1;
                     break;
                 }
@@ -191,7 +191,7 @@ namespace Perft
 
             var depths = options.Depths.Select(d => (d, zero)).ToList();
 
-            var perftPositions = options.Fens.Select(f => PerftPositionFactory.Create(Guid.NewGuid().ToString(),f, depths));
+            var perftPositions = options.Fens.Select(f => PerftPositionFactory.Create(Guid.NewGuid().ToString(), f, depths));
 
             foreach (var perftPosition in perftPositions)
                 yield return perftPosition;
@@ -221,7 +221,7 @@ namespace Perft
 
                 _log.Information("Depth       : {0}", depth);
                 sw.Restart();
-                
+
                 var perftResult = await _perft.DoPerftAsync(depth).ConfigureAwait(false);
                 sw.Stop();
 
@@ -259,7 +259,7 @@ namespace Perft
             results.Depth = depth;
             // add 1 to avoid potential dbz
             results.Elapsed = TimeSpan.FromMilliseconds(elapsedMs + 1);
-            results.Nps = (ulong) _uci.Nps(result, results.Elapsed);
+            results.Nps = (ulong)_uci.Nps(result, results.Elapsed);
             results.CorrectResult = expected;
             results.Passed = expected == result;
             results.TableHits = Game.Table.Hits;
@@ -285,7 +285,7 @@ namespace Perft
                     _log.Information("Result      : {0} - should be {1}", result.Result, result.CorrectResult);
                     if (result.Result != result.CorrectResult)
                     {
-                        var difference = (long) (result.CorrectResult - result.Result);
+                        var difference = (long)(result.CorrectResult - result.Result);
                         _log.Information("Difference  : {0}", difference < 0 ? -difference : difference);
                     }
                 }

@@ -46,7 +46,7 @@ namespace Rudz.Chess.Types
         public Rank(Rank file) => _value = file._value;
 
         public char Char => RankChars[AsInt()];
-        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator Rank(int value) => new Rank(value);
 
@@ -116,7 +116,13 @@ namespace Rudz.Chess.Types
         public static int operator >>(Rank left, int right) => left.AsInt() >> right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool operator >=(Rank left, Ranks right) => left._value >= right;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator >(Rank left, Rank right) => left.AsInt() > right.AsInt();
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool operator <=(Rank left, Ranks right) => left._value <= right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator <(Rank left, Rank right) => left.AsInt() < right.AsInt();
@@ -134,7 +140,7 @@ namespace Rudz.Chess.Types
         public bool IsValid() => _value < Ranks.RankNb;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public override string ToString() => ((int) _value + 1).ToString();
+        public override string ToString() => ((int)_value + 1).ToString();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals(Rank other) => _value == other._value;

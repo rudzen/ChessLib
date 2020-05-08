@@ -40,6 +40,7 @@ namespace Rudz.Chess.Types
         {
             [FieldOffset(0)]
             public int mg;
+
             [FieldOffset(16)]
             public int eg;
 
@@ -76,7 +77,7 @@ namespace Rudz.Chess.Types
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Score(ExtMove em)
             => _data = em.Score._data;
-        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator Score(int v)
             => new Score(v);
@@ -99,7 +100,7 @@ namespace Rudz.Chess.Types
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Score operator +(Score s, int v)
             => new Score(s.Mg() + v, s.Eg() + v);
-        
+
         public static readonly Score Zero = new Score();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

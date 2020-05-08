@@ -26,6 +26,9 @@ SOFTWARE.
 
 namespace Rudz.Chess.Enums
 {
+    using System.Runtime.CompilerServices;
+    using Types;
+
     public enum PieceTypes
     {
         NoPieceType = 0,
@@ -37,5 +40,13 @@ namespace Rudz.Chess.Enums
         King = 6,
         PieceTypeNb = 7,
         AllPieces = 0
+    }
+
+    public static class PieceTypesExtensions
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int AsInt(this PieceTypes p) => (int)p;
+
+        public static Piece MakePiece(this PieceTypes @this, Player side) => (int)@this | (side.Side << 3);
     }
 }

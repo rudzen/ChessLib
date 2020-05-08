@@ -35,7 +35,7 @@ namespace Rudz.Chess
     using System.Linq;
     using Types;
 
-    public class MoveList : IMoveList
+    public sealed class MoveList : IMoveList
     {
         private readonly ExtMove[] _moves;
         private int _cur, _last;
@@ -47,8 +47,8 @@ namespace Rudz.Chess
 
         int IReadOnlyCollection<ExtMove>.Count => _last;
 
-        public ulong Length => (ulong) _last;
-        
+        public ulong Length => (ulong)_last;
+
         public Move CurrentMove => _moves[_cur].Move;
 
         public static MoveList operator ++(MoveList moveList)
@@ -62,7 +62,7 @@ namespace Rudz.Chess
         public void Add(Move item) => _moves[_last++] = item;
 
         /// <summary>
-        /// Clears the move generated data
+        /// Reset the moves
         /// </summary>
         public void Clear()
         {
@@ -97,16 +97,31 @@ namespace Rudz.Chess
         public void Generate(IPosition pos, MoveGenerationType type = MoveGenerationType.Legal)
         {
             _cur = 0;
-            _last = Generate(pos, _moves, 0, type);
+            _last = Generate(pos, _moves, 0, pos.SideToMove, type);
             _moves[_last] = Move.EmptyMove;
         }
+
+        public ReadOnlySpan<ExtMove> Get() =>
+            _last == 0
+                ? ReadOnlySpan<ExtMove>.Empty
+                : _moves.AsSpan().Slice(0, _last);
 
         public IEnumerator<ExtMove> GetEnumerator()
             => _moves.Take(_last).GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator()
             => GetEnumerator();
-       
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="pos"></param>
+        /// <param name="moves"></param>
+        /// <param name="index"></param>
+        /// <param name="target"></param>
+        /// <param name="us"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
         private static int GeneratePawnMoves(IPosition pos, ExtMove[] moves, int index, BitBoard target, Player us, MoveGenerationType type)
         {
             // Compute our parametrized parameters at compile time, named according to the point of
@@ -243,7 +258,7 @@ namespace Rudz.Chess
                 return index;
 
             Debug.Assert(pos.EnPassantSquare.Rank == Ranks.Rank6.RelativeRank(us));
-            
+
             // An en passant capture can be an evasion only if the checking piece is the double
             // pushed pawn and so is in the target. Otherwise this is a discovery check and we are
             // forced to do otherwise.
@@ -258,12 +273,23 @@ namespace Rudz.Chess
             return index;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="pos"></param>
+        /// <param name="moves"></param>
+        /// <param name="index"></param>
+        /// <param name="us"></param>
+        /// <param name="target"></param>
+        /// <param name="pt"></param>
+        /// <param name="checks"></param>
+        /// <returns></returns>
         private static int GenerateMoves(IPosition pos, ExtMove[] moves, int index, Player us, BitBoard target, PieceTypes pt, bool checks)
         {
             Debug.Assert(pt != PieceTypes.King && pt != PieceTypes.Pawn);
 
             var squares = pos.Squares(pt, us);
-            
+
             if (squares.IsEmpty)
                 return index;
 
@@ -294,6 +320,16 @@ namespace Rudz.Chess
             return index;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="pos"></param>
+        /// <param name="moves"></param>
+        /// <param name="index"></param>
+        /// <param name="target"></param>
+        /// <param name="us"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
         private static int GenerateAll(IPosition pos, ExtMove[] moves, int index, BitBoard target, Player us, MoveGenerationType type)
         {
             var checks = type == MoveGenerationType.QuietChecks;
@@ -335,13 +371,13 @@ namespace Rudz.Chess
         /// <param name="pos"></param>
         /// <param name="moves"></param>
         /// <param name="index"></param>
+        /// <param name="us"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        private static int GenerateCapturesQuietsNonEvasions(IPosition pos, ExtMove[] moves, int index, MoveGenerationType type)
+        private static int GenerateCapturesQuietsNonEvasions(IPosition pos, ExtMove[] moves, int index, Player us, MoveGenerationType type)
         {
             Debug.Assert(type == MoveGenerationType.Captures || type == MoveGenerationType.Quiets || type == MoveGenerationType.NonEvasions);
             Debug.Assert(!pos.InCheck);
-            var us = pos.SideToMove;
             var target = type switch
             {
                 MoveGenerationType.Captures => pos.Pieces(~us),
@@ -360,11 +396,11 @@ namespace Rudz.Chess
         /// <param name="pos"></param>
         /// <param name="moves"></param>
         /// <param name="index"></param>
+        /// <param name="us"></param>
         /// <returns></returns>
-        private static int GenerateEvasions(IPosition pos, ExtMove[] moves, int index)
+        private static int GenerateEvasions(IPosition pos, ExtMove[] moves, int index, Player us)
         {
             Debug.Assert(pos.InCheck);
-            var us = pos.SideToMove;
             var ksq = pos.GetKingSquare(us);
             var sliderAttacks = BitBoard.Empty;
             var sliders = pos.Checkers & ~pos.Pieces(PieceTypes.Pawn, PieceTypes.Knight);
@@ -403,46 +439,44 @@ namespace Rudz.Chess
         /// <param name="pos"></param>
         /// <param name="moves"></param>
         /// <param name="index"></param>
+        /// <param name="us"></param>
         /// <returns></returns>
-        private static int GenerateLegal(IPosition pos, ExtMove[] moves, int index)
+        private static int GenerateLegal(IPosition pos, ExtMove[] moves, int index, Player us)
         {
-            var cur = index;
-            var us = pos.SideToMove;
             var pinned = pos.BlockersForKing(us) & pos.Pieces(us);
             var ksq = pos.GetKingSquare(us);
 
             var end = pos.InCheck
-                ? GenerateEvasions(pos, moves, index)
-                : Generate(pos, moves, index, MoveGenerationType.NonEvasions);
+                ? GenerateEvasions(pos, moves, index, us)
+                : Generate(pos, moves, index, us, MoveGenerationType.NonEvasions);
 
-            // In case there exists pinned pieces, the move is a king move (including castleling) or it's an en-pessant move
-            // the move is checked, otherwise we assume the move is legal.
-            while (cur != end)
+            // In case there exists pinned pieces, the move is a king move (including castleling) or
+            // it's an en-pessant move the move is checked, otherwise we assume the move is legal.
+            while (index != end)
             {
                 var pinnedIsEmpty = pinned.IsEmpty;
-                if ((!pinnedIsEmpty || moves[cur].Move.GetFromSquare() == ksq || moves[cur].Move.IsEnPassantMove())
-                    && !pos.IsLegal(moves[cur].Move))
-                    moves[cur].Move = moves[--end].Move;
+                if ((!pinnedIsEmpty || moves[index].Move.GetFromSquare() == ksq || moves[index].Move.IsEnPassantMove())
+                    && !pos.IsLegal(moves[index].Move))
+                    moves[index].Move = moves[--end].Move;
                 else
-                    ++cur;
+                    ++index;
             }
-            
+
             return end;
         }
 
-
         /// <summary>
-        /// GenerateQuietChecks generates all pseudo-legal non-captures and knight
-        /// underpromotions that give check. Returns a pointer to the end of the move list.
-        /// /// </summary>
+        /// GenerateQuietChecks generates all pseudo-legal non-captures and knight underpromotions
+        /// that give check. Returns a pointer to the end of the move list. ///
+        /// </summary>
         /// <param name="pos"></param>
         /// <param name="moves"></param>
         /// <param name="index"></param>
+        /// <param name="us"></param>
         /// <returns></returns>
-        private static int GenerateQuietChecks(IPosition pos, ExtMove[] moves, int index)
+        private static int GenerateQuietChecks(IPosition pos, ExtMove[] moves, int index, Player us)
         {
             Debug.Assert(!pos.InCheck);
-            var us = pos.SideToMove;
             var dc = pos.BlockersForKing(~us) & pos.Pieces(us);
 
             while (!dc.IsEmpty)
@@ -465,27 +499,27 @@ namespace Rudz.Chess
             return GenerateAll(pos, moves, index, ~pos.Pieces(), us, MoveGenerationType.QuietChecks);
         }
 
-        private static int Generate(IPosition pos, ExtMove[] moves, int index, MoveGenerationType type)
+        private static int Generate(IPosition pos, ExtMove[] moves, int index, Player us, MoveGenerationType type)
         {
             int result;
             switch (type)
             {
                 case MoveGenerationType.Legal:
-                    result = GenerateLegal(pos, moves, index);
+                    result = GenerateLegal(pos, moves, index, us);
                     break;
 
                 case MoveGenerationType.Captures:
                 case MoveGenerationType.Quiets:
                 case MoveGenerationType.NonEvasions:
-                    result = GenerateCapturesQuietsNonEvasions(pos, moves, index, type);
+                    result = GenerateCapturesQuietsNonEvasions(pos, moves, index, us, type);
                     break;
 
                 case MoveGenerationType.Evasions:
-                    result = GenerateEvasions(pos, moves, index);
+                    result = GenerateEvasions(pos, moves, index, us);
                     break;
 
                 case MoveGenerationType.QuietChecks:
-                    result = GenerateQuietChecks(pos, moves, index);
+                    result = GenerateQuietChecks(pos, moves, index, us);
                     break;
 
                 default:

@@ -26,7 +26,6 @@ SOFTWARE.
 
 namespace Rudz.Chess.Types
 {
-    using Enums;
     using System;
     using System.Collections;
     using System.Collections.Generic;
@@ -63,11 +62,11 @@ namespace Rudz.Chess.Types
         public bool IsEmpty => Value == 0;
 
         public static BitBoard Empty = BitBoards.EmptyBitBoard;
-        
+
         public string String => Convert.ToString((long)Value, 2).PadLeft(64, '0');
 
         /// <summary>
-        /// [] overload :>
+        /// [] overload :&gt;
         /// </summary>
         /// <param name="index">the damn index</param>
         /// <returns>the Bit object if assigning</returns>
@@ -240,7 +239,7 @@ namespace Rudz.Chess.Types
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override bool Equals(object obj)
-            => !ReferenceEquals(null, obj) && obj is BitBoard board && Equals(board);
+            => obj is BitBoard board && Equals(board);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override int GetHashCode()

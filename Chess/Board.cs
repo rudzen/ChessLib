@@ -167,7 +167,9 @@ namespace Rudz.Chess
             var pc = pt.MakePiece(c);
             var squares = _pieceList[pc.AsInt()];
             var idx = Array.IndexOf(squares, Types.Square.None);
-            return squares.AsSpan().Slice(0, idx);
+            return idx == 0
+                ? ReadOnlySpan<Square>.Empty
+                : squares.AsSpan().Slice(0, idx);
         }
 
         public int PieceCount(PieceTypes pt, Player c)

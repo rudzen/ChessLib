@@ -30,7 +30,7 @@ namespace Rudz.Chess.Types
     using Extensions;
     using System;
     using System.Runtime.CompilerServices;
-    
+
     public readonly struct Player : IEquatable<Player>
     {
         private static readonly Direction[] PawnPushDist = { Directions.North, Directions.South };
@@ -44,7 +44,7 @@ namespace Rudz.Chess.Types
         private static readonly string[] PlayerColors = { "White", "Black" };
 
         private static readonly Func<BitBoard, BitBoard>[] PawnPushModifiers = { BitBoards.NorthOne, BitBoards.SouthOne };
-        
+
         public Player(byte side)
             : this() => Side = side;
 
@@ -63,7 +63,7 @@ namespace Rudz.Chess.Types
         public static readonly Player White = 0;
 
         public static readonly Player Black = 1;
-        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator Player(int value) => new Player((byte)value);
 
@@ -105,10 +105,10 @@ namespace Rudz.Chess.Types
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override string ToString() => Side == 0 ? "White" : "Black";
-        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool IsOk() => Side.InBetween(White.Side, Black.Side);
-        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public string GetName() => PlayerColors[Side];
 
@@ -125,6 +125,6 @@ namespace Rudz.Chess.Types
         public Direction PawnEastAttackDistance() => PawnEastAttackDist[Side];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public  BitBoard PawnPush(BitBoard bitBoard) => PawnPushModifiers[Side](bitBoard);
+        public BitBoard PawnPush(BitBoard bitBoard) => PawnPushModifiers[Side](bitBoard);
     }
 }

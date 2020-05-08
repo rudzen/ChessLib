@@ -27,7 +27,6 @@ SOFTWARE.
 namespace Rudz.Chess.Types
 {
     using Enums;
-    using Extensions;
     using System.Runtime.CompilerServices;
 
     public static class PieceExtensions
@@ -68,18 +67,6 @@ namespace Rudz.Chess.Types
 
         private static readonly char[] PieceUnicodeChar = { ' ', '\u2659', '\u2658', '\u2657', '\u2656', '\u2655', '\u2654', ' ', ' ', '\u265F', '\u265E', '\u265D', '\u265C', '\u265B', '\u265A', ' ' };
 
-        // Generic helper functions
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsWhite(this Piece p) => p.AsInt().InBetween((int)Pieces.WhitePawn, (int)Pieces.WhiteKing);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsBlack(this Piece p) => p.AsInt().InBetween((int)Pieces.BlackPawn, (int)Pieces.BlackKing);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int AsInt(this PieceTypes p) => (int)p;
-
-        public static Piece MakePiece(this PieceTypes @this, Player side) => (int)@this | (side.Side << 3);
-
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static char GetPieceChar(this Piece p) => PieceChars[p.AsInt()];
 
@@ -93,7 +80,7 @@ namespace Rudz.Chess.Types
         public static PieceValues PieceValue(this Piece p) => Values[p.Type().AsInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ref string GetName(this Piece p) => ref PieceNames[p.Type().AsInt()];
+        public static string GetName(this Piece p) => PieceNames[p.Type().AsInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static char GetPromotionChar(this PieceTypes p) => PromotionPieceNotation[p.AsInt()];

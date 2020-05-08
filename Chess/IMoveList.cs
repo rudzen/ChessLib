@@ -27,6 +27,7 @@ SOFTWARE.
 namespace Rudz.Chess
 {
     using Enums;
+    using System;
     using System.Collections.Generic;
     using Types;
 
@@ -46,5 +47,6 @@ namespace Rudz.Chess
         bool Contains(Move item);
         bool Contains(Square from, Square to);
         void Generate(IPosition pos, MoveGenerationType type = MoveGenerationType.Legal);
+        ReadOnlySpan<ExtMove> Get();
     }
 }

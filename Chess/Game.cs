@@ -43,16 +43,11 @@ namespace Rudz.Chess
 
     public sealed class Game : IGame
     {
-        private const int MaxPositions = 256;
-
         private readonly ObjectPool<IMoveList> _moveLists;
         
-        private readonly StringBuilder _output;
-
         public Game(IPosition pos)
         {
             Pos = pos;
-            _output = new StringBuilder(256);
             _moveLists = new DefaultObjectPool<IMoveList>(new MoveListPolicy());
         }
 
@@ -124,7 +119,7 @@ namespace Rudz.Chess
                 return (ulong)entry.Value;
 
             var ml = _moveLists.Get();
-            ml.Generate(Pos, MoveGenerationType.Legal);
+            ml.Generate(Pos);
 
             if (depth == 1)
             {

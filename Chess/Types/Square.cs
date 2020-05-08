@@ -42,7 +42,7 @@ namespace Rudz.Chess.Types
         {
             SquareStrings = Enum.GetValues(typeof(Squares)).Cast<Squares>().Take(64).Select(x => x.ToString()).ToArray();
         }
-        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Square(int square) => Value = (Squares)square;
 
@@ -76,7 +76,7 @@ namespace Rudz.Chess.Types
         public bool IsOk => Value >= Squares.a1 && Value <= Squares.h8;
 
         public bool IsPromotionRank => !(BitBoards.PromotionRanksBB & this).IsEmpty;
-        
+
         public bool IsDark => !(BitBoards.DarkSquares & this).IsEmpty;
 
         public static readonly Square None = new Square(Squares.none);
@@ -226,7 +226,7 @@ namespace Rudz.Chess.Types
             => AsInt();
 
         public int AsInt()
-            => (int) Value;
+            => (int)Value;
 
         public BitBoard AsBb()
             => BitBoards.BbSquares[AsInt()];

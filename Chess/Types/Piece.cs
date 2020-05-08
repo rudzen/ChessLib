@@ -53,6 +53,10 @@ namespace Rudz.Chess.Types
         [FieldOffset(0)]
         public readonly Pieces Value;
 
+        public bool IsWhite => ColorOf().IsWhite;
+
+        public bool IsBlack => !IsWhite;
+        
         public static readonly Piece EmptyPiece = Pieces.NoPiece;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
