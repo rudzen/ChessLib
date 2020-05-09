@@ -192,13 +192,13 @@ namespace Rudz.Chess
                 while (!pawnOne.IsEmpty)
                 {
                     var to = BitBoards.PopLsb(ref pawnOne);
-                    moves[index++].Move = Move.MakeMove(to - up, to);
+                    moves[index++].Move = Move.Create(to - up, to);
                 }
 
                 while (!pawnTwo.IsEmpty)
                 {
                     var to = BitBoards.PopLsb(ref pawnTwo);
-                    moves[index++].Move = Move.MakeMove(to - up - up, to);
+                    moves[index++].Move = Move.Create(to - up - up, to);
                 }
             }
 
@@ -245,13 +245,13 @@ namespace Rudz.Chess
             while (!pawnOne.IsEmpty)
             {
                 var to = BitBoards.PopLsb(ref pawnOne);
-                moves[index++].Move = Move.MakeMove(to - right, to);
+                moves[index++].Move = Move.Create(to - right, to);
             }
 
             while (!pawnTwo.IsEmpty)
             {
                 var to = BitBoards.PopLsb(ref pawnTwo);
-                moves[index++].Move = Move.MakeMove(to - left, to);
+                moves[index++].Move = Move.Create(to - left, to);
             }
 
             if (pos.EnPassantSquare == Square.None)
@@ -268,7 +268,7 @@ namespace Rudz.Chess
             pawnOne = pawnsNotOn7 & pos.EnPassantSquare.PawnAttack(them);
             Debug.Assert(!pawnOne.IsEmpty);
             while (!pawnOne.IsEmpty)
-                moves[index++].Move = Move.MakeMove(BitBoards.PopLsb(ref pawnOne), pos.EnPassantSquare, MoveTypes.Enpassant);
+                moves[index++].Move = Move.Create(BitBoards.PopLsb(ref pawnOne), pos.EnPassantSquare, MoveTypes.Enpassant);
 
             return index;
         }
@@ -313,7 +313,7 @@ namespace Rudz.Chess
                 while (!b.IsEmpty)
                 {
                     var to = BitBoards.PopLsb(ref b);
-                    moves[index++].Move = Move.MakeMove(from, to);
+                    moves[index++].Move = Move.Create(from, to);
                 }
             }
 
@@ -344,7 +344,7 @@ namespace Rudz.Chess
             var ksq = pos.GetKingSquare(us);
             var b = pos.GetAttacks(ksq, PieceTypes.King) & target;
             while (!b.IsEmpty)
-                moves[index++].Move = Move.MakeMove(ksq, BitBoards.PopLsb(ref b));
+                moves[index++].Move = Move.Create(ksq, BitBoards.PopLsb(ref b));
 
             if (type == MoveGenerationType.Captures)
                 return index;
@@ -357,10 +357,10 @@ namespace Rudz.Chess
                 return index;
 
             if (!pos.CastlingImpeded(kingSide) && pos.CanCastle(kingSide))
-                moves[index++].Move = Move.MakeMove(ksq, pos.CastlingRookSquare(kingSide), MoveTypes.Castling);
+                moves[index++].Move = Move.Create(ksq, pos.CastlingRookSquare(kingSide), MoveTypes.Castling);
 
             if (!pos.CastlingImpeded(queenSide) && pos.CanCastle(queenSide))
-                moves[index++].Move = Move.MakeMove(ksq, pos.CastlingRookSquare(queenSide), MoveTypes.Castling);
+                moves[index++].Move = Move.Create(ksq, pos.CastlingRookSquare(queenSide), MoveTypes.Castling);
 
             return index;
         }
@@ -421,7 +421,7 @@ namespace Rudz.Chess
             // Generate evasions for king, capture and non capture moves
             var b = pos.GetAttacks(ksq, PieceTypes.King) & ~pos.Pieces(us) & ~sliderAttacks;
             while (!b.IsEmpty)
-                moves[index++].Move = Move.MakeMove(ksq, BitBoards.PopLsb(ref b));
+                moves[index++].Move = Move.Create(ksq, BitBoards.PopLsb(ref b));
 
             if (pos.Checkers.MoreThanOne())
                 return index; // Double check, only a king move can save the day
@@ -493,7 +493,7 @@ namespace Rudz.Chess
                     b &= ~PieceTypes.Queen.PseudoAttacks(pos.GetKingSquare(~us));
 
                 while (!b.IsEmpty)
-                    moves[index++].Move = Move.MakeMove(from, BitBoards.PopLsb(ref b));
+                    moves[index++].Move = Move.Create(from, BitBoards.PopLsb(ref b));
             }
 
             return GenerateAll(pos, moves, index, ~pos.Pieces(), us, MoveGenerationType.QuietChecks);
@@ -543,19 +543,19 @@ namespace Rudz.Chess
         private static int MakePromotions(ExtMove[] moves, int index, Square to, Square ksq, Direction direction, MoveGenerationType type)
         {
             if (type == MoveGenerationType.Captures || type == MoveGenerationType.Evasions || type == MoveGenerationType.NonEvasions)
-                moves[index++].Move = Move.MakeMove(to - direction, to, MoveTypes.Promotion, PieceTypes.Queen);
+                moves[index++].Move = Move.Create(to - direction, to, MoveTypes.Promotion, PieceTypes.Queen);
 
             if (type == MoveGenerationType.Quiets || type == MoveGenerationType.Evasions || type == MoveGenerationType.NonEvasions)
             {
-                moves[index++].Move = Move.MakeMove(to - direction, to, MoveTypes.Promotion, PieceTypes.Rook);
-                moves[index++].Move = Move.MakeMove(to - direction, to, MoveTypes.Promotion, PieceTypes.Bishop);
-                moves[index++].Move = Move.MakeMove(to - direction, to, MoveTypes.Promotion);
+                moves[index++].Move = Move.Create(to - direction, to, MoveTypes.Promotion, PieceTypes.Rook);
+                moves[index++].Move = Move.Create(to - direction, to, MoveTypes.Promotion, PieceTypes.Bishop);
+                moves[index++].Move = Move.Create(to - direction, to, MoveTypes.Promotion);
             }
 
             // Knight promotion is the only promotion that can give a direct check that's not
             // already included in the queen promotion.
             if (type == MoveGenerationType.QuietChecks && !(PieceTypes.Knight.PseudoAttacks(to) & ksq).IsEmpty)
-                moves[index++].Move = Move.MakeMove(to - direction, to, MoveTypes.Promotion);
+                moves[index++].Move = Move.Create(to - direction, to, MoveTypes.Promotion);
 
             return index;
         }

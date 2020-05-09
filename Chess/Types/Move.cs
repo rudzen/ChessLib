@@ -62,11 +62,11 @@ namespace Rudz.Chess.Types
             => new Move(value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Move MakeMove(Square from, Square to)
+        public static Move Create(Square from, Square to)
             => new Move(from, to);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Move MakeMove(Square from, Square to, MoveTypes moveType, PieceTypes promoPt = PieceTypes.Knight)
+        public static Move Create(Square from, Square to, MoveTypes moveType, PieceTypes promoPt = PieceTypes.Knight)
             => new Move(from, to, moveType, promoPt);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

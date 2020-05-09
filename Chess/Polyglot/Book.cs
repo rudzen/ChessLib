@@ -129,8 +129,8 @@ namespace Rudz.Chess.Polyglot
             var polyPt = (m >> 12) & 7;
 
             move = polyPt > 0
-                ? Move.MakeMove(from, to, MoveTypes.Promotion, PolyToPt(polyPt))
-                : Move.MakeMove(from, to);
+                ? Move.Create(from, to, MoveTypes.Promotion, PolyToPt(polyPt))
+                : Move.Create(from, to);
 
             var ml = _pos.GenerateMoves();
 

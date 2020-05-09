@@ -79,7 +79,7 @@ namespace Chess.Test.Move
             const MoveTypes expectedMoveType = MoveTypes.Promotion;
 
             // full move spectrum
-            var move = Move.MakeMove(expectedFrom, expectedTo, MoveTypes.Promotion, expectedPromotionPiece);
+            var move = Move.Create(expectedFrom, expectedTo, MoveTypes.Promotion, expectedPromotionPiece);
 
             var actualFrom = move.GetFromSquare();
             var actualTo = move.GetToSquare();

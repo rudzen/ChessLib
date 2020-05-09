@@ -86,13 +86,13 @@ namespace Rudz.Chess
             {
                 foreach (var sq1 in BitBoards.AllSquares)
                 {
-                    foreach (var sq2 in BitBoards.AllSquares)
+                    for (var sq2 = sq1 + 1; sq2 <= Enums.Squares.h8; ++sq2)
                     {
                         if ((pc.Type().PseudoAttacks(sq1) & sq2).IsEmpty)
                             continue;
 
-                        var move = Move.MakeMove(sq1, sq2);
-                        var key = pc.GetZobristPst(sq1) ^ pc.GetZobristPst(sq2) ^ Zobrist.GetZobristSide();
+                        var move = Move.Create(sq1, sq2);
+                        HashKey key = pc.GetZobristPst(sq1) ^ pc.GetZobristPst(sq2) ^ Zobrist.GetZobristSide();
                         var i = CuckooHashOne(key);
                         while (true)
                         {
@@ -104,7 +104,9 @@ namespace Rudz.Chess
                                 break;
 
                             // Push victim to alternative slot
-                            i = i == CuckooHashOne(key) ? CuckooHashTwo(key) : CuckooHashOne(key);
+                            i = i == CuckooHashOne(key)
+                                ? CuckooHashTwo(key)
+                                : CuckooHashOne(key);
                         }
                         count++;
                     }
@@ -1194,7 +1196,9 @@ namespace Rudz.Chess
 
         public bool HasGameCycle(int ply)
         {
-            var end = _state.Rule50 < _state.PliesFromNull ? _state.Rule50 : _state.PliesFromNull;
+            var end = _state.Rule50 < _state.PliesFromNull
+                ? _state.Rule50
+                : _state.PliesFromNull;
 
             if (end < 3)
                 return false;
