@@ -126,6 +126,9 @@ namespace Rudz.Chess
             var from = m.GetFromSquare();
             var us = m.GetMovingSide();
             var them = ~us;
+            var movingPiece = this.GetPiece(from);
+            if (movingPiece.Value == Enums.Pieces.NoPiece)
+                return false;
 
             if (m.IsCastlelingMove())
             {
