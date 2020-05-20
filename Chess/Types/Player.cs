@@ -104,7 +104,7 @@ namespace Rudz.Chess.Types
         public override int GetHashCode() => Side << 24;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public override string ToString() => Side == 0 ? "White" : "Black";
+        public override string ToString() => PlayerColors[Side];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool IsOk() => Side.InBetween(White.Side, Black.Side);

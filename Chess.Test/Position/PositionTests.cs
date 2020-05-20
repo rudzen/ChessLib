@@ -39,8 +39,9 @@ namespace Chess.Test.Position
         [Fact]
         public void AddPieceTest()
         {
+            var pieceValue = new PieceValue();
             var board = new Board();
-            var position = new Position(board);
+            var position = new Position(board, pieceValue);
 
             position.AddPiece(Pieces.WhiteKing, Squares.a7);
             var pieces = position.Pieces();
@@ -57,7 +58,7 @@ namespace Chess.Test.Position
             // Test piece type overload
 
             board = new Board();
-            position = new Position(board);
+            position = new Position(board, pieceValue);
 
             position.AddPiece(PieceTypes.Knight.MakePiece(Player.Black), Squares.d5);
             pieces = position.Pieces();
@@ -73,8 +74,9 @@ namespace Chess.Test.Position
         {
             const int expected = 1;
 
+            var pieceValue = new PieceValue();
             var board = new Board();
-            var cb = new Position(board);
+            var cb = new Position(board, pieceValue);
 
             cb.AddPiece(Pieces.WhiteKing, Squares.a6);
             cb.AddPiece(Pieces.WhiteBishop, Squares.d5);

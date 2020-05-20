@@ -60,7 +60,7 @@ namespace Rudz.Chess.UCI
             var user = _currentProcessName.UserProcessorTime;
 
             double percentage;
-            
+
             if (now <= _lastCpu || total.Milliseconds < _lastSysCpu.Milliseconds || user.Milliseconds < _lastUserCpu.Milliseconds)
             {
                 //Overflow detection. Just skip this value.

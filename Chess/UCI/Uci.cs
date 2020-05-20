@@ -85,6 +85,8 @@ namespace Rudz.Chess.UCI
             O["UCI_Chess960"] = new Option("UCI_Chess960", O.Count, false);
         }
 
+        public void AddOption(string name, IOption option) => O[name] = option;
+
         public int Nps(ulong nodes, TimeSpan time)
             => (int)((int)nodes * 1000.0 / time.Milliseconds);
 

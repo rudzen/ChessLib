@@ -48,5 +48,7 @@ namespace Rudz.Chess.Enums
         public static int AsInt(this PieceTypes p) => (int)p;
 
         public static Piece MakePiece(this PieceTypes @this, Player side) => (int)@this | (side.Side << 3);
+
+        public static bool IsSlider(this PieceTypes @this) => @this == PieceTypes.Bishop | @this == PieceTypes.Rook | @this == PieceTypes.Queen;
     }
 }

@@ -131,10 +131,10 @@ namespace Perft
             container.Register<IGame, Game>(Reuse.Transient);
             container.Register<IBoard, Board>(Reuse.Singleton);
             // container.Register<IMoveList, MoveList>(Reuse.Transient);
-            container.Register<IMaterial, Material>(Reuse.Transient);
             container.Register<IPosition, Position>(Reuse.Transient);
             container.Register<IKillerMoves, KillerMoves>(Reuse.Transient);
             container.Register<IUci, Uci>(Reuse.Singleton);
+            container.Register<IPieceValue, PieceValue>(Reuse.Singleton);
 
             // Bind options
             container.Register<IOptions, EpdOptions>(Reuse.Singleton, serviceKey: OptionType.EdpOptions);

@@ -40,15 +40,9 @@ namespace Rudz.Chess.Types
         // for polyglot support in the future
         public const string BookPieceNames = "pPnNbBrRqQkK";
 
-        private const ushort WhitePieces = 126;
-
-        private const ushort BlackPieces = 32256;
-
         private static readonly string[] PieceStrings = { " ", "P", "N", "B", "R", "Q", "K", " ", " ", "p", "n", "b", "r", "q", "k" };
 
         private static readonly string[] PieceNames = { "None", "Pawn", "Knight", "Bishop", "Rook", "Queen", "King" };
-
-        private static readonly PieceValues[] Values = { 0, PieceValues.Pawn, PieceValues.Knight, PieceValues.Bishop, PieceValues.Rook, PieceValues.Queen, PieceValues.King };
 
         /*
  * white chess king 	♔ 	U+2654 	&#9812;
@@ -75,9 +69,6 @@ namespace Rudz.Chess.Types
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string GetPieceString(this Piece p) => PieceStrings[p.AsInt()];
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static PieceValues PieceValue(this Piece p) => Values[p.Type().AsInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string GetName(this Piece p) => PieceNames[p.Type().AsInt()];

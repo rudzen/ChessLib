@@ -112,7 +112,8 @@ namespace Chess.Test.Move
             var movesString = new List<Movestrings>(128);
 
             var board = new Board();
-            var pos = new Position(board);
+            var pieceValue = new PieceValue();
+            var pos = new Position(board, pieceValue);
             var game = GameFactory.Create(pos);
 
             game.NewGame();
@@ -151,7 +152,8 @@ namespace Chess.Test.Move
         public void MoveListToStringTest()
         {
             var board = new Board();
-            var pos = new Position(board);
+            var pieceValue = new PieceValue();
+            var pos = new Position(board, pieceValue);
             var game = GameFactory.Create(pos);
 
             game.NewGame();

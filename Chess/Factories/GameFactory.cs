@@ -41,10 +41,6 @@ namespace Rudz.Chess.Factories
         }
 
         public static IGame Create()
-        {
-            var board = new Board();
-            var pos = new Position(board);
-            return new Game(pos);
-        }
+            => new Game(new Position(new Board(), new PieceValue()));
     }
 }

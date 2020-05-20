@@ -115,7 +115,8 @@ namespace Chess.Test.Pieces
 
             // just to get the attacks
             var board = new Board();
-            var pos = new Rudz.Chess.Position(board);
+            var pieceValue = new PieceValue();
+            var pos = new Rudz.Chess.Position(board, pieceValue);
             
             foreach (var square in border)
             {

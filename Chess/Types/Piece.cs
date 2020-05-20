@@ -33,8 +33,7 @@ namespace Rudz.Chess.Types
     using System.Runtime.InteropServices;
 
     /// <summary>
-    /// Piece.
-    /// Contains the piece type which indicate what type and color the piece is
+    /// Piece. Contains the piece type which indicate what type and color the piece is
     /// </summary>
     [StructLayout(LayoutKind.Explicit, Size = 1)]
     public readonly struct Piece : IEquatable<Piece>
@@ -48,15 +47,13 @@ namespace Rudz.Chess.Types
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Piece(Pieces piece) => Value = piece;
 
-        public static Comparer<Piece> PieceComparer { get; } = new PieceRelationalComparer();
-
         [FieldOffset(0)]
         public readonly Pieces Value;
 
         public bool IsWhite => ColorOf().IsWhite;
 
-        public bool IsBlack => !IsWhite;
-        
+        public bool IsBlack => ColorOf().IsBlack;
+
         public static readonly Piece EmptyPiece = Pieces.NoPiece;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -67,7 +64,10 @@ namespace Rudz.Chess.Types
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator Piece(Pieces value) => new Piece(value);
-        
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Piece operator ~(Piece piece) => piece.AsInt() ^ 8;
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Piece operator +(Piece left, Player right) => new Piece(left.Value + (byte)(right << 3));
 
@@ -96,16 +96,22 @@ namespace Rudz.Chess.Types
         public static bool operator >=(Piece left, Pieces right) => left.Value >= right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool operator <(Piece left, Pieces right) => left.Value < right;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool operator >(Piece left, Pieces right) => left.Value > right;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Piece operator ++(Piece left) => new Piece(left.Value + 1);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Piece operator --(Piece left) => new Piece(left.Value - 1);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator true(Piece piece) => piece.Value != Pieces.NoPiece;
+        public static bool operator true(Piece piece) => piece.Value != EmptyPiece;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator false(Piece piece) => piece.Value == Pieces.NoPiece;
+        public static bool operator false(Piece piece) => piece.Value == EmptyPiece;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Player ColorOf() => (int)Value >> 3;
@@ -150,17 +156,25 @@ namespace Rudz.Chess.Types
 
         private sealed class PieceRelationalComparer : Comparer<Piece>
         {
+            private readonly IPieceValue _pieceValue;
+
+            public PieceRelationalComparer(IPieceValue pieceValue)
+            {
+                _pieceValue = pieceValue;
+            }
+
             public override int Compare(Piece x, Piece y)
             {
                 if (x.Value == y.Value)
                     return 0;
 
-                // this is dangerous (fear king leopold III ?), king has no value and is considered to be uniq
+                // this is dangerous (fear king leopold III ?), king has no value and is considered
+                // to be uniq
                 if (x.Type() == PieceTypes.King || y.Type() == PieceTypes.King)
                     return 1;
 
-                var xValue = x.PieceValue();
-                var yValue = y.PieceValue();
+                var xValue = _pieceValue.GetPieceValue(x, Phases.Mg);
+                var yValue = _pieceValue.GetPieceValue(y, Phases.Mg);
 
                 if (xValue < yValue)
                     return -1;

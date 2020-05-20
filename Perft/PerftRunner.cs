@@ -200,6 +200,7 @@ namespace Perft
         private async Task<PerftResult> ComputePerft(CancellationToken cancellationToken)
         {
             var result = _resultPool.Get();
+            result.Clear();
 
             var pp = _perft.Positions.Last();
 
@@ -263,8 +264,6 @@ namespace Perft
             results.CorrectResult = expected;
             results.Passed = expected == result;
             results.TableHits = Game.Table.Hits;
-
-            _uci.Depth(depth);
         }
 
         private void LogInfoHeader()

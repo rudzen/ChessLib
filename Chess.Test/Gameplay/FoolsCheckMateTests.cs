@@ -50,7 +50,8 @@ namespace Chess.Test.Gameplay
 
             // construct game and start a new game
             var board = new Board();
-            var position = new Position(board);
+            var pieceValue = new PieceValue();
+            var position = new Position(board, pieceValue);
             var game = GameFactory.Create(position);
             game.NewGame();
             var state = new State();

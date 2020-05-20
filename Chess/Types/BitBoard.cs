@@ -133,6 +133,10 @@ namespace Rudz.Chess.Types
             => left.Value & right.AsBb();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static BitBoard operator &(BitBoard left, File right)
+            => left.Value & right.BitBoardFile();
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static BitBoard operator &(Square left, BitBoard right)
             => left.AsBb() & right.Value;
 

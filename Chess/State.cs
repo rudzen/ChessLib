@@ -29,13 +29,14 @@ namespace Rudz.Chess
     using Enums;
     using Extensions;
     using System;
+    using System.Linq;
     using Types;
 
     public sealed class State : IEquatable<State>
     {
         public Move LastMove { get; set; }
 
-        public IMaterial Material { get; set; }
+        public Value[] NonPawnMaterial { get; set; }
 
         public HashKey PawnStructureKey { get; set; }
 
@@ -77,10 +78,8 @@ namespace Rudz.Chess
             Rule50 = other.Rule50;
             PliesFromNull = other.PliesFromNull;
             EnPassantSquare = other.EnPassantSquare;
+            Array.Copy(other.NonPawnMaterial, NonPawnMaterial, other.NonPawnMaterial.Length);
             Previous = other;
-
-            Material = new Material();
-            Material.CopyFrom(other.Material);
 
             CheckedSquares = new BitBoard[PieceTypes.PieceTypeNb.AsInt()];
             Pinners = new BitBoard[2];
@@ -90,7 +89,7 @@ namespace Rudz.Chess
         public State()
         {
             LastMove = Move.EmptyMove;
-            Material = new Material();
+            NonPawnMaterial = new Value[2];
             CastlelingRights = CastlelingRights.None;
             EnPassantSquare = Square.None;
             Checkers = BitBoard.Empty;
@@ -111,8 +110,7 @@ namespace Rudz.Chess
             other.Previous = this;
 
             // copy over material
-            other.Material = new Material();
-            Material.CopyTo(other.Material);
+            Array.Copy(NonPawnMaterial, other.NonPawnMaterial, NonPawnMaterial.Length);
 
             // initialize the rest of the values
             other.CheckedSquares = new BitBoard[PieceTypes.PieceTypeNb.AsInt()];
@@ -125,7 +123,7 @@ namespace Rudz.Chess
         public void Clear()
         {
             LastMove = Move.EmptyMove;
-            Material.Clear();
+            NonPawnMaterial.Clear();
             PawnStructureKey = Key = 0ul;
             PliesFromNull = Repetition = 0;
             CastlelingRights = CastlelingRights.None;
@@ -168,7 +166,8 @@ namespace Rudz.Chess
                    && PawnStructureKey.Equals(other.PawnStructureKey)
                    && EnPassantSquare.Equals(other.EnPassantSquare)
                    && CastlelingRights == other.CastlelingRights
-                   && Equals(Material, other.Material)
+                   && NonPawnMaterial.First() == other.NonPawnMaterial.First()
+                   && NonPawnMaterial.Last() == other.NonPawnMaterial.Last()
                    && PliesFromNull == other.PliesFromNull
                    && Rule50 == other.Rule50
                    && Pinners.Equals(other.Pinners)
@@ -184,7 +183,7 @@ namespace Rudz.Chess
         {
             var hashCode = new HashCode();
             hashCode.Add(LastMove);
-            hashCode.Add(Material);
+            hashCode.Add(NonPawnMaterial);
             hashCode.Add(PawnStructureKey);
             hashCode.Add(PliesFromNull);
             hashCode.Add(Rule50);

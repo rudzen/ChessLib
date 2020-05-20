@@ -35,6 +35,7 @@ namespace Rudz.Chess.Types
     public struct ExtMove : IEquatable<ExtMove>
     {
         public static readonly ExtMove Empty;
+
         public Move Move;
 
         public Score Score;

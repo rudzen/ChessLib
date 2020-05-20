@@ -15,7 +15,8 @@ namespace Chess.Test.Move
             const ulong expectedMoves = 4;
             
             var board = new Board();
-            var pos = new Rudz.Chess.Position(board);
+            var pieceValue = new PieceValue();
+            var pos = new Rudz.Chess.Position(board, pieceValue);
             var fd = new FenData(fen);
 
             pos.SetFen(fd);

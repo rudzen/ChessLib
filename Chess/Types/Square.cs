@@ -60,6 +60,9 @@ namespace Rudz.Chess.Types
         public Square(Rank rank, File file)
             : this(rank.AsInt(), file.AsInt()) { }
 
+        public Square((Rank, File) rankFile)
+            : this(rankFile.Item1, rankFile.Item2) { }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private Square(Squares square) => Value = square;
 
@@ -73,6 +76,8 @@ namespace Rudz.Chess.Types
 
         public char FileChar => File.FileChar();
 
+        public (Rank, File) RankFile => (Rank, File);
+
         public bool IsOk => Value >= Squares.a1 && Value <= Squares.h8;
 
         public bool IsPromotionRank => !(BitBoards.PromotionRanksBB & this).IsEmpty;
@@ -81,12 +86,18 @@ namespace Rudz.Chess.Types
 
         public static readonly Square None = new Square(Squares.none);
 
+        public static Square Make(Rank r, File f) => new Square(r, f);
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator Square(int value)
             => new Square(value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator Square(Squares value)
+            => new Square(value);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static implicit operator Square((Rank, File) value)
             => new Square(value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

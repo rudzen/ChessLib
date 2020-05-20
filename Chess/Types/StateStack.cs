@@ -73,19 +73,21 @@ namespace Rudz.Chess.Types
         /// </summary>
         /// <param name="offset">The negative offset from the current top of the stack</param>
         /// <returns>The stack with the offset based from the top of the stack</returns>
-        /// <exception cref="InvalidOperationException">If the offset is either positive or will go below zero</exception>
+        /// <exception cref="InvalidOperationException">
+        /// If the offset is either positive or will go below zero
+        /// </exception>
         public State Peek(int offset)
         {
             if (offset >= 0)
                 throw new InvalidOperationException("Offset can only be negative");
-            
+
             var index = Count - 1 + offset;
             if (index < 0)
                 throw new InvalidOperationException("Offset value reached before start of stack");
 
             return _stack[index];
         }
-        
+
         /// <summary>
         /// Get the top stack element and remove it
         /// </summary>
@@ -96,7 +98,7 @@ namespace Rudz.Chess.Types
             var index = Count - 1;
             if (index < 0)
                 throw new InvalidOperationException("There are no elements on the stack.");
-            
+
             Count--;
             return _stack[index];
         }
@@ -110,7 +112,7 @@ namespace Rudz.Chess.Types
         {
             if (Count == Size)
                 throw new StackOverflowException();
-            
+
             _stack[Count] = state;
             Count++;
         }
@@ -124,7 +126,7 @@ namespace Rudz.Chess.Types
             target = new State[max];
             Array.Copy(_stack, target, max);
         }
-        
+
         /// <summary>
         /// Copy the current stack as an array
         /// </summary>

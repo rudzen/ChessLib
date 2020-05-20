@@ -43,6 +43,8 @@ namespace Rudz.Chess.UCI
 
         void Initialize(int maxThreads = 128);
 
+        void AddOption(string name, IOption option);
+
         int Nps(ulong nodes, TimeSpan time);
 
         Move MoveFromUci(IPosition pos, string uciMove);

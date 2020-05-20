@@ -18,7 +18,8 @@ namespace Chess.Benchmark
         public void Setup()
         {
             var board = new Board();
-            var pos = new Position(board);
+            var pieceValue = new PieceValue();
+            var pos = new Position(board, pieceValue);
             _game = new Game(pos);
         }
 

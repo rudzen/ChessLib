@@ -29,32 +29,51 @@ namespace Rudz.Chess
     using Enums;
     using Types;
 
-    public interface IMaterial
+    public interface IPieceValue
     {
-        int MaterialValueTotal { get; }
-        int MaterialValueWhite { get; }
-        int MaterialValueBlack { get; }
+        Value MaxValueWithoutPawns { get; }
+        Value MaxValue { get; }
 
-        int[] MaterialValue { get; }
+        Value PawnValueMg { get; set; }
 
-        int this[int index] { get; set; }
+        Value PawnValueEg { get; set; }
 
-        void Add(Piece piece);
+        Value KnightValueMg { get; set; }
 
-        void UpdateKey(Player side, PieceTypes pieceType, int delta);
+        Value KnightValueEg { get; set; }
 
-        uint GetKey(int index);
+        Value BishopValueMg { get; set; }
 
-        void SetKey(int index, uint value);
+        Value BishopValueEg { get; set; }
 
-        void MakeMove(IPosition pos, Move move);
+        Value RookValueMg { get; set; }
 
-        int Count(Player side, PieceTypes pieceType);
+        Value RookValueEg { get; set; }
 
-        void Clear();
+        Value QueenValueMg { get; set; }
 
-        void CopyFrom(IMaterial material);
+        Value QueenValueEg { get; set; }
 
-        void CopyTo(IMaterial material);
+        public Value ValueZero { get; set; }
+
+        public Value ValueDraw { get; set; }
+
+        public Value ValueKnownWin { get; set; }
+
+        public Value ValueMate { get; set; }
+
+        public Value ValueInfinite { get; set; }
+
+        public Value ValueNone { get; set; }
+
+        public Value ValueMateInMaxPly { get; }
+
+        public Value ValueMatedInMaxPly { get; }
+
+        void SetDefaults();
+
+        void SetPieceValues(PieceValues[] values, Phases phase);
+
+        PieceValues GetPieceValue(Piece pc, Phases phase);
     }
 }

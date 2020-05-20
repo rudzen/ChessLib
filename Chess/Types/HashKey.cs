@@ -24,6 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+// ReSharper disable ConvertToAutoProperty
 namespace Rudz.Chess.Types
 {
     using Enums;
@@ -42,7 +43,7 @@ namespace Rudz.Chess.Types
         private readonly uint _upperKey32;
 
         [FieldOffset(0)]
-        private ulong _key;
+        private readonly ulong _key;
 
         private HashKey(ulong key)
         {
@@ -108,16 +109,16 @@ namespace Rudz.Chess.Types
             => left._key ^ right.GetZobristEnPessant();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void HashSide() => _key ^= Zobrist.GetZobristSide();
+        public readonly bool Equals(HashKey other)
+            => _key == other._key;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly bool Equals(HashKey other) => _key == other._key;
+        public override readonly bool Equals(object obj)
+            => obj is HashKey other && Equals(other);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public override readonly bool Equals(object obj) => obj is HashKey other && Equals(other);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public override readonly int GetHashCode() => _key.GetHashCode();
+        public override readonly int GetHashCode()
+            => _key.GetHashCode();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override string ToString() => $"0x{Key:X}";

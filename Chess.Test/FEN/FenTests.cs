@@ -40,8 +40,12 @@ namespace Chess.Test.FEN
         {
             
             var expected = new FenError(0, 0);
-            var position = new Position(new Board());
-            var game = GameFactory.Create(position);
+            
+            var board = new Board();
+            var pieceValue = new PieceValue();
+            var pos = new Position(board, pieceValue);
+            var game = GameFactory.Create(pos);
+            
             var actual = game.NewGame();
 
             Assert.Equal(expected, actual);
@@ -50,8 +54,10 @@ namespace Chess.Test.FEN
         [Fact]
         public void GetFenTest()
         {
-            var position = new Position(new Board());
-            var game = GameFactory.Create(position);
+            var board = new Board();
+            var pieceValue = new PieceValue();
+            var pos = new Position(board, pieceValue);
+            var game = GameFactory.Create(pos);
             var expectedError = new FenError(0, 0);
             var actualError = game.NewGame();
 

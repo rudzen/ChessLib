@@ -50,6 +50,8 @@ namespace Rudz.Chess
 
         IBoard Board { get; }
 
+        IPieceValue PieceValue { get; }
+
         BitBoard Checkers { get; }
 
         int Rule50 { get; }
@@ -170,6 +172,8 @@ namespace Rudz.Chess
 
         bool HasGameCycle(int ply);
 
+        bool SeeGe(Move m, Value threshold);
+        
         IPositionValidator Validate(PositionValidationTypes type = PositionValidationTypes.Basic);
     }
 }

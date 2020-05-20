@@ -26,16 +26,30 @@ SOFTWARE.
 
 namespace Rudz.Chess.Enums
 {
-    using System;
-
-    [Flags]
     public enum PieceValues
     {
-        Pawn = 100,
-        Knight = 300,
-        Bishop = 300,
-        Rook = 500,
-        Queen = 1000,
-        King = 0
+        ValueZero = 0,
+        ValueDraw = 0,
+        ValueKnownWin = 10000,
+        ValueMate = 32000,
+        ValueInfinite = 32001,
+        ValueNone = 32002,
+
+        ValueMateInMaxPly = ValueMate - 2 * PieceValue.MAX_PLY,
+        ValueMatedInMaxPly = -ValueMate + 2 * PieceValue.MAX_PLY,
+
+        PawnValueMg = 128,
+        PawnValueEg = 213,
+        KnightValueMg = 781,
+        KnightValueEg = 854,
+        BishopValueMg = 825,
+        BishopValueEg = 915,
+        RookValueMg = 1276,
+        RookValueEg = 1380,
+        QueenValueMg = 2538,
+        QueenValueEg = 2682,
+
+        MidgameLimit = 15258,
+        EndgameLimit = 3915
     }
 }
