@@ -88,13 +88,12 @@ namespace Rudz.Chess
             while (_dynamicPawns)
             {
                 var sq = BitBoards.PopLsb(ref _dynamicPawns);
-                var r = sq.Rank;
-                var f = sq.File;
+                var (r, f) = sq.RankFile;
                 var rr = sq.RelativeRank(_us);
 
                 if (r > _fenceRank[f.AsInt()])
                 {
-                    if ((_pos.Pieces(PieceTypes.Pawn, _them) & sq.PassedPawnFrontAttackSpan(_us)).IsEmpty && (theirKsq.File != f || theirKsq.Rank.RelativeRank(_us) < rr))
+                    if ((_theirPawns & sq.PassedPawnFrontAttackSpan(_us)).IsEmpty && (theirKsq.File != f || theirKsq.Rank.RelativeRank(_us) < rr))
                         return false;
                 }
                 else if (_fence & sq)
@@ -109,13 +108,13 @@ namespace Rudz.Chess
 
                         if (f != Files.FileA
                             && _pos.GetPiece(sq + Directions.West) != _ourPawn
-                            || BitBoards.PopCount(_pos.Pieces(PieceTypes.Pawn, _us) & PreviousFile(f)) > 1
+                            || BitBoards.PopCount(_ourPawns & PreviousFile(f)) > 1
                             || (_fixedPawn & (sq + Directions.West)).IsEmpty
                             || (_fence & (sq + Directions.West)).IsEmpty)
                             return false;
                         if (f != Files.FileH
                             && _pos.GetPiece(sq + Directions.East) != _ourPawn
-                            || BitBoards.PopCount(_pos.Pieces(PieceTypes.Pawn, _us) & NextFile(f)) > 1
+                            || BitBoards.PopCount(_ourPawns & NextFile(f)) > 1
                             || (_fixedPawn & (sq + Directions.East)).IsEmpty
                             || (_fence & (sq + Directions.West)).IsEmpty)
                             return false;
@@ -156,15 +155,17 @@ namespace Rudz.Chess
                         if (theirKsq.File != f || theirKsq.Rank.RelativeRank(_us) < rr)
                             return false;
 
-                        if ((f != Files.FileA && _pos.GetPiece(sq + Directions.West) != _ourPawn)
+                        if (f != Files.FileA
+                            && _pos.GetPiece(sq + Directions.West) != _ourPawn
                             || BitBoards.PopCount(_ourPawns & (f - 1)) > 1
-                            || (_fixedPawn & Square.Make(r, f - 1)).IsEmpty
-                            || (_fence & Square.Make(r, f - 1)).IsEmpty)
+                            || (_fixedPawn & Square.Make(r, PreviousFile(f))).IsEmpty
+                            || (_fence & Square.Make(r, PreviousFile(f))).IsEmpty)
                             return false;
-                        if ((f != Files.FileH && _pos.GetPiece(sq + Directions.East) != _ourPawn)
+                        if (f != Files.FileH
+                            && _pos.GetPiece(sq + Directions.East) != _ourPawn
                             || BitBoards.PopCount(_ourPawns & (f + 1)) > 1
-                            || (_fixedPawn & Square.Make(r, f + 1)).IsEmpty
-                            || (_fence & Square.Make(r, f + 1)).IsEmpty)
+                            || (_fixedPawn & Square.Make(r, NextFile(f))).IsEmpty
+                            || (_fence & Square.Make(r,  NextFile(f))).IsEmpty)
                             return false;
                     }
 
@@ -190,13 +191,14 @@ namespace Rudz.Chess
 
         private void MarkOurPawns(Direction up)
         {
-            var pawns = _ourPawns;
-            while (pawns)
+            var ourPawns = _pos.Board.Squares(PieceTypes.Pawn, _us);
+
+            foreach (var psq in ourPawns)
             {
-                var psq = BitBoards.PopLsb(ref pawns);
                 var rr = psq.RelativeRank(_us);
-                if (rr < Ranks.Rank7 && (_pos.GetPiece(psq + up) == _theirPawn || !(_fixedPawn & (psq + up)).IsEmpty)
-                                     && (psq.PawnAttack(_us) & _theirPawns).IsEmpty)
+                if (rr < Ranks.Rank7
+                    && (_pos.GetPiece(psq + up) == _theirPawn || !(_fixedPawn & (psq + up)).IsEmpty)
+                    && (psq.PawnAttack(_us) & _theirPawns).IsEmpty)
                 {
                     _fixedPawn |= psq;
                     _marked |= psq;
@@ -208,56 +210,45 @@ namespace Rudz.Chess
 
         private void MarkTheirPawns()
         {
-            var pawns = _theirPawns;
-            while (pawns)
-            {
-                var psq = BitBoards.PopLsb(ref pawns);
-                var (r, f) = psq.RankFile;
-                if (f != Files.FileA)
-                    _marked |= new Square(RankBelow(r), PreviousFile(f));
-                if (f != Files.FileH)
-                    _marked |= new Square(RankBelow(r), NextFile(f));
-            }
+            var (east, west) = _us.IsWhite
+                ? (Directions.SouthEast, Directions.SouthWest)
+                : (Directions.NorthEast, Directions.NorthWest);
+
+            _marked |= _theirPawns.Shift(east) | _theirPawns.Shift(west);
         }
 
-        private bool FormsFence(File f, Rank r)
+        private bool FormsFence(Square sq)
         {
-            var originalSquare = Square.Make(r, f);
+            _processed |= sq;
 
-            _processed |= originalSquare;
-
-            if (f == Files.FileH)
+            if (sq.File == Files.FileH)
             {
-                _fence |= originalSquare;
+                _fence |= sq;
                 return true;
             }
 
-            // above
+            // look up
 
-            var s = Square.Make(RankAbove(r), f);
-
-            if (!(_marked & s).IsEmpty && (_processed & s).IsEmpty && FormsFence(f, RankAbove(r)))
+            var s = sq + _us.PawnPushDistance();
+            if (!(_marked & s).IsEmpty && (_processed & s).IsEmpty && FormsFence(s))
             {
                 _fence |= s;
                 return true;
             }
 
-            // increase file
+            // look east
 
-            var nextFile = NextFile(f);
-            s = new Square(r, nextFile);
-
-            if (!(_marked & s).IsEmpty && (_processed & s).IsEmpty && FormsFence(nextFile, r))
+            s = sq + Directions.East;
+            if (!(_marked & s).IsEmpty && (_processed & s).IsEmpty && FormsFence(s))
             {
                 _fence |= s;
                 return true;
             }
 
-            // below
+            // look down
 
-            s = new Square(RankBelow(r), f);
-
-            if (!(_marked & s).IsEmpty && (_processed & s).IsEmpty && FormsFence(f, RankBelow(r)))
+            s = sq + _them.PawnPushDistance();
+            if (!(_marked & s).IsEmpty && (_processed & s).IsEmpty && FormsFence(s))
             {
                 _fence |= s;
                 return true;
@@ -267,25 +258,14 @@ namespace Rudz.Chess
         }
 
         internal Square NextFenceRankSquare(File f, Player them)
-        {
-            var s1 = Square.Make(_fenceRank[f.AsInt()], NextFile(f)) + them.PawnPushDistance();
-            var s2 = new Square(_fenceRank[f.AsInt()].AsInt() * 8 + f.AsInt()) + them.PawnPushDistance();
-
-            return s2;
-        }
+            => new Square(_fenceRank[f.AsInt()].AsInt() * 8 + f.AsInt()) + them.PawnPushDistance();
 
         internal bool IsFenceFormed()
         {
             for (Rank rank = Ranks.Rank2; rank < Ranks.Rank8; ++rank)
             {
-                //if (rank == Ranks.Rank4)
-                //{
-                //    var a = 1;
-                //}
-
                 var startSquare = Square.Make(rank, Files.FileA);
-
-                if (!(_marked & startSquare).IsEmpty && FormsFence(Files.FileA, rank))
+                if (!(_marked & startSquare).IsEmpty && FormsFence(startSquare))
                 {
                     _fence |= startSquare;
                     return true;
@@ -313,16 +293,6 @@ namespace Rudz.Chess
                 }
             }
         }
-
-        private Rank RankBelow(Rank r)
-            => _us.IsWhite
-                ? r - 1
-                : r + 1;
-
-        private Rank RankAbove(Rank r)
-            => _us.IsWhite
-                ? r + 1
-                : r - 1;
 
         private static File NextFile(File f)
             => f + 1;
