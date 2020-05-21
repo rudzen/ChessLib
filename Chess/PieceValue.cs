@@ -24,11 +24,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using Newtonsoft.Json;
-
 namespace Rudz.Chess
 {
     using Enums;
+    using Newtonsoft.Json;
     using System;
     using Types;
 
@@ -134,13 +133,13 @@ namespace Rudz.Chess
                     case PieceTypes.Pawn:
                         value *= 8;
                         break;
+
                     case PieceTypes.Knight:
                     case PieceTypes.Bishop:
                     case PieceTypes.Rook:
                         value *= 2;
                         break;
                 }
-                //var value = _values[0][pt.AsInt()];
                 if (pt != PieceTypes.Pawn)
                     sumNoPawns += value;
                 sum += value;

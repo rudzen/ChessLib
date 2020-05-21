@@ -59,7 +59,6 @@ namespace Rudz.Chess
             _bySide = new BitBoard[2];
             _byType = new BitBoard[PieceTypes.PieceTypeNb.AsInt()];
             _pieceCount = new int[(int)Enums.Pieces.PieceNb];
-            var mem = new Memory<Square>(new Square[(int)Enums.Pieces.PieceNb]);
             _pieceList = new Square[64][];
             for (var i = 0; i < _pieceList.Length; i++)
             {

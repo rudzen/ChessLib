@@ -56,6 +56,10 @@ namespace Rudz.Chess
             PawnArea = BitBoards.RANK2 | BitBoards.RANK3 | BitBoards.RANK4 | BitBoards.RANK5 | BitBoards.RANK6 | BitBoards.RANK7;
         }
 
+        /// <summary>
+        /// Computes wheter the current position contains a pawn fence which makes the game a draw.
+        /// </summary>
+        /// <returns>true if the game is a draw position - otherwise false</returns>
         public bool IsBlocked()
         {
             // Quick check if there is only pawns and kings on the board It might be possible to
@@ -63,9 +67,7 @@ namespace Rudz.Chess
             if (_pos.Board.PieceCount(PieceTypes.AllPieces) > _pos.Board.PieceCount(PieceTypes.Pawn) + 2)
                 return false;
 
-            Direction up = _us.IsWhite
-                ? Directions.North
-                : Directions.South;
+            var up = _us.PawnPushDistance();
 
             MarkOurPawns(up);
             MarkTheirPawns();
@@ -83,7 +85,7 @@ namespace Rudz.Chess
             if (ourKsq.Rank.RelativeRank(_us) > _fenceRank[ourKsq.File.AsInt()].RelativeRank(_us))
                 return false;
 
-            ComputeDynamicFencedPawns(_them);
+            _dynamicPawns |= ComputeDynamicFencedPawns(_them);
 
             while (_dynamicPawns)
             {
@@ -177,6 +179,9 @@ namespace Rudz.Chess
             return true;
         }
 
+        /// <summary>
+        /// Computes the fence ranks
+        /// </summary>
         private void ComputeFenceRanks()
         {
             var covered = _fence;
@@ -189,6 +194,10 @@ namespace Rudz.Chess
             }
         }
 
+        /// <summary>
+        /// Marks the current players pawns as either fixed and marked or dynamic
+        /// </summary>
+        /// <param name="up">The up direction for the current player</param>
         private void MarkOurPawns(Direction up)
         {
             var ourPawns = _pos.Board.Squares(PieceTypes.Pawn, _us);
@@ -208,6 +217,9 @@ namespace Rudz.Chess
             }
         }
 
+        /// <summary>
+        /// Marks the opponent pawn attacks
+        /// </summary>
         private void MarkTheirPawns()
         {
             var (east, west) = _us.IsWhite
@@ -217,10 +229,17 @@ namespace Rudz.Chess
             _marked |= _theirPawns.Shift(east) | _theirPawns.Shift(west);
         }
 
+        /// <summary>
+        /// Determines which squares forms a fence.
+        /// First square is always on file A - and will perform a depth first verification of its surrounding squares.
+        /// </summary>
+        /// <param name="sq">The square which is currently being looked at</param>
+        /// <returns>true if the square is in the fence</returns>
         private bool FormsFence(Square sq)
         {
             _processed |= sq;
 
+            // File H is marked as fence if it is reached.
             if (sq.File == Files.FileH)
             {
                 _fence |= sq;
@@ -271,15 +290,19 @@ namespace Rudz.Chess
                     return true;
                 }
             }
+
             return false;
+
         }
 
-        internal void ComputeDynamicFencedPawns(Player them)
+        internal BitBoard ComputeDynamicFencedPawns(Player them)
         {
             // reverse order of Down
             var down = them.IsBlack
                 ? Directions.South
                 : Directions.North;
+
+            var result = BitBoard.Empty;
 
             for (File f = Files.FileA; f < Files.FileNb; ++f)
             {
@@ -289,9 +312,11 @@ namespace Rudz.Chess
                 {
                     sq = BitBoards.PopLsb(ref b) + down;
                     if (_pos.GetPiece(sq) == _ourPawn)
-                        _dynamicPawns |= sq;
+                        result |= sq;
                 }
             }
+
+            return result;
         }
 
         private static File NextFile(File f)

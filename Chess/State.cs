@@ -156,7 +156,7 @@ namespace Rudz.Chess
                 break;
             }
         }
-        
+
         public bool Equals(State other)
         {
             if (ReferenceEquals(null, other)) return false;
@@ -194,9 +194,11 @@ namespace Rudz.Chess
             hashCode.Add(Previous);
             hashCode.Add(CapturedPiece);
             foreach (var pinner in Pinners)
-                hashCode.Add(pinner);
+                if (!pinner.IsEmpty)
+                    hashCode.Add(pinner);
             foreach (var checkedSquare in CheckedSquares)
-                hashCode.Add(checkedSquare);
+                if (!checkedSquare.IsEmpty)
+                    hashCode.Add(checkedSquare);
             return hashCode.ToHashCode();
         }
     }
