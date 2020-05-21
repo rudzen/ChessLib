@@ -65,7 +65,7 @@ namespace Chess.Test.Square
 
             var s = new Square(Ranks.Rank1, Files.FileH);
 
-            var actual = s.Relative(PlayerExtensions.Black);
+            var actual = s.Relative(Player.Black);
 
             Assert.Equal(expected, actual);
         }
@@ -77,7 +77,7 @@ namespace Chess.Test.Square
 
             var s = new Square(Ranks.Rank3, Files.FileC);
 
-            var actual = s.Relative(PlayerExtensions.White);
+            var actual = s.Relative(Player.White);
 
             Assert.Equal(expected, actual);
         }

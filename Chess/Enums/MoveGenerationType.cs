@@ -24,18 +24,41 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Types
+namespace Rudz.Chess.Enums
 {
-    using System.Runtime.CompilerServices;
-
-    public static class RankExtensions
+    /// <summary>
+    /// Move generation flag
+    /// </summary>
+    public enum MoveGenerationType
     {
-        private static readonly char[] RankChars = { '1', '2', '3', '4', '5', '6', '7', '8' };
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static char RankChar(this Rank r) => RankChars[r.AsInt()];
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string RankString(this Rank r) => RankChars[r.AsInt()].ToString();
+        /// <summary>
+        /// Generate all legal moves
+        /// </summary>
+        Legal,
+        
+        /// <summary>
+        /// Generate only captures
+        /// </summary>
+        Captures,
+        
+        /// <summary>
+        /// Generate only quiet moves (non-captures)
+        /// </summary>
+        Quiets,
+        
+        /// <summary>
+        /// Generate only moves which are not evasions
+        /// </summary>
+        NonEvasions,
+        
+        /// <summary>
+        /// Generate only evasion moves (if fx in check)
+        /// </summary>
+        Evasions,
+        
+        /// <summary>
+        /// Generate only moves which are not captures and gives check
+        /// </summary>
+        QuietChecks,
     }
 }

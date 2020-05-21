@@ -146,10 +146,7 @@ namespace Rudz.Chess.Transposition
                 break;
             }
 
-            if (!set)
-                e.Defaults();
-
-            return (set, e);
+            return (set, !set ? TTCluster.DefaultEntry : e);
         }
 
         /// <summary>
@@ -200,7 +197,7 @@ namespace Rudz.Chess.Transposition
                         (candidate.Generation == g,
                             ttEntry.Generation == g,
                             ttEntry.Type == Bound.Exact,
-                            ttEntry.Depth < candidate.Depth);
+                            ttEntry.Depth <= candidate.Depth);
 
                     if (cc1 && cc4 || !(cc2 || cc3) && (cc4 || cc1))
                     {
@@ -242,10 +239,7 @@ namespace Rudz.Chess.Transposition
         public void Clear()
         {
             foreach (var t in _table)
-            {
                 t.Reset();
-                Array.ForEach(t.Cluster, entry => entry.Defaults());
-            }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

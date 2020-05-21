@@ -24,15 +24,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System;
-using System.Threading.Tasks;
-
 namespace Chess.Test.Move
 {
     using Perft;
     using Perft.Interfaces;
     using Rudz.Chess.Fen;
+    using System;
     using System.Collections.Generic;
+    using System.Threading.Tasks;
     using Xunit;
 
     public sealed class PerftTest
@@ -109,7 +108,6 @@ namespace Chess.Test.Move
         [Fact]
         public async Task PerftShort()
         {
-
             foreach (var perftPosition in Positions)
             {
                 var perft = PerftFactory.Create();

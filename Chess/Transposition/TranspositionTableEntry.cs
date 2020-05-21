@@ -63,16 +63,6 @@ namespace Rudz.Chess.Transposition
         public static bool operator !=(TranspositionTableEntry left, TranspositionTableEntry right)
             => !(left == right);
 
-        public void Defaults()
-        {
-            Key32 = 0;
-            Move = MoveExtensions.EmptyMove;
-            Depth = sbyte.MinValue;
-            Generation = 1;
-            Value = StaticValue = int.MaxValue;
-            Type = Bound.Void;
-        }
-
         public void Save(TranspositionTableEntry tte)
         {
             Key32 = tte.Key32;

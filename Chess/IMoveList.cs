@@ -1,4 +1,4 @@
-﻿/*
+/*
 ChessLib, a chess data structure library
 
 MIT License
@@ -26,29 +26,27 @@ SOFTWARE.
 
 namespace Rudz.Chess
 {
+    using Enums;
     using System;
+    using System.Collections.Generic;
     using Types;
 
-    public interface IMoveList
+    public interface IMoveList : IReadOnlyCollection<ExtMove>
     {
-        ulong Count { get; }
+        ulong Length { get; }
+        Move CurrentMove { get; }
+        void Add(ExtMove item);
+        void Add(Move item);
 
-        Move this[int index] { get; }
-
-        void Add(Move move);
-
-        bool Contains(Move move);
-
-        bool Contains(Square from, Square to);
-        
         /// <summary>
-        /// Primary use is for polyglot moves
+        /// Clears the move generated data
         /// </summary>
-        /// <param name="from">The from square</param>
-        /// <param name="to">The to square</param>
-        /// <returns>The first move that matches from and to squares</returns>
-        Move GetMove(Square from, Square to);
+        void Clear();
 
-        ReadOnlySpan<Move> GetMoves();
+        bool Contains(ExtMove item);
+        bool Contains(Move item);
+        bool Contains(Square from, Square to);
+        void Generate(IPosition pos, MoveGenerationType type = MoveGenerationType.Legal);
+        ReadOnlySpan<ExtMove> Get();
     }
 }

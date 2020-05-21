@@ -27,8 +27,8 @@ SOFTWARE.
 namespace Rudz.Chess.Enums
 {
     using System;
+    using Types;
 
-    [Flags]
     public enum CastlelingSides
     {
         None = 0,
@@ -45,13 +45,31 @@ namespace Rudz.Chess.Enums
         WhiteOoo = WhiteOo << 1,
         BlackOo = WhiteOo << 2,
         BlackOoo = WhiteOo << 3,
-        
+
         KingSide = WhiteOo | BlackOo,
         QueenSide = WhiteOoo | BlackOoo,
         WhiteCastleling = WhiteOo | WhiteOoo,
         BlackCastleling = BlackOo | BlackOoo,
-        
+
         Any = WhiteCastleling | BlackCastleling,
         CastleRightsNb = 16
+    }
+
+    public static class CastlelingSideExtensions
+    {
+        public static CastlelingRights MakeCastlelingRights(this CastlelingSides cs, Player p)
+            => p.IsWhite
+                ? cs == CastlelingSides.Queen
+                    ? CastlelingRights.WhiteOoo
+                    : CastlelingRights.WhiteOo
+                : cs == CastlelingSides.Queen
+                    ? CastlelingRights.BlackOoo
+                    : CastlelingRights.BlackOo;
+    }
+
+    public enum CastlelingPerform
+    {
+        Do,
+        Undo
     }
 }

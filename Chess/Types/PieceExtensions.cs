@@ -27,7 +27,6 @@ SOFTWARE.
 namespace Rudz.Chess.Types
 {
     using Enums;
-    using Extensions;
     using System.Runtime.CompilerServices;
 
     public static class PieceExtensions
@@ -41,17 +40,9 @@ namespace Rudz.Chess.Types
         // for polyglot support in the future
         public const string BookPieceNames = "pPnNbBrRqQkK";
 
-        private const ushort WhitePieces = 126;
-
-        private const ushort BlackPieces = 32256;
-
-        public static readonly Piece EmptyPiece = Pieces.NoPiece;
-
         private static readonly string[] PieceStrings = { " ", "P", "N", "B", "R", "Q", "K", " ", " ", "p", "n", "b", "r", "q", "k" };
 
         private static readonly string[] PieceNames = { "None", "Pawn", "Knight", "Bishop", "Rook", "Queen", "King" };
-
-        private static readonly PieceValues[] Values = { 0, PieceValues.Pawn, PieceValues.Knight, PieceValues.Bishop, PieceValues.Rook, PieceValues.Queen, PieceValues.King };
 
         /*
  * white chess king 	♔ 	U+2654 	&#9812;
@@ -68,25 +59,7 @@ namespace Rudz.Chess.Types
  * black chess pawn 	♟ 	U+265F 	&#9823;
          */
 
-        private static readonly string[] PieceUnicode = { " ", "\u2659", "\u2658", "\u2657", "\u2656", "\u2655", "\u2654", " ", " ", "\u265F", "\u265E", "\u265D", "\u265C", "\u265B", "\u265A", " " };
-
         private static readonly char[] PieceUnicodeChar = { ' ', '\u2659', '\u2658', '\u2657', '\u2656', '\u2655', '\u2654', ' ', ' ', '\u265F', '\u265E', '\u265D', '\u265C', '\u265B', '\u265A', ' ' };
-
-        // Generic helper functions
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsWhite(this Piece p) => p.AsInt().InBetween((int)Pieces.WhitePawn, (int)Pieces.WhiteKing);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsBlack(this Piece p) => p.AsInt().InBetween((int)Pieces.BlackPawn, (int)Pieces.BlackKing);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int AsInt(this PieceTypes p) => (int)p;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Piece MakePiece(this PieceTypes @this, Player side) => (int)@this | (side.Side << 3);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsNoPiece(this Piece p) => p == Pieces.NoPiece;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static char GetPieceChar(this Piece p) => PieceChars[p.AsInt()];
@@ -98,18 +71,10 @@ namespace Rudz.Chess.Types
         public static string GetPieceString(this Piece p) => PieceStrings[p.AsInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsPieceWhite(int code) => (WhitePieces & code) != 0;
-
-        public static bool IsPieceBlack(int code) => (BlackPieces & code) != 0;
+        public static string GetName(this Piece p) => PieceNames[p.Type().AsInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static PieceValues PieceValue(this Piece p) => Values[p.Type().AsInt()];
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ref string GetName(this Piece p) => ref PieceNames[p.Type().AsInt()];
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static char GetPromotionChar(this Piece p) => PromotionPieceNotation[(int)p.Type()];
+        public static char GetPromotionChar(this PieceTypes p) => PromotionPieceNotation[p.AsInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static char GetPgnChar(this Piece p) => PgnPieceChars[(int)p.Type()];

@@ -34,8 +34,8 @@ namespace Rudz.Chess.Enums
     {
         None = 0,
         Move = 1,
-        File = 2,
-        Rank = 4
+        File = 1 << 1,
+        Rank = 1 << 2
     }
 
     public static class EMoveAmbiguityExtensions

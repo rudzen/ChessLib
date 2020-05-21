@@ -87,7 +87,7 @@ namespace Rudz.Chess
                 notation.Append(CastlelingExtensions.GetCastlelingString(to, from));
             else
             {
-                var pc = move.GetMovingPiece();
+                var pc = _pos.MovedPiece(move);
                 var pt = pc.Type();
 
                 if (pt != PieceTypes.Pawn)
@@ -97,21 +97,25 @@ namespace Rudz.Chess
                 }
 
                 if (move.IsEnPassantMove())
-                    notation.Append("ep").Append(from.FileChar());
-                else if (move.IsCaptureMove())
+                    notation.Append("ep").Append(from.FileChar);
+                else
                 {
-                    if (pt == PieceTypes.Pawn)
-                        notation.Append(from.FileChar());
-                    notation.Append('x');
+                    var capturedPiece = _pos.GetPiece(to);
+                    if (capturedPiece != Piece.EmptyPiece)
+                    {
+                        if (pt == PieceTypes.Pawn)
+                            notation.Append(from.FileChar);
+                        notation.Append('x');
+                    }
                 }
 
                 notation.Append(to.ToString());
 
                 if (move.IsPromotionMove())
-                    notation.Append('=').Append(move.GetPromotedPiece().GetUnicodeChar());
+                    notation.Append('=').Append(move.GetPromotedPieceType().MakePiece(_pos.SideToMove).GetUnicodeChar());
             }
 
-            if (_pos.State.InCheck)
+            if (_pos.InCheck)
                 notation.Append(GetCheckChar());
 
             return notation.ToString();
@@ -134,30 +138,34 @@ namespace Rudz.Chess
                 notation.Append(CastlelingExtensions.GetCastlelingString(to, from));
             else
             {
-                var pt = move.GetMovingPieceType();
+                var pt = _pos.GetPieceType(from);
 
                 if (pt != PieceTypes.Pawn)
                 {
-                    notation.Append(move.GetMovingPiece().GetPgnChar());
+                    notation.Append(_pos.GetPiece(from).GetPgnChar());
                     Disambiguation(move, from, notation);
                 }
 
                 if (move.IsEnPassantMove())
-                    notation.Append("ep").Append(from.FileChar());
-                else if (move.IsCaptureMove())
+                    notation.Append("ep").Append(from.FileChar);
+                else
                 {
-                    if (pt == PieceTypes.Pawn)
-                        notation.Append(from.FileChar());
-                    notation.Append('x');
+                    var capturedPiece = _pos.GetPiece(to);
+                    if (capturedPiece != Piece.EmptyPiece)
+                    {
+                        if (pt == PieceTypes.Pawn)
+                            notation.Append(from.FileChar);
+                        notation.Append('x');
+                    }
                 }
 
                 notation.Append(to.ToString());
 
                 if (move.IsPromotionMove())
-                    notation.Append('=').Append(move.GetPromotedPiece().GetPgnChar());
+                    notation.Append('=').Append(move.GetPromotedPieceType().MakePiece(_pos.SideToMove).GetPgnChar());
             }
 
-            if (_pos.State.InCheck)
+            if (_pos.InCheck)
                 notation.Append(GetCheckChar());
 
             return notation.ToString();
@@ -180,7 +188,7 @@ namespace Rudz.Chess
                 notation.Append(CastlelingExtensions.GetCastlelingString(to, from));
             else
             {
-                var pt = move.GetMovingPieceType();
+                var pt = _pos.GetPieceType(from);
 
                 if (pt != PieceTypes.Pawn)
                     notation.Append(pt.GetPieceChar());
@@ -188,24 +196,28 @@ namespace Rudz.Chess
                 notation.Append(from.ToString());
 
                 if (move.IsEnPassantMove())
-                    notation.Append("ep").Append(from.FileChar());
-                else if (move.IsCaptureMove())
-                {
-                    if (pt == PieceTypes.Pawn)
-                        notation.Append(from.FileChar());
-
-                    notation.Append('x');
-                }
+                    notation.Append("ep").Append(from.FileChar);
                 else
-                    notation.Append('-');
+                {
+                    var capturedPiece = _pos.GetPiece(to);
+                    if (capturedPiece != Piece.EmptyPiece)
+                    {
+                        if (pt == PieceTypes.Pawn)
+                            notation.Append(from.FileChar);
+
+                        notation.Append('x');
+                    }
+                    else
+                        notation.Append('-');
+                }
 
                 notation.Append(to.ToString());
 
                 if (move.IsPromotionMove())
-                    notation.Append('=').Append(move.GetPromotedPiece().GetUnicodeChar());
+                    notation.Append('=').Append(move.GetPromotedPieceType().MakePiece(_pos.SideToMove).GetUnicodeChar());
             }
 
-            if (_pos.State.InCheck)
+            if (_pos.InCheck)
                 notation.Append(GetCheckChar());
 
             return notation.ToString();
@@ -228,7 +240,7 @@ namespace Rudz.Chess
                 notation.Append(CastlelingExtensions.GetCastlelingString(to, from));
             else
             {
-                var pt = move.GetMovingPieceType();
+                var pt = _pos.GetPieceType(from);
 
                 if (pt != PieceTypes.Pawn)
                     notation.Append(pt.GetPieceChar());
@@ -236,24 +248,28 @@ namespace Rudz.Chess
                 notation.Append(from.ToString());
 
                 if (move.IsEnPassantMove())
-                    notation.Append("ep").Append(from.FileChar());
-                else if (move.IsCaptureMove())
-                {
-                    if (pt == PieceTypes.Pawn)
-                        notation.Append(from.FileChar());
-
-                    notation.Append('x').Append(move.GetCapturedPiece().Type().GetPieceChar());
-                }
+                    notation.Append("ep").Append(from.FileChar);
                 else
-                    notation.Append('-');
+                {
+                    var capturedPiece = _pos.GetPiece(to);
+                    if (capturedPiece != Piece.EmptyPiece)
+                    {
+                        if (pt == PieceTypes.Pawn)
+                            notation.Append(from.FileChar);
+
+                        notation.Append('x').Append(capturedPiece.Type().GetPieceChar());
+                    }
+                    else
+                        notation.Append('-');
+                }
 
                 notation.Append(to.ToString());
 
                 if (move.IsPromotionMove())
-                    notation.Append('=').Append(move.GetPromotedPiece().GetUnicodeChar());
+                    notation.Append('=').Append(move.GetPromotedPieceType().MakePiece(_pos.SideToMove).GetUnicodeChar());
             }
 
-            if (_pos.State.InCheck)
+            if (_pos.InCheck)
                 notation.Append(GetCheckChar());
 
             return notation.ToString();
@@ -261,29 +277,32 @@ namespace Rudz.Chess
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private char GetCheckChar()
-            => !_pos.GenerateMoves().GetMoves().IsEmpty ? '+' : '#';
+            => _pos.GenerateMoves().Any() ? '+' : '#';
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private MoveAmbiguities Ambiguity(Move move, BitBoard similarTypeAttacks)
         {
             var ambiguity = MoveAmbiguities.None;
+            var c = _pos.SideToMove;
+            var from = move.GetFromSquare();
+
+
 
             foreach (var square in similarTypeAttacks)
             {
-                var c = move.GetMovingSide();
                 var pinned = _pos.GetPinnedPieces(square, c);
 
                 if (similarTypeAttacks & pinned)
                     continue;
 
-                if (move.GetMovingPieceType() != _pos.GetPieceType(square))
+                if (_pos.GetPieceType(from) != _pos.GetPieceType(square))
                     continue;
 
                 if (_pos.Pieces(c) & square)
                 {
-                    if (square.File() == move.GetFromSquare().File())
+                    if (square.File == from.File)
                         ambiguity |= MoveAmbiguities.File;
-                    else if (square.Rank() == move.GetFromSquare().Rank())
+                    else if (square.Rank == from.Rank)
                         ambiguity |= MoveAmbiguities.Rank;
 
                     ambiguity |= MoveAmbiguities.Move;
@@ -301,11 +320,12 @@ namespace Rudz.Chess
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private BitBoard GetSimilarAttacks(Move move)
         {
-            var pt = move.GetMovingPieceType();
+            var from = move.GetFromSquare();
+            var pt = _pos.GetPieceType(from);
 
             return pt == PieceTypes.Pawn || pt == PieceTypes.King
-                ? BitBoards.EmptyBitBoard
-                : move.GetToSquare().GetAttacks(pt, _pos.Pieces()) ^ move.GetFromSquare();
+                ? BitBoard.Empty
+                : _pos.GetAttacks(move.GetToSquare(), pt, _pos.Pieces()) ^ from;
         }
 
         /// <summary>
@@ -326,9 +346,9 @@ namespace Rudz.Chess
                 return;
 
             if (!ambiguity.HasFlagFast(MoveAmbiguities.File))
-                sb.Append(from.FileChar());
+                sb.Append(from.FileChar);
             else if (!ambiguity.HasFlagFast(MoveAmbiguities.Rank))
-                sb.Append(from.RankChar());
+                sb.Append(from.RankChar);
             else
                 sb.Append(from.ToString());
         }

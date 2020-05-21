@@ -26,27 +26,53 @@ SOFTWARE.
 
 namespace Rudz.Chess.Types
 {
+    using System;
     using System.Runtime.CompilerServices;
 
     /// <summary>
     /// Extended move structure which combines Move and Score
     /// </summary>
-    public struct ExtMove
+    public struct ExtMove : IEquatable<ExtMove>
     {
+        public static readonly ExtMove Empty;
+
         public Move Move;
 
         public Score Score;
 
-        public ExtMove(Move m, Score s)
+        static ExtMove()
+            => Empty = new ExtMove();
+
+        private ExtMove(Move m, Score s)
         {
             Move = m;
             Score = s;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator ExtMove(Move m) => new ExtMove(m, 0);
+        public static implicit operator ExtMove(Move m)
+            => new ExtMove(m, 0);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator ExtMove(Score s) => new ExtMove(MoveExtensions.EmptyMove, s);
+        public static implicit operator ExtMove(Score s)
+            => new ExtMove(Move.EmptyMove, s);
+
+        public static bool operator !=(ExtMove left, ExtMove right)
+            => !(left == right);
+
+        public static bool operator ==(ExtMove left, ExtMove right)
+            => left.Equals(right);
+
+        public bool Equals(ExtMove other)
+            => Move.Equals(other.Move);
+
+        public override bool Equals(object obj)
+            => obj is ExtMove other && Equals(other);
+
+        public override int GetHashCode()
+            => Move.GetHashCode();
+
+        public override string ToString()
+            => $"{Move}, {Score}";
     }
 }

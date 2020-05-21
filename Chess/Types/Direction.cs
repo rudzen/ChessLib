@@ -27,20 +27,18 @@ SOFTWARE.
 namespace Rudz.Chess.Types
 {
     using Enums;
+    using System;
     using System.Runtime.CompilerServices;
 
-    public readonly struct Direction
+    public readonly struct Direction : IEquatable<Direction>
     {
         public Directions Value { get; }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Direction(Directions d) => Value = d;
+        private Direction(Directions d) => Value = d;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Direction(int d) => Value = (Directions)d;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Direction(Direction d) => Value = d.Value;
+        private Direction(int d) => Value = (Directions)d;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator Direction(int value) => new Direction(value);
@@ -90,6 +88,6 @@ namespace Rudz.Chess.Types
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override int GetHashCode() => AsInt();
 
-        public int AsInt() => (int) Value;
+        private int AsInt() => (int)Value;
     }
 }

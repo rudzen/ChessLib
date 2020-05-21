@@ -24,27 +24,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Types
+namespace Rudz.Chess.UCI
 {
-    using System.Runtime.CompilerServices;
-
-    /// <summary>
-    /// Made in a hurry.
-    /// TODO : to be organized in a more fluent manner
-    /// </summary>
-    public static class MoveExtensions
+    public enum CopyProtections
     {
-        public static readonly Move EmptyMove = new Move();
-
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static (bool, Move) Locate(this Move move, IPosition pos)
-        {
-            // force position to contain the latest moves for the position moves to be searched in
-            var moveList = pos.GenerateMoves();
-
-            var element = moveList.GetMove(move.GetFromSquare(), move.GetToSquare());
-            return element == null ? (false, EmptyMove) : (true, element);
-        }
+        Checking,
+        Ok,
+        Error
     }
 }

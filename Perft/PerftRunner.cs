@@ -36,6 +36,7 @@ namespace Perft
     using Parsers;
     using Rudz.Chess;
     using Rudz.Chess.Extensions;
+    using Rudz.Chess.Types;
     using Rudz.Chess.UCI;
     using Serilog;
     using System;
@@ -56,6 +57,8 @@ namespace Perft
 
         private static readonly Lazy<string> CurrentDirectory = new Lazy<string>(() => System.Environment.CurrentDirectory);
 
+        private readonly IDictionary<HashKey, ulong> _resultCache;
+
         private readonly Func<CancellationToken, IAsyncEnumerable<IPerftPosition>>[] _runners;
 
         private readonly IEpdParser _epdParser;
@@ -72,6 +75,8 @@ namespace Perft
 
         private readonly IUci _uci;
 
+        private readonly CPU _cpu;
+
         private bool _usingEpd;
 
         public PerftRunner(IEpdParser parser, ILogger log, IBuildTimeStamp buildTimeStamp, IPerft perft, IConfiguration configuration, ObjectPool<PerftResult> resultPool, IUci uci)
@@ -86,15 +91,19 @@ namespace Perft
             _uci = uci;
             _uci.Initialize();
 
-            _runners = new Func<CancellationToken, IAsyncEnumerable<IPerftPosition>>[] {ParseEpd, ParseFen};
+            _runners = new Func<CancellationToken, IAsyncEnumerable<IPerftPosition>>[] { ParseEpd, ParseFen };
 
             TranspositionTableOptions = Framework.IoC.Resolve<IOptions>(OptionType.TTOptions) as TTOptions;
             configuration.Bind("TranspositionTable", TranspositionTableOptions);
+
+            _resultCache = new Dictionary<HashKey, ulong>(256);
 
             _outputSettings = new JsonSerializerSettings
             {
                 Formatting = Formatting.Indented
             };
+
+            _cpu = new CPU();
         }
 
         public bool SaveResults { get; set; }
@@ -133,9 +142,9 @@ namespace Perft
                         _log.Error("Parsing failed for Id={0}", position.Id);
                     _resultPool.Return(result);
                 }
-                catch (Exception)
+                catch (AggregateException e)
                 {
-                    _log.Warning("Cancel requested.");
+                    _log.Error(e.GetBaseException(), "Cancel requested.");
                     errors = 1;
                     break;
                 }
@@ -182,7 +191,7 @@ namespace Perft
 
             var depths = options.Depths.Select(d => (d, zero)).ToList();
 
-            var perftPositions = options.Fens.Select(f => PerftPositionFactory.Create(Guid.NewGuid().ToString(),f, depths));
+            var perftPositions = options.Fens.Select(f => PerftPositionFactory.Create(Guid.NewGuid().ToString(), f, depths));
 
             foreach (var perftPosition in perftPositions)
                 yield return perftPosition;
@@ -191,6 +200,7 @@ namespace Perft
         private async Task<PerftResult> ComputePerft(CancellationToken cancellationToken)
         {
             var result = _resultPool.Get();
+            result.Clear();
 
             var pp = _perft.Positions.Last();
 
@@ -212,6 +222,7 @@ namespace Perft
 
                 _log.Information("Depth       : {0}", depth);
                 sw.Restart();
+
                 var perftResult = await _perft.DoPerftAsync(depth).ConfigureAwait(false);
                 sw.Stop();
 
@@ -239,7 +250,7 @@ namespace Perft
             // ReSharper disable once MethodHasAsyncOverload
             var contents = JsonConvert.SerializeObject(result, _outputSettings);
             var outputFileName = $"{baseFileName}{result.Depth}].json";
-            await File.WriteAllTextAsync(outputFileName, contents, cancellationToken).ConfigureAwait(false);
+            await System.IO.File.WriteAllTextAsync(outputFileName, contents, cancellationToken).ConfigureAwait(false);
         }
 
         private void ComputeResultsAsync(ulong result, int depth, ulong expected, long elapsedMs, IPerftResult results)
@@ -249,12 +260,10 @@ namespace Perft
             results.Depth = depth;
             // add 1 to avoid potential dbz
             results.Elapsed = TimeSpan.FromMilliseconds(elapsedMs + 1);
-            results.Nps = (ulong) _uci.Nps(result, results.Elapsed);
+            results.Nps = (ulong)_uci.Nps(result, results.Elapsed);
             results.CorrectResult = expected;
             results.Passed = expected == result;
             results.TableHits = Game.Table.Hits;
-
-            _uci.Depth(depth);
         }
 
         private void LogInfoHeader()
@@ -271,7 +280,14 @@ namespace Perft
                 _log.Information("Time passed : {0}", result.Elapsed);
                 _log.Information("Nps         : {0}", result.Nps);
                 if (_usingEpd)
+                {
                     _log.Information("Result      : {0} - should be {1}", result.Result, result.CorrectResult);
+                    if (result.Result != result.CorrectResult)
+                    {
+                        var difference = (long)(result.CorrectResult - result.Result);
+                        _log.Information("Difference  : {0}", difference < 0 ? -difference : difference);
+                    }
+                }
                 else
                     _log.Information("Result      : {0}", result.Result);
                 _log.Information("TT hits     : {0}", Game.Table.Hits);

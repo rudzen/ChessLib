@@ -24,6 +24,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using FluentAssertions;
+using Rudz.Chess.Extensions;
+
 namespace Chess.Test.Position
 {
     using Rudz.Chess;
@@ -36,7 +39,9 @@ namespace Chess.Test.Position
         [Fact]
         public void AddPieceTest()
         {
-            var position = new Position();
+            var pieceValue = new PieceValue();
+            var board = new Board();
+            var position = new Position(board, pieceValue);
 
             position.AddPiece(Pieces.WhiteKing, Squares.a7);
             var pieces = position.Pieces();
@@ -48,13 +53,14 @@ namespace Chess.Test.Position
 
             // test overload
             pieces = position.Pieces(piece);
-            Assert.False((pieces & square).Empty());
+            Assert.False((pieces & square).IsEmpty);
 
             // Test piece type overload
 
-            position = new Position();
+            board = new Board();
+            position = new Position(board, pieceValue);
 
-            position.AddPiece(PieceTypes.Knight, Squares.d5, PlayerExtensions.Black);
+            position.AddPiece(PieceTypes.Knight.MakePiece(Player.Black), Squares.d5);
             pieces = position.Pieces();
             square = pieces.Lsb();
             Assert.Equal(Squares.d5, square.Value);
@@ -68,7 +74,9 @@ namespace Chess.Test.Position
         {
             const int expected = 1;
 
-            var cb = new Position();
+            var pieceValue = new PieceValue();
+            var board = new Board();
+            var cb = new Position(board, pieceValue);
 
             cb.AddPiece(Pieces.WhiteKing, Squares.a6);
             cb.AddPiece(Pieces.WhiteBishop, Squares.d5);
@@ -76,17 +84,19 @@ namespace Chess.Test.Position
             cb.AddPiece(Pieces.BlackKing, Squares.b3);
             cb.AddPiece(Pieces.BlackPawn, Squares.c4); // this is a pinned pieces
 
-            var b = cb.GetPinnedPieces(Squares.b3, PlayerExtensions.Black);
+            var b = cb.GetPinnedPieces(Squares.b3, Player.Black);
 
             // b must contain one square at this point
             var pinnedCount = b.Count;
 
-            Assert.Equal(expected, pinnedCount);
+            pinnedCount.Should().Be(expected);
 
             // test for correct square
             var pinnedSquare = b.Lsb();
 
-            Assert.Equal(Squares.c4, pinnedSquare.Value);
+            var expectedSquare = new Square(Ranks.Rank4, Files.FileC);
+            
+            pinnedSquare.Should().Be(expectedSquare);
         }
 
         // TODO : Add test functions for the rest of the methods and properties in position class

@@ -42,6 +42,15 @@ namespace Perft
     using System.Threading.Tasks;
     using TimeStamp;
 
+    /*
+     *
+     *    TODO: Fens to investigate:
+     * r2n3r/1bNk2pp/6P1/pP3p2/3pPqnP/1P1P1p1R/2P3B1/Q1B1bKN1 b - e3
+     *
+     *
+     *
+     */
+
     internal static class Program
     {
         private const string ConfigFileName = "appsettings.json";
@@ -120,11 +129,12 @@ namespace Perft
 
             // Bind chess classes
             container.Register<IGame, Game>(Reuse.Transient);
-            container.Register<IMoveList, MoveList>(Reuse.Transient);
-            container.Register<IMaterial, Material>(Reuse.Transient);
+            container.Register<IBoard, Board>(Reuse.Singleton);
+            // container.Register<IMoveList, MoveList>(Reuse.Transient);
             container.Register<IPosition, Position>(Reuse.Transient);
             container.Register<IKillerMoves, KillerMoves>(Reuse.Transient);
             container.Register<IUci, Uci>(Reuse.Singleton);
+            container.Register<IPieceValue, PieceValue>(Reuse.Singleton);
 
             // Bind options
             container.Register<IOptions, EpdOptions>(Reuse.Singleton, serviceKey: OptionType.EdpOptions);

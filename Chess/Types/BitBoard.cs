@@ -26,7 +26,6 @@ SOFTWARE.
 
 namespace Rudz.Chess.Types
 {
-    using Enums;
     using System;
     using System.Collections;
     using System.Collections.Generic;
@@ -38,7 +37,7 @@ namespace Rudz.Chess.Types
     /// Enumeration will yield each set bit as a Square struct.
     /// <para>For more information - please see https://github.com/rudzen/ChessLib/wiki/BitBoard</para>
     /// </summary>
-    public readonly struct BitBoard : IEnumerable<Square>
+    public readonly struct BitBoard : IEnumerable<Square>, IEquatable<BitBoard>
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public BitBoard(ulong value)
@@ -50,7 +49,7 @@ namespace Rudz.Chess.Types
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public BitBoard(Square square)
-            : this(square.BitBoardSquare()) { }
+            : this(square.AsBb()) { }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public BitBoard(int value)
@@ -60,10 +59,14 @@ namespace Rudz.Chess.Types
 
         public int Count => BitBoards.PopCount(Value);
 
+        public bool IsEmpty => Value == 0;
+
+        public static BitBoard Empty = BitBoards.EmptyBitBoard;
+
         public string String => Convert.ToString((long)Value, 2).PadLeft(64, '0');
 
         /// <summary>
-        /// [] overload :>
+        /// [] overload :&gt;
         /// </summary>
         /// <param name="index">the damn index</param>
         /// <returns>the Bit object if assigning</returns>
@@ -79,7 +82,7 @@ namespace Rudz.Chess.Types
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator BitBoard(Square square)
-            => new BitBoard(square.BitBoardSquare());
+            => new BitBoard(square.AsBb());
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static BitBoard operator *(BitBoard left, ulong right)
@@ -103,7 +106,7 @@ namespace Rudz.Chess.Types
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static BitBoard operator |(BitBoard left, Square right)
-            => left.Value | right.BitBoardSquare();
+            => left.Value | right.AsBb();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static BitBoard operator |(BitBoard left, BitBoard right)
@@ -127,11 +130,15 @@ namespace Rudz.Chess.Types
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static BitBoard operator &(BitBoard left, Square right)
-            => left.Value & right.BitBoardSquare();
+            => left.Value & right.AsBb();
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static BitBoard operator &(BitBoard left, File right)
+            => left.Value & right.BitBoardFile();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static BitBoard operator &(Square left, BitBoard right)
-            => left.BitBoardSquare() & right.Value;
+            => left.AsBb() & right.Value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static BitBoard operator ~(BitBoard bitBoard)
@@ -177,11 +184,8 @@ namespace Rudz.Chess.Types
             => bitBoard.Value == 0;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool Empty() => Value == 0;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Square FirstOrDefault()
-            => Empty() ? Squares.none : this.Lsb();
+            => IsEmpty ? Square.None : this.Lsb();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public BitBoard Xor(int pos)
@@ -217,15 +221,12 @@ namespace Rudz.Chess.Types
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public IEnumerator<Square> GetEnumerator()
         {
-            if (Empty())
+            if (IsEmpty)
                 yield break;
 
             BitBoard bb = Value;
             while (bb)
-            {
-                yield return bb.Lsb();
-                BitBoards.ResetLsb(ref bb);
-            }
+                yield return BitBoards.PopLsb(ref bb);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -242,7 +243,7 @@ namespace Rudz.Chess.Types
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override bool Equals(object obj)
-            => !ReferenceEquals(null, obj) && obj is BitBoard board && Equals(board);
+            => obj is BitBoard board && Equals(board);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override int GetHashCode()

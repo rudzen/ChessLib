@@ -26,18 +26,29 @@ SOFTWARE.
 
 namespace Rudz.Chess.Enums
 {
-    using System;
+    using System.Runtime.CompilerServices;
+    using Types;
 
-    [Flags]
     public enum PieceTypes
     {
-        AllPieces = 0,
+        NoPieceType = 0,
         Pawn = 1,
         Knight = 2,
         Bishop = 3,
         Rook = 4,
         Queen = 5,
         King = 6,
-        PieceTypeNb = 7
+        PieceTypeNb = 7,
+        AllPieces = 0
+    }
+
+    public static class PieceTypesExtensions
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int AsInt(this PieceTypes p) => (int)p;
+
+        public static Piece MakePiece(this PieceTypes @this, Player side) => (int)@this | (side.Side << 3);
+
+        public static bool IsSlider(this PieceTypes @this) => @this == PieceTypes.Bishop | @this == PieceTypes.Rook | @this == PieceTypes.Queen;
     }
 }

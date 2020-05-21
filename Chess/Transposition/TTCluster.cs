@@ -26,7 +26,6 @@ SOFTWARE.
 
 namespace Rudz.Chess.Transposition
 {
-    using System;
     using Types;
 
     /// <summary>
@@ -35,7 +34,7 @@ namespace Rudz.Chess.Transposition
     /// </summary>
     public sealed class TTCluster : ITTCluster
     {
-        public static readonly TranspositionTableEntry DefaultEntry = new TranspositionTableEntry(0, MoveExtensions.EmptyMove, 0, 0, 0, 0, Bound.Void);
+        public static readonly TranspositionTableEntry DefaultEntry = new TranspositionTableEntry(0, Move.EmptyMove, 0, 1, int.MaxValue, int.MaxValue, Bound.Void);
 
         private static readonly TranspositionTableEntry[] Defaults = { DefaultEntry, DefaultEntry, DefaultEntry, DefaultEntry };
 
@@ -53,9 +52,6 @@ namespace Rudz.Chess.Transposition
         }
 
         public void Reset()
-        {
-            Cluster = new TranspositionTableEntry[4];
-            Array.Copy(Defaults, Cluster, Defaults.Length);
-        }
+            => Cluster = new[] { DefaultEntry, DefaultEntry, DefaultEntry, DefaultEntry };
     }
 }

@@ -30,33 +30,55 @@ namespace Rudz.Chess
     using Fen;
     using System;
     using System.Collections.Generic;
+    using System.Text;
     using Types;
+    using Validation;
 
     public interface IPosition : IEnumerable<Piece>
     {
-        BitBoard[] BoardPieces { get; }
-
-        BitBoard[] OccupiedBySide { get; }
-
         bool IsProbing { get; set; }
-
-        Piece[] BoardLayout { get; }
 
         Action<Piece, Square> PieceUpdated { get; set; }
 
-        State State { get; set; }
+        bool Chess960 { get; set; }
+
+        Player SideToMove { get; }
+
+        Square EnPassantSquare { get; }
+
+        string FenNotation { get; }
+
+        IBoard Board { get; }
+
+        IPieceValue PieceValue { get; }
+
+        BitBoard Checkers { get; }
+
+        int Rule50 { get; }
+
+        int Ply { get; }
+
+        bool InCheck { get; }
+
+        bool IsRepetition { get; }
+
+        State State { get; }
+
+        bool IsMate { get; }
 
         void Clear();
 
         void AddPiece(Piece pc, Square sq);
 
-        void AddPiece(PieceTypes pt, Square sq, Player c);
+        void MakeMove(Move m, State newState);
 
-        void MovePiece(Square from, Square to);
+        void MakeMove(Move m, State newState, bool givesCheck);
 
-        bool MakeMove(Move m);
+        void MakeNullMove(State newState);
 
         void TakeMove(Move m);
+
+        void TakeNullMove();
 
         Piece GetPiece(Square sq);
 
@@ -66,11 +88,17 @@ namespace Rudz.Chess
 
         BitBoard GetPinnedPieces(Square sq, Player c);
 
+        BitBoard CheckedSquares(PieceTypes pt);
+
+        BitBoard PinnedPieces(Player c);
+
+        BitBoard BlockersForKing(Player c);
+
         bool IsOccupied(Square sq);
 
         bool IsAttacked(Square sq, Player c);
 
-        BitBoard PieceAttacks(Square sq, PieceTypes pt);
+        bool GivesCheck(Move m);
 
         BitBoard Pieces();
 
@@ -86,7 +114,13 @@ namespace Rudz.Chess
 
         BitBoard Pieces(PieceTypes pt1, PieceTypes pt2, Player side);
 
+        ReadOnlySpan<Square> Squares(PieceTypes pt, Player c);
+
         Square GetPieceSquare(PieceTypes pt, Player color);
+
+        Square GetKingSquare(Player color);
+
+        Piece MovedPiece(Move m);
 
         bool PieceOnFile(Square square, Player side, PieceTypes pieceType);
 
@@ -108,32 +142,38 @@ namespace Rudz.Chess
 
         bool AttackedByKing(Square sq, Player c);
 
-        Square GetRookCastleFrom(Square sq);
+        bool CanCastle(CastlelingRights cr);
 
-        void SetRookCastleFrom(Square indexSq, Square sq);
+        bool CanCastle(Player color);
 
-        Square GetKingCastleFrom(Player c, CastlelingSides sides);
+        bool CastlingImpeded(CastlelingRights cr);
 
-        void SetKingCastleFrom(Player c, Square sq, CastlelingSides sides);
+        Square CastlingRookSquare(CastlelingRights cr);
 
-        CastlelingSides IsCastleMove(string m);
-
-        bool CanCastle(CastlelingSides sides);
-
-        bool IsCastleAllowed(Square sq);
+        CastlelingRights GetCastlelingRightsMask(Square sq);
 
         bool IsPseudoLegal(Move m);
 
-        bool IsLegal(Move m, Piece pc, Square from, MoveTypes type);
-
         bool IsLegal(Move m);
 
-        bool IsMate();
-
         FenData GenerateFen();
+
+        FenError SetFen(FenData fen, bool validate = false);
 
         HashKey GetPiecesKey();
 
         HashKey GetPawnKey();
+
+        BitBoard GetAttacks(Square square, PieceTypes pt, BitBoard occupied);
+
+        BitBoard GetAttacks(Square square, PieceTypes pt);
+
+        void MoveToString(Move m, StringBuilder output);
+
+        bool HasGameCycle(int ply);
+
+        bool SeeGe(Move m, Value threshold);
+        
+        IPositionValidator Validate(PositionValidationTypes type = PositionValidationTypes.Basic);
     }
 }

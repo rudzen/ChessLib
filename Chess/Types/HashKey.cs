@@ -24,6 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+// ReSharper disable ConvertToAutoProperty
 namespace Rudz.Chess.Types
 {
     using Enums;
@@ -36,13 +37,13 @@ namespace Rudz.Chess.Types
     public struct HashKey : IEquatable<HashKey>
     {
         [FieldOffset(0)]
-        private uint _lowerKey32;
+        private readonly uint _lowerKey32;
 
         [FieldOffset(4)]
-        private uint _upperKey32;
+        private readonly uint _upperKey32;
 
         [FieldOffset(0)]
-        private ulong _key;
+        private readonly ulong _key;
 
         private HashKey(ulong key)
         {
@@ -89,7 +90,7 @@ namespace Rudz.Chess.Types
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static HashKey operator ^(HashKey left, int right)
-            => left._key ^ (ulong) right;
+            => left._key ^ (ulong)right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static HashKey operator ^(HashKey left, HashKey right)
@@ -108,15 +109,18 @@ namespace Rudz.Chess.Types
             => left._key ^ right.GetZobristEnPessant();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void HashSide() => _key ^= Zobrist.GetZobristSide();
-        
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly bool Equals(HashKey other) => _key == other._key;
+        public readonly bool Equals(HashKey other)
+            => _key == other._key;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public override readonly bool Equals(object obj) => obj is HashKey other && Equals(other);
+        public override readonly bool Equals(object obj)
+            => obj is HashKey other && Equals(other);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public override readonly int GetHashCode() => _key.GetHashCode();
+        public override readonly int GetHashCode()
+            => _key.GetHashCode();
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public override string ToString() => $"0x{Key:X}";
     }
 }

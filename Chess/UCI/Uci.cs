@@ -46,7 +46,7 @@ namespace Rudz.Chess.UCI
             _pvPool = new DefaultObjectPool<StringBuilder>(policy, 128);
             O = new Dictionary<string, IOption>();
         }
-        
+
         static Uci()
         {
             OptionComparer = new OptionComparer();
@@ -54,7 +54,7 @@ namespace Rudz.Chess.UCI
         }
 
         public int MaxThreads { get; set; }
-        
+
         public IDictionary<string, IOption> O { get; set; }
 
         public Action<IOption> OnLogger { get; set; }
@@ -66,6 +66,8 @@ namespace Rudz.Chess.UCI
         public Action<IOption> OnHashSize { get; set; }
 
         public Action<IOption> OnClearHash { get; set; }
+
+        public bool IsDebugModeEnabled { get; set; }
 
         public void Initialize(int maxThreads = 128)
         {
@@ -83,21 +85,37 @@ namespace Rudz.Chess.UCI
             O["UCI_Chess960"] = new Option("UCI_Chess960", O.Count, false);
         }
 
+        public void AddOption(string name, IOption option) => O[name] = option;
+
         public int Nps(ulong nodes, TimeSpan time)
-            => (int) ((int) nodes * 1000.0 / time.Milliseconds);
+            => (int)((int)nodes * 1000.0 / time.Milliseconds);
 
         public Move MoveFromUci(IPosition pos, string uciMove)
         {
             var moveList = pos.GenerateMoves();
-            var moves = moveList.GetMoves();
 
-            foreach (var move in moves)
+            foreach (var move in moveList)
             {
-                if (uciMove.Equals(move.ToString(), StringComparison.InvariantCultureIgnoreCase))
+                if (uciMove.Equals(move.Move.ToString(), StringComparison.InvariantCultureIgnoreCase))
                     return move;
             }
 
-            return MoveExtensions.EmptyMove;
+            return Move.EmptyMove;
+        }
+
+        public string UciOk()
+        {
+            return "uciok";
+        }
+
+        public string ReadyOk()
+        {
+            return "readyok";
+        }
+
+        public string CopyProtection(CopyProtections copyProtections)
+        {
+            return $"copyprotection {copyProtections.ToString()}";
         }
 
         public string BestMove(Move move, Move ponderMove) =>
@@ -122,9 +140,9 @@ namespace Rudz.Chess.UCI
         public string Pv(int count, int score, int depth, int selectiveDepth, int alpha, int beta, TimeSpan time, IEnumerable<Move> pvLine, ulong nodes)
         {
             var sb = _pvPool.Get();
-            
+
             sb.AppendFormat("info multipv {0} depth {1} seldepth {2} score {3} ", count + 1, depth, selectiveDepth, score);
-            
+
             if (score >= beta)
                 sb.Append("lowerbound ");
             else if (score <= alpha)
@@ -142,8 +160,8 @@ namespace Rudz.Chess.UCI
             => $"info hashfull {Game.Table.Fullness()} tbhits {tbHits} nodes {nodes} time {time.Milliseconds} nps {Nps(nodes, time)}";
 
         /// <summary>
-        /// Print all the options default values in chronological
-        /// insertion order (the idx field) and in the format defined by the UCI protocol.
+        /// Print all the options default values in chronological insertion order (the idx field)
+        /// and in the format defined by the UCI protocol.
         /// </summary>
         /// <returns>the current UCI options as string</returns>
         public override string ToString()
@@ -155,7 +173,7 @@ namespace Rudz.Chess.UCI
             foreach (var opt in list)
             {
                 sb.AppendLine();
-                sb.Append("option name ").Append(opt.Name).Append(" type ").Append(OptionTypeStrings[(int) opt.Type]);
+                sb.Append("option name ").Append(opt.Name).Append(" type ").Append(OptionTypeStrings[(int)opt.Type]);
                 if (opt.Type != UciOptionType.Button)
                     sb.Append(" default ").Append(opt.DefaultValue);
 

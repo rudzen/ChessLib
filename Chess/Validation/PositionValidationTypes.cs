@@ -1,4 +1,4 @@
-﻿/*
+/*
 ChessLib, a chess data structure library
 
 MIT License
@@ -24,33 +24,28 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess
+namespace Rudz.Chess.Validation
 {
-    using Enums;
-    using Types;
+    using System;
 
-    public interface IMaterial
+    [Flags]
+    public enum PositionValidationTypes
     {
-        int MaterialValueTotal { get; }
-        int MaterialValueWhite { get; }
-        int MaterialValueBlack { get; }
+        None = 0,
+        Basic = 1,
+        Castleling = 1 << 1,
+        Kings = 1 << 2,
+        Pawns = 1 << 3,
+        PieceConsistency = 1 << 4,
+        PieceCount = 1 << 5,
+        PieceTypes = 1 << 6,
+        State = 1 << 7,
+        All = Basic | Castleling | Kings | Pawns | PieceConsistency | PieceCount | PieceTypes | State
+    }
 
-        int[] MaterialValue { get; }
-
-        int this[int index] { get; set; }
-
-        void Add(Piece piece);
-
-        void UpdateKey(Player side, PieceTypes pieceType, int delta);
-
-        uint GetKey(int index);
-
-        void MakeMove(Move move);
-
-        int Count(Player side, PieceTypes pieceType);
-
-        void Clear();
-
-        void CopyFrom(IMaterial material);
+    public static class PositionValidationTypesExtensions
+    {
+        public static bool HasFlagFast(this PositionValidationTypes @this, PositionValidationTypes flag)
+            => (@this & flag) != 0;
     }
 }

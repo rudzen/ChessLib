@@ -24,14 +24,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using Rudz.Chess.Factories;
+using System.Linq;
 
 namespace Chess.Test.Gameplay
 {
-    using System.Collections.Generic;
     using Rudz.Chess;
     using Rudz.Chess.Enums;
+    using Rudz.Chess.Factories;
     using Rudz.Chess.Types;
+    using System.Collections.Generic;
     using Xunit;
 
     public sealed class FoolsCheckMateTests
@@ -41,30 +42,31 @@ namespace Chess.Test.Gameplay
         {
             // generate moves
             var moves = new List<Move>(4) {
-                                                      new Move(Pieces.WhitePawn, Squares.f2, Squares.f3),
-                                                      new Move(Pieces.BlackPawn, Squares.e7, Squares.e5, MoveTypes.Doublepush, Pieces.NoPiece),
-                                                      new Move(Pieces.WhitePawn, Squares.g2, Squares.g4, MoveTypes.Doublepush, Pieces.NoPiece),
-                                                      new Move(Pieces.BlackQueen, Squares.d8, Squares.h4)
+                                                      Move.Create(Squares.f2, Squares.f3),
+                                                      Move.Create(Squares.e7, Squares.e5),
+                                                      Move.Create(Squares.g2, Squares.g4),
+                                                      Move.Create(Squares.d8, Squares.h4)
                                                   };
 
             // construct game and start a new game
-            var position = new Position();
+            var board = new Board();
+            var pieceValue = new PieceValue();
+            var position = new Position(board, pieceValue);
             var game = GameFactory.Create(position);
             game.NewGame();
+            var state = new State();
 
             // make the moves necessary to create a mate
             foreach (var move in moves)
-                Assert.True(game.MakeMove(move));
+                position.MakeMove(move, state);
 
             // verify in check is actually true
-            Assert.True(game.State.InCheck);
+            Assert.True(position.InCheck);
 
-            var moveList = game.Pos.GenerateMoves();
+            var resultingMoves = position.GenerateMoves();
 
-            var resultingMoves = moveList.GetMoves();
-            
             // verify that no legal moves actually exists.
-            Assert.True(resultingMoves.IsEmpty);
+            Assert.True(!resultingMoves.Any());
         }
     }
 }

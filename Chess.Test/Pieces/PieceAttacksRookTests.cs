@@ -24,6 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using Rudz.Chess;
+
 namespace Chess.Test.Pieces
 {
     using Rudz.Chess.Enums;
@@ -39,7 +41,7 @@ namespace Chess.Test.Pieces
             const int index = (int)EBands.Alpha;
             const int sliderIndex = 1;
             var expected = RookExpected[index];
-            var actuals = Bands[index].Select(x => SlideAttacks[sliderIndex](sliderIndex, BitBoards.EmptyBitBoard).Count);
+            var actuals = Bands[index].Select(x => SlideAttacks[sliderIndex](sliderIndex, BitBoard.Empty).Count);
 
             foreach (var actual in actuals)
                 Assert.Equal(expected, actual);
@@ -51,7 +53,7 @@ namespace Chess.Test.Pieces
             const int index = (int)EBands.Beta;
             const int sliderIndex = 1;
             var expected = RookExpected[index];
-            var actuals = Bands[index].Select(x => SlideAttacks[sliderIndex](sliderIndex, BitBoards.EmptyBitBoard).Count);
+            var actuals = Bands[index].Select(x => SlideAttacks[sliderIndex](sliderIndex, BitBoard.Empty).Count);
 
             foreach (var actual in actuals)
                 Assert.Equal(expected, actual);
@@ -63,7 +65,7 @@ namespace Chess.Test.Pieces
             const int index = (int)EBands.Gamma;
             const int sliderIndex = 1;
             var expected = RookExpected[index];
-            var actuals = Bands[index].Select(x => SlideAttacks[sliderIndex](sliderIndex, BitBoards.EmptyBitBoard).Count);
+            var actuals = Bands[index].Select(x => SlideAttacks[sliderIndex](sliderIndex, BitBoard.Empty).Count);
 
             foreach (var actual in actuals)
                 Assert.Equal(expected, actual);
@@ -75,7 +77,7 @@ namespace Chess.Test.Pieces
             const int index = (int)EBands.Delta;
             const int sliderIndex = 1;
             var expected = RookExpected[index];
-            var actuals = Bands[index].Select(x => SlideAttacks[sliderIndex](sliderIndex, BitBoards.EmptyBitBoard).Count);
+            var actuals = Bands[index].Select(x => SlideAttacks[sliderIndex](sliderIndex, BitBoard.Empty).Count);
 
             foreach (var actual in actuals)
                 Assert.Equal(expected, actual);
@@ -111,10 +113,15 @@ namespace Chess.Test.Pieces
              *
              */
 
+            // just to get the attacks
+            var board = new Board();
+            var pieceValue = new PieceValue();
+            var pos = new Rudz.Chess.Position(board, pieceValue);
+            
             foreach (var square in border)
             {
-                var attacks = square.GetAttacks(PieceTypes.Rook, borderInner);
-                Assert.False(attacks.Empty());
+                var attacks = pos.GetAttacks(square, PieceTypes.Rook, borderInner);
+                Assert.False(attacks.IsEmpty);
                 var expected = corners & square ? expectedCorner : expectedSide;
                 var actual = attacks.Count;
                 Assert.Equal(expected, actual);
