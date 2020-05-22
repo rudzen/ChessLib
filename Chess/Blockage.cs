@@ -240,7 +240,7 @@ namespace Rudz.Chess
                 return true;
             }
 
-            Span<Direction> directions = stackalloc Direction[] { _us.IsWhite ? Directions.North : Directions.South, Directions.East, Directions.West };
+            Span<Direction> directions = stackalloc Direction[] { _us.PawnPushDistance(), Directions.East, _them.PawnPushDistance() };
 
             foreach (var direction in directions)
             {
