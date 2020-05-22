@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 namespace Rudz.Chess
 {
     using Enums;
+    using System;
     using Types;
 
     /// <summary>
@@ -12,8 +13,6 @@ namespace Rudz.Chess
     /// </summary>
     public sealed class Blockage
     {
-        private static readonly BitBoard PawnArea;
-
         private readonly IPosition _pos;
 
         private readonly BitBoard _ourPawns;
@@ -49,11 +48,6 @@ namespace Rudz.Chess
             _theirPawns = pos.Pieces(PieceTypes.Pawn, _them);
             _ourPawn = PieceTypes.Pawn.MakePiece(_us);
             _theirPawn = ~_ourPawn;
-        }
-
-        static Blockage()
-        {
-            PawnArea = BitBoards.RANK2 | BitBoards.RANK3 | BitBoards.RANK4 | BitBoards.RANK5 | BitBoards.RANK6 | BitBoards.RANK7;
         }
 
         /// <summary>
@@ -118,7 +112,7 @@ namespace Rudz.Chess
                             && _pos.GetPiece(sq + Directions.East) != _ourPawn
                             || BitBoards.PopCount(_ourPawns & NextFile(f)) > 1
                             || (_fixedPawn & (sq + Directions.East)).IsEmpty
-                            || (_fence & (sq + Directions.West)).IsEmpty)
+                            || (_fence & (sq + Directions.East)).IsEmpty)
                             return false;
                     }
 
@@ -167,7 +161,7 @@ namespace Rudz.Chess
                             && _pos.GetPiece(sq + Directions.East) != _ourPawn
                             || BitBoards.PopCount(_ourPawns & (f + 1)) > 1
                             || (_fixedPawn & Square.Make(r, NextFile(f))).IsEmpty
-                            || (_fence & Square.Make(r,  NextFile(f))).IsEmpty)
+                            || (_fence & Square.Make(r, NextFile(f))).IsEmpty)
                             return false;
                     }
 
@@ -222,16 +216,16 @@ namespace Rudz.Chess
         /// </summary>
         private void MarkTheirPawns()
         {
-            var (east, west) = _us.IsWhite
+            var (southEast, southWest) = _us.IsWhite
                 ? (Directions.SouthEast, Directions.SouthWest)
                 : (Directions.NorthEast, Directions.NorthWest);
 
-            _marked |= _theirPawns.Shift(east) | _theirPawns.Shift(west);
+            _marked |= _theirPawns.Shift(southEast) | _theirPawns.Shift(southWest);
         }
 
         /// <summary>
-        /// Determines which squares forms a fence.
-        /// First square is always on file A - and will perform a depth first verification of its surrounding squares.
+        /// Determines which squares forms a fence. First square is always on file A - and will
+        /// perform a depth first verification of its surrounding squares.
         /// </summary>
         /// <param name="sq">The square which is currently being looked at</param>
         /// <returns>true if the square is in the fence</returns>
@@ -246,29 +240,13 @@ namespace Rudz.Chess
                 return true;
             }
 
-            // look up
+            Span<Direction> directions = stackalloc Direction[] { _us.IsWhite ? Directions.North : Directions.South, Directions.East, Directions.West };
 
-            var s = sq + _us.PawnPushDistance();
-            if (!(_marked & s).IsEmpty && (_processed & s).IsEmpty && FormsFence(s))
+            foreach (var direction in directions)
             {
-                _fence |= s;
-                return true;
-            }
-
-            // look east
-
-            s = sq + Directions.East;
-            if (!(_marked & s).IsEmpty && (_processed & s).IsEmpty && FormsFence(s))
-            {
-                _fence |= s;
-                return true;
-            }
-
-            // look down
-
-            s = sq + _them.PawnPushDistance();
-            if (!(_marked & s).IsEmpty && (_processed & s).IsEmpty && FormsFence(s))
-            {
+                var s = sq + direction;
+                if ((_marked & s).IsEmpty || !(_processed & s).IsEmpty || !FormsFence(s))
+                    continue;
                 _fence |= s;
                 return true;
             }
@@ -292,7 +270,6 @@ namespace Rudz.Chess
             }
 
             return false;
-
         }
 
         internal BitBoard ComputeDynamicFencedPawns(Player them)
