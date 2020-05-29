@@ -113,15 +113,16 @@ namespace Rudz.Chess
             => GetEnumerator();
 
         /// <summary>
-        /// 
+        /// Generate all pawn moves.
+        /// The type of moves are determined by the <see cref="MoveGenerationType"/>
         /// </summary>
-        /// <param name="pos"></param>
-        /// <param name="moves"></param>
-        /// <param name="index"></param>
-        /// <param name="target"></param>
-        /// <param name="us"></param>
-        /// <param name="type"></param>
-        /// <returns></returns>
+        /// <param name="pos">The current position</param>
+        /// <param name="moves">The current moves so far</param>
+        /// <param name="index">The index of the current moves</param>
+        /// <param name="target">The target squares</param>
+        /// <param name="us">The current player</param>
+        /// <param name="type">The type of moves to generate</param>
+        /// <returns>The new move index</returns>
         private static int GeneratePawnMoves(IPosition pos, ExtMove[] moves, int index, BitBoard target, Player us, MoveGenerationType type)
         {
             // Compute our parametrized parameters at compile time, named according to the point of
@@ -274,16 +275,16 @@ namespace Rudz.Chess
         }
 
         /// <summary>
-        /// 
+        /// Generate moves for knight, bishop, rook and queen
         /// </summary>
-        /// <param name="pos"></param>
-        /// <param name="moves"></param>
-        /// <param name="index"></param>
-        /// <param name="us"></param>
-        /// <param name="target"></param>
-        /// <param name="pt"></param>
-        /// <param name="checks"></param>
-        /// <returns></returns>
+        /// <param name="pos">The current position</param>
+        /// <param name="moves">The current moves so far</param>
+        /// <param name="index">The current move index</param>
+        /// <param name="us">The current player</param>
+        /// <param name="target">The target of where to move to</param>
+        /// <param name="pt">The piece type performing the moves</param>
+        /// <param name="checks">Position is in check</param>
+        /// <returns>The new move index</returns>
         private static int GenerateMoves(IPosition pos, ExtMove[] moves, int index, Player us, BitBoard target, PieceTypes pt, bool checks)
         {
             Debug.Assert(pt != PieceTypes.King && pt != PieceTypes.Pawn);
@@ -295,15 +296,8 @@ namespace Rudz.Chess
 
             foreach (var from in squares)
             {
-                if (checks)
-                {
-                    if ((pt == PieceTypes.Bishop || pt == PieceTypes.Rook || pt == PieceTypes.Queen)
-                        && (pt.PseudoAttacks(from) & target & pos.CheckedSquares(pt)).IsEmpty)
-                        continue;
-
-                    if (pos.BlockersForKing(~us) & from)
-                        continue;
-                }
+                if (checks && (!(pos.BlockersForKing(~us) & from).IsEmpty || (pt.PseudoAttacks(from) & target & pos.CheckedSquares(pt)).IsEmpty))
+                    continue;
 
                 var b = pos.GetAttacks(from, pt) & target;
 
@@ -547,9 +541,10 @@ namespace Rudz.Chess
 
             if (type == MoveGenerationType.Quiets || type == MoveGenerationType.Evasions || type == MoveGenerationType.NonEvasions)
             {
-                moves[index++].Move = Move.Create(to - direction, to, MoveTypes.Promotion, PieceTypes.Rook);
-                moves[index++].Move = Move.Create(to - direction, to, MoveTypes.Promotion, PieceTypes.Bishop);
-                moves[index++].Move = Move.Create(to - direction, to, MoveTypes.Promotion);
+                var from = to - direction;
+                moves[index++].Move = Move.Create(from, to, MoveTypes.Promotion, PieceTypes.Rook);
+                moves[index++].Move = Move.Create(from, to, MoveTypes.Promotion, PieceTypes.Bishop);
+                moves[index++].Move = Move.Create(from, to, MoveTypes.Promotion);
             }
 
             // Knight promotion is the only promotion that can give a direct check that's not
