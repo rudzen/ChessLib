@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2019 Rudy Alex Kohn
+Copyright (c) 2017-2020 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,6 +24,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using FluentAssertions;
+using Rudz.Chess.Extensions;
+
 namespace Chess.Test.Position
 {
     using Rudz.Chess;
@@ -36,27 +39,34 @@ namespace Chess.Test.Position
         [Fact]
         public void AddPieceTest()
         {
-            var position = new Position();
+            var pieceValue = new PieceValue();
+            var board = new Board();
+            var position = new Position(board, pieceValue);
 
-            position.AddPiece(EPieces.WhiteKing, ESquare.a7);
+            position.AddPiece(Pieces.WhiteKing, Squares.a7);
             var pieces = position.Pieces();
             var square = pieces.Lsb();
-            Assert.Equal(ESquare.a7, square.Value);
+            Assert.Equal(Squares.a7, square.Value);
 
             var piece = position.GetPiece(square);
-            Assert.Equal(EPieces.WhiteKing, piece.Value);
+            Assert.Equal(Pieces.WhiteKing, piece.Value);
+
+            // test overload
+            pieces = position.Pieces(piece);
+            Assert.False((pieces & square).IsEmpty);
 
             // Test piece type overload
 
-            position = new Position();
+            board = new Board();
+            position = new Position(board, pieceValue);
 
-            position.AddPiece(EPieceType.Knight, ESquare.d5, PlayerExtensions.Black);
+            position.AddPiece(PieceTypes.Knight.MakePiece(Player.Black), Squares.d5);
             pieces = position.Pieces();
             square = pieces.Lsb();
-            Assert.Equal(ESquare.d5, square.Value);
+            Assert.Equal(Squares.d5, square.Value);
 
             piece = position.GetPiece(square);
-            Assert.Equal(EPieces.BlackKnight, piece.Value);
+            Assert.Equal(Pieces.BlackKnight, piece.Value);
         }
 
         [Fact]
@@ -64,25 +74,29 @@ namespace Chess.Test.Position
         {
             const int expected = 1;
 
-            var cb = new Position();
+            var pieceValue = new PieceValue();
+            var board = new Board();
+            var cb = new Position(board, pieceValue);
 
-            cb.AddPiece(EPieces.WhiteKing, ESquare.a6);
-            cb.AddPiece(EPieces.WhiteBishop, ESquare.d5);
+            cb.AddPiece(Pieces.WhiteKing, Squares.a6);
+            cb.AddPiece(Pieces.WhiteBishop, Squares.d5);
 
-            cb.AddPiece(EPieces.BlackKing, ESquare.b3);
-            cb.AddPiece(EPieces.BlackPawn, ESquare.c4); // this is a pinned pieces
+            cb.AddPiece(Pieces.BlackKing, Squares.b3);
+            cb.AddPiece(Pieces.BlackPawn, Squares.c4); // this is a pinned pieces
 
-            var b = cb.GetPinnedPieces(ESquare.b3, PlayerExtensions.Black);
+            var b = cb.GetPinnedPieces(Squares.b3, Player.Black);
 
             // b must contain one square at this point
             var pinnedCount = b.Count;
 
-            Assert.Equal(expected, pinnedCount);
+            pinnedCount.Should().Be(expected);
 
             // test for correct square
             var pinnedSquare = b.Lsb();
 
-            Assert.Equal(ESquare.c4, pinnedSquare.Value);
+            var expectedSquare = new Square(Ranks.Rank4, Files.FileC);
+            
+            pinnedSquare.Should().Be(expectedSquare);
         }
 
         // TODO : Add test functions for the rest of the methods and properties in position class

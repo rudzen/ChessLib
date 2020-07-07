@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2019 Rudy Alex Kohn
+Copyright (c) 2017-2020 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -39,12 +39,12 @@ namespace Chess.Test.Data
             var chars = new StringBuilder(1024);
             var strings = new StringBuilder(1024);
 
-            for (Square sq = ESquare.a1; sq; ++sq)
+            for (Square sq = Squares.a1; sq; ++sq)
             {
                 chars.Clear();
                 strings.Clear();
-                chars.Append(sq.FileChar());
-                chars.Append(sq.RankChar());
+                chars.Append(sq.FileChar);
+                chars.Append(sq.RankChar);
                 strings.Append(sq.ToString());
                 Assert.Equal(chars.ToString(), strings.ToString());
             }

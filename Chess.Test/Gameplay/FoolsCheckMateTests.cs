@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2019 Rudy Alex Kohn
+Copyright (c) 2017-2020 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,14 +24,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using Rudz.Chess.Factories;
+using System.Linq;
 
 namespace Chess.Test.Gameplay
 {
-    using System.Collections.Generic;
     using Rudz.Chess;
     using Rudz.Chess.Enums;
+    using Rudz.Chess.Factories;
     using Rudz.Chess.Types;
+    using System.Collections.Generic;
     using Xunit;
 
     public sealed class FoolsCheckMateTests
@@ -41,28 +42,31 @@ namespace Chess.Test.Gameplay
         {
             // generate moves
             var moves = new List<Move>(4) {
-                                                      new Move(EPieces.WhitePawn, ESquare.f2, ESquare.f3),
-                                                      new Move(EPieces.BlackPawn, ESquare.e7, ESquare.e5, EMoveType.Doublepush, EPieces.NoPiece),
-                                                      new Move(EPieces.WhitePawn, ESquare.g2, ESquare.g4, EMoveType.Doublepush, EPieces.NoPiece),
-                                                      new Move(EPieces.BlackQueen, ESquare.d8, ESquare.h4)
+                                                      Move.Create(Squares.f2, Squares.f3),
+                                                      Move.Create(Squares.e7, Squares.e5),
+                                                      Move.Create(Squares.g2, Squares.g4),
+                                                      Move.Create(Squares.d8, Squares.h4)
                                                   };
 
             // construct game and start a new game
-            var position = new Position();
+            var board = new Board();
+            var pieceValue = new PieceValue();
+            var position = new Position(board, pieceValue);
             var game = GameFactory.Create(position);
             game.NewGame();
+            var state = new State();
 
             // make the moves necessary to create a mate
             foreach (var move in moves)
-                Assert.True(game.MakeMove(move));
+                position.MakeMove(move, state);
 
             // verify in check is actually true
-            Assert.True(game.Position.InCheck);
+            Assert.True(position.InCheck);
 
-            var moveList = game.Position.GenerateMoves();
+            var resultingMoves = position.GenerateMoves();
 
             // verify that no legal moves actually exists.
-            Assert.Empty(moveList);
+            Assert.True(!resultingMoves.Any());
         }
     }
 }

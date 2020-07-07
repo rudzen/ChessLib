@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2019 Rudy Alex Kohn
+Copyright (c) 2017-2020 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -26,31 +26,32 @@ SOFTWARE.
 
 namespace Rudz.Chess.Transposition
 {
-    using System;
     using Types;
 
     /// <summary>
-    /// Stores an array of <see cref="TranspositionTableEntry"/>.
-    /// In essence it acts like a entry bucket of 4 elements for each position stored in the <see cref="TranspositionTable"/>
+    /// Stores an array of <see cref="TranspositionTableEntry"/>. In essence it acts like a entry
+    /// bucket of 4 elements for each position stored in the <see cref="TranspositionTable"/>
     /// </summary>
     public sealed class TTCluster : ITTCluster
     {
-        private static readonly TranspositionTableEntry DefaultEntry = new TranspositionTableEntry(0, MoveExtensions.EmptyMove, 0, 0, 0, 0, Bound.Void);
+        public static readonly TranspositionTableEntry DefaultEntry = new TranspositionTableEntry(0, Move.EmptyMove, 0, 1, int.MaxValue, int.MaxValue, Bound.Void);
 
         private static readonly TranspositionTableEntry[] Defaults = { DefaultEntry, DefaultEntry, DefaultEntry, DefaultEntry };
 
         public TTCluster()
         {
-            Cluster = new TranspositionTableEntry[4];
-            Array.Copy(Defaults, Cluster, Defaults.Length);
+            Reset();
         }
 
-        public TranspositionTableEntry[] Cluster { get; }
+        public TranspositionTableEntry[] Cluster { get; private set; }
 
         public TranspositionTableEntry this[int key]
         {
             get => Cluster[key];
             set => Cluster[key] = value;
         }
+
+        public void Reset()
+            => Cluster = new[] { DefaultEntry, DefaultEntry, DefaultEntry, DefaultEntry };
     }
 }

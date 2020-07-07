@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2019 Rudy Alex Kohn
+Copyright (c) 2017-2020 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -38,7 +38,7 @@ namespace Chess.Test.Pieces
             const int index = (int)EBands.Alpha;
             const int sliderIndex = 2;
             var expected = BishopExpected[index] + RookExpected[index];
-            var actuals = Bands[index].Select(x => SlideAttacks[sliderIndex](x, BitBoards.EmptyBitBoard).Count);
+            var actuals = Bands[index].Select(x => SlideAttacks[sliderIndex](x, BitBoard.Empty).Count);
 
             foreach (var actual in actuals)
                 Assert.Equal(expected, actual);
@@ -50,7 +50,7 @@ namespace Chess.Test.Pieces
             const int index = (int)EBands.Beta;
             const int sliderIndex = 2;
             var expected = BishopExpected[index] + RookExpected[index];
-            var actuals = Bands[index].Select(x => SlideAttacks[sliderIndex](x, BitBoards.EmptyBitBoard).Count);
+            var actuals = Bands[index].Select(x => SlideAttacks[sliderIndex](x, BitBoard.Empty).Count);
 
             foreach (var actual in actuals)
                 Assert.Equal(expected, actual);
@@ -62,7 +62,7 @@ namespace Chess.Test.Pieces
             const int index = (int)EBands.Gamma;
             const int sliderIndex = 2;
             var expected = BishopExpected[index] + RookExpected[index];
-            var actuals = Bands[index].Select(x => SlideAttacks[sliderIndex](x, BitBoards.EmptyBitBoard).Count);
+            var actuals = Bands[index].Select(x => SlideAttacks[sliderIndex](x, BitBoard.Empty).Count);
 
             foreach (var actual in actuals)
                 Assert.Equal(expected, actual);
@@ -74,7 +74,7 @@ namespace Chess.Test.Pieces
             const int index = (int)EBands.Delta;
             const int sliderIndex = 2;
             var expected = BishopExpected[index] + RookExpected[index];
-            var actuals = Bands[index].Select(x => SlideAttacks[sliderIndex](x, BitBoards.EmptyBitBoard).Count);
+            var actuals = Bands[index].Select(x => SlideAttacks[sliderIndex](x, BitBoard.Empty).Count);
 
             foreach (var actual in actuals)
                 Assert.Equal(expected, actual);

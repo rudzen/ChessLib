@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2019 Rudy Alex Kohn
+Copyright (c) 2017-2020 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,12 +24,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using Rudz.Chess.Factories;
-
 namespace Chess.Test.Move
 {
     using Rudz.Chess;
     using Rudz.Chess.Enums;
+    using Rudz.Chess.Factories;
     using Rudz.Chess.Types;
     using Xunit;
 
@@ -41,28 +40,32 @@ namespace Chess.Test.Move
             // Tests both knights moving to same square for Rank ambiguity
 
             const string fen = "8/6k1/8/8/8/8/1K1N1N2/8 w - - 0 1";
-            const EMoveNotation notation = EMoveNotation.Fan;
+            const MoveNotations notation = MoveNotations.Fan;
 
-            var movingPiece = new Piece(EPieces.WhiteKnight);
-            var fromOneSquare = new Square(ESquare.d2);
-            var fromTwoSquare = new Square(ESquare.f2);
-            var toSquare = new Square(ESquare.e4);
+            var movingPiece = new Piece(Pieces.WhiteKnight);
+            var fromOneSquare = new Square(Squares.d2);
+            var fromTwoSquare = new Square(Squares.f2);
+            var toSquare = new Square(Squares.e4);
 
             var uniChar = movingPiece.GetUnicodeChar();
-            var toSquareString = toSquare.GetSquareString();
+            var toSquareString = toSquare.ToString();
 
-            var expectedPrimary = $"{uniChar}{fromOneSquare.FileChar()}{toSquareString}";
-            var expectedSecondary = $"{uniChar}{fromTwoSquare.FileChar()}{toSquareString}";
+            var expectedPrimary = $"{uniChar}{fromOneSquare.FileChar}{toSquareString}";
+            var expectedSecondary = $"{uniChar}{fromTwoSquare.FileChar}{toSquareString}";
 
-            var pos = new Position();
+            var board = new Board();
+            var pieceValue = new PieceValue();
+            var pos = new Position(board, pieceValue);
             var g = GameFactory.Create(pos);
             g.NewGame(fen);
 
-            var w1 = new Move(movingPiece, fromOneSquare, toSquare);
-            var w2 = new Move(movingPiece, fromTwoSquare, toSquare);
+            var w1 = new Move(fromOneSquare, toSquare);
+            var w2 = new Move(fromTwoSquare, toSquare);
 
-            var actualPrimary = w1.ToNotation(g.Position, notation);
-            var actualSecondary = w2.ToNotation(g.Position, notation);
+            var ambiguity = new MoveAmbiguity(pos);
+
+            var actualPrimary = ambiguity.ToNotation(w1);
+            var actualSecondary = ambiguity.ToNotation(w2);
 
             Assert.Equal(expectedPrimary, actualPrimary);
             Assert.Equal(expectedSecondary, actualSecondary);
@@ -74,28 +77,32 @@ namespace Chess.Test.Move
             // Tests both knights moving to same square for Rank ambiguity
 
             const string fen = "8/6k1/8/8/8/8/1K1N1N2/8 w - - 0 1";
-            const EMoveNotation notation = EMoveNotation.Fan;
+            const MoveNotations notation = MoveNotations.Fan;
 
-            var movingPiece = new Piece(EPieces.WhiteKnight);
-            var fromOneSquare = new Square(ESquare.d2);
-            var fromTwoSquare = new Square(ESquare.f2);
-            var toSquare = new Square(ESquare.e4);
+            var movingPiece = new Piece(Pieces.WhiteKnight);
+            var fromOneSquare = new Square(Squares.d2);
+            var fromTwoSquare = new Square(Squares.f2);
+            var toSquare = new Square(Squares.e4);
 
             var uniChar = movingPiece.GetUnicodeChar();
-            var toSquareString = toSquare.GetSquareString();
+            var toSquareString = toSquare.ToString();
 
-            var expectedPrimary = $"{uniChar}{fromOneSquare.FileChar()}{toSquareString}";
-            var expectedSecondary = $"{uniChar}{fromTwoSquare.FileChar()}{toSquareString}";
+            var expectedPrimary = $"{uniChar}{fromOneSquare.FileChar}{toSquareString}";
+            var expectedSecondary = $"{uniChar}{fromTwoSquare.FileChar}{toSquareString}";
 
-            var pos = new Position();
+            var board = new Board();
+            var pieceValue = new PieceValue();
+            var pos = new Position(board, pieceValue);
             var g = GameFactory.Create(pos);
             g.NewGame(fen);
 
-            var w1 = new Move(movingPiece, fromOneSquare, toSquare);
-            var w2 = new Move(movingPiece, fromTwoSquare, toSquare);
+            var w1 = new Move(fromOneSquare, toSquare);
+            var w2 = new Move(fromTwoSquare, toSquare);
 
-            var actualPrimary = w1.ToNotation(g.Position, notation);
-            var actualSecondary = w2.ToNotation(g.Position, notation);
+            var ambiguity = new MoveAmbiguity(pos);
+
+            var actualPrimary = ambiguity.ToNotation(w1, notation);
+            var actualSecondary = ambiguity.ToNotation(w2, notation);
 
             Assert.Equal(expectedPrimary, actualPrimary);
             Assert.Equal(expectedSecondary, actualSecondary);
@@ -107,28 +114,32 @@ namespace Chess.Test.Move
             // Tests both knights moving to same square for File ambiguity
 
             const string fen = "8/6k1/8/8/3N4/8/1K1N4/8 w - - 0 1";
-            const EMoveNotation notation = EMoveNotation.Fan;
+            const MoveNotations notation = MoveNotations.Fan;
 
-            var movingPiece = new Piece(EPieces.WhiteKnight);
-            var fromOneSquare = new Square(ESquare.d2);
-            var fromTwoSquare = new Square(ESquare.d4);
-            var toSquare = new Square(ESquare.f3);
+            var movingPiece = new Piece(Pieces.WhiteKnight);
+            var fromOneSquare = new Square(Squares.d2);
+            var fromTwoSquare = new Square(Squares.d4);
+            var toSquare = new Square(Squares.f3);
 
             var uniChar = movingPiece.GetUnicodeChar();
-            var toSquareString = toSquare.GetSquareString();
+            var toSquareString = toSquare.ToString();
 
-            var expectedPrimary = $"{uniChar}{fromOneSquare.RankChar()}{toSquareString}";
-            var expectedSecondary = $"{uniChar}{fromTwoSquare.RankChar()}{toSquareString}";
+            var expectedPrimary = $"{uniChar}{fromOneSquare.RankChar}{toSquareString}";
+            var expectedSecondary = $"{uniChar}{fromTwoSquare.RankChar}{toSquareString}";
 
-            var pos = new Position();
+            var board = new Board();
+            var pieceValue = new PieceValue();
+            var pos = new Position(board, pieceValue);
             var g = GameFactory.Create(pos);
             g.NewGame(fen);
 
-            var w1 = new Move(movingPiece, fromOneSquare, toSquare);
-            var w2 = new Move(movingPiece, fromTwoSquare, toSquare);
+            var w1 = new Move(fromOneSquare, toSquare);
+            var w2 = new Move(fromTwoSquare, toSquare);
 
-            var actualPrimary = w1.ToNotation(g.Position, notation);
-            var actualSecondary = w2.ToNotation(g.Position, notation);
+            var ambiguity = new MoveAmbiguity(pos);
+
+            var actualPrimary = ambiguity.ToNotation(w1, notation);
+            var actualSecondary = ambiguity.ToNotation(w2, notation);
 
             Assert.Equal(expectedPrimary, actualPrimary);
             Assert.Equal(expectedSecondary, actualSecondary);
@@ -140,28 +151,32 @@ namespace Chess.Test.Move
             // Tests both knights moving to same square for Rank ambiguity
 
             const string fen = "8/6k1/8/8/8/8/1K1N1N2/8 w - - 0 1";
-            const EMoveNotation notation = EMoveNotation.San;
+            const MoveNotations notation = MoveNotations.San;
 
-            var movingPiece = new Piece(EPieces.WhiteKnight);
-            var fromOneSquare = new Square(ESquare.d2);
-            var fromTwoSquare = new Square(ESquare.f2);
-            var toSquare = new Square(ESquare.e4);
+            var movingPiece = new Piece(Pieces.WhiteKnight);
+            var fromOneSquare = new Square(Squares.d2);
+            var fromTwoSquare = new Square(Squares.f2);
+            var toSquare = new Square(Squares.e4);
 
             var uniChar = movingPiece.GetPieceChar();
-            var toSquareString = toSquare.GetSquareString();
+            var toSquareString = toSquare.ToString();
 
-            var expectedPrimary = $"{uniChar}{fromOneSquare.FileChar()}{toSquareString}";
-            var expectedSecondary = $"{uniChar}{fromTwoSquare.FileChar()}{toSquareString}";
+            var expectedPrimary = $"{uniChar}{fromOneSquare.FileChar}{toSquareString}";
+            var expectedSecondary = $"{uniChar}{fromTwoSquare.FileChar}{toSquareString}";
 
-            var pos = new Position();
+            var board = new Board();
+            var pieceValue = new PieceValue();
+            var pos = new Position(board, pieceValue);
             var g = GameFactory.Create(pos);
             g.NewGame(fen);
 
-            var w1 = new Move(movingPiece, fromOneSquare, toSquare);
-            var w2 = new Move(movingPiece, fromTwoSquare, toSquare);
+            var w1 = new Move(fromOneSquare, toSquare);
+            var w2 = new Move(fromTwoSquare, toSquare);
 
-            var actualPrimary = w1.ToNotation(g.Position, notation);
-            var actualSecondary = w2.ToNotation(g.Position, notation);
+            var ambiguity = new MoveAmbiguity(pos);
+
+            var actualPrimary = ambiguity.ToNotation(w1, notation);
+            var actualSecondary = ambiguity.ToNotation(w2, notation);
 
             Assert.Equal(expectedPrimary, actualPrimary);
             Assert.Equal(expectedSecondary, actualSecondary);
@@ -173,28 +188,32 @@ namespace Chess.Test.Move
             // Tests both knights moving to same square for Rank ambiguity
 
             const string fen = "8/6k1/8/8/8/8/1K1N1N2/8 w - - 0 1";
-            const EMoveNotation notation = EMoveNotation.San;
+            const MoveNotations notation = MoveNotations.San;
 
-            var movingPiece = new Piece(EPieces.WhiteKnight);
-            var fromOneSquare = new Square(ESquare.d2);
-            var fromTwoSquare = new Square(ESquare.f2);
-            var toSquare = new Square(ESquare.e4);
+            var movingPiece = new Piece(Pieces.WhiteKnight);
+            var fromOneSquare = new Square(Squares.d2);
+            var fromTwoSquare = new Square(Squares.f2);
+            var toSquare = new Square(Squares.e4);
 
             var uniChar = movingPiece.GetPieceChar();
-            var toSquareString = toSquare.GetSquareString();
+            var toSquareString = toSquare.ToString();
 
-            var expectedPrimary = $"{uniChar}{fromOneSquare.FileChar()}{toSquareString}";
-            var expectedSecondary = $"{uniChar}{fromTwoSquare.FileChar()}{toSquareString}";
+            var expectedPrimary = $"{uniChar}{fromOneSquare.FileChar}{toSquareString}";
+            var expectedSecondary = $"{uniChar}{fromTwoSquare.FileChar}{toSquareString}";
 
-            var pos = new Position();
+            var board = new Board();
+            var pieceValue = new PieceValue();
+            var pos = new Position(board, pieceValue);
             var g = GameFactory.Create(pos);
             g.NewGame(fen);
 
-            var w1 = new Move(movingPiece, fromOneSquare, toSquare);
-            var w2 = new Move(movingPiece, fromTwoSquare, toSquare);
+            var w1 = new Move(fromOneSquare, toSquare);
+            var w2 = new Move(fromTwoSquare, toSquare);
 
-            var actualPrimary = w1.ToNotation(g.Position, notation);
-            var actualSecondary = w2.ToNotation(g.Position, notation);
+            var ambiguity = new MoveAmbiguity(pos);
+
+            var actualPrimary = ambiguity.ToNotation(w1, notation);
+            var actualSecondary = ambiguity.ToNotation(w2, notation);
 
             Assert.Equal(expectedPrimary, actualPrimary);
             Assert.Equal(expectedSecondary, actualSecondary);
@@ -206,28 +225,32 @@ namespace Chess.Test.Move
             // Tests both knights moving to same square for File ambiguity
 
             const string fen = "8/6k1/8/8/3N4/8/1K1N4/8 w - - 0 1";
-            const EMoveNotation notation = EMoveNotation.San;
+            const MoveNotations notation = MoveNotations.San;
 
-            var movingPiece = new Piece(EPieces.WhiteKnight);
-            var fromOneSquare = new Square(ESquare.d2);
-            var fromTwoSquare = new Square(ESquare.d4);
-            var toSquare = new Square(ESquare.f3);
+            var movingPiece = new Piece(Pieces.WhiteKnight);
+            var fromOneSquare = new Square(Squares.d2);
+            var fromTwoSquare = new Square(Squares.d4);
+            var toSquare = new Square(Squares.f3);
 
             var uniChar = movingPiece.GetPieceChar();
-            var toSquareString = toSquare.GetSquareString();
+            var toSquareString = toSquare.ToString();
 
-            var expectedPrimary = $"{uniChar}{fromOneSquare.RankChar()}{toSquareString}";
-            var expectedSecondary = $"{uniChar}{fromTwoSquare.RankChar()}{toSquareString}";
+            var expectedPrimary = $"{uniChar}{fromOneSquare.RankChar}{toSquareString}";
+            var expectedSecondary = $"{uniChar}{fromTwoSquare.RankChar}{toSquareString}";
 
-            var pos = new Position();
+            var board = new Board();
+            var pieceValue = new PieceValue();
+            var pos = new Position(board, pieceValue);
             var g = GameFactory.Create(pos);
             g.NewGame(fen);
 
-            var w1 = new Move(movingPiece, fromOneSquare, toSquare);
-            var w2 = new Move(movingPiece, fromTwoSquare, toSquare);
+            var w1 = new Move(fromOneSquare, toSquare);
+            var w2 = new Move(fromTwoSquare, toSquare);
 
-            var actualPrimary = w1.ToNotation(g.Position, notation);
-            var actualSecondary = w2.ToNotation(g.Position, notation);
+            var ambiguity = new MoveAmbiguity(pos);
+
+            var actualPrimary = ambiguity.ToNotation(w1, notation);
+            var actualSecondary = ambiguity.ToNotation(w2, notation);
 
             Assert.Equal(expectedPrimary, actualPrimary);
             Assert.Equal(expectedSecondary, actualSecondary);
@@ -239,28 +262,32 @@ namespace Chess.Test.Move
             // Tests both knights moving to same square for Rank ambiguity
 
             const string fen = "8/6k1/8/8/8/8/1K1N1N2/8 w - - 0 1";
-            const EMoveNotation notation = EMoveNotation.Lan;
+            const MoveNotations notation = MoveNotations.Lan;
 
-            var movingPiece = new Piece(EPieces.WhiteKnight);
-            var fromOneSquare = new Square(ESquare.d2);
-            var fromTwoSquare = new Square(ESquare.f2);
-            var toSquare = new Square(ESquare.e4);
+            var movingPiece = new Piece(Pieces.WhiteKnight);
+            var fromOneSquare = new Square(Squares.d2);
+            var fromTwoSquare = new Square(Squares.f2);
+            var toSquare = new Square(Squares.e4);
 
             var uniChar = movingPiece.GetPieceChar();
-            var toSquareString = toSquare.GetSquareString();
+            var toSquareString = toSquare.ToString();
 
-            var expectedPrimary = $"{uniChar}{fromOneSquare.GetSquareString()}-{toSquareString}";
-            var expectedSecondary = $"{uniChar}{fromTwoSquare.GetSquareString()}-{toSquareString}";
+            var expectedPrimary = $"{uniChar}{fromOneSquare.ToString()}-{toSquareString}";
+            var expectedSecondary = $"{uniChar}{fromTwoSquare.ToString()}-{toSquareString}";
 
-            var pos = new Position();
+            var board = new Board();
+            var pieceValue = new PieceValue();
+            var pos = new Position(board, pieceValue);
             var g = GameFactory.Create(pos);
             g.NewGame(fen);
 
-            var w1 = new Move(movingPiece, fromOneSquare, toSquare);
-            var w2 = new Move(movingPiece, fromTwoSquare, toSquare);
+            var w1 = new Move(fromOneSquare, toSquare);
+            var w2 = new Move(fromTwoSquare, toSquare);
 
-            var actualPrimary = w1.ToNotation(g.Position, notation);
-            var actualSecondary = w2.ToNotation(g.Position, notation);
+            var ambiguity = new MoveAmbiguity(pos);
+
+            var actualPrimary = ambiguity.ToNotation(w1, notation);
+            var actualSecondary = ambiguity.ToNotation(w2, notation);
 
             Assert.Equal(expectedPrimary, actualPrimary);
             Assert.Equal(expectedSecondary, actualSecondary);
@@ -272,28 +299,32 @@ namespace Chess.Test.Move
             // Tests both knights moving to same square for Rank ambiguity
 
             const string fen = "8/6k1/8/8/8/8/1K1N1N2/8 w - - 0 1";
-            const EMoveNotation notation = EMoveNotation.Lan;
+            const MoveNotations notation = MoveNotations.Lan;
 
-            var movingPiece = new Piece(EPieces.WhiteKnight);
-            var fromOneSquare = new Square(ESquare.d2);
-            var fromTwoSquare = new Square(ESquare.f2);
-            var toSquare = new Square(ESquare.e4);
+            var movingPiece = new Piece(Pieces.WhiteKnight);
+            var fromOneSquare = new Square(Squares.d2);
+            var fromTwoSquare = new Square(Squares.f2);
+            var toSquare = new Square(Squares.e4);
 
             var uniChar = movingPiece.GetPieceChar();
-            var toSquareString = toSquare.GetSquareString();
+            var toSquareString = toSquare.ToString();
 
-            var expectedPrimary = $"{uniChar}{fromOneSquare.GetSquareString()}-{toSquareString}";
-            var expectedSecondary = $"{uniChar}{fromTwoSquare.GetSquareString()}-{toSquareString}";
+            var expectedPrimary = $"{uniChar}{fromOneSquare.ToString()}-{toSquareString}";
+            var expectedSecondary = $"{uniChar}{fromTwoSquare.ToString()}-{toSquareString}";
 
-            var pos = new Position();
+            var board = new Board();
+            var pieceValue = new PieceValue();
+            var pos = new Position(board, pieceValue);
             var g = GameFactory.Create(pos);
             g.NewGame(fen);
 
-            var w1 = new Move(movingPiece, fromOneSquare, toSquare);
-            var w2 = new Move(movingPiece, fromTwoSquare, toSquare);
+            var w1 = new Move(fromOneSquare, toSquare);
+            var w2 = new Move(fromTwoSquare, toSquare);
 
-            var actualPrimary = w1.ToNotation(g.Position, notation);
-            var actualSecondary = w2.ToNotation(g.Position, notation);
+            var ambiguity = new MoveAmbiguity(pos);
+
+            var actualPrimary = ambiguity.ToNotation(w1, notation);
+            var actualSecondary = ambiguity.ToNotation(w2, notation);
 
             Assert.Equal(expectedPrimary, actualPrimary);
             Assert.Equal(expectedSecondary, actualSecondary);
@@ -305,28 +336,32 @@ namespace Chess.Test.Move
             // Tests both knights moving to same square for File ambiguity
 
             const string fen = "8/6k1/8/8/3N4/8/1K1N4/8 w - - 0 1";
-            const EMoveNotation notation = EMoveNotation.Lan;
+            const MoveNotations notation = MoveNotations.Lan;
 
-            var movingPiece = new Piece(EPieces.WhiteKnight);
-            var fromOneSquare = new Square(ESquare.d2);
-            var fromTwoSquare = new Square(ESquare.d4);
-            var toSquare = new Square(ESquare.f3);
+            var movingPiece = new Piece(Pieces.WhiteKnight);
+            var fromOneSquare = new Square(Squares.d2);
+            var fromTwoSquare = new Square(Squares.d4);
+            var toSquare = new Square(Squares.f3);
 
             var uniChar = movingPiece.GetPieceChar();
-            var toSquareString = toSquare.GetSquareString();
+            var toSquareString = toSquare.ToString();
 
-            var expectedPrimary = $"{uniChar}{fromOneSquare.GetSquareString()}-{toSquareString}";
-            var expectedSecondary = $"{uniChar}{fromTwoSquare.GetSquareString()}-{toSquareString}";
+            var expectedPrimary = $"{uniChar}{fromOneSquare.ToString()}-{toSquareString}";
+            var expectedSecondary = $"{uniChar}{fromTwoSquare.ToString()}-{toSquareString}";
 
-            var pos = new Position();
+            var board = new Board();
+            var pieceValue = new PieceValue();
+            var pos = new Position(board, pieceValue);
             var g = GameFactory.Create(pos);
             g.NewGame(fen);
 
-            var w1 = new Move(movingPiece, fromOneSquare, toSquare);
-            var w2 = new Move(movingPiece, fromTwoSquare, toSquare);
+            var w1 = new Move(fromOneSquare, toSquare);
+            var w2 = new Move(fromTwoSquare, toSquare);
 
-            var actualPrimary = w1.ToNotation(g.Position, notation);
-            var actualSecondary = w2.ToNotation(g.Position, notation);
+            var ambiguity = new MoveAmbiguity(pos);
+
+            var actualPrimary = ambiguity.ToNotation(w1, notation);
+            var actualSecondary = ambiguity.ToNotation(w2, notation);
 
             Assert.Equal(expectedPrimary, actualPrimary);
             Assert.Equal(expectedSecondary, actualSecondary);
@@ -338,28 +373,32 @@ namespace Chess.Test.Move
             // Tests both knights moving to same square for Rank ambiguity
 
             const string fen = "8/6k1/8/8/8/8/1K1N1N2/8 w - - 0 1";
-            const EMoveNotation notation = EMoveNotation.Ran;
+            const MoveNotations notation = MoveNotations.Ran;
 
-            var movingPiece = new Piece(EPieces.WhiteKnight);
-            var fromOneSquare = new Square(ESquare.d2);
-            var fromTwoSquare = new Square(ESquare.f2);
-            var toSquare = new Square(ESquare.e4);
+            var movingPiece = new Piece(Pieces.WhiteKnight);
+            var fromOneSquare = new Square(Squares.d2);
+            var fromTwoSquare = new Square(Squares.f2);
+            var toSquare = new Square(Squares.e4);
 
             var uniChar = movingPiece.GetPieceChar();
-            var toSquareString = toSquare.GetSquareString();
+            var toSquareString = toSquare.ToString();
 
-            var expectedPrimary = $"{uniChar}{fromOneSquare.GetSquareString()}-{toSquareString}";
-            var expectedSecondary = $"{uniChar}{fromTwoSquare.GetSquareString()}-{toSquareString}";
+            var expectedPrimary = $"{uniChar}{fromOneSquare.ToString()}-{toSquareString}";
+            var expectedSecondary = $"{uniChar}{fromTwoSquare.ToString()}-{toSquareString}";
 
-            var pos = new Position();
+            var board = new Board();
+            var pieceValue = new PieceValue();
+            var pos = new Position(board, pieceValue);
             var g = GameFactory.Create(pos);
             g.NewGame(fen);
 
-            var w1 = new Move(movingPiece, fromOneSquare, toSquare);
-            var w2 = new Move(movingPiece, fromTwoSquare, toSquare);
+            var w1 = new Move(fromOneSquare, toSquare);
+            var w2 = new Move(fromTwoSquare, toSquare);
 
-            var actualPrimary = w1.ToNotation(g.Position, notation);
-            var actualSecondary = w2.ToNotation(g.Position, notation);
+            var ambiguity = new MoveAmbiguity(pos);
+
+            var actualPrimary = ambiguity.ToNotation(w1, notation);
+            var actualSecondary = ambiguity.ToNotation(w2, notation);
 
             Assert.Equal(expectedPrimary, actualPrimary);
             Assert.Equal(expectedSecondary, actualSecondary);
@@ -371,28 +410,32 @@ namespace Chess.Test.Move
             // Tests both knights moving to same square for Rank ambiguity
 
             const string fen = "8/6k1/8/8/8/8/1K1N1N2/8 w - - 0 1";
-            const EMoveNotation notation = EMoveNotation.Ran;
+            const MoveNotations notation = MoveNotations.Ran;
 
-            var movingPiece = new Piece(EPieces.WhiteKnight);
-            var fromOneSquare = new Square(ESquare.d2);
-            var fromTwoSquare = new Square(ESquare.f5);
-            var toSquare = new Square(ESquare.e4);
+            var movingPiece = new Piece(Pieces.WhiteKnight);
+            var fromOneSquare = new Square(Squares.d2);
+            var fromTwoSquare = new Square(Squares.f2);
+            var toSquare = new Square(Squares.e4);
 
             var uniChar = movingPiece.GetPieceChar();
-            var toSquareString = toSquare.GetSquareString();
+            var toSquareString = toSquare.ToString();
 
-            var expectedPrimary = $"{uniChar}{fromOneSquare.GetSquareString()}-{toSquareString}";
-            var expectedSecondary = $"{uniChar}{fromTwoSquare.GetSquareString()}-{toSquareString}";
+            var expectedPrimary = $"{uniChar}{fromOneSquare.ToString()}-{toSquareString}";
+            var expectedSecondary = $"{uniChar}{fromTwoSquare.ToString()}-{toSquareString}";
 
-            var pos = new Position();
+            var board = new Board();
+            var pieceValue = new PieceValue();
+            var pos = new Position(board, pieceValue);
             var g = GameFactory.Create(pos);
             g.NewGame(fen);
 
-            var w1 = new Move(movingPiece, fromOneSquare, toSquare);
-            var w2 = new Move(movingPiece, fromTwoSquare, toSquare);
+            var w1 = new Move(fromOneSquare, toSquare);
+            var w2 = new Move(fromTwoSquare, toSquare);
 
-            var actualPrimary = w1.ToNotation(g.Position, notation);
-            var actualSecondary = w2.ToNotation(g.Position, notation);
+            var ambiguity = new MoveAmbiguity(pos);
+
+            var actualPrimary = ambiguity.ToNotation(w1, notation);
+            var actualSecondary = ambiguity.ToNotation(w2, notation);
 
             Assert.Equal(expectedPrimary, actualPrimary);
             Assert.Equal(expectedSecondary, actualSecondary);
@@ -404,28 +447,32 @@ namespace Chess.Test.Move
             // Tests both knights moving to same square for File ambiguity
 
             const string fen = "8/6k1/8/8/3N4/8/1K1N4/8 w - - 0 1";
-            const EMoveNotation notation = EMoveNotation.Ran;
+            const MoveNotations notation = MoveNotations.Ran;
 
-            var movingPiece = new Piece(EPieces.WhiteKnight);
-            var fromOneSquare = new Square(ESquare.d2);
-            var fromTwoSquare = new Square(ESquare.d4);
-            var toSquare = new Square(ESquare.f3);
+            var movingPiece = new Piece(Pieces.WhiteKnight);
+            var fromOneSquare = new Square(Squares.d2);
+            var fromTwoSquare = new Square(Squares.d4);
+            var toSquare = new Square(Squares.f3);
 
             var uniChar = movingPiece.GetPieceChar();
-            var toSquareString = toSquare.GetSquareString();
+            var toSquareString = toSquare.ToString();
 
-            var expectedPrimary = $"{uniChar}{fromOneSquare.GetSquareString()}-{toSquareString}";
-            var expectedSecondary = $"{uniChar}{fromTwoSquare.GetSquareString()}-{toSquareString}";
+            var expectedPrimary = $"{uniChar}{fromOneSquare.ToString()}-{toSquareString}";
+            var expectedSecondary = $"{uniChar}{fromTwoSquare.ToString()}-{toSquareString}";
 
-            var pos = new Position();
+            var board = new Board();
+            var pieceValue = new PieceValue();
+            var pos = new Position(board, pieceValue);
             var g = GameFactory.Create(pos);
             g.NewGame(fen);
 
-            var w1 = new Move(movingPiece, fromOneSquare, toSquare);
-            var w2 = new Move(movingPiece, fromTwoSquare, toSquare);
+            var w1 = new Move(fromOneSquare, toSquare);
+            var w2 = new Move(fromTwoSquare, toSquare);
 
-            var actualPrimary = w1.ToNotation(g.Position, notation);
-            var actualSecondary = w2.ToNotation(g.Position, notation);
+            var ambiguity = new MoveAmbiguity(pos);
+
+            var actualPrimary = ambiguity.ToNotation(w1, notation);
+            var actualSecondary = ambiguity.ToNotation(w2, notation);
 
             Assert.Equal(expectedPrimary, actualPrimary);
             Assert.Equal(expectedSecondary, actualSecondary);

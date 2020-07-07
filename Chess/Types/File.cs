@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2019 Rudy Alex Kohn
+Copyright (c) 2017-2020 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -27,17 +27,25 @@ SOFTWARE.
 namespace Rudz.Chess.Types
 {
     using Enums;
+    using System;
+    using System.Linq;
     using System.Runtime.CompilerServices;
 
-    public struct File
+    public readonly struct File : IEquatable<File>
     {
-        public EFile Value;
+        private static readonly char[] FileChars = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' };
+
+        private static readonly string[] FileStrings;
+
+        public readonly Files Value;
+
+        static File() => FileStrings = FileChars.Select(x => x.ToString()).ToArray();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public File(int file) => Value = (EFile)file;
+        public File(int file) => Value = (Files)file;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public File(EFile file) => Value = file;
+        public File(Files file) => Value = file;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public File(File file) => Value = file.Value;
@@ -46,7 +54,7 @@ namespace Rudz.Chess.Types
         public static implicit operator File(int value) => new File(value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator File(EFile value) => new File(value);
+        public static implicit operator File(Files value) => new File(value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator ==(File left, File right) => left.Equals(right);
@@ -55,16 +63,16 @@ namespace Rudz.Chess.Types
         public static bool operator !=(File left, File right) => !left.Equals(right);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator ==(File left, EFile right) => left.Value == right;
+        public static bool operator ==(File left, Files right) => left.Value == right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator !=(File left, EFile right) => left.Value != right;
+        public static bool operator !=(File left, Files right) => left.Value != right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator ==(File left, int right) => left.Value == (EFile)right;
+        public static bool operator ==(File left, int right) => left.Value == (Files)right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator !=(File left, int right) => left.Value != (EFile)right;
+        public static bool operator !=(File left, int right) => left.Value != (Files)right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static File operator +(File left, File right) => left.AsInt() + right.AsInt();
@@ -73,7 +81,7 @@ namespace Rudz.Chess.Types
         public static File operator +(File left, int right) => left.AsInt() + right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static File operator +(File left, EFile right) => left.AsInt() + (int)right;
+        public static File operator +(File left, Files right) => left.AsInt() + (int)right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static File operator -(File left, File right) => left.AsInt() - right.AsInt();
@@ -82,10 +90,10 @@ namespace Rudz.Chess.Types
         public static File operator -(File left, int right) => left.AsInt() - right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static File operator -(File left, EFile right) => left.AsInt() - (int)right;
+        public static File operator -(File left, Files right) => left.AsInt() - (int)right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static File operator ++(File file) => ++file.Value;
+        public static File operator ++(File file) => file.Value + 1;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static BitBoard operator &(File left, ulong right) => left.BitBoardFile() & right;
@@ -115,18 +123,19 @@ namespace Rudz.Chess.Types
         public static bool operator <(File left, File right) => left.AsInt() < right.AsInt();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator true(File sq) => sq.IsValid();
+        public static bool operator true(File f) => f.IsValid();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator false(File sq) => !sq.IsValid();
+        public static bool operator false(File f) => !f.IsValid();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int AsInt() => (int)Value;
 
-        public bool IsValid() => Value <= EFile.FileH;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool IsValid() => Value <= Files.FileH;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public override string ToString() => this.FileString();
+        public override string ToString() => FileStrings[AsInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals(File other) => Value == other.Value;
@@ -136,5 +145,8 @@ namespace Rudz.Chess.Types
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override int GetHashCode() => AsInt();
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public char FileChar() => FileChars[AsInt()];
     }
 }

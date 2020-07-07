@@ -1,4 +1,4 @@
-﻿/**
+﻿/*
 *Copyright (C) 2007 Pradyumna Kannan.
 *
 *This code is provided 'as-is', without any expressed or implied warranty.

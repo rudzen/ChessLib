@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2019 Rudy Alex Kohn
+Copyright (c) 2017-2020 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -35,8 +35,8 @@ namespace Chess.Test.Data
         [Fact]
         public void GetSquareTest()
         {
-            const ESquare expected = ESquare.a5;
-            var ps = new PieceSquare(EPieces.NoPiece, expected);
+            const Squares expected = Squares.a5;
+            var ps = new PieceSquare(Piece.EmptyPiece, expected);
             var actual = ps.Square;
             var expectedSquare = new Square(expected);
             Assert.Equal(expectedSquare, actual);
@@ -45,8 +45,8 @@ namespace Chess.Test.Data
         [Fact]
         public void GetPieceTest()
         {
-            const EPieces expected = EPieces.BlackKnight;
-            var ps = new PieceSquare(expected, ESquare.none);
+            const Pieces expected = Pieces.BlackKnight;
+            var ps = new PieceSquare(expected, Square.None);
             var actual = ps.Piece;
             var expectedPiece = new Piece(expected);
             Assert.Equal(expectedPiece, actual);
@@ -55,7 +55,7 @@ namespace Chess.Test.Data
         [Fact]
         public void GetPieceAndSquareTest()
         {
-            for (var pc = EPieces.NoPiece; pc < EPieces.PieceNb; ++pc)
+            for (var pc = Pieces.NoPiece; pc < Pieces.PieceNb; ++pc)
             {
                 var expectedPiece = new Piece(pc);
                 foreach (var sq in BitBoards.AllSquares)

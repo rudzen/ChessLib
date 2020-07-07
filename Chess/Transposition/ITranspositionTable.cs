@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2019 Rudy Alex Kohn
+Copyright (c) 2017-2020 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -35,7 +35,6 @@ namespace Rudz.Chess.Transposition
         /// </summary>
         ulong Hits { get; }
 
-
         int Size { get; }
 
         /// <summary>
@@ -55,7 +54,7 @@ namespace Rudz.Chess.Transposition
         /// </summary>
         /// <param name="key">The position key</param>
         /// <returns>The cluster of the keys position in the table</returns>
-        ITTCluster FindCluster(ulong key);
+        ITTCluster FindCluster(HashKey key);
 
         void Refresh(TranspositionTableEntry tte);
 
@@ -64,20 +63,19 @@ namespace Rudz.Chess.Transposition
         /// </summary>
         /// <param name="key">The position key</param>
         /// <returns>(true, entry) if one was found, (false, empty) if not found</returns>
-        (bool, TranspositionTableEntry) Probe(ulong key);
+        (bool, TranspositionTableEntry) Probe(HashKey key);
 
         /// <summary>
         /// Probes the table for the first cluster index which matches the position key
         /// </summary>
         /// <param name="key">The position key</param>
         /// <returns>The cluster entry</returns>
-        TranspositionTableEntry ProbeFirst(ulong key);
+        TranspositionTableEntry ProbeFirst(HashKey key);
 
         /// <summary>
-        /// Stores a move in the transposition table.
-        /// It will automatically detect the best cluster location to store it in.
-        /// If a similar move already is present, a simple check if done to make sure
-        /// it actually is an improvement of the previous move.
+        /// Stores a move in the transposition table. It will automatically detect the best cluster
+        /// location to store it in. If a similar move already is present, a simple check if done to
+        /// make sure it actually is an improvement of the previous move.
         /// </summary>
         /// <param name="key">The position key</param>
         /// <param name="value">The value of the move</param>
@@ -85,11 +83,10 @@ namespace Rudz.Chess.Transposition
         /// <param name="depth">The depth of the move</param>
         /// <param name="move">The move it self</param>
         /// <param name="statValue">The static value of the move</param>
-        void Store(ulong key, int value, Bound type, sbyte depth, Move move, int statValue);
+        void Store(HashKey key, int value, Bound type, sbyte depth, Move move, int statValue);
 
         /// <summary>
-        /// Get the approximation full % of the table
-        /// // todo : fix
+        /// Get the approximation full % of the table // todo : fix
         /// </summary>
         /// <returns>The % as integer value</returns>
         int Fullness();

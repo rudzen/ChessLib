@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2019 Rudy Alex Kohn
+Copyright (c) 2017-2020 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -94,10 +94,6 @@ No perft cache:
 
     public class PerftBenchRunner
     {
-        public static void Main(string[] args)
-        {
-            var summary = BenchmarkRunner.Run<FenBenchmark>();
-            //var summary = BenchmarkRunner.Run<PerftBench>();
-        }
+        public static void Main(string[] args) => BenchmarkSwitcher.FromAssembly(typeof(PerftBenchRunner).Assembly).Run(args);
     }
 }

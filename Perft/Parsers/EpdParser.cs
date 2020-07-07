@@ -50,56 +50,50 @@ namespace Perft.Parsers
         {
             const char space = ' ';
             Sets = new List<IEpdSet>();
-            using (var fs = File.Open(Settings.Filename, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            await using var fs = File.Open(Settings.Filename, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            await using var bs = new BufferedStream(fs);
+            using var sr = new StreamReader(bs);
+            var id = string.Empty;
+            var epd = string.Empty;
+            var idSet = false;
+            var epdSet = false;
+            var perftData = new List<string>(16);
+            string s;
+            while ((s = await sr.ReadLineAsync().ConfigureAwait(false)) != null)
             {
-                using (var bs = new BufferedStream(fs))
+                // skip comments
+                if (s.Length < 4 || s[0] == '#')
                 {
-                    using (var sr = new StreamReader(bs))
+                    if (idSet && epdSet)
                     {
-                        var id = string.Empty;
-                        var epd = string.Empty;
-                        var idSet = false;
-                        var epdSet = false;
-                        var perftData = new List<string>(16);
-                        string s;
-                        while ((s = await sr.ReadLineAsync().ConfigureAwait(false)) != null)
-                        {
-                            // skip comments
-                            if (s.Length < 4 || s[0] == '#')
-                            {
-                                if (idSet && epdSet)
-                                {
-                                    Sets.Add(new EpdSet { Epd = epd, Id = id, Perft = perftData.Select(ParsePerftLines).ToList() });
-                                    id = epd = string.Empty;
-                                    idSet = epdSet = false;
-                                    perftData.Clear();
-                                }
-
-                                continue;
-                            }
-
-                            if (!idSet & s[0] == 'i' && s[1] == 'd')
-                            {
-                                id = s.Split(' ', StringSplitOptions.RemoveEmptyEntries)[1];
-                                idSet = true;
-                                continue;
-                            }
-
-                            if (s[0] == 'e' & s[1] == 'p' & s[2] == 'd')
-                            {
-                                var firstSpace = s.IndexOf(space);
-                                epd = s.Substring(firstSpace).TrimStart();
-                                epdSet = true;
-                                continue;
-                            }
-
-                            if (s.StartsWith("perft"))
-                            {
-                                var firstSpace = s.IndexOf(space);
-                                perftData.Add(s.Substring(firstSpace));
-                            }
-                        }
+                        Sets.Add(new EpdSet { Epd = epd, Id = id, Perft = perftData.Select(ParsePerftLines).ToList() });
+                        id = epd = string.Empty;
+                        idSet = epdSet = false;
+                        perftData.Clear();
                     }
+
+                    continue;
+                }
+
+                if (!idSet & s[0] == 'i' && s[1] == 'd')
+                {
+                    id = s.Split(' ', StringSplitOptions.RemoveEmptyEntries)[1];
+                    idSet = true;
+                    continue;
+                }
+
+                if (s[0] == 'e' & s[1] == 'p' & s[2] == 'd')
+                {
+                    var firstSpace = s.IndexOf(space);
+                    epd = s.Substring(firstSpace).TrimStart();
+                    epdSet = true;
+                    continue;
+                }
+
+                if (s.StartsWith("perft"))
+                {
+                    var firstSpace = s.IndexOf(space);
+                    perftData.Add(s.Substring(firstSpace));
                 }
             }
 
@@ -108,70 +102,7 @@ namespace Perft.Parsers
 
         public ulong Parse()
         {
-            return 0;
-            //var count = 0UL;
-            //const char space = ' ';
-            //Sets = new List<IEpdSet>(1024);
-            //using (var fs = File.Open(Settings.Filename, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-            //{
-            //    using (var bs = new BufferedStream(fs))
-            //    {
-            //        using (var sr = new StreamReader(bs))
-            //        {
-            //            string s;
-            //            string id = string.Empty, epd = string.Empty;
-            //            bool idSet = false, epdSet = false;
-            //            var perftData = new List<string>(16);
-            //            while ((s = sr.ReadLine()) != null)
-            //            {
-            //                // skip comments
-            //                if (s.Length < 4 || s[0] == '#')
-            //                {
-            //                    if (idSet && epdSet)
-            //                    {
-            //                        var p = new List<(int, ulong)>(perftData.Count);
-            //                        foreach (var pd in perftData)
-            //                        {
-            //                            var pp = ParsePerftLines(pd);
-            //                            p.Add(pp);
-            //                        }
-
-            //                        Sets.Add(new EpdSet { Epd = epd, Id = id, Perft = p });
-            //                        count++;
-
-            //                        id = epd = string.Empty;
-            //                        idSet = epdSet = false;
-            //                        perftData.Clear();
-            //                    }
-            //                    continue;
-            //                }
-
-            //                if (!idSet & s[0] == 'i' && s[1] == 'd')
-            //                {
-            //                    id = s.Split(' ', StringSplitOptions.RemoveEmptyEntries)[1];
-            //                    idSet = true;
-            //                    continue;
-            //                }
-
-            //                if (s[0] == 'e' & s[1] == 'p' & s[2] == 'd')
-            //                {
-            //                    var firstSpace = s.IndexOf(space);
-            //                    epd = s.Substring(firstSpace).TrimStart();
-            //                    epdSet = true;
-            //                    continue;
-            //                }
-
-            //                if (s.StartsWith("perft"))
-            //                {
-            //                    var firstSpace = s.IndexOf(space);
-            //                    perftData.Add(s.Substring(firstSpace));
-            //                }
-            //            }
-            //        }
-            //    }
-            //}
-
-            //return count;
+            throw new NotImplementedException();
         }
 
         private static (int, ulong) ParsePerftLines(string perftData)

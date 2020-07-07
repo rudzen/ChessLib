@@ -1,6 +1,5 @@
 ﻿namespace Perft.Environment
 {
-    using Chess.Perft.Environment;
     using System;
     using System.Diagnostics;
     using System.Reflection;
@@ -18,7 +17,7 @@
 
         private static readonly string FrameWork = Assembly.GetEntryAssembly()?.GetCustomAttribute<TargetFrameworkAttribute>()?.FrameworkName;
 
-        public bool IsDevelopment { get; set; } = true;
+        public bool IsDevelopment { get; set; }
 
         public string Configuration => IsDevelopment ? "Development" : "Production";
 

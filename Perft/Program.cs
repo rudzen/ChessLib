@@ -31,14 +31,25 @@ namespace Perft
     using CommandLine;
     using DryIoc;
     using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.ObjectPool;
     using Options;
     using Parsers;
     using Rudz.Chess;
+    using Rudz.Chess.UCI;
     using Serilog;
     using System;
     using System.IO;
     using System.Threading.Tasks;
     using TimeStamp;
+
+    /*
+     *
+     *    TODO: Fens to investigate:
+     * r2n3r/1bNk2pp/6P1/pP3p2/3pPqnP/1P1P1p1R/2P3B1/Q1B1bKN1 b - e3
+     *
+     *
+     *
+     */
 
     internal static class Program
     {
@@ -51,7 +62,7 @@ namespace Perft
 
         public static async Task<int> Main(string[] args)
         {
-            OptionType optionsUsed = OptionType.None;
+            var optionsUsed = OptionType.None;
             IOptions options = null;
             IOptions ttOptions = null;
 
@@ -89,14 +100,14 @@ namespace Perft
                     (TTOptions opts) => setTT(opts),
                     errs => 1);
 
-            if (returnValue == 0)
-            {
-                var perftRunner = Framework.IoC.Resolve<IPerftRunner>();
-                perftRunner.Options = options;
-                perftRunner.SaveResults = true;
+            if (returnValue != 0)
+                return returnValue;
 
-                returnValue = await perftRunner.Run().ConfigureAwait(false);
-            }
+            var perftRunner = Framework.IoC.Resolve<IPerftRunner>();
+            perftRunner.Options = options;
+            perftRunner.SaveResults = true;
+
+            returnValue = await perftRunner.Run().ConfigureAwait(false);
 
             return returnValue;
         }
@@ -105,11 +116,10 @@ namespace Perft
         {
             // Read the configuration file for this assembly
             builder.SetBasePath(Directory.GetCurrentDirectory())
-                //.AddInMemoryCollection(new[] { new KeyValuePair<string, string>("ScannerName", scannerName) })
                 .AddJsonFile(ConfigFileName);
         }
 
-        public static void AddServices(IContainer container, IConfiguration configuration)
+        private static void AddServices(IContainer container, IConfiguration configuration)
         {
             // Bind logger with configuration
             container.Register(Made.Of(() => ConfigureLogger(configuration)), Reuse.Singleton);
@@ -119,10 +129,12 @@ namespace Perft
 
             // Bind chess classes
             container.Register<IGame, Game>(Reuse.Transient);
-            container.Register<IMoveList, MoveList>(Reuse.Transient, setup: Setup.With(allowDisposableTransient: true));
-            container.Register<IMaterial, Material>(Reuse.Transient);
+            container.Register<IBoard, Board>(Reuse.Singleton);
+            // container.Register<IMoveList, MoveList>(Reuse.Transient);
             container.Register<IPosition, Position>(Reuse.Transient);
             container.Register<IKillerMoves, KillerMoves>(Reuse.Transient);
+            container.Register<IUci, Uci>(Reuse.Singleton);
+            container.Register<IPieceValue, PieceValue>(Reuse.Singleton);
 
             // Bind options
             container.Register<IOptions, EpdOptions>(Reuse.Singleton, serviceKey: OptionType.EdpOptions);
@@ -132,13 +144,21 @@ namespace Perft
             // Bind chess perft classes
             container.Register<IPerftPosition, PerftPosition>(Reuse.Transient);
             container.Register<IPerft, Perft>(Reuse.Transient);
-            container.Register<IPerftResult, PerftResult>(Reuse.Transient);
             container.Register<IPerftRunner, PerftRunner>(Reuse.Transient);
 
             // Bind perft classes
             container.Register<IEpdParserSettings, EpdParserSettings>(Reuse.Singleton);
             container.Register<IEpdSet, EpdSet>(Reuse.Transient);
             container.Register<IEpdParser, EpdParser>(Reuse.Singleton);
+
+            // Bind object pool for perft result
+            container.Register<ObjectPoolProvider, DefaultObjectPoolProvider>(Reuse.Singleton);
+            container.RegisterDelegate(context =>
+            {
+                var provider = context.Resolve<ObjectPoolProvider>();
+                var policy = new DefaultPooledObjectPolicy<PerftResult>();
+                return provider.Create(policy);
+            });
         }
 
         private static ILogger ConfigureLogger(IConfiguration configuration)

@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2019 Rudy Alex Kohn
+Copyright (c) 2017-2020 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -41,7 +41,7 @@ namespace Chess.Test.Pieces
             const int index = (int)EBands.Alpha;
             const int sliderIndex = 0;
             var expected = BishopExpected[index];
-            var actuals = Bands[index].Select(x => SlideAttacks[sliderIndex](x, BitBoards.EmptyBitBoard).Count);
+            var actuals = Bands[index].Select(x => SlideAttacks[sliderIndex](x, BitBoard.Empty).Count);
 
             foreach (var actual in actuals)
                 Assert.Equal(expected, actual);
@@ -53,7 +53,7 @@ namespace Chess.Test.Pieces
             const int index = (int)EBands.Beta;
             const int sliderIndex = 0;
             var expected = BishopExpected[index];
-            var actuals = Bands[index].Select(x => SlideAttacks[sliderIndex](x, BitBoards.EmptyBitBoard).Count);
+            var actuals = Bands[index].Select(x => SlideAttacks[sliderIndex](x, BitBoard.Empty).Count);
 
             foreach (var actual in actuals)
                 Assert.Equal(expected, actual);
@@ -65,7 +65,7 @@ namespace Chess.Test.Pieces
             const int index = (int)EBands.Gamma;
             const int sliderIndex = 0;
             var expected = BishopExpected[index];
-            var actuals = Bands[index].Select(x => SlideAttacks[sliderIndex](x, BitBoards.EmptyBitBoard).Count);
+            var actuals = Bands[index].Select(x => SlideAttacks[sliderIndex](x, BitBoard.Empty).Count);
 
             foreach (var actual in actuals)
                 Assert.Equal(expected, actual);
@@ -77,7 +77,7 @@ namespace Chess.Test.Pieces
             const int index = (int)EBands.Delta;
             const int sliderIndex = 0;
             var expected = BishopExpected[index];
-            var actuals = Bands[index].Select(x => SlideAttacks[sliderIndex](x, BitBoards.EmptyBitBoard).Count);
+            var actuals = Bands[index].Select(x => SlideAttacks[sliderIndex](x, BitBoard.Empty).Count);
 
             foreach (var actual in actuals)
                 Assert.Equal(expected, actual);
@@ -91,7 +91,7 @@ namespace Chess.Test.Pieces
         {
             BitBoard border = 0xff818181818181ff;
             BitBoard borderInner = 0x7e424242427e00;
-            var corners = BitBoards.MakeBitboard(ESquare.a1, ESquare.a8, ESquare.h1, ESquare.h8);
+            var corners = BitBoards.MakeBitboard(Squares.a1, Squares.a8, Squares.h1, Squares.h8);
 
             const int expectedCorner = 1; // just a single attack square no matter what
             const int expectedSide = 2;
@@ -112,7 +112,7 @@ namespace Chess.Test.Pieces
             foreach (var square in border)
             {
                 var attacks = square.BishopAttacks(borderInner);
-                Assert.False(attacks.Empty());
+                Assert.False(attacks.IsEmpty);
                 var expected = corners & square ? expectedCorner : expectedSide;
                 var actual = attacks.Count;
                 Assert.Equal(expected, actual);

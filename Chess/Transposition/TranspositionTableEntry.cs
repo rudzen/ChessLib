@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2019 Rudy Alex Kohn
+Copyright (c) 2017-2020 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -26,17 +26,20 @@ SOFTWARE.
 
 namespace Rudz.Chess.Transposition
 {
+    using System;
+    using System.Runtime.InteropServices;
     using Types;
 
+    [StructLayout(LayoutKind.Sequential, Pack = 2)]
     public struct TranspositionTableEntry
     {
         public uint Key32;
         public Move Move;
-        public sbyte Depth;
-        public sbyte Generation;
         public int Value;
         public int StaticValue;
         public Bound Type;
+        public sbyte Depth;
+        public sbyte Generation;
 
         public TranspositionTableEntry(uint k, Move m, sbyte d, sbyte g, int v, int sv, Bound b)
         {
@@ -54,20 +57,16 @@ namespace Rudz.Chess.Transposition
             this = tte;
         }
 
-        public void Defaults()
-        {
-            Key32 = 0;
-            Move = MoveExtensions.EmptyMove;
-            Depth = sbyte.MinValue;
-            Generation = 1;
-            Value = StaticValue = int.MaxValue;
-            Type = Bound.Void;
-        }
+        public static bool operator ==(TranspositionTableEntry left, TranspositionTableEntry right)
+            => left.Equals(right);
+
+        public static bool operator !=(TranspositionTableEntry left, TranspositionTableEntry right)
+            => !(left == right);
 
         public void Save(TranspositionTableEntry tte)
         {
             Key32 = tte.Key32;
-            if (tte.Move != MoveExtensions.EmptyMove)
+            if (!tte.Move.IsNullMove())
                 Move = tte.Move;
             Depth = tte.Depth;
             Generation = tte.Generation;
@@ -75,5 +74,14 @@ namespace Rudz.Chess.Transposition
             StaticValue = tte.StaticValue;
             Type = tte.Type;
         }
-    };
+
+        public readonly bool Equals(TranspositionTableEntry other)
+            => Key32 == other.Key32 && Generation == other.Generation;
+
+        public override readonly bool Equals(object obj)
+            => obj is TranspositionTableEntry other && Equals(other);
+
+        public override readonly int GetHashCode()
+            => HashCode.Combine(Key32, Move, Depth, Generation, Value, StaticValue, Type);
+    }
 }

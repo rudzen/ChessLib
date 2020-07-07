@@ -354,3 +354,5 @@ MigrationBackup/
 .idea/.idea.ChessLib/.idea/
 
 .idea/.idea.ChessLib/
+
+Perft/Logs/

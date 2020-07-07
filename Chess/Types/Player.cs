@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2019 Rudy Alex Kohn
+Copyright (c) 2017-2020 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,34 +24,54 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using Rudz.Chess.Extensions;
-
 namespace Rudz.Chess.Types
 {
     using Enums;
+    using Extensions;
+    using System;
     using System.Runtime.CompilerServices;
 
-    public struct Player
+    public readonly struct Player : IEquatable<Player>
     {
-        public Player(int side)
+        private static readonly Direction[] PawnPushDist = { Directions.North, Directions.South };
+
+        private static readonly Direction[] PawnDoublePushDist = { Directions.NorthDouble, Directions.SouthDouble };
+
+        private static readonly Direction[] PawnWestAttackDist = { Directions.NorthEast, Directions.SouthEast };
+
+        private static readonly Direction[] PawnEastAttackDist = { Directions.NorthWest, Directions.SouthWest };
+
+        private static readonly string[] PlayerColors = { "White", "Black" };
+
+        private static readonly Func<BitBoard, BitBoard>[] PawnPushModifiers = { BitBoards.NorthOne, BitBoards.SouthOne };
+
+        public Player(byte side)
             : this() => Side = side;
 
         public Player(Player side)
             : this() => Side = side.Side;
 
-        public Player(EPlayer side)
-            : this((int)side) { }
+        public Player(Players side)
+            : this((byte)side) { }
 
-        public int Side;
+        public readonly byte Side;
+
+        public bool IsWhite => Side == 0;
+
+        public bool IsBlack => Side != 0;
+
+        public static readonly Player White = 0;
+
+        public static readonly Player Black = 1;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator Player(int value) => new Player(value);
+        public static implicit operator Player(int value) => new Player((byte)value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator Player(uint value) => new Player((int)value);
+        public static implicit operator Player(uint value) => new Player((byte)value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator Player(EPlayer value) => new Player(value);
+        public static implicit operator Player(Players value) => new Player(value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator Player(bool value) => new Player(value.AsByte());
@@ -72,7 +92,7 @@ namespace Rudz.Chess.Types
         public static int operator >>(Player left, int right) => left.Side >> right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static EPieces operator +(EPieceType pieceType, Player side) => (EPieces)pieceType + (byte)(side.Side << 3);
+        public static Pieces operator +(PieceTypes pieceType, Player side) => (Pieces)pieceType + (byte)(side.Side << 3);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override bool Equals(object obj) => obj is Player player && Equals(player);
@@ -82,5 +102,29 @@ namespace Rudz.Chess.Types
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override int GetHashCode() => Side << 24;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public override string ToString() => PlayerColors[Side];
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool IsOk() => Side.InBetween(White.Side, Black.Side);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public string GetName() => PlayerColors[Side];
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Direction PawnPushDistance() => PawnPushDist[Side];
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Direction PawnDoublePushDistance() => PawnDoublePushDist[Side];
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Direction PawnWestAttackDistance() => PawnWestAttackDist[Side];
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Direction PawnEastAttackDistance() => PawnEastAttackDist[Side];
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public BitBoard PawnPush(BitBoard bitBoard) => PawnPushModifiers[Side](bitBoard);
     }
 }

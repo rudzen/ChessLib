@@ -3,7 +3,7 @@ Perft, a chess perft test library
 
 MIT License
 
-Copyright (c) 2017-2019 Rudy Alex Kohn
+Copyright (c) 2017-2020 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -26,6 +26,7 @@ SOFTWARE.
 
 namespace Chess.Perft.Interfaces
 {
+    using Rudz.Chess;
     using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
@@ -40,7 +41,9 @@ namespace Chess.Perft.Interfaces
 
         ulong Expected { get; set; }
 
-        ulong DoPerft(int depth);
+        public IGame CurrentGame { get; set; }
+        
+        IAsyncEnumerable<ulong> DoPerft(int depth);
 
         Task<ulong> DoPerftAsync(int depth);
 

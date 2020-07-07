@@ -37,6 +37,9 @@ namespace Rudz.Chess.Extensions
         public static bool InBetween(this int v, int min, int max) => (uint)v - (uint)min <= (uint)max - (uint)min;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool InBetween(this byte v, byte min, byte max) => (uint)v - (uint)min <= (uint)max - (uint)min;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool InBetween(this char v, char min, char max) => v - (uint)min <= max - min;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -69,7 +72,7 @@ namespace Rudz.Chess.Extensions
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int ToIntegral(this string str)
         {
-            if (string.IsNullOrWhiteSpace(str))
+            if (str.IsNullOrWhiteSpace())
                 return 0;
 
             var x = 0;
@@ -94,7 +97,7 @@ namespace Rudz.Chess.Extensions
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool ToIntegral(this string str, out int result)
         {
-            if (string.IsNullOrWhiteSpace(str))
+            if (str.IsNullOrWhiteSpace())
             {
                 result = 0;
                 return false;
@@ -107,7 +110,7 @@ namespace Rudz.Chess.Extensions
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool ToIntegral(this string str, out ulong result)
         {
-            if (string.IsNullOrWhiteSpace(str))
+            if (str.IsNullOrWhiteSpace())
             {
                 result = 0;
                 return false;

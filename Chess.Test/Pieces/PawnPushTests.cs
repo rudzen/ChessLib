@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2019 Rudy Alex Kohn
+Copyright (c) 2017-2020 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -36,7 +36,7 @@ namespace Chess.Test.Pieces
         public void PawnPushNorth()
         {
             BitBoard fullBoard = 0xffffffffffff00;
-            Direction direction = EDirection.North;
+            Direction direction = Directions.North;
 
             const int expected = 1;
 
@@ -52,7 +52,7 @@ namespace Chess.Test.Pieces
         public void PawnPushSouth()
         {
             BitBoard fullBoard = 0xffffffffffff00;
-            Direction direction = EDirection.South;
+            Direction direction = Directions.South;
 
             const int expected = 1;
 
@@ -67,8 +67,8 @@ namespace Chess.Test.Pieces
         [Fact]
         public void PawnDoublePushNorth()
         {
-            BitBoard fullBoard = BitBoards.RANK2;
-            Direction direction = EDirection.North;
+            var fullBoard = BitBoards.RANK2;
+            Direction direction = Directions.North;
 
             const int expected = 2;
 
@@ -83,8 +83,8 @@ namespace Chess.Test.Pieces
         [Fact]
         public void PawnDoublePushSouth()
         {
-            BitBoard fullBoard = BitBoards.RANK7;
-            Direction direction = EDirection.South;
+            var fullBoard = BitBoards.RANK7;
+            Direction direction = Directions.South;
 
             const int expected = 2;
 

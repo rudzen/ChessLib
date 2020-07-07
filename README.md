@@ -5,20 +5,13 @@ A C# chess data library with complete move generation and all needed custom type
 
 ## Requirements
 
-ChessLib is using NET_STANDARD 2.0, which enables it to be used with the following
-
-* .NET Framework 4.6.1+
-* .NET Core 2.0+
-* Mono 5.4+
-* Xamarin.iOS 10.14+
-* Xamarin.Mac 3.8+
-* Xamarin.Android 7.5+
+* .NET Core 3.1+
 
 ## What is this for?
 
 This library contains all the data, types and structures for which to create a piece of
 chess software. It does not contain any heuristics or search algorithms as these
-are ment to be implemented separatly.
+are meant to be implemented separately.
 
 ## But why?
 
@@ -31,6 +24,7 @@ Yes you can, it is designed with that in mind.
 
 ## Features
 
+* Custom perft application which uses the library to calculate and compare results from custom positions
 * Transposition Table
 * Complete move generation with legality check
 * Custom compact and very efficient types for Bitboard, Square, Piece, Move, Player, File, Rank and Direction with tons of operators and helper functionality
@@ -47,9 +41,9 @@ Yes you can, it is designed with that in mind.
 * Mate validation
 * Plenty of unit tests to see how it works
 * Notation generation for the following notation types: Fan, San, Lan, Ran, Uci
-* Basic perft project included, performs depth 6 (119060324 moves) on a AMD-FX 8350 in ~12.5 seconds (without TT)
 * Benchmark project for perft
 * Custom MoveList data structure
+* Pawn blockage algorithm
 
 ## Is it fast?
 
@@ -57,8 +51,8 @@ Yes. As far as C# goes it should be able to hold its own.
 
 Perft console test program approximate timings to depth 6
 
-* AMD-FX 8350 = ~12.5 seconds. (without TT)
-* Intel i7-8086k = ~6 seconds. (without TT)
+* AMD-FX 8350 = ~12.5 seconds. (without TT) (earlier version)
+* Intel i7-8086k = ~4 seconds
 
 ## What is not included?
 
@@ -68,5 +62,5 @@ Perft console test program approximate timings to depth 6
 
 ## Planned
 
-* Better move generation with staged enumerator
 * Basic chess engine (search + evaluation) w. UCI support
+* As nuget package

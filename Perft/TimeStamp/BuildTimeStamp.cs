@@ -32,6 +32,8 @@ namespace Perft.TimeStamp
 
     public sealed class BuildTimeStamp : IBuildTimeStamp
     {
+        private const string AttributeName = "TimestampAttribute";
+
         private static readonly Lazy<string> _timeStamp = new Lazy<string>(GetTimestamp);
 
         public string TimeStamp => _timeStamp.Value;
@@ -40,7 +42,7 @@ namespace Perft.TimeStamp
         {
             var attribute = Assembly.GetExecutingAssembly()
                 .GetCustomAttributesData()
-                .First(x => x.AttributeType.Name == "TimestampAttribute");
+                .First(x => x.AttributeType.Name == AttributeName);
 
             return (string)attribute.ConstructorArguments.First().Value;
         }

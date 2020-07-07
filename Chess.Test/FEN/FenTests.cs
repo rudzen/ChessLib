@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2019 Rudy Alex Kohn
+Copyright (c) 2017-2020 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,6 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using System.Runtime.Versioning;
 using Rudz.Chess.Factories;
 
 namespace Chess.Test.FEN
@@ -37,9 +38,14 @@ namespace Chess.Test.FEN
         [Fact]
         public void SetFenTest()
         {
+            
             var expected = new FenError(0, 0);
-            var position = new Position();
-            var game = GameFactory.Create(position);
+            
+            var board = new Board();
+            var pieceValue = new PieceValue();
+            var pos = new Position(board, pieceValue);
+            var game = GameFactory.Create(pos);
+            
             var actual = game.NewGame();
 
             Assert.Equal(expected, actual);
@@ -48,8 +54,10 @@ namespace Chess.Test.FEN
         [Fact]
         public void GetFenTest()
         {
-            var position = new Position();
-            var game = GameFactory.Create(position);
+            var board = new Board();
+            var pieceValue = new PieceValue();
+            var pos = new Position(board, pieceValue);
+            var game = GameFactory.Create(pos);
             var expectedError = new FenError(0, 0);
             var actualError = game.NewGame();
 

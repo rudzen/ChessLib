@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2019 Rudy Alex Kohn
+Copyright (c) 2017-2020 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -27,7 +27,6 @@ SOFTWARE.
 namespace Rudz.Chess.Types
 {
     using Enums;
-    using Extensions;
     using System.Runtime.CompilerServices;
 
     public static class PieceExtensions
@@ -40,14 +39,6 @@ namespace Rudz.Chess.Types
 
         // for polyglot support in the future
         public const string BookPieceNames = "pPnNbBrRqQkK";
-
-        private const ushort WhitePieces = 126;
-
-        private const ushort BlackPieces = 32256;
-
-        public static readonly Piece EmptyPiece = EPieces.NoPiece;
-
-        public static readonly EPieceValue[] PieceValues = { 0, EPieceValue.Pawn, EPieceValue.Knight, EPieceValue.Bishop, EPieceValue.Rook, EPieceValue.Queen, EPieceValue.King };
 
         private static readonly string[] PieceStrings = { " ", "P", "N", "B", "R", "Q", "K", " ", " ", "p", "n", "b", "r", "q", "k" };
 
@@ -68,54 +59,22 @@ namespace Rudz.Chess.Types
  * black chess pawn 	♟ 	U+265F 	&#9823;
          */
 
-        private static readonly string[] PieceUnicode = { " ", "\u2659", "\u2658", "\u2657", "\u2656", "\u2655", "\u2654", " ", " ", "\u265F", "\u265E", "\u265D", "\u265C", "\u265B", "\u265A", " " };
-
         private static readonly char[] PieceUnicodeChar = { ' ', '\u2659', '\u2658', '\u2657', '\u2656', '\u2655', '\u2654', ' ', ' ', '\u265F', '\u265E', '\u265D', '\u265C', '\u265B', '\u265A', ' ' };
-
-        // Generic helper functions
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsWhite(this Piece p) => p.AsInt().InBetween((int)EPieces.WhitePawn, (int)EPieces.WhiteKing);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsBlack(this Piece p) => p.AsInt().InBetween((int)EPieces.BlackPawn, (int)EPieces.BlackKing);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int AsInt(this Piece p) => (int)p.Value;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int AsInt(this EPieceType p) => (int)p;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static EPieceType Type(this Piece p) => (EPieceType)(p.AsInt() & 0x7);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Piece MakePiece(this EPieceType @this, Player side) => (int)@this | (side.Side << 3);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsNoPiece(this Piece p) => p == EPieces.NoPiece;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static char GetPieceChar(this Piece p) => PieceChars[p.AsInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static char GetPieceChar(this EPieceType p) => PieceChars[(int)p];
+        public static char GetPieceChar(this PieceTypes p) => PieceChars[(int)p];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string GetPieceString(this Piece p) => PieceStrings[p.AsInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsPieceWhite(int code) => (WhitePieces & code) != 0;
-
-        public static bool IsPieceBlack(int code) => (BlackPieces & code) != 0;
+        public static string GetName(this Piece p) => PieceNames[p.Type().AsInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static EPieceValue PieceValue(this Piece p) => PieceValues[(int)p.Type()];
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ref string GetName(this Piece p) => ref PieceNames[p.Type().AsInt()];
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static char GetPromotionChar(this Piece p) => PromotionPieceNotation[(int)p.Type()];
+        public static char GetPromotionChar(this PieceTypes p) => PromotionPieceNotation[p.AsInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static char GetPgnChar(this Piece p) => PgnPieceChars[(int)p.Type()];

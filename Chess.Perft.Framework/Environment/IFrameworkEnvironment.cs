@@ -1,4 +1,4 @@
-﻿namespace Chess.Perft.Environment
+﻿namespace Perft.Environment
 {
     public interface IFrameworkEnvironment
     {

@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2019 Rudy Alex Kohn
+Copyright (c) 2017-2020 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -75,7 +75,7 @@ namespace Chess.Test.Pieces
         public override void AlphaPattern()
         {
             const int index = (int)EBands.Alpha;
-            var us = PlayerExtensions.White;
+            var us = Player.White;
             var expected = PawnExpected[index];
             var actuals = PawnBands[index].Select(w => w.PawnAttack(us).Count);
 
@@ -96,7 +96,7 @@ namespace Chess.Test.Pieces
         public override void BetaPattern()
         {
             const int index = (int)EBands.Beta;
-            var us = PlayerExtensions.White;
+            var us = Player.White;
             var expected = PawnExpected[index];
             var actuals = PawnBands[index].Select(w => w.PawnAttack(us).Count);
 
@@ -117,7 +117,7 @@ namespace Chess.Test.Pieces
         public override void GammaPattern()
         {
             const int index = (int)EBands.Gamma;
-            var us = PlayerExtensions.White;
+            var us = Player.White;
             var expected = PawnExpected[index];
             var actuals = PawnBands[index].Select(w => w.PawnAttack(us).Count);
 
@@ -138,7 +138,7 @@ namespace Chess.Test.Pieces
         public override void DeltaPattern()
         {
             const int index = (int)EBands.Delta;
-            var us = PlayerExtensions.White;
+            var us = Player.White;
             var expected = PawnExpected[index];
             var actuals = PawnBands[index].Select(w => w.PawnAttack(us).Count);
 

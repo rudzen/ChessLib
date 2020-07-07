@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2019 Rudy Alex Kohn
+Copyright (c) 2017-2020 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -35,17 +35,16 @@ namespace Rudz.Chess
     public sealed class KillerMoves : IKillerMoves
     {
         private IPieceSquare[,] _killerMoves;
-
-        public KillerMoves()
-        { }
+        private int _maxDepth;
 
         public void Initialize(int maxDepth)
         {
+            _maxDepth = maxDepth;
             _killerMoves = new IPieceSquare[maxDepth + 1, 2];
             for (var depth = 0; depth <= maxDepth; depth++)
             {
-                _killerMoves[depth, 0] = new PieceSquare(EPieces.NoPiece, ESquare.none);
-                _killerMoves[depth, 1] = new PieceSquare(EPieces.NoPiece, ESquare.none);
+                _killerMoves[depth, 0] = new PieceSquare(Piece.EmptyPiece, Square.None);
+                _killerMoves[depth, 1] = new PieceSquare(Piece.EmptyPiece, Square.None);
             }
             Reset();
         }
@@ -76,6 +75,11 @@ namespace Rudz.Chess
         private bool Equals(IPieceSquare killerMove, Move move, Piece fromPiece)
             => killerMove.Piece == fromPiece && killerMove.Square == move.GetToSquare();
 
+        public IPieceSquare Get(int depth, int index)
+        {
+            return _killerMoves[depth, index];
+        }
+        
         public void Shift(int depth)
         {
             // Shift killer moves closer to root position.
@@ -91,10 +95,10 @@ namespace Rudz.Chess
             // Reset killer moves far from root position.
             for (var i = lastDepth + 1; i < _killerMoves.Length; i++)
             {
-                _killerMoves[i, 0].Piece = EPieces.NoPiece;
-                _killerMoves[i, 0].Square = ESquare.none;
-                _killerMoves[i, 1].Piece = EPieces.NoPiece;
-                _killerMoves[i, 1].Square = ESquare.none;
+                _killerMoves[i, 0].Piece = Piece.EmptyPiece;
+                _killerMoves[i, 0].Square = Square.None;
+                _killerMoves[i, 1].Piece = Piece.EmptyPiece;
+                _killerMoves[i, 1].Square = Square.None;
             }
         }
 
@@ -103,11 +107,38 @@ namespace Rudz.Chess
             Array.Clear(_killerMoves, 0, _killerMoves.Length);
             for (var i = 0; i < _killerMoves.Length; i++)
             {
-                _killerMoves[i, 0].Piece = EPieces.NoPiece;
-                _killerMoves[i, 0].Square = ESquare.none;
-                _killerMoves[i, 1].Piece = EPieces.NoPiece;
-                _killerMoves[i, 1].Square = ESquare.none;
+                _killerMoves[i, 0].Piece = Piece.EmptyPiece;
+                _killerMoves[i, 0].Square = Square.None;
+                _killerMoves[i, 1].Piece = Piece.EmptyPiece;
+                _killerMoves[i, 1].Square = Square.None;
             }
+        }
+
+        public bool Equals(IKillerMoves other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            for (var j = 0; j < _maxDepth; ++j)
+            {
+                var otherKm = other.Get(j, 0);
+                if (otherKm.Piece != _killerMoves[j, 0].Piece || otherKm.Square != _killerMoves[j, 0].Square)
+                    return false;
+                otherKm = other.Get(j, 1);
+                if (otherKm.Piece != _killerMoves[j, 1].Piece || otherKm.Square != _killerMoves[j, 1].Square)
+                    return false;
+            }
+
+            return false;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return ReferenceEquals(this, obj) || obj is KillerMoves other && Equals(other);
+        }
+
+        public override int GetHashCode()
+        {
+            return (_killerMoves != null ? _killerMoves.GetHashCode() : 0);
         }
     }
 }

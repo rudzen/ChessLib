@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2019 Rudy Alex Kohn
+Copyright (c) 2017-2020 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,8 +24,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using Rudz.Chess.Factories;
-
 namespace Chess.Test.Move
 {
     using System;
@@ -33,6 +31,7 @@ namespace Chess.Test.Move
     using System.Text;
     using Rudz.Chess;
     using Rudz.Chess.Enums;
+    using Rudz.Chess.Factories;
     using Rudz.Chess.Types;
     using Xunit;
 
@@ -74,23 +73,17 @@ namespace Chess.Test.Move
         [Fact]
         public void TestAllBasicMove()
         {
-            Square expectedFrom = ESquare.a2;
-            Square expectedTo = ESquare.h8;
-            const EPieceType expectedMovingPieceType = EPieceType.Pawn;
-            Piece expectedMovingPiece = EPieces.WhitePawn;
-            Piece expectedCapturedPiece = EPieces.BlackKnight;
-            Piece expectedPromotionPiece = EPieces.WhiteQueen;
-            const EMoveType expectedMoveType = EMoveType.Promotion;
+            Square expectedFrom = Squares.a2;
+            Square expectedTo = Squares.h8;
+            var expectedPromotionPiece = PieceTypes.Queen;
+            const MoveTypes expectedMoveType = MoveTypes.Promotion;
 
             // full move spectrum
-            var move = new Move(expectedMovingPiece, expectedCapturedPiece, expectedFrom, expectedTo, expectedMoveType, expectedPromotionPiece);
+            var move = Move.Create(expectedFrom, expectedTo, MoveTypes.Promotion, expectedPromotionPiece);
 
             var actualFrom = move.GetFromSquare();
             var actualTo = move.GetToSquare();
-            var actualMovingEPieceType = move.GetMovingPieceType();
-            var actualMovingPiece = move.GetMovingPiece();
-            var actualCapturedPiece = move.GetCapturedPiece();
-            var actualPromotionPiece = move.GetPromotedPiece();
+            var actualPromotionPiece = move.GetPromotedPieceType();
             var actualEMoveType = move.GetMoveType();
 
             // test promotion status
@@ -101,16 +94,14 @@ namespace Chess.Test.Move
             Assert.Equal(expectedFrom, actualFrom);
             Assert.Equal(expectedTo, actualTo);
 
-            // test pieces
-            Assert.Equal(expectedMovingPieceType, actualMovingEPieceType);
-            Assert.Equal(expectedMovingPiece, actualMovingPiece);
-            Assert.Equal(expectedCapturedPiece, actualCapturedPiece);
+            // test promotion pieces
             Assert.Equal(expectedPromotionPiece, actualPromotionPiece);
 
             // move type
+            Assert.True(move.IsQueenPromotion());
+            Assert.True(move.IsPromotionMove());
             Assert.Equal(expectedMoveType, actualEMoveType);
             Assert.False(move.IsCastlelingMove());
-            Assert.False(move.IsDoublePush());
             Assert.False(move.IsEnPassantMove());
         }
 
@@ -120,7 +111,9 @@ namespace Chess.Test.Move
             var moves = new List<Move>(128);
             var movesString = new List<Movestrings>(128);
 
-            var pos = new Position();
+            var board = new Board();
+            var pieceValue = new PieceValue();
+            var pos = new Position(board, pieceValue);
             var game = GameFactory.Create(pos);
 
             game.NewGame();
@@ -128,9 +121,9 @@ namespace Chess.Test.Move
             var tmp = new StringBuilder(128);
 
             // build move list and expected result
-            for (Square s1 = ESquare.a1; s1; s1++)
+            for (Square s1 = Squares.a1; s1; s1++)
             {
-                for (Square s2 = ESquare.a2; s2; s2++)
+                for (Square s2 = Squares.a2; s2; s2++)
                 {
                     if (s1 == s2)
                         continue;
@@ -150,7 +143,7 @@ namespace Chess.Test.Move
             {
                 result.Clear();
                 result.Append(' ');
-                game.MoveToString(moves[i], result);
+                game.Pos.MoveToString(moves[i], result);
                 Assert.Equal(result.ToString(), movesString[i].ToString());
             }
         }
@@ -158,7 +151,9 @@ namespace Chess.Test.Move
         [Fact]
         public void MoveListToStringTest()
         {
-            var pos = new Position();
+            var board = new Board();
+            var pieceValue = new PieceValue();
+            var pos = new Position(board, pieceValue);
             var game = GameFactory.Create(pos);
 
             game.NewGame();
@@ -173,8 +168,8 @@ namespace Chess.Test.Move
             // generate 256 random moves
             for (var i = 0; i < 256; i++)
             {
-                Square rndSquareFrom = (ESquare)rngeezuz.Next((int)ESquare.a1, (int)ESquare.h8);
-                Square rndSquareTo = (ESquare)rngeezuz.Next((int)ESquare.a1, (int)ESquare.h8);
+                Square rndSquareFrom = (Squares)rngeezuz.Next((int)Squares.a1, (int)Squares.h8);
+                Square rndSquareTo = (Squares)rngeezuz.Next((int)Squares.a1, (int)Squares.h8);
                 moves.Add(new Move(rndSquareFrom, rndSquareTo));
 
                 expected.Append(' ');
@@ -186,13 +181,13 @@ namespace Chess.Test.Move
             foreach (var move in moves)
             {
                 result.Append(' ');
-                game.MoveToString(move, result);
+                game.Pos.MoveToString(move, result);
             }
 
             Assert.Equal(expected.ToString(), result.ToString());
         }
 
-        private struct Movestrings
+        private readonly struct Movestrings
         {
             private readonly string _s;
 

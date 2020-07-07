@@ -3,7 +3,7 @@ Perft, a chess perft test library
 
 MIT License
 
-Copyright (c) 2017-2019 Rudy Alex Kohn
+Copyright (c) 2017-2020 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -33,9 +33,7 @@ namespace Chess.Perft
     public static class PerftPositionFactory
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static IPerftPosition Create(string fen, List<(int, ulong)> values)
-        {
-            return new PerftPosition { Fen = fen, Value = values };
-        }
+        public static IPerftPosition Create(string id, string fen, List<(int, ulong)> values)
+            => new PerftPosition { Id = id, Fen = fen, Value = values };
     }
 }

@@ -36,13 +36,11 @@ namespace Rudz.Chess.Factories
         {
             var g = Create();
             var fenData = new FenData(fen);
-            g.SetFen(fenData);
+            g.Pos.SetFen(fenData);
             return g;
         }
 
         public static IGame Create()
-        {
-            return new Game(new Position());
-        }
+            => new Game(new Position(new Board(), new PieceValue()));
     }
 }

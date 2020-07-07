@@ -7,7 +7,7 @@ namespace Chess.Benchmark
     [MemoryDiagnoser]
     public class FenBenchmark
     {
-        private const string f = "rnkq1bnr/p3ppp1/1ppp3p/3B4/6b1/2PQ3P/PP1PPP2/RNB1K1NR w KQ -";
+        private const string F = "rnkq1bnr/p3ppp1/1ppp3p/3B4/6b1/2PQ3P/PP1PPP2/RNB1K1NR w KQ -";
 
         private IGame _game;
 
@@ -17,7 +17,9 @@ namespace Chess.Benchmark
         [GlobalSetup]
         public void Setup()
         {
-            var pos = new Position();
+            var board = new Board();
+            var pieceValue = new PieceValue();
+            var pos = new Position(board, pieceValue);
             _game = new Game(pos);
         }
 
@@ -26,8 +28,8 @@ namespace Chess.Benchmark
         {
             for (var i = 0; i < N; ++i)
             {
-                var fp = new FenData(f);
-                _game.SetFen(fp);
+                var fp = new FenData(F);
+                _game.Pos.SetFen(fp);
             }
         }
 
@@ -36,8 +38,8 @@ namespace Chess.Benchmark
         {
             for (var i = 0; i < N; ++i)
             {
-                var fp = new FenData(f);
-                _game.SetFen(fp);
+                var fp = new FenData(F);
+                _game.Pos.SetFen(fp);
             }
         }
     }

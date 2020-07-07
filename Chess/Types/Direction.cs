@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2019 Rudy Alex Kohn
+Copyright (c) 2017-2020 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -27,32 +27,30 @@ SOFTWARE.
 namespace Rudz.Chess.Types
 {
     using Enums;
+    using System;
     using System.Runtime.CompilerServices;
 
-    public struct Direction
+    public readonly struct Direction : IEquatable<Direction>
     {
-        public EDirection Value { get; }
+        public Directions Value { get; }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Direction(EDirection d) => Value = d;
+        private Direction(Directions d) => Value = d;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Direction(int d) => Value = (EDirection)d;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Direction(Direction d) => Value = d.Value;
+        private Direction(int d) => Value = (Directions)d;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator Direction(int value) => new Direction(value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator Direction(EDirection value) => new Direction(value);
+        public static implicit operator Direction(Directions value) => new Direction(value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Direction operator +(Direction left, Direction right) => left.Value + (int)right.Value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Direction operator +(Direction left, EDirection right) => left.Value + (int)right;
+        public static Direction operator +(Direction left, Directions right) => left.Value + (int)right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Direction operator +(Direction left, int right) => left.Value + right;
@@ -61,7 +59,7 @@ namespace Rudz.Chess.Types
         public static Direction operator -(Direction left, Direction right) => left.Value - (int)right.Value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Direction operator -(Direction left, EDirection right) => left.Value - (int)right;
+        public static Direction operator -(Direction left, Directions right) => left.Value - (int)right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Direction operator -(Direction left, int right) => left.Value - right;
@@ -70,9 +68,26 @@ namespace Rudz.Chess.Types
         public static Direction operator *(Direction left, Direction right) => (int)left.Value * (int)right.Value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Direction operator *(Direction left, EDirection right) => (int)left.Value * (int)right;
+        public static Direction operator *(Direction left, Directions right) => (int)left.Value * (int)right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Direction operator *(Direction left, int right) => (int)left.Value * right;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool operator ==(Direction left, Direction right) => left.Equals(right);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool operator !=(Direction left, Direction right) => !(left == right);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool Equals(Direction other) => Value == other.Value;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public override bool Equals(object obj) => obj is Direction other && Equals(other);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public override int GetHashCode() => AsInt();
+
+        private int AsInt() => (int)Value;
     }
 }

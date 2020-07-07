@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2019 Rudy Alex Kohn
+Copyright (c) 2017-2020 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -30,108 +30,150 @@ namespace Rudz.Chess
     using Fen;
     using System;
     using System.Collections.Generic;
+    using System.Text;
     using Types;
+    using Validation;
 
     public interface IPosition : IEnumerable<Piece>
     {
-        BitBoard[] BoardPieces { get; }
-
-        BitBoard[] OccupiedBySide { get; }
-
         bool IsProbing { get; set; }
-
-        Piece[] BoardLayout { get; }
 
         Action<Piece, Square> PieceUpdated { get; set; }
 
-        bool InCheck { get; set; }
+        bool Chess960 { get; set; }
 
-        State State { get; set; }
+        Player SideToMove { get; }
+
+        Square EnPassantSquare { get; }
+
+        string FenNotation { get; }
+
+        IBoard Board { get; }
+
+        IPieceValue PieceValue { get; }
+
+        BitBoard Checkers { get; }
+
+        int Rule50 { get; }
+
+        int Ply { get; }
+
+        bool InCheck { get; }
+
+        bool IsRepetition { get; }
+
+        State State { get; }
+
+        bool IsMate { get; }
 
         void Clear();
 
-        void AddPiece(Piece piece, Square square);
+        void AddPiece(Piece pc, Square sq);
 
-        void AddPiece(EPieceType pieceType, Square square, Player side);
+        void MakeMove(Move m, State newState);
 
-        bool MakeMove(Move move);
+        void MakeMove(Move m, State newState, bool givesCheck);
 
-        void TakeMove(Move move);
+        void MakeNullMove(State newState);
 
-        Piece GetPiece(Square square);
+        void TakeMove(Move m);
 
-        EPieceType GetPieceType(Square square);
+        void TakeNullMove();
 
-        bool IsPieceTypeOnSquare(Square square, EPieceType pieceType);
+        Piece GetPiece(Square sq);
 
-        BitBoard GetPinnedPieces(Square square, Player side);
+        PieceTypes GetPieceType(Square sq);
 
-        bool IsOccupied(Square square);
+        bool IsPieceTypeOnSquare(Square sq, PieceTypes pt);
 
-        bool IsAttacked(Square square, Player side);
+        BitBoard GetPinnedPieces(Square sq, Player c);
 
-        BitBoard PieceAttacks(Square square, EPieceType pieceType);
+        BitBoard CheckedSquares(PieceTypes pt);
+
+        BitBoard PinnedPieces(Player c);
+
+        BitBoard BlockersForKing(Player c);
+
+        bool IsOccupied(Square sq);
+
+        bool IsAttacked(Square sq, Player c);
+
+        bool GivesCheck(Move m);
 
         BitBoard Pieces();
 
-        BitBoard Pieces(Player side);
+        BitBoard Pieces(Player c);
 
         BitBoard Pieces(Piece pc);
 
-        BitBoard Pieces(EPieceType type);
+        BitBoard Pieces(PieceTypes pt);
 
-        BitBoard Pieces(EPieceType type1, EPieceType type2);
+        BitBoard Pieces(PieceTypes pt1, PieceTypes pt2);
 
-        BitBoard Pieces(EPieceType type, Player side);
+        BitBoard Pieces(PieceTypes pt, Player side);
 
-        BitBoard Pieces(EPieceType type1, EPieceType type2, Player side);
+        BitBoard Pieces(PieceTypes pt1, PieceTypes pt2, Player side);
 
-        Square GetPieceSquare(EPieceType pt, Player color);
+        ReadOnlySpan<Square> Squares(PieceTypes pt, Player c);
 
-        bool PieceOnFile(Square square, Player side, EPieceType pieceType);
+        Square GetPieceSquare(PieceTypes pt, Player color);
+
+        Square GetKingSquare(Player color);
+
+        Piece MovedPiece(Move m);
+
+        bool PieceOnFile(Square square, Player side, PieceTypes pieceType);
 
         bool PawnIsolated(Square square, Player side);
 
         bool PassedPawn(Square square);
 
-        void RemovePiece(Square square, Piece piece);
+        void RemovePiece(Square square);
 
-        BitBoard AttacksTo(Square square, BitBoard occupied);
+        BitBoard AttacksTo(Square sq, BitBoard occupied);
 
-        BitBoard AttacksTo(Square square);
+        BitBoard AttacksTo(Square sq);
 
-        bool AttackedBySlider(Square square, Player side);
+        bool AttackedBySlider(Square sq, Player c);
 
-        bool AttackedByKnight(Square square, Player side);
+        bool AttackedByKnight(Square sq, Player c);
 
-        bool AttackedByPawn(Square square, Player side);
+        bool AttackedByPawn(Square sq, Player c);
 
-        bool AttackedByKing(Square square, Player side);
+        bool AttackedByKing(Square sq, Player c);
 
-        Square GetRookCastleFrom(Square index);
+        bool CanCastle(CastlelingRights cr);
 
-        void SetRookCastleFrom(Square index, Square square);
+        bool CanCastle(Player color);
 
-        Square GetKingCastleFrom(Player side, ECastleling castleType);
+        bool CastlingImpeded(CastlelingRights cr);
 
-        void SetKingCastleFrom(Player side, Square square, ECastleling castleType);
+        Square CastlingRookSquare(CastlelingRights cr);
 
-        ECastleling IsCastleMove(string m);
+        CastlelingRights GetCastlelingRightsMask(Square sq);
 
-        Move StringToMove(string m);
+        bool IsPseudoLegal(Move m);
 
-        bool CanCastle(ECastleling type);
-
-        bool IsCastleAllowed(Square square);
-
-        bool IsPseudoLegal(Move move);
-
-        bool IsLegal(Move move, Piece piece, Square from, EMoveType type);
-
-        bool IsLegal(Move move);
-
-        bool IsMate();
+        bool IsLegal(Move m);
 
         FenData GenerateFen();
+
+        FenError SetFen(FenData fen, bool validate = false);
+
+        HashKey GetPiecesKey();
+
+        HashKey GetPawnKey();
+
+        BitBoard GetAttacks(Square square, PieceTypes pt, BitBoard occupied);
+
+        BitBoard GetAttacks(Square square, PieceTypes pt);
+
+        void MoveToString(Move m, StringBuilder output);
+
+        bool HasGameCycle(int ply);
+
+        bool SeeGe(Move m, Value threshold);
+        
+        IPositionValidator Validate(PositionValidationTypes type = PositionValidationTypes.Basic);
     }
 }

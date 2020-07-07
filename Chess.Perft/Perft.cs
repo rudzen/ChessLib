@@ -3,7 +3,7 @@ Perft, a chess perft test library
 
 MIT License
 
-Copyright (c) 2017-2019 Rudy Alex Kohn
+Copyright (c) 2017-2020 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -29,6 +29,7 @@ namespace Chess.Perft
     using Interfaces;
     using Rudz.Chess;
     using Rudz.Chess.Fen;
+    using Rudz.Chess.Types;
     using System;
     using System.Collections.Generic;
     using System.Linq;
@@ -56,13 +57,13 @@ namespace Chess.Perft
 
     public sealed class Perft : IPerft
     {
+        private readonly IDictionary<HashKey, ulong> _results;
+        
         public Perft(IGame game, IEnumerable<IPerftPosition> positions)
         {
-            if (positions.Any())
-                Positions = positions.ToList();
-            else
-                Positions = new List<IPerftPosition>();
+            Positions = positions.ToList();
             CurrentGame = game;
+            _results = new Dictionary<HashKey, ulong>(Positions.Count);
         }
 
         public Action<string> BoardPrintCallback { get; set; }
@@ -77,28 +78,26 @@ namespace Chess.Perft
         public ulong Expected { get; set; }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ulong DoPerft(int depth)
+        public async IAsyncEnumerable<ulong> DoPerft(int depth)
         {
-            var total = 0ul;
-
             if (Positions.Count == 0)
-                return total;
+                yield break;
 
-            foreach (var position in Positions)
+            foreach (var fd in Positions.Select(p => new FenData(p.Fen)))
             {
-                var fp = new FenData(position.Fen);
-                CurrentGame.SetFen(fp);
-                var res = CurrentGame.Perft(depth);
-                total += res;
-                BoardPrintCallback?.Invoke(position.Fen);
-            }
+                Game.Table.NewSearch();
+                CurrentGame.Pos.SetFen(fd);
 
-            return total;
+                var result = CurrentGame.Perft(depth, true);
+                
+                // BoardPrintCallback?.Invoke(fd.ToString());
+                yield return result;
+            }
         }
 
         public Task<ulong> DoPerftAsync(int depth)
             => Task.Run(()
-                => CurrentGame.Perft(depth));
+                => CurrentGame.Perft(depth, true));
 
         public string GetBoard()
             => CurrentGame.ToString();
@@ -106,7 +105,7 @@ namespace Chess.Perft
         public void SetGamePosition(IPerftPosition pp)
         {
             var fp = new FenData(pp.Fen);
-            CurrentGame.SetFen(fp);
+            CurrentGame.Pos.SetFen(fp);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -114,20 +113,20 @@ namespace Chess.Perft
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void AddPosition(IPerftPosition pp)
-        {
-            Positions.Add(pp);
-        }
+            => Positions.Add(pp);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool HasPositionCount(int index, int depth)
         {
-            if (Positions[index].Value == null)
+            var pos = Positions[index];
+
+            if (pos.Value == null)
                 return false;
 
-            if (!Positions[index].Value.Any())
+            if (!pos.Value.Any())
                 return false;
 
-            var depthValue = Positions[index].Value.FirstOrDefault(v => v.Item1 == depth && v.Item2 > 0);
+            var depthValue = pos.Value.FirstOrDefault(v => v.Item1 == depth && v.Item2 > 0);
 
             return !depthValue.Equals(default);
         }
