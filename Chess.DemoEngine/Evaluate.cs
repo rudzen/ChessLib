@@ -9,26 +9,27 @@ namespace Chess.DemoEngine
     /// </summary>
     public sealed class Evaluate
     {
-        private static readonly int[] PIECE_VALUES = {0, 100, 350, 350, 550, 1000, 50000, 100, 350, 350, 550, 1000, 50000};
+        private static readonly int[] PIECE_VALUES = { 0, 100, 350, 350, 550, 1000, 50000, 100, 350, 350, 550, 1000, 50000 };
 
-        // condition for end game material detection.. (should be tweaked?)
-        // private static readonly int ENDGAME_MAT = 1 * PIECE_VALUES[wR] + 2 * PIECE_VALUES[wN] + 2 * PIECE_VALUES[wP] + PIECE_VALUES[wK];
-        // private static readonly int ENDGAME_MAT_DELTA = PIECE_VALUES[wP] * (1 / 2);
+        // condition for end game material detection.. (should be tweaked?) private static readonly
+        // int ENDGAME_MAT = 1 * PIECE_VALUES[wR] + 2 * PIECE_VALUES[wN] + 2 * PIECE_VALUES[wP] +
+        // PIECE_VALUES[wK]; private static readonly int ENDGAME_MAT_DELTA = PIECE_VALUES[wP] * (1 / 2);
 
         private static readonly int[] WP_EVAL = {
-            0	,	0	,	0	,	0	,	0	,	0	,	0	,	0	,
-            10	,	10	,	0	,	-10	,	-10	,	0	,	10	,	10	,
-            5	,	0	,	0	,	5	,	5	,	0	,	0	,	5	,
-            0	,	0	,	10	,	20	,	20	,	10	,	0	,	0	,
-            5	,	5	,	5	,	10	,	10	,	5	,	5	,	5	,
-            10	,	10	,	10	,	20	,	20	,	10	,	10	,	10	,
-            20	,	20	,	20	,	30	,	30	,	20	,	20	,	20	,
-            0	,	0	,	0	,	0	,	0	,	0	,	0	,	0
+            0   ,   0   ,   0   ,   0   ,   0   ,   0   ,   0   ,   0   ,
+            10  ,   10  ,   0   ,   -10 ,   -10 ,   0   ,   10  ,   10  ,
+            5   ,   0   ,   0   ,   5   ,   5   ,   0   ,   0   ,   5   ,
+            0   ,   0   ,   10  ,   20  ,   20  ,   10  ,   0   ,   0   ,
+            5   ,   5   ,   5   ,   10  ,   10  ,   5   ,   5   ,   5   ,
+            10  ,   10  ,   10  ,   20  ,   20  ,   10  ,   10  ,   10  ,
+            20  ,   20  ,   20  ,   30  ,   30  ,   20  ,   20  ,   20  ,
+            0   ,   0   ,   0   ,   0   ,   0   ,   0   ,   0   ,   0
         };
-    
+
         // basic evaluation points
         private const int PAWN_ISOLATED = -10;
-        private static int[] PAWN_PASSED = {0, 5, 10, 20, 35, 60, 100, 200};
+
+        private static int[] PAWN_PASSED = { 0, 5, 10, 20, 35, 60, 100, 200 };
 
         private const int ROOK_OPEN_FILE = 10;
         private const int ROOK_OPEN_FILE_SEMI = 5;
@@ -55,7 +56,7 @@ namespace Chess.DemoEngine
         {
             _pos = pos;
         }
-        
+
         public Score Eval()
         {
             return new Score();
@@ -64,9 +65,8 @@ namespace Chess.DemoEngine
         private Score Eval(PieceTypes pt, Player us)
         {
             var result = EvaluatePawns(Player.White) - EvaluatePawns(Player.Black);
-            
 
-
+            return result;
         }
 
         private Score EvaluatePawns(Player us)
@@ -90,7 +90,7 @@ namespace Chess.DemoEngine
                     result += PAWN_ISOLATED;
 
                 if (_pos.PassedPawn(sq))
-                    result += PAWN_PASSED[sq.Rank().AsInt()];
+                    result += PAWN_PASSED[sq.Rank.AsInt()];
             }
 
             return result;
@@ -108,12 +108,12 @@ namespace Chess.DemoEngine
 
         private Score EvaluateRooks(Player us)
         {
-            
+            return Score.Zero;
         }
 
         private Score EvaluateQueens(Player us)
         {
-            
+            return Score.Zero;
         }
 
         private Score EvaluatePieces(PieceTypes pt, Player us)
@@ -124,19 +124,14 @@ namespace Chess.DemoEngine
 
             if (pieces.IsEmpty)
                 return Score.Zero;
-            
+
             var result = Score.Zero;
 
             foreach (var square in pieces)
             {
-                
             }
-            
 
-
-
-
+            return result;
         }
-        
     }
 }
