@@ -78,40 +78,40 @@ namespace Rudz.Chess.Types
             => left._data != right._data;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Square GetFromSquare()
+        public Square FromSquare()
             => (_data >> 6) & 0x3F;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Square GetToSquare()
+        public Square ToSquare()
             => new Square(_data & 0x3F);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public PieceTypes GetPromotedPieceType()
+        public PieceTypes PromotedPieceType()
             => (PieceTypes)(((_data >> 12) & 3) + 2);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool IsQueenPromotion()
-            => GetPromotedPieceType() == PieceTypes.Queen;
+            => PromotedPieceType() == PieceTypes.Queen;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public MoveTypes GetMoveType()
+        public MoveTypes MoveType()
             => (MoveTypes)(_data & (3 << 14));
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool IsType(MoveTypes moveType)
-            => GetMoveType() == moveType;
+            => MoveType() == moveType;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool IsEnPassantMove()
-            => GetMoveType() == MoveTypes.Enpassant;
+            => MoveType() == MoveTypes.Enpassant;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool IsCastlelingMove()
-            => GetMoveType() == MoveTypes.Castling;
+            => MoveType() == MoveTypes.Castling;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool IsPromotionMove()
-            => GetMoveType() == MoveTypes.Promotion;
+            => MoveType() == MoveTypes.Promotion;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool IsNullMove()
@@ -119,7 +119,7 @@ namespace Rudz.Chess.Types
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool IsValidMove()
-            => GetFromSquare().AsInt() != GetToSquare().AsInt();
+            => FromSquare().AsInt() != ToSquare().AsInt();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals(Move other)
@@ -138,11 +138,11 @@ namespace Rudz.Chess.Types
         {
             return IsNullMove()
                 ? "(null)"
-                : GetMoveType() == MoveTypes.Normal
-                    ? $"{GetFromSquare()}{GetToSquare()}"
-                    : GetMoveType() == MoveTypes.Castling
-                        ? GetFromSquare() < GetToSquare() ? "0-0" : "0-0-0"
-                        : $"{GetFromSquare()}{GetToSquare()}{GetPromotedPieceType().GetPromotionChar()}";
+                : MoveType() == MoveTypes.Normal
+                    ? $"{FromSquare()}{ToSquare()}"
+                    : MoveType() == MoveTypes.Castling
+                        ? FromSquare() < ToSquare() ? "0-0" : "0-0-0"
+                        : $"{FromSquare()}{ToSquare()}{PromotedPieceType().GetPromotionChar()}";
         }
     }
 }

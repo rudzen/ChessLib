@@ -51,7 +51,7 @@ namespace Rudz.Chess
         }
 
         /// <summary>
-        /// Computes wheter the current position contains a pawn fence which makes the game a draw.
+        /// Computes whether the current position contains a pawn fence which makes the game a draw.
         /// </summary>
         /// <returns>true if the game is a draw position - otherwise false</returns>
         public bool IsBlocked()
@@ -254,25 +254,24 @@ namespace Rudz.Chess
             return false;
         }
 
-        internal Square NextFenceRankSquare(File f, Player them)
+        private Square NextFenceRankSquare(File f, Player them)
             => new Square(_fenceRank[f.AsInt()].AsInt() * 8 + f.AsInt()) + them.PawnPushDistance();
 
-        internal bool IsFenceFormed()
+        private bool IsFenceFormed()
         {
             for (Rank rank = Ranks.Rank2; rank < Ranks.Rank8; ++rank)
             {
                 var startSquare = Square.Make(rank, Files.FileA);
-                if (!(_marked & startSquare).IsEmpty && FormsFence(startSquare))
-                {
-                    _fence |= startSquare;
-                    return true;
-                }
+                if ((_marked & startSquare).IsEmpty || !FormsFence(startSquare))
+                    continue;
+                _fence |= startSquare;
+                return true;
             }
 
             return false;
         }
 
-        internal BitBoard ComputeDynamicFencedPawns(Player them)
+        private BitBoard ComputeDynamicFencedPawns(Player them)
         {
             // reverse order of Down
             var down = them.IsBlack

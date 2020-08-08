@@ -24,6 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using System;
+
 namespace Rudz.Chess.Hash
 {
     using Enums;
@@ -89,9 +91,12 @@ namespace Rudz.Chess.Hash
             for (var i = 0; i < ZobristPst.Length; i++)
                 ZobristPst[i] = new ulong[64];
 
+            Span<PieceTypes> Pts = stackalloc PieceTypes[]
+                {PieceTypes.Pawn, PieceTypes.Knight, PieceTypes.Bishop, PieceTypes.Rook, PieceTypes.Queen, PieceTypes.King};
+
             for (var side = Players.White; side < Players.PlayerNb; ++side)
             {
-                for (var pieceType = PieceTypes.Pawn; pieceType < PieceTypes.PieceTypeNb; ++pieceType)
+                foreach (var pieceType in Pts)
                 {
                     var piece = pieceType.MakePiece(side);
                     for (var square = Squares.a1; square <= Squares.h8; square++)

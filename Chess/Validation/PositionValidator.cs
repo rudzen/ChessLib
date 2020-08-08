@@ -49,28 +49,28 @@ namespace Rudz.Chess.Validation
         public IPositionValidator Validate(PositionValidationTypes types = PositionValidationTypes.All)
         {
             var error = string.Empty;
-            
+
             if (types.HasFlagFast(PositionValidationTypes.Basic))
                 error = ValidateBasic();
 
             if (types.HasFlagFast(PositionValidationTypes.Castleling))
                 error = ValidateCastleling(error);
-            
+
             if (types.HasFlagFast(PositionValidationTypes.Kings))
                 error = ValidateKings(error);
-            
+
             if (types.HasFlagFast(PositionValidationTypes.Pawns))
                 error = ValidatePawns(error);
-            
+
             if (types.HasFlagFast(PositionValidationTypes.PieceConsistency))
                 error = ValidatePieceConsistency(error);
-            
+
             if (types.HasFlagFast(PositionValidationTypes.PieceCount))
                 error = ValidatePieceCount(error);
-            
+
             if (types.HasFlagFast(PositionValidationTypes.PieceTypes))
                 error = ValidatePieceTypes(error);
-            
+
             if (types.HasFlagFast(PositionValidationTypes.State))
                 error = ValidateState(error);
 
@@ -86,10 +86,10 @@ namespace Rudz.Chess.Validation
                 error = AddError(error, $"{nameof(_pos.SideToMove)} is not a valid");
 
             if (_board.PieceAt(_pos.GetKingSquare(Player.White)) != Pieces.WhiteKing)
-                error = AddError(error, $"white king position is not a white king");
+                error = AddError(error, "white king position is not a white king");
 
             if (_board.PieceAt(_pos.GetKingSquare(Player.Black)) != Pieces.BlackKing)
-                error = AddError(error, $"black king position is not a black king");
+                error = AddError(error, "black king position is not a black king");
 
             if (_pos.EnPassantSquare != Square.None && _pos.EnPassantSquare.RelativeRank(_pos.SideToMove) != Ranks.Rank6)
                 error = AddError(error, $"{nameof(_pos.EnPassantSquare)} square is not on rank 6");
@@ -138,7 +138,7 @@ namespace Rudz.Chess.Validation
             }
 
             if (!(_pos.AttacksTo(_pos.GetKingSquare(~_pos.SideToMove)) & _board.Pieces(_pos.SideToMove)).IsEmpty)
-                error = AddError(error, $"kings appear to attack each other");
+                error = AddError(error, "kings appear to attack each other");
 
             return error;
         }
@@ -146,13 +146,13 @@ namespace Rudz.Chess.Validation
         private string ValidatePawns(string error)
         {
             if (!(_board.Pieces(PieceTypes.Pawn) & (BitBoards.RANK1 | BitBoards.RANK8)).IsEmpty)
-                error = AddError(error, $"pawns exists on rank 1 or rank 8");
+                error = AddError(error, "pawns exists on rank 1 or rank 8");
 
             if (_board.PieceCount(PieceTypes.Pawn, Player.White) > 8)
-                error = AddError(error, $"white side has more than 8 pawns");
+                error = AddError(error, "white side has more than 8 pawns");
 
             if (_board.PieceCount(PieceTypes.Pawn, Player.Black) > 8)
-                error = AddError(error, $"black side has more than 8 pawns");
+                error = AddError(error, "black side has more than 8 pawns");
 
             return error;
         }
@@ -160,16 +160,16 @@ namespace Rudz.Chess.Validation
         private string ValidatePieceConsistency(string error)
         {
             if (!(_board.Pieces(Player.White) & _board.Pieces(Player.Black)).IsEmpty)
-                error = AddError(error, $"white and black pieces overlap");
+                error = AddError(error, "white and black pieces overlap");
 
             if ((_board.Pieces(Player.White) | _board.Pieces(Player.Black)) != _board.Pieces())
-                error = AddError(error, $"white and black pieces do not match all pieces");
+                error = AddError(error, "white and black pieces do not match all pieces");
 
             if (_board.Pieces(Player.White).Count > 16)
-                error = AddError(error, $"white side has more than 16 pieces");
+                error = AddError(error, "white side has more than 16 pieces");
 
             if (_board.Pieces(Player.Black).Count > 16)
-                error = AddError(error, $"black side has more than 16 pieces");
+                error = AddError(error, "black side has more than 16 pieces");
 
             return error;
         }

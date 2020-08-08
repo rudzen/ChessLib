@@ -76,7 +76,7 @@ namespace Rudz.Chess.Transposition
         public ulong SetSize(int mbSize)
         {
             if (mbSize < 0)
-                throw new TranspositionTableException($"Unable to create table with negative size: {mbSize}");
+                throw new TranspositionTableFailure($"Unable to create table with negative size: {mbSize}");
 
             Size = mbSize;
             var size = (int)(((ulong)mbSize << 20) / (ulong)ClusterSize);

@@ -1,4 +1,4 @@
-﻿/*
+/*
 *Copyright (C) 2007 Pradyumna Kannan.
 *
 *This code is provided 'as-is', without any expressed or implied warranty.
@@ -32,7 +32,6 @@
 namespace Rudz.Chess
 {
     using System;
-    using System.Runtime.CompilerServices;
     using Types;
 
     // ReSharper disable once InconsistentNaming
@@ -42,7 +41,11 @@ namespace Rudz.Chess
 
         private const ulong Ff = 0xFFUL;
 
-        private static readonly BitBoard[,] MagicBishopDb = new BitBoard[64, 1 << 9];
+        private const int MagicBishopDbLength = 512;
+
+        private const int MagicRookDbLength = 4096;
+
+        private static readonly BitBoard[][] MagicBishopDb = new BitBoard[64][];
 
         private static readonly ulong[] MagicmovesBMagics =
             {
@@ -68,7 +71,7 @@ namespace Rudz.Chess
                 0x0002040810204000UL, 0x0004081020400000UL, 0x000A102040000000UL, 0x0014224000000000UL, 0x0028440200000000UL, 0x0050080402000000UL, 0x0020100804020000UL, 0x0040201008040200UL
             };
 
-        private static readonly BitBoard[,] MagicRookDb = new BitBoard[64, 1 << 12];
+        private static readonly BitBoard[][] MagicRookDb = new BitBoard[64][];
 
         private static readonly ulong[] MagicmovesRMagics =
             {
@@ -82,8 +85,7 @@ namespace Rudz.Chess
                 0x0000102040800101UL, 0x0000102040008101UL, 0x0000081020004101UL, 0x0000040810002101UL, 0x0001000204080011UL, 0x0001000204000801UL, 0x0001000082000401UL, 0x0000002040810402UL
             };
 
-        private static readonly ulong[] MagicmovesRMask =
-            {
+        private static readonly ulong[] MagicmovesRMask = {
                 0x000101010101017EUL, 0x000202020202027CUL, 0x000404040404047AUL, 0x0008080808080876UL, 0x001010101010106EUL, 0x002020202020205EUL, 0x004040404040403EUL, 0x008080808080807EUL,
                 0x0001010101017E00UL, 0x0002020202027C00UL, 0x0004040404047A00UL, 0x0008080808087600UL, 0x0010101010106E00UL, 0x0020202020205E00UL, 0x0040404040403E00UL, 0x0080808080807E00UL,
                 0x00010101017E0100UL, 0x00020202027C0200UL, 0x00040404047A0400UL, 0x0008080808760800UL, 0x00101010106E1000UL, 0x00202020205E2000UL, 0x00404040403E4000UL, 0x00808080807E8000UL,
@@ -96,8 +98,13 @@ namespace Rudz.Chess
 
         static MagicBB()
         {
-            int[] initmagicmovesBitpos64Database =
-                {
+            for (var i = 0; i < MagicBishopDb.Length; i++)
+                MagicBishopDb[i] = new BitBoard[MagicBishopDbLength];
+
+            for (var i = 0; i < MagicBishopDb.Length; ++i)
+                MagicRookDb[i] = new BitBoard[MagicRookDbLength];
+
+            Span<int> initMagicMovesDb = stackalloc int[] {
                     63,  0, 58,  1, 59, 47, 53,  2,
                     60, 39, 48, 27, 54, 33, 42,  3,
                     61, 51, 37, 40, 49, 18, 28, 20,
@@ -106,7 +113,7 @@ namespace Rudz.Chess
                     50, 36, 17, 19, 29, 10, 13, 21,
                     56, 45, 25, 31, 35, 16,  9, 12,
                     44, 24, 15,  8, 23,  7,  6,  5
-                };
+            };
 
             Span<int> squares = stackalloc int[64];
             int numSquares;
@@ -118,14 +125,14 @@ namespace Rudz.Chess
                 while (temp != 0)
                 {
                     var bit = (ulong)((long)temp & -(long)temp);
-                    squares[numSquares++] = initmagicmovesBitpos64Database[(bit * 0x07EDD5E59A4E28C2UL) >> 58];
+                    squares[numSquares++] = initMagicMovesDb[(int) ((bit * 0x07EDD5E59A4E28C2UL) >> 58)];
                     temp ^= bit;
                 }
 
                 for (temp = 0; temp < One << numSquares; ++temp)
                 {
                     var tempocc = InitmagicmovesOcc(squares.Slice(0, numSquares), temp);
-                    MagicBishopDb[i, (tempocc * MagicmovesBMagics[i]) >> 55] = InitmagicmovesBmoves(i, tempocc);
+                    MagicBishopDb[i][(tempocc * MagicmovesBMagics[i]) >> 55] = InitmagicmovesBmoves(i, tempocc);
                 }
             }
 
@@ -138,38 +145,35 @@ namespace Rudz.Chess
                 while (temp != 0)
                 {
                     var bit = (ulong)((long)temp & -(long)temp);
-                    squares[numSquares++] = initmagicmovesBitpos64Database[(bit * 0x07EDD5E59A4E28C2UL) >> 58];
+                    squares[numSquares++] = initMagicMovesDb[(int) ((bit * 0x07EDD5E59A4E28C2UL) >> 58)];
                     temp ^= bit;
                 }
 
                 for (temp = 0; temp < One << numSquares; ++temp)
                 {
                     var tempocc = InitmagicmovesOcc(squares.Slice(0, numSquares), temp);
-                    MagicRookDb[i, (tempocc * MagicmovesRMagics[i]) >> 52] = InitmagicmovesRmoves(i, tempocc);
+                    MagicRookDb[i][(tempocc * MagicmovesRMagics[i]) >> 52] = InitmagicmovesRmoves(i, tempocc);
                 }
             }
-        }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static BitBoard BishopAttacks(this Square square, BitBoard occupied) => MagicBishopDb[square.AsInt(), ((occupied.Value & MagicmovesBMask[square.AsInt()]) * MagicmovesBMagics[square.AsInt()]) >> 55];
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static BitBoard RookAttacks(this Square square, BitBoard occupied) => MagicRookDb[square.AsInt(), ((occupied.Value & MagicmovesRMask[square.AsInt()]) * MagicmovesRMagics[square.AsInt()]) >> 52];
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static BitBoard QueenAttacks(this Square square, BitBoard occupied) => BishopAttacks(square, occupied) | RookAttacks(square, occupied);
-
-        private static ulong InitmagicmovesOcc(ReadOnlySpan<int> squares, ulong linocc)
-        {
-            var ret = 0ul;
-            for (var i = 0; i < squares.Length; ++i)
+            static ulong InitmagicmovesOcc(ReadOnlySpan<int> squares, ulong linocc)
             {
-                if ((linocc & (One << i)) != 0)
-                    ret |= One << squares[i];
-            }
+                var ret = 0ul;
+                for (var i = 0; i < squares.Length; ++i)
+                {
+                    if ((linocc & (One << i)) != 0)
+                        ret |= One << squares[i];
+                }
 
-            return ret;
+                return ret;
+            }
         }
+
+        public static BitBoard BishopAttacks(this Square square, BitBoard occupied) => MagicBishopDb[square.AsInt()][((occupied.Value & MagicmovesBMask[square.AsInt()]) * MagicmovesBMagics[square.AsInt()]) >> 55];
+
+        public static BitBoard RookAttacks(this Square square, BitBoard occupied) => MagicRookDb[square.AsInt()][((occupied.Value & MagicmovesRMask[square.AsInt()]) * MagicmovesRMagics[square.AsInt()]) >> 52];
+
+        public static BitBoard QueenAttacks(this Square square, BitBoard occupied) => BishopAttacks(square, occupied) | RookAttacks(square, occupied);
 
         private static ulong InitmagicmovesRmoves(int square, ulong occ)
         {

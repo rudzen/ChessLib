@@ -58,7 +58,7 @@ namespace Rudz.Chess
             _pieces = new Piece[64];
             _bySide = new BitBoard[2];
             _byType = new BitBoard[PieceTypes.PieceTypeNb.AsInt()];
-            _pieceCount = new int[(int)Enums.Pieces.PieceNb];
+            _pieceCount = new int[16];
             _pieceList = new Square[64][];
             for (var i = 0; i < _pieceList.Length; i++)
             {
@@ -135,7 +135,7 @@ namespace Rudz.Chess
         }
 
         public Piece MovedPiece(Move move)
-            => PieceAt(move.GetFromSquare());
+            => PieceAt(move.FromSquare());
 
         public BitBoard Pieces()
             => _byType[PieceTypes.AllPieces.AsInt()];
@@ -163,8 +163,7 @@ namespace Rudz.Chess
 
         public ReadOnlySpan<Square> Squares(PieceTypes pt, Player c)
         {
-            var pc = pt.MakePiece(c);
-            var squares = _pieceList[pc.AsInt()];
+            var squares = _pieceList[pt.MakePiece(c).AsInt()];
             var idx = Array.IndexOf(squares, Types.Square.None);
             return idx == 0
                 ? ReadOnlySpan<Square>.Empty
@@ -177,14 +176,13 @@ namespace Rudz.Chess
         public int PieceCount(PieceTypes pt)
             => _pieceCount[pt.MakePiece(Player.White).AsInt()] + _pieceCount[pt.MakePiece(Player.Black).AsInt()];
 
+        public int PieceCount()
+            => PieceCount(PieceTypes.AllPieces);
+
         public IEnumerator<Piece> GetEnumerator()
-        {
-            return _pieces.Where(piece => piece != Piece.EmptyPiece).GetEnumerator();
-        }
+            => _pieces.Where(piece => piece != Piece.EmptyPiece).GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+            => GetEnumerator();
     }
 }

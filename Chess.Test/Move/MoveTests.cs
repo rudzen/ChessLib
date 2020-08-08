@@ -55,8 +55,8 @@ namespace Chess.Test.Move
 
                     Assert.False(move.IsNullMove());
 
-                    var actualFrom = move.GetFromSquare();
-                    var actualTo = move.GetToSquare();
+                    var actualFrom = move.FromSquare();
+                    var actualTo = move.ToSquare();
 
                     Assert.Equal(expectedFrom, actualFrom);
                     Assert.Equal(expectedTo, actualTo);
@@ -81,10 +81,10 @@ namespace Chess.Test.Move
             // full move spectrum
             var move = Move.Create(expectedFrom, expectedTo, MoveTypes.Promotion, expectedPromotionPiece);
 
-            var actualFrom = move.GetFromSquare();
-            var actualTo = move.GetToSquare();
-            var actualPromotionPiece = move.GetPromotedPieceType();
-            var actualEMoveType = move.GetMoveType();
+            var actualFrom = move.FromSquare();
+            var actualTo = move.ToSquare();
+            var actualPromotionPiece = move.PromotedPieceType();
+            var actualEMoveType = move.MoveType();
 
             // test promotion status
             Assert.True(move.IsPromotionMove());

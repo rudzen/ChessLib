@@ -29,18 +29,19 @@ namespace Rudz.Chess.Exceptions
     using System;
     using System.Runtime.Serialization;
 
-    public class InvalidFenException : ArgumentException
+    public class InvalidSquare : InvalidOperationException
     {
-        public InvalidFenException()
-        { }
+        public InvalidSquare()
+        {
+        }
 
-        public InvalidFenException(string message)
+        public InvalidSquare(string message)
             : base(message) { }
 
-        public InvalidFenException(string message, Exception innerException)
+        public InvalidSquare(string message, Exception innerException)
             : base(message, innerException) { }
 
-        protected InvalidFenException(SerializationInfo info, StreamingContext context)
+        protected InvalidSquare(SerializationInfo info, StreamingContext context)
             : base(info, context) { }
     }
 }

@@ -51,5 +51,6 @@ namespace Rudz.Chess
         ReadOnlySpan<Square> Squares(PieceTypes pt, Player c);
         int PieceCount(PieceTypes pt, Player c);
         int PieceCount(PieceTypes pt);
+        int PieceCount();
     }
 }

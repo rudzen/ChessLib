@@ -69,14 +69,14 @@ namespace Rudz.Chess.Fen
             var f = fen.Trim().AsSpan();
 
             if (f.Length >= MaxFenLen)
-                throw new InvalidFenException($"Invalid length for fen {fen}.");
+                throw new InvalidFen($"Invalid length for fen {fen}.");
 
             if (!ValidFenRegex.Value.IsMatch(fen))
-                throw new InvalidFenException($"Invalid format for fen {fen}.");
+                throw new InvalidFen($"Invalid format for fen {fen}.");
 
             CountValidity(f);
             if (!CountPieceValidity(f))
-                throw new InvalidFenException($"Invalid piece validity for fen {fen}");
+                throw new InvalidFen($"Invalid piece validity for fen {fen}");
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -87,7 +87,7 @@ namespace Rudz.Chess.Fen
         {
             var spaceIndex = s.IndexOf(Space);
             if (spaceIndex == -1)
-                throw new InvalidFenException($"Invalid fen {s.ToString()}");
+                throw new InvalidFen($"Invalid fen {s.ToString()}");
 
             var mainSection = s.Slice(0, spaceIndex);
 
@@ -101,21 +101,21 @@ namespace Rudz.Chess.Fen
                 if (t == '/')
                 {
                     if (++pieceCount[0] > SeparatorCount)
-                        throw new InvalidFenException($"Invalid fen (too many separators) {s.ToString()}");
+                        throw new InvalidFen($"Invalid fen (too many separators) {s.ToString()}");
                     continue;
                 }
 
                 if (char.IsNumber(t))
                 {
                     if (!t.InBetween('1', '8'))
-                        throw new InvalidFenException($"Invalid fen (not a valid square jump) {s.ToString()}");
+                        throw new InvalidFen($"Invalid fen (not a valid square jump) {s.ToString()}");
                     continue;
                 }
 
                 var pieceIndex = PieceExtensions.PieceChars.IndexOf(t);
 
                 if (pieceIndex == -1)
-                    throw new InvalidFenException($"Invalid fen (unknown piece) {s.ToString()}");
+                    throw new InvalidFen($"Invalid fen (unknown piece) {s.ToString()}");
 
                 var pc = new Piece((Pieces)pieceIndex);
                 var pt = pc.Type();
@@ -125,7 +125,7 @@ namespace Rudz.Chess.Fen
                 var limit = limits[pt.AsInt()];
 
                 if (pieceCount[pc.AsInt()] > limit)
-                    throw new InvalidFenException($"Invalid fen (piece limit exceeded for {pc}) {s.ToString()}");
+                    throw new InvalidFen($"Invalid fen (piece limit exceeded for {pc}) {s.ToString()}");
             }
 
             // check for summed up values
@@ -143,20 +143,20 @@ namespace Rudz.Chess.Fen
             var valid = GetSpanSum(whitePieces, 15);
 
             if (!valid)
-                throw new InvalidFenException($"Invalid fen (white piece count exceeds limit) {s.ToString()}");
+                throw new InvalidFen($"Invalid fen (white piece count exceeds limit) {s.ToString()}");
 
             var blackPieces = pieceCount.Slice(9, 5);
 
             valid = GetSpanSum(blackPieces, 15);
 
             if (!valid)
-                throw new InvalidFenException($"Invalid fen (black piece count exceeds limit) {s.ToString()}");
+                throw new InvalidFen($"Invalid fen (black piece count exceeds limit) {s.ToString()}");
 
             spaceIndex = s.LastIndexOf(' ');
             var endSection = s.Slice(spaceIndex);
 
             if (endSection.ToString().ToIntegral() >= 2048)
-                throw new InvalidFenException($"Invalid half move count for fen {s.ToString()}");
+                throw new InvalidFen($"Invalid half move count for fen {s.ToString()}");
 
             return true;
         }
@@ -190,12 +190,12 @@ namespace Rudz.Chess.Fen
             var valid = spaceCount >= SpaceCount;
 
             if (!valid)
-                throw new InvalidFenException($"Invalid space character count in fen {str.ToString()}");
+                throw new InvalidFen($"Invalid space character count in fen {str.ToString()}");
 
             valid = seperatorCount == SeparatorCount;
 
             if (!valid)
-                throw new InvalidFenException($"Invalid separator count in fen {str.ToString()}");
+                throw new InvalidFen($"Invalid separator count in fen {str.ToString()}");
         }
     }
 }

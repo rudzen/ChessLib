@@ -68,12 +68,12 @@ namespace Rudz.Chess
             _killerMoves[depth, 1].Square = _killerMoves[depth, 0].Square;
             // Update killer move.
             _killerMoves[depth, 0].Piece = fromPiece;
-            _killerMoves[depth, 0].Square = move.GetToSquare();
+            _killerMoves[depth, 0].Square = move.ToSquare();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private bool Equals(IPieceSquare killerMove, Move move, Piece fromPiece)
-            => killerMove.Piece == fromPiece && killerMove.Square == move.GetToSquare();
+            => killerMove.Piece == fromPiece && killerMove.Square == move.ToSquare();
 
         public IPieceSquare Get(int depth, int index)
         {

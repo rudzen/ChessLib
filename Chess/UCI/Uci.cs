@@ -168,7 +168,7 @@ namespace Rudz.Chess.UCI
         {
             var list = new List<IOption>(O.Values);
             list.Sort(OptionComparer);
-            var sb = new StringBuilder(128);
+            var sb = _pvPool.Get();
 
             foreach (var opt in list)
             {
@@ -180,7 +180,10 @@ namespace Rudz.Chess.UCI
                 if (opt.Type == UciOptionType.Spin)
                     sb.Append(" min ").Append(opt.Min).Append(" max ").Append(opt.Max);
             }
-            return sb.ToString();
+
+            var result = sb.ToString();
+            _pvPool.Return(sb);
+            return result;
         }
     }
 }

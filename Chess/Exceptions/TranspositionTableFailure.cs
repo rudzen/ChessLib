@@ -30,21 +30,21 @@ namespace Rudz.Chess.Exceptions
     using System.Runtime.Serialization;
 
     [Serializable]
-    public class TranspositionTableException : ArgumentException
+    public class TranspositionTableFailure : ArgumentException
     {
-        public TranspositionTableException()
+        public TranspositionTableFailure()
         {
         }
 
-        public TranspositionTableException(string message) : base(message)
+        public TranspositionTableFailure(string message) : base(message)
         {
         }
 
-        public TranspositionTableException(string message, Exception inner) : base(message, inner)
+        public TranspositionTableFailure(string message, Exception inner) : base(message, inner)
         {
         }
 
-        protected TranspositionTableException(
+        protected TranspositionTableFailure(
             SerializationInfo info,
             StreamingContext context) : base(info, context)
         {

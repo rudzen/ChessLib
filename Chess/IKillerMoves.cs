@@ -24,10 +24,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System;
-
 namespace Rudz.Chess
 {
+    using System;
     using Types;
 
     public interface IKillerMoves : IEquatable<IKillerMoves>
@@ -37,7 +36,7 @@ namespace Rudz.Chess
         int GetValue(int depth, Move move, Piece fromPiece);
 
         IPieceSquare Get(int depth, int index);
-        
+
         void UpdateValue(int depth, Move move, Piece fromPiece);
 
         void Shift(int depth);

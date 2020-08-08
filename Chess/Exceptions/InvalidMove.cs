@@ -29,19 +29,19 @@ namespace Rudz.Chess.Exceptions
     using System;
     using System.Runtime.Serialization;
 
-    public class InvalidMoveException : InvalidOperationException
+    public class InvalidMove : InvalidOperationException
     {
-        public InvalidMoveException()
+        public InvalidMove()
         {
         }
 
-        public InvalidMoveException(string message)
+        public InvalidMove(string message)
             : base(message) { }
 
-        public InvalidMoveException(string message, Exception innerException)
+        public InvalidMove(string message, Exception innerException)
             : base(message, innerException) { }
 
-        protected InvalidMoveException(SerializationInfo info, StreamingContext context)
+        protected InvalidMove(SerializationInfo info, StreamingContext context)
             : base(info, context) { }
     }
 }

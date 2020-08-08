@@ -34,16 +34,13 @@ namespace Rudz.Chess.Types
     /// </summary>
     public struct ExtMove : IEquatable<ExtMove>
     {
-        public static readonly ExtMove Empty;
+        public static readonly ExtMove Empty = new ExtMove();
 
         public Move Move;
 
-        public Score Score;
+        public int Score;
 
-        static ExtMove()
-            => Empty = new ExtMove();
-
-        private ExtMove(Move m, Score s)
+        private ExtMove(Move m, int s)
         {
             Move = m;
             Score = s;
@@ -54,7 +51,7 @@ namespace Rudz.Chess.Types
             => new ExtMove(m, 0);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator ExtMove(Score s)
+        public static implicit operator ExtMove(int s)
             => new ExtMove(Move.EmptyMove, s);
 
         public static bool operator !=(ExtMove left, ExtMove right)
