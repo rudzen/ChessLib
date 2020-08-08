@@ -75,16 +75,8 @@ namespace Rudz.Chess.Types
             => _data = s._data;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Score(ExtMove em)
-            => _data = em.Score._data;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator Score(int v)
             => new Score(v);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator Score(ExtMove em)
-            => new Score(em.Score._data.mg, em.Score._data.eg);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Score operator *(Score s, int v)
