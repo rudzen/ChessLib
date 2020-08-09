@@ -36,33 +36,26 @@ namespace Rudz.Chess
     {
         public static int Generate(IPosition pos, ExtMove[] moves, int index, Player us, MoveGenerationType type)
         {
-            int result;
             switch (type)
             {
                 case MoveGenerationType.Legal:
-                    result = GenerateLegal(pos, moves, index, us);
-                    break;
+                    return GenerateLegal(pos, moves, index, us);
 
                 case MoveGenerationType.Captures:
                 case MoveGenerationType.Quiets:
                 case MoveGenerationType.NonEvasions:
-                    result = GenerateCapturesQuietsNonEvasions(pos, moves, index, us, type);
-                    break;
+                    return GenerateCapturesQuietsNonEvasions(pos, moves, index, us, type);
 
                 case MoveGenerationType.Evasions:
-                    result = GenerateEvasions(pos, moves, index, us);
-                    break;
+                    return GenerateEvasions(pos, moves, index, us);
 
                 case MoveGenerationType.QuietChecks:
-                    result = GenerateQuietChecks(pos, moves, index, us);
-                    break;
+                    return GenerateQuietChecks(pos, moves, index, us);
 
                 default:
                     Debug.Assert(false);
                     throw new ArgumentOutOfRangeException(nameof(type), type, null);
             }
-
-            return result;
         }
 
         private static int GenerateAll(IPosition pos, ExtMove[] moves, int index, BitBoard target, Player us, MoveGenerationType type)
@@ -78,8 +71,7 @@ namespace Rudz.Chess
 
             var ksq = pos.GetKingSquare(us);
             var b = pos.GetAttacks(ksq, PieceTypes.King) & target;
-            while (!b.IsEmpty)
-                moves[index++].Move = Move.Create(ksq, BitBoards.PopLsb(ref b));
+            index = Move.Create(moves, index, ksq, b);
 
             if (type == MoveGenerationType.Captures)
                 return index;
@@ -155,8 +147,7 @@ namespace Rudz.Chess
 
             // Generate evasions for king, capture and non capture moves
             var b = pos.GetAttacks(ksq, PieceTypes.King) & ~pos.Pieces(us) & ~sliderAttacks;
-            while (!b.IsEmpty)
-                moves[index++].Move = Move.Create(ksq, BitBoards.PopLsb(ref b));
+            index = Move.Create(moves, index, ksq, b);
 
             if (pos.Checkers.MoreThanOne())
                 return index; // Double check, only a king move can save the day
@@ -230,11 +221,7 @@ namespace Rudz.Chess
                 if (checks)
                     b &= pos.CheckedSquares(pt);
 
-                while (!b.IsEmpty)
-                {
-                    var to = BitBoards.PopLsb(ref b);
-                    moves[index++].Move = Move.Create(from, to);
-                }
+                index = Move.Create(moves, index, from, b);
             }
 
             return index;
@@ -427,8 +414,7 @@ namespace Rudz.Chess
                 if (pt == PieceTypes.King)
                     b &= ~PieceTypes.Queen.PseudoAttacks(pos.GetKingSquare(~us));
 
-                while (!b.IsEmpty)
-                    moves[index++].Move = Move.Create(from, BitBoards.PopLsb(ref b));
+                index = Move.Create(moves, index, from, b);
             }
 
             return GenerateAll(pos, moves, index, ~pos.Pieces(), us, MoveGenerationType.QuietChecks);
