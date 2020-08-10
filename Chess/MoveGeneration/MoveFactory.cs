@@ -22,18 +22,20 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+#1#
 */
 
-using FluentAssertions;
-using Xunit;
-
-namespace Chess.Test.Book
+namespace Rudz.Chess.MoveGeneration
 {
-    public class PolyglotTests
+    using Enums;
+
+    public static class MoveFactory
     {
-        [Fact]
-        public void PolyZobristSideTest()
+        public static MoveList GenerateMoves(this IPosition pos, MoveGenerationType type = MoveGenerationType.Legal)
         {
+            var ml = new MoveList();
+            ml.Generate(pos, type);
+            return ml;
         }
     }
 }

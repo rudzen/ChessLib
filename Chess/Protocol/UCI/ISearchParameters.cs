@@ -1,4 +1,4 @@
-/*
+﻿/*
 ChessLib, a chess data structure library
 
 MIT License
@@ -24,16 +24,34 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using FluentAssertions;
-using Xunit;
-
-namespace Chess.Test.Book
+namespace Rudz.Chess.Protocol.UCI
 {
-    public class PolyglotTests
+    using Types;
+
+    public interface ISearchParameters
     {
-        [Fact]
-        public void PolyZobristSideTest()
-        {
-        }
+        ulong BlackIncrementTimeMilliseconds { get; set; }
+
+        ulong BlackTimeMilliseconds { get; set; }
+
+        bool Infinite { get; set; }
+
+        int[] MovesToGo { get; set; }
+
+        int MoveTime { get; set; }
+
+        ulong WhiteIncrementTimeMilliseconds { get; set; }
+
+        ulong WhiteTimeMilliseconds { get; set; }
+
+        void Clear();
+
+        ulong Inc(Player player);
+
+        ulong Time(Player player);
+
+        string Get(Player side);
+
+        bool DecreaseMovesToGo(Player side);
     }
 }

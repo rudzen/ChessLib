@@ -26,13 +26,13 @@ SOFTWARE.
 
 namespace Chess.Test.Move
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Text;
     using Rudz.Chess;
     using Rudz.Chess.Enums;
     using Rudz.Chess.Factories;
     using Rudz.Chess.Types;
+    using System;
+    using System.Collections.Generic;
+    using System.Text;
     using Xunit;
 
     public sealed class MoveTests

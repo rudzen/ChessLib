@@ -24,16 +24,27 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using FluentAssertions;
-using Xunit;
-
-namespace Chess.Test.Book
+namespace Rudz.Chess.Protocol.UCI
 {
-    public class PolyglotTests
+    using System.Runtime.CompilerServices;
+
+    public enum InputOutputMutex
     {
-        [Fact]
-        public void PolyZobristSideTest()
-        {
-        }
+        None,
+        Acquire,
+        Atomic,
+        Relax
+    }
+
+    internal static class InputOutputMutexExtensions
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool IsReleasable(this InputOutputMutex @this) => @this.InBetween(InputOutputMutex.Acquire, InputOutputMutex.Atomic);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool IsWaitable(this InputOutputMutex @this) => @this.InBetween(InputOutputMutex.Atomic, InputOutputMutex.Relax);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static bool InBetween(this InputOutputMutex v, InputOutputMutex min, InputOutputMutex max) => (uint)v - (uint)min <= (uint)max - (uint)min;
     }
 }

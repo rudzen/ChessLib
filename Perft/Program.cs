@@ -35,7 +35,8 @@ namespace Perft
     using Options;
     using Parsers;
     using Rudz.Chess;
-    using Rudz.Chess.UCI;
+    using Rudz.Chess.Protocol.UCI;
+    using Rudz.Chess.Tables;
     using Serilog;
     using System;
     using System.IO;

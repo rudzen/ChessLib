@@ -1,4 +1,4 @@
-/*
+﻿/*
 ChessLib, a chess data structure library
 
 MIT License
@@ -24,16 +24,37 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using FluentAssertions;
-using Xunit;
-
-namespace Chess.Test.Book
+namespace Chess.Test.HashTable
 {
-    public class PolyglotTests
+    using Rudz.Chess.Hash;
+    using Rudz.Chess.Hash.Tables;
+    using Rudz.Chess.Types;
+    using System;
+    using System.Runtime.InteropServices;
+    using Xunit;
+
+    public class PawnHashTableTest
     {
         [Fact]
-        public void PolyZobristSideTest()
+        public void BaseInitializeTest()
         {
+            const int tableSizeMb = 8;
+
+            var t = new PawnTable();
+
+            var key = new RKiss(1234567).Rand();
+            var size = Marshal.SizeOf(typeof(PawnTableEntry));
+            var initEntry = new Func<PawnTableEntry>(() => new PawnTableEntry(0));
+
+            t.initialize(size, tableSizeMb, initEntry);
+
+            var fromTable = t[key];
+
+            fromTable.PassedPawns[0] = BitBoards.Center;
+
+            var reRead = t[key];
+
+            Assert.Equal(reRead.PassedPawns[0], BitBoards.Center);
         }
     }
 }

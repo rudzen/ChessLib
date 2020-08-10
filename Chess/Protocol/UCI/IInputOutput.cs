@@ -24,16 +24,25 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using FluentAssertions;
-using Xunit;
-
-namespace Chess.Test.Book
+namespace Rudz.Chess.Protocol.UCI
 {
-    public class PolyglotTests
+    using System.IO;
+    using System.Threading.Tasks;
+
+    public interface IInputOutput
     {
-        [Fact]
-        public void PolyZobristSideTest()
-        {
-        }
+        TextReader Input { get; set; }
+        TextWriter Output { get; set; }
+        string LastLineRead { get; set; }
+        string ReadLine(InputOutputMutex action = InputOutputMutex.None);
+        Task<string> ReadLineAsync(InputOutputMutex action = InputOutputMutex.None);
+        string ReadWord(InputOutputMutex action = InputOutputMutex.None);
+        Task<string> ReadWordAsync(InputOutputMutex action = InputOutputMutex.None);
+        void InitSync();
+        void EndSync();
+        void Write(string cad, InputOutputMutex action = InputOutputMutex.None);
+        Task WriteAsync(string cad, InputOutputMutex action = InputOutputMutex.None);
+        void WriteLine(string cad, InputOutputMutex action = InputOutputMutex.None);
+        Task WriteLineAsync(string cad, InputOutputMutex action = InputOutputMutex.None);
     }
 }

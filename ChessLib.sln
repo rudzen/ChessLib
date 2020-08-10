@@ -17,7 +17,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Perft", "Perft\Perft.csproj
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chess.Perft.Framework", "Chess.Perft.Framework\Chess.Perft.Framework.csproj", "{55E449CF-B5AB-4405-8B64-2F1AB1346D90}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chess.DemoEngine", "Chess.DemoEngine\Chess.DemoEngine.csproj", "{5435922F-4404-4827-80DC-9AEF3E0F6C69}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chess.DemoEngine", "Chess.DemoEngine\Chess.DemoEngine.csproj", "{5435922F-4404-4827-80DC-9AEF3E0F6C69}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,4 +1,4 @@
-/*
+﻿/*
 ChessLib, a chess data structure library
 
 MIT License
@@ -24,16 +24,46 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using FluentAssertions;
-using Xunit;
-
-namespace Chess.Test.Book
+namespace Rudz.Chess.Tables
 {
-    public class PolyglotTests
+    using Enums;
+    using Extensions;
+    using Types;
+
+    public sealed class HistoryHeuristic : IHistoryHeuristic
     {
-        [Fact]
-        public void PolyZobristSideTest()
+        private readonly int[][][] _table;
+
+        public HistoryHeuristic()
         {
+            _table = new int[(int)Players.PlayerNb][][];
+            Initialize(Player.White);
+            Initialize(Player.Black);
+        }
+
+        public void Clear()
+        {
+            ClearTable(Player.White);
+            ClearTable(Player.Black);
+        }
+
+        public void Set(Player c, Square from, Square to, int value)
+            => _table[c.Side][from.AsInt()][to.AsInt()] = value;
+
+        public int Retrieve(Player c, Square from, Square to)
+            => _table[c.Side][from.AsInt()][to.AsInt()];
+
+        private void Initialize(Player c)
+        {
+            _table[c.Side] = new int[64][];
+            for (var i = 0; i < _table[c.Side].Length; ++i)
+                _table[c.Side][i] = new int[64];
+        }
+
+        private void ClearTable(Player c)
+        {
+            for (var i = 0; i < _table[c.Side].Length; i++)
+                _table[c.Side][i].Clear();
         }
     }
 }
