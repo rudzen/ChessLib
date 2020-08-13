@@ -24,13 +24,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using FluentAssertions;
-using Rudz.Chess.Extensions;
-
 namespace Chess.Test.Position
 {
+    using FluentAssertions;
     using Rudz.Chess;
     using Rudz.Chess.Enums;
+    using Rudz.Chess.Factories;
     using Rudz.Chess.Types;
     using Xunit;
 
@@ -70,21 +69,18 @@ namespace Chess.Test.Position
         }
 
         [Fact]
-        public void PinnedPiecesTest()
+        public void KingBlockerTest()
         {
+            // black has an absolute pinned piece at e6
+            const string fen = "1rk5/8/4n3/5B2/1N6/8/8/1Q1K4 b - - 3 53";
+
             const int expected = 1;
+            var expectedSquare = new Square(Ranks.Rank6, Files.FileE);
 
-            var pieceValue = new PieceValue();
-            var board = new Board();
-            var cb = new Position(board, pieceValue);
+            var game = GameFactory.Create(fen);
+            var pos = game.Pos;
 
-            cb.AddPiece(Pieces.WhiteKing, Squares.a6);
-            cb.AddPiece(Pieces.WhiteBishop, Squares.d5);
-
-            cb.AddPiece(Pieces.BlackKing, Squares.b3);
-            cb.AddPiece(Pieces.BlackPawn, Squares.c4); // this is a pinned pieces
-
-            var b = cb.GetPinnedPieces(Squares.b3, Player.Black);
+            var b = pos.BlockersForKing(Player.Black);
 
             // b must contain one square at this point
             var pinnedCount = b.Count;
@@ -94,8 +90,6 @@ namespace Chess.Test.Position
             // test for correct square
             var pinnedSquare = b.Lsb();
 
-            var expectedSquare = new Square(Ranks.Rank4, Files.FileC);
-            
             pinnedSquare.Should().Be(expectedSquare);
         }
 

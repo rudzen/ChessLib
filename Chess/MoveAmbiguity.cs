@@ -308,7 +308,7 @@ namespace Rudz.Chess
 
             foreach (var square in similarTypeAttacks)
             {
-                var pinned = _pos.GetPinnedPieces(square, c);
+                var pinned = _pos.PinnedPieces(c);
 
                 if (similarTypeAttacks & pinned)
                     continue;

@@ -86,8 +86,6 @@ namespace Rudz.Chess
 
         bool IsPieceTypeOnSquare(Square sq, PieceTypes pt);
 
-        BitBoard GetPinnedPieces(Square sq, Player c);
-
         BitBoard CheckedSquares(PieceTypes pt);
 
         BitBoard PinnedPieces(Player c);
