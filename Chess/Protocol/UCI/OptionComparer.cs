@@ -1,4 +1,4 @@
-/*
+﻿/*
 ChessLib, a chess data structure library
 
 MIT License
@@ -24,16 +24,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using FluentAssertions;
-using Xunit;
-
-namespace Chess.Test.Book
+namespace Rudz.Chess.Protocol.UCI
 {
-    public class PolyglotTests
+    using System.Collections.Generic;
+
+    public sealed class OptionComparer : IComparer<IOption>
     {
-        [Fact]
-        public void PolyZobristSideTest()
+        public int Compare(IOption x, IOption y)
         {
+            return x.Idx.CompareTo(y.Idx);
         }
     }
 }

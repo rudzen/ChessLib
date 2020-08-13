@@ -28,6 +28,7 @@ namespace Rudz.Chess.Polyglot
 {
     using Enums;
     using Extensions;
+    using MoveGeneration;
     using System;
     using System.Diagnostics;
     using System.IO;

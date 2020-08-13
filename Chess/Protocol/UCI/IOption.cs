@@ -1,4 +1,4 @@
-/*
+﻿/*
 ChessLib, a chess data structure library
 
 MIT License
@@ -24,16 +24,29 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using FluentAssertions;
-using Xunit;
-
-namespace Chess.Test.Book
+namespace Rudz.Chess.Protocol.UCI
 {
-    public class PolyglotTests
+    using System;
+
+    public interface IOption
     {
-        [Fact]
-        public void PolyZobristSideTest()
-        {
-        }
+        string Name { get; set; }
+        UciOptionType Type { get; set; }
+        string DefaultValue { get; set; }
+        int Min { get; set; }
+        int Max { get; set; }
+        int Idx { get; set; }
+        Action<IOption> OnChange { get; set; }
+        int GetInt();
+        string GetText();
+
+        /// <summary>
+        /// Updates currentValue and triggers OnChange() action.
+        /// It's up to the GUI to check for option's limits, but we could receive the new value from
+        /// the user by console window, so let's check the bounds anyway.
+        /// </summary>
+        /// <param name="v"></param>
+        /// <returns></returns>
+        IOption SetCurrentValue(string v);
     }
 }

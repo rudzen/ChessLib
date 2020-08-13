@@ -28,6 +28,7 @@ namespace Rudz.Chess
 {
     using Enums;
     using Fen;
+    using Hash.Tables.Transposition;
     using Microsoft.Extensions.ObjectPool;
     using ObjectPoolPolicies;
     using System;
@@ -35,7 +36,6 @@ namespace Rudz.Chess
     using System.Collections.Generic;
     using System.Linq;
     using System.Runtime.CompilerServices;
-    using Transposition;
     using Types;
     using Piece = Types.Piece;
     using Square = Types.Square;

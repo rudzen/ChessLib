@@ -24,15 +24,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System.Linq;
-
 namespace Chess.Test.Gameplay
 {
     using Rudz.Chess;
     using Rudz.Chess.Enums;
     using Rudz.Chess.Factories;
+    using Rudz.Chess.MoveGeneration;
     using Rudz.Chess.Types;
     using System.Collections.Generic;
+    using System.Linq;
     using Xunit;
 
     public sealed class FoolsCheckMateTests

@@ -30,6 +30,7 @@ namespace Rudz.Chess
     using Exceptions;
     using Extensions;
     using Microsoft.Extensions.ObjectPool;
+    using MoveGeneration;
     using System;
     using System.Collections.Generic;
     using System.Linq;

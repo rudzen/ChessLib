@@ -1,3 +1,5 @@
+using Rudz.Chess.MoveGeneration;
+
 namespace Rudz.Chess.ObjectPoolPolicies
 {
     using Microsoft.Extensions.ObjectPool;
