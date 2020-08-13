@@ -483,32 +483,6 @@ namespace Rudz.Chess
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool IsPieceTypeOnSquare(Square sq, PieceTypes pt) => _board.PieceAt(sq).Type() == pt;
 
-        /// <summary>
-        /// Detects any pinned pieces For more info : https://en.wikipedia.org/wiki/Pin_(chess)
-        /// </summary>
-        /// <param name="sq">The square</param>
-        /// <param name="c">The side</param>
-        /// <returns>Pinned pieces as BitBoard</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public BitBoard GetPinnedPieces(Square sq, Player c)
-        {
-            var pinnedPieces = BitBoard.Empty;
-            var them = ~c;
-
-            var opponentQueens = _board.Pieces(them, PieceTypes.Queen);
-            var ourPieces = _board.Pieces(c);
-            var pieces = _board.Pieces();
-
-            var pinners
-                = sq.XrayBishopAttacks(pieces, ourPieces) & (_board.Pieces(them, PieceTypes.Bishop) | opponentQueens)
-                  | sq.XrayRookAttacks(pieces, ourPieces) & (_board.Pieces(them, PieceTypes.Rook) | opponentQueens);
-
-            while (pinners)
-                pinnedPieces |= BitBoards.PopLsb(ref pinners).BitboardBetween(sq) & ourPieces;
-
-            return pinnedPieces;
-        }
-
         public BitBoard CheckedSquares(PieceTypes pt)
             => _state.CheckedSquares[pt.AsInt()];
 
@@ -1445,37 +1419,32 @@ namespace Rudz.Chess
         {
             var result = (blockers: BitBoard.Empty, pinners: BitBoard.Empty);
 
-            try
+            // Snipers are sliders that attack 's' when a piece and other snipers are removed
+            var snipers = (PieceTypes.Rook.PseudoAttacks(s) & _board.Pieces(PieceTypes.Queen, PieceTypes.Rook)
+                           | (PieceTypes.Bishop.PseudoAttacks(s) &
+                              _board.Pieces(PieceTypes.Queen, PieceTypes.Bishop))) & sliders;
+            var occupancy = _board.Pieces() ^ snipers;
+
+            var pc = GetPiece(s);
+            var uniColorPieces = _board.Pieces(pc.ColorOf());
+
+            while (snipers)
             {
-                // Snipers are sliders that attack 's' when a piece and other snipers are removed
-                var snipers = (PieceTypes.Rook.PseudoAttacks(s) & _board.Pieces(PieceTypes.Queen, PieceTypes.Rook)
-                               | (PieceTypes.Bishop.PseudoAttacks(s) & _board.Pieces(PieceTypes.Queen, PieceTypes.Bishop))) & sliders;
-                var occupancy = _board.Pieces() ^ snipers;
+                var sniperSq = BitBoards.PopLsb(ref snipers);
+                var b = s.BitboardBetween(sniperSq) & occupancy;
 
-                var pc = GetPiece(s);
-                var uniColorPieces = _board.Pieces(pc.ColorOf());
+                if (b.IsEmpty || b.MoreThanOne())
+                    continue;
 
-                while (snipers)
-                {
-                    var sniperSq = BitBoards.PopLsb(ref snipers);
-                    var b = s.BitboardBetween(sniperSq) & occupancy;
+                result.blockers |= b;
 
-                    if (b.IsEmpty || b.MoreThanOne())
-                        continue;
+                if (b & uniColorPieces)
+                    result.pinners |= sniperSq;
 
-                    result.blockers |= b;
-
-                    if (b & uniColorPieces)
-                        result.pinners |= sniperSq;
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
             }
 
             return result;
+
         }
 
         private void SetCheckInfo(State state)
@@ -1493,7 +1462,7 @@ namespace Rudz.Chess
             state.CheckedSquares[PieceTypes.King.AsInt()] = BitBoard.Empty;
         }
 
-        public IEnumerator<Piece> GetEnumerator() => _board.GetEnumerator(); // BoardLayout.Cast<Piece>().GetEnumerator();
+        public IEnumerator<Piece> GetEnumerator() => _board.GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
