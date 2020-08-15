@@ -1324,15 +1324,8 @@ namespace Rudz.Chess
             var kingTo = (isKingSide ? Enums.Squares.g1 : Enums.Squares.c1).RelativeSquare(stm);
             var rookTo = (isKingSide ? Enums.Squares.f1 : Enums.Squares.d1).RelativeSquare(stm);
 
-            var maxSquare = rookFrom.Max(rookTo);
-            for (var s = rookFrom.Min(rookTo); s <= maxSquare; ++s)
-                if (s != kingFrom && s != rookFrom)
-                    _castlingPath[cr.AsInt()] |= s;
-
-            maxSquare = kingFrom.Max(kingTo);
-            for (var s = kingFrom.Min(kingTo); s <= maxSquare; ++s)
-                if (s != kingFrom && s != rookFrom)
-                    _castlingPath[cr.AsInt()] |= s;
+            _castlingPath[cr.AsInt()] = (rookFrom.BitboardBetween(rookTo) | kingFrom.BitboardBetween(kingTo) | rookTo | kingTo)
+                                        & ~(kingFrom | rookFrom);
         }
 
         private void SetCheckInfo(State state)
