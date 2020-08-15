@@ -24,13 +24,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System.Runtime.Versioning;
-using Rudz.Chess.Factories;
-
 namespace Chess.Test.FEN
 {
     using FluentAssertions;
     using Rudz.Chess;
+    using Rudz.Chess.Factories;
     using Rudz.Chess.Fen;
     using Xunit;
 
@@ -39,15 +37,12 @@ namespace Chess.Test.FEN
         [Fact]
         public void SetFenTest()
         {
-            
             var board = new Board();
             var pieceValue = new PieceValue();
             var pos = new Position(board, pieceValue);
             var game = GameFactory.Create(pos);
 
             game.NewGame();
-            
-            Assert.True(true);
         }
 
         [Fact]
@@ -63,7 +58,7 @@ namespace Chess.Test.FEN
 
             var actualFen = game.GetFen();
 
-            Assert.Equal(expectedFen, actualFen);
+            actualFen.Should().Be(expectedFen);
         }
     }
 }

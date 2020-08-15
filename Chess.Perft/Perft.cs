@@ -58,7 +58,7 @@ namespace Chess.Perft
     public sealed class Perft : IPerft
     {
         private readonly IDictionary<HashKey, ulong> _results;
-        
+
         public Perft(IGame game, IEnumerable<IPerftPosition> positions)
         {
             Positions = positions.ToList();
@@ -89,7 +89,7 @@ namespace Chess.Perft
                 CurrentGame.Pos.SetFen(fd);
 
                 var result = CurrentGame.Perft(depth, true);
-                
+
                 // BoardPrintCallback?.Invoke(fd.ToString());
                 yield return result;
             }

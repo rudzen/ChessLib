@@ -34,18 +34,14 @@ namespace Rudz.Chess.Enums
         Promotion = 1 << 14,
         Enpassant = 2 << 14,
         Castling = 3 << 14
-        // Normal = 0,
-        // Quiet = 1,
-        // Doublepush = 2,
-        // Castle = 4,
-        // Epcapture = 8,
-        // Promotion = 16,
-        // Capture = 32
     }
 
     public static class MoveTypesExtensions
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int AsInt(this MoveTypes @this) => (int) @this;
+        public static int AsInt(this MoveTypes @this) => (int)@this;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool HasFlagFast(this MoveTypes value, MoveTypes flag) => (value & flag) != 0;
     }
 }

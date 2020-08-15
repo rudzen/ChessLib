@@ -64,4 +64,13 @@ namespace Rudz.Chess.Enums
         Do,
         Undo
     }
+
+    public static class CastlelingExtensions
+    {
+        public static string GetCastlelingString(Square toSquare, Square fromSquare) => toSquare < fromSquare ? "O-O-O" : "O-O";
+
+        public static bool HasFlagFast(this CastlelingRights value, CastlelingRights flag) => (value & flag) != 0;
+
+        public static int AsInt(this CastlelingRights value) => (int)value;
+    }
 }

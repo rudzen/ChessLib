@@ -32,7 +32,7 @@ namespace Rudz.Chess.Protocol.UCI
 
     public sealed class InputOutput : IInputOutput
     {
-        private static readonly char[] SplitChar = new[] {' '};
+        private static readonly char[] SplitChar = { ' ' };
 
         private readonly System.Threading.Mutex _mutex;
 
@@ -47,7 +47,7 @@ namespace Rudz.Chess.Protocol.UCI
         }
 
         public TextReader Input { get; set; }
-        
+
         public TextWriter Output { get; set; }
 
         public string LastLineRead { get; set; }

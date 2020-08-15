@@ -24,11 +24,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using Rudz.Chess.Exceptions;
-
 namespace Rudz.Chess
 {
     using Enums;
+    using Exceptions;
     using Extensions;
     using Fen;
     using Hash;
@@ -935,16 +934,6 @@ namespace Rudz.Chess
         /// </summary>
         /// <param name="fen">The fen data to set</param>
         /// <param name="validate">If true, the fen string is validated, otherwise not</param>
-        /// <returns>
-        /// 0 = all ok.
-        /// -1 = Error in piece file layout parsing
-        /// -2 = Error in piece rank layout parsing
-        /// -3 = Unknown piece detected
-        /// -4 = Error while parsing moving side
-        /// -5 = Error while parsing castleling
-        /// -6 = Error while parsing en-passant square
-        /// -9 = FEN length exceeding maximum
-        /// </returns>
         public void SetFen(FenData fen, bool validate = false)
         {
             if (validate)

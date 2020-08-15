@@ -24,6 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using FluentAssertions;
+
 namespace Chess.Test.Pieces
 {
     using Rudz.Chess;
@@ -43,8 +45,7 @@ namespace Chess.Test.Pieces
             var expected = BishopExpected[index];
             var actuals = Bands[index].Select(x => SlideAttacks[sliderIndex](x, BitBoard.Empty).Count);
 
-            foreach (var actual in actuals)
-                Assert.Equal(expected, actual);
+            actuals.Should().AllBeEquivalentTo(expected);
         }
 
         [Fact]
@@ -55,8 +56,7 @@ namespace Chess.Test.Pieces
             var expected = BishopExpected[index];
             var actuals = Bands[index].Select(x => SlideAttacks[sliderIndex](x, BitBoard.Empty).Count);
 
-            foreach (var actual in actuals)
-                Assert.Equal(expected, actual);
+            actuals.Should().AllBeEquivalentTo(expected);
         }
 
         [Fact]
@@ -67,8 +67,7 @@ namespace Chess.Test.Pieces
             var expected = BishopExpected[index];
             var actuals = Bands[index].Select(x => SlideAttacks[sliderIndex](x, BitBoard.Empty).Count);
 
-            foreach (var actual in actuals)
-                Assert.Equal(expected, actual);
+            actuals.Should().AllBeEquivalentTo(expected);
         }
 
         [Fact]
@@ -79,8 +78,7 @@ namespace Chess.Test.Pieces
             var expected = BishopExpected[index];
             var actuals = Bands[index].Select(x => SlideAttacks[sliderIndex](x, BitBoard.Empty).Count);
 
-            foreach (var actual in actuals)
-                Assert.Equal(expected, actual);
+            actuals.Should().AllBeEquivalentTo(expected);
         }
 
         /// <summary>
@@ -112,7 +110,7 @@ namespace Chess.Test.Pieces
             foreach (var square in border)
             {
                 var attacks = square.BishopAttacks(borderInner);
-                Assert.False(attacks.IsEmpty);
+                attacks.IsEmpty.Should().BeFalse();
                 var expected = corners & square ? expectedCorner : expectedSide;
                 var actual = attacks.Count;
                 Assert.Equal(expected, actual);

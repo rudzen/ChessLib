@@ -41,7 +41,7 @@ namespace Chess.Test.Move
 
             var board = new Board();
             var pieceValue = new PieceValue();
-            var pos = new Rudz.Chess.Position(board, pieceValue);
+            var pos = new Position(board, pieceValue);
             var fd = new FenData(fen);
 
             pos.SetFen(fd);
