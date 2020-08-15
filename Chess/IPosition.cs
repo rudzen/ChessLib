@@ -156,7 +156,7 @@ namespace Rudz.Chess
 
         FenData GenerateFen();
 
-        FenError SetFen(FenData fen, bool validate = false);
+        void SetFen(FenData fen, bool validate = false);
 
         HashKey GetPiecesKey();
 

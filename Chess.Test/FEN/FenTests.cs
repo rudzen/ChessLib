@@ -29,6 +29,7 @@ using Rudz.Chess.Factories;
 
 namespace Chess.Test.FEN
 {
+    using FluentAssertions;
     using Rudz.Chess;
     using Rudz.Chess.Fen;
     using Xunit;
@@ -39,16 +40,14 @@ namespace Chess.Test.FEN
         public void SetFenTest()
         {
             
-            var expected = new FenError(0, 0);
-            
             var board = new Board();
             var pieceValue = new PieceValue();
             var pos = new Position(board, pieceValue);
             var game = GameFactory.Create(pos);
-            
-            var actual = game.NewGame();
 
-            Assert.Equal(expected, actual);
+            game.NewGame();
+            
+            Assert.True(true);
         }
 
         [Fact]
@@ -58,11 +57,7 @@ namespace Chess.Test.FEN
             var pieceValue = new PieceValue();
             var pos = new Position(board, pieceValue);
             var game = GameFactory.Create(pos);
-            var expectedError = new FenError(0, 0);
-            var actualError = game.NewGame();
-
-            // verify no errors given (same as SetFen test)
-            Assert.Equal(expectedError, actualError);
+            game.NewGame();
 
             var expectedFen = new FenData(Fen.StartPositionFen);
 

@@ -24,6 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using Rudz.Chess.Exceptions;
+
 namespace Rudz.Chess
 {
     using Enums;
@@ -943,7 +945,7 @@ namespace Rudz.Chess
         /// -6 = Error while parsing en-passant square
         /// -9 = FEN length exceeding maximum
         /// </returns>
-        public FenError SetFen(FenData fen, bool validate = false)
+        public void SetFen(FenData fen, bool validate = false)
         {
             if (validate)
                 Fen.Fen.Validate(fen.Fen.ToString());
@@ -953,7 +955,7 @@ namespace Rudz.Chess
             var chunk = fen.Chunk();
 
             if (chunk.IsEmpty)
-                return new FenError();
+                throw new InvalidFen($"Invalid board layout detected for : {fen.Fen.ToString()}");
 
             var f = 1; // file (column)
             var r = 8; // rank (row)
@@ -964,12 +966,12 @@ namespace Rudz.Chess
                 {
                     f += c - '0';
                     if (f > 9)
-                        return new FenError(-1, fen.Index);
+                        throw new InvalidFen($"File exceeded at index {fen.Index}");
                 }
                 else if (c == '/')
                 {
                     if (f != 9)
-                        return new FenError(-2, fen.Index);
+                        throw new InvalidFen($"File value mismatch at index {fen.Index}");
 
                     r--;
                     f = 1;
@@ -979,7 +981,7 @@ namespace Rudz.Chess
                     var pieceIndex = PieceExtensions.PieceChars.IndexOf(c);
 
                     if (pieceIndex == -1)
-                        return new FenError(-3, fen.Index);
+                        throw new InvalidFen($"Invalid piece information '{c}' at index {fen.Index}");
 
                     Player player = char.IsLower(PieceExtensions.PieceChars[pieceIndex]);
 
@@ -996,7 +998,7 @@ namespace Rudz.Chess
             chunk = fen.Chunk();
 
             if (chunk.IsEmpty || chunk.Length != 1)
-                return new FenError(-3, fen.Index);
+                throw new InvalidFen($"Player information not found at index {fen.Index}");
 
             _sideToMove = (chunk[0] != 'w').ToInt();
 
@@ -1004,7 +1006,7 @@ namespace Rudz.Chess
             chunk = fen.Chunk();
 
             if (chunk.IsEmpty)
-                return new FenError(-5, fen.Index);
+                throw new InvalidFen($"Castleling information not found at index {fen.Index}");
 
             SetupCastleling(chunk);
 
@@ -1040,8 +1042,6 @@ namespace Rudz.Chess
             _ply = moveNum;
 
             SetState();
-
-            return 0;
         }
 
         private void SetState()

@@ -41,7 +41,7 @@ namespace Rudz.Chess
 
         bool IsRepetition { get; }
         
-        FenError NewGame(string fen = Fen.Fen.StartPositionFen);
+        void NewGame(string fen = Fen.Fen.StartPositionFen);
 
         /// <summary>
         /// Apply a FEN string board setup to the board structure.

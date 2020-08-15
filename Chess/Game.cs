@@ -70,7 +70,7 @@ namespace Rudz.Chess
         public bool IsRepetition => Pos.IsRepetition;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public FenError NewGame(string fen = Fen.Fen.StartPositionFen) => Pos.SetFen(new FenData(fen), true);
+        public void NewGame(string fen = Fen.Fen.StartPositionFen) => Pos.SetFen(new FenData(fen), true);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public FenData GetFen() => Pos.GenerateFen();
