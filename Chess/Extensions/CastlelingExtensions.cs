@@ -33,59 +33,8 @@ namespace Rudz.Chess.Extensions
 
     public static class CastlelingExtensions
     {
-        private static readonly CastlelingRights[] OoAllowedMask = { CastlelingRights.WhiteOo, CastlelingRights.BlackOo };
-
-        private static readonly CastlelingRights[] OooAllowedMask = { CastlelingRights.WhiteOoo, CastlelingRights.BlackOoo };
-
-        /// <summary>
-        /// [short/long, side] castle positional | array when altering castleling rights.
-        /// </summary>
-        private static readonly CastlelingRights[][] CastlePositionalOr
-            = new[]
-            {
-                new[] {CastlelingRights.WhiteOo, CastlelingRights.BlackOo},
-                new[] {CastlelingRights.WhiteOoo, CastlelingRights.BlackOoo}
-            };
-        
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Square GetKingCastleTo(this CastlelingSides castleType, Player side)
-        {
-            var isKingSide = castleType == CastlelingSides.King;
-            return (isKingSide ? Squares.g1 : Squares.c1).RelativeSquare(side);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static CastlelingRights GetCastleAllowedMask(this CastlelingSides castleType, Player side)
-        {
-            return castleType switch
-            {
-                CastlelingSides.King => OoAllowedMask[side.Side],
-                CastlelingSides.Queen => OooAllowedMask[side.Side],
-                _ => throw new ArgumentOutOfRangeException(nameof(castleType), castleType, null)
-            };
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string GetCastlelingString(this CastlelingSides @this)
-        {
-            return @this switch
-            {
-                CastlelingSides.King => "O-O",
-                CastlelingSides.Queen => "O-O-O",
-                CastlelingSides.None => string.Empty,
-                CastlelingSides.CastleNb => string.Empty,
-                _ => throw new ArgumentOutOfRangeException(nameof(@this), @this, null)
-            };
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static CastlelingRights GetCastlePositionalOr(this Player c, int index) => CastlePositionalOr[index][c.Side];
-
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string GetCastlelingString(Square toSquare, Square fromSquare) => toSquare < fromSquare ? "O-O-O" : "O-O";
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool HasFlagFast(this CastlelingSides value, CastlelingSides flag) => (value & flag) != 0;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool HasFlagFast(this CastlelingRights value, CastlelingRights flag) => (value & flag) != 0;

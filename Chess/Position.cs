@@ -1115,16 +1115,16 @@ namespace Rudz.Chess
         private void SetCastlingRight(Player stm, Square rookFrom)
         {
             var ksq = GetKingSquare(stm);
-            var cs = ksq < rookFrom ? CastlelingSides.King : CastlelingSides.Queen;
-            var cr = OrCastlingRight(stm, cs);
+            var isKingSide = ksq < rookFrom;
+            var cr = OrCastlingRight(stm, isKingSide);
 
             _state.CastlelingRights |= cr;
             _castlingRightsMask[ksq.AsInt()] |= cr;
             _castlingRightsMask[rookFrom.AsInt()] |= cr;
             _castlingRookSquare[cr.AsInt()] = rookFrom;
 
-            var kingTo = (cs == CastlelingSides.King ? Enums.Squares.g1 : Enums.Squares.c1).RelativeSquare(stm);
-            var rookTo = (cs == CastlelingSides.King ? Enums.Squares.f1 : Enums.Squares.d1).RelativeSquare(stm);
+            var kingTo = (isKingSide ? Enums.Squares.g1 : Enums.Squares.c1).RelativeSquare(stm);
+            var rookTo = (isKingSide ? Enums.Squares.f1 : Enums.Squares.d1).RelativeSquare(stm);
 
             var maxSquare = rookFrom.Max(rookTo);
             for (var s = rookFrom.Min(rookTo); s <= maxSquare; ++s)
@@ -1343,8 +1343,8 @@ namespace Rudz.Chess
             AddPiece(PieceTypes.Rook.MakePiece(us), doCastleling ? rookTo : rookFrom);
         }
 
-        private static CastlelingRights OrCastlingRight(Player c, CastlelingSides s)
-            => (CastlelingRights)((int)CastlelingRights.WhiteOo << (s == CastlelingSides.Queen ? 1 : 0) + 2 * c.Side);
+        private static CastlelingRights OrCastlingRight(Player c, bool isKingSide)
+            => (CastlelingRights)((int)CastlelingRights.WhiteOo << ((!isKingSide).AsByte() + 2 * c.Side));
 
         private void SetupCastleling(ReadOnlySpan<char> castleling)
         {
@@ -1352,13 +1352,14 @@ namespace Rudz.Chess
             {
                 Square rsq;
                 Player c = char.IsLower(ca) ? 1 : 0;
+                var rook = PieceTypes.Rook.MakePiece(c);
                 var token = char.ToUpper(ca);
 
                 if (token == 'K')
-                    for (rsq = Enums.Squares.h1.RelativeSquare(c); GetPieceType(rsq) != PieceTypes.Rook; --rsq)
+                    for (rsq = Enums.Squares.h1.RelativeSquare(c); GetPiece(rsq) != rook; --rsq)
                     { }
                 else if (token == 'Q')
-                    for (rsq = Enums.Squares.a1.RelativeSquare(c); GetPieceType(rsq) != PieceTypes.Rook; --rsq)
+                    for (rsq = Enums.Squares.a1.RelativeSquare(c); GetPiece(rsq) != rook; --rsq)
                     { }
                 else if (token.InBetween('A', 'H'))
                     rsq = new Square(Ranks.Rank1.RelativeRank(c), new File(token - 'A'));
