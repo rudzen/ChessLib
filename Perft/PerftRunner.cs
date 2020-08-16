@@ -51,7 +51,7 @@ namespace Perft
 
     public sealed class PerftRunner : IPerftRunner
     {
-        private const string Version = "v0.1.3";
+        private const string Version = "v0.1.4";
 
         private static readonly string Line = new string('-', 65);
 

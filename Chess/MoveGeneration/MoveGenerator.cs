@@ -34,6 +34,8 @@ namespace Rudz.Chess.MoveGeneration
 
     public static class MoveGenerator
     {
+        private static readonly (CastlelingRights, CastlelingRights)[] CastleSideRights = { (CastlelingRights.WhiteOo, CastlelingRights.WhiteOoo), (CastlelingRights.BlackOo, CastlelingRights.BlackOoo) };
+
         public static int Generate(IPosition pos, ExtMove[] moves, int index, Player us, MoveGenerationType type)
         {
             switch (type)
@@ -76,9 +78,7 @@ namespace Rudz.Chess.MoveGeneration
             if (type == MoveGenerationType.Captures)
                 return index;
 
-            var (kingSide, queenSide) = us.IsWhite
-                ? (CastlelingRights.WhiteOo, CastlelingRights.WhiteOoo)
-                : (CastlelingRights.BlackOo, CastlelingRights.BlackOoo);
+            var (kingSide, queenSide) = CastleSideRights[us.Side];
 
             if (!pos.CanCastle(kingSide | queenSide))
                 return index;
@@ -131,16 +131,16 @@ namespace Rudz.Chess.MoveGeneration
             var ksq = pos.GetKingSquare(us);
             var sliderAttacks = BitBoard.Empty;
             var sliders = pos.Checkers & ~pos.Pieces(PieceTypes.Pawn, PieceTypes.Knight);
-            Square checksq;
+            Square checkSquare;
 
             // Find all the squares attacked by slider checkers. We will remove them from the king
             // evasions in order to skip known illegal moves, which avoids any useless legality
             // checks later on.
             while (!sliders.IsEmpty)
             {
-                checksq = BitBoards.PopLsb(ref sliders);
-                var fullLine = checksq.Line(ksq);
-                fullLine ^= checksq;
+                checkSquare = BitBoards.PopLsb(ref sliders);
+                var fullLine = checkSquare.Line(ksq);
+                fullLine ^= checkSquare;
                 fullLine ^= ksq;
                 sliderAttacks |= fullLine;
             }
@@ -153,8 +153,8 @@ namespace Rudz.Chess.MoveGeneration
                 return index; // Double check, only a king move can save the day
 
             // Generate blocking evasions or captures of the checking piece
-            checksq = pos.Checkers.Lsb();
-            var target = checksq.BitboardBetween(ksq) | checksq;
+            checkSquare = pos.Checkers.Lsb();
+            var target = checkSquare.BitboardBetween(ksq) | checkSquare;
 
             return GenerateAll(pos, moves, index, target, us, MoveGenerationType.Evasions);
         }
@@ -239,8 +239,7 @@ namespace Rudz.Chess.MoveGeneration
         /// <returns>The new move index</returns>
         private static int GeneratePawnMoves(IPosition pos, ExtMove[] moves, int index, BitBoard target, Player us, MoveGenerationType type)
         {
-            // Compute our parametrized parameters at compile time, named according to the point of
-            // view of white side.
+            // Compute our parametrized parameters named according to the point of view of white side.
 
             var them = ~us;
             var rank7Bb = us.Rank7();

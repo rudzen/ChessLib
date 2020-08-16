@@ -475,8 +475,9 @@ namespace Rudz.Chess
                 // After castling, the rook and king final positions are the same in Chess960 as
                 // they would be in standard chess.
 
-                to = (to > from ? Enums.Squares.g1 : Enums.Squares.c1).RelativeSquare(us);
-                var step = to > from ? Directions.West : Directions.East;
+                var isKingSide = to > from;
+                to = (isKingSide ? Enums.Squares.g1 : Enums.Squares.c1).RelativeSquare(us);
+                var step = isKingSide ? Directions.West : Directions.East;
 
                 for (var s = to; s != from; s += step)
                     if (AttacksTo(s) & Board.Pieces(~us))
@@ -496,8 +497,7 @@ namespace Rudz.Chess
 
             // A non-king move is legal if and only if it is not pinned or it is moving along the
             // ray towards or away from the king.
-            return (BlockersForKing(us) & from).IsEmpty
-                   || from.Aligned(to, ksq);
+            return (BlockersForKing(us) & from).IsEmpty || from.Aligned(to, ksq);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1203,7 +1203,8 @@ namespace Rudz.Chess
             var pc = Board.PieceAt(from);
             PieceUpdated?.Invoke(pc, to);
         }
-        /// Position::set_castle_right() is an helper function used to set castling rights given the
+
+        /// IPosition.SetCastlingRight() is an helper function used to set castling rights given the
         /// corresponding color and the rook starting square.
         private void SetCastlingRight(Player stm, Square rookFrom)
         {
@@ -1273,15 +1274,16 @@ namespace Rudz.Chess
             State.Key = key;
             State.PawnStructureKey = pawnKey;
         }
+
         private void SetupCastleling(ReadOnlySpan<char> castleling)
         {
             foreach (var ca in castleling)
             {
-                Square rsq;
                 Player c = char.IsLower(ca) ? 1 : 0;
                 var rook = PieceTypes.Rook.MakePiece(c);
                 var token = char.ToUpper(ca);
 
+                Square rsq;
                 if (token == 'K')
                     for (rsq = Enums.Squares.h1.RelativeSquare(c); GetPiece(rsq) != rook; --rsq)
                     { }
@@ -1296,6 +1298,7 @@ namespace Rudz.Chess
                 SetCastlingRight(c, rsq);
             }
         }
+
         private (BitBoard, BitBoard) SliderBlockers(BitBoard sliders, Square s)
         {
             var result = (blockers: BitBoard.Empty, pinners: BitBoard.Empty);

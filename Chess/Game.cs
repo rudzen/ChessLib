@@ -142,7 +142,7 @@ namespace Rudz.Chess
 
             _moveLists.Return(ml);
 
-            if (tot <= int.MaxValue)
+            if (tot <= int.MaxValue && move != Move.EmptyMove)
                 Table.Store(posKey.Key, (int)tot, Bound.Exact, (sbyte)depth, move, 0);
 
             return tot;

@@ -88,7 +88,15 @@ namespace Chess.Perft
                 Game.Table.NewSearch();
                 CurrentGame.Pos.SetFen(fd);
 
-                var result = CurrentGame.Perft(depth, true);
+                if (_results.TryGetValue(CurrentGame.Pos.State.Key, out var result))
+                {
+                    yield return result;
+                    continue;
+                }
+
+                result = CurrentGame.Perft(depth, true);
+
+                _results[CurrentGame.Pos.State.Key] = result;
 
                 // BoardPrintCallback?.Invoke(fd.ToString());
                 yield return result;

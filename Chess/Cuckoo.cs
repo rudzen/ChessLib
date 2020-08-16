@@ -147,7 +147,7 @@ namespace Rudz.Chess
         }
 
         private static int CuckooHashOne(in HashKey key)
-                    => (int)(key.Key & 0x1FFF);
+            => (int)(key.Key & 0x1FFF);
 
         private static int CuckooHashTwo(in HashKey key)
             => (int)((key.Key >> 16) & 0x1FFF);
