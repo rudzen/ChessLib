@@ -29,14 +29,6 @@ namespace Rudz.Chess.Enums
     using System;
     using Types;
 
-    public enum CastlelingSides
-    {
-        None = 0,
-        King = 1,
-        Queen = 2,
-        CastleNb = 3
-    }
-
     [Flags]
     public enum CastlelingRights
     {
@@ -57,12 +49,12 @@ namespace Rudz.Chess.Enums
 
     public static class CastlelingSideExtensions
     {
-        public static CastlelingRights MakeCastlelingRights(this CastlelingSides cs, Player p)
+        public static CastlelingRights MakeCastlelingRights(this CastlelingRights cs, Player p)
             => p.IsWhite
-                ? cs == CastlelingSides.Queen
+                ? cs == CastlelingRights.QueenSide
                     ? CastlelingRights.WhiteOoo
                     : CastlelingRights.WhiteOo
-                : cs == CastlelingSides.Queen
+                : cs == CastlelingRights.QueenSide
                     ? CastlelingRights.BlackOoo
                     : CastlelingRights.BlackOo;
     }
@@ -71,5 +63,14 @@ namespace Rudz.Chess.Enums
     {
         Do,
         Undo
+    }
+
+    public static class CastlelingExtensions
+    {
+        public static string GetCastlelingString(Square toSquare, Square fromSquare) => toSquare < fromSquare ? "O-O-O" : "O-O";
+
+        public static bool HasFlagFast(this CastlelingRights value, CastlelingRights flag) => (value & flag) != 0;
+
+        public static int AsInt(this CastlelingRights value) => (int)value;
     }
 }

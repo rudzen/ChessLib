@@ -24,14 +24,46 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Extensions
+namespace Chess.Test.Protocol
 {
-    using Enums;
-    using System.Runtime.CompilerServices;
+    using FluentAssertions;
+    using Rudz.Chess.Enums;
+    using Rudz.Chess.Factories;
+    using Rudz.Chess.Protocol.UCI;
+    using System;
+    using Xunit;
 
-    public static class MoveTypesExtensions
+    public sealed class UciTests
     {
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool HasFlagFast(this MoveTypes value, MoveTypes flag) => (value & flag) != 0;
+        [Fact]
+        public void NpsSimpleTest()
+        {
+            const ulong expected = 0UL;
+
+            const ulong nodes = 1000UL;
+
+            var ts = TimeSpan.FromSeconds(1);
+
+            var uci = new Uci();
+
+            var actual = uci.Nps(nodes, ts);
+
+            actual.Should().Be(expected);
+        }
+
+        [Fact]
+        public void MoveFromUciBasicTest()
+        {
+            const string uciMove = "a2a3";
+            var expected = new Rudz.Chess.Types.Move(Squares.a2, Squares.a3);
+            var uci = new Uci();
+
+            var game = GameFactory.Create();
+            game.NewGame();
+
+            var actual = uci.MoveFromUci(game.Pos, uciMove);
+
+            actual.Should().Be(expected);
+        }
     }
 }

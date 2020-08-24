@@ -88,14 +88,14 @@ namespace Rudz.Chess.Protocol.UCI
 
         public void AddOption(string name, IOption option) => O[name] = option;
 
-        public int Nps(ulong nodes, TimeSpan time)
-            => (int)((int)nodes * 1000.0 / time.Milliseconds);
+        public ulong Nps(ulong nodes, TimeSpan time)
+            => (ulong)(nodes * 1000.0 / time.Milliseconds);
 
         public Move MoveFromUci(IPosition pos, string uciMove)
         {
             var moveList = pos.GenerateMoves();
 
-            foreach (var move in moveList)
+            foreach (var move in moveList.Get())
             {
                 if (uciMove.Equals(move.Move.ToString(), StringComparison.InvariantCultureIgnoreCase))
                     return move;

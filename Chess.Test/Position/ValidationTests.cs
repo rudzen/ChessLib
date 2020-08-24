@@ -66,9 +66,9 @@ namespace Chess.Test.Position
             const PositionValidationTypes validationType = PositionValidationTypes.Castleling;
             var game = GameFactory.Create();
             game.NewGame(fen);
-            
+
             var validator = game.Pos.Validate(validationType);
-            
+
             Assert.True(validator.IsOk);
             Assert.True(validator.ErrorMsg.IsNullOrEmpty());
         }

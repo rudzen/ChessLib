@@ -45,7 +45,7 @@ namespace Rudz.Chess.Protocol.UCI
 
         void AddOption(string name, IOption option);
 
-        int Nps(ulong nodes, TimeSpan time);
+        ulong Nps(ulong nodes, TimeSpan time);
 
         Move MoveFromUci(IPosition pos, string uciMove);
 

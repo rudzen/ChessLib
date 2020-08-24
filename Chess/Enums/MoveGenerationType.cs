@@ -35,27 +35,27 @@ namespace Rudz.Chess.Enums
         /// Generate all legal moves
         /// </summary>
         Legal,
-        
+
         /// <summary>
         /// Generate only captures
         /// </summary>
         Captures,
-        
+
         /// <summary>
         /// Generate only quiet moves (non-captures)
         /// </summary>
         Quiets,
-        
+
         /// <summary>
         /// Generate only moves which are not evasions
         /// </summary>
         NonEvasions,
-        
+
         /// <summary>
         /// Generate only evasion moves (if fx in check)
         /// </summary>
         Evasions,
-        
+
         /// <summary>
         /// Generate only moves which are not captures and gives check
         /// </summary>

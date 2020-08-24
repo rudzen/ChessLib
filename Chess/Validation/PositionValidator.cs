@@ -103,7 +103,7 @@ namespace Rudz.Chess.Validation
 
             foreach (var c in players)
             {
-                Span<CastlelingRights> crs = stackalloc CastlelingRights[] { CastlelingSides.King.MakeCastlelingRights(c), CastlelingSides.Queen.MakeCastlelingRights(c) };
+                Span<CastlelingRights> crs = stackalloc CastlelingRights[] { CastlelingRights.KingSide.MakeCastlelingRights(c), CastlelingRights.QueenSide.MakeCastlelingRights(c) };
                 var ourRook = PieceTypes.Rook.MakePiece(c);
                 foreach (var cr in crs)
                 {

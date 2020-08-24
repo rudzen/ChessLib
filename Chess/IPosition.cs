@@ -156,7 +156,7 @@ namespace Rudz.Chess
 
         FenData GenerateFen();
 
-        FenError SetFen(FenData fen, bool validate = false);
+        void SetFen(FenData fen, bool validate = false);
 
         HashKey GetPiecesKey();
 
@@ -171,7 +171,7 @@ namespace Rudz.Chess
         bool HasGameCycle(int ply);
 
         bool SeeGe(Move m, Value threshold);
-        
+
         IPositionValidator Validate(PositionValidationTypes type = PositionValidationTypes.Basic);
     }
 }

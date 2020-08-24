@@ -42,7 +42,7 @@ namespace Chess.Perft.Interfaces
         ulong Expected { get; set; }
 
         public IGame CurrentGame { get; set; }
-        
+
         IAsyncEnumerable<ulong> DoPerft(int depth);
 
         Task<ulong> DoPerftAsync(int depth);

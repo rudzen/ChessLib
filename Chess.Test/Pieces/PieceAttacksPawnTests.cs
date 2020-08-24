@@ -24,11 +24,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System.Linq;
-
 namespace Chess.Test.Pieces
 {
+    using FluentAssertions;
     using Rudz.Chess.Types;
+    using System.Linq;
     using Xunit;
 
     public sealed class PieceAttacksPawnTests : PieceAttacks
@@ -77,19 +77,15 @@ namespace Chess.Test.Pieces
             const int index = (int)EBands.Alpha;
             var us = Player.White;
             var expected = PawnExpected[index];
+
             var actuals = PawnBands[index].Select(w => w.PawnAttack(us).Count);
+            actuals.Should().AllBeEquivalentTo(expected);
 
-            // white
-            foreach (var actual in actuals)
-                Assert.Equal(expected, actual);
-
+            // black
             us = ~us;
 
             actuals = PawnBands[index].Select(x => x.PawnAttack(us).Count);
-
-            // black
-            foreach (var actual in actuals)
-                Assert.Equal(expected, actual);
+            actuals.Should().AllBeEquivalentTo(expected);
         }
 
         [Fact]
@@ -100,17 +96,13 @@ namespace Chess.Test.Pieces
             var expected = PawnExpected[index];
             var actuals = PawnBands[index].Select(w => w.PawnAttack(us).Count);
 
-            // white
-            foreach (var actual in actuals)
-                Assert.Equal(expected, actual);
+            actuals.Should().AllBeEquivalentTo(expected);
 
+            // black
             us = ~us;
 
             actuals = PawnBands[index].Select(x => x.PawnAttack(us).Count);
-
-            // black
-            foreach (var actual in actuals)
-                Assert.Equal(expected, actual);
+            actuals.Should().AllBeEquivalentTo(expected);
         }
 
         [Fact]
@@ -121,17 +113,13 @@ namespace Chess.Test.Pieces
             var expected = PawnExpected[index];
             var actuals = PawnBands[index].Select(w => w.PawnAttack(us).Count);
 
-            // white
-            foreach (var actual in actuals)
-                Assert.Equal(expected, actual);
+            actuals.Should().AllBeEquivalentTo(expected);
 
+            // black
             us = ~us;
 
             actuals = PawnBands[index].Select(x => x.PawnAttack(us).Count);
-
-            // black
-            foreach (var actual in actuals)
-                Assert.Equal(expected, actual);
+            actuals.Should().AllBeEquivalentTo(expected);
         }
 
         [Fact]
@@ -142,17 +130,13 @@ namespace Chess.Test.Pieces
             var expected = PawnExpected[index];
             var actuals = PawnBands[index].Select(w => w.PawnAttack(us).Count);
 
-            // white
-            foreach (var actual in actuals)
-                Assert.Equal(expected, actual);
+            actuals.Should().AllBeEquivalentTo(expected);
 
+            // black
             us = ~us;
 
             actuals = PawnBands[index].Select(x => x.PawnAttack(us).Count);
-
-            // black
-            foreach (var actual in actuals)
-                Assert.Equal(expected, actual);
+            actuals.Should().AllBeEquivalentTo(expected);
         }
     }
 }

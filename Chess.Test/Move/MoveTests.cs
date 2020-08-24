@@ -26,7 +26,6 @@ SOFTWARE.
 
 namespace Chess.Test.Move
 {
-    using Rudz.Chess;
     using Rudz.Chess.Enums;
     using Rudz.Chess.Factories;
     using Rudz.Chess.Types;
@@ -111,10 +110,7 @@ namespace Chess.Test.Move
             var moves = new List<Move>(128);
             var movesString = new List<Movestrings>(128);
 
-            var board = new Board();
-            var pieceValue = new PieceValue();
-            var pos = new Position(board, pieceValue);
-            var game = GameFactory.Create(pos);
+            var game = GameFactory.Create();
 
             game.NewGame();
 
@@ -151,10 +147,7 @@ namespace Chess.Test.Move
         [Fact]
         public void MoveListToStringTest()
         {
-            var board = new Board();
-            var pieceValue = new PieceValue();
-            var pos = new Position(board, pieceValue);
-            var game = GameFactory.Create(pos);
+            var game = GameFactory.Create();
 
             game.NewGame();
 
@@ -165,11 +158,16 @@ namespace Chess.Test.Move
 
             var rngeezuz = new Random(DateTime.Now.Millisecond);
 
-            // generate 256 random moves
+            // generate 256-ish random moves
             for (var i = 0; i < 256; i++)
             {
                 Square rndSquareFrom = (Squares)rngeezuz.Next((int)Squares.a1, (int)Squares.h8);
                 Square rndSquareTo = (Squares)rngeezuz.Next((int)Squares.a1, (int)Squares.h8);
+
+                // Skip same squares to and from
+                if (rndSquareFrom == rndSquareTo)
+                    continue;
+
                 moves.Add(new Move(rndSquareFrom, rndSquareTo));
 
                 expected.Append(' ');
