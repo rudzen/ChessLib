@@ -24,10 +24,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using Rudz.Chess;
-
 namespace Chess.Test.Pieces
 {
+    using FluentAssertions;
+    using Rudz.Chess;
     using Rudz.Chess.Enums;
     using Rudz.Chess.Types;
     using System.Linq;
@@ -43,8 +43,7 @@ namespace Chess.Test.Pieces
             var expected = RookExpected[index];
             var actuals = Bands[index].Select(x => SlideAttacks[sliderIndex](sliderIndex, BitBoard.Empty).Count);
 
-            foreach (var actual in actuals)
-                Assert.Equal(expected, actual);
+            actuals.Should().AllBeEquivalentTo(expected);
         }
 
         [Fact]
@@ -55,8 +54,7 @@ namespace Chess.Test.Pieces
             var expected = RookExpected[index];
             var actuals = Bands[index].Select(x => SlideAttacks[sliderIndex](sliderIndex, BitBoard.Empty).Count);
 
-            foreach (var actual in actuals)
-                Assert.Equal(expected, actual);
+            actuals.Should().AllBeEquivalentTo(expected);
         }
 
         [Fact]
@@ -67,8 +65,7 @@ namespace Chess.Test.Pieces
             var expected = RookExpected[index];
             var actuals = Bands[index].Select(x => SlideAttacks[sliderIndex](sliderIndex, BitBoard.Empty).Count);
 
-            foreach (var actual in actuals)
-                Assert.Equal(expected, actual);
+            actuals.Should().AllBeEquivalentTo(expected);
         }
 
         [Fact]
@@ -79,12 +76,12 @@ namespace Chess.Test.Pieces
             var expected = RookExpected[index];
             var actuals = Bands[index].Select(x => SlideAttacks[sliderIndex](sliderIndex, BitBoard.Empty).Count);
 
-            foreach (var actual in actuals)
-                Assert.Equal(expected, actual);
+            actuals.Should().AllBeEquivalentTo(expected);
         }
 
         /// <summary>
-        /// Testing results of blocked rook attacks, they should always return 7 on the sides, and 14 in the corner
+        /// Testing results of blocked rook attacks, they should always return 7 on the sides, and
+        /// 14 in the corner
         /// </summary>
         [Fact]
         public void RookBorderBlocked()
@@ -116,15 +113,15 @@ namespace Chess.Test.Pieces
             // just to get the attacks
             var board = new Board();
             var pieceValue = new PieceValue();
-            var pos = new Rudz.Chess.Position(board, pieceValue);
-            
+            var pos = new Position(board, pieceValue);
+
             foreach (var square in border)
             {
                 var attacks = pos.GetAttacks(square, PieceTypes.Rook, borderInner);
-                Assert.False(attacks.IsEmpty);
+                attacks.IsEmpty.Should().BeFalse();
                 var expected = corners & square ? expectedCorner : expectedSide;
                 var actual = attacks.Count;
-                Assert.Equal(expected, actual);
+                actual.Should().Be(expected);
             }
         }
     }

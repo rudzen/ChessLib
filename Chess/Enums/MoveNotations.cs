@@ -83,4 +83,9 @@ namespace Rudz.Chess.Enums
         /// </summary>
         Uci = 256
     }
+
+    public static class MoveNotationsExtensions
+    {
+        public static bool HasFlagFast(this MoveNotations value, MoveNotations flag) => (value & flag) != 0;
+    }
 }

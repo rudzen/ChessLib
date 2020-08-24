@@ -26,6 +26,7 @@ SOFTWARE.
 
 namespace Chess.Test.Pieces
 {
+    using FluentAssertions;
     using System.Linq;
     using Xunit;
 
@@ -37,7 +38,8 @@ namespace Chess.Test.Pieces
             const int index = (int)EBands.Alpha;
             const int attackIndex = 2;
 
-            // special case, as the expected values vary depending on the kings location on the outer rim
+            // special case, as the expected values vary depending on the kings location on the
+            // outer rim
             foreach (var pieceLocation in Bands[index])
             {
                 var attacks = RegAttacks[attackIndex](pieceLocation);
@@ -54,8 +56,7 @@ namespace Chess.Test.Pieces
             var expected = KingExpected[index];
             var actuals = Bands[index].Select(x => RegAttacks[attackIndex](x).Count);
 
-            foreach (var actual in actuals)
-                Assert.Equal(expected, actual);
+            actuals.Should().AllBeEquivalentTo(expected);
         }
 
         [Fact]
@@ -66,8 +67,7 @@ namespace Chess.Test.Pieces
             var expected = KingExpected[index];
             var actuals = Bands[index].Select(x => RegAttacks[attackIndex](x).Count);
 
-            foreach (var actual in actuals)
-                Assert.Equal(expected, actual);
+            actuals.Should().AllBeEquivalentTo(expected);
         }
 
         [Fact]
@@ -78,8 +78,7 @@ namespace Chess.Test.Pieces
             var expected = KingExpected[index];
             var actuals = Bands[index].Select(x => RegAttacks[attackIndex](x).Count);
 
-            foreach (var actual in actuals)
-                Assert.Equal(expected, actual);
+            actuals.Should().AllBeEquivalentTo(expected);
         }
     }
 }

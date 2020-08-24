@@ -29,7 +29,9 @@ namespace Chess.Test.Move
     using Rudz.Chess;
     using Rudz.Chess.Enums;
     using Rudz.Chess.Factories;
+    using Rudz.Chess.MoveGeneration;
     using Rudz.Chess.Types;
+    using System.Linq;
     using Xunit;
 
     public sealed class MoveNotationTests
@@ -476,6 +478,26 @@ namespace Chess.Test.Move
 
             Assert.Equal(expectedPrimary, actualPrimary);
             Assert.Equal(expectedSecondary, actualSecondary);
+        }
+
+        [Fact]
+        public void RookSanAmbiguityTest()
+        {
+            // Tests rook ambiguity notation for white rooks @ e1 and g2. Author : johnathandavis
+
+            const string fen = "5r1k/p6p/4r1n1/3NPp2/8/8/PP4RP/4R1K1 w - - 3 53";
+            const MoveNotations notation = MoveNotations.San;
+            var expectedNotations = new[] { "Ree2", "Rge2" };
+
+            var game = GameFactory.Create(fen);
+
+            var sanMoves = game.Pos
+                .GenerateMoves()
+                .Select(m => new MoveAmbiguity(game.Pos).ToNotation(m, notation))
+                .ToArray();
+
+            foreach (var notationResult in expectedNotations)
+                Assert.Contains(sanMoves, s => s == notationResult);
         }
     }
 }

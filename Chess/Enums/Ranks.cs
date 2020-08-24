@@ -26,6 +26,9 @@ SOFTWARE.
 
 namespace Rudz.Chess.Enums
 {
+    using System.Runtime.CompilerServices;
+    using Types;
+
     public enum Ranks
     {
         Rank1 = 0,
@@ -37,5 +40,11 @@ namespace Rudz.Chess.Enums
         Rank7 = 6,
         Rank8 = 7,
         RankNb = 8
+    }
+
+    public static class RanksExtensions
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Rank RelativeRank(this Ranks rank, Player color) => (Ranks)((int)rank ^ (color.Side * 7));
     }
 }

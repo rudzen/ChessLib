@@ -33,7 +33,9 @@ namespace Rudz.Chess
 
     public interface IMoveList : IReadOnlyCollection<ExtMove>
     {
-        ulong Length { get; }
+        ExtMove this[int index] { get; set; }
+
+        int Length { get; }
         Move CurrentMove { get; }
         void Add(ExtMove item);
         void Add(Move item);

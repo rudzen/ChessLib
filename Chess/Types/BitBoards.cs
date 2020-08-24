@@ -154,6 +154,8 @@ namespace Rudz.Chess.Types
 
         private static readonly IDictionary<Directions, Func<BitBoard, BitBoard>> ShiftFuncs = MakeShiftFuncs();
 
+        private static readonly Func<BitBoard, BitBoard>[] FillFuncs = MakeFillFuncs();
+
         static BitBoards()
         {
             PseudoAttacksBB = new BitBoard[PieceTypes.PieceTypeNb.AsInt()][];
@@ -587,7 +589,7 @@ namespace Rudz.Chess.Types
         /// <returns>Filled bitboard</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static BitBoard Fill(this in BitBoard bb, in Player side)
-            => side == Players.White ? bb.NorthFill() : bb.SouthFill();
+            => FillFuncs[side.Side](bb);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static BitBoard Shift(this in BitBoard bb, in Direction direction)
@@ -667,6 +669,9 @@ namespace Rudz.Chess.Types
 
             return sf;
         }
+
+        private static Func<BitBoard, BitBoard>[] MakeFillFuncs()
+            => new Func<BitBoard, BitBoard>[] { NorthFill, SouthFill};
 
         private static BitBoard GetAttacks(this in Square square, PieceTypes pieceType, in BitBoard occupied = default)
         {

@@ -22,14 +22,13 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-Types for:
-- Piece value
+
+Add:
+- CastlelingRights type
 
 Improve:
-- Move generation
-- Move generation cache dictionary functionality
 - Move notation functionality (add more notaion variation, including humanoid readable)
-- MakeMove() and UpdateKey() should be merged
 
-Functionality:
-- Pinned pieces should be generated when making a move and stored as array in State
+
+Unit Tests:
+- Cuckoo

@@ -28,6 +28,7 @@ namespace Rudz.Chess.Polyglot
 {
     using Enums;
     using Extensions;
+    using MoveGeneration;
     using System;
     using System.Diagnostics;
     using System.IO;
@@ -122,8 +123,8 @@ namespace Rudz.Chess.Polyglot
 
             Move move = m;
 
-            var from = move.GetFromSquare();
-            var to = move.GetToSquare();
+            var from = move.FromSquare();
+            var to = move.ToSquare();
 
             static PieceTypes PolyToPt(int pt) => (PieceTypes)(3 - pt);
 
@@ -140,12 +141,12 @@ namespace Rudz.Chess.Polyglot
 
             foreach (var em in ml)
             {
-                if (from != em.Move.GetFromSquare())
+                if (from != em.Move.FromSquare())
                     continue;
 
-                if (to == em.Move.GetToSquare())
+                if (to == em.Move.ToSquare())
                 {
-                    var type = move.GetMoveType();
+                    var type = move.MoveType();
                     if (type != MoveTypes.Promotion || type == MoveTypes.Promotion && em.Move.IsPromotionMove())
                         return em.Move;
                 }

@@ -26,6 +26,7 @@ SOFTWARE.
 
 namespace Perft.Parsers
 {
+    using Rudz.Chess.Extensions;
     using System;
     using System.Collections.Generic;
     using System.IO;
@@ -108,7 +109,9 @@ namespace Perft.Parsers
         private static (int, ulong) ParsePerftLines(string perftData)
         {
             var s = perftData.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-            var result = (depth: int.Parse(s[0]), count: ulong.Parse(s[1]));
+            var result = (depth: 0, count: 0ul);
+            s[0].ToIntegral(out result.depth);
+            s[1].ToIntegral(out result.count);
             return result;
         }
     }

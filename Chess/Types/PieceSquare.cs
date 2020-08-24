@@ -45,19 +45,10 @@ namespace Rudz.Chess.Types
         public Square Square { get; set; }
 
         public bool Equals(IPieceSquare other)
-        {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
-            return Piece.Equals(other.Piece) && Square.Equals(other.Square);
-        }
+            => !ReferenceEquals(null, other) && (ReferenceEquals(this, other) || Piece.Equals(other.Piece) && Square.Equals(other.Square));
 
         public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return Equals((PieceSquare)obj);
-        }
+            => !ReferenceEquals(null, obj) && (ReferenceEquals(this, obj) || obj.GetType() == GetType() && Equals((PieceSquare) obj));
 
         public override int GetHashCode()
         {

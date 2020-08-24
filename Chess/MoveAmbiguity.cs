@@ -29,6 +29,8 @@ namespace Rudz.Chess
     using Enums;
     using Exceptions;
     using Extensions;
+    using Microsoft.Extensions.ObjectPool;
+    using MoveGeneration;
     using System;
     using System.Collections.Generic;
     using System.Linq;
@@ -38,6 +40,8 @@ namespace Rudz.Chess
 
     public sealed class MoveAmbiguity : IMoveAmbiguity
     {
+        private readonly ObjectPool<StringBuilder> _sbPool = new DefaultObjectPool<StringBuilder>(new StringBuilderPooledObjectPolicy(), 128);
+
         private readonly IDictionary<MoveNotations, Func<Move, string>> _notationFuncs;
 
         private readonly IPosition _pos;
@@ -62,7 +66,7 @@ namespace Rudz.Chess
                 return "(none)";
 
             if (!_notationFuncs.TryGetValue(notation, out var func))
-                throw new InvalidMoveException("Invalid move notation detected.");
+                throw new InvalidMove("Invalid move notation detected.");
 
             return func(move);
         }
@@ -78,10 +82,10 @@ namespace Rudz.Chess
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private string ToFan(Move move)
         {
-            var from = move.GetFromSquare();
-            var to = move.GetToSquare();
+            var from = move.FromSquare();
+            var to = move.ToSquare();
 
-            var notation = new StringBuilder(12);
+            var notation = _sbPool.Get();
 
             if (move.IsCastlelingMove())
                 notation.Append(CastlelingExtensions.GetCastlelingString(to, from));
@@ -112,13 +116,17 @@ namespace Rudz.Chess
                 notation.Append(to.ToString());
 
                 if (move.IsPromotionMove())
-                    notation.Append('=').Append(move.GetPromotedPieceType().MakePiece(_pos.SideToMove).GetUnicodeChar());
+                    notation.Append('=').Append(move.PromotedPieceType().MakePiece(_pos.SideToMove).GetUnicodeChar());
+
+                if (_pos.InCheck)
+                    notation.Append(GetCheckChar());
             }
 
-            if (_pos.InCheck)
-                notation.Append(GetCheckChar());
+            var result = notation.ToString();
 
-            return notation.ToString();
+            _sbPool.Return(notation);
+
+            return result;
         }
 
         /// <summary>
@@ -129,10 +137,10 @@ namespace Rudz.Chess
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private string ToSan(Move move)
         {
-            var from = move.GetFromSquare();
-            var to = move.GetToSquare();
+            var from = move.FromSquare();
+            var to = move.ToSquare();
 
-            var notation = new StringBuilder(12);
+            var notation = _sbPool.Get();
 
             if (move.IsCastlelingMove())
                 notation.Append(CastlelingExtensions.GetCastlelingString(to, from));
@@ -162,13 +170,17 @@ namespace Rudz.Chess
                 notation.Append(to.ToString());
 
                 if (move.IsPromotionMove())
-                    notation.Append('=').Append(move.GetPromotedPieceType().MakePiece(_pos.SideToMove).GetPgnChar());
+                    notation.Append('=').Append(move.PromotedPieceType().MakePiece(_pos.SideToMove).GetPgnChar());
+
+                if (_pos.InCheck)
+                    notation.Append(GetCheckChar());
             }
 
-            if (_pos.InCheck)
-                notation.Append(GetCheckChar());
+            var result = notation.ToString();
 
-            return notation.ToString();
+            _sbPool.Return(notation);
+
+            return result;
         }
 
         /// <summary>
@@ -179,10 +191,10 @@ namespace Rudz.Chess
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private string ToLan(Move move)
         {
-            var from = move.GetFromSquare();
-            var to = move.GetToSquare();
+            var from = move.FromSquare();
+            var to = move.ToSquare();
 
-            var notation = new StringBuilder(12);
+            var notation = _sbPool.Get();
 
             if (move.IsCastlelingMove())
                 notation.Append(CastlelingExtensions.GetCastlelingString(to, from));
@@ -214,13 +226,17 @@ namespace Rudz.Chess
                 notation.Append(to.ToString());
 
                 if (move.IsPromotionMove())
-                    notation.Append('=').Append(move.GetPromotedPieceType().MakePiece(_pos.SideToMove).GetUnicodeChar());
+                    notation.Append('=').Append(move.PromotedPieceType().MakePiece(_pos.SideToMove).GetUnicodeChar());
+
+                if (_pos.InCheck)
+                    notation.Append(GetCheckChar());
             }
 
-            if (_pos.InCheck)
-                notation.Append(GetCheckChar());
+            var result = notation.ToString();
 
-            return notation.ToString();
+            _sbPool.Return(notation);
+
+            return result;
         }
 
         /// <summary>
@@ -231,10 +247,10 @@ namespace Rudz.Chess
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private string ToRan(Move move)
         {
-            var from = move.GetFromSquare();
-            var to = move.GetToSquare();
+            var from = move.FromSquare();
+            var to = move.ToSquare();
 
-            var notation = new StringBuilder(12);
+            var notation = _sbPool.Get();
 
             if (move.IsCastlelingMove())
                 notation.Append(CastlelingExtensions.GetCastlelingString(to, from));
@@ -266,13 +282,17 @@ namespace Rudz.Chess
                 notation.Append(to.ToString());
 
                 if (move.IsPromotionMove())
-                    notation.Append('=').Append(move.GetPromotedPieceType().MakePiece(_pos.SideToMove).GetUnicodeChar());
+                    notation.Append('=').Append(move.PromotedPieceType().MakePiece(_pos.SideToMove).GetUnicodeChar());
+
+                if (_pos.InCheck)
+                    notation.Append(GetCheckChar());
             }
 
-            if (_pos.InCheck)
-                notation.Append(GetCheckChar());
+            var result = notation.ToString();
 
-            return notation.ToString();
+            _sbPool.Return(notation);
+
+            return result;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -284,13 +304,11 @@ namespace Rudz.Chess
         {
             var ambiguity = MoveAmbiguities.None;
             var c = _pos.SideToMove;
-            var from = move.GetFromSquare();
-
-
+            var from = move.FromSquare();
 
             foreach (var square in similarTypeAttacks)
             {
-                var pinned = _pos.GetPinnedPieces(square, c);
+                var pinned = _pos.PinnedPieces(c);
 
                 if (similarTypeAttacks & pinned)
                     continue;
@@ -320,12 +338,12 @@ namespace Rudz.Chess
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private BitBoard GetSimilarAttacks(Move move)
         {
-            var from = move.GetFromSquare();
+            var from = move.FromSquare();
             var pt = _pos.GetPieceType(from);
 
             return pt == PieceTypes.Pawn || pt == PieceTypes.King
                 ? BitBoard.Empty
-                : _pos.GetAttacks(move.GetToSquare(), pt, _pos.Pieces()) ^ from;
+                : _pos.GetAttacks(move.ToSquare(), pt, _pos.Pieces()) ^ from;
         }
 
         /// <summary>

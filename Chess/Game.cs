@@ -28,6 +28,7 @@ namespace Rudz.Chess
 {
     using Enums;
     using Fen;
+    using Hash.Tables.Transposition;
     using Microsoft.Extensions.ObjectPool;
     using ObjectPoolPolicies;
     using System;
@@ -35,7 +36,6 @@ namespace Rudz.Chess
     using System.Collections.Generic;
     using System.Linq;
     using System.Runtime.CompilerServices;
-    using Transposition;
     using Types;
     using Piece = Types.Piece;
     using Square = Types.Square;
@@ -70,7 +70,7 @@ namespace Rudz.Chess
         public bool IsRepetition => Pos.IsRepetition;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public FenError NewGame(string fen = Fen.Fen.StartPositionFen) => Pos.SetFen(new FenData(fen), true);
+        public void NewGame(string fen = Fen.Fen.StartPositionFen) => Pos.SetFen(new FenData(fen), true);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public FenData GetFen() => Pos.GenerateFen();
@@ -142,7 +142,7 @@ namespace Rudz.Chess
 
             _moveLists.Return(ml);
 
-            if (tot <= int.MaxValue)
+            if (tot <= int.MaxValue && move != Move.EmptyMove)
                 Table.Store(posKey.Key, (int)tot, Bound.Exact, (sbyte)depth, move, 0);
 
             return tot;

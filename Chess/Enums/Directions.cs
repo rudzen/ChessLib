@@ -32,10 +32,10 @@ namespace Rudz.Chess.Enums
         North = 8,
         East = 1,
         South = -North,            // -8
-        West = -East,             // -1
-        NorthEast = North + East, //  9
-        SouthEast = South + East, // -7
-        SouthWest = South + West, // -9
+        West = -East,              // -1
+        NorthEast = North + East,  //  9
+        SouthEast = South + East,  // -7
+        SouthWest = South + West,  // -9
         NorthWest = North + West,  //  7
 
         NorthDouble = North + North,
