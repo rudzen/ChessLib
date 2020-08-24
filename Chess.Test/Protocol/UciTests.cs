@@ -24,35 +24,46 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Types
+namespace Chess.Test.Protocol
 {
+    using FluentAssertions;
+    using Rudz.Chess.Enums;
+    using Rudz.Chess.Factories;
+    using Rudz.Chess.Protocol.UCI;
     using System;
+    using Xunit;
 
-    /// <summary>
-    /// Model for data transfer of piece and square Used for notification when a piece is updated in
-    /// the chess structure
-    /// </summary>
-    public class PieceSquare : EventArgs, IPieceSquare
+    public sealed class UciTests
     {
-        public PieceSquare(Piece piece, Square square)
+        [Fact]
+        public void NpsSimpleTest()
         {
-            Piece = piece;
-            Square = square;
+            const ulong expected = 0UL;
+
+            const ulong nodes = 1000UL;
+
+            var ts = TimeSpan.FromSeconds(1);
+
+            var uci = new Uci();
+
+            var actual = uci.Nps(nodes, ts);
+
+            actual.Should().Be(expected);
         }
 
-        public Piece Piece { get; set; }
-
-        public Square Square { get; set; }
-
-        public bool Equals(IPieceSquare other)
-            => !ReferenceEquals(null, other) && (ReferenceEquals(this, other) || Piece.Equals(other.Piece) && Square.Equals(other.Square));
-
-        public override bool Equals(object obj)
-            => !ReferenceEquals(null, obj) && (ReferenceEquals(this, obj) || obj.GetType() == GetType() && Equals((PieceSquare) obj));
-
-        public override int GetHashCode()
+        [Fact]
+        public void MoveFromUciBasicTest()
         {
-            return HashCode.Combine(Piece, Square);
+            const string uciMove = "a2a3";
+            var expected = new Rudz.Chess.Types.Move(Squares.a2, Squares.a3);
+            var uci = new Uci();
+
+            var game = GameFactory.Create();
+            game.NewGame();
+
+            var actual = uci.MoveFromUci(game.Pos, uciMove);
+
+            actual.Should().Be(expected);
         }
     }
 }

@@ -24,17 +24,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using FluentAssertions;
-
 namespace Chess.Test.Pieces
 {
+    using FluentAssertions;
     using Rudz.Chess;
     using Rudz.Chess.Enums;
     using Rudz.Chess.Types;
     using System.Linq;
     using Xunit;
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public sealed class PieceAttacksBishopTests : PieceAttacksSliders
     {
         [Fact]
@@ -82,7 +81,8 @@ namespace Chess.Test.Pieces
         }
 
         /// <summary>
-        /// Testing results of blocked bishop attacks, they should always return 2 on the sides, and 1 in the corner
+        /// Testing results of blocked bishop attacks, they should always return 2 on the sides, and
+        /// 1 in the corner
         /// </summary>
         [Fact]
         public void BishopBorderBlocked()
