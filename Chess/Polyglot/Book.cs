@@ -146,12 +146,12 @@ namespace Rudz.Chess.Polyglot
                 if (from != em.Move.FromSquare())
                     continue;
 
-                if (to == em.Move.ToSquare())
-                {
-                    var type = move.MoveType();
-                    if (type != MoveTypes.Promotion || type == MoveTypes.Promotion && em.Move.IsPromotionMove())
-                        return em.Move;
-                }
+                if (to != em.Move.ToSquare())
+                    continue;
+
+                var type = move.MoveType();
+                if (type != MoveTypes.Promotion || type == MoveTypes.Promotion && em.Move.IsPromotionMove())
+                    return em.Move;
             }
 
             return Move.EmptyMove;

@@ -1284,16 +1284,31 @@ namespace Rudz.Chess
                 var token = char.ToUpper(ca);
 
                 Square rsq;
-                if (token == 'K')
-                    for (rsq = Enums.Squares.h1.RelativeSquare(c); GetPiece(rsq) != rook; --rsq)
-                    { }
-                else if (token == 'Q')
-                    for (rsq = Enums.Squares.a1.RelativeSquare(c); GetPiece(rsq) != rook; --rsq)
-                    { }
-                else if (token.InBetween('A', 'H'))
-                    rsq = new Square(Ranks.Rank1.RelativeRank(c), new File(token - 'A'));
-                else
-                    continue;
+                switch (token)
+                {
+                    case 'K':
+                    {
+                        for (rsq = Enums.Squares.h1.RelativeSquare(c); GetPiece(rsq) != rook; --rsq)
+                        { }
+
+                        break;
+                    }
+                    case 'Q':
+                    {
+                        for (rsq = Enums.Squares.a1.RelativeSquare(c); GetPiece(rsq) != rook; --rsq)
+                        { }
+
+                        break;
+                    }
+                    default:
+                    {
+                        if (token.InBetween('A', 'H'))
+                            rsq = new Square(Ranks.Rank1.RelativeRank(c), new File(token - 'A'));
+                        else
+                            continue;
+                        break;
+                    }
+                }
 
                 SetCastlingRight(c, rsq);
             }

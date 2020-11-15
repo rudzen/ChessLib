@@ -90,12 +90,12 @@ namespace Rudz.Chess
             get => _valueMate;
             set
             {
-                if (_valueMate != value)
-                {
-                    _valueMate = value;
-                    _valueMateInMaxPly = value - 2 * MAX_PLY;
-                    _valueMatedInMaxPly = value + 2 * MAX_PLY;
-                }
+                if (_valueMate == value)
+                    return;
+
+                _valueMate = value;
+                _valueMateInMaxPly = value - 2 * MAX_PLY;
+                _valueMatedInMaxPly = value + 2 * MAX_PLY;
             }
         }
 
