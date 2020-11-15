@@ -93,6 +93,8 @@ namespace Rudz.Chess.Polyglot
                     ? best
                     : e.count;
 
+                sum += e.count;
+
                 // Choose book move according to its score. If a move has a very high score it has
                 // higher probability to be choosen than a move with lower score. Note that first
                 // entry is always chosen.

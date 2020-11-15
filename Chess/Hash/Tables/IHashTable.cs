@@ -26,10 +26,14 @@ SOFTWARE.
 
 namespace Rudz.Chess.Hash.Tables
 {
+    using System;
+
     public interface IHashTable<T> where T : new()
     {
         int Count { get; }
 
         ref T this[ulong key] { get; }
+
+        void Initialize(int elementSize, int tableSizeMb, Func<T> initializer);
     }
 }

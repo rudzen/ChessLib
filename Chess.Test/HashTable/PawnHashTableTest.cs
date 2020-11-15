@@ -46,7 +46,7 @@ namespace Chess.Test.HashTable
             var size = Marshal.SizeOf(typeof(PawnTableEntry));
             var initEntry = new Func<PawnTableEntry>(() => new PawnTableEntry(0));
 
-            t.initialize(size, tableSizeMb, initEntry);
+            t.Initialize(size, tableSizeMb, initEntry);
 
             var fromTable = t[key];
 

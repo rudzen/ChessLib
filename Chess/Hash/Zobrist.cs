@@ -24,12 +24,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System;
-
 namespace Rudz.Chess.Hash
 {
     using Enums;
-    using Extensions;
+    using System;
     using System.Runtime.CompilerServices;
     using Types;
 
