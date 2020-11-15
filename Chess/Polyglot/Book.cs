@@ -178,20 +178,20 @@ namespace Rudz.Chess.Polyglot
                 var p = PieceMapping[_pos.GetPiece(s).AsInt()];
 
                 // PolyGlot pieces are: BP = 0, WP = 1, BN = 2, ... BK = 10, WK = 11
-                k ^= BookZobrist.psq[p, s.AsInt()];
+                k ^= BookZobrist.Psq(p, s);
             }
 
             if (_pos.State.CastlelingRights != CastlelingRights.None)
                 k = Enum.GetValues(_pos.State.CastlelingRights.GetType())
                     .Cast<CastlelingRights>()
                     .Where(f => _pos.State.CastlelingRights.HasFlagFast(f))
-                    .Aggregate(k, (current, validCastlelingFlag) => current ^ BookZobrist.castle[validCastlelingFlag.AsInt()]);
+                    .Aggregate(k, (current, validCastlelingFlag) => current ^ BookZobrist.Castle(validCastlelingFlag));
 
             if (_pos.EnPassantSquare != Square.None)
-                k ^= BookZobrist.enpassant[_pos.EnPassantSquare.File.AsInt()];
+                k ^= BookZobrist.EnPassant(_pos.EnPassantSquare.File.AsInt());
 
             if (_pos.SideToMove.IsWhite)
-                k ^= BookZobrist.turn;
+                k ^= BookZobrist.Turn();
 
             return k;
         }
