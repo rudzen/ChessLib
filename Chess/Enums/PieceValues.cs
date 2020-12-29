@@ -26,6 +26,8 @@ SOFTWARE.
 
 namespace Rudz.Chess.Enums
 {
+    using Types;
+
     public enum PieceValues
     {
         ValueZero = 0,

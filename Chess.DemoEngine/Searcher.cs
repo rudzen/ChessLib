@@ -1,4 +1,5 @@
 using Rudz.Chess;
+using Rudz.Chess.MoveGeneration;
 
 namespace Chess.DemoEngine
 {

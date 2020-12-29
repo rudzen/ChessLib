@@ -1,4 +1,4 @@
-﻿/*
+/*
 ChessLib, a chess data structure library
 
 MIT License
@@ -26,22 +26,10 @@ SOFTWARE.
 
 namespace Rudz.Chess.Factories
 {
-    using Fen;
-    using Types;
-
-    public static class GameFactory
+    public static class BlockageFactory
     {
-        public static IGame Create(IPosition position) => new Game(position);
+        public static IBlockage Create(IPosition pos) => new Blockage(pos);
 
-        public static IGame Create(string fen)
-        {
-            var g = Create();
-            var fenData = new FenData(fen);
-            g.Pos.SetFen(fenData);
-            return g;
-        }
-
-        public static IGame Create()
-            => new Game(new Position(new Board(), new PieceValue()));
+        public static bool IsBlocked(IPosition pos) => Create(pos).IsBlocked();
     }
 }

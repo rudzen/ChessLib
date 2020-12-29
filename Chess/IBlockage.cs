@@ -26,29 +26,12 @@ SOFTWARE.
 
 namespace Rudz.Chess
 {
-    using Enums;
-    using System;
-    using System.Collections.Generic;
-    using Types;
-
-    public interface IMoveList : IReadOnlyCollection<ExtMove>
+    public interface IBlockage
     {
-        ExtMove this[int index] { get; set; }
-
-        int Length { get; }
-        Move CurrentMove { get; }
-        void Add(ExtMove item);
-        void Add(Move item);
-
         /// <summary>
-        /// Clears the move generated data
+        /// Computes whether the current position contains a pawn fence which makes the game a draw.
         /// </summary>
-        void Clear();
-
-        bool Contains(ExtMove item);
-        bool Contains(Move item);
-        bool Contains(Square from, Square to);
-        void Generate(IPosition pos, MoveGenerationType type = MoveGenerationType.Legal);
-        ReadOnlySpan<ExtMove> Get();
+        /// <returns>true if the game is a draw position - otherwise false</returns>
+        bool IsBlocked();
     }
 }

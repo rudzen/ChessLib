@@ -1,6 +1,7 @@
 ﻿using BenchmarkDotNet.Attributes;
 using Rudz.Chess;
 using Rudz.Chess.Fen;
+using Rudz.Chess.Types;
 
 namespace Chess.Benchmark
 {

@@ -29,6 +29,7 @@ namespace Chess.Test.Move
     using Rudz.Chess;
     using Rudz.Chess.Fen;
     using Rudz.Chess.MoveGeneration;
+    using Rudz.Chess.Types;
     using Xunit;
 
     public class MoveGeneratorTests

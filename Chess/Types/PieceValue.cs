@@ -24,12 +24,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess
+namespace Rudz.Chess.Types
 {
     using Enums;
     using Newtonsoft.Json;
     using System;
-    using Types;
 
     public sealed class PieceValue : IPieceValue
     {

@@ -1,4 +1,4 @@
-﻿/*
+/*
 ChessLib, a chess data structure library
 
 MIT License
@@ -24,24 +24,31 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Factories
+namespace Rudz.Chess.MoveGeneration
 {
-    using Fen;
+    using Enums;
+    using System;
+    using System.Collections.Generic;
     using Types;
 
-    public static class GameFactory
+    public interface IMoveList : IReadOnlyCollection<ExtMove>
     {
-        public static IGame Create(IPosition position) => new Game(position);
+        ExtMove this[int index] { get; set; }
 
-        public static IGame Create(string fen)
-        {
-            var g = Create();
-            var fenData = new FenData(fen);
-            g.Pos.SetFen(fenData);
-            return g;
-        }
+        int Length { get; }
+        Move CurrentMove { get; }
+        void Add(ExtMove item);
+        void Add(Move item);
 
-        public static IGame Create()
-            => new Game(new Position(new Board(), new PieceValue()));
+        /// <summary>
+        /// Clears the move generated data
+        /// </summary>
+        void Clear();
+
+        bool Contains(ExtMove item);
+        bool Contains(Move item);
+        bool Contains(Square from, Square to);
+        void Generate(IPosition pos, MoveGenerationType type = MoveGenerationType.Legal);
+        ReadOnlySpan<ExtMove> Get();
     }
 }
