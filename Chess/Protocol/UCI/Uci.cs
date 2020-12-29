@@ -104,41 +104,42 @@ namespace Rudz.Chess.Protocol.UCI
             return Move.EmptyMove;
         }
 
-        public string UciOk()
-        {
-            return "uciok";
-        }
+        public string UciOk() => "uciok";
 
-        public string ReadyOk()
-        {
-            return "readyok";
-        }
+        public string ReadyOk() => "readyok";
 
         public string CopyProtection(CopyProtections copyProtections)
-        {
-            return $"copyprotection {copyProtections.ToString()}";
-        }
+            => $"copyprotection {copyProtections.ToString()}";
 
-        public string BestMove(Move move, Move ponderMove) =>
-            !ponderMove.IsNullMove()
+        public string BestMove(Move move, Move ponderMove)
+            => !ponderMove.IsNullMove()
                 ? $"bestmove {move} ponder {ponderMove}"
                 : $"bestmove {move}";
 
         public string CurrentMoveNum(int moveNumber, Move move, ulong visitedNodes, TimeSpan time)
             => $"info currmovenumber {moveNumber} currmove {move} nodes {visitedNodes} time {time.Milliseconds}";
 
-        public string Score(int value, int mateInMaxPly, int valueMate) =>
-            Math.Abs(value) >= mateInMaxPly
+        public string Score(int value, int mateInMaxPly, int valueMate)
+            => Math.Abs(value) >= mateInMaxPly
                 ? $"mate {(value > 0 ? valueMate - value + 1 : -valueMate - value) / 2}"
-                : $"cp {value / 100}";
+                : $"cp {ToCenti(value)}";
 
         public string ScoreCp(int value)
-            => $"info score cp {value / 100}";
+            => $"info score cp {ToCenti(value)}";
 
         public string Depth(int depth)
             => $"info depth {depth}";
 
-        public string Pv(int count, int score, int depth, int selectiveDepth, int alpha, int beta, TimeSpan time, IEnumerable<Move> pvLine, ulong nodes)
+        public string Pv(
+            int count,
+            int score,
+            int depth,
+            int selectiveDepth,
+            int alpha,
+            int beta,
+            TimeSpan time,
+            IEnumerable<Move> pvLine,
+            ulong nodes)
         {
             var sb = _pvPool.Get();
 
@@ -186,5 +187,7 @@ namespace Rudz.Chess.Protocol.UCI
             _pvPool.Return(sb);
             return result;
         }
+
+        private static int ToCenti(int v) => v / 100;
     }
 }

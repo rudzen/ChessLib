@@ -81,5 +81,10 @@ namespace Rudz.Chess.Types
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static char GetUnicodeChar(this Piece p) => PieceUnicodeChar[p.AsInt()];
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int AsInt(this Pieces piece) {
+            return (int) piece;
+        }
     }
 }

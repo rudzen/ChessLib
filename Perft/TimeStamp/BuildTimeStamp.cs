@@ -34,7 +34,7 @@ namespace Perft.TimeStamp
     {
         private const string AttributeName = "TimestampAttribute";
 
-        private static readonly Lazy<string> _timeStamp = new Lazy<string>(GetTimestamp);
+        private static readonly Lazy<string> _timeStamp = new(GetTimestamp);
 
         public string TimeStamp => _timeStamp.Value;
 

@@ -47,11 +47,11 @@ namespace Rudz.Chess.Types
         public Move(Square from, Square to, MoveTypes moveType, PieceTypes promoPt = PieceTypes.Knight)
             => _data = (ushort)(to | (from.AsInt() << 6) | moveType.AsInt() | ((promoPt - PieceTypes.Knight) << 12));
 
-        public static readonly Move EmptyMove = new Move();
+        public static readonly Move EmptyMove = new();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator Move(string value)
-            => new Move(new Square(value[1] - '1', value[0] - 'a'), new Square(value[3] - '1', value[2] - 'a'));
+            => new(new Square(value[1] - '1', value[0] - 'a'), new Square(value[3] - '1', value[2] - 'a'));
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator Move(ExtMove extMove)
@@ -59,11 +59,11 @@ namespace Rudz.Chess.Types
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator Move(ushort value)
-            => new Move(value);
+            => new(value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Move Create(Square from, Square to)
-            => new Move(from, to);
+            => new(from, to);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int Create(ExtMove[] moves, int index, Square from, BitBoard to)
@@ -75,7 +75,7 @@ namespace Rudz.Chess.Types
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Move Create(Square from, Square to, MoveTypes moveType, PieceTypes promoPt = PieceTypes.Knight)
-            => new Move(from, to, moveType, promoPt);
+            => new(from, to, moveType, promoPt);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator ==(Move left, Move right)
@@ -91,7 +91,7 @@ namespace Rudz.Chess.Types
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Square ToSquare()
-            => new Square(_data & 0x3F);
+            => new(_data & 0x3F);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public PieceTypes PromotedPieceType()

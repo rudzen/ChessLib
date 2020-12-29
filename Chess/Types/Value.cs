@@ -46,20 +46,13 @@ namespace Rudz.Chess.Types
 
         private Value(PieceValues value) => Raw = value;
 
-        //[JsonProperty("value")]
-        //public int Raw
-        //{
-        //    get { return (int) _value; }
-        //    set { _value = (PieceValues) value; }
-        //}
-
-        public static Value ValueZero = new Value(PieceValues.ValueZero);
+        public static Value ValueZero = new(PieceValues.ValueZero);
 
         public static implicit operator Value(int value)
-            => new Value(value);
+            => new(value);
 
         public static implicit operator Value(PieceValues value)
-            => new Value(value);
+            => new(value);
 
         public static bool operator ==(Value left, Value right)
             => left.Equals(right);

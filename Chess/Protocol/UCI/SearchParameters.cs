@@ -41,7 +41,7 @@ namespace Rudz.Chess.Protocol.UCI
 
         private readonly ulong[] _inc;
 
-        private readonly StringBuilder _output = new StringBuilder(256);
+        private readonly StringBuilder _output = new(256);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public SearchParameters()

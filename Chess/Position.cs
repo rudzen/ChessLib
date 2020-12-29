@@ -294,7 +294,7 @@ namespace Rudz.Chess
 
             sb.Append(State.Rule50);
             sb.Append(' ');
-            sb.Append(1 + (Ply - (_sideToMove.IsBlack.AsByte()) / 2));
+            sb.Append(1 + (Ply - _sideToMove.IsBlack.AsByte() / 2));
 
             return new FenData(sb.ToString());
         }
@@ -548,9 +548,9 @@ namespace Rudz.Chess
                     return false;
 
                 if ((from.PawnAttack(us) & Pieces(~us) & to).IsEmpty // Not a capture
-                    && !((from + us.PawnPushDistance() == to) && !IsOccupied(to)) // Not a single push
-                    && !((from + us.PawnDoublePushDistance() == to) // Not a double push
-                         && (from.Rank == Ranks.Rank2.RelativeRank(us))
+                    && !(from + us.PawnPushDistance() == to && !IsOccupied(to)) // Not a single push
+                    && !(from + us.PawnDoublePushDistance() == to // Not a double push
+                         && from.Rank == Ranks.Rank2.RelativeRank(us)
                          && !IsOccupied(to)
                          && !IsOccupied(to - us.PawnPushDistance())))
                     return false;
@@ -694,7 +694,7 @@ namespace Rudz.Chess
             if (isPawn)
             {
                 // Set en-passant square, only if moved pawn can be captured
-                if (((int)to.Value ^ (int)from.Value) == 16
+                if ((to.Value.AsInt() ^ from.Value.AsInt()) == 16
                     && !((to - us.PawnPushDistance()).PawnAttack(us) & Pieces(PieceTypes.Pawn, them)).IsEmpty)
                 {
                     State.EnPassantSquare = to - us.PawnPushDistance();
@@ -1150,7 +1150,7 @@ namespace Rudz.Chess
             output.Append(separator);
             for (var rank = Ranks.Rank8; rank >= Ranks.Rank1; rank--)
             {
-                output.Append((int)rank + 1);
+                output.Append(rank.AsInt() + 1);
                 output.Append(space);
                 for (var file = Files.FileA; file <= Files.FileH; file++)
                 {

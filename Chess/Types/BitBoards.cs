@@ -83,7 +83,7 @@ namespace Rudz.Chess.Types
 
         public static readonly BitBoard RANK8 = 0xff00000000000000;
 
-        public static readonly BitBoard EmptyBitBoard = new BitBoard(0UL);
+        public static readonly BitBoard EmptyBitBoard = new(0UL);
 
         public static readonly BitBoard AllSquares = ~EmptyBitBoard;
 
@@ -97,13 +97,13 @@ namespace Rudz.Chess.Types
 
         public static readonly BitBoard CornerH8;
 
-        public static readonly BitBoard QueenSide = new BitBoard(FILEA | FILEB | FILEC | FILED);
+        public static readonly BitBoard QueenSide = new(FILEA | FILEB | FILEC | FILED);
 
-        public static readonly BitBoard CenterFiles = new BitBoard(FILEC | FILED | FILEE | FILEF);
+        public static readonly BitBoard CenterFiles = new(FILEC | FILED | FILEE | FILEF);
 
-        public static readonly BitBoard KingSide = new BitBoard(FILEE | FILEF | FILEG | FILEH);
+        public static readonly BitBoard KingSide = new(FILEE | FILEF | FILEG | FILEH);
 
-        public static readonly BitBoard Center = new BitBoard((FILED | FILEE) & (RANK4 | RANK5));
+        public static readonly BitBoard Center = new((FILED | FILEE) & (RANK4 | RANK5));
 
         public static readonly BitBoard[] PromotionRanks = { RANK8, RANK1 };
 

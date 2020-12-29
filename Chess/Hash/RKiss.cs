@@ -44,7 +44,7 @@ namespace Rudz.Chess.Hash
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator RKiss(ulong seed) => new RKiss(seed);
+        public static implicit operator RKiss(ulong seed) => new(seed);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public IEnumerable<ulong> Get(int count)

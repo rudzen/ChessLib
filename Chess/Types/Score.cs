@@ -76,24 +76,24 @@ namespace Rudz.Chess.Types
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator Score(int v)
-            => new Score(v);
+            => new(v);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Score operator *(Score s, int v)
-            => new Score(s.Mg() * v, s.Eg() * v);
+            => new(s.Mg() * v, s.Eg() * v);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Score operator +(Score s1, Score s2)
-            => new Score(s1.Mg() + s2.Mg(), s1.Eg() + s2.Eg());
+            => new(s1.Mg() + s2.Mg(), s1.Eg() + s2.Eg());
 
         public static Score operator -(Score s1, Score s2)
-            => new Score(s1.Mg() - s2.Mg(), s1.Eg() - s2.Eg());
+            => new(s1.Mg() - s2.Mg(), s1.Eg() - s2.Eg());
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Score operator +(Score s, int v)
-            => new Score(s.Mg() + v, s.Eg() + v);
+            => new(s.Mg() + v, s.Eg() + v);
 
-        public static readonly Score Zero = new Score();
+        public static readonly Score Zero = new();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetMg(int v)

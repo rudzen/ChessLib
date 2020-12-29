@@ -45,6 +45,8 @@ namespace Rudz.Chess.Enums
     public static class RanksExtensions
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Rank RelativeRank(this Ranks rank, Player color) => (Ranks)((int)rank ^ (color.Side * 7));
+        public static Rank RelativeRank(this Ranks rank, Player color) => (Ranks)(rank.AsInt() ^ (color.Side * 7));
+
+        public static int AsInt(this Ranks r) => (int)r;
     }
 }

@@ -41,10 +41,10 @@ namespace Rudz.Chess.Types
         private Direction(int d) => Value = (Directions)d;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator Direction(int value) => new Direction(value);
+        public static implicit operator Direction(int value) => new(value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator Direction(Directions value) => new Direction(value);
+        public static implicit operator Direction(Directions value) => new(value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Direction operator +(Direction left, Direction right) => left.Value + (int)right.Value;

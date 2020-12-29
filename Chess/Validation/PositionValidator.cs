@@ -100,10 +100,13 @@ namespace Rudz.Chess.Validation
         private string ValidateCastleling(string error)
         {
             Span<Player> players = stackalloc Player[] { Player.White, Player.Black };
+            Span<CastlelingRights> crs = stackalloc CastlelingRights[] { CastlelingRights.None, CastlelingRights.None };
 
             foreach (var c in players)
             {
-                Span<CastlelingRights> crs = stackalloc CastlelingRights[] { CastlelingRights.KingSide.MakeCastlelingRights(c), CastlelingRights.QueenSide.MakeCastlelingRights(c) };
+                crs[0] = CastlelingRights.KingSide.MakeCastlelingRights(c);
+                crs[1] = CastlelingRights.QueenSide.MakeCastlelingRights(c);
+
                 var ourRook = PieceTypes.Rook.MakePiece(c);
                 foreach (var cr in crs)
                 {

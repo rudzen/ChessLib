@@ -93,7 +93,7 @@ namespace Rudz.Chess.Extensions
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static MemoryStream GenerateStream(this string @this) => new MemoryStream(Encoding.UTF8.GetBytes(@this ?? ""));
+        public static MemoryStream GenerateStream(this string @this) => new(Encoding.UTF8.GetBytes(@this ?? ""));
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsNullOrEmpty(this string @this) => string.IsNullOrEmpty(@this);

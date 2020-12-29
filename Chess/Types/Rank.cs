@@ -48,10 +48,10 @@ namespace Rudz.Chess.Types
         public char Char => RankChars[AsInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator Rank(int value) => new Rank(value);
+        public static implicit operator Rank(int value) => new(value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator Rank(Ranks value) => new Rank(value);
+        public static implicit operator Rank(Ranks value) => new(value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator ==(Rank left, Rank right) => left.Equals(right);

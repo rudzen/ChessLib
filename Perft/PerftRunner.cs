@@ -53,9 +53,9 @@ namespace Perft
     {
         private const string Version = "v0.1.4";
 
-        private static readonly string Line = new string('-', 65);
+        private static readonly string Line = new('-', 65);
 
-        private static readonly Lazy<string> CurrentDirectory = new Lazy<string>(() => System.Environment.CurrentDirectory);
+        private static readonly Lazy<string> CurrentDirectory = new(() => System.Environment.CurrentDirectory);
 
         private readonly IDictionary<HashKey, ulong> _resultCache;
 
