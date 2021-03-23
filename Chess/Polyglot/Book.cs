@@ -30,6 +30,7 @@ namespace Rudz.Chess.Polyglot
     using Extensions;
     using MoveGeneration;
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
@@ -87,17 +88,32 @@ namespace Rudz.Chess.Polyglot
             _fileStream.Seek(FindFirst(key) * _entrySize, SeekOrigin.Begin);
             var e = ReadEntry();
 
+            Dictionary<ushort, List<ushort>> map_move_score = new Dictionary<ushort, List<ushort>>();
+
             while (e.key == key)
             {
                 best = best > e.count
                     ? best
                     : e.count;
 
-                // Choose book move according to its score. If a move has a very high score it has
-                // higher probability to be choosen than a move with lower score. Note that first
-                // entry is always chosen.
-                if (sum > 0 && (rnd.Next() % sum) < e.count || pickBest && e.count == best)
-                    polyMove = e.move;
+                // Map all moves with its score
+                // then chose randomly between best scores
+
+                if (!map_move_score.ContainsKey(e.count))
+                {
+                    map_move_score.Add(e.count, new List<ushort>());
+                }
+                map_move_score[e.count].Add(e.move);
+
+                e = ReadEntry();
+
+            }
+
+            if (map_move_score.Count > 0)
+            {
+                Random r = new Random();
+                int random_index = r.Next(0, map_move_score[best].Count);
+                polyMove = map_move_score[best][random_index];
             }
 
             return polyMove == 0
@@ -158,10 +174,10 @@ namespace Rudz.Chess.Polyglot
         private Entry ReadEntry()
         {
             Entry e;
-            e.key = _binaryReader.ReadUInt64();
-            e.move = _binaryReader.ReadUInt16();
-            e.count = _binaryReader.ReadUInt16();
-            e.learn = _binaryReader.ReadUInt32();
+            e.key = BitConverter.ToUInt64(_binaryReader.ReadBytes(8).Reverse().ToArray());
+            e.move = BitConverter.ToUInt16(_binaryReader.ReadBytes(2).Reverse().ToArray());
+            e.count = BitConverter.ToUInt16(_binaryReader.ReadBytes(2).Reverse().ToArray());
+            e.learn = BitConverter.ToUInt32(_binaryReader.ReadBytes(4).Reverse().ToArray());
             return e;
         }
 
@@ -170,20 +186,80 @@ namespace Rudz.Chess.Polyglot
             var k = new HashKey();
             var b = _pos.Pieces();
 
-            while (b)
+            /*while (b)
             {
                 var s = BitBoards.PopLsb(ref b);
                 var p = PieceMapping[_pos.GetPiece(s).AsInt()];
 
                 // PolyGlot pieces are: BP = 0, WP = 1, BN = 2, ... BK = 10, WK = 11
                 k ^= BookZobrist.psq[p, s.AsInt()];
+            }*/
+
+            for (int i = 0; i < 64; i++)
+            {
+                Piece p = _pos.GetPiece(i);
+
+                if (p != Piece.EmptyPiece)
+                {
+                    int encode = 0;
+
+                    switch (p.ToString())
+                    {
+                        case "p": encode = 0; break;
+                        case "P": encode = 1; break;
+                        case "n": encode = 2; break;
+                        case "N": encode = 3; break;
+                        case "b": encode = 4; break;
+                        case "B": encode = 5; break;
+                        case "r": encode = 6; break;
+                        case "R": encode = 7; break;
+                        case "q": encode = 8; break;
+                        case "Q": encode = 9; break;
+                        case "k": encode = 10; break;
+                        case "K": encode = 11; break;
+
+
+                    }
+
+                    int file = i % 8;
+                    int row = i / 8;
+
+                    int offset_p = 64 * encode + 8 * row + file;
+
+                    k ^= BookZobrist.piecemap[offset_p];
+
+                }
+
             }
 
+
             if (_pos.State.CastlelingRights != CastlelingRights.None)
-                k = Enum.GetValues(_pos.State.CastlelingRights.GetType())
-                    .Cast<CastlelingRights>()
-                    .Where(f => _pos.State.CastlelingRights.HasFlagFast(f))
-                    .Aggregate(k, (current, validCastlelingFlag) => current ^ BookZobrist.castle[validCastlelingFlag.AsInt()]);
+            {
+                var bk = _pos.State.CastlelingRights & CastlelingRights.BlackOo;
+                var bq = _pos.State.CastlelingRights & CastlelingRights.BlackOoo;
+                var wk = _pos.State.CastlelingRights & CastlelingRights.WhiteOo;
+                var wq = _pos.State.CastlelingRights & CastlelingRights.WhiteOoo;
+
+                if (wk == CastlelingRights.WhiteOo)
+                {
+                    k ^= BookZobrist.castle[0];
+                }
+                if (wq == CastlelingRights.WhiteOoo)
+                {
+                    k ^= BookZobrist.castle[1];
+                }
+                if (bk == CastlelingRights.BlackOo)
+                {
+                    k ^= BookZobrist.castle[2];
+                }
+                if (bq == CastlelingRights.BlackOoo)
+                {
+                    k ^= BookZobrist.castle[3];
+                }
+
+
+
+            }
 
             if (_pos.EnPassantSquare != Square.None)
                 k ^= BookZobrist.enpassant[_pos.EnPassantSquare.File.AsInt()];
