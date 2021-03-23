@@ -330,7 +330,7 @@ namespace Rudz.Chess.Polyglot
                     0x71F1CE2490D20B07UL, 0xF1BCC3D275AFE51AUL, 0xE728E8C83C334074UL,
                     0x96FBF83A12884624UL, 0x81A1549FD6573DA5UL, 0x5FA7867CAF35E149UL,
                     0x56986E2EF3ED091BUL, 0x917F1DD5F8886C61UL, 0xD20D8C88C8FFE65FUL
-                },
+                }
             };
 
             castle = new[]
@@ -338,23 +338,25 @@ namespace Rudz.Chess.Polyglot
                 0x31D71DCE64B2C310UL, 0xF165B587DF898190UL, 0xA57E6339DD2CF3A0UL,
                 0x1EF6E6DBB1961EC9UL
             };
+
             enpassant = new[]
             {
                 0x70CC73D90BC26E24UL, 0xE21A6B35DF0C3AD7UL,
                 0x003A93D8B2806962UL, 0x1C99DED33CB890A1UL, 0xCF3145DE0ADD4289UL,
                 0xD0E4427A5514FB72UL, 0x77C621CC9FB3A483UL, 0x67A34DAC4356550BUL
             };
+
             turn = 0xF8D626AAAF278509UL;
         }
 
-        internal static ulong Psq(uint piece, Square sq)
+        internal static ulong Psq(int piece, Square sq)
         {
             return psq[piece, sq.AsInt()];
         }
 
-        internal static ulong Castle(CastlelingRights rights)
+        internal static ulong Castle(int rights)
         {
-            return castle[rights.AsInt()];
+            return castle[rights];
         }
 
         internal static ulong EnPassant(File f)

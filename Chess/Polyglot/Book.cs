@@ -24,6 +24,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using System.Collections;
+using System.Collections.Generic;
+
 namespace Rudz.Chess.Polyglot
 {
     using Enums;
@@ -37,8 +40,87 @@ namespace Rudz.Chess.Polyglot
 
     public sealed class Book : IDisposable
     {
-        private static readonly uint[] PieceMapping = { 0, 11, 9, 7, 5, 3, 1, 0, 0, 10, 8, 6, 4, 2, 0, 0 };
+        private static readonly int[] PieceMapping =
+        {
+            /* no piece */     0,
+            /* white pawn */   1,
+            /* white knight */ 3,
+            /* white bishop */ 5,
+            /* white rook */   7,
+            /* white queen */  9,
+            /* white king */  11,
+            /* no piece */     0,
+            /* no piece */     0,
+            /* black pawn */   0,
+            /* black knight */ 2,
+            /* black bishop */ 4,
+            /* black rook */   6,
+            /* black queen */  8,
+            /* black king */  10,
+            /* no piece */     0
+        };
 
+        private static readonly IDictionary<Piece, int> PieceMap;
+        private static readonly IDictionary<CastlelingRights, int> CastlelingMap;
+
+        static Book()
+        {
+            PieceMap = new Dictionary<Piece, int>(12)
+            {
+                {Pieces.BlackPawn, 0},
+                {Pieces.WhitePawn, 1},
+                {Pieces.BlackKnight, 2},
+                {Pieces.WhiteKnight, 3},
+                {Pieces.BlackBishop, 4},
+                {Pieces.WhiteBishop, 5},
+                {Pieces.BlackRook, 6},
+                {Pieces.WhiteRook, 7},
+                {Pieces.BlackQueen, 8},
+                {Pieces.WhiteQueen, 9},
+                {Pieces.BlackKing, 10},
+                {Pieces.WhiteKing, 11}
+            };
+
+            CastlelingMap = new Dictionary<CastlelingRights, int>(4)
+            {
+                {CastlelingRights.BlackOo, 0},
+                {CastlelingRights.WhiteOo, 1},
+                {CastlelingRights.BlackOoo, 2},
+                {CastlelingRights.WhiteOoo, 3}
+            };
+
+            /*
+             *                 if (castlelingRights.HasFlagFast(CastlelingRights.WhiteOo))
+                    k ^= BookZobrist.Castle(0);
+                if (castlelingRights.HasFlagFast(CastlelingRights.WhiteOoo))
+                    k ^= BookZobrist.Castle(1);
+                if (castlelingRights.HasFlagFast(CastlelingRights.BlackOo))
+                    k ^= BookZobrist.Castle(2);
+                if (castlelingRights.HasFlagFast(CastlelingRights.BlackOoo))
+                    k ^= BookZobrist.Castle(3);
+             */
+        }
+
+        /*
+
+         // PolyGlot pieces are: BP = 0, WP = 1, BN = 2, ... BK = 10, WK = 11
+
+
+         *         NoPiece = 0,
+        WhitePawn = 1,
+        WhiteKnight = 2,
+        WhiteBishop = 3,
+        WhiteRook = 4,
+        WhiteQueen = 5,
+        WhiteKing = 6,
+        BlackPawn = 9,
+        BlackKnight = 10,
+        BlackBishop = 11,
+        BlackRook = 12,
+        BlackQueen = 13,
+        BlackKing = 14,
+        PieceNb = 15
+         */
         private readonly IPosition _pos;
         private FileStream _fileStream;
         private BinaryReader _binaryReader;
@@ -72,7 +154,7 @@ namespace Rudz.Chess.Polyglot
             }
         }
 
-        public Move probe(bool pickBest = true)
+        public Move Probe(bool pickBest = true)
         {
             if (_fileName.IsNullOrEmpty() || _fileStream == null)
                 return Move.EmptyMove;
@@ -96,10 +178,12 @@ namespace Rudz.Chess.Polyglot
                 sum += e.count;
 
                 // Choose book move according to its score. If a move has a very high score it has
-                // higher probability to be choosen than a move with lower score. Note that first
+                // higher probability to be chosen than a move with lower score. Note that first
                 // entry is always chosen.
-                if (sum > 0 && (rnd.Next() % sum) < e.count || pickBest && e.count == best)
+                if (sum > 0 && rnd.Next() % sum < e.count || pickBest && e.count == best)
                     polyMove = e.move;
+
+                e = ReadEntry();
             }
 
             return polyMove == 0
@@ -167,25 +251,44 @@ namespace Rudz.Chess.Polyglot
             return e;
         }
 
-        private HashKey ComputePolyglotKey()
+        private ulong ComputePolyglotKey()
         {
             var k = new HashKey();
+            var k2 = new HashKey();
             var b = _pos.Pieces();
 
             while (b)
             {
                 var s = BitBoards.PopLsb(ref b);
-                var p = PieceMapping[_pos.GetPiece(s).AsInt()];
+                var pc = _pos.GetPiece(s);
+                var p = PieceMap[pc];
+                var p2 = PieceMapping[pc.AsInt()];
 
                 // PolyGlot pieces are: BP = 0, WP = 1, BN = 2, ... BK = 10, WK = 11
                 k ^= BookZobrist.Psq(p, s);
+                k2 ^= BookZobrist.Psq(p2, s);
             }
 
-            if (_pos.State.CastlelingRights != CastlelingRights.None)
-                k = Enum.GetValues(_pos.State.CastlelingRights.GetType())
-                    .Cast<CastlelingRights>()
-                    .Where(f => _pos.State.CastlelingRights.HasFlagFast(f))
-                    .Aggregate(k, (current, validCastlelingFlag) => current ^ BookZobrist.Castle(validCastlelingFlag));
+            b = _pos.State.CastlelingRights.AsInt();
+
+            while (b)
+            {
+                var idx = BitBoards.PopLsb(ref b).AsInt();
+                k ^= BookZobrist.Castle(idx);
+            }
+
+            // var castlelingRights = _pos.State.CastlelingRights;
+            // if (castlelingRights != CastlelingRights.None)
+            // {
+            //     if (castlelingRights.HasFlagFast(CastlelingRights.WhiteOo))
+            //         k ^= BookZobrist.Castle(CastlelingMap[CastlelingRights.WhiteOo]);
+            //     if (castlelingRights.HasFlagFast(CastlelingRights.WhiteOoo))
+            //         k ^= BookZobrist.Castle(CastlelingMap[CastlelingRights.WhiteOoo]);
+            //     if (castlelingRights.HasFlagFast(CastlelingRights.BlackOo))
+            //         k ^= BookZobrist.Castle(CastlelingMap[CastlelingRights.BlackOo]);
+            //     if (castlelingRights.HasFlagFast(CastlelingRights.BlackOoo))
+            //         k ^= BookZobrist.Castle(CastlelingMap[CastlelingRights.BlackOoo]);
+            // }
 
             if (_pos.EnPassantSquare != Square.None)
                 k ^= BookZobrist.EnPassant(_pos.EnPassantSquare.File.AsInt());
@@ -193,7 +296,7 @@ namespace Rudz.Chess.Polyglot
             if (_pos.SideToMove.IsWhite)
                 k ^= BookZobrist.Turn();
 
-            return k;
+            return k.Key;
         }
 
         private long FindFirst(HashKey key)

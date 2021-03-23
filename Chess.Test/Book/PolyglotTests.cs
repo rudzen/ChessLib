@@ -24,7 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using FluentAssertions;
+using Rudz.Chess.Factories;
 using Xunit;
 
 namespace Chess.Test.Book
@@ -34,6 +34,20 @@ namespace Chess.Test.Book
         [Fact]
         public void PolyZobristSideTest()
         {
+            const string fn = "D:\\coded_c#\\Portfish\\src\\book.bin";
+
+            var game = GameFactory.Create();
+            game.NewGame();
+            using var b = new Rudz.Chess.Polyglot.Book(game.Pos)
+            {
+                FileName = fn
+            };
+
+            var m = b.Probe(true);
+
+            var notExpected = Rudz.Chess.Types.Move.EmptyMove;
+
+            Assert.True(m.IsNullMove());
         }
     }
 }
