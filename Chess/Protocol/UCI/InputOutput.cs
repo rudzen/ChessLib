@@ -98,7 +98,7 @@ namespace Rudz.Chess.Protocol.UCI
             if (_index < 0 || _index == _words.Length)
             {
                 _index = -1;
-                LastLineRead = await ReadLineAsync(action);
+                LastLineRead = await ReadLineAsync(action).ConfigureAwait(false);
                 _words = LastLineRead.Split(SplitChar, StringSplitOptions.RemoveEmptyEntries);
             }
 
@@ -128,7 +128,7 @@ namespace Rudz.Chess.Protocol.UCI
             if (action.IsWaitable())
                 _mutex.WaitOne();
 
-            await Output.WriteAsync(cad);
+            await Output.WriteAsync(cad).ConfigureAwait(false);
 
             if (action.IsReleasable())
                 _mutex.ReleaseMutex();

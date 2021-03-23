@@ -51,10 +51,10 @@ namespace Rudz.Chess.Types
         public File(File file) => Value = file.Value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator File(int value) => new File(value);
+        public static implicit operator File(int value) => new(value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator File(Files value) => new File(value);
+        public static implicit operator File(Files value) => new(value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator ==(File left, File right) => left.Equals(right);

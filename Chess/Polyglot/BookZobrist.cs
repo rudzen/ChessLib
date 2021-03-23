@@ -26,15 +26,18 @@ SOFTWARE.
 
 namespace Rudz.Chess.Polyglot
 {
+    using Enums;
+    using Types;
+
     public static class BookZobrist
     {
-        public static ulong[,] psq;
+        private static readonly ulong[,] psq;
 
-        public static ulong[] castle;
+        private static readonly ulong[] castle;
 
-        public static ulong[] enpassant;
+        private static readonly ulong[] enpassant;
 
-        public static ulong turn;
+        private static readonly ulong turn;
 
         static BookZobrist()
         {
@@ -342,6 +345,26 @@ namespace Rudz.Chess.Polyglot
                 0xD0E4427A5514FB72UL, 0x77C621CC9FB3A483UL, 0x67A34DAC4356550BUL
             };
             turn = 0xF8D626AAAF278509UL;
+        }
+
+        internal static ulong Psq(uint piece, Square sq)
+        {
+            return psq[piece, sq.AsInt()];
+        }
+
+        internal static ulong Castle(CastlelingRights rights)
+        {
+            return castle[rights.AsInt()];
+        }
+
+        internal static ulong EnPassant(File f)
+        {
+            return enpassant[f.AsInt()];
+        }
+
+        internal static ulong Turn()
+        {
+            return turn;
         }
     }
 }

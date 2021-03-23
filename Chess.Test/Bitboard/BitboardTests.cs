@@ -24,12 +24,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System;
-
 namespace Chess.Test.Bitboard
 {
     using Rudz.Chess.Enums;
     using Rudz.Chess.Types;
+    using System;
     using Xunit;
 
     public sealed class BitboardTests
@@ -51,7 +50,7 @@ namespace Chess.Test.Bitboard
         [Fact]
         public void BitBoardOrALlTest()
         {
-            var baseSquares = new Square[] {Squares.a1, Squares.a2, Squares.a3, Squares.a4, Squares.a5, Squares.a6, Squares.a7, Squares.a8};
+            var baseSquares = new Square[] { Squares.a1, Squares.a2, Squares.a3, Squares.a4, Squares.a5, Squares.a6, Squares.a7, Squares.a8 };
             var bb = BitBoard.Empty.OrAll(baseSquares);
             while (!bb.IsEmpty)
             {

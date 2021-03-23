@@ -84,21 +84,21 @@ namespace Rudz.Chess.Types
 
         public bool IsDark => !(BitBoards.DarkSquares & this).IsEmpty;
 
-        public static readonly Square None = new Square(Squares.none);
+        public static readonly Square None = new(Squares.none);
 
-        public static Square Make(Rank r, File f) => new Square(r, f);
+        public static Square Make(Rank r, File f) => new(r, f);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator Square(int value)
-            => new Square(value);
+            => new(value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator Square(Squares value)
-            => new Square(value);
+            => new(value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator Square((Rank, File) value)
-            => new Square(value);
+            => new(value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator ==(Square left, Square right)
@@ -150,11 +150,11 @@ namespace Rudz.Chess.Types
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Square operator ++(Square square)
-            => new Square(square.Value + 1);
+            => new(square.Value + 1);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Square operator --(Square square)
-            => new Square(square.Value - 1);
+            => new(square.Value - 1);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static BitBoard operator &(Square left, ulong right)
@@ -246,7 +246,7 @@ namespace Rudz.Chess.Types
             => Rank.RelativeRank(color);
 
         public bool IsOppositeColor(Square other)
-            => (((int)Value + Rank.AsInt() + (int)other.Value + other.Rank.AsInt()) & 1) != 0;
+            => ((Value.AsInt() + Rank.AsInt() + (int)other.Value + other.Rank.AsInt()) & 1) != 0;
 
         public int CompareTo(Square other)
             => Value.CompareTo(other.Value);

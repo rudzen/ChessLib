@@ -27,6 +27,7 @@ SOFTWARE.
 namespace Rudz.Chess.Factories
 {
     using Fen;
+    using Types;
 
     public static class GameFactory
     {

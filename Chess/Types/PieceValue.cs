@@ -24,12 +24,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess
+namespace Rudz.Chess.Types
 {
     using Enums;
     using Newtonsoft.Json;
     using System;
-    using Types;
 
     public sealed class PieceValue : IPieceValue
     {
@@ -90,12 +89,12 @@ namespace Rudz.Chess
             get => _valueMate;
             set
             {
-                if (_valueMate != value)
-                {
-                    _valueMate = value;
-                    _valueMateInMaxPly = value - 2 * MAX_PLY;
-                    _valueMatedInMaxPly = value + 2 * MAX_PLY;
-                }
+                if (_valueMate == value)
+                    return;
+
+                _valueMate = value;
+                _valueMateInMaxPly = value - 2 * MAX_PLY;
+                _valueMatedInMaxPly = value + 2 * MAX_PLY;
             }
         }
 

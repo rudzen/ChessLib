@@ -40,7 +40,7 @@ namespace Chess.Test.Move
 
         private const int MediumCount = 4;
 
-        private static readonly List<IPerftPosition> Positions = new List<IPerftPosition>(5)
+        private static readonly List<IPerftPosition> Positions = new(5)
         {
             PerftPositionFactory.Create(
                 Guid.NewGuid().ToString(),

@@ -43,9 +43,7 @@ namespace Chess.Test.Fence
             g.NewGame(fen);
             var pos = g.Pos;
 
-            var blockage = new Blockage(pos);
-
-            var actual = blockage.IsBlocked();
+            var actual = BlockageFactory.IsBlocked(pos);
 
             Assert.Equal(expected, actual);
         }
@@ -61,9 +59,7 @@ namespace Chess.Test.Fence
             g.NewGame(fen);
             var pos = g.Pos;
 
-            var blockage = new Blockage(pos);
-
-            var actual = blockage.IsBlocked();
+            var actual = BlockageFactory.IsBlocked(pos);
 
             Assert.Equal(expected, actual);
         }
@@ -79,9 +75,7 @@ namespace Chess.Test.Fence
             g.NewGame(fen);
             var pos = g.Pos;
 
-            var blockage = new Blockage(pos);
-
-            var actual = blockage.IsBlocked();
+            var actual = BlockageFactory.IsBlocked(pos);
 
             Assert.Equal(expected, actual);
         }
@@ -98,9 +92,7 @@ namespace Chess.Test.Fence
             g.NewGame(fen);
             var pos = g.Pos;
 
-            var blockage = new Blockage(pos);
-
-            var actual = blockage.IsBlocked();
+            var actual = BlockageFactory.IsBlocked(pos);
 
             Assert.Equal(expected, actual);
         }
@@ -116,9 +108,7 @@ namespace Chess.Test.Fence
             g.NewGame(fen);
             var pos = g.Pos;
 
-            var blockage = new Blockage(pos);
-
-            var actual = blockage.IsBlocked();
+            var actual = BlockageFactory.IsBlocked(pos);
 
             Assert.Equal(expected, actual);
         }
@@ -134,9 +124,7 @@ namespace Chess.Test.Fence
             g.NewGame(fen);
             var pos = g.Pos;
 
-            var blockage = new Blockage(pos);
-
-            var actual = blockage.IsBlocked();
+            var actual = BlockageFactory.IsBlocked(pos);
 
             Assert.Equal(expected, actual);
         }

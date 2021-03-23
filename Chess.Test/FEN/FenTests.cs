@@ -30,6 +30,7 @@ namespace Chess.Test.FEN
     using Rudz.Chess;
     using Rudz.Chess.Factories;
     using Rudz.Chess.Fen;
+    using Rudz.Chess.Types;
     using Xunit;
 
     public sealed class FenTests

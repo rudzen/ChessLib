@@ -1,4 +1,4 @@
-﻿/*
+/*
 ChessLib, a chess data structure library
 
 MIT License
@@ -24,16 +24,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Hash.Tables
+namespace Rudz.Chess.Factories
 {
-    using System;
-
-    public interface IHashTable<T> where T : new()
+    public static class BlockageFactory
     {
-        int Count { get; }
+        public static IBlockage Create(IPosition pos) => new Blockage(pos);
 
-        ref T this[ulong key] { get; }
-
-        void Initialize(int elementSize, int tableSizeMb, Func<T> initializer);
+        public static bool IsBlocked(IPosition pos) => Create(pos).IsBlocked();
     }
 }

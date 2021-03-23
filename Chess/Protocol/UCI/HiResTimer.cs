@@ -92,7 +92,7 @@ namespace Rudz.Chess.Protocol.UCI
 
         public bool UseHighPriorityThread { get; set; } = true;
 
-        public static implicit operator HiResTimer(int id) => new HiResTimer(id);
+        public static implicit operator HiResTimer(int id) => new(id);
 
         public static bool operator ==(HiResTimer left, HiResTimer right) => Equals(left, right);
 

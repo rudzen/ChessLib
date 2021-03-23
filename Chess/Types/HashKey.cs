@@ -66,11 +66,11 @@ namespace Rudz.Chess.Types
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator HashKey(ulong value)
-            => new HashKey(value);
+            => new(value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator HashKey(uint value)
-            => new HashKey(value);
+            => new(value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator ==(HashKey left, HashKey right)

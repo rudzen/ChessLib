@@ -57,19 +57,19 @@ namespace Rudz.Chess.Types
         public static readonly Piece EmptyPiece = Pieces.NoPiece;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator Piece(char value) => new Piece(GetPiece(value));
+        public static implicit operator Piece(char value) => new(GetPiece(value));
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator Piece(int value) => new Piece(value);
+        public static implicit operator Piece(int value) => new(value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator Piece(Pieces value) => new Piece(value);
+        public static implicit operator Piece(Pieces value) => new(value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Piece operator ~(Piece piece) => piece.AsInt() ^ 8;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Piece operator +(Piece left, Player right) => new Piece(left.Value + (byte)(right << 3));
+        public static Piece operator +(Piece left, Player right) => new(left.Value + (byte)(right << 3));
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Piece operator >>(Piece left, int right) => (int)left.Value >> right;
@@ -102,10 +102,10 @@ namespace Rudz.Chess.Types
         public static bool operator >(Piece left, Pieces right) => left.Value > right;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Piece operator ++(Piece left) => new Piece(left.Value + 1);
+        public static Piece operator ++(Piece left) => new(left.Value + 1);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Piece operator --(Piece left) => new Piece(left.Value - 1);
+        public static Piece operator --(Piece left) => new(left.Value - 1);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator true(Piece piece) => piece.Value != EmptyPiece;

@@ -11,7 +11,7 @@ namespace Rudz.Chess
     /// <summary>
     /// Computes pawn blockage (fences) See https://pdfs.semanticscholar.org/31c2/d37c80ea1aef0676ba30393bc46c0ccc70e9.pdf
     /// </summary>
-    public sealed class Blockage
+    public sealed class Blockage : IBlockage
     {
         private readonly IPosition _pos;
 

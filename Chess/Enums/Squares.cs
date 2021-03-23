@@ -50,9 +50,11 @@ namespace Rudz.Chess.Enums
     public static class SquaresExtensions
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static BitBoard BitBoardSquare(this Squares sq) => BitBoards.BbSquares[(int)sq];
+        public static BitBoard BitBoardSquare(this Squares sq) => BitBoards.BbSquares[sq.AsInt()];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Square RelativeSquare(this Squares sq, Player c) => (int)sq ^ (c.Side * 56);
+        public static Square RelativeSquare(this Squares sq, Player c) => sq.AsInt() ^ (c.Side * 56);
+
+        public static int AsInt(this Squares sq) => (int)sq;
     }
 }

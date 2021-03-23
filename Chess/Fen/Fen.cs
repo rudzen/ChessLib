@@ -50,7 +50,7 @@ namespace Rudz.Chess.Fen
 
         private const int SeparatorCount = 7;
 
-        private static readonly Lazy<Regex> ValidFenRegex = new Lazy<Regex>(() => new Regex(
+        private static readonly Lazy<Regex> ValidFenRegex = new(() => new Regex(
            string.Format(@"^ \s* {0}/{0}/{0}/{0}/{0}/{0}/{0}/{0} \s+ (?:w|b) \s+ (?:[KkQq]+|\-) \s+ (?:[a-h][1-8]|\-) \s+ \d+ \s+ \d+ \s* $", FenRankRegexSnippet),
            RegexOptions.Compiled | RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline));
 
@@ -94,7 +94,7 @@ namespace Rudz.Chess.Fen
             Span<int> limits = stackalloc int[] { 32, 8, 10, 10, 10, 9, 1 };
 
             // piece count storage, using index 0 = '/' count
-            Span<int> pieceCount = stackalloc int[(int)Pieces.PieceNb];
+            Span<int> pieceCount = stackalloc int[Pieces.PieceNb.AsInt()];
 
             foreach (var t in mainSection)
             {
@@ -171,14 +171,14 @@ namespace Rudz.Chess.Fen
         private static void CountValidity(ReadOnlySpan<char> str)
         {
             var spaceCount = 0;
-            var seperatorCount = 0;
+            var separatorCount = 0;
 
             foreach (var c in str)
             {
                 switch (c)
                 {
                     case Separator:
-                        seperatorCount++;
+                        separatorCount++;
                         break;
 
                     case Space:
@@ -192,7 +192,7 @@ namespace Rudz.Chess.Fen
             if (!valid)
                 throw new InvalidFen($"Invalid space character count in fen {str.ToString()}");
 
-            valid = seperatorCount == SeparatorCount;
+            valid = separatorCount == SeparatorCount;
 
             if (!valid)
                 throw new InvalidFen($"Invalid separator count in fen {str.ToString()}");

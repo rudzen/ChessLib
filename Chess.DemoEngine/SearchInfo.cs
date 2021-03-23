@@ -38,6 +38,6 @@ namespace Chess.DemoEngine
         public float fail_high { get; set; }
         public float fail_high_first { get; set; }
 
-        public List<int> ph2 { get; set; } = new List<int>(14);
+        public List<int> ph2 { get; set; } = new(14);
     }
 }

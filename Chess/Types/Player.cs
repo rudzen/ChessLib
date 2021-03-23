@@ -65,19 +65,19 @@ namespace Rudz.Chess.Types
         public static readonly Player Black = 1;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator Player(int value) => new Player((byte)value);
+        public static implicit operator Player(int value) => new((byte)value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator Player(uint value) => new Player((byte)value);
+        public static implicit operator Player(uint value) => new((byte)value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator Player(Players value) => new Player(value);
+        public static implicit operator Player(Players value) => new(value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator Player(bool value) => new Player(value.AsByte());
+        public static implicit operator Player(bool value) => new(value.AsByte());
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Player operator ~(Player player) => new Player(player.Side ^ 1);
+        public static Player operator ~(Player player) => new(player.Side ^ 1);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator ==(Player left, Player right) => left.Side == right.Side;

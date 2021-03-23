@@ -316,6 +316,7 @@ namespace Rudz.Chess
                 if (_pos.GetPieceType(from) != _pos.GetPieceType(square))
                     continue;
 
+                // ReSharper disable once InvertIf
                 if (_pos.Pieces(c) & square)
                 {
                     if (square.File == from.File)

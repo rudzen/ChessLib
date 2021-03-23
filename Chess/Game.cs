@@ -30,6 +30,7 @@ namespace Rudz.Chess
     using Fen;
     using Hash.Tables.Transposition;
     using Microsoft.Extensions.ObjectPool;
+    using MoveGeneration;
     using ObjectPoolPolicies;
     using System;
     using System.Collections;

@@ -34,6 +34,8 @@ namespace Rudz.Chess.Hash.Tables
 
         public int Count => _table.Length;
 
+        public ref T this[ulong key] => ref _table[(uint)key & (_table.Length - 1)];
+
         /// <summary>
         /// Initialized the table array. In case the table array is initialized with a different
         /// size the existing elements are being kept. The index operator[] will return a reference
@@ -47,7 +49,7 @@ namespace Rudz.Chess.Hash.Tables
         /// <param name="elementSize">The size of <see cref="T"/></param>
         /// <param name="tableSizeMb">The number of elements to store in the array</param>
         /// <param name="initializer">Initializer function to initialize a single entry object</param>
-        public void initialize(int elementSize, int tableSizeMb, Func<T> initializer)
+        public void Initialize(int elementSize, int tableSizeMb, Func<T> initializer)
         {
             var arraySize = tableSizeMb * 1024 * 1024 / elementSize;
             if (_table != null)
@@ -72,7 +74,5 @@ namespace Rudz.Chess.Hash.Tables
                     _table[i] = initializer();
             }
         }
-
-        public ref T this[ulong key] => ref _table[(uint)key & (_table.Length - 1)];
     }
 }

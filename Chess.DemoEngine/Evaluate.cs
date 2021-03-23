@@ -59,7 +59,7 @@ namespace Chess.DemoEngine
 
         public Score Eval()
         {
-            return new Score();
+            return new();
         }
 
         private Score Eval(PieceTypes pt, Player us)

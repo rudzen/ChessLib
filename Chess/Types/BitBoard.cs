@@ -74,15 +74,15 @@ namespace Rudz.Chess.Types
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator BitBoard(ulong value)
-            => new BitBoard(value);
+            => new(value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator BitBoard(int value)
-            => new BitBoard(value);
+            => new(value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator BitBoard(Square square)
-            => new BitBoard(square.AsBb());
+            => new(square.AsBb());
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static BitBoard operator *(BitBoard left, ulong right)

@@ -1,4 +1,4 @@
-﻿/*
+/*
 ChessLib, a chess data structure library
 
 MIT License
@@ -24,16 +24,31 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Hash.Tables
+namespace Rudz.Chess.MoveGeneration
 {
+    using Enums;
     using System;
+    using System.Collections.Generic;
+    using Types;
 
-    public interface IHashTable<T> where T : new()
+    public interface IMoveList : IReadOnlyCollection<ExtMove>
     {
-        int Count { get; }
+        ExtMove this[int index] { get; set; }
 
-        ref T this[ulong key] { get; }
+        int Length { get; }
+        Move CurrentMove { get; }
+        void Add(ExtMove item);
+        void Add(Move item);
 
-        void Initialize(int elementSize, int tableSizeMb, Func<T> initializer);
+        /// <summary>
+        /// Clears the move generated data
+        /// </summary>
+        void Clear();
+
+        bool Contains(ExtMove item);
+        bool Contains(Move item);
+        bool Contains(Square from, Square to);
+        void Generate(IPosition pos, MoveGenerationType type = MoveGenerationType.Legal);
+        ReadOnlySpan<ExtMove> Get();
     }
 }

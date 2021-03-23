@@ -434,28 +434,30 @@ namespace Rudz.Chess.MoveGeneration
         {
             var from = to - direction;
 
-            if (type == MoveGenerationType.Captures
-                || type == MoveGenerationType.Evasions
-                || type == MoveGenerationType.NonEvasions)
+            switch (type)
             {
-                moves[index++].Move = Move.Create(from, to, MoveTypes.Promotion, PieceTypes.Queen);
-                if (!(PieceTypes.Knight.PseudoAttacks(to) & ksq).IsEmpty)
-                    moves[index++].Move = Move.Create(from, to, MoveTypes.Promotion);
+                case MoveGenerationType.Captures:
+                case MoveGenerationType.Evasions:
+                case MoveGenerationType.NonEvasions:
+                    moves[index++].Move = Move.Create(from, to, MoveTypes.Promotion, PieceTypes.Queen);
+                    if (!(PieceTypes.Knight.PseudoAttacks(to) & ksq).IsEmpty)
+                        moves[index++].Move = Move.Create(from, to, MoveTypes.Promotion);
+                    break;
             }
 
-            if (type == MoveGenerationType.Quiets
-                || type == MoveGenerationType.Evasions
-                || type == MoveGenerationType.NonEvasions)
-            {
-                moves[index++].Move = Move.Create(from, to, MoveTypes.Promotion, PieceTypes.Rook);
-                moves[index++].Move = Move.Create(from, to, MoveTypes.Promotion, PieceTypes.Bishop);
-                if ((PieceTypes.Knight.PseudoAttacks(to) & ksq).IsEmpty)
-                    moves[index++].Move = Move.Create(from, to, MoveTypes.Promotion);
-
+            if (type != MoveGenerationType.Quiets
+                && type != MoveGenerationType.Evasions
+                && type != MoveGenerationType.NonEvasions)
                 return index;
-            }
+
+            moves[index++].Move = Move.Create(@from, to, MoveTypes.Promotion, PieceTypes.Rook);
+            moves[index++].Move = Move.Create(@from, to, MoveTypes.Promotion, PieceTypes.Bishop);
+
+            if ((PieceTypes.Knight.PseudoAttacks(to) & ksq).IsEmpty)
+                moves[index++].Move = Move.Create(@from, to, MoveTypes.Promotion);
 
             return index;
+
         }
     }
 }
