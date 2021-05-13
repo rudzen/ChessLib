@@ -78,6 +78,7 @@ namespace Rudz.Chess
             Rule50 = other.Rule50;
             PliesFromNull = other.PliesFromNull;
             EnPassantSquare = other.EnPassantSquare;
+            NonPawnMaterial = new Value[2];
             Array.Copy(other.NonPawnMaterial, NonPawnMaterial, other.NonPawnMaterial.Length);
             Previous = other;
 
@@ -90,6 +91,7 @@ namespace Rudz.Chess
         {
             LastMove = Move.EmptyMove;
             NonPawnMaterial = new Value[2];
+            Array.Fill(NonPawnMaterial, Value.ValueZero);
             CastlelingRights = CastlelingRights.None;
             EnPassantSquare = Square.None;
             Checkers = BitBoard.Empty;
