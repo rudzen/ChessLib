@@ -12,12 +12,13 @@
     <TargetFramework>net5.0</TargetFramework>
     <PackageVersion>0.0.1</PackageVersion>
     <Description>Chess library with data structures and move generation.</Description>
-    <Copyright>(C) 2020 Rudy Alex Kohn</Copyright>
+    <Copyright>(C) 2020-2021 Rudy Alex Kohn</Copyright>
     <AssemblyVersion>0.0.1.0</AssemblyVersion>
     <FileVersion>0.0.1.0</FileVersion>
     <PackageProjectUrl>http://github.com/rudzen/chesslib</PackageProjectUrl>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <Authors>Rudy Alex Kohn</Authors>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(IsWindows)'=='true'">

@@ -5,6 +5,8 @@
     <TargetFramework>net5.0</TargetFramework>
     <Platforms>AnyCPU;x64</Platforms>
     <LangVersion>default</LangVersion>
+    <Copyright>(C) 2020-2021 Rudy Alex Kohn</Copyright>
+    <Authors>Rudy Alex Kohn</Authors>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
