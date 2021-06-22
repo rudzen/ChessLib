@@ -26,13 +26,6 @@ SOFTWARE.
 
 namespace Rudz.Chess
 {
-    using Enums;
-    using Exceptions;
-    using Extensions;
-    using Fen;
-    using Hash;
-    using Microsoft.Extensions.ObjectPool;
-    using MoveGeneration;
     using System;
     using System.Collections;
     using System.Collections.Generic;
@@ -40,6 +33,13 @@ namespace Rudz.Chess
     using System.Linq;
     using System.Runtime.CompilerServices;
     using System.Text;
+    using Enums;
+    using Exceptions;
+    using Extensions;
+    using Fen;
+    using Hash;
+    using Microsoft.Extensions.ObjectPool;
+    using MoveGeneration;
     using Types;
     using Validation;
 
@@ -1041,7 +1041,7 @@ namespace Rudz.Chess
 
             State.EnPassantSquare = chunk.Length == 1 || chunk[0] == '-' || !chunk[0].InBetween('a', 'h')
                 ? Square.None
-                : chunk[1].InBetween('3', '6')
+              : chunk[1] != '3' && chunk[1] != '6'
                     ? Square.None
                     : new Square(chunk[1] - '1', chunk[0] - 'a').Value;
 
@@ -1287,27 +1287,27 @@ namespace Rudz.Chess
                 switch (token)
                 {
                     case 'K':
-                    {
-                        for (rsq = Enums.Squares.h1.RelativeSquare(c); GetPiece(rsq) != rook; --rsq)
-                        { }
+                        {
+                            for (rsq = Enums.Squares.h1.RelativeSquare(c); GetPiece(rsq) != rook; --rsq)
+                            { }
 
-                        break;
-                    }
+                            break;
+                        }
                     case 'Q':
-                    {
-                        for (rsq = Enums.Squares.a1.RelativeSquare(c); GetPiece(rsq) != rook; --rsq)
-                        { }
+                        {
+                            for (rsq = Enums.Squares.a1.RelativeSquare(c); GetPiece(rsq) != rook; --rsq)
+                            { }
 
-                        break;
-                    }
+                            break;
+                        }
                     default:
-                    {
-                        if (token.InBetween('A', 'H'))
-                            rsq = new Square(Ranks.Rank1.RelativeRank(c), new File(token - 'A'));
-                        else
-                            continue;
-                        break;
-                    }
+                        {
+                            if (token.InBetween('A', 'H'))
+                                rsq = new Square(Ranks.Rank1.RelativeRank(c), new File(token - 'A'));
+                            else
+                                continue;
+                            break;
+                        }
                 }
 
                 SetCastlingRight(c, rsq);
