@@ -45,10 +45,10 @@ public class PieceSquare : EventArgs, IPieceSquare
     public Square Square { get; set; }
 
     public bool Equals(IPieceSquare other)
-        => !ReferenceEquals(null, other) && (ReferenceEquals(this, other) || Piece.Equals(other.Piece) && Square.Equals(other.Square));
+        => other is not null && (ReferenceEquals(this, other) || Piece.Equals(other.Piece) && Square.Equals(other.Square));
 
     public override bool Equals(object obj)
-        => !ReferenceEquals(null, obj) && (ReferenceEquals(this, obj) || obj.GetType() == GetType() && Equals((PieceSquare)obj));
+        => obj is not null && (ReferenceEquals(this, obj) || obj.GetType() == GetType() && Equals((PieceSquare)obj));
 
     public override int GetHashCode()
     {

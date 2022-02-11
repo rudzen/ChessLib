@@ -108,7 +108,7 @@ public sealed class MoveList : IMoveList
     public ReadOnlySpan<ExtMove> Get() =>
         _last == 0
             ? ReadOnlySpan<ExtMove>.Empty
-            : _moves.AsSpan().Slice(0, _last);
+            : _moves.AsSpan()[.._last];
 
     public IEnumerator<ExtMove> GetEnumerator()
         => _moves.Take(_last).GetEnumerator();

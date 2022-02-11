@@ -96,8 +96,8 @@ public sealed class Book : IDisposable
             sum += e.count;
 
             // Choose book move according to its score. If a move has a very high score it has
-            // higher probability to be choosen than a move with lower score. Note that first
-            // entry is always chosen.
+            // higher probability to be choosen than a move with lower score. Note that first entry
+            // is always chosen.
             if (sum > 0 && (rnd.Next() % sum) < e.count || pickBest && e.count == best)
                 polyMove = e.move;
         }
@@ -117,11 +117,12 @@ public sealed class Book : IDisposable
     {
         // A PolyGlot book move is encoded as follows:
         //
-        // bit 0- 5: destination square (from 0 to 63) bit 6-11: origin square (from 0 to 63)
+        // bit 0- 5: destination square (from 0 to 63)
+        // bit 6-11: origin square (from 0 to 63)
         // bit 12-14: promotion piece (from KNIGHT == 1 to QUEEN == 4)
         //
-        // In case book move is a non-normal move, the move have to be converted. Castleling
-        // moves are especially converted to reflect Mirage castleling move format.
+        // In case book move is a non-normal move, the move have to be converted. Castleling moves
+        // are especially converted to reflect castleling move format.
 
         Move move = m;
 
@@ -141,20 +142,19 @@ public sealed class Book : IDisposable
 
         // Iterate all known moves for current position to find a match.
 
-        foreach (var em in ml)
-        {
-            if (from != em.Move.FromSquare())
-                continue;
+        var emMoves = ml.Select(em => em.Move)
+            .Where(m => from == m.FromSquare())
+            .Where(m => to == m.ToSquare())
+            .Where(m =>
+            {
+                var type = move.MoveType();
+                if (m.IsPromotionMove())
+                    return type == MoveTypes.Promotion;
+                else
+                    return type != MoveTypes.Promotion;
+            });
 
-            if (to != em.Move.ToSquare())
-                continue;
-
-            var type = move.MoveType();
-            if (type != MoveTypes.Promotion || type == MoveTypes.Promotion && em.Move.IsPromotionMove())
-                return em.Move;
-        }
-
-        return Move.EmptyMove;
+        return emMoves.FirstOrDefault(Move.EmptyMove);
     }
 
     private Entry ReadEntry()

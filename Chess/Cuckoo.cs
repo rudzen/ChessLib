@@ -38,15 +38,11 @@ using Types;
 /// </summary>
 public static class Cuckoo
 {
-    private static readonly HashKey[] CuckooKeys;
-    private static readonly Move[] CuckooMoves;
+    private static readonly HashKey[] CuckooKeys = new HashKey[8192];
+    private static readonly Move[] CuckooMoves = new Move[8192];
 
     static Cuckoo()
     {
-        // initialize cuckoo tables
-        CuckooKeys = new HashKey[8192];
-        CuckooMoves = new Move[8192];
-
         Span<Piece> pieces = stackalloc Piece[]
         {
             Enums.Pieces.WhitePawn,

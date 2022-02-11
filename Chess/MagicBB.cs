@@ -187,7 +187,7 @@ public static class MagicBB
 
             for (temp = 0; temp < One << numSquares; ++temp)
             {
-                var tempocc = InitmagicmovesOcc(squares.Slice(0, numSquares), temp);
+                var tempocc = InitmagicmovesOcc(squares[..numSquares], temp);
                 MagicBishopDb[i][(tempocc * MagicmovesBMagics[i]) >> 55] = InitmagicmovesBmoves(i, tempocc);
             }
         }
@@ -207,7 +207,7 @@ public static class MagicBB
 
             for (temp = 0; temp < One << numSquares; ++temp)
             {
-                var tempocc = InitmagicmovesOcc(squares.Slice(0, numSquares), temp);
+                var tempocc = InitmagicmovesOcc(squares[..numSquares], temp);
                 MagicRookDb[i][(tempocc * MagicmovesRMagics[i]) >> 52] = InitmagicmovesRmoves(i, tempocc);
             }
         }

@@ -40,7 +40,4 @@ public static class MoveTypesExtensions
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int AsInt(this MoveTypes @this) => (int)@this;
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool HasFlagFast(this MoveTypes value, MoveTypes flag) => (value & flag) != 0;
 }

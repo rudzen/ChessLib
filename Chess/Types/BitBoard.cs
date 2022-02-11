@@ -61,7 +61,7 @@ public readonly struct BitBoard : IEnumerable<Square>, IEquatable<BitBoard>
 
     public bool IsEmpty => Value == 0;
 
-    public static BitBoard Empty = BitBoards.EmptyBitBoard;
+    public static readonly BitBoard Empty = BitBoards.EmptyBitBoard;
 
     public string String => Convert.ToString((long)Value, 2).PadLeft(64, '0');
 

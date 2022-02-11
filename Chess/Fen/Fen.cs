@@ -89,7 +89,7 @@ public static class Fen
         if (spaceIndex == -1)
             throw new InvalidFen($"Invalid fen {s.ToString()}");
 
-        var mainSection = s.Slice(0, spaceIndex);
+        var mainSection = s[..spaceIndex];
 
         Span<int> limits = stackalloc int[] { 32, 8, 10, 10, 10, 9, 1 };
 
@@ -153,7 +153,7 @@ public static class Fen
             throw new InvalidFen($"Invalid fen (black piece count exceeds limit) {s.ToString()}");
 
         spaceIndex = s.LastIndexOf(' ');
-        var endSection = s.Slice(spaceIndex);
+        var endSection = s[spaceIndex..];
 
         if (endSection.ToString().ToIntegral() >= 2048)
             throw new InvalidFen($"Invalid half move count for fen {s.ToString()}");

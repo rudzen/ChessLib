@@ -108,25 +108,25 @@ public interface IPosition : IEnumerable<Piece>
 
     BitBoard Pieces(PieceTypes pt1, PieceTypes pt2);
 
-    BitBoard Pieces(PieceTypes pt, Player side);
+    BitBoard Pieces(PieceTypes pt, Player c);
 
-    BitBoard Pieces(PieceTypes pt1, PieceTypes pt2, Player side);
+    BitBoard Pieces(PieceTypes pt1, PieceTypes pt2, Player c);
 
     ReadOnlySpan<Square> Squares(PieceTypes pt, Player c);
 
-    Square GetPieceSquare(PieceTypes pt, Player color);
+    Square GetPieceSquare(PieceTypes pt, Player c);
 
-    Square GetKingSquare(Player color);
+    Square GetKingSquare(Player c);
 
     Piece MovedPiece(Move m);
 
-    bool PieceOnFile(Square square, Player side, PieceTypes pieceType);
+    bool PieceOnFile(Square sq, Player c, PieceTypes pt);
 
-    bool PawnIsolated(Square square, Player side);
+    bool PawnIsolated(Square sq, Player c);
 
-    bool PassedPawn(Square square);
+    bool PassedPawn(Square sq);
 
-    void RemovePiece(Square square);
+    void RemovePiece(Square sq);
 
     BitBoard AttacksTo(Square sq, BitBoard occupied);
 
@@ -142,7 +142,7 @@ public interface IPosition : IEnumerable<Piece>
 
     bool CanCastle(CastlelingRights cr);
 
-    bool CanCastle(Player color);
+    bool CanCastle(Player c);
 
     bool CastlingImpeded(CastlelingRights cr);
 
@@ -162,9 +162,9 @@ public interface IPosition : IEnumerable<Piece>
 
     HashKey GetPawnKey();
 
-    BitBoard GetAttacks(Square square, PieceTypes pt, BitBoard occupied);
+    BitBoard GetAttacks(Square sq, PieceTypes pt, BitBoard occupied);
 
-    BitBoard GetAttacks(Square square, PieceTypes pt);
+    BitBoard GetAttacks(Square sq, PieceTypes pt);
 
     void MoveToString(Move m, StringBuilder output);
 

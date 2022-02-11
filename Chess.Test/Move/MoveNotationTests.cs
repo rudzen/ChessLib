@@ -42,7 +42,6 @@ public sealed class MoveNotationTests
         // Tests both knights moving to same square for Rank ambiguity
 
         const string fen = "8/6k1/8/8/8/8/1K1N1N2/8 w - - 0 1";
-        const MoveNotations notation = MoveNotations.Fan;
 
         var movingPiece = new Piece(Pieces.WhiteKnight);
         var fromOneSquare = new Square(Squares.d2);
@@ -274,8 +273,8 @@ public sealed class MoveNotationTests
         var uniChar = movingPiece.GetPieceChar();
         var toSquareString = toSquare.ToString();
 
-        var expectedPrimary = $"{uniChar}{fromOneSquare.ToString()}-{toSquareString}";
-        var expectedSecondary = $"{uniChar}{fromTwoSquare.ToString()}-{toSquareString}";
+        var expectedPrimary = $"{uniChar}{fromOneSquare}-{toSquareString}";
+        var expectedSecondary = $"{uniChar}{fromTwoSquare}-{toSquareString}";
 
         var board = new Board();
         var pieceValue = new PieceValue();
@@ -311,8 +310,8 @@ public sealed class MoveNotationTests
         var uniChar = movingPiece.GetPieceChar();
         var toSquareString = toSquare.ToString();
 
-        var expectedPrimary = $"{uniChar}{fromOneSquare.ToString()}-{toSquareString}";
-        var expectedSecondary = $"{uniChar}{fromTwoSquare.ToString()}-{toSquareString}";
+        var expectedPrimary = $"{uniChar}{fromOneSquare}-{toSquareString}";
+        var expectedSecondary = $"{uniChar}{fromTwoSquare}-{toSquareString}";
 
         var board = new Board();
         var pieceValue = new PieceValue();
@@ -348,8 +347,8 @@ public sealed class MoveNotationTests
         var uniChar = movingPiece.GetPieceChar();
         var toSquareString = toSquare.ToString();
 
-        var expectedPrimary = $"{uniChar}{fromOneSquare.ToString()}-{toSquareString}";
-        var expectedSecondary = $"{uniChar}{fromTwoSquare.ToString()}-{toSquareString}";
+        var expectedPrimary = $"{uniChar}{fromOneSquare}-{toSquareString}";
+        var expectedSecondary = $"{uniChar}{fromTwoSquare}-{toSquareString}";
 
         var board = new Board();
         var pieceValue = new PieceValue();
@@ -385,8 +384,8 @@ public sealed class MoveNotationTests
         var uniChar = movingPiece.GetPieceChar();
         var toSquareString = toSquare.ToString();
 
-        var expectedPrimary = $"{uniChar}{fromOneSquare.ToString()}-{toSquareString}";
-        var expectedSecondary = $"{uniChar}{fromTwoSquare.ToString()}-{toSquareString}";
+        var expectedPrimary = $"{uniChar}{fromOneSquare}-{toSquareString}";
+        var expectedSecondary = $"{uniChar}{fromTwoSquare}-{toSquareString}";
 
         var board = new Board();
         var pieceValue = new PieceValue();
@@ -422,8 +421,8 @@ public sealed class MoveNotationTests
         var uniChar = movingPiece.GetPieceChar();
         var toSquareString = toSquare.ToString();
 
-        var expectedPrimary = $"{uniChar}{fromOneSquare.ToString()}-{toSquareString}";
-        var expectedSecondary = $"{uniChar}{fromTwoSquare.ToString()}-{toSquareString}";
+        var expectedPrimary = $"{uniChar}{fromOneSquare}-{toSquareString}";
+        var expectedSecondary = $"{uniChar}{fromTwoSquare}-{toSquareString}";
 
         var board = new Board();
         var pieceValue = new PieceValue();
@@ -459,8 +458,8 @@ public sealed class MoveNotationTests
         var uniChar = movingPiece.GetPieceChar();
         var toSquareString = toSquare.ToString();
 
-        var expectedPrimary = $"{uniChar}{fromOneSquare.ToString()}-{toSquareString}";
-        var expectedSecondary = $"{uniChar}{fromTwoSquare.ToString()}-{toSquareString}";
+        var expectedPrimary = $"{uniChar}{fromOneSquare}-{toSquareString}";
+        var expectedSecondary = $"{uniChar}{fromTwoSquare}-{toSquareString}";
 
         var board = new Board();
         var pieceValue = new PieceValue();

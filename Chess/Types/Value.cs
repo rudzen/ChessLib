@@ -46,7 +46,7 @@ public readonly struct Value : IEquatable<Value>
 
     private Value(PieceValues value) => Raw = value;
 
-    public static Value ValueZero = new(PieceValues.ValueZero);
+    public static readonly Value ValueZero = new(PieceValues.ValueZero);
 
     public static implicit operator Value(int value)
         => new(value);

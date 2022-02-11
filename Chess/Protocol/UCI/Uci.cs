@@ -109,7 +109,7 @@ public class Uci : IUci
     public string ReadyOk() => "readyok";
 
     public string CopyProtection(CopyProtections copyProtections)
-        => $"copyprotection {copyProtections.ToString()}";
+        => $"copyprotection {copyProtections}";
 
     public string BestMove(Move move, Move ponderMove)
         => !ponderMove.IsNullMove()

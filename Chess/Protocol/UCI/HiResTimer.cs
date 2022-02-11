@@ -111,7 +111,7 @@ public sealed class HiResTimer : IHiResTimer
         if (IsRunning)
             Stop();
 
-        Debug.Print($"Timer Start on thread {Thread.CurrentThread.ManagedThreadId}");
+        Debug.Print($"Timer Start on thread {Environment.CurrentManagedThreadId}");
 
         _cancellationTokenSource = new CancellationTokenSource();
         _cancellationTokenSource.Token.ThrowIfCancellationRequested();
@@ -125,7 +125,7 @@ public sealed class HiResTimer : IHiResTimer
         if (!IsRunning)
             return;
 
-        Debug.WriteLine($"Timer Stop on thread {Thread.CurrentThread.ManagedThreadId}");
+        Debug.WriteLine($"Timer Stop on thread {Environment.CurrentManagedThreadId}");
         if (_executer.IsCanceled || _executer.IsCompleted)
             return;
 
@@ -148,7 +148,7 @@ public sealed class HiResTimer : IHiResTimer
 
     public override bool Equals(object obj)
     {
-        if (ReferenceEquals(null, obj))
+        if (obj is null)
             return false;
         if (ReferenceEquals(this, obj))
             return true;
@@ -161,7 +161,7 @@ public sealed class HiResTimer : IHiResTimer
 
     private void ExecuteTimer(CancellationToken cancellationToken)
     {
-        Debug.Print($"Timer ExecuteTimer on thread {Thread.CurrentThread.ManagedThreadId}");
+        Debug.Print($"Timer ExecuteTimer on thread {Environment.CurrentManagedThreadId}");
 
         var nextTrigger = 0f;
 

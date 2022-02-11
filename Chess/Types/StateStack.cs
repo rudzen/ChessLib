@@ -139,7 +139,7 @@ public sealed class StateStack : IEnumerable<State>
     }
 
     public ReadOnlySpan<State> AsReadOnlySpan()
-        => _stack.AsSpan().Slice(0, Count);
+        => _stack.AsSpan()[..Count];
 
     IEnumerator<State> IEnumerable<State>.GetEnumerator()
         => _stack.TakeWhile(state => state != null).GetEnumerator();

@@ -166,10 +166,10 @@ public sealed class Position : IPosition
     public bool CanCastle(CastlelingRights cr)
         => State.CastlelingRights.HasFlagFast(cr);
 
-    public bool CanCastle(Player color)
+    public bool CanCastle(Player c)
     {
-        var c = (CastlelingRights)((int)(CastlelingRights.WhiteOo | CastlelingRights.WhiteOoo) << (2 * color.Side));
-        return State.CastlelingRights.HasFlagFast(c);
+        var cr = (CastlelingRights)((int)(CastlelingRights.WhiteOo | CastlelingRights.WhiteOoo) << (2 * c.Side));
+        return State.CastlelingRights.HasFlagFast(cr);
     }
 
     public bool CastlingImpeded(CastlelingRights cr)
@@ -326,8 +326,8 @@ public sealed class Position : IPosition
     IEnumerator IEnumerable.GetEnumerator()
         => GetEnumerator();
 
-    public Square GetKingSquare(Player color)
-        => Board.Square(PieceTypes.King, color);
+    public Square GetKingSquare(Player c)
+        => Board.Square(PieceTypes.King, c);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public HashKey GetPawnKey()
@@ -981,7 +981,7 @@ public sealed class Position : IPosition
         var chunk = fen.Chunk();
 
         if (chunk.IsEmpty)
-            throw new InvalidFen($"Invalid board layout detected for : {fen.Fen.ToString()}");
+            throw new InvalidFen($"Invalid board layout detected for : {fen.Fen}");
 
         var f = 1; // file (column)
         var r = 8; // rank (row)

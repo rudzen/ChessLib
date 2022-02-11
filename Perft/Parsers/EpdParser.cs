@@ -86,7 +86,7 @@ public class EpdParser : IEpdParser
             if (s[0] == 'e' & s[1] == 'p' & s[2] == 'd')
             {
                 var firstSpace = s.IndexOf(space);
-                epd = s.Substring(firstSpace).TrimStart();
+                epd = s[firstSpace..].TrimStart();
                 epdSet = true;
                 continue;
             }
@@ -94,7 +94,7 @@ public class EpdParser : IEpdParser
             if (s.StartsWith("perft"))
             {
                 var firstSpace = s.IndexOf(space);
-                perftData.Add(s.Substring(firstSpace));
+                perftData.Add(s[firstSpace..]);
             }
         }
 

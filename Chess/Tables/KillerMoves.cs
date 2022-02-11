@@ -115,7 +115,7 @@ public sealed class KillerMoves : IKillerMoves
 
     public bool Equals(IKillerMoves other)
     {
-        if (ReferenceEquals(null, other)) return false;
+        if (other is null) return false;
         if (ReferenceEquals(this, other)) return true;
         for (var j = 0; j < _maxDepth; ++j)
         {

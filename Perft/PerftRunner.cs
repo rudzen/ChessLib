@@ -159,12 +159,6 @@ public sealed class PerftRunner : IPerftRunner
         return ParseEpd(options);
     }
 
-    private IAsyncEnumerable<IPerftPosition> ParseFen(CancellationToken cancellationToken)
-    {
-        var options = Options as FenOptions;
-        return ParseFen(options);
-    }
-
     private async IAsyncEnumerable<IPerftPosition> ParseEpd(EpdOptions options)
     {
         _epdParser.Settings.Filename = options.Epds.First();
@@ -182,8 +176,13 @@ public sealed class PerftRunner : IPerftRunner
             yield return perftPosition;
     }
 
-#pragma warning disable 1998
+    private IAsyncEnumerable<IPerftPosition> ParseFen(CancellationToken cancellationToken)
+    {
+        var options = Options as FenOptions;
+        return ParseFen(options);
+    }
 
+#pragma warning disable 1998
     private static async IAsyncEnumerable<IPerftPosition> ParseFen(FenOptions options)
 #pragma warning restore 1998
     {

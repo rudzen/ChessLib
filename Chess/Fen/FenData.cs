@@ -80,13 +80,13 @@ public sealed class FenData : EventArgs, IFenData
         (int start, int end) result;
         Index++;
         return _splitPoints.TryDequeue(out result)
-            ? Fen.Span.Slice(result.start, result.end - result.start)
+            ? Fen.Span[result.start..result.end]
             : ReadOnlySpan<char>.Empty;
     }
 
     public bool Equals(FenData other)
     {
-        if (ReferenceEquals(null, other)) return false;
+        if (other is null) return false;
         if (ReferenceEquals(this, other)) return true;
 
         if (_splitPoints.Count != other._splitPoints.Count)

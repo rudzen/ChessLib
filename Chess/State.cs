@@ -161,7 +161,7 @@ public sealed class State : IEquatable<State>
 
     public bool Equals(State other)
     {
-        if (ReferenceEquals(null, other)) return false;
+        if (other is null) return false;
         // if (ReferenceEquals(this, other)) return true;
         return LastMove.Equals(other.LastMove)
                && Key.Equals(other.Key)

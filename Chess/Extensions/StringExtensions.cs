@@ -66,7 +66,7 @@ public static class StringExtensions
                     continue;
 
                 // return token
-                q.Enqueue(new string(command.Slice(startIndex, i - startIndex).TrimEnd(tokenizer).ToArray()));
+                q.Enqueue(new string(command[startIndex..i].TrimEnd(tokenizer).ToArray()));
                 startIndex = i + 1;
             }
             else if (character == tokenizer)

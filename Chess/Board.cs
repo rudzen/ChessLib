@@ -167,7 +167,7 @@ public sealed class Board : IBoard
         var idx = Array.IndexOf(squares, Types.Square.None);
         return idx == 0
             ? ReadOnlySpan<Square>.Empty
-            : squares.AsSpan().Slice(0, idx);
+            : squares.AsSpan()[..idx];
     }
 
     public int PieceCount(PieceTypes pt, Player c)
