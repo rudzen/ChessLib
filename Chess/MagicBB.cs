@@ -104,125 +104,63 @@ public static class MagicBB
         for (var i = 0; i < MagicBishopDb.Length; ++i)
             MagicRookDb[i] = new BitBoard[MagicRookDbLength];
 
+#pragma warning disable format // @formatter:off
         Span<int> initMagicMovesDb = stackalloc int[] {
-            63,
-            0,
-            58,
-            1,
-            59,
-            47,
-            53,
-            2,
-            60,
-            39,
-            48,
-            27,
-            54,
-            33,
-            42,
-            3,
-            61,
-            51,
-            37,
-            40,
-            49,
-            18,
-            28,
-            20,
-            55,
-            30,
-            34,
-            11,
-            43,
-            14,
-            22,
-            4,
-            62,
-            57,
-            46,
-            52,
-            38,
-            26,
-            32,
-            41,
-            50,
-            36,
-            17,
-            19,
-            29,
-            10,
-            13,
-            21,
-            56,
-            45,
-            25,
-            31,
-            35,
-            16,
-            9,
-            12,
-            44,
-            24,
-            15,
-            8,
-            23,
-            7,
-            6,
-            5
+            63,  0, 58,  1, 59, 47, 53,  2,
+            60, 39, 48, 27, 54, 33, 42,  3,
+            61, 51, 37, 40, 49, 18, 28, 20,
+            55, 30, 34, 11, 43, 14, 22,  4,
+            62, 57, 46, 52, 38, 26, 32, 41,
+            50, 36, 17, 19, 29, 10, 13, 21,
+            56, 45, 25, 31, 35, 16,  9, 12,
+            44, 24, 15,  8, 23,  7,  6,  5
         };
+#pragma warning restore format // @formatter:on
 
         Span<int> squares = stackalloc int[64];
-        int numSquares;
 
         for (var i = 0; i < squares.Length; ++i)
         {
-            numSquares = 0;
-            var temp = MagicmovesBMask[i];
-            while (temp != 0)
-            {
-                var bit = (ulong)((long)temp & -(long)temp);
-                squares[numSquares++] = initMagicMovesDb[(int)((bit * 0x07EDD5E59A4E28C2UL) >> 58)];
-                temp ^= bit;
-            }
-
-            for (temp = 0; temp < One << numSquares; ++temp)
+            var numSquares = InitSquares(squares, MagicmovesBMask[i], initMagicMovesDb);
+            for (var temp = 0UL; temp < One << numSquares; ++temp)
             {
                 var tempocc = InitmagicmovesOcc(squares[..numSquares], temp);
                 MagicBishopDb[i][(tempocc * MagicmovesBMagics[i]) >> 55] = InitmagicmovesBmoves(i, tempocc);
             }
         }
 
-        squares.Clear();
-
         for (var i = 0; i < squares.Length; ++i)
         {
-            numSquares = 0;
-            var temp = MagicmovesRMask[i];
-            while (temp != 0)
-            {
-                var bit = (ulong)((long)temp & -(long)temp);
-                squares[numSquares++] = initMagicMovesDb[(int)((bit * 0x07EDD5E59A4E28C2UL) >> 58)];
-                temp ^= bit;
-            }
-
-            for (temp = 0; temp < One << numSquares; ++temp)
+            var numSquares = InitSquares(squares, MagicmovesRMask[i], initMagicMovesDb);
+            for (var temp = 0UL; temp < One << numSquares; ++temp)
             {
                 var tempocc = InitmagicmovesOcc(squares[..numSquares], temp);
                 MagicRookDb[i][(tempocc * MagicmovesRMagics[i]) >> 52] = InitmagicmovesRmoves(i, tempocc);
             }
         }
+    }
 
-        static ulong InitmagicmovesOcc(ReadOnlySpan<int> squares, ulong linocc)
+    private static int InitSquares(Span<int> squares, ulong mask, ReadOnlySpan<int> bbInits)
+    {
+        var numSquares = 0;
+        while (mask != 0)
         {
-            var ret = 0ul;
-            for (var i = 0; i < squares.Length; ++i)
-            {
-                if ((linocc & (One << i)) != 0)
-                    ret |= One << squares[i];
-            }
-
-            return ret;
+            var bit = (ulong)((long)mask & -(long)mask);
+            squares[numSquares++] = bbInits[(int)((bit * 0x07EDD5E59A4E28C2UL) >> 58)];
+            mask ^= bit;
         }
+
+        return numSquares;
+    }
+
+    private static ulong InitmagicmovesOcc(ReadOnlySpan<int> squares, ulong linocc)
+    {
+        var ret = 0ul;
+        for (var i = 0; i < squares.Length; ++i)
+            if ((linocc & (One << i)) != 0)
+                ret |= One << squares[i];
+
+        return ret;
     }
 
     public static BitBoard BishopAttacks(this Square square, BitBoard occupied)

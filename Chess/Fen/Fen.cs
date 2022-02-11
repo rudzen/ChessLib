@@ -170,6 +170,21 @@ public static class Fen
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void CountValidity(ReadOnlySpan<char> str)
     {
+        var (spaceCount, separatorCount) = CountSpacesAndSeparators(str);
+
+        var valid = spaceCount >= SpaceCount;
+
+        if (!valid)
+            throw new InvalidFen($"Invalid space character count in fen {str.ToString()}");
+
+        valid = separatorCount == SeparatorCount;
+
+        if (!valid)
+            throw new InvalidFen($"Invalid separator count in fen {str.ToString()}");
+    }
+
+    private static (int, int) CountSpacesAndSeparators(ReadOnlySpan<char> str)
+    {
         var spaceCount = 0;
         var separatorCount = 0;
 
@@ -187,14 +202,6 @@ public static class Fen
             }
         }
 
-        var valid = spaceCount >= SpaceCount;
-
-        if (!valid)
-            throw new InvalidFen($"Invalid space character count in fen {str.ToString()}");
-
-        valid = separatorCount == SeparatorCount;
-
-        if (!valid)
-            throw new InvalidFen($"Invalid separator count in fen {str.ToString()}");
+        return (spaceCount, separatorCount);
     }
 }
