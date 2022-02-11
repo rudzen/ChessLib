@@ -24,156 +24,155 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Perft
+namespace Perft;
+
+using Chess.Perft;
+using Chess.Perft.Interfaces;
+using CommandLine;
+using DryIoc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.ObjectPool;
+using Options;
+using Parsers;
+using Rudz.Chess;
+using Rudz.Chess.Protocol.UCI;
+using Rudz.Chess.Tables;
+using Rudz.Chess.Types;
+using Serilog;
+using System;
+using System.IO;
+using System.Threading.Tasks;
+using TimeStamp;
+
+/*
+ *
+ *    TODO: Fens to investigate:
+ * r2n3r/1bNk2pp/6P1/pP3p2/3pPqnP/1P1P1p1R/2P3B1/Q1B1bKN1 b - e3
+ *
+ *
+ *
+ */
+
+internal static class Program
 {
-    using Chess.Perft;
-    using Chess.Perft.Interfaces;
-    using CommandLine;
-    using DryIoc;
-    using Microsoft.Extensions.Configuration;
-    using Microsoft.Extensions.ObjectPool;
-    using Options;
-    using Parsers;
-    using Rudz.Chess;
-    using Rudz.Chess.Protocol.UCI;
-    using Rudz.Chess.Tables;
-    using Rudz.Chess.Types;
-    using Serilog;
-    using System;
-    using System.IO;
-    using System.Threading.Tasks;
-    using TimeStamp;
+    private const string ConfigFileName = "appsettings.json";
 
-    /*
-     *
-     *    TODO: Fens to investigate:
-     * r2n3r/1bNk2pp/6P1/pP3p2/3pPqnP/1P1P1p1R/2P3B1/Q1B1bKN1 b - e3
-     *
-     *
-     *
-     */
-
-    internal static class Program
+    static Program()
     {
-        private const string ConfigFileName = "appsettings.json";
+        Framework.Startup(BuildConfiguration, AddServices);
+    }
 
-        static Program()
+    public static async Task<int> Main(string[] args)
+    {
+        var optionsUsed = OptionType.None;
+        IOptions options = null;
+        IOptions ttOptions = null;
+
+        var setEdp = new Func<EpdOptions, int>(o =>
         {
-            Framework.Startup(BuildConfiguration, AddServices);
-        }
+            optionsUsed |= OptionType.EdpOptions;
+            options = o;
+            return 0;
+        });
 
-        public static async Task<int> Main(string[] args)
+        var setFen = new Func<FenOptions, int>(o =>
         {
-            var optionsUsed = OptionType.None;
-            IOptions options = null;
-            IOptions ttOptions = null;
+            optionsUsed |= OptionType.FenOptions;
+            options = o;
+            return 0;
+        });
 
-            var setEdp = new Func<EpdOptions, int>(o =>
-            {
-                optionsUsed |= OptionType.EdpOptions;
-                options = o;
-                return 0;
-            });
+        var setTT = new Func<TTOptions, int>(o =>
+        {
+            optionsUsed |= OptionType.TTOptions;
+            ttOptions = o;
+            return 0;
+        });
 
-            var setFen = new Func<FenOptions, int>(o =>
-            {
-                optionsUsed |= OptionType.FenOptions;
-                options = o;
-                return 0;
-            });
+        /*
+         * fens -f "rnkq1bnr/p3ppp1/1ppp3p/3B4/6b1/2PQ3P/PP1PPP2/RNB1K1NR w KQ -" -d 6
+         * fens -f "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1" -d 6
+         * epd -f D:\perft-random.epd
+         */
 
-            var setTT = new Func<TTOptions, int>(o =>
-            {
-                optionsUsed |= OptionType.TTOptions;
-                ttOptions = o;
-                return 0;
-            });
+        var returnValue = Parser.Default.ParseArguments<EpdOptions, FenOptions, TTOptions>(args)
+            .MapResult(
+                (EpdOptions opts) => setEdp(opts),
+                (FenOptions opts) => setFen(opts),
+                (TTOptions opts) => setTT(opts),
+                errs => 1);
 
-            /*
-             * fens -f "rnkq1bnr/p3ppp1/1ppp3p/3B4/6b1/2PQ3P/PP1PPP2/RNB1K1NR w KQ -" -d 6
-             * fens -f "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1" -d 6
-             * epd -f D:\perft-random.epd
-             */
-
-            var returnValue = Parser.Default.ParseArguments<EpdOptions, FenOptions, TTOptions>(args)
-                .MapResult(
-                    (EpdOptions opts) => setEdp(opts),
-                    (FenOptions opts) => setFen(opts),
-                    (TTOptions opts) => setTT(opts),
-                    errs => 1);
-
-            if (returnValue != 0)
-                return returnValue;
-
-            var perftRunner = Framework.IoC.Resolve<IPerftRunner>();
-            perftRunner.Options = options;
-            perftRunner.SaveResults = true;
-
-            returnValue = await perftRunner.Run().ConfigureAwait(false);
-
+        if (returnValue != 0)
             return returnValue;
-        }
 
-        private static void BuildConfiguration(IConfigurationBuilder builder)
+        var perftRunner = Framework.IoC.Resolve<IPerftRunner>();
+        perftRunner.Options = options;
+        perftRunner.SaveResults = true;
+
+        returnValue = await perftRunner.Run().ConfigureAwait(false);
+
+        return returnValue;
+    }
+
+    private static void BuildConfiguration(IConfigurationBuilder builder)
+    {
+        // Read the configuration file for this assembly
+        builder.SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile(ConfigFileName);
+    }
+
+    private static void AddServices(IContainer container, IConfiguration configuration)
+    {
+        // Bind logger with configuration
+        container.Register(Made.Of(() => ConfigureLogger(configuration)), Reuse.Singleton);
+
+        // Bind build time stamp class
+        container.Register<IBuildTimeStamp, BuildTimeStamp>(Reuse.Singleton);
+
+        // Bind chess classes
+        container.Register<IGame, Game>(Reuse.Transient);
+        container.Register<IBoard, Board>(Reuse.Singleton);
+        // container.Register<IMoveList, MoveList>(Reuse.Transient);
+        container.Register<IPosition, Position>(Reuse.Transient);
+        container.Register<IKillerMoves, KillerMoves>(Reuse.Transient);
+        container.Register<IUci, Uci>(Reuse.Singleton);
+        container.Register<IPieceValue, PieceValue>(Reuse.Singleton);
+
+        // Bind options
+        container.Register<IOptions, EpdOptions>(Reuse.Singleton, serviceKey: OptionType.EdpOptions);
+        container.Register<IOptions, FenOptions>(Reuse.Singleton, serviceKey: OptionType.FenOptions);
+        container.Register<IOptions, TTOptions>(Reuse.Singleton, serviceKey: OptionType.TTOptions);
+
+        // Bind chess perft classes
+        container.Register<IPerftPosition, PerftPosition>(Reuse.Transient);
+        container.Register<IPerft, Perft>(Reuse.Transient);
+        container.Register<IPerftRunner, PerftRunner>(Reuse.Transient);
+
+        // Bind perft classes
+        container.Register<IEpdParserSettings, EpdParserSettings>(Reuse.Singleton);
+        container.Register<IEpdSet, EpdSet>(Reuse.Transient);
+        container.Register<IEpdParser, EpdParser>(Reuse.Singleton);
+
+        // Bind object pool for perft result
+        container.Register<ObjectPoolProvider, DefaultObjectPoolProvider>(Reuse.Singleton);
+        container.RegisterDelegate(context =>
         {
-            // Read the configuration file for this assembly
-            builder.SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile(ConfigFileName);
-        }
+            var provider = context.Resolve<ObjectPoolProvider>();
+            var policy = new DefaultPooledObjectPolicy<PerftResult>();
+            return provider.Create(policy);
+        });
+    }
 
-        private static void AddServices(IContainer container, IConfiguration configuration)
-        {
-            // Bind logger with configuration
-            container.Register(Made.Of(() => ConfigureLogger(configuration)), Reuse.Singleton);
-
-            // Bind build time stamp class
-            container.Register<IBuildTimeStamp, BuildTimeStamp>(Reuse.Singleton);
-
-            // Bind chess classes
-            container.Register<IGame, Game>(Reuse.Transient);
-            container.Register<IBoard, Board>(Reuse.Singleton);
-            // container.Register<IMoveList, MoveList>(Reuse.Transient);
-            container.Register<IPosition, Position>(Reuse.Transient);
-            container.Register<IKillerMoves, KillerMoves>(Reuse.Transient);
-            container.Register<IUci, Uci>(Reuse.Singleton);
-            container.Register<IPieceValue, PieceValue>(Reuse.Singleton);
-
-            // Bind options
-            container.Register<IOptions, EpdOptions>(Reuse.Singleton, serviceKey: OptionType.EdpOptions);
-            container.Register<IOptions, FenOptions>(Reuse.Singleton, serviceKey: OptionType.FenOptions);
-            container.Register<IOptions, TTOptions>(Reuse.Singleton, serviceKey: OptionType.TTOptions);
-
-            // Bind chess perft classes
-            container.Register<IPerftPosition, PerftPosition>(Reuse.Transient);
-            container.Register<IPerft, Perft>(Reuse.Transient);
-            container.Register<IPerftRunner, PerftRunner>(Reuse.Transient);
-
-            // Bind perft classes
-            container.Register<IEpdParserSettings, EpdParserSettings>(Reuse.Singleton);
-            container.Register<IEpdSet, EpdSet>(Reuse.Transient);
-            container.Register<IEpdParser, EpdParser>(Reuse.Singleton);
-
-            // Bind object pool for perft result
-            container.Register<ObjectPoolProvider, DefaultObjectPoolProvider>(Reuse.Singleton);
-            container.RegisterDelegate(context =>
-            {
-                var provider = context.Resolve<ObjectPoolProvider>();
-                var policy = new DefaultPooledObjectPolicy<PerftResult>();
-                return provider.Create(policy);
-            });
-        }
-
-        private static ILogger ConfigureLogger(IConfiguration configuration)
-        {
-            // Apply the config to the logger
-            Log.Logger = new LoggerConfiguration()
-                //.WriteTo.EventLog("File System Scanner", manageEventSource: true, restrictedToMinimumLevel: LogEventLevel.Error)
-                .ReadFrom.Configuration(configuration)
-                .Enrich.WithThreadId()
-                .Enrich.FromLogContext()
-                .CreateLogger();
-            AppDomain.CurrentDomain.ProcessExit += (s, e) => Log.CloseAndFlush();
-            return Log.Logger;
-        }
+    private static ILogger ConfigureLogger(IConfiguration configuration)
+    {
+        // Apply the config to the logger
+        Log.Logger = new LoggerConfiguration()
+            //.WriteTo.EventLog("File System Scanner", manageEventSource: true, restrictedToMinimumLevel: LogEventLevel.Error)
+            .ReadFrom.Configuration(configuration)
+            .Enrich.WithThreadId()
+            .Enrich.FromLogContext()
+            .CreateLogger();
+        AppDomain.CurrentDomain.ProcessExit += (s, e) => Log.CloseAndFlush();
+        return Log.Logger;
     }
 }

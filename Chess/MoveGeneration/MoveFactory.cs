@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2020 Rudy Alex Kohn
+Copyright (c) 2017-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -25,17 +25,16 @@ SOFTWARE.
 #1#
 */
 
-namespace Rudz.Chess.MoveGeneration
-{
-    using Enums;
+namespace Rudz.Chess.MoveGeneration;
 
-    public static class MoveFactory
+using Enums;
+
+public static class MoveFactory
+{
+    public static MoveList GenerateMoves(this IPosition pos, MoveGenerationType type = MoveGenerationType.Legal)
     {
-        public static MoveList GenerateMoves(this IPosition pos, MoveGenerationType type = MoveGenerationType.Legal)
-        {
-            var ml = new MoveList();
-            ml.Generate(pos, type);
-            return ml;
-        }
+        var ml = new MoveList();
+        ml.Generate(pos, type);
+        return ml;
     }
 }

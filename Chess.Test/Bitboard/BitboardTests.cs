@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2020 Rudy Alex Kohn
+Copyright (c) 2017-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,40 +24,39 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Test.Bitboard
+namespace Chess.Test.Bitboard;
+
+using Rudz.Chess.Enums;
+using Rudz.Chess.Types;
+using System;
+using Xunit;
+
+public sealed class BitboardTests
 {
-    using Rudz.Chess.Enums;
-    using Rudz.Chess.Types;
-    using System;
-    using Xunit;
-
-    public sealed class BitboardTests
+    [Fact]
+    public void MakeBitBoardTest()
     {
-        [Fact]
-        public void MakeBitBoardTest()
-        {
-            // a few squares
-            var b1 = BitBoards.MakeBitboard(Squares.a1, Squares.b1, Squares.a2, Squares.b2);
-            var b2 = Squares.a1.BitBoardSquare() | Squares.b1.BitBoardSquare() | Squares.a2.BitBoardSquare() | Squares.b2.BitBoardSquare();
-            Assert.Equal(b1, b2);
+        // a few squares
+        var b1 = BitBoards.MakeBitboard(Squares.a1, Squares.b1, Squares.a2, Squares.b2);
+        var b2 = Squares.a1.BitBoardSquare() | Squares.b1.BitBoardSquare() | Squares.a2.BitBoardSquare() | Squares.b2.BitBoardSquare();
+        Assert.Equal(b1, b2);
 
-            // a single square (not needed, but still has to work in case of list of squares etc)
-            var b3 = BitBoards.MakeBitboard(Squares.h3);
-            var b4 = Squares.h3.BitBoardSquare();
-            Assert.Equal(b3, b4);
-        }
+        // a single square (not needed, but still has to work in case of list of squares etc)
+        var b3 = BitBoards.MakeBitboard(Squares.h3);
+        var b4 = Squares.h3.BitBoardSquare();
+        Assert.Equal(b3, b4);
+    }
 
-        [Fact]
-        public void BitBoardOrALlTest()
+    [Fact]
+    public void BitBoardOrALlTest()
+    {
+        var baseSquares = new Square[] { Squares.a1, Squares.a2, Squares.a3, Squares.a4, Squares.a5, Squares.a6, Squares.a7, Squares.a8 };
+        var bb = BitBoard.Empty.OrAll(baseSquares);
+        while (!bb.IsEmpty)
         {
-            var baseSquares = new Square[] { Squares.a1, Squares.a2, Squares.a3, Squares.a4, Squares.a5, Squares.a6, Squares.a7, Squares.a8 };
-            var bb = BitBoard.Empty.OrAll(baseSquares);
-            while (!bb.IsEmpty)
-            {
-                var s = BitBoards.PopLsb(ref bb);
-                var valid = Array.BinarySearch(baseSquares, s) > -1;
-                Assert.True(valid);
-            }
+            var s = BitBoards.PopLsb(ref bb);
+            var valid = Array.BinarySearch(baseSquares, s) > -1;
+            Assert.True(valid);
         }
     }
 }

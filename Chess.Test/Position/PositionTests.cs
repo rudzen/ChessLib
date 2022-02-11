@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2020 Rudy Alex Kohn
+Copyright (c) 2017-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,75 +24,74 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Test.Position
+namespace Chess.Test.Position;
+
+using FluentAssertions;
+using Rudz.Chess;
+using Rudz.Chess.Enums;
+using Rudz.Chess.Factories;
+using Rudz.Chess.Types;
+using Xunit;
+
+public sealed class PositionTests
 {
-    using FluentAssertions;
-    using Rudz.Chess;
-    using Rudz.Chess.Enums;
-    using Rudz.Chess.Factories;
-    using Rudz.Chess.Types;
-    using Xunit;
-
-    public sealed class PositionTests
+    [Fact]
+    public void AddPieceTest()
     {
-        [Fact]
-        public void AddPieceTest()
-        {
-            var pieceValue = new PieceValue();
-            var board = new Board();
-            var position = new Position(board, pieceValue);
+        var pieceValue = new PieceValue();
+        var board = new Board();
+        var position = new Position(board, pieceValue);
 
-            position.AddPiece(Pieces.WhiteKing, Squares.a7);
-            var pieces = position.Pieces();
-            var square = pieces.Lsb();
-            Assert.Equal(Squares.a7, square.Value);
+        position.AddPiece(Pieces.WhiteKing, Squares.a7);
+        var pieces = position.Pieces();
+        var square = pieces.Lsb();
+        Assert.Equal(Squares.a7, square.Value);
 
-            var piece = position.GetPiece(square);
-            Assert.Equal(Pieces.WhiteKing, piece.Value);
+        var piece = position.GetPiece(square);
+        Assert.Equal(Pieces.WhiteKing, piece.Value);
 
-            // test overload
-            pieces = position.Pieces(piece);
-            Assert.False((pieces & square).IsEmpty);
+        // test overload
+        pieces = position.Pieces(piece);
+        Assert.False((pieces & square).IsEmpty);
 
-            // Test piece type overload
+        // Test piece type overload
 
-            board = new Board();
-            position = new Position(board, pieceValue);
+        board = new Board();
+        position = new Position(board, pieceValue);
 
-            position.AddPiece(PieceTypes.Knight.MakePiece(Player.Black), Squares.d5);
-            pieces = position.Pieces();
-            square = pieces.Lsb();
-            Assert.Equal(Squares.d5, square.Value);
+        position.AddPiece(PieceTypes.Knight.MakePiece(Player.Black), Squares.d5);
+        pieces = position.Pieces();
+        square = pieces.Lsb();
+        Assert.Equal(Squares.d5, square.Value);
 
-            piece = position.GetPiece(square);
-            Assert.Equal(Pieces.BlackKnight, piece.Value);
-        }
-
-        [Fact]
-        public void KingBlockerTest()
-        {
-            // black has an absolute pinned piece at e6
-            const string fen = "1rk5/8/4n3/5B2/1N6/8/8/1Q1K4 b - - 3 53";
-
-            const int expected = 1;
-            var expectedSquare = new Square(Ranks.Rank6, Files.FileE);
-
-            var game = GameFactory.Create(fen);
-            var pos = game.Pos;
-
-            var b = pos.BlockersForKing(Player.Black);
-
-            // b must contain one square at this point
-            var pinnedCount = b.Count;
-
-            pinnedCount.Should().Be(expected);
-
-            // test for correct square
-            var pinnedSquare = b.Lsb();
-
-            pinnedSquare.Should().Be(expectedSquare);
-        }
-
-        // TODO : Add test functions for the rest of the methods and properties in position class
+        piece = position.GetPiece(square);
+        Assert.Equal(Pieces.BlackKnight, piece.Value);
     }
+
+    [Fact]
+    public void KingBlockerTest()
+    {
+        // black has an absolute pinned piece at e6
+        const string fen = "1rk5/8/4n3/5B2/1N6/8/8/1Q1K4 b - - 3 53";
+
+        const int expected = 1;
+        var expectedSquare = new Square(Ranks.Rank6, Files.FileE);
+
+        var game = GameFactory.Create(fen);
+        var pos = game.Pos;
+
+        var b = pos.BlockersForKing(Player.Black);
+
+        // b must contain one square at this point
+        var pinnedCount = b.Count;
+
+        pinnedCount.Should().Be(expected);
+
+        // test for correct square
+        var pinnedSquare = b.Lsb();
+
+        pinnedSquare.Should().Be(expectedSquare);
+    }
+
+    // TODO : Add test functions for the rest of the methods and properties in position class
 }

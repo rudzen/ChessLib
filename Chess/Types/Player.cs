@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2020 Rudy Alex Kohn
+Copyright (c) 2017-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,107 +24,106 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Types
+namespace Rudz.Chess.Types;
+
+using Enums;
+using Extensions;
+using System;
+using System.Runtime.CompilerServices;
+
+public readonly struct Player : IEquatable<Player>
 {
-    using Enums;
-    using Extensions;
-    using System;
-    using System.Runtime.CompilerServices;
+    private static readonly Direction[] PawnPushDist = { Directions.North, Directions.South };
 
-    public readonly struct Player : IEquatable<Player>
-    {
-        private static readonly Direction[] PawnPushDist = { Directions.North, Directions.South };
+    private static readonly Direction[] PawnDoublePushDist = { Directions.NorthDouble, Directions.SouthDouble };
 
-        private static readonly Direction[] PawnDoublePushDist = { Directions.NorthDouble, Directions.SouthDouble };
+    private static readonly Direction[] PawnWestAttackDist = { Directions.NorthEast, Directions.SouthEast };
 
-        private static readonly Direction[] PawnWestAttackDist = { Directions.NorthEast, Directions.SouthEast };
+    private static readonly Direction[] PawnEastAttackDist = { Directions.NorthWest, Directions.SouthWest };
 
-        private static readonly Direction[] PawnEastAttackDist = { Directions.NorthWest, Directions.SouthWest };
+    private static readonly string[] PlayerColors = { "White", "Black" };
 
-        private static readonly string[] PlayerColors = { "White", "Black" };
+    private static readonly Func<BitBoard, BitBoard>[] PawnPushModifiers = { BitBoards.NorthOne, BitBoards.SouthOne };
 
-        private static readonly Func<BitBoard, BitBoard>[] PawnPushModifiers = { BitBoards.NorthOne, BitBoards.SouthOne };
+    public Player(byte side)
+        : this() => Side = side;
 
-        public Player(byte side)
-            : this() => Side = side;
+    public Player(Player side)
+        : this() => Side = side.Side;
 
-        public Player(Player side)
-            : this() => Side = side.Side;
+    public Player(Players side)
+        : this((byte)side) { }
 
-        public Player(Players side)
-            : this((byte)side) { }
+    public readonly byte Side;
 
-        public readonly byte Side;
+    public bool IsWhite => Side == 0;
 
-        public bool IsWhite => Side == 0;
+    public bool IsBlack => Side != 0;
 
-        public bool IsBlack => Side != 0;
+    public static readonly Player White = 0;
 
-        public static readonly Player White = 0;
+    public static readonly Player Black = 1;
 
-        public static readonly Player Black = 1;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static implicit operator Player(int value) => new((byte)value);
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator Player(int value) => new((byte)value);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static implicit operator Player(uint value) => new((byte)value);
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator Player(uint value) => new((byte)value);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static implicit operator Player(Players value) => new(value);
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator Player(Players value) => new(value);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static implicit operator Player(bool value) => new(value.AsByte());
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator Player(bool value) => new(value.AsByte());
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Player operator ~(Player player) => new(player.Side ^ 1);
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Player operator ~(Player player) => new(player.Side ^ 1);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool operator ==(Player left, Player right) => left.Side == right.Side;
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator ==(Player left, Player right) => left.Side == right.Side;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool operator !=(Player left, Player right) => left.Side != right.Side;
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator !=(Player left, Player right) => left.Side != right.Side;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static int operator <<(Player left, int right) => left.Side << right;
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int operator <<(Player left, int right) => left.Side << right;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static int operator >>(Player left, int right) => left.Side >> right;
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int operator >>(Player left, int right) => left.Side >> right;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Pieces operator +(PieceTypes pieceType, Player side) => (Pieces)pieceType + (byte)(side.Side << 3);
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Pieces operator +(PieceTypes pieceType, Player side) => (Pieces)pieceType + (byte)(side.Side << 3);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public override bool Equals(object obj) => obj is Player player && Equals(player);
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public override bool Equals(object obj) => obj is Player player && Equals(player);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool Equals(Player other) => Side == other.Side;
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool Equals(Player other) => Side == other.Side;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public override int GetHashCode() => Side << 24;
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public override int GetHashCode() => Side << 24;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public override string ToString() => PlayerColors[Side];
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public override string ToString() => PlayerColors[Side];
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool IsOk() => Side.InBetween(White.Side, Black.Side);
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsOk() => Side.InBetween(White.Side, Black.Side);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public string GetName() => PlayerColors[Side];
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public string GetName() => PlayerColors[Side];
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Direction PawnPushDistance() => PawnPushDist[Side];
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Direction PawnPushDistance() => PawnPushDist[Side];
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Direction PawnDoublePushDistance() => PawnDoublePushDist[Side];
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Direction PawnDoublePushDistance() => PawnDoublePushDist[Side];
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Direction PawnWestAttackDistance() => PawnWestAttackDist[Side];
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Direction PawnWestAttackDistance() => PawnWestAttackDist[Side];
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Direction PawnEastAttackDistance() => PawnEastAttackDist[Side];
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Direction PawnEastAttackDistance() => PawnEastAttackDist[Side];
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public BitBoard PawnPush(BitBoard bitBoard) => PawnPushModifiers[Side](bitBoard);
-    }
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public BitBoard PawnPush(BitBoard bitBoard) => PawnPushModifiers[Side](bitBoard);
 }

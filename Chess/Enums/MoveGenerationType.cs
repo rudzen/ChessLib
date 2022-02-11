@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2020 Rudy Alex Kohn
+Copyright (c) 2017-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,41 +24,40 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Enums
+namespace Rudz.Chess.Enums;
+
+/// <summary>
+/// Move generation flag
+/// </summary>
+public enum MoveGenerationType
 {
     /// <summary>
-    /// Move generation flag
+    /// Generate all legal moves
     /// </summary>
-    public enum MoveGenerationType
-    {
-        /// <summary>
-        /// Generate all legal moves
-        /// </summary>
-        Legal,
+    Legal,
 
-        /// <summary>
-        /// Generate only captures
-        /// </summary>
-        Captures,
+    /// <summary>
+    /// Generate only captures
+    /// </summary>
+    Captures,
 
-        /// <summary>
-        /// Generate only quiet moves (non-captures)
-        /// </summary>
-        Quiets,
+    /// <summary>
+    /// Generate only quiet moves (non-captures)
+    /// </summary>
+    Quiets,
 
-        /// <summary>
-        /// Generate only moves which are not evasions
-        /// </summary>
-        NonEvasions,
+    /// <summary>
+    /// Generate only moves which are not evasions
+    /// </summary>
+    NonEvasions,
 
-        /// <summary>
-        /// Generate only evasion moves (if fx in check)
-        /// </summary>
-        Evasions,
+    /// <summary>
+    /// Generate only evasion moves (if fx in check)
+    /// </summary>
+    Evasions,
 
-        /// <summary>
-        /// Generate only moves which are not captures and gives check
-        /// </summary>
-        QuietChecks,
-    }
+    /// <summary>
+    /// Generate only moves which are not captures and gives check
+    /// </summary>
+    QuietChecks,
 }

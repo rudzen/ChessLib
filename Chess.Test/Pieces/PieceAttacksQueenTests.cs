@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2020 Rudy Alex Kohn
+Copyright (c) 2017-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,57 +24,56 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Test.Pieces
+namespace Chess.Test.Pieces;
+
+using FluentAssertions;
+using Rudz.Chess.Types;
+using System.Linq;
+using Xunit;
+
+public sealed class PieceAttacksQueenTests : PieceAttacksSliders
 {
-    using FluentAssertions;
-    using Rudz.Chess.Types;
-    using System.Linq;
-    using Xunit;
-
-    public sealed class PieceAttacksQueenTests : PieceAttacksSliders
+    [Fact]
+    public override void AlphaPattern()
     {
-        [Fact]
-        public override void AlphaPattern()
-        {
-            const int index = (int)EBands.Alpha;
-            const int sliderIndex = 2;
-            var expected = BishopExpected[index] + RookExpected[index];
-            var actuals = Bands[index].Select(x => SlideAttacks[sliderIndex](x, BitBoard.Empty).Count);
+        const int index = (int)EBands.Alpha;
+        const int sliderIndex = 2;
+        var expected = BishopExpected[index] + RookExpected[index];
+        var actuals = Bands[index].Select(x => SlideAttacks[sliderIndex](x, BitBoard.Empty).Count);
 
-            actuals.Should().AllBeEquivalentTo(expected);
-        }
+        actuals.Should().AllBeEquivalentTo(expected);
+    }
 
-        [Fact]
-        public override void BetaPattern()
-        {
-            const int index = (int)EBands.Beta;
-            const int sliderIndex = 2;
-            var expected = BishopExpected[index] + RookExpected[index];
-            var actuals = Bands[index].Select(x => SlideAttacks[sliderIndex](x, BitBoard.Empty).Count);
+    [Fact]
+    public override void BetaPattern()
+    {
+        const int index = (int)EBands.Beta;
+        const int sliderIndex = 2;
+        var expected = BishopExpected[index] + RookExpected[index];
+        var actuals = Bands[index].Select(x => SlideAttacks[sliderIndex](x, BitBoard.Empty).Count);
 
-            actuals.Should().AllBeEquivalentTo(expected);
-        }
+        actuals.Should().AllBeEquivalentTo(expected);
+    }
 
-        [Fact]
-        public override void GammaPattern()
-        {
-            const int index = (int)EBands.Gamma;
-            const int sliderIndex = 2;
-            var expected = BishopExpected[index] + RookExpected[index];
-            var actuals = Bands[index].Select(x => SlideAttacks[sliderIndex](x, BitBoard.Empty).Count);
+    [Fact]
+    public override void GammaPattern()
+    {
+        const int index = (int)EBands.Gamma;
+        const int sliderIndex = 2;
+        var expected = BishopExpected[index] + RookExpected[index];
+        var actuals = Bands[index].Select(x => SlideAttacks[sliderIndex](x, BitBoard.Empty).Count);
 
-            actuals.Should().AllBeEquivalentTo(expected);
-        }
+        actuals.Should().AllBeEquivalentTo(expected);
+    }
 
-        [Fact]
-        public override void DeltaPattern()
-        {
-            const int index = (int)EBands.Delta;
-            const int sliderIndex = 2;
-            var expected = BishopExpected[index] + RookExpected[index];
-            var actuals = Bands[index].Select(x => SlideAttacks[sliderIndex](x, BitBoard.Empty).Count);
+    [Fact]
+    public override void DeltaPattern()
+    {
+        const int index = (int)EBands.Delta;
+        const int sliderIndex = 2;
+        var expected = BishopExpected[index] + RookExpected[index];
+        var actuals = Bands[index].Select(x => SlideAttacks[sliderIndex](x, BitBoard.Empty).Count);
 
-            actuals.Should().AllBeEquivalentTo(expected);
-        }
+        actuals.Should().AllBeEquivalentTo(expected);
     }
 }

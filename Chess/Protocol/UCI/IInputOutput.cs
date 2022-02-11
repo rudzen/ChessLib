@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2020 Rudy Alex Kohn
+Copyright (c) 2017-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,25 +24,24 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Protocol.UCI
-{
-    using System.IO;
-    using System.Threading.Tasks;
+namespace Rudz.Chess.Protocol.UCI;
 
-    public interface IInputOutput
-    {
-        TextReader Input { get; set; }
-        TextWriter Output { get; set; }
-        string LastLineRead { get; set; }
-        string ReadLine(InputOutputMutex action = InputOutputMutex.None);
-        Task<string> ReadLineAsync(InputOutputMutex action = InputOutputMutex.None);
-        string ReadWord(InputOutputMutex action = InputOutputMutex.None);
-        Task<string> ReadWordAsync(InputOutputMutex action = InputOutputMutex.None);
-        void InitSync();
-        void EndSync();
-        void Write(string cad, InputOutputMutex action = InputOutputMutex.None);
-        Task WriteAsync(string cad, InputOutputMutex action = InputOutputMutex.None);
-        void WriteLine(string cad, InputOutputMutex action = InputOutputMutex.None);
-        Task WriteLineAsync(string cad, InputOutputMutex action = InputOutputMutex.None);
-    }
+using System.IO;
+using System.Threading.Tasks;
+
+public interface IInputOutput
+{
+    TextReader Input { get; set; }
+    TextWriter Output { get; set; }
+    string LastLineRead { get; set; }
+    string ReadLine(InputOutputMutex action = InputOutputMutex.None);
+    Task<string> ReadLineAsync(InputOutputMutex action = InputOutputMutex.None);
+    string ReadWord(InputOutputMutex action = InputOutputMutex.None);
+    Task<string> ReadWordAsync(InputOutputMutex action = InputOutputMutex.None);
+    void InitSync();
+    void EndSync();
+    void Write(string cad, InputOutputMutex action = InputOutputMutex.None);
+    Task WriteAsync(string cad, InputOutputMutex action = InputOutputMutex.None);
+    void WriteLine(string cad, InputOutputMutex action = InputOutputMutex.None);
+    Task WriteLineAsync(string cad, InputOutputMutex action = InputOutputMutex.None);
 }

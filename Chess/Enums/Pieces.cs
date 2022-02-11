@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2020 Rudy Alex Kohn
+Copyright (c) 2017-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,23 +24,22 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Enums
+namespace Rudz.Chess.Enums;
+
+public enum Pieces : byte
 {
-    public enum Pieces : byte
-    {
-        NoPiece = 0,
-        WhitePawn = 1,
-        WhiteKnight = 2,
-        WhiteBishop = 3,
-        WhiteRook = 4,
-        WhiteQueen = 5,
-        WhiteKing = 6,
-        BlackPawn = 9,
-        BlackKnight = 10,
-        BlackBishop = 11,
-        BlackRook = 12,
-        BlackQueen = 13,
-        BlackKing = 14,
-        PieceNb = 15
-    }
+    NoPiece = 0,
+    WhitePawn = 1,
+    WhiteKnight = 2,
+    WhiteBishop = 3,
+    WhiteRook = 4,
+    WhiteQueen = 5,
+    WhiteKing = 6,
+    BlackPawn = 9,
+    BlackKnight = 10,
+    BlackBishop = 11,
+    BlackRook = 12,
+    BlackQueen = 13,
+    BlackKing = 14,
+    PieceNb = 15
 }

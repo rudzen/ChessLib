@@ -27,44 +27,43 @@
 
  */
 
-namespace Rudz.Chess.Hash
+namespace Rudz.Chess.Hash;
+
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.CompilerServices;
+
+public sealed class RKiss : IRKiss
 {
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Runtime.CompilerServices;
+    private ulong _s;
 
-    public sealed class RKiss : IRKiss
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public RKiss(ulong s)
     {
-        private ulong _s;
+        _s = s;
+    }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public RKiss(ulong s)
-        {
-            _s = s;
-        }
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static implicit operator RKiss(ulong seed) => new(seed);
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator RKiss(ulong seed) => new(seed);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public IEnumerable<ulong> Get(int count)
+        => Enumerable.Repeat(Rand64(), count);
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public IEnumerable<ulong> Get(int count)
-            => Enumerable.Repeat(Rand64(), count);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public ulong Rand() => Rand64();
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ulong Rand() => Rand64();
+    /// Special generator used to fast init magic numbers.
+    /// Output values only have 1/8th of their bits set on average.
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public ulong Sparse() => Rand64() & Rand64() & Rand64();
 
-        /// Special generator used to fast init magic numbers.
-        /// Output values only have 1/8th of their bits set on average.
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ulong Sparse() => Rand64() & Rand64() & Rand64();
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private ulong Rand64()
-        {
-            _s ^= _s >> 12;
-            _s ^= _s << 25;
-            _s ^= _s >> 27;
-            return _s * 2685821657736338717L;
-        }
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private ulong Rand64()
+    {
+        _s ^= _s >> 12;
+        _s ^= _s << 25;
+        _s ^= _s >> 27;
+        return _s * 2685821657736338717L;
     }
 }

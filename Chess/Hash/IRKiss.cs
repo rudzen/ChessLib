@@ -27,18 +27,17 @@
 
  */
 
-namespace Rudz.Chess.Hash
+namespace Rudz.Chess.Hash;
+
+using System.Collections.Generic;
+
+public interface IRKiss
 {
-    using System.Collections.Generic;
+    IEnumerable<ulong> Get(int count);
 
-    public interface IRKiss
-    {
-        IEnumerable<ulong> Get(int count);
+    ulong Rand();
 
-        ulong Rand();
-
-        /// Special generator used to fast init magic numbers.
-        /// Output values only have 1/8th of their bits set on average.
-        ulong Sparse();
-    }
+    /// Special generator used to fast init magic numbers.
+    /// Output values only have 1/8th of their bits set on average.
+    ulong Sparse();
 }

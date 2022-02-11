@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2020 Rudy Alex Kohn
+Copyright (c) 2017-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,29 +24,28 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Enums
+namespace Rudz.Chess.Enums;
+
+using System.Runtime.CompilerServices;
+using Types;
+
+public enum Ranks
 {
-    using System.Runtime.CompilerServices;
-    using Types;
+    Rank1 = 0,
+    Rank2 = 1,
+    Rank3 = 2,
+    Rank4 = 3,
+    Rank5 = 4,
+    Rank6 = 5,
+    Rank7 = 6,
+    Rank8 = 7,
+    RankNb = 8
+}
 
-    public enum Ranks
-    {
-        Rank1 = 0,
-        Rank2 = 1,
-        Rank3 = 2,
-        Rank4 = 3,
-        Rank5 = 4,
-        Rank6 = 5,
-        Rank7 = 6,
-        Rank8 = 7,
-        RankNb = 8
-    }
+public static class RanksExtensions
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Rank RelativeRank(this Ranks rank, Player color) => (Ranks)(rank.AsInt() ^ (color.Side * 7));
 
-    public static class RanksExtensions
-    {
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Rank RelativeRank(this Ranks rank, Player color) => (Ranks)(rank.AsInt() ^ (color.Side * 7));
-
-        public static int AsInt(this Ranks r) => (int)r;
-    }
+    public static int AsInt(this Ranks r) => (int)r;
 }

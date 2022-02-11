@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2020 Rudy Alex Kohn
+Copyright (c) 2017-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,24 +24,23 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Enums
+namespace Rudz.Chess.Enums;
+
+public enum Directions
 {
-    public enum Directions
-    {
-        NoDirection = 0,
-        North = 8,
-        East = 1,
-        South = -North,            // -8
-        West = -East,              // -1
-        NorthEast = North + East,  //  9
-        SouthEast = South + East,  // -7
-        SouthWest = South + West,  // -9
-        NorthWest = North + West,  //  7
+    NoDirection = 0,
+    North = 8,
+    East = 1,
+    South = -North,            // -8
+    West = -East,              // -1
+    NorthEast = North + East,  //  9
+    SouthEast = South + East,  // -7
+    SouthWest = South + West,  // -9
+    NorthWest = North + West,  //  7
 
-        NorthDouble = North + North,
-        SouthDouble = South + South,
+    NorthDouble = North + North,
+    SouthDouble = South + South,
 
-        NorthFill = NorthDouble << 1,
-        SouthFill = -NorthFill
-    }
+    NorthFill = NorthDouble << 1,
+    SouthFill = -NorthFill
 }

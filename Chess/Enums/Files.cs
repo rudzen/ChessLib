@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2020 Rudy Alex Kohn
+Copyright (c) 2017-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,19 +24,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-// ReSharper disable UnusedMember.Global
-namespace Rudz.Chess.Enums
+namespace Rudz.Chess.Enums;
+
+public enum Files
 {
-    public enum Files
-    {
-        FileA = 0,
-        FileB = 1,
-        FileC = 2,
-        FileD = 3,
-        FileE = 4,
-        FileF = 5,
-        FileG = 6,
-        FileH = 7,
-        FileNb = 8
-    }
+    FileA = 0,
+    FileB = 1,
+    FileC = 2,
+    FileD = 3,
+    FileE = 4,
+    FileF = 5,
+    FileG = 6,
+    FileH = 7,
+    FileNb = 8
 }

@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2020 Rudy Alex Kohn
+Copyright (c) 2017-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,27 +24,26 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Protocol.UCI
+namespace Rudz.Chess.Protocol.UCI;
+
+using System.Runtime.CompilerServices;
+
+public enum InputOutputMutex
 {
-    using System.Runtime.CompilerServices;
+    None,
+    Acquire,
+    Atomic,
+    Relax
+}
 
-    public enum InputOutputMutex
-    {
-        None,
-        Acquire,
-        Atomic,
-        Relax
-    }
+internal static class InputOutputMutexExtensions
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool IsReleasable(this InputOutputMutex @this) => @this.InBetween(InputOutputMutex.Acquire, InputOutputMutex.Atomic);
 
-    internal static class InputOutputMutexExtensions
-    {
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsReleasable(this InputOutputMutex @this) => @this.InBetween(InputOutputMutex.Acquire, InputOutputMutex.Atomic);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool IsWaitable(this InputOutputMutex @this) => @this.InBetween(InputOutputMutex.Atomic, InputOutputMutex.Relax);
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsWaitable(this InputOutputMutex @this) => @this.InBetween(InputOutputMutex.Atomic, InputOutputMutex.Relax);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static bool InBetween(this InputOutputMutex v, InputOutputMutex min, InputOutputMutex max) => (uint)v - (uint)min <= (uint)max - (uint)min;
-    }
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static bool InBetween(this InputOutputMutex v, InputOutputMutex min, InputOutputMutex max) => (uint)v - (uint)min <= (uint)max - (uint)min;
 }

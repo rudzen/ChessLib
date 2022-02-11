@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2020 Rudy Alex Kohn
+Copyright (c) 2017-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,37 +24,36 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Test.HashTable
+namespace Chess.Test.HashTable;
+
+using Rudz.Chess.Hash;
+using Rudz.Chess.Hash.Tables;
+using Rudz.Chess.Types;
+using System;
+using System.Runtime.InteropServices;
+using Xunit;
+
+public class PawnHashTableTest
 {
-    using Rudz.Chess.Hash;
-    using Rudz.Chess.Hash.Tables;
-    using Rudz.Chess.Types;
-    using System;
-    using System.Runtime.InteropServices;
-    using Xunit;
-
-    public class PawnHashTableTest
+    [Fact]
+    public void BaseInitializeTest()
     {
-        [Fact]
-        public void BaseInitializeTest()
-        {
-            const int tableSizeMb = 8;
+        const int tableSizeMb = 8;
 
-            var t = new PawnTable();
+        var t = new PawnTable();
 
-            var key = new RKiss(1234567).Rand();
-            var size = Marshal.SizeOf(typeof(PawnTableEntry));
-            var initEntry = new Func<PawnTableEntry>(() => new PawnTableEntry(0));
+        var key = new RKiss(1234567).Rand();
+        var size = Marshal.SizeOf(typeof(PawnTableEntry));
+        var initEntry = new Func<PawnTableEntry>(() => new PawnTableEntry(0));
 
-            t.Initialize(size, tableSizeMb, initEntry);
+        t.Initialize(size, tableSizeMb, initEntry);
 
-            var fromTable = t[key];
+        var fromTable = t[key];
 
-            fromTable.PassedPawns[0] = BitBoards.Center;
+        fromTable.PassedPawns[0] = BitBoards.Center;
 
-            var reRead = t[key];
+        var reRead = t[key];
 
-            Assert.Equal(reRead.PassedPawns[0], BitBoards.Center);
-        }
+        Assert.Equal(reRead.PassedPawns[0], BitBoards.Center);
     }
 }

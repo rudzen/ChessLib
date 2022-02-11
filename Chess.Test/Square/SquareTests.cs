@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2020 Rudy Alex Kohn
+Copyright (c) 2017-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,62 +24,61 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Test.Square
+namespace Chess.Test.Square;
+
+using Rudz.Chess.Enums;
+using Rudz.Chess.Types;
+using Xunit;
+
+public sealed class SquareTests
 {
-    using Rudz.Chess.Enums;
-    using Rudz.Chess.Types;
-    using Xunit;
-
-    public sealed class SquareTests
+    [Fact]
+    public void SquareOppositeColorPositiveTest()
     {
-        [Fact]
-        public void SquareOppositeColorPositiveTest()
-        {
-            const bool expected = true;
+        const bool expected = true;
 
-            var sq1 = new Square(Squares.a1);
-            var sq2 = new Square(Squares.a2);
+        var sq1 = new Square(Squares.a1);
+        var sq2 = new Square(Squares.a2);
 
-            var actual = sq1.IsOppositeColor(sq2);
+        var actual = sq1.IsOppositeColor(sq2);
 
-            Assert.Equal(expected, actual);
-        }
+        Assert.Equal(expected, actual);
+    }
 
-        [Fact]
-        public void SquareOppositeColorNegativeTest()
-        {
-            const bool expected = false;
+    [Fact]
+    public void SquareOppositeColorNegativeTest()
+    {
+        const bool expected = false;
 
-            var sq1 = new Square(Squares.a1);
-            var sq2 = new Square(Squares.a3);
+        var sq1 = new Square(Squares.a1);
+        var sq2 = new Square(Squares.a3);
 
-            var actual = sq1.IsOppositeColor(sq2);
+        var actual = sq1.IsOppositeColor(sq2);
 
-            Assert.Equal(expected, actual);
-        }
+        Assert.Equal(expected, actual);
+    }
 
-        [Fact]
-        public void RelativeSquareBlackTest()
-        {
-            const Squares expected = Squares.h8;
+    [Fact]
+    public void RelativeSquareBlackTest()
+    {
+        const Squares expected = Squares.h8;
 
-            var s = new Square(Ranks.Rank1, Files.FileH);
+        var s = new Square(Ranks.Rank1, Files.FileH);
 
-            var actual = s.Relative(Player.Black);
+        var actual = s.Relative(Player.Black);
 
-            Assert.Equal(expected, actual);
-        }
+        Assert.Equal(expected, actual);
+    }
 
-        [Fact]
-        public void RelativeSquareWhiteTest()
-        {
-            const Squares expected = Squares.c3;
+    [Fact]
+    public void RelativeSquareWhiteTest()
+    {
+        const Squares expected = Squares.c3;
 
-            var s = new Square(Ranks.Rank3, Files.FileC);
+        var s = new Square(Ranks.Rank3, Files.FileC);
 
-            var actual = s.Relative(Player.White);
+        var actual = s.Relative(Player.White);
 
-            Assert.Equal(expected, actual);
-        }
+        Assert.Equal(expected, actual);
     }
 }

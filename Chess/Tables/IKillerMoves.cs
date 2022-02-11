@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2020 Rudy Alex Kohn
+Copyright (c) 2017-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,23 +24,22 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Tables
+namespace Rudz.Chess.Tables;
+
+using System;
+using Types;
+
+public interface IKillerMoves : IEquatable<IKillerMoves>
 {
-    using System;
-    using Types;
+    void Initialize(int maxDepth);
 
-    public interface IKillerMoves : IEquatable<IKillerMoves>
-    {
-        void Initialize(int maxDepth);
+    int GetValue(int depth, Move move, Piece fromPiece);
 
-        int GetValue(int depth, Move move, Piece fromPiece);
+    IPieceSquare Get(int depth, int index);
 
-        IPieceSquare Get(int depth, int index);
+    void UpdateValue(int depth, Move move, Piece fromPiece);
 
-        void UpdateValue(int depth, Move move, Piece fromPiece);
+    void Shift(int depth);
 
-        void Shift(int depth);
-
-        void Reset();
-    }
+    void Reset();
 }

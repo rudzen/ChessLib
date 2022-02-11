@@ -1,17 +1,16 @@
-﻿namespace Perft.Environment
+﻿namespace Perft.Environment;
+
+public interface IFrameworkEnvironment
 {
-    public interface IFrameworkEnvironment
-    {
-        bool IsDevelopment { get; set; }
+    bool IsDevelopment { get; set; }
 
-        string Configuration { get; }
+    string Configuration { get; }
 
-        string DotNetFrameWork { get; }
+    string DotNetFrameWork { get; }
 
-        string Os { get; }
+    string Os { get; }
 
-        bool IsAdmin { get; }
+    bool IsAdmin { get; }
 
-        bool HighresTimer { get; }
-    }
+    bool HighresTimer { get; }
 }

@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2020 Rudy Alex Kohn
+Copyright (c) 2017-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,72 +24,71 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Test.Pieces
+namespace Chess.Test.Pieces;
+
+using FluentAssertions;
+using System.Linq;
+using Xunit;
+
+public sealed class PieceAttacksKnightTests : PieceAttacksRegular
 {
-    using FluentAssertions;
-    using System.Linq;
-    using Xunit;
-
-    public sealed class PieceAttacksKnightTests : PieceAttacksRegular
+    [Fact]
+    public override void AlphaPattern()
     {
-        [Fact]
-        public override void AlphaPattern()
+        const int index = (int)EBands.Alpha;
+        const int attackIndex = 1;
+        const ulong narrowLocations = 0x4281000000008142;
+
+        foreach (var pieceLocation in Bands[index])
         {
-            const int index = (int)EBands.Alpha;
-            const int attackIndex = 1;
-            const ulong narrowLocations = 0x4281000000008142;
-
-            foreach (var pieceLocation in Bands[index])
-            {
-                var attacks = RegAttacks[attackIndex](pieceLocation);
-                var expected = (BoardCorners & pieceLocation) != 0
-                    ? KnightExpected[index] >> 1 /* for corners */
-                    : (narrowLocations & pieceLocation) != 0
-                        ? KnightExpected[index] - 1 /* narrowLocations */
-                        : KnightExpected[index];
-                var actual = attacks.Count;
-                Assert.Equal(expected, actual);
-            }
-        }
-
-        [Fact]
-        public override void BetaPattern()
-        {
-            const int index = (int)EBands.Beta;
-            const int attackIndex = 1;
-            const ulong narrowLocations = 0x42000000004200;
-
-            foreach (var pieceLocation in Bands[index])
-            {
-                var attacks = RegAttacks[attackIndex](pieceLocation);
-                var expected = (narrowLocations & pieceLocation) != 0
-                    ? KnightExpected[index] - 2
+            var attacks = RegAttacks[attackIndex](pieceLocation);
+            var expected = (BoardCorners & pieceLocation) != 0
+                ? KnightExpected[index] >> 1 /* for corners */
+                : (narrowLocations & pieceLocation) != 0
+                    ? KnightExpected[index] - 1 /* narrowLocations */
                     : KnightExpected[index];
-                var actual = attacks.Count;
-                Assert.Equal(expected, actual);
-            }
+            var actual = attacks.Count;
+            Assert.Equal(expected, actual);
         }
+    }
 
-        [Fact]
-        public override void GammaPattern()
+    [Fact]
+    public override void BetaPattern()
+    {
+        const int index = (int)EBands.Beta;
+        const int attackIndex = 1;
+        const ulong narrowLocations = 0x42000000004200;
+
+        foreach (var pieceLocation in Bands[index])
         {
-            const int index = (int)EBands.Gamma;
-            const int attackIndex = 1;
-            var expected = KnightExpected[index];
-            var actuals = Bands[index].Select(x => RegAttacks[attackIndex](x).Count);
-
-            actuals.Should().AllBeEquivalentTo(expected);
+            var attacks = RegAttacks[attackIndex](pieceLocation);
+            var expected = (narrowLocations & pieceLocation) != 0
+                ? KnightExpected[index] - 2
+                : KnightExpected[index];
+            var actual = attacks.Count;
+            Assert.Equal(expected, actual);
         }
+    }
 
-        [Fact]
-        public override void DeltaPattern()
-        {
-            const int index = (int)EBands.Delta;
-            const int attackIndex = 1;
-            var expected = KnightExpected[index];
-            var actuals = Bands[index].Select(x => RegAttacks[attackIndex](x).Count);
+    [Fact]
+    public override void GammaPattern()
+    {
+        const int index = (int)EBands.Gamma;
+        const int attackIndex = 1;
+        var expected = KnightExpected[index];
+        var actuals = Bands[index].Select(x => RegAttacks[attackIndex](x).Count);
 
-            actuals.Should().AllBeEquivalentTo(expected);
-        }
+        actuals.Should().AllBeEquivalentTo(expected);
+    }
+
+    [Fact]
+    public override void DeltaPattern()
+    {
+        const int index = (int)EBands.Delta;
+        const int attackIndex = 1;
+        var expected = KnightExpected[index];
+        var actuals = Bands[index].Select(x => RegAttacks[attackIndex](x).Count);
+
+        actuals.Should().AllBeEquivalentTo(expected);
     }
 }

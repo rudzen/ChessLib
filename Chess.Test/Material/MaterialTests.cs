@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2020 Rudy Alex Kohn
+Copyright (c) 2017-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,24 +24,24 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Test.Material
+namespace Chess.Test.Material;
+
+using Xunit;
+using Rudz.Chess.Enums;
+using System;
+using System.Collections.Generic;
+using Rudz.Chess;
+using Rudz.Chess.Types;
+using Pieces;
+
+public sealed class MaterialTests
 {
-    using Xunit;
-    using Rudz.Chess.Enums;
-    using System;
-    using System.Collections.Generic;
-    using Rudz.Chess;
-    using Rudz.Chess.Types;
-    using Pieces;
+    //TODO : Implement the RIGHT way
 
-    public sealed class MaterialTests
+    [Fact]
+    public void MaterialValueTest()
     {
-        //TODO : Implement the RIGHT way
-
-        [Fact]
-        public void MaterialValueTest()
-        {
-            Assert.True(true);
+        Assert.True(true);
         //    var pos = new Position();
         //    var game = new Game(pos);
         //    game.NewGame();
@@ -80,6 +80,5 @@ namespace Chess.Test.Material
         //        Assert.True(game.MakeMove(moves[i]));
         //        Assert.Equal(lostMaterial[i], Math.Abs(game.State.Material.MaterialValueTotal));
         //    }
-        }
     }
 }

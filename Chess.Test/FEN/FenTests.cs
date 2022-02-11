@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2020 Rudy Alex Kohn
+Copyright (c) 2017-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,42 +24,41 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Test.FEN
+namespace Chess.Test.FEN;
+
+using FluentAssertions;
+using Rudz.Chess;
+using Rudz.Chess.Factories;
+using Rudz.Chess.Fen;
+using Rudz.Chess.Types;
+using Xunit;
+
+public sealed class FenTests
 {
-    using FluentAssertions;
-    using Rudz.Chess;
-    using Rudz.Chess.Factories;
-    using Rudz.Chess.Fen;
-    using Rudz.Chess.Types;
-    using Xunit;
-
-    public sealed class FenTests
+    [Fact]
+    public void SetFenTest()
     {
-        [Fact]
-        public void SetFenTest()
-        {
-            var board = new Board();
-            var pieceValue = new PieceValue();
-            var pos = new Position(board, pieceValue);
-            var game = GameFactory.Create(pos);
+        var board = new Board();
+        var pieceValue = new PieceValue();
+        var pos = new Position(board, pieceValue);
+        var game = GameFactory.Create(pos);
 
-            game.NewGame();
-        }
+        game.NewGame();
+    }
 
-        [Fact]
-        public void GetFenTest()
-        {
-            var board = new Board();
-            var pieceValue = new PieceValue();
-            var pos = new Position(board, pieceValue);
-            var game = GameFactory.Create(pos);
-            game.NewGame();
+    [Fact]
+    public void GetFenTest()
+    {
+        var board = new Board();
+        var pieceValue = new PieceValue();
+        var pos = new Position(board, pieceValue);
+        var game = GameFactory.Create(pos);
+        game.NewGame();
 
-            var expectedFen = new FenData(Fen.StartPositionFen);
+        var expectedFen = new FenData(Fen.StartPositionFen);
 
-            var actualFen = game.GetFen();
+        var actualFen = game.GetFen();
 
-            actualFen.Should().Be(expectedFen);
-        }
+        actualFen.Should().Be(expectedFen);
     }
 }

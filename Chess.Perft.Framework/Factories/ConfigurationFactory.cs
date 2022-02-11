@@ -1,12 +1,11 @@
-﻿namespace Perft.Factories
-{
-    using Microsoft.Extensions.Configuration;
+﻿namespace Perft.Factories;
 
-    public static class ConfigurationFactory
+using Microsoft.Extensions.Configuration;
+
+public static class ConfigurationFactory
+{
+    public static IConfiguration CreateConfiguration(IConfigurationBuilder configurationBuilder)
     {
-        public static IConfiguration CreateConfiguration(IConfigurationBuilder configurationBuilder)
-        {
-            return configurationBuilder.Build();
-        }
+        return configurationBuilder.Build();
     }
 }

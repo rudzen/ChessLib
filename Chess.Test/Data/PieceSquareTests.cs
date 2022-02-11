@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2020 Rudy Alex Kohn
+Copyright (c) 2017-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,47 +24,46 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Test.Data
+namespace Chess.Test.Data;
+
+using Rudz.Chess.Enums;
+using Rudz.Chess.Types;
+using Xunit;
+
+public sealed class PieceSquareTests
 {
-    using Rudz.Chess.Enums;
-    using Rudz.Chess.Types;
-    using Xunit;
-
-    public sealed class PieceSquareTests
+    [Fact]
+    public void GetSquareTest()
     {
-        [Fact]
-        public void GetSquareTest()
-        {
-            const Squares expected = Squares.a5;
-            var ps = new PieceSquare(Piece.EmptyPiece, expected);
-            var actual = ps.Square;
-            var expectedSquare = new Square(expected);
-            Assert.Equal(expectedSquare, actual);
-        }
+        const Squares expected = Squares.a5;
+        var ps = new PieceSquare(Piece.EmptyPiece, expected);
+        var actual = ps.Square;
+        var expectedSquare = new Square(expected);
+        Assert.Equal(expectedSquare, actual);
+    }
 
-        [Fact]
-        public void GetPieceTest()
-        {
-            const Pieces expected = Pieces.BlackKnight;
-            var ps = new PieceSquare(expected, Square.None);
-            var actual = ps.Piece;
-            var expectedPiece = new Piece(expected);
-            Assert.Equal(expectedPiece, actual);
-        }
+    [Fact]
+    public void GetPieceTest()
+    {
+        const Pieces expected = Pieces.BlackKnight;
+        var ps = new PieceSquare(expected, Square.None);
+        var actual = ps.Piece;
+        var expectedPiece = new Piece(expected);
+        Assert.Equal(expectedPiece, actual);
+    }
 
-        [Fact]
-        public void GetPieceAndSquareTest()
+    [Fact]
+    public void GetPieceAndSquareTest()
+    {
+        for (var pc = Pieces.NoPiece; pc < Pieces.PieceNb; ++pc)
         {
-            for (var pc = Pieces.NoPiece; pc < Pieces.PieceNb; ++pc)
+            var expectedPiece = new Piece(pc);
+            foreach (var sq in BitBoards.AllSquares)
             {
-                var expectedPiece = new Piece(pc);
-                foreach (var sq in BitBoards.AllSquares)
-                {
-                    var expectedSquare = new Square(sq);
-                    var ps = new PieceSquare(expectedPiece, expectedSquare);
-                    Assert.Equal(expectedPiece, ps.Piece);
-                    Assert.Equal(expectedSquare, sq);
-                }
+                var expectedSquare = new Square(sq);
+                var ps = new PieceSquare(expectedPiece, expectedSquare);
+                Assert.Equal(expectedPiece, ps.Piece);
+                Assert.Equal(expectedSquare, sq);
             }
         }
     }

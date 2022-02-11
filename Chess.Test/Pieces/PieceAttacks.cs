@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2020 Rudy Alex Kohn
+Copyright (c) 2017-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,60 +24,59 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Test.Pieces
+namespace Chess.Test.Pieces;
+
+using Rudz.Chess.Types;
+
+/// <summary>
+/// Position indication is as follows:
+/// Alpha = Outer band (edge)
+/// Beta  = 2nd band
+/// Gamma = 3rd band
+/// Delta = 4th band (inner 4 squares)
+/// </summary>
+public abstract class PieceAttacks : IPieceAttacks
 {
-    using Rudz.Chess.Types;
-
-    /// <summary>
-    /// Position indication is as follows:
-    /// Alpha = Outer band (edge)
-    /// Beta  = 2nd band
-    /// Gamma = 3rd band
-    /// Delta = 4th band (inner 4 squares)
-    /// </summary>
-    public abstract class PieceAttacks : IPieceAttacks
+    protected enum EBands
     {
-        protected enum EBands
-        {
-            Alpha = 0,
-            Beta = 1,
-            Gamma = 2,
-            Delta = 3
-        }
-
-        /*
-         * Patterns
-         *
-         * Alpha:               Beta:
-         * X X X X X X X X      0 0 0 0 0 0 0 0
-         * X 0 0 0 0 0 0 X      0 X X X X X X 0
-         * X 0 0 0 0 0 0 X      0 X 0 0 0 0 X 0
-         * X 0 0 0 0 0 0 X      0 X 0 0 0 0 X 0
-         * X 0 0 0 0 0 0 X      0 X 0 0 0 0 X 0
-         * X 0 0 0 0 0 0 X      0 X 0 0 0 0 X 0
-         * X 0 0 0 0 0 0 X      0 X X X X X X 0
-         * X X X X X X X X      0 0 0 0 0 0 0 0
-         *
-         * Gamma:               Delta:
-         * 0 0 0 0 0 0 0 0      0 0 0 0 0 0 0 0
-         * 0 0 0 0 0 0 0 0      0 0 0 0 0 0 0 0
-         * 0 0 X X X X 0 0      0 0 0 0 0 0 0 0
-         * 0 0 X 0 0 X 0 0      0 0 0 X X 0 0 0
-         * 0 0 X 0 0 X 0 0      0 0 0 X X 0 0 0
-         * 0 0 X X X X 0 0      0 0 0 0 0 0 0 0
-         * 0 0 0 0 0 0 0 0      0 0 0 0 0 0 0 0
-         * 0 0 0 0 0 0 0 0      0 0 0 0 0 0 0 0
-         *
-         */
-
-        protected static readonly BitBoard[] Bands ={0xff818181818181ff, 0x7e424242427e00, 0x3c24243c0000, 0x1818000000};
-
-        public abstract void AlphaPattern();
-
-        public abstract void BetaPattern();
-
-        public abstract void GammaPattern();
-
-        public abstract void DeltaPattern();
+        Alpha = 0,
+        Beta = 1,
+        Gamma = 2,
+        Delta = 3
     }
+
+    /*
+     * Patterns
+     *
+     * Alpha:               Beta:
+     * X X X X X X X X      0 0 0 0 0 0 0 0
+     * X 0 0 0 0 0 0 X      0 X X X X X X 0
+     * X 0 0 0 0 0 0 X      0 X 0 0 0 0 X 0
+     * X 0 0 0 0 0 0 X      0 X 0 0 0 0 X 0
+     * X 0 0 0 0 0 0 X      0 X 0 0 0 0 X 0
+     * X 0 0 0 0 0 0 X      0 X 0 0 0 0 X 0
+     * X 0 0 0 0 0 0 X      0 X X X X X X 0
+     * X X X X X X X X      0 0 0 0 0 0 0 0
+     *
+     * Gamma:               Delta:
+     * 0 0 0 0 0 0 0 0      0 0 0 0 0 0 0 0
+     * 0 0 0 0 0 0 0 0      0 0 0 0 0 0 0 0
+     * 0 0 X X X X 0 0      0 0 0 0 0 0 0 0
+     * 0 0 X 0 0 X 0 0      0 0 0 X X 0 0 0
+     * 0 0 X 0 0 X 0 0      0 0 0 X X 0 0 0
+     * 0 0 X X X X 0 0      0 0 0 0 0 0 0 0
+     * 0 0 0 0 0 0 0 0      0 0 0 0 0 0 0 0
+     * 0 0 0 0 0 0 0 0      0 0 0 0 0 0 0 0
+     *
+     */
+
+    protected static readonly BitBoard[] Bands = { 0xff818181818181ff, 0x7e424242427e00, 0x3c24243c0000, 0x1818000000 };
+
+    public abstract void AlphaPattern();
+
+    public abstract void BetaPattern();
+
+    public abstract void GammaPattern();
+
+    public abstract void DeltaPattern();
 }

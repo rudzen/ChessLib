@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2020 Rudy Alex Kohn
+Copyright (c) 2017-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,56 +24,55 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess
+namespace Rudz.Chess;
+
+using Enums;
+using Types;
+
+public interface IPieceValue
 {
-    using Enums;
-    using Types;
+    Value MaxValueWithoutPawns { get; }
+    Value MaxValue { get; }
 
-    public interface IPieceValue
-    {
-        Value MaxValueWithoutPawns { get; }
-        Value MaxValue { get; }
+    Value PawnValueMg { get; set; }
 
-        Value PawnValueMg { get; set; }
+    Value PawnValueEg { get; set; }
 
-        Value PawnValueEg { get; set; }
+    Value KnightValueMg { get; set; }
 
-        Value KnightValueMg { get; set; }
+    Value KnightValueEg { get; set; }
 
-        Value KnightValueEg { get; set; }
+    Value BishopValueMg { get; set; }
 
-        Value BishopValueMg { get; set; }
+    Value BishopValueEg { get; set; }
 
-        Value BishopValueEg { get; set; }
+    Value RookValueMg { get; set; }
 
-        Value RookValueMg { get; set; }
+    Value RookValueEg { get; set; }
 
-        Value RookValueEg { get; set; }
+    Value QueenValueMg { get; set; }
 
-        Value QueenValueMg { get; set; }
+    Value QueenValueEg { get; set; }
 
-        Value QueenValueEg { get; set; }
+    public Value ValueZero { get; set; }
 
-        public Value ValueZero { get; set; }
+    public Value ValueDraw { get; set; }
 
-        public Value ValueDraw { get; set; }
+    public Value ValueKnownWin { get; set; }
 
-        public Value ValueKnownWin { get; set; }
+    public Value ValueMate { get; set; }
 
-        public Value ValueMate { get; set; }
+    public Value ValueInfinite { get; set; }
 
-        public Value ValueInfinite { get; set; }
+    public Value ValueNone { get; set; }
 
-        public Value ValueNone { get; set; }
+    public Value ValueMateInMaxPly { get; }
 
-        public Value ValueMateInMaxPly { get; }
+    public Value ValueMatedInMaxPly { get; }
 
-        public Value ValueMatedInMaxPly { get; }
+    void SetDefaults();
 
-        void SetDefaults();
+    void SetPieceValues(PieceValues[] values, Phases phase);
 
-        void SetPieceValues(PieceValues[] values, Phases phase);
-
-        PieceValues GetPieceValue(Piece pc, Phases phase);
-    }
+    PieceValues GetPieceValue(Piece pc, Phases phase);
 }

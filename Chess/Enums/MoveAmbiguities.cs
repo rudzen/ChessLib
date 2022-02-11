@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2020 Rudy Alex Kohn
+Copyright (c) 2017-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,23 +24,22 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Enums
+namespace Rudz.Chess.Enums;
+
+using System;
+using System.Runtime.CompilerServices;
+
+[Flags]
+public enum MoveAmbiguities
 {
-    using System;
-    using System.Runtime.CompilerServices;
+    None = 0,
+    Move = 1,
+    File = 1 << 1,
+    Rank = 1 << 2
+}
 
-    [Flags]
-    public enum MoveAmbiguities
-    {
-        None = 0,
-        Move = 1,
-        File = 1 << 1,
-        Rank = 1 << 2
-    }
-
-    public static class EMoveAmbiguityExtensions
-    {
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool HasFlagFast(this MoveAmbiguities value, MoveAmbiguities flag) => (value & flag) != 0;
-    }
+public static class EMoveAmbiguityExtensions
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool HasFlagFast(this MoveAmbiguities value, MoveAmbiguities flag) => (value & flag) != 0;
 }

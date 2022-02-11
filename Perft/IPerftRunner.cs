@@ -3,7 +3,7 @@ Perft, a chess perft testing application
 
 MIT License
 
-Copyright (c) 2019-2020 Rudy Alex Kohn
+Copyright (c) 2019-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,18 +24,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Perft
+namespace Perft;
+
+using Options;
+using System.Threading;
+using System.Threading.Tasks;
+
+public interface IPerftRunner
 {
-    using Options;
-    using System.Threading;
-    using System.Threading.Tasks;
+    bool SaveResults { get; set; }
+    IOptions Options { get; set; }
+    TTOptions TranspositionTableOptions { get; set; }
 
-    public interface IPerftRunner
-    {
-        bool SaveResults { get; set; }
-        IOptions Options { get; set; }
-        TTOptions TranspositionTableOptions { get; set; }
-
-        Task<int> Run(CancellationToken cancellationToken = default);
-    }
+    Task<int> Run(CancellationToken cancellationToken = default);
 }

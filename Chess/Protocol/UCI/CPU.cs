@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2020 Rudy Alex Kohn
+Copyright (c) 2017-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,61 +24,60 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Protocol.UCI
+namespace Rudz.Chess.Protocol.UCI;
+
+using System;
+using System.Diagnostics;
+
+public sealed class CPU
 {
-    using System;
-    using System.Diagnostics;
+    private const int Interval = 500;
 
-    public sealed class CPU
+    private const double DefaultOverflow = double.MinValue;
+
+    private readonly Process _currentProcessName;
+
+    private readonly int _numProcessors;
+
+    private DateTime _lastCpu;
+
+    private TimeSpan _lastSysCpu;
+
+    private TimeSpan _lastUserCpu;
+
+    public CPU()
     {
-        private const int Interval = 500;
+        _currentProcessName = Process.GetCurrentProcess();
+        _numProcessors = Environment.ProcessorCount;
+    }
 
-        private const double DefaultOverflow = double.MinValue;
+    public double CpuUse { get; set; }
 
-        private readonly Process _currentProcessName;
+    public double Usage()
+    {
+        var now = DateTime.UtcNow;
+        var total = _currentProcessName.TotalProcessorTime;
+        var user = _currentProcessName.UserProcessorTime;
 
-        private readonly int _numProcessors;
+        double percentage;
 
-        private DateTime _lastCpu;
-
-        private TimeSpan _lastSysCpu;
-
-        private TimeSpan _lastUserCpu;
-
-        public CPU()
+        if (now <= _lastCpu || total.Milliseconds < _lastSysCpu.Milliseconds || user.Milliseconds < _lastUserCpu.Milliseconds)
         {
-            _currentProcessName = Process.GetCurrentProcess();
-            _numProcessors = Environment.ProcessorCount;
+            //Overflow detection. Just skip this value.
+            percentage = DefaultOverflow;
+        }
+        else
+        {
+            percentage = (total - _lastSysCpu + user - _lastUserCpu).Milliseconds;
+            percentage /= (now - _lastCpu).Milliseconds;
+            percentage /= _numProcessors;
         }
 
-        public double CpuUse { get; set; }
+        _lastCpu = now;
+        _lastSysCpu = total;
+        _lastUserCpu = user;
+        CpuUse = percentage;
 
-        public double Usage()
-        {
-            var now = DateTime.UtcNow;
-            var total = _currentProcessName.TotalProcessorTime;
-            var user = _currentProcessName.UserProcessorTime;
-
-            double percentage;
-
-            if (now <= _lastCpu || total.Milliseconds < _lastSysCpu.Milliseconds || user.Milliseconds < _lastUserCpu.Milliseconds)
-            {
-                //Overflow detection. Just skip this value.
-                percentage = DefaultOverflow;
-            }
-            else
-            {
-                percentage = (total - _lastSysCpu + user - _lastUserCpu).Milliseconds;
-                percentage /= (now - _lastCpu).Milliseconds;
-                percentage /= _numProcessors;
-            }
-
-            _lastCpu = now;
-            _lastSysCpu = total;
-            _lastUserCpu = user;
-            CpuUse = percentage;
-
-            return percentage <= 0 ? 0 : Math.Round(percentage * 1000, MidpointRounding.ToEven);
-        }
+        return percentage <= 0 ? 0 : Math.Round(percentage * 1000, MidpointRounding.ToEven);
     }
 }

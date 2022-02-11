@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2020 Rudy Alex Kohn
+Copyright (c) 2017-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,29 +24,28 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Protocol.UCI
+namespace Rudz.Chess.Protocol.UCI;
+
+using System;
+
+public interface IOption
 {
-    using System;
+    string Name { get; set; }
+    UciOptionType Type { get; set; }
+    string DefaultValue { get; set; }
+    int Min { get; set; }
+    int Max { get; set; }
+    int Idx { get; set; }
+    Action<IOption> OnChange { get; set; }
+    int GetInt();
+    string GetText();
 
-    public interface IOption
-    {
-        string Name { get; set; }
-        UciOptionType Type { get; set; }
-        string DefaultValue { get; set; }
-        int Min { get; set; }
-        int Max { get; set; }
-        int Idx { get; set; }
-        Action<IOption> OnChange { get; set; }
-        int GetInt();
-        string GetText();
-
-        /// <summary>
-        /// Updates currentValue and triggers OnChange() action.
-        /// It's up to the GUI to check for option's limits, but we could receive the new value from
-        /// the user by console window, so let's check the bounds anyway.
-        /// </summary>
-        /// <param name="v"></param>
-        /// <returns></returns>
-        IOption SetCurrentValue(string v);
-    }
+    /// <summary>
+    /// Updates currentValue and triggers OnChange() action.
+    /// It's up to the GUI to check for option's limits, but we could receive the new value from
+    /// the user by console window, so let's check the bounds anyway.
+    /// </summary>
+    /// <param name="v"></param>
+    /// <returns></returns>
+    IOption SetCurrentValue(string v);
 }

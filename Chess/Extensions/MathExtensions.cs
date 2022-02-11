@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2020 Rudy Alex Kohn
+Copyright (c) 2017-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,153 +24,152 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Extensions
+namespace Rudz.Chess.Extensions;
+
+using System;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using Types;
+
+public static class MathExtensions
 {
-    using System;
-    using System.Runtime.CompilerServices;
-    using System.Runtime.InteropServices;
-    using Types;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool InBetween(this int v, int min, int max) => (uint)v - (uint)min <= (uint)max - (uint)min;
 
-    public static class MathExtensions
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool InBetween(this byte v, byte min, byte max) => (uint)v - (uint)min <= (uint)max - (uint)min;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool InBetween(this char v, char min, char max) => v - (uint)min <= max - min;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool InBetween(this uint v, int min, int max) => v - (uint)min <= (uint)max - (uint)min;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static int Clamp(this int v, int min, int max) => v < min ? min : v > max ? max : v;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static double Clamp(this double v, double min, double max) => v < min ? min : v > max ? max : v;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static int Abs(this int @this) => Math.Abs(@this);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static int Max(this int @this, int value) => Math.Max(@this, value);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static double Round(this double @this, int digits) => Math.Round(@this, digits);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static unsafe byte AsByte(this bool @this) => *(byte*)&@this;
+
+    /// <summary>
+    /// Converts a string to an int.
+    /// Approx. 17 times faster than int.Parse.
+    /// </summary>
+    /// <param name="str">The string to convert</param>
+    /// <returns>The resulting number</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static int ToIntegral(this string str)
     {
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool InBetween(this int v, int min, int max) => (uint)v - (uint)min <= (uint)max - (uint)min;
+        if (str.IsNullOrWhiteSpace())
+            return 0;
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool InBetween(this byte v, byte min, byte max) => (uint)v - (uint)min <= (uint)max - (uint)min;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool InBetween(this char v, char min, char max) => v - (uint)min <= max - min;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool InBetween(this uint v, int min, int max) => v - (uint)min <= (uint)max - (uint)min;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int Clamp(this int v, int min, int max) => v < min ? min : v > max ? max : v;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static double Clamp(this double v, double min, double max) => v < min ? min : v > max ? max : v;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int Abs(this int @this) => Math.Abs(@this);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int Max(this int @this, int value) => Math.Max(@this, value);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static double Round(this double @this, int digits) => Math.Round(@this, digits);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe byte AsByte(this bool @this) => *(byte*)&@this;
-
-        /// <summary>
-        /// Converts a string to an int.
-        /// Approx. 17 times faster than int.Parse.
-        /// </summary>
-        /// <param name="str">The string to convert</param>
-        /// <returns>The resulting number</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int ToIntegral(this string str)
+        var x = 0;
+        var neg = false;
+        var pos = 0;
+        var max = str.Length - 1;
+        if (str[pos] == '-')
         {
-            if (str.IsNullOrWhiteSpace())
-                return 0;
-
-            var x = 0;
-            var neg = false;
-            var pos = 0;
-            var max = str.Length - 1;
-            if (str[pos] == '-')
-            {
-                neg = true;
-                pos++;
-            }
-
-            while (pos <= max && InBetween(str[pos], '0', '9'))
-            {
-                x = x * 10 + (str[pos] - '0');
-                pos++;
-            }
-
-            return neg ? -x : x;
+            neg = true;
+            pos++;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool ToIntegral(this string str, out int result)
+        while (pos <= max && InBetween(str[pos], '0', '9'))
         {
-            if (str.IsNullOrWhiteSpace())
-            {
-                result = 0;
-                return false;
-            }
-
-            result = str.ToIntegral();
-            return true;
+            x = x * 10 + (str[pos] - '0');
+            pos++;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool ToIntegral(this string str, out ulong result)
+        return neg ? -x : x;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool ToIntegral(this string str, out int result)
+    {
+        if (str.IsNullOrWhiteSpace())
         {
-            if (str.IsNullOrWhiteSpace())
-            {
-                result = 0;
-                return false;
-            }
-
-            var x = 0ul;
-            var pos = 0;
-            var max = str.Length - 1;
-            while (pos <= max && InBetween(str[pos], '0', '9'))
-            {
-                x = x * 10 + (ulong)(str[pos] - '0');
-                pos++;
-            }
-
-            result = x;
-            return true;
+            result = 0;
+            return false;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool ToIntegral(this ReadOnlySpan<char> str, out int result)
+        result = str.ToIntegral();
+        return true;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool ToIntegral(this string str, out ulong result)
+    {
+        if (str.IsNullOrWhiteSpace())
         {
-            if (str.IsEmpty)
-            {
-                result = 0;
-                return false;
-            }
-
-            var x = 0;
-            var pos = 0;
-            var max = str.Length - 1;
-            while (pos <= max && InBetween(str[pos], '0', '9'))
-            {
-                x = x * 10 + (str[pos] - '0');
-                pos++;
-            }
-
-            result = x;
-            return true;
+            result = 0;
+            return false;
         }
 
-        /// <summary>
-        /// Modulo for pow^2 values...
-        /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int ModPow2(int input, int ceil) => input & (ceil - 1);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int Pow2(this int value) => 1 << BitBoards.Msb(value).AsInt();
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsEven(this int value) => (value & 1) == 0;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsOdd(this int value) => !value.IsEven();
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int ToInt(this bool @this)
+        var x = 0ul;
+        var pos = 0;
+        var max = str.Length - 1;
+        while (pos <= max && InBetween(str[pos], '0', '9'))
         {
-            var myBoolSpan = MemoryMarshal.CreateReadOnlySpan(ref @this, 1);
-            return MemoryMarshal.AsBytes(myBoolSpan)[0];
+            x = x * 10 + (ulong)(str[pos] - '0');
+            pos++;
         }
+
+        result = x;
+        return true;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool ToIntegral(this ReadOnlySpan<char> str, out int result)
+    {
+        if (str.IsEmpty)
+        {
+            result = 0;
+            return false;
+        }
+
+        var x = 0;
+        var pos = 0;
+        var max = str.Length - 1;
+        while (pos <= max && InBetween(str[pos], '0', '9'))
+        {
+            x = x * 10 + (str[pos] - '0');
+            pos++;
+        }
+
+        result = x;
+        return true;
+    }
+
+    /// <summary>
+    /// Modulo for pow^2 values...
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static int ModPow2(int input, int ceil) => input & (ceil - 1);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static int Pow2(this int value) => 1 << BitBoards.Msb(value).AsInt();
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool IsEven(this int value) => (value & 1) == 0;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool IsOdd(this int value) => !value.IsEven();
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static int ToInt(this bool @this)
+    {
+        var myBoolSpan = MemoryMarshal.CreateReadOnlySpan(ref @this, 1);
+        return MemoryMarshal.AsBytes(myBoolSpan)[0];
     }
 }

@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2020 Rudy Alex Kohn
+Copyright (c) 2017-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,14 +24,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess
+namespace Rudz.Chess;
+
+public interface IBlockage
 {
-    public interface IBlockage
-    {
-        /// <summary>
-        /// Computes whether the current position contains a pawn fence which makes the game a draw.
-        /// </summary>
-        /// <returns>true if the game is a draw position - otherwise false</returns>
-        bool IsBlocked();
-    }
+    /// <summary>
+    /// Computes whether the current position contains a pawn fence which makes the game a draw.
+    /// </summary>
+    /// <returns>true if the game is a draw position - otherwise false</returns>
+    bool IsBlocked();
 }

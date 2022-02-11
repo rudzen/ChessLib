@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2020 Rudy Alex Kohn
+Copyright (c) 2017-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,39 +24,38 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Test.File
+namespace Chess.Test.File;
+
+using Rudz.Chess.Enums;
+using Xunit;
+using F = Rudz.Chess.Types.File;
+
+public sealed class FileTests
 {
-    using Rudz.Chess.Enums;
-    using Xunit;
-    using F = Rudz.Chess.Types.File;
-
-    public sealed class FileTests
+    [Fact]
+    public void FileStructureIntTest()
     {
-        [Fact]
-        public void FileStructureIntTest()
-        {
-            const int val = 3;
-            const Files expected = (Files)val;
-            var f = new F(val);
-            var actual = f.Value;
-            Assert.Equal(expected, actual);
+        const int val = 3;
+        const Files expected = (Files)val;
+        var f = new F(val);
+        var actual = f.Value;
+        Assert.Equal(expected, actual);
 
-            f = val;
-            actual = f.Value;
-            Assert.Equal(expected, actual);
-        }
+        f = val;
+        actual = f.Value;
+        Assert.Equal(expected, actual);
+    }
 
-        [Fact]
-        public void FileStructureEFileTest()
-        {
-            const Files expected = Files.FileG;
-            var f = new F(expected);
-            var actual = f.Value;
-            Assert.Equal(expected, actual);
+    [Fact]
+    public void FileStructureEFileTest()
+    {
+        const Files expected = Files.FileG;
+        var f = new F(expected);
+        var actual = f.Value;
+        Assert.Equal(expected, actual);
 
-            f = expected;
-            actual = f.Value;
-            Assert.Equal(expected, actual);
-        }
+        f = expected;
+        actual = f.Value;
+        Assert.Equal(expected, actual);
     }
 }

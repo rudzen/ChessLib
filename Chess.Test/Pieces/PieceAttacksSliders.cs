@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2020 Rudy Alex Kohn
+Copyright (c) 2017-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,26 +24,25 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Test.Pieces
+namespace Chess.Test.Pieces;
+
+using System;
+using Rudz.Chess;
+using Rudz.Chess.Types;
+
+public abstract class PieceAttacksSliders : PieceAttacks
 {
-    using System;
-    using Rudz.Chess;
-    using Rudz.Chess.Types;
+    protected static readonly int[] BishopExpected = { 7, 9, 11, 13 };
 
-    public abstract class PieceAttacksSliders : PieceAttacks
-    {
-        protected static readonly int[] BishopExpected = { 7, 9, 11, 13 };
+    protected static readonly int[] RookExpected = { 14, 14, 14, 14 }; // rooks always 14 :>
 
-        protected static readonly int[] RookExpected = { 14, 14, 14, 14 }; // rooks always 14 :>
+    protected readonly Func<Square, BitBoard, BitBoard>[] SlideAttacks = { MagicBB.BishopAttacks, MagicBB.RookAttacks, MagicBB.QueenAttacks };
 
-        protected readonly Func<Square, BitBoard, BitBoard>[] SlideAttacks = { MagicBB.BishopAttacks, MagicBB.RookAttacks, MagicBB.QueenAttacks };
+    public abstract override void AlphaPattern();
 
-        public abstract override void AlphaPattern();
+    public abstract override void BetaPattern();
 
-        public abstract override void BetaPattern();
+    public abstract override void GammaPattern();
 
-        public abstract override void GammaPattern();
-
-        public abstract override void DeltaPattern();
-    }
+    public abstract override void DeltaPattern();
 }

@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2020 Rudy Alex Kohn
+Copyright (c) 2017-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,31 +24,30 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Util
+namespace Rudz.Chess.Util;
+
+using System;
+using System.Collections.Concurrent;
+
+/// <summary>
+/// <para>Generic singular method result data cache.</para>
+/// <para>Construct idea from Bill Hilke</para>
+/// </summary>
+public static class DataCache
 {
-    using System;
-    using System.Collections.Concurrent;
-
-    /// <summary>
-    /// <para>Generic singular method result data cache.</para>
-    /// <para>Construct idea from Bill Hilke</para>
-    /// </summary>
-    public static class DataCache
+    public static Func<TArg, TRet> Cache<TArg, TRet>(this Func<TArg, TRet> functor)
     {
-        public static Func<TArg, TRet> Cache<TArg, TRet>(this Func<TArg, TRet> functor)
-        {
-            var table = new ConcurrentDictionary<TArg, TRet>();
+        var table = new ConcurrentDictionary<TArg, TRet>();
 
-            return arg0 =>
-                {
-                    if (table.TryGetValue(arg0, out var returnValue))
-                        return returnValue;
-
-                    returnValue = functor(arg0);
-                    table.TryAdd(arg0, returnValue);
-
+        return arg0 =>
+            {
+                if (table.TryGetValue(arg0, out var returnValue))
                     return returnValue;
-                };
-        }
+
+                returnValue = functor(arg0);
+                table.TryAdd(arg0, returnValue);
+
+                return returnValue;
+            };
     }
 }

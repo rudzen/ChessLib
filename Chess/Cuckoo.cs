@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2020 Rudy Alex Kohn
+Copyright (c) 2017-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,132 +24,131 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess
+namespace Rudz.Chess;
+
+using Hash;
+using System;
+using System.Diagnostics;
+using Types;
+
+/// <summary>
+/// Marcel van Kervinck's cuckoo algorithm for fast detection of "upcoming repetition"
+/// situations. https://marcelk.net/2013-04-06/paper/upcoming-rep-v2.pdf
+/// TODO : Unit tests
+/// </summary>
+public static class Cuckoo
 {
-    using Hash;
-    using System;
-    using System.Diagnostics;
-    using Types;
+    private static readonly HashKey[] CuckooKeys;
+    private static readonly Move[] CuckooMoves;
 
-    /// <summary>
-    /// Marcel van Kervinck's cuckoo algorithm for fast detection of "upcoming repetition"
-    /// situations. https://marcelk.net/2013-04-06/paper/upcoming-rep-v2.pdf
-    /// TODO : Unit tests
-    /// </summary>
-    public static class Cuckoo
+    static Cuckoo()
     {
-        private static readonly HashKey[] CuckooKeys;
-        private static readonly Move[] CuckooMoves;
+        // initialize cuckoo tables
+        CuckooKeys = new HashKey[8192];
+        CuckooMoves = new Move[8192];
 
-        static Cuckoo()
+        Span<Piece> pieces = stackalloc Piece[]
         {
-            // initialize cuckoo tables
-            CuckooKeys = new HashKey[8192];
-            CuckooMoves = new Move[8192];
+            Enums.Pieces.WhitePawn,
+            Enums.Pieces.WhiteKnight,
+            Enums.Pieces.WhiteBishop,
+            Enums.Pieces.WhiteRook,
+            Enums.Pieces.WhiteQueen,
+            Enums.Pieces.WhiteKing,
+            Enums.Pieces.BlackPawn,
+            Enums.Pieces.BlackKnight,
+            Enums.Pieces.BlackBishop,
+            Enums.Pieces.BlackRook,
+            Enums.Pieces.BlackQueen,
+            Enums.Pieces.BlackKing
+        };
 
-            Span<Piece> pieces = stackalloc Piece[]
+        var count = 0;
+        foreach (var pc in pieces)
+        {
+            foreach (var sq1 in BitBoards.AllSquares)
             {
-                Enums.Pieces.WhitePawn,
-                Enums.Pieces.WhiteKnight,
-                Enums.Pieces.WhiteBishop,
-                Enums.Pieces.WhiteRook,
-                Enums.Pieces.WhiteQueen,
-                Enums.Pieces.WhiteKing,
-                Enums.Pieces.BlackPawn,
-                Enums.Pieces.BlackKnight,
-                Enums.Pieces.BlackBishop,
-                Enums.Pieces.BlackRook,
-                Enums.Pieces.BlackQueen,
-                Enums.Pieces.BlackKing
-            };
-
-            var count = 0;
-            foreach (var pc in pieces)
-            {
-                foreach (var sq1 in BitBoards.AllSquares)
+                for (var sq2 = sq1 + 1; sq2 <= Enums.Squares.h8; ++sq2)
                 {
-                    for (var sq2 = sq1 + 1; sq2 <= Enums.Squares.h8; ++sq2)
+                    if ((pc.Type().PseudoAttacks(sq1) & sq2).IsEmpty)
+                        continue;
+
+                    var move = Move.Create(sq1, sq2);
+                    HashKey key = pc.GetZobristPst(sq1) ^ pc.GetZobristPst(sq2) ^ Zobrist.GetZobristSide();
+                    var i = CuckooHashOne(key);
+                    while (true)
                     {
-                        if ((pc.Type().PseudoAttacks(sq1) & sq2).IsEmpty)
-                            continue;
+                        (CuckooKeys[i], key) = (key, CuckooKeys[i].Key);
+                        (CuckooMoves[i], move) = (move, CuckooMoves[i]);
 
-                        var move = Move.Create(sq1, sq2);
-                        HashKey key = pc.GetZobristPst(sq1) ^ pc.GetZobristPst(sq2) ^ Zobrist.GetZobristSide();
-                        var i = CuckooHashOne(key);
-                        while (true)
-                        {
-                            (CuckooKeys[i], key) = (key, CuckooKeys[i].Key);
-                            (CuckooMoves[i], move) = (move, CuckooMoves[i]);
+                        // check for empty slot
+                        if (move.IsNullMove())
+                            break;
 
-                            // check for empty slot
-                            if (move.IsNullMove())
-                                break;
-
-                            // Push victim to alternative slot
-                            i = i == CuckooHashOne(key)
-                                ? CuckooHashTwo(key)
-                                : CuckooHashOne(key);
-                        }
-
-                        count++;
+                        // Push victim to alternative slot
+                        i = i == CuckooHashOne(key)
+                            ? CuckooHashTwo(key)
+                            : CuckooHashOne(key);
                     }
+
+                    count++;
                 }
             }
-
-            Debug.Assert(count == 3668);
         }
 
-        public static bool HashCuckooCycle(IPosition pos, int end, int ply)
-        {
-            var state = pos.State;
-            var originalKey = state.Key;
-            var statePrevious = state.Previous;
-
-            for (var i = 3; i <= end; i += 2)
-            {
-                statePrevious = statePrevious.Previous.Previous;
-                var moveKey = originalKey ^ statePrevious.Key;
-
-                var j = CuckooHashOne(moveKey);
-                var found = CuckooKeys[j] == moveKey;
-
-                if (!found)
-                {
-                    j = CuckooHashTwo(moveKey);
-                    found = CuckooKeys[j] == moveKey;
-                }
-
-                if (!found)
-                    continue;
-
-                var move = CuckooMoves[j];
-                var s1 = move.FromSquare();
-                var s2 = move.ToSquare();
-
-                if ((s1.BitboardBetween(s2) & pos.Board.Pieces()).IsEmpty)
-                    continue;
-
-                if (ply > i)
-                    return true;
-
-                // For nodes before or at the root, check that the move is a repetition rather than
-                // a move to the current position. In the cuckoo table, both moves Rc1c5 and Rc5c1
-                // are stored in the same location, so we have to select which square to check.
-                if (pos.GetPiece(!pos.IsOccupied(s1) ? s2 : s1).ColorOf() != pos.SideToMove)
-                    continue;
-
-                // For repetitions before or at the root, require one more
-                if (statePrevious.Repetition > 0)
-                    return true;
-            }
-
-            return false;
-        }
-
-        private static int CuckooHashOne(in HashKey key)
-            => (int)(key.Key & 0x1FFF);
-
-        private static int CuckooHashTwo(in HashKey key)
-            => (int)((key.Key >> 16) & 0x1FFF);
+        Debug.Assert(count == 3668);
     }
+
+    public static bool HashCuckooCycle(IPosition pos, int end, int ply)
+    {
+        var state = pos.State;
+        var originalKey = state.Key;
+        var statePrevious = state.Previous;
+
+        for (var i = 3; i <= end; i += 2)
+        {
+            statePrevious = statePrevious.Previous.Previous;
+            var moveKey = originalKey ^ statePrevious.Key;
+
+            var j = CuckooHashOne(moveKey);
+            var found = CuckooKeys[j] == moveKey;
+
+            if (!found)
+            {
+                j = CuckooHashTwo(moveKey);
+                found = CuckooKeys[j] == moveKey;
+            }
+
+            if (!found)
+                continue;
+
+            var move = CuckooMoves[j];
+            var s1 = move.FromSquare();
+            var s2 = move.ToSquare();
+
+            if ((s1.BitboardBetween(s2) & pos.Board.Pieces()).IsEmpty)
+                continue;
+
+            if (ply > i)
+                return true;
+
+            // For nodes before or at the root, check that the move is a repetition rather than
+            // a move to the current position. In the cuckoo table, both moves Rc1c5 and Rc5c1
+            // are stored in the same location, so we have to select which square to check.
+            if (pos.GetPiece(!pos.IsOccupied(s1) ? s2 : s1).ColorOf() != pos.SideToMove)
+                continue;
+
+            // For repetitions before or at the root, require one more
+            if (statePrevious.Repetition > 0)
+                return true;
+        }
+
+        return false;
+    }
+
+    private static int CuckooHashOne(in HashKey key)
+        => (int)(key.Key & 0x1FFF);
+
+    private static int CuckooHashTwo(in HashKey key)
+        => (int)((key.Key >> 16) & 0x1FFF);
 }

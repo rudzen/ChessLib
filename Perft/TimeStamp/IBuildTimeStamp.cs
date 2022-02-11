@@ -3,7 +3,7 @@ Perft, a chess perft testing application
 
 MIT License
 
-Copyright (c) 2019-2020 Rudy Alex Kohn
+Copyright (c) 2019-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,10 +24,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Perft.TimeStamp
+namespace Perft.TimeStamp;
+
+public interface IBuildTimeStamp
 {
-    public interface IBuildTimeStamp
-    {
-        string TimeStamp { get; }
-    }
+    string TimeStamp { get; }
 }

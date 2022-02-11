@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2020 Rudy Alex Kohn
+Copyright (c) 2017-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,35 +24,34 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Types
+namespace Rudz.Chess.Types;
+
+using System;
+
+/// <summary>
+/// Model for data transfer of piece and square Used for notification when a piece is updated in
+/// the chess structure
+/// </summary>
+public class PieceSquare : EventArgs, IPieceSquare
 {
-    using System;
-
-    /// <summary>
-    /// Model for data transfer of piece and square Used for notification when a piece is updated in
-    /// the chess structure
-    /// </summary>
-    public class PieceSquare : EventArgs, IPieceSquare
+    public PieceSquare(Piece piece, Square square)
     {
-        public PieceSquare(Piece piece, Square square)
-        {
-            Piece = piece;
-            Square = square;
-        }
+        Piece = piece;
+        Square = square;
+    }
 
-        public Piece Piece { get; set; }
+    public Piece Piece { get; set; }
 
-        public Square Square { get; set; }
+    public Square Square { get; set; }
 
-        public bool Equals(IPieceSquare other)
-            => !ReferenceEquals(null, other) && (ReferenceEquals(this, other) || Piece.Equals(other.Piece) && Square.Equals(other.Square));
+    public bool Equals(IPieceSquare other)
+        => !ReferenceEquals(null, other) && (ReferenceEquals(this, other) || Piece.Equals(other.Piece) && Square.Equals(other.Square));
 
-        public override bool Equals(object obj)
-            => !ReferenceEquals(null, obj) && (ReferenceEquals(this, obj) || obj.GetType() == GetType() && Equals((PieceSquare) obj));
+    public override bool Equals(object obj)
+        => !ReferenceEquals(null, obj) && (ReferenceEquals(this, obj) || obj.GetType() == GetType() && Equals((PieceSquare)obj));
 
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(Piece, Square);
-        }
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(Piece, Square);
     }
 }

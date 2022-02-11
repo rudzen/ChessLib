@@ -3,7 +3,7 @@ Perft, a chess perft testing application
 
 MIT License
 
-Copyright (c) 2019-2020 Rudy Alex Kohn
+Copyright (c) 2019-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,27 +24,26 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Perft.TimeStamp
+namespace Perft.TimeStamp;
+
+using System;
+using System.Linq;
+using System.Reflection;
+
+public sealed class BuildTimeStamp : IBuildTimeStamp
 {
-    using System;
-    using System.Linq;
-    using System.Reflection;
+    private const string AttributeName = "TimestampAttribute";
 
-    public sealed class BuildTimeStamp : IBuildTimeStamp
+    private static readonly Lazy<string> _timeStamp = new(GetTimestamp);
+
+    public string TimeStamp => _timeStamp.Value;
+
+    private static string GetTimestamp()
     {
-        private const string AttributeName = "TimestampAttribute";
+        var attribute = Assembly.GetExecutingAssembly()
+            .GetCustomAttributesData()
+            .First(x => x.AttributeType.Name == AttributeName);
 
-        private static readonly Lazy<string> _timeStamp = new(GetTimestamp);
-
-        public string TimeStamp => _timeStamp.Value;
-
-        private static string GetTimestamp()
-        {
-            var attribute = Assembly.GetExecutingAssembly()
-                .GetCustomAttributesData()
-                .First(x => x.AttributeType.Name == AttributeName);
-
-            return (string)attribute.ConstructorArguments.First().Value;
-        }
+        return (string)attribute.ConstructorArguments.First().Value;
     }
 }

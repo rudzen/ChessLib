@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2020 Rudy Alex Kohn
+Copyright (c) 2017-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,52 +24,51 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Types
+namespace Rudz.Chess.Types;
+
+using System;
+using System.Runtime.CompilerServices;
+
+/// <summary>
+/// Extended move structure which combines Move and Score
+/// </summary>
+public struct ExtMove : IEquatable<ExtMove>
 {
-    using System;
-    using System.Runtime.CompilerServices;
+    public static readonly ExtMove Empty = new();
 
-    /// <summary>
-    /// Extended move structure which combines Move and Score
-    /// </summary>
-    public struct ExtMove : IEquatable<ExtMove>
+    public Move Move;
+
+    public int Score;
+
+    private ExtMove(Move m, int s)
     {
-        public static readonly ExtMove Empty = new();
-
-        public Move Move;
-
-        public int Score;
-
-        private ExtMove(Move m, int s)
-        {
-            Move = m;
-            Score = s;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator ExtMove(Move m)
-            => new(m, 0);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator ExtMove(int s)
-            => new(Move.EmptyMove, s);
-
-        public static bool operator !=(ExtMove left, ExtMove right)
-            => !(left == right);
-
-        public static bool operator ==(ExtMove left, ExtMove right)
-            => left.Equals(right);
-
-        public bool Equals(ExtMove other)
-            => Move.Equals(other.Move);
-
-        public override bool Equals(object obj)
-            => obj is ExtMove other && Equals(other);
-
-        public override int GetHashCode()
-            => Move.GetHashCode();
-
-        public override string ToString()
-            => $"{Move}, {Score}";
+        Move = m;
+        Score = s;
     }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static implicit operator ExtMove(Move m)
+        => new(m, 0);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static implicit operator ExtMove(int s)
+        => new(Move.EmptyMove, s);
+
+    public static bool operator !=(ExtMove left, ExtMove right)
+        => !(left == right);
+
+    public static bool operator ==(ExtMove left, ExtMove right)
+        => left.Equals(right);
+
+    public bool Equals(ExtMove other)
+        => Move.Equals(other.Move);
+
+    public override bool Equals(object obj)
+        => obj is ExtMove other && Equals(other);
+
+    public override int GetHashCode()
+        => Move.GetHashCode();
+
+    public override string ToString()
+        => $"{Move}, {Score}";
 }

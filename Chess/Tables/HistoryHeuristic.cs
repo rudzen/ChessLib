@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2020 Rudy Alex Kohn
+Copyright (c) 2017-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,46 +24,45 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Tables
+namespace Rudz.Chess.Tables;
+
+using Enums;
+using Extensions;
+using Types;
+
+public sealed class HistoryHeuristic : IHistoryHeuristic
 {
-    using Enums;
-    using Extensions;
-    using Types;
+    private readonly int[][][] _table;
 
-    public sealed class HistoryHeuristic : IHistoryHeuristic
+    public HistoryHeuristic()
     {
-        private readonly int[][][] _table;
+        _table = new int[(int)Players.PlayerNb][][];
+        Initialize(Player.White);
+        Initialize(Player.Black);
+    }
 
-        public HistoryHeuristic()
-        {
-            _table = new int[(int)Players.PlayerNb][][];
-            Initialize(Player.White);
-            Initialize(Player.Black);
-        }
+    public void Clear()
+    {
+        ClearTable(Player.White);
+        ClearTable(Player.Black);
+    }
 
-        public void Clear()
-        {
-            ClearTable(Player.White);
-            ClearTable(Player.Black);
-        }
+    public void Set(Player c, Square from, Square to, int value)
+        => _table[c.Side][from.AsInt()][to.AsInt()] = value;
 
-        public void Set(Player c, Square from, Square to, int value)
-            => _table[c.Side][from.AsInt()][to.AsInt()] = value;
+    public int Retrieve(Player c, Square from, Square to)
+        => _table[c.Side][from.AsInt()][to.AsInt()];
 
-        public int Retrieve(Player c, Square from, Square to)
-            => _table[c.Side][from.AsInt()][to.AsInt()];
+    private void Initialize(Player c)
+    {
+        _table[c.Side] = new int[64][];
+        for (var i = 0; i < _table[c.Side].Length; ++i)
+            _table[c.Side][i] = new int[64];
+    }
 
-        private void Initialize(Player c)
-        {
-            _table[c.Side] = new int[64][];
-            for (var i = 0; i < _table[c.Side].Length; ++i)
-                _table[c.Side][i] = new int[64];
-        }
-
-        private void ClearTable(Player c)
-        {
-            for (var i = 0; i < _table[c.Side].Length; i++)
-                _table[c.Side][i].Clear();
-        }
+    private void ClearTable(Player c)
+    {
+        for (var i = 0; i < _table[c.Side].Length; i++)
+            _table[c.Side][i].Clear();
     }
 }

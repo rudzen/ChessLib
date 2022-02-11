@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2020 Rudy Alex Kohn
+Copyright (c) 2017-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,70 +24,69 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Types
+namespace Rudz.Chess.Types;
+
+using Enums;
+using System;
+using System.Runtime.CompilerServices;
+
+public readonly struct Direction : IEquatable<Direction>
 {
-    using Enums;
-    using System;
-    using System.Runtime.CompilerServices;
+    public Directions Value { get; }
 
-    public readonly struct Direction : IEquatable<Direction>
-    {
-        public Directions Value { get; }
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private Direction(Directions d) => Value = d;
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private Direction(Directions d) => Value = d;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private Direction(int d) => Value = (Directions)d;
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private Direction(int d) => Value = (Directions)d;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static implicit operator Direction(int value) => new(value);
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator Direction(int value) => new(value);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static implicit operator Direction(Directions value) => new(value);
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator Direction(Directions value) => new(value);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Direction operator +(Direction left, Direction right) => left.Value + (int)right.Value;
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Direction operator +(Direction left, Direction right) => left.Value + (int)right.Value;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Direction operator +(Direction left, Directions right) => left.Value + (int)right;
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Direction operator +(Direction left, Directions right) => left.Value + (int)right;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Direction operator +(Direction left, int right) => left.Value + right;
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Direction operator +(Direction left, int right) => left.Value + right;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Direction operator -(Direction left, Direction right) => left.Value - (int)right.Value;
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Direction operator -(Direction left, Direction right) => left.Value - (int)right.Value;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Direction operator -(Direction left, Directions right) => left.Value - (int)right;
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Direction operator -(Direction left, Directions right) => left.Value - (int)right;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Direction operator -(Direction left, int right) => left.Value - right;
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Direction operator -(Direction left, int right) => left.Value - right;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Direction operator *(Direction left, Direction right) => (int)left.Value * (int)right.Value;
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Direction operator *(Direction left, Direction right) => (int)left.Value * (int)right.Value;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Direction operator *(Direction left, Directions right) => (int)left.Value * (int)right;
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Direction operator *(Direction left, Directions right) => (int)left.Value * (int)right;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Direction operator *(Direction left, int right) => (int)left.Value * right;
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Direction operator *(Direction left, int right) => (int)left.Value * right;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool operator ==(Direction left, Direction right) => left.Equals(right);
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator ==(Direction left, Direction right) => left.Equals(right);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool operator !=(Direction left, Direction right) => !(left == right);
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator !=(Direction left, Direction right) => !(left == right);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool Equals(Direction other) => Value == other.Value;
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool Equals(Direction other) => Value == other.Value;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public override bool Equals(object obj) => obj is Direction other && Equals(other);
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public override bool Equals(object obj) => obj is Direction other && Equals(other);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public override int GetHashCode() => AsInt();
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public override int GetHashCode() => AsInt();
-
-        private int AsInt() => (int)Value;
-    }
+    private int AsInt() => (int)Value;
 }

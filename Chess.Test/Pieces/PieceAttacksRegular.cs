@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2020 Rudy Alex Kohn
+Copyright (c) 2017-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,33 +24,32 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Test.Pieces
+namespace Chess.Test.Pieces;
+
+using Rudz.Chess.Enums;
+using Rudz.Chess.Types;
+using System;
+
+public abstract class PieceAttacksRegular : PieceAttacks
 {
-    using Rudz.Chess.Enums;
-    using Rudz.Chess.Types;
-    using System;
+    // special case with alpha and beta bands in the corners are taken care of
+    protected static readonly int[] KnightExpected = { 4, 6, 8, 8 };
 
-    public abstract class PieceAttacksRegular : PieceAttacks
-    {
-        // special case with alpha and beta bands in the corners are taken care of
-        protected static readonly int[] KnightExpected = { 4, 6, 8, 8 };
+    // special case with alpha band is taken care of
+    protected static readonly int[] KingExpected = { 5, 8, 8, 8 };
 
-        // special case with alpha band is taken care of
-        protected static readonly int[] KingExpected = { 5, 8, 8, 8 };
+    protected static readonly BitBoard BoardCorners
+        = BitBoards.MakeBitboard(Squares.a1) | BitBoards.MakeBitboard(Squares.a8)
+        | BitBoards.MakeBitboard(Squares.h1) | BitBoards.MakeBitboard(Squares.h8);
 
-        protected static readonly BitBoard BoardCorners
-            = BitBoards.MakeBitboard(Squares.a1) | BitBoards.MakeBitboard(Squares.a8)
-            | BitBoards.MakeBitboard(Squares.h1) | BitBoards.MakeBitboard(Squares.h8);
+    // pawn = 0 (N/A for now), knight = 1, king = 2
+    protected readonly Func<Square, BitBoard>[] RegAttacks = { BitBoards.KnightAttacks, BitBoards.KnightAttacks, BitBoards.KingAttacks };
 
-        // pawn = 0 (N/A for now), knight = 1, king = 2
-        protected readonly Func<Square, BitBoard>[] RegAttacks = { BitBoards.KnightAttacks, BitBoards.KnightAttacks, BitBoards.KingAttacks };
+    public abstract override void AlphaPattern();
 
-        public abstract override void AlphaPattern();
+    public abstract override void BetaPattern();
 
-        public abstract override void BetaPattern();
+    public abstract override void GammaPattern();
 
-        public abstract override void GammaPattern();
-
-        public abstract override void DeltaPattern();
-    }
+    public abstract override void DeltaPattern();
 }
