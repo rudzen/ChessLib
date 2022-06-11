@@ -5,7 +5,7 @@ A C# chess data library with complete move generation and all needed custom type
 
 ## Requirements
 
-* .NET Core 3.1+
+* .NET 6.0+
 
 ## What is this for?
 
@@ -16,9 +16,9 @@ are meant to be implemented separately.
 ## But why?
 
 This library was developed during a course "Advanced C# and object oriented programming E17" at DTU (Danish Technical University) as part of a chess user interface, which will be released at a later stage when it is ready.
-Since the UI needs to handle legality, mate check etc etc, all these features are contained within the library.
+Since the UI needs to handle legality, mate check etc., all these features are contained within the library.
 
-## Can i use this as a starting point for my chess software?
+## Can I use this as a starting point for my chess software?
 
 Yes you can, it is designed with that in mind.
 
@@ -49,10 +49,10 @@ Yes you can, it is designed with that in mind.
 
 Yes. As far as C# goes it should be able to hold its own.
 
-Perft console test program approximate timings to depth 6
+Perft console test program approximate timings to depth 6 for normal start position
 
 * AMD-FX 8350 = ~12.5 seconds. (without TT) (earlier version)
-* Intel i7-8086k = ~4 seconds
+* Intel i7-8086k = ~3.5 seconds
 
 ## What is not included?
 
