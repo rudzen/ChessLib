@@ -309,7 +309,7 @@ public sealed class MoveAmbiguity : IMoveAmbiguity
         {
             var pinned = _pos.PinnedPieces(c);
 
-            if (similarTypeAttacks & pinned)
+            if (square & pinned)
                 continue;
 
             if (_pos.GetPieceType(from) != _pos.GetPieceType(square))
