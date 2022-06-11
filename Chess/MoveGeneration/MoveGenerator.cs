@@ -27,16 +27,21 @@ SOFTWARE.
 namespace Rudz.Chess.MoveGeneration;
 
 using Enums;
-using Extensions;
 using System;
 using System.Diagnostics;
 using Types;
 
 public static class MoveGenerator
 {
-    private static readonly (CastlelingRights, CastlelingRights)[] CastleSideRights = { (CastlelingRights.WhiteOo, CastlelingRights.WhiteOoo), (CastlelingRights.BlackOo, CastlelingRights.BlackOoo) };
+    private static readonly (CastlelingRights, CastlelingRights)[] CastleSideRights
+        = { (CastlelingRights.WhiteOo, CastlelingRights.WhiteOoo), (CastlelingRights.BlackOo, CastlelingRights.BlackOoo) };
 
-    public static int Generate(IPosition pos, ExtMove[] moves, int index, Player us, MoveGenerationType type)
+    public static int Generate(
+        IPosition pos,
+        Span<ExtMove> moves,
+        int index,
+        Player us,
+        MoveGenerationType type)
     {
         switch (type)
         {
@@ -60,7 +65,13 @@ public static class MoveGenerator
         }
     }
 
-    private static int GenerateAll(IPosition pos, ExtMove[] moves, int index, BitBoard target, Player us, MoveGenerationType type)
+    private static int GenerateAll(
+        IPosition pos,
+        Span<ExtMove> moves,
+        int index,
+        BitBoard target,
+        Player us,
+        MoveGenerationType type)
     {
         var checks = type == MoveGenerationType.QuietChecks;
         index = GeneratePawnMoves(pos, moves, index, target, us, type);
@@ -101,7 +112,12 @@ public static class MoveGenerator
     /// <param name="us"></param>
     /// <param name="type"></param>
     /// <returns></returns>
-    private static int GenerateCapturesQuietsNonEvasions(IPosition pos, ExtMove[] moves, int index, Player us, MoveGenerationType type)
+    private static int GenerateCapturesQuietsNonEvasions(
+        IPosition pos,
+        Span<ExtMove> moves,
+        int index,
+        Player us,
+        MoveGenerationType type)
     {
         Debug.Assert(type == MoveGenerationType.Captures || type == MoveGenerationType.Quiets || type == MoveGenerationType.NonEvasions);
         Debug.Assert(!pos.InCheck);
@@ -125,7 +141,11 @@ public static class MoveGenerator
     /// <param name="index"></param>
     /// <param name="us"></param>
     /// <returns></returns>
-    private static int GenerateEvasions(IPosition pos, ExtMove[] moves, int index, Player us)
+    private static int GenerateEvasions(
+        IPosition pos,
+        Span<ExtMove> moves,
+        int index,
+        Player us)
     {
         Debug.Assert(pos.InCheck);
         var ksq = pos.GetKingSquare(us);
@@ -167,7 +187,11 @@ public static class MoveGenerator
     /// <param name="index"></param>
     /// <param name="us"></param>
     /// <returns></returns>
-    private static int GenerateLegal(IPosition pos, ExtMove[] moves, int index, Player us)
+    private static int GenerateLegal(
+        IPosition pos,
+        Span<ExtMove> moves,
+        int index,
+        Player us)
     {
         var pinned = pos.BlockersForKing(us) & pos.Pieces(us);
         var ksq = pos.GetKingSquare(us);
@@ -202,7 +226,14 @@ public static class MoveGenerator
     /// <param name="pt">The piece type performing the moves</param>
     /// <param name="checks">Position is in check</param>
     /// <returns>The new move index</returns>
-    private static int GenerateMoves(IPosition pos, ExtMove[] moves, int index, Player us, BitBoard target, PieceTypes pt, bool checks)
+    private static int GenerateMoves(
+        IPosition pos,
+        Span<ExtMove> moves,
+        int index,
+        Player us,
+        BitBoard target,
+        PieceTypes pt,
+        bool checks)
     {
         Debug.Assert(pt != PieceTypes.King && pt != PieceTypes.Pawn);
 
@@ -213,7 +244,8 @@ public static class MoveGenerator
 
         foreach (var from in squares)
         {
-            if (checks && (!(pos.BlockersForKing(~us) & from).IsEmpty || (pt.PseudoAttacks(from) & target & pos.CheckedSquares(pt)).IsEmpty))
+            if (checks
+                && (!(pos.BlockersForKing(~us) & from).IsEmpty || (pt.PseudoAttacks(from) & target & pos.CheckedSquares(pt)).IsEmpty))
                 continue;
 
             var b = pos.GetAttacks(from, pt) & target;
@@ -237,7 +269,13 @@ public static class MoveGenerator
     /// <param name="us">The current player</param>
     /// <param name="type">The type of moves to generate</param>
     /// <returns>The new move index</returns>
-    private static int GeneratePawnMoves(IPosition pos, ExtMove[] moves, int index, BitBoard target, Player us, MoveGenerationType type)
+    private static int GeneratePawnMoves(
+        IPosition pos,
+        Span<ExtMove> moves,
+        int index,
+        BitBoard target,
+        Player us,
+        MoveGenerationType type)
     {
         // Compute our parametrized parameters named according to the point of view of white side.
 
@@ -350,7 +388,9 @@ public static class MoveGenerator
         }
 
         // Standard and en-passant captures
-        if (type != MoveGenerationType.Captures && type != MoveGenerationType.Evasions && type != MoveGenerationType.NonEvasions)
+        if (type != MoveGenerationType.Captures
+            && type != MoveGenerationType.Evasions
+            && type != MoveGenerationType.NonEvasions)
             return index;
 
         pawnOne = pawnsNotOn7.Shift(right) & enemies;
@@ -396,7 +436,11 @@ public static class MoveGenerator
     /// <param name="index"></param>
     /// <param name="us"></param>
     /// <returns></returns>
-    private static int GenerateQuietChecks(IPosition pos, ExtMove[] moves, int index, Player us)
+    private static int GenerateQuietChecks(
+        IPosition pos,
+        Span<ExtMove> moves,
+        int index,
+        Player us)
     {
         Debug.Assert(!pos.InCheck);
         var dc = pos.BlockersForKing(~us) & pos.Pieces(us);
@@ -406,8 +450,10 @@ public static class MoveGenerator
             var from = BitBoards.PopLsb(ref dc);
             var pt = pos.GetPiece(from).Type();
 
+            // No need to generate pawn quiet checks,
+            // as these will be generated together with direct checks
             if (pt == PieceTypes.Pawn)
-                continue; // Will be generated together with direct checks
+                continue;
 
             var b = pos.GetAttacks(from, pt) & ~pos.Pieces();
 
@@ -430,7 +476,13 @@ public static class MoveGenerator
     /// <param name="direction"></param>
     /// <param name="type"></param>
     /// <returns></returns>
-    private static int MakePromotions(ExtMove[] moves, int index, Square to, Square ksq, Direction direction, MoveGenerationType type)
+    private static int MakePromotions(
+        Span<ExtMove> moves,
+        int index,
+        Square to,
+        Square ksq,
+        Direction direction,
+        MoveGenerationType type)
     {
         var from = to - direction;
 
@@ -450,13 +502,12 @@ public static class MoveGenerator
             && type != MoveGenerationType.NonEvasions)
             return index;
 
-        moves[index++].Move = Move.Create(@from, to, MoveTypes.Promotion, PieceTypes.Rook);
-        moves[index++].Move = Move.Create(@from, to, MoveTypes.Promotion, PieceTypes.Bishop);
+        moves[index++].Move = Move.Create(from, to, MoveTypes.Promotion, PieceTypes.Rook);
+        moves[index++].Move = Move.Create(from, to, MoveTypes.Promotion, PieceTypes.Bishop);
 
         if ((PieceTypes.Knight.PseudoAttacks(to) & ksq).IsEmpty)
-            moves[index++].Move = Move.Create(@from, to, MoveTypes.Promotion);
+            moves[index++].Move = Move.Create(from, to, MoveTypes.Promotion);
 
         return index;
-
     }
 }

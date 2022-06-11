@@ -314,8 +314,8 @@ public sealed class Position : IPosition
         };
     }
 
-    public BitBoard GetAttacks(Square square, PieceTypes pt)
-        => GetAttacks(square, pt, Pieces());
+    public BitBoard GetAttacks(Square sq, PieceTypes pt)
+        => GetAttacks(sq, pt, Pieces());
 
     public CastlelingRights GetCastlelingRightsMask(Square sq)
         => _castlingRightsMask[sq.AsInt()];
@@ -1103,7 +1103,10 @@ public sealed class Position : IPosition
             DoCastleling(us, from, ref to, out _, out _, CastlelingPerform.Undo);
         else
         {
+            // Note: The parameters are reversed, since we move the piece "back"
+#pragma warning disable S2234 // Parameters should be passed in the correct order
             MovePiece(to, from);
+#pragma warning restore S2234 // Parameters should be passed in the correct order
 
             if (State.CapturedPiece != Piece.EmptyPiece)
             {

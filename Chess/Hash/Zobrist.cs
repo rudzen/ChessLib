@@ -84,32 +84,38 @@ public static class Zobrist
 
     static Zobrist()
     {
-        IRKiss rnd = new RKiss(DefaultRandomSeed);
+        var rnd = RKiss.Create(DefaultRandomSeed);
+        InitializePst(rnd);
+        InitializeRandomArray(ZobristEpFile, rnd);
+        InitializeRandomArray(ZobristCastling, rnd);
+        ZobristSide = rnd.Rand();
+        ZobristNoPawn = rnd.Rand();
+    }
 
+    private static void InitializePst(IRKiss rnd)
+    {
         for (var i = 0; i < ZobristPst.Length; i++)
             ZobristPst[i] = new ulong[64];
 
-        Span<PieceTypes> Pts = stackalloc PieceTypes[]
+        Span<PieceTypes> pieceTypes = stackalloc PieceTypes[]
             { PieceTypes.Pawn, PieceTypes.Knight, PieceTypes.Bishop, PieceTypes.Rook, PieceTypes.Queen, PieceTypes.King };
+        Span<Player> players = stackalloc Player[] { Player.White, Player.Black };
 
-        for (var side = Players.White; side < Players.PlayerNb; ++side)
+        foreach (var side in players)
         {
-            foreach (var pieceType in Pts)
+            foreach (var pieceType in pieceTypes)
             {
-                var piece = pieceType.MakePiece(side);
-                for (var square = Squares.a1; square <= Squares.h8; square++)
-                    ZobristPst[piece.AsInt()][(int)square] = rnd.Rand();
+                var pieceIndex = pieceType.MakePiece(side).AsInt();
+                foreach (var sq in BitBoards.AllSquares)
+                    ZobristPst[pieceIndex][sq.AsInt()] = rnd.Rand();
             }
         }
+    }
 
-        for (var i = 0; i < ZobristCastling.Length; i++)
-            ZobristCastling[i] = rnd.Rand();
-
-        for (var i = 0; i < ZobristEpFile.Length; i++)
-            ZobristEpFile[i] = rnd.Rand();
-
-        ZobristSide = rnd.Rand();
-        ZobristNoPawn = rnd.Rand();
+    private static void InitializeRandomArray(Span<ulong> array, IRKiss rnd)
+    {
+        for (var i = 0; i < array.Length; i++)
+            array[i] = rnd.Rand();
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

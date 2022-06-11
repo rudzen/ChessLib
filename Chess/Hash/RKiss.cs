@@ -43,8 +43,7 @@ public sealed class RKiss : IRKiss
         _s = s;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator RKiss(ulong seed) => new(seed);
+    public static IRKiss Create(ulong seed) => new RKiss(seed);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public IEnumerable<ulong> Get(int count)

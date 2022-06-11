@@ -167,7 +167,6 @@ internal static class Program
     {
         // Apply the config to the logger
         Log.Logger = new LoggerConfiguration()
-            //.WriteTo.EventLog("File System Scanner", manageEventSource: true, restrictedToMinimumLevel: LogEventLevel.Error)
             .ReadFrom.Configuration(configuration)
             .Enrich.WithThreadId()
             .Enrich.FromLogContext()

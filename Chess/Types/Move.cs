@@ -66,7 +66,7 @@ public readonly struct Move : IEquatable<Move>
         => new(from, to);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static int Create(ExtMove[] moves, int index, Square from, BitBoard to)
+    public static int Create(Span<ExtMove> moves, int index, Square from, BitBoard to)
     {
         while (!to.IsEmpty)
             moves[index++].Move = Create(from, BitBoards.PopLsb(ref to));

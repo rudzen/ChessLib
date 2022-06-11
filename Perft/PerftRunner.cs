@@ -79,7 +79,14 @@ public sealed class PerftRunner : IPerftRunner
 
     private bool _usingEpd;
 
-    public PerftRunner(IEpdParser parser, ILogger log, IBuildTimeStamp buildTimeStamp, IPerft perft, IConfiguration configuration, ObjectPool<PerftResult> resultPool, IUci uci)
+    public PerftRunner(
+        IEpdParser parser,
+        ILogger log,
+        IBuildTimeStamp buildTimeStamp,
+        IPerft perft,
+        IConfiguration configuration,
+        ObjectPool<PerftResult> resultPool,
+        IUci uci)
     {
         _epdParser = parser;
         _log = log;
@@ -227,7 +234,7 @@ public sealed class PerftRunner : IPerftRunner
 
             var elapsedMs = sw.ElapsedMilliseconds;
 
-            ComputeResultsAsync(perftResult, depth, expected, elapsedMs, result);
+            ComputeResults(perftResult, depth, expected, elapsedMs, result);
 
             errors += await LogResults(result).ConfigureAwait(false);
 
@@ -249,17 +256,21 @@ public sealed class PerftRunner : IPerftRunner
         // ReSharper disable once MethodHasAsyncOverload
         var contents = JsonConvert.SerializeObject(result, _outputSettings);
         var outputFileName = $"{baseFileName}{result.Depth}].json";
-        await System.IO.File.WriteAllTextAsync(outputFileName, contents, cancellationToken).ConfigureAwait(false);
+        await System.IO.File.WriteAllTextAsync(
+            outputFileName,
+            contents,
+            cancellationToken)
+            .ConfigureAwait(false);
     }
 
-    private void ComputeResultsAsync(ulong result, int depth, ulong expected, long elapsedMs, IPerftResult results)
+    private void ComputeResults(ulong result, int depth, ulong expected, long elapsedMs, IPerftResult results)
     {
         // compute results
         results.Result = result;
         results.Depth = depth;
         // add 1 to avoid potential dbz
         results.Elapsed = TimeSpan.FromMilliseconds(elapsedMs + 1);
-        results.Nps = (ulong)_uci.Nps(result, results.Elapsed);
+        results.Nps = _uci.Nps(result, results.Elapsed);
         results.CorrectResult = expected;
         results.Passed = expected == result;
         results.TableHits = Game.Table.Hits;
@@ -284,7 +295,7 @@ public sealed class PerftRunner : IPerftRunner
                 if (result.Result != result.CorrectResult)
                 {
                     var difference = (long)(result.CorrectResult - result.Result);
-                    _log.Information("Difference  : {0}", difference < 0 ? -difference : difference);
+                    _log.Information("Difference  : {0}", Math.Abs(difference));
                 }
             }
             else
