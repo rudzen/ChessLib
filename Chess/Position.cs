@@ -1041,7 +1041,7 @@ public sealed class Position : IPosition
 
         State.EnPassantSquare = chunk.Length == 1 || chunk[0] == '-' || !chunk[0].InBetween('a', 'h')
             ? Square.None
-            : chunk[1].InBetween('3', '6')
+            : chunk[1] != '3' && chunk[1] != '6'
                 ? Square.None
                 : new Square(chunk[1] - '1', chunk[0] - 'a').Value;
 
