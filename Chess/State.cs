@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2020 Rudy Alex Kohn
+Copyright (c) 2017-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,184 +24,183 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess
+namespace Rudz.Chess;
+
+using Enums;
+using Extensions;
+using System;
+using System.Linq;
+using Types;
+
+public sealed class State : IEquatable<State>
 {
-    using Enums;
-    using Extensions;
-    using System;
-    using System.Linq;
-    using Types;
+    public Move LastMove { get; set; }
 
-    public sealed class State : IEquatable<State>
+    public Value[] NonPawnMaterial { get; set; }
+
+    public HashKey PawnStructureKey { get; set; }
+
+    public int PliesFromNull { get; set; }
+
+    public int Rule50 { get; set; }
+
+    public HashKey Key { get; set; }
+
+    public CastlelingRights CastlelingRights { get; set; }
+
+    public Square EnPassantSquare { get; set; }
+
+    public Piece CapturedPiece { get; set; }
+
+    public BitBoard[] BlockersForKing { get; set; }
+
+    public BitBoard[] Pinners { get; set; }
+
+    /// <summary>
+    /// Represents checked squares for side to move
+    /// </summary>
+    public BitBoard Checkers { get; set; }
+
+    public BitBoard[] CheckedSquares { get; set; }
+
+    public State Previous { get; set; }
+
+    public int Repetition { get; set; }
+
+    /// <summary>
+    /// Partial copy from existing state The properties not copied are re-calculated
+    /// </summary>
+    /// <param name="other">The current state</param>
+    public State(State other)
     {
-        public Move LastMove { get; set; }
+        PawnStructureKey = other.PawnStructureKey;
+        CastlelingRights = other.CastlelingRights;
+        Rule50 = other.Rule50;
+        PliesFromNull = other.PliesFromNull;
+        EnPassantSquare = other.EnPassantSquare;
+        NonPawnMaterial = new Value[2];
+        Array.Copy(other.NonPawnMaterial, NonPawnMaterial, other.NonPawnMaterial.Length);
+        Previous = other;
 
-        public Value[] NonPawnMaterial { get; set; }
+        CheckedSquares = new BitBoard[PieceTypes.PieceTypeNb.AsInt()];
+        Pinners = new BitBoard[2];
+        BlockersForKing = new BitBoard[2];
+    }
 
-        public HashKey PawnStructureKey { get; set; }
+    public State()
+    {
+        LastMove = Move.EmptyMove;
+        NonPawnMaterial = new Value[2];
+        Array.Fill(NonPawnMaterial, Value.ValueZero);
+        CastlelingRights = CastlelingRights.None;
+        EnPassantSquare = Square.None;
+        Checkers = BitBoard.Empty;
+        CheckedSquares = new BitBoard[PieceTypes.PieceTypeNb.AsInt()];
+        Pinners = new BitBoard[2];
+        BlockersForKing = new BitBoard[2];
+        CapturedPiece = Piece.EmptyPiece;
+    }
 
-        public int PliesFromNull { get; set; }
+    public State CopyTo(State other)
+    {
+        // copy over preserved values
+        other.PawnStructureKey = PawnStructureKey;
+        other.CastlelingRights = CastlelingRights;
+        other.Rule50 = Rule50;
+        other.PliesFromNull = PliesFromNull;
+        other.EnPassantSquare = EnPassantSquare;
+        other.Previous = this;
 
-        public int Rule50 { get; set; }
+        // copy over material
+        Array.Copy(NonPawnMaterial, other.NonPawnMaterial, NonPawnMaterial.Length);
 
-        public HashKey Key { get; set; }
+        // initialize the rest of the values
+        other.CheckedSquares = new BitBoard[PieceTypes.PieceTypeNb.AsInt()];
+        other.Pinners = new BitBoard[2];
+        other.BlockersForKing = new BitBoard[2];
 
-        public CastlelingRights CastlelingRights { get; set; }
+        return other;
+    }
 
-        public Square EnPassantSquare { get; set; }
+    public void Clear()
+    {
+        LastMove = Move.EmptyMove;
+        NonPawnMaterial.Clear();
+        PawnStructureKey = Key = 0ul;
+        PliesFromNull = Repetition = 0;
+        CastlelingRights = CastlelingRights.None;
+        EnPassantSquare = Square.None;
+        CheckedSquares.Fill(BitBoard.Empty);
+        Pinners.Fill(BitBoard.Empty);
+        BlockersForKing.Fill(BitBoard.Empty);
+        CapturedPiece = Piece.EmptyPiece;
+        Previous = null;
+    }
 
-        public Piece CapturedPiece { get; set; }
+    public void UpdateRepetition()
+    {
+        var end = Rule50 < PliesFromNull
+            ? Rule50
+            : PliesFromNull;
 
-        public BitBoard[] BlockersForKing { get; set; }
+        Repetition = 0;
 
-        public BitBoard[] Pinners { get; set; }
+        if (end < 4)
+            return;
 
-        /// <summary>
-        /// Represents checked squares for side to move
-        /// </summary>
-        public BitBoard Checkers { get; set; }
-
-        public BitBoard[] CheckedSquares { get; set; }
-
-        public State Previous { get; set; }
-
-        public int Repetition { get; set; }
-
-        /// <summary>
-        /// Partial copy from existing state The properties not copied are re-calculated
-        /// </summary>
-        /// <param name="other">The current state</param>
-        public State(State other)
+        var statePrevious = Previous.Previous;
+        for (var i = 4; i <= end; i += 2)
         {
-            PawnStructureKey = other.PawnStructureKey;
-            CastlelingRights = other.CastlelingRights;
-            Rule50 = other.Rule50;
-            PliesFromNull = other.PliesFromNull;
-            EnPassantSquare = other.EnPassantSquare;
-            NonPawnMaterial = new Value[2];
-            Array.Copy(other.NonPawnMaterial, NonPawnMaterial, other.NonPawnMaterial.Length);
-            Previous = other;
-
-            CheckedSquares = new BitBoard[PieceTypes.PieceTypeNb.AsInt()];
-            Pinners = new BitBoard[2];
-            BlockersForKing = new BitBoard[2];
+            statePrevious = statePrevious.Previous.Previous;
+            if (statePrevious.Key != Key)
+                continue;
+            Repetition = statePrevious.Repetition != 0 ? -i : i;
+            break;
         }
+    }
 
-        public State()
-        {
-            LastMove = Move.EmptyMove;
-            NonPawnMaterial = new Value[2];
-            Array.Fill(NonPawnMaterial, Value.ValueZero);
-            CastlelingRights = CastlelingRights.None;
-            EnPassantSquare = Square.None;
-            Checkers = BitBoard.Empty;
-            CheckedSquares = new BitBoard[PieceTypes.PieceTypeNb.AsInt()];
-            Pinners = new BitBoard[2];
-            BlockersForKing = new BitBoard[2];
-            CapturedPiece = Piece.EmptyPiece;
-        }
+    public bool Equals(State other)
+    {
+        if (other is null) return false;
+        // if (ReferenceEquals(this, other)) return true;
+        return LastMove.Equals(other.LastMove)
+               && Key.Equals(other.Key)
+               && PawnStructureKey.Equals(other.PawnStructureKey)
+               && EnPassantSquare.Equals(other.EnPassantSquare)
+               && CastlelingRights == other.CastlelingRights
+               && NonPawnMaterial.First() == other.NonPawnMaterial.First()
+               && NonPawnMaterial.Last() == other.NonPawnMaterial.Last()
+               && PliesFromNull == other.PliesFromNull
+               && Rule50 == other.Rule50
+               && Pinners.Equals(other.Pinners)
+               && Checkers.Equals(other.Checkers)
+               && CapturedPiece == other.CapturedPiece
+               && Equals(Previous, other.Previous);
+    }
 
-        public State CopyTo(State other)
-        {
-            // copy over preserved values
-            other.PawnStructureKey = PawnStructureKey;
-            other.CastlelingRights = CastlelingRights;
-            other.Rule50 = Rule50;
-            other.PliesFromNull = PliesFromNull;
-            other.EnPassantSquare = EnPassantSquare;
-            other.Previous = this;
+    public override bool Equals(object obj)
+        => ReferenceEquals(this, obj) || obj is State other && Equals(other);
 
-            // copy over material
-            Array.Copy(NonPawnMaterial, other.NonPawnMaterial, NonPawnMaterial.Length);
-
-            // initialize the rest of the values
-            other.CheckedSquares = new BitBoard[PieceTypes.PieceTypeNb.AsInt()];
-            other.Pinners = new BitBoard[2];
-            other.BlockersForKing = new BitBoard[2];
-
-            return other;
-        }
-
-        public void Clear()
-        {
-            LastMove = Move.EmptyMove;
-            NonPawnMaterial.Clear();
-            PawnStructureKey = Key = 0ul;
-            PliesFromNull = Repetition = 0;
-            CastlelingRights = CastlelingRights.None;
-            EnPassantSquare = Square.None;
-            CheckedSquares.Fill(BitBoard.Empty);
-            Pinners.Fill(BitBoard.Empty);
-            BlockersForKing.Fill(BitBoard.Empty);
-            CapturedPiece = Piece.EmptyPiece;
-            Previous = null;
-        }
-
-        public void UpdateRepetition()
-        {
-            var end = Rule50 < PliesFromNull
-                ? Rule50
-                : PliesFromNull;
-
-            Repetition = 0;
-
-            if (end < 4)
-                return;
-
-            var statePrevious = Previous.Previous;
-            for (var i = 4; i <= end; i += 2)
-            {
-                statePrevious = statePrevious.Previous.Previous;
-                if (statePrevious.Key != Key)
-                    continue;
-                Repetition = statePrevious.Repetition != 0 ? -i : i;
-                break;
-            }
-        }
-
-        public bool Equals(State other)
-        {
-            if (ReferenceEquals(null, other)) return false;
-            // if (ReferenceEquals(this, other)) return true;
-            return LastMove.Equals(other.LastMove)
-                   && Key.Equals(other.Key)
-                   && PawnStructureKey.Equals(other.PawnStructureKey)
-                   && EnPassantSquare.Equals(other.EnPassantSquare)
-                   && CastlelingRights == other.CastlelingRights
-                   && NonPawnMaterial.First() == other.NonPawnMaterial.First()
-                   && NonPawnMaterial.Last() == other.NonPawnMaterial.Last()
-                   && PliesFromNull == other.PliesFromNull
-                   && Rule50 == other.Rule50
-                   && Pinners.Equals(other.Pinners)
-                   && Checkers.Equals(other.Checkers)
-                   && CapturedPiece == other.CapturedPiece
-                   && Equals(Previous, other.Previous);
-        }
-
-        public override bool Equals(object obj)
-            => ReferenceEquals(this, obj) || obj is State other && Equals(other);
-
-        public override int GetHashCode()
-        {
-            var hashCode = new HashCode();
-            hashCode.Add(LastMove);
-            hashCode.Add(NonPawnMaterial);
-            hashCode.Add(PawnStructureKey);
-            hashCode.Add(PliesFromNull);
-            hashCode.Add(Rule50);
-            hashCode.Add(Key);
-            hashCode.Add((int)CastlelingRights);
-            hashCode.Add(EnPassantSquare);
-            hashCode.Add(Checkers);
-            hashCode.Add(Previous);
-            hashCode.Add(CapturedPiece);
-            foreach (var pinner in Pinners)
-                if (!pinner.IsEmpty)
-                    hashCode.Add(pinner);
-            foreach (var checkedSquare in CheckedSquares)
-                if (!checkedSquare.IsEmpty)
-                    hashCode.Add(checkedSquare);
-            return hashCode.ToHashCode();
-        }
+    public override int GetHashCode()
+    {
+        var hashCode = new HashCode();
+        hashCode.Add(LastMove);
+        hashCode.Add(NonPawnMaterial);
+        hashCode.Add(PawnStructureKey);
+        hashCode.Add(PliesFromNull);
+        hashCode.Add(Rule50);
+        hashCode.Add(Key);
+        hashCode.Add((int)CastlelingRights);
+        hashCode.Add(EnPassantSquare);
+        hashCode.Add(Checkers);
+        hashCode.Add(Previous);
+        hashCode.Add(CapturedPiece);
+        foreach (var pinner in Pinners)
+            if (!pinner.IsEmpty)
+                hashCode.Add(pinner);
+        foreach (var checkedSquare in CheckedSquares)
+            if (!checkedSquare.IsEmpty)
+                hashCode.Add(checkedSquare);
+        return hashCode.ToHashCode();
     }
 }

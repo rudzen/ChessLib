@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2020 Rudy Alex Kohn
+Copyright (c) 2017-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,43 +24,42 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Test.Sizes
+namespace Chess.Test.Sizes;
+
+using FluentAssertions;
+using Xunit;
+
+public class BaseTypesSizeTests
 {
-    using FluentAssertions;
-    using Xunit;
-
-    public class BaseTypesSizeTests
+    [Fact]
+    public unsafe void MoveSizeTest()
     {
-        [Fact]
-        public unsafe void MoveSizeTest()
-        {
-            const int expected = 2;
-            var actual = sizeof(Rudz.Chess.Types.Move);
-            actual.Should().Be(expected);
-        }
+        const int expected = 2;
+        var actual = sizeof(Rudz.Chess.Types.Move);
+        actual.Should().Be(expected);
+    }
 
-        [Fact]
-        public unsafe void PieceSizeTest()
-        {
-            const int expected = 1;
-            var actual = sizeof(Rudz.Chess.Types.Piece);
-            actual.Should().Be(expected);
-        }
+    [Fact]
+    public unsafe void PieceSizeTest()
+    {
+        const int expected = 1;
+        var actual = sizeof(Rudz.Chess.Types.Piece);
+        actual.Should().Be(expected);
+    }
 
-        [Fact]
-        public unsafe void SquareSizeTest()
-        {
-            const int expected = 4;
-            var actual = sizeof(Rudz.Chess.Types.Square);
-            actual.Should().Be(expected);
-        }
+    [Fact]
+    public unsafe void SquareSizeTest()
+    {
+        const int expected = 4;
+        var actual = sizeof(Rudz.Chess.Types.Square);
+        actual.Should().Be(expected);
+    }
 
-        [Fact]
-        public unsafe void RankSizeTest()
-        {
-            const int expected = 4;
-            var actual = sizeof(Rudz.Chess.Types.Rank);
-            actual.Should().Be(expected);
-        }
+    [Fact]
+    public unsafe void RankSizeTest()
+    {
+        const int expected = 4;
+        var actual = sizeof(Rudz.Chess.Types.Rank);
+        actual.Should().Be(expected);
     }
 }

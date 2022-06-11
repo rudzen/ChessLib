@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2020 Rudy Alex Kohn
+Copyright (c) 2017-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,22 +24,21 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.ObjectPoolPolicies
+namespace Rudz.Chess.ObjectPoolPolicies;
+
+using Microsoft.Extensions.ObjectPool;
+using MoveGeneration;
+
+public class MoveListPolicy : IPooledObjectPolicy<IMoveList>
 {
-    using Microsoft.Extensions.ObjectPool;
-    using MoveGeneration;
-
-    public class MoveListPolicy : IPooledObjectPolicy<IMoveList>
+    public IMoveList Create()
     {
-        public IMoveList Create()
-        {
-            return new MoveList();
-        }
+        return new MoveList();
+    }
 
-        public bool Return(IMoveList obj)
-        {
-            obj.Clear();
-            return true;
-        }
+    public bool Return(IMoveList obj)
+    {
+        obj.Clear();
+        return true;
     }
 }

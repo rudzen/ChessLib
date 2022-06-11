@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2020 Rudy Alex Kohn
+Copyright (c) 2017-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,66 +24,65 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Test.Bitboard
+namespace Chess.Test.Bitboard;
+
+using Rudz.Chess.Enums;
+using Rudz.Chess.Types;
+using System.Linq;
+using System.Threading.Tasks;
+using Xunit;
+
+public sealed class BitboardDataTests
 {
-    using Rudz.Chess.Enums;
-    using Rudz.Chess.Types;
-    using System.Linq;
-    using System.Threading.Tasks;
-    using Xunit;
-
-    public sealed class BitboardDataTests
+    [Fact]
+    public void AlignedSimplePositiveTest()
     {
-        [Fact]
-        public void AlignedSimplePositiveTest()
+        const bool expected = true;
+
+        const Squares sq1 = Squares.a1;
+        const Squares sq2 = Squares.a2;
+        const Squares sq3 = Squares.a3;
+
+        var actual = BitBoards.Aligned(sq1, sq2, sq3);
+
+        Assert.Equal(expected, actual);
+    }
+
+    [Fact]
+    public async Task AlignedSimpleTotalTest()
+    {
+        const int expected = 10640;
+
+        var actual = await Task.Run(() =>
         {
-            const bool expected = true;
+            var sum = 0;
+            foreach (var s1 in BitBoards.AllSquares)
+                sum += BitBoards.AllSquares
+                    .Sum(s2 => BitBoards.AllSquares
+                        .Count(s3 => s1.Aligned(s2, s3)));
+            return sum;
+        }).ConfigureAwait(false);
 
-            const Squares sq1 = Squares.a1;
-            const Squares sq2 = Squares.a2;
-            const Squares sq3 = Squares.a3;
+        Assert.Equal(expected, actual);
+    }
 
-            var actual = BitBoards.Aligned(sq1, sq2, sq3);
+    [Fact]
+    public async Task AlignedSimpleTotalNoIdenticalsTest()
+    {
+        const int expected = 9184;
 
-            Assert.Equal(expected, actual);
-        }
-
-        [Fact]
-        public async Task AlignedSimpleTotalTest()
+        var actual = await Task.Run(() =>
         {
-            const int expected = 10640;
+            var sum = 0;
+            foreach (var s1 in BitBoards.AllSquares)
+                sum += BitBoards.AllSquares
+                    .Where(x2 => x2 != s1)
+                    .Sum(s2 => BitBoards.AllSquares
+                        .Where(x3 => x3 != s2)
+                        .Count(s3 => s1.Aligned(s2, s3)));
+            return sum;
+        }).ConfigureAwait(false);
 
-            var actual = await Task.Run(() =>
-            {
-                var sum = 0;
-                foreach (var s1 in BitBoards.AllSquares)
-                    sum += BitBoards.AllSquares
-                        .Sum(s2 => BitBoards.AllSquares
-                            .Count(s3 => s1.Aligned(s2, s3)));
-                return sum;
-            }).ConfigureAwait(false);
-
-            Assert.Equal(expected, actual);
-        }
-
-        [Fact]
-        public async Task AlignedSimpleTotalNoIdenticalsTest()
-        {
-            const int expected = 9184;
-
-            var actual = await Task.Run(() =>
-            {
-                var sum = 0;
-                foreach (var s1 in BitBoards.AllSquares)
-                    sum += BitBoards.AllSquares
-                        .Where(x2 => x2 != s1)
-                        .Sum(s2 => BitBoards.AllSquares
-                            .Where(x3 => x3 != s2)
-                            .Count(s3 => s1.Aligned(s2, s3)));
-                return sum;
-            }).ConfigureAwait(false);
-
-            Assert.Equal(expected, actual);
-        }
+        Assert.Equal(expected, actual);
     }
 }

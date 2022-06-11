@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2020 Rudy Alex Kohn
+Copyright (c) 2017-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,22 +24,21 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Extensions
+namespace Rudz.Chess.Extensions;
+
+using System;
+using System.Runtime.CompilerServices;
+
+public static class ArrayExtensions
 {
-    using System;
-    using System.Runtime.CompilerServices;
-
-    public static class ArrayExtensions
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void Fill<T>(this T[] arr, T value)
     {
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Fill<T>(this T[] arr, T value)
-        {
-            if (arr == null)
-                throw new ArgumentNullException(nameof(arr));
-            Array.Fill(arr, value);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Clear<T>(this T[] arr) => Array.Clear(arr, 0, arr.Length);
+        if (arr == null)
+            throw new ArgumentNullException(nameof(arr));
+        Array.Fill(arr, value);
     }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void Clear<T>(this T[] arr) => Array.Clear(arr, 0, arr.Length);
 }

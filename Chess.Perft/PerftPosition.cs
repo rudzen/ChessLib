@@ -3,7 +3,7 @@ Perft, a chess perft test library
 
 MIT License
 
-Copyright (c) 2017-2020 Rudy Alex Kohn
+Copyright (c) 2017-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,15 +24,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Perft
-{
-    using Interfaces;
-    using System.Collections.Generic;
+namespace Chess.Perft;
 
-    public sealed class PerftPosition : IPerftPosition
-    {
-        public string Id { get; set; }
-        public string Fen { get; set; }
-        public List<(int, ulong)> Value { get; set; }
-    }
+using Interfaces;
+using System.Collections.Generic;
+
+public sealed class PerftPosition : IPerftPosition
+{
+    public string Id { get; set; }
+    public string Fen { get; set; }
+    public List<(int, ulong)> Value { get; set; }
 }

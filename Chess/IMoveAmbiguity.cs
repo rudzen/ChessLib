@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2020 Rudy Alex Kohn
+Copyright (c) 2017-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,13 +24,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess
-{
-    using Enums;
-    using Types;
+namespace Rudz.Chess;
 
-    public interface IMoveAmbiguity
-    {
-        string ToNotation(Move move, MoveNotations notation = MoveNotations.Fan);
-    }
+using Enums;
+using Types;
+
+public interface IMoveAmbiguity
+{
+    string ToNotation(Move move, MoveNotations notation = MoveNotations.Fan);
 }

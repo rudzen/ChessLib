@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2020 Rudy Alex Kohn
+Copyright (c) 2017-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,28 +24,27 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Validation
+namespace Rudz.Chess.Validation;
+
+using System;
+
+[Flags]
+public enum PositionValidationTypes
 {
-    using System;
+    None = 0,
+    Basic = 1,
+    Castleling = 1 << 1,
+    Kings = 1 << 2,
+    Pawns = 1 << 3,
+    PieceConsistency = 1 << 4,
+    PieceCount = 1 << 5,
+    PieceTypes = 1 << 6,
+    State = 1 << 7,
+    All = Basic | Castleling | Kings | Pawns | PieceConsistency | PieceCount | PieceTypes | State
+}
 
-    [Flags]
-    public enum PositionValidationTypes
-    {
-        None = 0,
-        Basic = 1,
-        Castleling = 1 << 1,
-        Kings = 1 << 2,
-        Pawns = 1 << 3,
-        PieceConsistency = 1 << 4,
-        PieceCount = 1 << 5,
-        PieceTypes = 1 << 6,
-        State = 1 << 7,
-        All = Basic | Castleling | Kings | Pawns | PieceConsistency | PieceCount | PieceTypes | State
-    }
-
-    public static class PositionValidationTypesExtensions
-    {
-        public static bool HasFlagFast(this PositionValidationTypes @this, PositionValidationTypes flag)
-            => (@this & flag) != 0;
-    }
+public static class PositionValidationTypesExtensions
+{
+    public static bool HasFlagFast(this PositionValidationTypes @this, PositionValidationTypes flag)
+        => (@this & flag) != 0;
 }

@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2020 Rudy Alex Kohn
+Copyright (c) 2017-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,49 +24,48 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Protocol.UCI
+namespace Rudz.Chess.Protocol.UCI;
+
+using System;
+using System.Collections.Generic;
+using Types;
+
+public interface IUci
 {
-    using System;
-    using System.Collections.Generic;
-    using Types;
+    public int MaxThreads { get; set; }
+    public IDictionary<string, IOption> O { get; set; }
+    Action<IOption> OnLogger { get; set; }
+    Action<IOption> OnEval { get; set; }
+    Action<IOption> OnThreads { get; set; }
+    Action<IOption> OnHashSize { get; set; }
+    Action<IOption> OnClearHash { get; set; }
+    bool IsDebugModeEnabled { get; set; }
 
-    public interface IUci
-    {
-        public int MaxThreads { get; set; }
-        public IDictionary<string, IOption> O { get; set; }
-        Action<IOption> OnLogger { get; set; }
-        Action<IOption> OnEval { get; set; }
-        Action<IOption> OnThreads { get; set; }
-        Action<IOption> OnHashSize { get; set; }
-        Action<IOption> OnClearHash { get; set; }
-        bool IsDebugModeEnabled { get; set; }
+    void Initialize(int maxThreads = 128);
 
-        void Initialize(int maxThreads = 128);
+    void AddOption(string name, IOption option);
 
-        void AddOption(string name, IOption option);
+    ulong Nps(ulong nodes, TimeSpan time);
 
-        ulong Nps(ulong nodes, TimeSpan time);
+    Move MoveFromUci(IPosition pos, string uciMove);
 
-        Move MoveFromUci(IPosition pos, string uciMove);
+    string UciOk();
 
-        string UciOk();
+    string ReadyOk();
 
-        string ReadyOk();
+    string CopyProtection(CopyProtections copyProtections);
 
-        string CopyProtection(CopyProtections copyProtections);
+    string BestMove(Move move, Move ponderMove);
 
-        string BestMove(Move move, Move ponderMove);
+    string CurrentMoveNum(int moveNumber, Move move, ulong visitedNodes, TimeSpan time);
 
-        string CurrentMoveNum(int moveNumber, Move move, ulong visitedNodes, TimeSpan time);
+    string Score(int value, int mateInMaxPly, int valueMate);
 
-        string Score(int value, int mateInMaxPly, int valueMate);
+    string ScoreCp(int value);
 
-        string ScoreCp(int value);
+    string Depth(int depth);
 
-        string Depth(int depth);
+    string Pv(int count, int score, int depth, int selectiveDepth, int alpha, int beta, TimeSpan time, IEnumerable<Move> pvLine, ulong nodes);
 
-        string Pv(int count, int score, int depth, int selectiveDepth, int alpha, int beta, TimeSpan time, IEnumerable<Move> pvLine, ulong nodes);
-
-        string Fullness(ulong tbHits, ulong nodes, TimeSpan time);
-    }
+    string Fullness(ulong tbHits, ulong nodes, TimeSpan time);
 }

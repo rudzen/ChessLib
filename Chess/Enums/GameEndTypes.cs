@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2020 Rudy Alex Kohn
+Copyright (c) 2017-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,19 +24,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Enums
-{
-    using System;
+namespace Rudz.Chess.Enums;
 
-    [Flags]
-    public enum GameEndTypes
-    {
-        None = 0,
-        Repetition = 1,
-        Pat = 1 << 1,
-        FiftyMove = 1 << 2,
-        MaterialDrawn = 1 << 3,
-        CheckMate = 1 << 4,
-        TimeIsUp = 1 << 5
-    }
+using System;
+
+[Flags]
+public enum GameEndTypes
+{
+    None = 0,
+    Repetition = 1,
+    Pat = 1 << 1,
+    FiftyMove = 1 << 2,
+    MaterialDrawn = 1 << 3,
+    CheckMate = 1 << 4,
+    TimeIsUp = 1 << 5
 }

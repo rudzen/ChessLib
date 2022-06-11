@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2020 Rudy Alex Kohn
+Copyright (c) 2017-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -29,62 +29,61 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Rudz.Chess.Fen;
 
-namespace Chess.Benchmark
+namespace Chess.Benchmark;
+
+using BenchmarkDotNet.Attributes;
+using Perft;
+using Perft.Interfaces;
+
+//[ClrJob(true), CoreJob]
+//[RPlotExporter, RankColumn]
+public class PerftBench
 {
-    using BenchmarkDotNet.Attributes;
-    using Perft;
-    using Perft.Interfaces;
+    private IPerft _perft;
 
-    //[ClrJob(true), CoreJob]
-    //[RPlotExporter, RankColumn]
-    public class PerftBench
+    private readonly IPerftPosition _pp;
+
+    public PerftBench()
     {
-        private IPerft _perft;
-
-        private readonly IPerftPosition _pp;
-
-        public PerftBench()
-        {
-            _pp = PerftPositionFactory.Create(
-                Guid.NewGuid().ToString(),
-                Fen.StartPositionFen,
-                new List<(int, ulong)>(6)
-                {
+        _pp = PerftPositionFactory.Create(
+            Guid.NewGuid().ToString(),
+            Fen.StartPositionFen,
+            new List<(int, ulong)>(6)
+            {
                     (1, 20),
                     (2, 400),
                     (3, 8902),
                     (4, 197281),
                     (5, 4865609),
                     (6, 119060324)
-                });
-        }
-
-        [Params(5, 6)]
-        public int N;
-
-        [GlobalSetup]
-        public void Setup()
-        {
-            _perft = PerftFactory.Create();
-            _perft.AddPosition(_pp);
-        }
-
-        [Benchmark]
-        public async Task<ulong> PerftIAsync()
-        {
-            var total = 0ul;
-
-            await foreach (var res in _perft.DoPerft(N).ConfigureAwait(false))
-                total += res;
-
-            return total;
-        }
-
-        [Benchmark]
-        public async Task<ulong> Perft()
-        {
-            return await _perft.DoPerftAsync(N);
-        }
-
+            });
     }
+
+    [Params(5, 6)]
+    public int N;
+
+    [GlobalSetup]
+    public void Setup()
+    {
+        _perft = PerftFactory.Create();
+        _perft.AddPosition(_pp);
+    }
+
+    [Benchmark]
+    public async Task<ulong> PerftIAsync()
+    {
+        var total = 0ul;
+
+        await foreach (var res in _perft.DoPerft(N).ConfigureAwait(false))
+            total += res;
+
+        return total;
+    }
+
+    [Benchmark]
+    public async Task<ulong> Perft()
+    {
+        return await _perft.DoPerftAsync(N);
+    }
+
 }

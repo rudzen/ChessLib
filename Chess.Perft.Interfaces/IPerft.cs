@@ -3,7 +3,7 @@ Perft, a chess perft test library
 
 MIT License
 
-Copyright (c) 2017-2020 Rudy Alex Kohn
+Copyright (c) 2017-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,37 +24,36 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Perft.Interfaces
+namespace Chess.Perft.Interfaces;
+
+using Rudz.Chess;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
+public interface IPerft
 {
-    using Rudz.Chess;
-    using System;
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
+    Action<string> BoardPrintCallback { get; set; }
 
-    public interface IPerft
-    {
-        Action<string> BoardPrintCallback { get; set; }
+    List<IPerftPosition> Positions { get; set; }
 
-        List<IPerftPosition> Positions { get; set; }
+    int Depth { get; set; }
 
-        int Depth { get; set; }
+    ulong Expected { get; set; }
 
-        ulong Expected { get; set; }
+    public IGame CurrentGame { get; set; }
 
-        public IGame CurrentGame { get; set; }
+    IAsyncEnumerable<ulong> DoPerft(int depth);
 
-        IAsyncEnumerable<ulong> DoPerft(int depth);
+    Task<ulong> DoPerftAsync(int depth);
 
-        Task<ulong> DoPerftAsync(int depth);
+    void ClearPositions();
 
-        void ClearPositions();
+    string GetBoard();
 
-        string GetBoard();
+    void SetGamePosition(IPerftPosition pp);
 
-        void SetGamePosition(IPerftPosition pp);
+    void AddPosition(IPerftPosition pp);
 
-        void AddPosition(IPerftPosition pp);
-
-        ulong GetPositionCount(int index, int depth);
-    }
+    ulong GetPositionCount(int index, int depth);
 }

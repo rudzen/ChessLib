@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2020 Rudy Alex Kohn
+Copyright (c) 2017-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,68 +24,67 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Enums
+namespace Rudz.Chess.Enums;
+
+using System;
+
+// TODO : implement Crn/Smith/Descriptive/Coordinate/ICCF notations
+
+// ICCF : https://en.wikipedia.org/wiki/ICCF_numeric_notation
+
+[Flags]
+public enum MoveNotations
 {
-    using System;
+    /// <summary>
+    /// Standard algebraic Notation [implemented]
+    /// </summary>
+    San = 0,
 
-    // TODO : implement Crn/Smith/Descriptive/Coordinate/ICCF notations
+    /// <summary>
+    /// Figurine algebraic Notation [implemented]
+    /// </summary>
+    Fan = 1,
 
-    // ICCF : https://en.wikipedia.org/wiki/ICCF_numeric_notation
+    /// <summary>
+    /// The Long algebraic Notation [almost implemented]
+    /// </summary>
+    Lan = 2,
 
-    [Flags]
-    public enum MoveNotations
-    {
-        /// <summary>
-        /// Standard algebraic Notation [implemented]
-        /// </summary>
-        San = 0,
+    /// <summary>
+    /// Reversible algebraic notation
+    /// todo: finish implementation
+    /// </summary>
+    Ran = 4,
 
-        /// <summary>
-        /// Figurine algebraic Notation [implemented]
-        /// </summary>
-        Fan = 1,
+    /// <summary>
+    /// Concise reversible notation
+    /// todo: implement
+    /// </summary>
+    Crn = 8,
 
-        /// <summary>
-        /// The Long algebraic Notation [almost implemented]
-        /// </summary>
-        Lan = 2,
+    /// <summary>
+    /// The smith notation
+    /// todo: implement
+    /// </summary>
+    Smith = 16,
 
-        /// <summary>
-        /// Reversible algebraic notation
-        /// todo: finish implementation
-        /// </summary>
-        Ran = 4,
+    /// <summary>
+    /// The descriptive notation
+    /// </summary>
+    Descriptive = 32,
 
-        /// <summary>
-        /// Concise reversible notation
-        /// todo: implement
-        /// </summary>
-        Crn = 8,
+    Coordinate = 64,
 
-        /// <summary>
-        /// The smith notation
-        /// todo: implement
-        /// </summary>
-        Smith = 16,
+    // ReSharper disable once InconsistentNaming
+    ICCF = 128,
 
-        /// <summary>
-        /// The descriptive notation
-        /// </summary>
-        Descriptive = 32,
+    /// <summary>
+    /// Universal chess interface notation
+    /// </summary>
+    Uci = 256
+}
 
-        Coordinate = 64,
-
-        // ReSharper disable once InconsistentNaming
-        ICCF = 128,
-
-        /// <summary>
-        /// Universal chess interface notation
-        /// </summary>
-        Uci = 256
-    }
-
-    public static class MoveNotationsExtensions
-    {
-        public static bool HasFlagFast(this MoveNotations value, MoveNotations flag) => (value & flag) != 0;
-    }
+public static class MoveNotationsExtensions
+{
+    public static bool HasFlagFast(this MoveNotations value, MoveNotations flag) => (value & flag) != 0;
 }

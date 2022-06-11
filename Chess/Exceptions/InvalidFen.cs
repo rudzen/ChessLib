@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2020 Rudy Alex Kohn
+Copyright (c) 2017-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,23 +24,22 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Exceptions
+namespace Rudz.Chess.Exceptions;
+
+using System;
+using System.Runtime.Serialization;
+
+public class InvalidFen : ArgumentException
 {
-    using System;
-    using System.Runtime.Serialization;
+    public InvalidFen()
+    { }
 
-    public class InvalidFen : ArgumentException
-    {
-        public InvalidFen()
-        { }
+    public InvalidFen(string message)
+        : base(message) { }
 
-        public InvalidFen(string message)
-            : base(message) { }
+    public InvalidFen(string message, Exception innerException)
+        : base(message, innerException) { }
 
-        public InvalidFen(string message, Exception innerException)
-            : base(message, innerException) { }
-
-        protected InvalidFen(SerializationInfo info, StreamingContext context)
-            : base(info, context) { }
-    }
+    protected InvalidFen(SerializationInfo info, StreamingContext context)
+        : base(info, context) { }
 }

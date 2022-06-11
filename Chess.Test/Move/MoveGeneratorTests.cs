@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2020 Rudy Alex Kohn
+Copyright (c) 2017-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,37 +24,36 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Test.Move
+namespace Chess.Test.Move;
+
+using Rudz.Chess;
+using Rudz.Chess.Fen;
+using Rudz.Chess.MoveGeneration;
+using Rudz.Chess.Types;
+using Xunit;
+
+public class MoveGeneratorTests
 {
-    using Rudz.Chess;
-    using Rudz.Chess.Fen;
-    using Rudz.Chess.MoveGeneration;
-    using Rudz.Chess.Types;
-    using Xunit;
-
-    public class MoveGeneratorTests
+    [Fact]
+    public void InCheckMoveGenerationTest()
     {
-        [Fact]
-        public void InCheckMoveGenerationTest()
-        {
-            const string fen = "rnbqkbnr/1ppQpppp/p2p4/8/8/2P5/PP1PPPPP/RNB1KBNR b KQkq - 1 6";
-            const int expectedMoves = 4;
+        const string fen = "rnbqkbnr/1ppQpppp/p2p4/8/8/2P5/PP1PPPPP/RNB1KBNR b KQkq - 1 6";
+        const int expectedMoves = 4;
 
-            var board = new Board();
-            var pieceValue = new PieceValue();
-            var pos = new Position(board, pieceValue);
-            var fd = new FenData(fen);
+        var board = new Board();
+        var pieceValue = new PieceValue();
+        var pos = new Position(board, pieceValue);
+        var fd = new FenData(fen);
 
-            pos.SetFen(fd);
+        pos.SetFen(fd);
 
-            // make sure black is in check
-            Assert.True(pos.InCheck);
+        // make sure black is in check
+        Assert.True(pos.InCheck);
 
-            // generate moves for black
-            var mg = pos.GenerateMoves();
-            var actualMoves = mg.Length;
+        // generate moves for black
+        var mg = pos.GenerateMoves();
+        var actualMoves = mg.Length;
 
-            Assert.Equal(expectedMoves, actualMoves);
-        }
+        Assert.Equal(expectedMoves, actualMoves);
     }
 }

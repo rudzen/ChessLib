@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2020 Rudy Alex Kohn
+Copyright (c) 2017-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,20 +24,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Enums
-{
-    using System;
+namespace Rudz.Chess.Enums;
 
-    /// <summary>
-    /// This is not the game result you are looking for.
-    /// </summary>
-    [Flags]
-    public enum GameResults
-    {
-        InProgress = 0,
-        WhiteWon = 1,
-        BlackWon = 1 << 1,
-        Draw = 1 << 2,
-        GameOver = WhiteWon | BlackWon | Draw
-    }
+using System;
+
+/// <summary>
+/// This is not the game result you are looking for.
+/// </summary>
+[Flags]
+public enum GameResults
+{
+    None = 0,
+    WhiteWon = 1,
+    BlackWon = 1 << 1,
+    Draw = 1 << 2,
+    GameOver = WhiteWon | BlackWon | Draw
 }

@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2020 Rudy Alex Kohn
+Copyright (c) 2017-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,35 +24,34 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess
+namespace Rudz.Chess;
+
+using Enums;
+using Fen;
+using System;
+using System.Collections.Generic;
+using Types;
+
+public interface IGame : IEnumerable<Piece>
 {
-    using Enums;
-    using Fen;
-    using System;
-    using System.Collections.Generic;
-    using Types;
+    Action<Piece, Square> PieceUpdated { get; }
+    BitBoard Occupied { get; }
+    IPosition Pos { get; }
+    GameEndTypes GameEndType { get; set; }
 
-    public interface IGame : IEnumerable<Piece>
-    {
-        Action<Piece, Square> PieceUpdated { get; }
-        BitBoard Occupied { get; }
-        IPosition Pos { get; }
-        GameEndTypes GameEndType { get; set; }
+    bool IsRepetition { get; }
 
-        bool IsRepetition { get; }
+    void NewGame(string fen = Fen.Fen.StartPositionFen);
 
-        void NewGame(string fen = Fen.Fen.StartPositionFen);
+    FenData GetFen();
 
-        FenData GetFen();
+    void UpdateDrawTypes();
 
-        void UpdateDrawTypes();
+    string ToString();
 
-        string ToString();
+    BitBoard OccupiedBySide(Player c);
 
-        BitBoard OccupiedBySide(Player c);
+    Player CurrentPlayer();
 
-        Player CurrentPlayer();
-
-        ulong Perft(int depth, bool root);
-    }
+    ulong Perft(int depth, bool root);
 }

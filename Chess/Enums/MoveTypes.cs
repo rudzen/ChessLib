@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2020 Rudy Alex Kohn
+Copyright (c) 2017-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,24 +24,20 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Enums
+namespace Rudz.Chess.Enums;
+
+using System.Runtime.CompilerServices;
+
+public enum MoveTypes : ushort
 {
-    using System.Runtime.CompilerServices;
+    Normal = 0,
+    Promotion = 1 << 14,
+    Enpassant = 2 << 14,
+    Castling = 3 << 14
+}
 
-    public enum MoveTypes : ushort
-    {
-        Normal = 0,
-        Promotion = 1 << 14,
-        Enpassant = 2 << 14,
-        Castling = 3 << 14
-    }
-
-    public static class MoveTypesExtensions
-    {
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int AsInt(this MoveTypes @this) => (int)@this;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool HasFlagFast(this MoveTypes value, MoveTypes flag) => (value & flag) != 0;
-    }
+public static class MoveTypesExtensions
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static int AsInt(this MoveTypes @this) => (int)@this;
 }

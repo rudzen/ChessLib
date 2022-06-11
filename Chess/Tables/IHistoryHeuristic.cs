@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2020 Rudy Alex Kohn
+Copyright (c) 2017-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,16 +24,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Tables
+namespace Rudz.Chess.Tables;
+
+using Types;
+
+public interface IHistoryHeuristic
 {
-    using Types;
+    void Clear();
 
-    public interface IHistoryHeuristic
-    {
-        void Clear();
+    void Set(Player c, Square from, Square to, int value);
 
-        void Set(Player c, Square from, Square to, int value);
-
-        int Retrieve(Player c, Square from, Square to);
-    }
+    int Retrieve(Player c, Square from, Square to);
 }

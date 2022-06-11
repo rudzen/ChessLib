@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2020 Rudy Alex Kohn
+Copyright (c) 2017-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,29 +24,28 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Enums
+namespace Rudz.Chess.Enums;
+
+using Types;
+
+public enum PieceTypes
 {
-    using Types;
+    NoPieceType = 0,
+    Pawn = 1,
+    Knight = 2,
+    Bishop = 3,
+    Rook = 4,
+    Queen = 5,
+    King = 6,
+    PieceTypeNb = 7,
+    AllPieces = 0
+}
 
-    public enum PieceTypes
-    {
-        NoPieceType = 0,
-        Pawn = 1,
-        Knight = 2,
-        Bishop = 3,
-        Rook = 4,
-        Queen = 5,
-        King = 6,
-        PieceTypeNb = 7,
-        AllPieces = 0
-    }
+public static class PieceTypesExtensions
+{
+    public static int AsInt(this PieceTypes p) => (int)p;
 
-    public static class PieceTypesExtensions
-    {
-        public static int AsInt(this PieceTypes p) => (int)p;
+    public static Piece MakePiece(this PieceTypes @this, Player side) => (int)@this | (side.Side << 3);
 
-        public static Piece MakePiece(this PieceTypes @this, Player side) => (int)@this | (side.Side << 3);
-
-        public static bool IsSlider(this PieceTypes @this) => @this == PieceTypes.Bishop | @this == PieceTypes.Rook | @this == PieceTypes.Queen;
-    }
+    public static bool IsSlider(this PieceTypes @this) => @this == PieceTypes.Bishop | @this == PieceTypes.Rook | @this == PieceTypes.Queen;
 }

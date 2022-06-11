@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2020 Rudy Alex Kohn
+Copyright (c) 2017-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,25 +24,25 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Polyglot
+namespace Rudz.Chess.Polyglot;
+
+using Enums;
+using Types;
+
+public static class BookZobrist
 {
-    using Enums;
-    using Types;
+    private static readonly ulong[,] psq;
 
-    public static class BookZobrist
+    private static readonly ulong[] castle;
+
+    private static readonly ulong[] enpassant;
+
+    private static readonly ulong turn;
+
+    static BookZobrist()
     {
-        private static readonly ulong[,] psq;
-
-        private static readonly ulong[] castle;
-
-        private static readonly ulong[] enpassant;
-
-        private static readonly ulong turn;
-
-        static BookZobrist()
+        psq = new[,]
         {
-            psq = new[,]
-            {
                 {
                     0x9D39247E33776D41UL, 0x2AF7398005AAA5C7UL, 0x44DB015024623547UL,
                     0x9C15F73E62A76AE2UL, 0x75834465489C0C89UL, 0x3290AC3A203001BFUL,
@@ -333,38 +333,37 @@ namespace Rudz.Chess.Polyglot
                 },
             };
 
-            castle = new[]
-            {
+        castle = new[]
+        {
                 0x31D71DCE64B2C310UL, 0xF165B587DF898190UL, 0xA57E6339DD2CF3A0UL,
                 0x1EF6E6DBB1961EC9UL
             };
-            enpassant = new[]
-            {
+        enpassant = new[]
+        {
                 0x70CC73D90BC26E24UL, 0xE21A6B35DF0C3AD7UL,
                 0x003A93D8B2806962UL, 0x1C99DED33CB890A1UL, 0xCF3145DE0ADD4289UL,
                 0xD0E4427A5514FB72UL, 0x77C621CC9FB3A483UL, 0x67A34DAC4356550BUL
             };
-            turn = 0xF8D626AAAF278509UL;
-        }
+        turn = 0xF8D626AAAF278509UL;
+    }
 
-        internal static ulong Psq(uint piece, Square sq)
-        {
-            return psq[piece, sq.AsInt()];
-        }
+    internal static ulong Psq(uint piece, Square sq)
+    {
+        return psq[piece, sq.AsInt()];
+    }
 
-        internal static ulong Castle(CastlelingRights rights)
-        {
-            return castle[rights.AsInt()];
-        }
+    internal static ulong Castle(CastlelingRights rights)
+    {
+        return castle[rights.AsInt()];
+    }
 
-        internal static ulong EnPassant(File f)
-        {
-            return enpassant[f.AsInt()];
-        }
+    internal static ulong EnPassant(File f)
+    {
+        return enpassant[f.AsInt()];
+    }
 
-        internal static ulong Turn()
-        {
-            return turn;
-        }
+    internal static ulong Turn()
+    {
+        return turn;
     }
 }

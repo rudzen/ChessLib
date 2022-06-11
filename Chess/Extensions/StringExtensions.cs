@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2020 Rudy Alex Kohn
+Copyright (c) 2017-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,81 +24,80 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Extensions
+namespace Rudz.Chess.Extensions;
+
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Runtime.CompilerServices;
+using System.Text;
+
+public static class StringExtensions
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Runtime.CompilerServices;
-    using System.Text;
-
-    public static class StringExtensions
+    /// <summary>
+    /// Custom tokenizer function which supports different ending trim and separation unit
+    /// TODO : Make custom command type
+    /// </summary>
+    /// <param name="command">The entirety of the command string</param>
+    /// <param name="separator">The separator</param>
+    /// <param name="tokenizer">The end token char to trim from the pillaged command string</param>
+    /// <returns></returns>
+    public static Queue<string> Parse(this ReadOnlySpan<char> command, char separator, char tokenizer)
     {
-        /// <summary>
-        /// Custom tokenizer function which supports different ending trim and separation unit
-        /// TODO : Make custom command type
-        /// </summary>
-        /// <param name="command">The entirety of the command string</param>
-        /// <param name="separator">The separator</param>
-        /// <param name="tokenizer">The end token char to trim from the pillaged command string</param>
-        /// <returns></returns>
-        public static Queue<string> Parse(this ReadOnlySpan<char> command, char separator, char tokenizer)
+        var q = new Queue<string>();
+        var startIndex = 0;
+        var inToken = false;
+
+        for (var i = 0; i < command.Length; ++i)
         {
-            var q = new Queue<string>();
-            var startIndex = 0;
-            var inToken = false;
-
-            for (var i = 0; i < command.Length; ++i)
+            if (i == command.Length - 1)
             {
-                if (i == command.Length - 1)
-                {
-                    // return last token.
-                    q.Enqueue(new string(command.Slice(startIndex, i - startIndex + 1).TrimEnd(tokenizer).ToArray()));
-                    break;
-                }
-
-                var character = command[i];
-
-                if (character == separator)
-                {
-                    // Skip if present.
-                    if (inToken)
-                        continue;
-
-                    // return token
-                    q.Enqueue(new string(command.Slice(startIndex, i - startIndex).TrimEnd(tokenizer).ToArray()));
-                    startIndex = i + 1;
-                }
-                else if (character == tokenizer)
-                {
-                    inToken ^= true;
-                    startIndex = i + 1;
-                }
+                // return last token.
+                q.Enqueue(new string(command.Slice(startIndex, i - startIndex + 1).TrimEnd(tokenizer).ToArray()));
+                break;
             }
 
-            return q;
-        }
+            var character = command[i];
 
-        public static IEnumerable<int> GetLocations(this string @this, char token = ' ')
-        {
-            var pos = 0;
-            while (true)
+            if (character == separator)
             {
-                var index = @this.IndexOf(token, pos);
-                if (index == -1)
-                    yield break;
-                yield return index;
-                pos = index;
+                // Skip if present.
+                if (inToken)
+                    continue;
+
+                // return token
+                q.Enqueue(new string(command[startIndex..i].TrimEnd(tokenizer).ToArray()));
+                startIndex = i + 1;
+            }
+            else if (character == tokenizer)
+            {
+                inToken ^= true;
+                startIndex = i + 1;
             }
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static MemoryStream GenerateStream(this string @this) => new(Encoding.UTF8.GetBytes(@this ?? ""));
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsNullOrEmpty(this string @this) => string.IsNullOrEmpty(@this);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsNullOrWhiteSpace(this string @this) => string.IsNullOrWhiteSpace(@this);
+        return q;
     }
+
+    public static IEnumerable<int> GetLocations(this string @this, char token = ' ')
+    {
+        var pos = 0;
+        while (true)
+        {
+            var index = @this.IndexOf(token, pos);
+            if (index == -1)
+                yield break;
+            yield return index;
+            pos = index;
+        }
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static MemoryStream GenerateStream(this string @this) => new(Encoding.UTF8.GetBytes(@this ?? ""));
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool IsNullOrEmpty(this string @this) => string.IsNullOrEmpty(@this);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool IsNullOrWhiteSpace(this string @this) => string.IsNullOrWhiteSpace(@this);
 }

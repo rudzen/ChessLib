@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2020 Rudy Alex Kohn
+Copyright (c) 2017-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,64 +24,63 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Hash.Tables.Transposition
+namespace Rudz.Chess.Hash.Tables.Transposition;
+
+using System;
+using System.Runtime.InteropServices;
+using Types;
+
+[StructLayout(LayoutKind.Sequential, Pack = 2)]
+public struct TranspositionTableEntry
 {
-    using System;
-    using System.Runtime.InteropServices;
-    using Types;
+    public uint Key32;
+    public Move Move;
+    public int Value;
+    public int StaticValue;
+    public Bound Type;
+    public sbyte Depth;
+    public sbyte Generation;
 
-    [StructLayout(LayoutKind.Sequential, Pack = 2)]
-    public struct TranspositionTableEntry
+    public TranspositionTableEntry(uint k, Move m, sbyte d, sbyte g, int v, int sv, Bound b)
     {
-        public uint Key32;
-        public Move Move;
-        public int Value;
-        public int StaticValue;
-        public Bound Type;
-        public sbyte Depth;
-        public sbyte Generation;
-
-        public TranspositionTableEntry(uint k, Move m, sbyte d, sbyte g, int v, int sv, Bound b)
-        {
-            Key32 = k;
-            Move = m;
-            Depth = d;
-            Generation = g;
-            Value = v;
-            StaticValue = sv;
-            Type = b;
-        }
-
-        public TranspositionTableEntry(TranspositionTableEntry tte)
-        {
-            this = tte;
-        }
-
-        public static bool operator ==(TranspositionTableEntry left, TranspositionTableEntry right)
-            => left.Equals(right);
-
-        public static bool operator !=(TranspositionTableEntry left, TranspositionTableEntry right)
-            => !(left == right);
-
-        public void Save(TranspositionTableEntry tte)
-        {
-            Key32 = tte.Key32;
-            if (!tte.Move.IsNullMove())
-                Move = tte.Move;
-            Depth = tte.Depth;
-            Generation = tte.Generation;
-            Value = tte.Value;
-            StaticValue = tte.StaticValue;
-            Type = tte.Type;
-        }
-
-        public readonly bool Equals(TranspositionTableEntry other)
-            => Key32 == other.Key32 && Generation == other.Generation;
-
-        public override readonly bool Equals(object obj)
-            => obj is TranspositionTableEntry other && Equals(other);
-
-        public override readonly int GetHashCode()
-            => HashCode.Combine(Key32, Move, Depth, Generation, Value, StaticValue, Type);
+        Key32 = k;
+        Move = m;
+        Depth = d;
+        Generation = g;
+        Value = v;
+        StaticValue = sv;
+        Type = b;
     }
+
+    public TranspositionTableEntry(TranspositionTableEntry tte)
+    {
+        this = tte;
+    }
+
+    public static bool operator ==(TranspositionTableEntry left, TranspositionTableEntry right)
+        => left.Equals(right);
+
+    public static bool operator !=(TranspositionTableEntry left, TranspositionTableEntry right)
+        => !(left == right);
+
+    public void Save(TranspositionTableEntry tte)
+    {
+        Key32 = tte.Key32;
+        if (!tte.Move.IsNullMove())
+            Move = tte.Move;
+        Depth = tte.Depth;
+        Generation = tte.Generation;
+        Value = tte.Value;
+        StaticValue = tte.StaticValue;
+        Type = tte.Type;
+    }
+
+    public readonly bool Equals(TranspositionTableEntry other)
+        => Key32 == other.Key32 && Generation == other.Generation;
+
+    public override readonly bool Equals(object obj)
+        => obj is TranspositionTableEntry other && Equals(other);
+
+    public override readonly int GetHashCode()
+        => HashCode.Combine(Key32, Move, Depth, Generation, Value, StaticValue, Type);
 }

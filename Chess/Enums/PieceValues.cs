@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2020 Rudy Alex Kohn
+Copyright (c) 2017-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,34 +24,33 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Enums
+namespace Rudz.Chess.Enums;
+
+using Types;
+
+public enum PieceValues
 {
-    using Types;
+    ValueZero = 0,
+    ValueDraw = 0,
+    ValueKnownWin = 10000,
+    ValueMate = 32000,
+    ValueInfinite = 32001,
+    ValueNone = 32002,
 
-    public enum PieceValues
-    {
-        ValueZero = 0,
-        ValueDraw = 0,
-        ValueKnownWin = 10000,
-        ValueMate = 32000,
-        ValueInfinite = 32001,
-        ValueNone = 32002,
+    ValueMateInMaxPly = ValueMate - 2 * PieceValue.MAX_PLY,
+    ValueMatedInMaxPly = -ValueMate + 2 * PieceValue.MAX_PLY,
 
-        ValueMateInMaxPly = ValueMate - 2 * PieceValue.MAX_PLY,
-        ValueMatedInMaxPly = -ValueMate + 2 * PieceValue.MAX_PLY,
+    PawnValueMg = 128,
+    PawnValueEg = 213,
+    KnightValueMg = 781,
+    KnightValueEg = 854,
+    BishopValueMg = 825,
+    BishopValueEg = 915,
+    RookValueMg = 1276,
+    RookValueEg = 1380,
+    QueenValueMg = 2538,
+    QueenValueEg = 2682,
 
-        PawnValueMg = 128,
-        PawnValueEg = 213,
-        KnightValueMg = 781,
-        KnightValueEg = 854,
-        BishopValueMg = 825,
-        BishopValueEg = 915,
-        RookValueMg = 1276,
-        RookValueEg = 1380,
-        QueenValueMg = 2538,
-        QueenValueEg = 2682,
-
-        MidgameLimit = 15258,
-        EndgameLimit = 3915
-    }
+    MidgameLimit = 15258,
+    EndgameLimit = 3915
 }

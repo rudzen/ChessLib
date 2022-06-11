@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2020 Rudy Alex Kohn
+Copyright (c) 2017-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,24 +24,23 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Factories
+namespace Rudz.Chess.Factories;
+
+using Fen;
+using Types;
+
+public static class GameFactory
 {
-    using Fen;
-    using Types;
+    public static IGame Create(IPosition position) => new Game(position);
 
-    public static class GameFactory
+    public static IGame Create(string fen)
     {
-        public static IGame Create(IPosition position) => new Game(position);
-
-        public static IGame Create(string fen)
-        {
-            var g = Create();
-            var fenData = new FenData(fen);
-            g.Pos.SetFen(fenData);
-            return g;
-        }
-
-        public static IGame Create()
-            => new Game(new Position(new Board(), new PieceValue()));
+        var g = Create();
+        var fenData = new FenData(fen);
+        g.Pos.SetFen(fenData);
+        return g;
     }
+
+    public static IGame Create()
+        => new Game(new Position(new Board(), new PieceValue()));
 }

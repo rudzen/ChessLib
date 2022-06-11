@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2020 Rudy Alex Kohn
+Copyright (c) 2017-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,119 +24,118 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Test.Pieces
+namespace Chess.Test.Pieces;
+
+using FluentAssertions;
+using Rudz.Chess.Types;
+using System.Linq;
+using Xunit;
+
+public sealed class PieceAttacksPawnTests : PieceAttacks
 {
-    using FluentAssertions;
-    using Rudz.Chess.Types;
-    using System.Linq;
-    using Xunit;
+    /*
+     * Pawn attack test information.
+     *
+     * - The bands are different for pawns, as their attack pattern at File A and H is different
+     * - Pawns never move to 1st or 8th rank
+     * - Each band tests cover both the white and black side
+     */
 
-    public sealed class PieceAttacksPawnTests : PieceAttacks
+    private static readonly BitBoard[] PawnBands = { 0x81818181818100, 0x42424242424200, 0x24242424242400, 0x18181818181800 };
+
+    /*
+     * Pawn bands :
+     *
+     * Alpha:               Beta:
+     *
+     * 0 0 0 0 0 0 0 0      0 0 0 0 0 0 0 0
+     * X 0 0 0 0 0 0 X      0 X 0 0 0 0 X 0
+     * X 0 0 0 0 0 0 X      0 X 0 0 0 0 X 0
+     * X 0 0 0 0 0 0 X      0 X 0 0 0 0 X 0
+     * X 0 0 0 0 0 0 X      0 X 0 0 0 0 X 0
+     * X 0 0 0 0 0 0 X      0 X 0 0 0 0 X 0
+     * X 0 0 0 0 0 0 X      0 X 0 0 0 0 X 0
+     * 0 0 0 0 0 0 0 0      0 0 0 0 0 0 0 0
+     *
+     * Gamma:               Delta:
+     *
+     * 0 0 0 0 0 0 0 0      0 0 0 0 0 0 0 0
+     * 0 0 X 0 0 X 0 0      0 0 0 X X 0 0 0
+     * 0 0 X 0 0 X 0 0      0 0 0 X X 0 0 0
+     * 0 0 X 0 0 X 0 0      0 0 0 X X 0 0 0
+     * 0 0 X 0 0 X 0 0      0 0 0 X X 0 0 0
+     * 0 0 X 0 0 X 0 0      0 0 0 X X 0 0 0
+     * 0 0 X 0 0 X 0 0      0 0 0 X X 0 0 0
+     * 0 0 0 0 0 0 0 0      0 0 0 0 0 0 0 0
+     */
+
+    private static readonly int[] PawnExpected = { 1, 2, 2, 2 };
+
+    [Fact]
+    public override void AlphaPattern()
     {
-        /*
-         * Pawn attack test information.
-         *
-         * - The bands are different for pawns, as their attack pattern at File A and H is different
-         * - Pawns never move to 1st or 8th rank
-         * - Each band tests cover both the white and black side
-         */
+        const int index = (int)EBands.Alpha;
+        var us = Player.White;
+        var expected = PawnExpected[index];
 
-        private static readonly BitBoard[] PawnBands = { 0x81818181818100, 0x42424242424200, 0x24242424242400, 0x18181818181800 };
+        var actuals = PawnBands[index].Select(w => w.PawnAttack(us).Count);
+        actuals.Should().AllBeEquivalentTo(expected);
 
-        /*
-         * Pawn bands :
-         *
-         * Alpha:               Beta:
-         *
-         * 0 0 0 0 0 0 0 0      0 0 0 0 0 0 0 0
-         * X 0 0 0 0 0 0 X      0 X 0 0 0 0 X 0
-         * X 0 0 0 0 0 0 X      0 X 0 0 0 0 X 0
-         * X 0 0 0 0 0 0 X      0 X 0 0 0 0 X 0
-         * X 0 0 0 0 0 0 X      0 X 0 0 0 0 X 0
-         * X 0 0 0 0 0 0 X      0 X 0 0 0 0 X 0
-         * X 0 0 0 0 0 0 X      0 X 0 0 0 0 X 0
-         * 0 0 0 0 0 0 0 0      0 0 0 0 0 0 0 0
-         *
-         * Gamma:               Delta:
-         *
-         * 0 0 0 0 0 0 0 0      0 0 0 0 0 0 0 0
-         * 0 0 X 0 0 X 0 0      0 0 0 X X 0 0 0
-         * 0 0 X 0 0 X 0 0      0 0 0 X X 0 0 0
-         * 0 0 X 0 0 X 0 0      0 0 0 X X 0 0 0
-         * 0 0 X 0 0 X 0 0      0 0 0 X X 0 0 0
-         * 0 0 X 0 0 X 0 0      0 0 0 X X 0 0 0
-         * 0 0 X 0 0 X 0 0      0 0 0 X X 0 0 0
-         * 0 0 0 0 0 0 0 0      0 0 0 0 0 0 0 0
-         */
+        // black
+        us = ~us;
 
-        private static readonly int[] PawnExpected = { 1, 2, 2, 2 };
+        actuals = PawnBands[index].Select(x => x.PawnAttack(us).Count);
+        actuals.Should().AllBeEquivalentTo(expected);
+    }
 
-        [Fact]
-        public override void AlphaPattern()
-        {
-            const int index = (int)EBands.Alpha;
-            var us = Player.White;
-            var expected = PawnExpected[index];
+    [Fact]
+    public override void BetaPattern()
+    {
+        const int index = (int)EBands.Beta;
+        var us = Player.White;
+        var expected = PawnExpected[index];
+        var actuals = PawnBands[index].Select(w => w.PawnAttack(us).Count);
 
-            var actuals = PawnBands[index].Select(w => w.PawnAttack(us).Count);
-            actuals.Should().AllBeEquivalentTo(expected);
+        actuals.Should().AllBeEquivalentTo(expected);
 
-            // black
-            us = ~us;
+        // black
+        us = ~us;
 
-            actuals = PawnBands[index].Select(x => x.PawnAttack(us).Count);
-            actuals.Should().AllBeEquivalentTo(expected);
-        }
+        actuals = PawnBands[index].Select(x => x.PawnAttack(us).Count);
+        actuals.Should().AllBeEquivalentTo(expected);
+    }
 
-        [Fact]
-        public override void BetaPattern()
-        {
-            const int index = (int)EBands.Beta;
-            var us = Player.White;
-            var expected = PawnExpected[index];
-            var actuals = PawnBands[index].Select(w => w.PawnAttack(us).Count);
+    [Fact]
+    public override void GammaPattern()
+    {
+        const int index = (int)EBands.Gamma;
+        var us = Player.White;
+        var expected = PawnExpected[index];
+        var actuals = PawnBands[index].Select(w => w.PawnAttack(us).Count);
 
-            actuals.Should().AllBeEquivalentTo(expected);
+        actuals.Should().AllBeEquivalentTo(expected);
 
-            // black
-            us = ~us;
+        // black
+        us = ~us;
 
-            actuals = PawnBands[index].Select(x => x.PawnAttack(us).Count);
-            actuals.Should().AllBeEquivalentTo(expected);
-        }
+        actuals = PawnBands[index].Select(x => x.PawnAttack(us).Count);
+        actuals.Should().AllBeEquivalentTo(expected);
+    }
 
-        [Fact]
-        public override void GammaPattern()
-        {
-            const int index = (int)EBands.Gamma;
-            var us = Player.White;
-            var expected = PawnExpected[index];
-            var actuals = PawnBands[index].Select(w => w.PawnAttack(us).Count);
+    [Fact]
+    public override void DeltaPattern()
+    {
+        const int index = (int)EBands.Delta;
+        var us = Player.White;
+        var expected = PawnExpected[index];
+        var actuals = PawnBands[index].Select(w => w.PawnAttack(us).Count);
 
-            actuals.Should().AllBeEquivalentTo(expected);
+        actuals.Should().AllBeEquivalentTo(expected);
 
-            // black
-            us = ~us;
+        // black
+        us = ~us;
 
-            actuals = PawnBands[index].Select(x => x.PawnAttack(us).Count);
-            actuals.Should().AllBeEquivalentTo(expected);
-        }
-
-        [Fact]
-        public override void DeltaPattern()
-        {
-            const int index = (int)EBands.Delta;
-            var us = Player.White;
-            var expected = PawnExpected[index];
-            var actuals = PawnBands[index].Select(w => w.PawnAttack(us).Count);
-
-            actuals.Should().AllBeEquivalentTo(expected);
-
-            // black
-            us = ~us;
-
-            actuals = PawnBands[index].Select(x => x.PawnAttack(us).Count);
-            actuals.Should().AllBeEquivalentTo(expected);
-        }
+        actuals = PawnBands[index].Select(x => x.PawnAttack(us).Count);
+        actuals.Should().AllBeEquivalentTo(expected);
     }
 }

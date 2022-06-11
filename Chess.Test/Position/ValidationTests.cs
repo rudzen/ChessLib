@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2020 Rudy Alex Kohn
+Copyright (c) 2017-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,55 +24,54 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Test.Position
+namespace Chess.Test.Position;
+
+using Rudz.Chess.Enums;
+using Rudz.Chess.Extensions;
+using Rudz.Chess.Factories;
+using Rudz.Chess.Types;
+using Rudz.Chess.Validation;
+using Xunit;
+
+public class ValidationTests
 {
-    using Rudz.Chess.Enums;
-    using Rudz.Chess.Extensions;
-    using Rudz.Chess.Factories;
-    using Rudz.Chess.Types;
-    using Rudz.Chess.Validation;
-    using Xunit;
-
-    public class ValidationTests
+    [Fact]
+    public void ValidationKingsNegative()
     {
-        [Fact]
-        public void ValidationKingsNegative()
-        {
-            const PositionValidationTypes type = PositionValidationTypes.Kings;
-            var expectedErrorMsg = $"king count for player {Player.White} was 2";
+        const PositionValidationTypes type = PositionValidationTypes.Kings;
+        var expectedErrorMsg = $"king count for player {Player.White} was 2";
 
-            var game = GameFactory.Create();
-            game.NewGame();
+        var game = GameFactory.Create();
+        game.NewGame();
 
-            var pc = PieceTypes.King.MakePiece(Player.White);
+        var pc = PieceTypes.King.MakePiece(Player.White);
 
-            game.Pos.AddPiece(pc, Squares.e4);
+        game.Pos.AddPiece(pc, Squares.e4);
 
-            var validator = game.Pos.Validate(type);
+        var validator = game.Pos.Validate(type);
 
-            Assert.NotEmpty(validator.ErrorMsg);
+        Assert.NotEmpty(validator.ErrorMsg);
 
-            var actualErrorMessage = validator.ErrorMsg;
+        var actualErrorMessage = validator.ErrorMsg;
 
-            Assert.Equal(expectedErrorMsg, actualErrorMessage);
-            Assert.False(validator.IsOk);
-        }
-
-        [Fact]
-        public void ValidateCastleling()
-        {
-            // position only has pawns, rooks and kings
-            const string fen = "r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 1";
-            const PositionValidationTypes validationType = PositionValidationTypes.Castleling;
-            var game = GameFactory.Create();
-            game.NewGame(fen);
-
-            var validator = game.Pos.Validate(validationType);
-
-            Assert.True(validator.IsOk);
-            Assert.True(validator.ErrorMsg.IsNullOrEmpty());
-        }
-
-        // TODO : Add tests for the rest of the validations
+        Assert.Equal(expectedErrorMsg, actualErrorMessage);
+        Assert.False(validator.IsOk);
     }
+
+    [Fact]
+    public void ValidateCastleling()
+    {
+        // position only has pawns, rooks and kings
+        const string fen = "r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 1";
+        const PositionValidationTypes validationType = PositionValidationTypes.Castleling;
+        var game = GameFactory.Create();
+        game.NewGame(fen);
+
+        var validator = game.Pos.Validate(validationType);
+
+        Assert.True(validator.IsOk);
+        Assert.True(validator.ErrorMsg.IsNullOrEmpty());
+    }
+
+    // TODO : Add tests for the rest of the validations
 }

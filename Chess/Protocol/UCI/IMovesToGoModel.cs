@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2020 Rudy Alex Kohn
+Copyright (c) 2017-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,24 +24,23 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Protocol.UCI
+namespace Rudz.Chess.Protocol.UCI;
+
+using Types;
+
+public interface IMovesToGoModel
 {
-    using Types;
+    ulong BlackTimeMilliseconds { get; set; }
 
-    public interface IMovesToGoModel
-    {
-        ulong BlackTimeMilliseconds { get; set; }
+    int[] MovesToGo { get; set; }
 
-        int[] MovesToGo { get; set; }
+    int WhiteMovesToGo { get; set; }
 
-        int WhiteMovesToGo { get; set; }
+    int BlackMovesToGo { get; set; }
 
-        int BlackMovesToGo { get; set; }
+    ulong WhiteTimeMilliseconds { get; set; }
 
-        ulong WhiteTimeMilliseconds { get; set; }
+    int this[Player index] { get; set; }
 
-        int this[Player index] { get; set; }
-
-        ulong Time(Player player);
-    }
+    ulong Time(Player player);
 }

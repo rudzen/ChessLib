@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2020 Rudy Alex Kohn
+Copyright (c) 2017-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,76 +24,75 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Hash.Tables.Transposition
+namespace Rudz.Chess.Hash.Tables.Transposition;
+
+using Types;
+
+public interface ITranspositionTable
 {
-    using Types;
+    /// <summary>
+    /// Number of table hits
+    /// </summary>
+    ulong Hits { get; }
 
-    public interface ITranspositionTable
-    {
-        /// <summary>
-        /// Number of table hits
-        /// </summary>
-        ulong Hits { get; }
+    int Size { get; }
 
-        int Size { get; }
+    /// <summary>
+    /// Increases the generation of the table by one
+    /// </summary>
+    void NewSearch();
 
-        /// <summary>
-        /// Increases the generation of the table by one
-        /// </summary>
-        void NewSearch();
+    /// <summary>
+    /// Sets the size of the table in Mb
+    /// </summary>
+    /// <param name="mbSize">The size to set it to</param>
+    /// <returns>The number of clusters in the table</returns>
+    ulong SetSize(int mbSize);
 
-        /// <summary>
-        /// Sets the size of the table in Mb
-        /// </summary>
-        /// <param name="mbSize">The size to set it to</param>
-        /// <returns>The number of clusters in the table</returns>
-        ulong SetSize(int mbSize);
+    /// <summary>
+    /// Finds a cluster in the table based on a position key
+    /// </summary>
+    /// <param name="key">The position key</param>
+    /// <returns>The cluster of the keys position in the table</returns>
+    ITTCluster FindCluster(HashKey key);
 
-        /// <summary>
-        /// Finds a cluster in the table based on a position key
-        /// </summary>
-        /// <param name="key">The position key</param>
-        /// <returns>The cluster of the keys position in the table</returns>
-        ITTCluster FindCluster(HashKey key);
+    void Refresh(TranspositionTableEntry tte);
 
-        void Refresh(TranspositionTableEntry tte);
+    /// <summary>
+    /// Probes the transposition table for a entry that matches the position key.
+    /// </summary>
+    /// <param name="key">The position key</param>
+    /// <returns>(true, entry) if one was found, (false, empty) if not found</returns>
+    (bool, TranspositionTableEntry) Probe(HashKey key);
 
-        /// <summary>
-        /// Probes the transposition table for a entry that matches the position key.
-        /// </summary>
-        /// <param name="key">The position key</param>
-        /// <returns>(true, entry) if one was found, (false, empty) if not found</returns>
-        (bool, TranspositionTableEntry) Probe(HashKey key);
+    /// <summary>
+    /// Probes the table for the first cluster index which matches the position key
+    /// </summary>
+    /// <param name="key">The position key</param>
+    /// <returns>The cluster entry</returns>
+    TranspositionTableEntry ProbeFirst(HashKey key);
 
-        /// <summary>
-        /// Probes the table for the first cluster index which matches the position key
-        /// </summary>
-        /// <param name="key">The position key</param>
-        /// <returns>The cluster entry</returns>
-        TranspositionTableEntry ProbeFirst(HashKey key);
+    /// <summary>
+    /// Stores a move in the transposition table. It will automatically detect the best cluster
+    /// location to store it in. If a similar move already is present, a simple check if done to
+    /// make sure it actually is an improvement of the previous move.
+    /// </summary>
+    /// <param name="key">The position key</param>
+    /// <param name="value">The value of the move</param>
+    /// <param name="type">The bound type, e.i. did it exceed alpha or beta</param>
+    /// <param name="depth">The depth of the move</param>
+    /// <param name="move">The move it self</param>
+    /// <param name="statValue">The static value of the move</param>
+    void Store(HashKey key, int value, Bound type, sbyte depth, Move move, int statValue);
 
-        /// <summary>
-        /// Stores a move in the transposition table. It will automatically detect the best cluster
-        /// location to store it in. If a similar move already is present, a simple check if done to
-        /// make sure it actually is an improvement of the previous move.
-        /// </summary>
-        /// <param name="key">The position key</param>
-        /// <param name="value">The value of the move</param>
-        /// <param name="type">The bound type, e.i. did it exceed alpha or beta</param>
-        /// <param name="depth">The depth of the move</param>
-        /// <param name="move">The move it self</param>
-        /// <param name="statValue">The static value of the move</param>
-        void Store(HashKey key, int value, Bound type, sbyte depth, Move move, int statValue);
+    /// <summary>
+    /// Get the approximation full % of the table // todo : fix
+    /// </summary>
+    /// <returns>The % as integer value</returns>
+    int Fullness();
 
-        /// <summary>
-        /// Get the approximation full % of the table // todo : fix
-        /// </summary>
-        /// <returns>The % as integer value</returns>
-        int Fullness();
-
-        /// <summary>
-        /// Clears the current table
-        /// </summary>
-        void Clear();
-    }
+    /// <summary>
+    /// Clears the current table
+    /// </summary>
+    void Clear();
 }

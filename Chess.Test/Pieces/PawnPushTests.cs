@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2020 Rudy Alex Kohn
+Copyright (c) 2017-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,76 +24,75 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Test.Pieces
+namespace Chess.Test.Pieces;
+
+using Rudz.Chess.Enums;
+using Rudz.Chess.Types;
+using Xunit;
+
+public sealed class PawnPushTests
 {
-    using Rudz.Chess.Enums;
-    using Rudz.Chess.Types;
-    using Xunit;
-
-    public sealed class PawnPushTests
+    [Fact]
+    public void PawnPushNorth()
     {
-        [Fact]
-        public void PawnPushNorth()
+        BitBoard fullBoard = 0xffffffffffff00;
+        Direction direction = Directions.North;
+
+        const int expected = 1;
+
+        foreach (var sq in fullBoard)
         {
-            BitBoard fullBoard = 0xffffffffffff00;
-            Direction direction = Directions.North;
-
-            const int expected = 1;
-
-            foreach (var sq in fullBoard)
-            {
-                var toSq = sq + direction;
-                var actual = sq.Distance(toSq);
-                Assert.Equal(expected, actual);
-            }
+            var toSq = sq + direction;
+            var actual = sq.Distance(toSq);
+            Assert.Equal(expected, actual);
         }
+    }
 
-        [Fact]
-        public void PawnPushSouth()
+    [Fact]
+    public void PawnPushSouth()
+    {
+        BitBoard fullBoard = 0xffffffffffff00;
+        Direction direction = Directions.South;
+
+        const int expected = 1;
+
+        foreach (var sq in fullBoard)
         {
-            BitBoard fullBoard = 0xffffffffffff00;
-            Direction direction = Directions.South;
-
-            const int expected = 1;
-
-            foreach (var sq in fullBoard)
-            {
-                var toSq = sq + direction;
-                var actual = sq.Distance(toSq);
-                Assert.Equal(expected, actual);
-            }
+            var toSq = sq + direction;
+            var actual = sq.Distance(toSq);
+            Assert.Equal(expected, actual);
         }
+    }
 
-        [Fact]
-        public void PawnDoublePushNorth()
+    [Fact]
+    public void PawnDoublePushNorth()
+    {
+        var fullBoard = BitBoards.RANK2;
+        Direction direction = Directions.North;
+
+        const int expected = 2;
+
+        foreach (var sq in fullBoard)
         {
-            var fullBoard = BitBoards.RANK2;
-            Direction direction = Directions.North;
-
-            const int expected = 2;
-
-            foreach (var sq in fullBoard)
-            {
-                var toSq = sq + 2 * direction;
-                var actual = sq.Distance(toSq);
-                Assert.Equal(expected, actual);
-            }
+            var toSq = sq + 2 * direction;
+            var actual = sq.Distance(toSq);
+            Assert.Equal(expected, actual);
         }
+    }
 
-        [Fact]
-        public void PawnDoublePushSouth()
+    [Fact]
+    public void PawnDoublePushSouth()
+    {
+        var fullBoard = BitBoards.RANK7;
+        Direction direction = Directions.South;
+
+        const int expected = 2;
+
+        foreach (var sq in fullBoard)
         {
-            var fullBoard = BitBoards.RANK7;
-            Direction direction = Directions.South;
-
-            const int expected = 2;
-
-            foreach (var sq in fullBoard)
-            {
-                var toSq = sq + 2 * direction;
-                var actual = sq.Distance(toSq);
-                Assert.Equal(expected, actual);
-            }
+            var toSq = sq + 2 * direction;
+            var actual = sq.Distance(toSq);
+            Assert.Equal(expected, actual);
         }
     }
 }

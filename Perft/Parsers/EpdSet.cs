@@ -3,7 +3,7 @@ Perft, a chess perft testing application
 
 MIT License
 
-Copyright (c) 2019-2020 Rudy Alex Kohn
+Copyright (c) 2019-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,47 +24,46 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Perft.Parsers
+namespace Perft.Parsers;
+
+using System;
+using System.Collections.Generic;
+
+public sealed class EpdSet : IEpdSet
 {
-    using System;
-    using System.Collections.Generic;
+    public string Id { get; set; }
 
-    public sealed class EpdSet : IEpdSet
+    public string Epd { get; set; }
+
+    public List<(int, ulong)> Perft { get; set; }
+
+    public bool Equals(IEpdSet x, IEpdSet y)
     {
-        public string Id { get; set; }
+        var idComparison = string.Equals(x.Id, y.Id, StringComparison.Ordinal);
 
-        public string Epd { get; set; }
+        if (!idComparison)
+            return false;
 
-        public List<(int, ulong)> Perft { get; set; }
+        var epdComparison = string.Equals(x.Epd, y.Epd, StringComparison.Ordinal);
 
-        public bool Equals(IEpdSet x, IEpdSet y)
-        {
-            var idComparison = string.Equals(x.Id, y.Id, StringComparison.Ordinal);
+        return epdComparison;
+    }
 
-            if (!idComparison)
-                return false;
+    public int GetHashCode(IEpdSet obj)
+        => Id.GetHashCode(StringComparison.Ordinal) ^ Epd.GetHashCode(StringComparison.Ordinal);
 
-            var epdComparison = string.Equals(x.Epd, y.Epd, StringComparison.Ordinal);
+    public int CompareTo(IEpdSet other)
+    {
+        if (ReferenceEquals(this, other))
+            return 0;
 
-            return epdComparison;
-        }
+        if (other is null)
+            return 1;
 
-        public int GetHashCode(IEpdSet obj)
-            => Id.GetHashCode(StringComparison.Ordinal) ^ Epd.GetHashCode(StringComparison.Ordinal);
+        var idComparison = string.Compare(Id, other.Id, StringComparison.Ordinal);
 
-        public int CompareTo(IEpdSet other)
-        {
-            if (ReferenceEquals(this, other))
-                return 0;
-
-            if (other is null)
-                return 1;
-
-            var idComparison = string.Compare(Id, other.Id, StringComparison.Ordinal);
-
-            return idComparison != 0
-                ? idComparison
-                : string.Compare(Epd, other.Epd, StringComparison.Ordinal);
-        }
+        return idComparison != 0
+            ? idComparison
+            : string.Compare(Epd, other.Epd, StringComparison.Ordinal);
     }
 }

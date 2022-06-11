@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2020 Rudy Alex Kohn
+Copyright (c) 2017-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,13 +24,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Protocol.UCI
+namespace Rudz.Chess.Protocol.UCI;
+
+public enum UciOptionType
 {
-    public enum UciOptionType
-    {
-        Button,
-        Check,
-        Text,
-        Spin
-    }
+    Button,
+    Check,
+    Text,
+    Spin
 }

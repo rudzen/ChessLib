@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2020 Rudy Alex Kohn
+Copyright (c) 2017-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,31 +24,30 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.MoveGeneration
+namespace Rudz.Chess.MoveGeneration;
+
+using Enums;
+using System;
+using System.Collections.Generic;
+using Types;
+
+public interface IMoveList : IReadOnlyCollection<ExtMove>
 {
-    using Enums;
-    using System;
-    using System.Collections.Generic;
-    using Types;
+    ExtMove this[int index] { get; set; }
 
-    public interface IMoveList : IReadOnlyCollection<ExtMove>
-    {
-        ExtMove this[int index] { get; set; }
+    int Length { get; }
+    Move CurrentMove { get; }
+    void Add(ExtMove item);
+    void Add(Move item);
 
-        int Length { get; }
-        Move CurrentMove { get; }
-        void Add(ExtMove item);
-        void Add(Move item);
+    /// <summary>
+    /// Clears the move generated data
+    /// </summary>
+    void Clear();
 
-        /// <summary>
-        /// Clears the move generated data
-        /// </summary>
-        void Clear();
-
-        bool Contains(ExtMove item);
-        bool Contains(Move item);
-        bool Contains(Square from, Square to);
-        void Generate(IPosition pos, MoveGenerationType type = MoveGenerationType.Legal);
-        ReadOnlySpan<ExtMove> Get();
-    }
+    bool Contains(ExtMove item);
+    bool Contains(Move item);
+    bool Contains(Square from, Square to);
+    void Generate(IPosition pos, MoveGenerationType type = MoveGenerationType.Legal);
+    ReadOnlySpan<ExtMove> Get();
 }

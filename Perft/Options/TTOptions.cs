@@ -3,7 +3,7 @@ Perft, a chess perft testing application
 
 MIT License
 
-Copyright (c) 2019-2020 Rudy Alex Kohn
+Copyright (c) 2019-2022 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,17 +24,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+namespace Perft.Options;
+
 using CommandLine;
 
-namespace Perft.Options
+[Verb("tt", HelpText = "Configuration for transposition table")]
+public class TTOptions : IOptions
 {
-    [Verb("tt", HelpText = "Configuration for transposition table")]
-    public class TTOptions : IOptions
-    {
-        [Option('u', "use", Required = false, Default = true, HelpText = "Dis/En-able use of transposition table")]
-        public bool Use { get; set; }
+    [Option('u', "use", Required = false, Default = true, HelpText = "Dis/En-able use of transposition table")]
+    public bool Use { get; set; }
 
-        [Option('s', "size", Required = false, Default = 32, HelpText = "Set the size of the transposition table in mb")]
-        public int Size { get; set; }
-    }
+    [Option('s', "size", Required = false, Default = 32, HelpText = "Set the size of the transposition table in mb")]
+    public int Size { get; set; }
 }
