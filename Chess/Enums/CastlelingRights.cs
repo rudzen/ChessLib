@@ -72,4 +72,9 @@ public static class CastlelingExtensions
     public static bool HasFlagFast(this CastlelingRights value, CastlelingRights flag) => (value & flag) != 0;
 
     public static int AsInt(this CastlelingRights value) => (int)value;
+
+    public static CastlelingRights Without(this CastlelingRights @this, CastlelingRights remove)
+    {
+        return @this & ~remove;
+    }
 }

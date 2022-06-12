@@ -45,7 +45,7 @@ public sealed class PositionTests
         position.AddPiece(Pieces.WhiteKing, Squares.a7);
         var pieces = position.Pieces();
         var square = pieces.Lsb();
-        Assert.Equal(Squares.a7, square.Value);
+        square.Value.Should().Be(Squares.a7);
 
         var piece = position.GetPiece(square);
         Assert.Equal(Pieces.WhiteKing, piece.Value);
@@ -92,6 +92,4 @@ public sealed class PositionTests
 
         pinnedSquare.Should().Be(expectedSquare);
     }
-
-    // TODO : Add test functions for the rest of the methods and properties in position class
 }

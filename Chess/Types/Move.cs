@@ -144,12 +144,16 @@ public readonly struct Move : IEquatable<Move>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override string ToString()
     {
-        return IsNullMove()
-            ? "(null)"
-            : MoveType() == MoveTypes.Normal
-                ? $"{FromSquare()}{ToSquare()}"
-                : MoveType() == MoveTypes.Castling
-                    ? FromSquare() < ToSquare() ? "0-0" : "0-0-0"
-                    : $"{FromSquare()}{ToSquare()}{PromotedPieceType().GetPromotionChar()}";
+        if (IsNullMove())
+            return "(null)";
+
+        return MoveType() switch
+        {
+            MoveTypes.Normal => $"{FromSquare()}{ToSquare()}",
+            MoveTypes.Castling => FromSquare() < ToSquare() ? "0-0" : "0-0-0",
+            MoveTypes.Promotion => $"{FromSquare()}{ToSquare()}{PromotedPieceType().GetPromotionChar()}",
+            MoveTypes.Enpassant => $"{FromSquare()}{ToSquare()}",
+            _ => "(error)"
+        };
     }
 }

@@ -83,8 +83,5 @@ public static class PieceExtensions
     public static char GetUnicodeChar(this Piece p) => PieceUnicodeChar[p.AsInt()];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static int AsInt(this Pieces piece)
-    {
-        return (int)piece;
-    }
+    public static int AsInt(this Pieces piece) => (int)piece;
 }

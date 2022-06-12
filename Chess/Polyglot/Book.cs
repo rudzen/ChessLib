@@ -37,13 +37,22 @@ using Types;
 
 public sealed class Book : IDisposable
 {
-    private static readonly uint[] PieceMapping = { 0, 11, 9, 7, 5, 3, 1, 0, 0, 10, 8, 6, 4, 2, 0, 0 };
+    // PolyGlot pieces are: BP = 0, WP = 1, BN = 2, ... BK = 10, WK = 11
+    private static readonly int[] PieceMapping = { -1, 1, 3, 5, 7, 9, 11, -1, -1, 0, 2, 4, 6, 8, 10 };
 
+    private static readonly CastlelingRights[] CastleRights = {
+        CastlelingRights.WhiteOo,
+        CastlelingRights.WhiteOoo,
+        CastlelingRights.BlackOo,
+        CastlelingRights.BlackOoo
+    };
+    
     private readonly IPosition _pos;
     private FileStream _fileStream;
     private BinaryReader _binaryReader;
     private string _fileName;
     private readonly int _entrySize;
+    private readonly Random _rnd;
 
     private struct Entry
     {
@@ -57,6 +66,7 @@ public sealed class Book : IDisposable
     {
         _pos = pos;
         _entrySize = sizeof(Entry);
+        _rnd = new Random(DateTime.Now.Millisecond);
     }
 
     public string FileName
@@ -64,42 +74,47 @@ public sealed class Book : IDisposable
         get => _fileName;
         set
         {
+            if (string.IsNullOrEmpty(value))
+                return;
             if (_fileName == value)
                 return;
             _fileName = value;
             _fileStream = new FileStream(value, FileMode.Open, FileAccess.Read);
-            _binaryReader = new BinaryReader(_fileStream);
+            _binaryReader = new LittleEndianBinaryStreamReader(_fileStream);
         }
     }
 
-    public Move probe(bool pickBest = true)
+    public Move Probe(bool pickBest = true)
     {
         if (_fileName.IsNullOrEmpty() || _fileStream == null)
             return Move.EmptyMove;
-
-        var rnd = new Random(DateTime.Now.Millisecond);
 
         ushort polyMove = 0;
         ushort best = 0;
         uint sum = 0;
         var key = ComputePolyglotKey();
+        var firstIndex = FindFirst(key);
 
-        _fileStream.Seek(FindFirst(key) * _entrySize, SeekOrigin.Begin);
+        _fileStream.Seek(firstIndex * _entrySize, SeekOrigin.Begin);
+
         var e = ReadEntry();
 
         while (e.key == key)
         {
-            best = best > e.count
-                ? best
-                : e.count;
+            if (best <= e.count)
+                best = e.count;
 
             sum += e.count;
 
             // Choose book move according to its score. If a move has a very high score it has
             // higher probability to be choosen than a move with lower score. Note that first entry
             // is always chosen.
-            if (sum > 0 && (rnd.Next() % sum) < e.count || pickBest && e.count == best)
+            if (sum > 0 && (_rnd.Next() % sum) < e.count || pickBest && e.count == best)
                 polyMove = e.move;
+
+            // Stop if we wan't the top pick and move exists
+            if (pickBest && polyMove != 0)
+                break;
         }
 
         return polyMove == 0
@@ -129,14 +144,14 @@ public sealed class Book : IDisposable
         var from = move.FromSquare();
         var to = move.ToSquare();
 
-        static PieceTypes PolyToPt(int pt) => (PieceTypes)(3 - pt);
-
-        // Promotion type move needs to be converted from PG to Mirage format.
+        // Promotion type move needs to be converted from PG format.
         var polyPt = (m >> 12) & 7;
 
-        move = polyPt > 0
-            ? Move.Create(from, to, MoveTypes.Promotion, PolyToPt(polyPt))
-            : Move.Create(from, to);
+        if (polyPt > 0)
+        {
+            static PieceTypes PolyToPt(int pt) => (PieceTypes)(3 - pt);
+            move = Move.Create(from, to, MoveTypes.Promotion, PolyToPt(polyPt));
+        }
 
         var ml = _pos.GenerateMoves();
 
@@ -167,7 +182,7 @@ public sealed class Book : IDisposable
         return e;
     }
 
-    private HashKey ComputePolyglotKey()
+    public HashKey ComputePolyglotKey()
     {
         var k = new HashKey();
         var b = _pos.Pieces();
@@ -175,20 +190,17 @@ public sealed class Book : IDisposable
         while (b)
         {
             var s = BitBoards.PopLsb(ref b);
-            var p = PieceMapping[_pos.GetPiece(s).AsInt()];
-
-            // PolyGlot pieces are: BP = 0, WP = 1, BN = 2, ... BK = 10, WK = 11
+            var pc = _pos.GetPiece(s);
+            var p = PieceMapping[pc.AsInt()];
             k ^= BookZobrist.Psq(p, s);
         }
 
-        if (_pos.State.CastlelingRights != CastlelingRights.None)
-            k = Enum.GetValues(_pos.State.CastlelingRights.GetType())
-                .Cast<CastlelingRights>()
-                .Where(f => _pos.State.CastlelingRights.HasFlagFast(f))
-                .Aggregate(k, (current, validCastlelingFlag) => current ^ BookZobrist.Castle(validCastlelingFlag));
+        k ^= CastleRights
+            .Where(cr => _pos.State.CastlelingRights.HasFlagFast(cr))
+            .Aggregate(0UL, (current, validCastlelingFlag) => current ^ BookZobrist.Castle(validCastlelingFlag));
 
-        if (_pos.EnPassantSquare != Square.None)
-            k ^= BookZobrist.EnPassant(_pos.EnPassantSquare.File.AsInt());
+        if (_pos.State.EnPassantSquare != Square.None)
+            k ^= BookZobrist.EnPassant(_pos.State.EnPassantSquare.File);
 
         if (_pos.SideToMove.IsWhite)
             k ^= BookZobrist.Turn();
@@ -205,7 +217,7 @@ public sealed class Book : IDisposable
 
         while (low < high)
         {
-            var mid = (low + high) >> 1;
+            var mid = low.MidPoint(high);
 
             Debug.Assert(mid >= low && mid < high);
 
