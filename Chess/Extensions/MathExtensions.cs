@@ -174,7 +174,7 @@ public static class MathExtensions
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static long MidWith(this long @this, long that)
+    public static long MidPoint(this long @this, long that)
     {
         return (@this + that) >> 1;
     }

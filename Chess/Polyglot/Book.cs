@@ -52,6 +52,7 @@ public sealed class Book : IDisposable
     private BinaryReader _binaryReader;
     private string _fileName;
     private readonly int _entrySize;
+    private readonly Random _rnd;
 
     private struct Entry
     {
@@ -65,6 +66,7 @@ public sealed class Book : IDisposable
     {
         _pos = pos;
         _entrySize = sizeof(Entry);
+        _rnd = new Random(DateTime.Now.Millisecond);
     }
 
     public string FileName
@@ -87,8 +89,6 @@ public sealed class Book : IDisposable
         if (_fileName.IsNullOrEmpty() || _fileStream == null)
             return Move.EmptyMove;
 
-        var rnd = new Random(DateTime.Now.Millisecond);
-
         ushort polyMove = 0;
         ushort best = 0;
         uint sum = 0;
@@ -101,16 +101,15 @@ public sealed class Book : IDisposable
 
         while (e.key == key)
         {
-            best = best > e.count
-                ? best
-                : e.count;
+            if (best <= e.count)
+                best = e.count;
 
             sum += e.count;
 
             // Choose book move according to its score. If a move has a very high score it has
             // higher probability to be choosen than a move with lower score. Note that first entry
             // is always chosen.
-            if (sum > 0 && (rnd.Next() % sum) < e.count || pickBest && e.count == best)
+            if (sum > 0 && (_rnd.Next() % sum) < e.count || pickBest && e.count == best)
                 polyMove = e.move;
 
             // Stop if we wan't the top pick and move exists
@@ -218,7 +217,7 @@ public sealed class Book : IDisposable
 
         while (low < high)
         {
-            var mid = low.MidWith(high);
+            var mid = low.MidPoint(high);
 
             Debug.Assert(mid >= low && mid < high);
 
