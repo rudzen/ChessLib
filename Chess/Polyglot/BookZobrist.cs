@@ -29,19 +29,9 @@ namespace Rudz.Chess.Polyglot;
 using Enums;
 using Types;
 
-public static class BookZobrist
+internal static class BookZobrist
 {
-    private static readonly ulong[,] psq;
-
-    private static readonly ulong[] castle;
-
-    private static readonly ulong[] enpassant;
-
-    private static readonly ulong turn;
-
-    static BookZobrist()
-    {
-        psq = new[,]
+    private static readonly ulong[,] psq = new[,]
         {
                 {
                     0x9D39247E33776D41UL, 0x2AF7398005AAA5C7UL, 0x44DB015024623547UL,
@@ -333,21 +323,28 @@ public static class BookZobrist
                 },
             };
 
-        castle = new[]
+    private static readonly ulong[] castle = new[]
         {
-                0x31D71DCE64B2C310UL, 0xF165B587DF898190UL, 0xA57E6339DD2CF3A0UL,
-                0x1EF6E6DBB1961EC9UL
+            0UL,
+            0x31D71DCE64B2C310UL, // white short
+            0xF165B587DF898190UL, // white long
+            0UL,
+            0xA57E6339DD2CF3A0UL, // black short
+            0UL,
+            0UL,
+            0UL,
+            0x1EF6E6DBB1961EC9UL // black long
             };
-        enpassant = new[]
-        {
-                0x70CC73D90BC26E24UL, 0xE21A6B35DF0C3AD7UL,
-                0x003A93D8B2806962UL, 0x1C99DED33CB890A1UL, 0xCF3145DE0ADD4289UL,
-                0xD0E4427A5514FB72UL, 0x77C621CC9FB3A483UL, 0x67A34DAC4356550BUL
-            };
-        turn = 0xF8D626AAAF278509UL;
-    }
 
-    internal static ulong Psq(uint piece, Square sq)
+    private static readonly ulong[] enpassant = new[]
+    {
+        0x70CC73D90BC26E24UL, 0xE21A6B35DF0C3AD7UL, 0x003A93D8B2806962UL, 0x1C99DED33CB890A1UL,
+        0xCF3145DE0ADD4289UL, 0xD0E4427A5514FB72UL, 0x77C621CC9FB3A483UL, 0x67A34DAC4356550BUL
+    };
+
+    private static readonly ulong turn = 0xF8D626AAAF278509UL;
+
+    internal static ulong Psq(int piece, Square sq)
     {
         return psq[piece, sq.AsInt()];
     }

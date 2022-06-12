@@ -172,4 +172,10 @@ public static class MathExtensions
         var myBoolSpan = MemoryMarshal.CreateReadOnlySpan(ref @this, 1);
         return MemoryMarshal.AsBytes(myBoolSpan)[0];
     }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static long MidWith(this long @this, long that)
+    {
+        return (@this + that) >> 1;
+    }
 }
