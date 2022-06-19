@@ -170,11 +170,14 @@ public sealed class Board : IBoard
             : squares.AsSpan()[..idx];
     }
 
+    public int PieceCount(Piece pc)
+        => _pieceCount[pc.AsInt()];
+
     public int PieceCount(PieceTypes pt, Player c)
-        => _pieceCount[pt.MakePiece(c).AsInt()];
+        => PieceCount(pt.MakePiece(c));
 
     public int PieceCount(PieceTypes pt)
-        => _pieceCount[pt.MakePiece(Player.White).AsInt()] + _pieceCount[pt.MakePiece(Player.Black).AsInt()];
+        => PieceCount(pt.MakePiece(Player.White)) + PieceCount(pt.MakePiece(Player.Black));
 
     public int PieceCount()
         => PieceCount(PieceTypes.AllPieces);

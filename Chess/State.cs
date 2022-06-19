@@ -40,6 +40,8 @@ public sealed class State : IEquatable<State>
 
     public HashKey PawnStructureKey { get; set; }
 
+    public HashKey MaterialKey { get; set; }
+
     public int PliesFromNull { get; set; }
 
     public int Rule50 { get; set; }
@@ -48,12 +50,12 @@ public sealed class State : IEquatable<State>
 
     public Square EnPassantSquare { get; set; }
 
-    public HashKey Key { get; set; }
-
     // -----------------------------
     // Properties below this point are not copied from other state
     // since they are always recomputed
     // -----------------------------
+
+    public HashKey Key { get; set; }
 
     /// <summary>
     /// Represents checked squares for side to move
@@ -79,6 +81,7 @@ public sealed class State : IEquatable<State>
     public State(State other)
     {
         PawnStructureKey = other.PawnStructureKey;
+        MaterialKey = other.MaterialKey;
         CastlelingRights = other.CastlelingRights;
         Rule50 = other.Rule50;
         PliesFromNull = other.PliesFromNull;
@@ -110,6 +113,7 @@ public sealed class State : IEquatable<State>
     {
         // copy over preserved values
         other.PawnStructureKey = PawnStructureKey;
+        other.MaterialKey = MaterialKey;
         other.CastlelingRights = CastlelingRights;
         other.Rule50 = Rule50;
         other.PliesFromNull = PliesFromNull;
@@ -135,7 +139,7 @@ public sealed class State : IEquatable<State>
     {
         LastMove = Move.EmptyMove;
         NonPawnMaterial.Clear();
-        PawnStructureKey = Key = 0ul;
+        PawnStructureKey = Key = MaterialKey = 0UL;
         PliesFromNull = Repetition = 0;
         CastlelingRights = CastlelingRights.None;
         EnPassantSquare = Square.None;

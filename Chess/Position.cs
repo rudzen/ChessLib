@@ -397,6 +397,29 @@ public sealed class Position : IPosition
         return end >= 3 && Cuckoo.HashCuckooCycle(this, end, ply);
     }
 
+    public bool HasRepetition()
+    {
+        var currentState = State;
+        var end = Math.Min(State.Rule50, State.PliesFromNull);
+
+        while (end-- >= 4)
+        {
+            if (currentState.Repetition > 0)
+                return true;
+
+            currentState = currentState.Previous;
+        }
+
+        return false;
+    }
+
+    public bool IsDraw(int ply)
+        => State.Rule50 switch
+        {
+            > 99 when State.Checkers.IsEmpty || this.GenerateMoves().Length > 0 => true,
+            _ => State.Repetition > 0 && State.Repetition < ply
+        };
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool IsAttacked(Square sq, Player c)
         => AttackedBySlider(sq, c) || AttackedByKnight(sq, c) || AttackedByPawn(sq, c) || AttackedByKing(sq, c);
@@ -1341,8 +1364,14 @@ public sealed class Position : IPosition
 
         key ^= State.CastlelingRights.GetZobristCastleling();
 
+        var materialKey = 0UL;
+        foreach (var pc in Piece.AllPieces)
+            for (int cnt = 0; cnt < Board.PieceCount(pc); ++cnt)
+                materialKey ^= Zobrist.GetZobristPst(pc, cnt);
+
         State.Key = key;
         State.PawnStructureKey = pawnKey;
+        State.MaterialKey = materialKey;
     }
 
     private void SetupCastleling(ReadOnlySpan<char> castleling)

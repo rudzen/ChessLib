@@ -170,6 +170,10 @@ public interface IPosition : IEnumerable<Piece>
 
     bool HasGameCycle(int ply);
 
+    bool HasRepetition();
+
+    bool IsDraw(int ply);
+
     bool SeeGe(Move m, Value threshold);
 
     IPositionValidator Validate(PositionValidationTypes type = PositionValidationTypes.Basic);

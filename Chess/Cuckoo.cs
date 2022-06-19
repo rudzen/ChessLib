@@ -43,24 +43,8 @@ public static class Cuckoo
 
     static Cuckoo()
     {
-        Span<Piece> pieces = stackalloc Piece[]
-        {
-            Enums.Pieces.WhitePawn,
-            Enums.Pieces.WhiteKnight,
-            Enums.Pieces.WhiteBishop,
-            Enums.Pieces.WhiteRook,
-            Enums.Pieces.WhiteQueen,
-            Enums.Pieces.WhiteKing,
-            Enums.Pieces.BlackPawn,
-            Enums.Pieces.BlackKnight,
-            Enums.Pieces.BlackBishop,
-            Enums.Pieces.BlackRook,
-            Enums.Pieces.BlackQueen,
-            Enums.Pieces.BlackKing
-        };
-
         var count = 0;
-        foreach (var pc in pieces)
+        foreach (var pc in Piece.AllPieces)
         {
             foreach (var sq1 in BitBoards.AllSquares)
             {

@@ -179,22 +179,7 @@ public sealed class PositionValidator : IPositionValidator
 
     private string ValidatePieceCount(string error)
     {
-        Span<Piece> pieces = stackalloc Piece[] {
-            Pieces.WhitePawn,
-            Pieces.WhiteKnight,
-            Pieces.WhiteBishop,
-            Pieces.WhiteRook,
-            Pieces.WhiteQueen,
-            Pieces.WhiteKing,
-            Pieces.BlackPawn,
-            Pieces.BlackKnight,
-            Pieces.BlackBishop,
-            Pieces.BlackRook,
-            Pieces.BlackQueen,
-            Pieces.BlackKing
-        };
-
-        foreach (var pc in pieces)
+        foreach (var pc in Piece.AllPieces)
         {
             var pt = pc.Type();
             var c = pc.ColorOf();
