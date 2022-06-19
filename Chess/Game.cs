@@ -104,7 +104,7 @@ public sealed class Game : IGame
         => Pos.GetEnumerator();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public BitBoard OccupiedBySide(Player c)
+    public BitBoard OccupiedBySide(in Player c)
         => Pos.Pieces(c);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -136,7 +136,7 @@ public sealed class Game : IGame
         foreach (var em in ml)
         {
             move = em.Move;
-            Pos.MakeMove(move, state);
+            Pos.MakeMove(move, in state);
             tot += Perft(depth - 1);
             Pos.TakeMove(move);
         }

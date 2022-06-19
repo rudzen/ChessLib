@@ -28,6 +28,7 @@ namespace Rudz.Chess.Protocol.UCI;
 
 using Microsoft.Extensions.ObjectPool;
 using MoveGeneration;
+using Rudz.Chess.Enums;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -35,9 +36,9 @@ using Types;
 
 public class Uci : IUci
 {
-    private static readonly OptionComparer OptionComparer;
+    private static readonly OptionComparer OptionComparer = new OptionComparer();
 
-    private static readonly string[] OptionTypeStrings;
+    private static readonly string[] OptionTypeStrings = Enum.GetNames(typeof(UciOptionType));
 
     private readonly ObjectPool<StringBuilder> _pvPool;
 
@@ -46,12 +47,6 @@ public class Uci : IUci
         var policy = new StringBuilderPooledObjectPolicy();
         _pvPool = new DefaultObjectPool<StringBuilder>(policy, 128);
         O = new Dictionary<string, IOption>();
-    }
-
-    static Uci()
-    {
-        OptionComparer = new OptionComparer();
-        OptionTypeStrings = Enum.GetNames(typeof(UciOptionType));
     }
 
     public int MaxThreads { get; set; }
@@ -102,6 +97,21 @@ public class Uci : IUci
         }
 
         return Move.EmptyMove;
+    }
+
+    public IEnumerable<Move> MovesFromUci(IPosition pos, Stack<State> states, IEnumerable<string> moves)
+    {
+        foreach (var move in moves)
+        {
+            var m = MoveFromUci(pos, move);
+            if (m.IsNullMove())
+                yield break;
+
+            var state = new State();
+            states.Push(state);
+            pos.MakeMove(m, in state);
+            yield return m;
+        }
     }
 
     public string UciOk() => "uciok";
@@ -160,6 +170,23 @@ public class Uci : IUci
 
     public string Fullness(ulong tbHits, ulong nodes, TimeSpan time)
         => $"info hashfull {Game.Table.Fullness()} tbhits {tbHits} nodes {nodes} time {time.Milliseconds} nps {Nps(nodes, time)}";
+
+    public string MoveToString(Move m, ChessMode chessMode = ChessMode.NORMAL)
+    {
+        if (m.IsNullMove())
+            return "(none)";
+
+        var from = m.FromSquare();
+        var to = m.ToSquare();
+
+        if (m.IsCastlelingMove() && chessMode != ChessMode.CHESS_960)
+            to = Square.Make(from.Rank, to > from ? File.FILE_G : File.FILE_C);
+
+        if (m.IsPromotionMove())
+            return from.ToString() + to.ToString() + m.PromotedPieceType().GetPieceChar();
+
+        return from.ToString() + to.ToString();
+    }
 
     /// <summary>
     /// Print all the options default values in chronological insertion order (the idx field)

@@ -124,7 +124,7 @@ public static class MagicBB
             var numSquares = InitSquares(squares, MagicmovesBMask[i], initMagicMovesDb);
             for (var temp = 0UL; temp < One << numSquares; ++temp)
             {
-                var tempocc = InitmagicmovesOcc(squares[..numSquares], temp);
+                var tempocc = InitmagicmovesOcc(squares[..numSquares], in temp);
                 MagicBishopDb[i][(tempocc * MagicmovesBMagics[i]) >> 55] = InitmagicmovesBmoves(i, tempocc);
             }
         }
@@ -134,7 +134,7 @@ public static class MagicBB
             var numSquares = InitSquares(squares, MagicmovesRMask[i], initMagicMovesDb);
             for (var temp = 0UL; temp < One << numSquares; ++temp)
             {
-                var tempocc = InitmagicmovesOcc(squares[..numSquares], temp);
+                var tempocc = InitmagicmovesOcc(squares[..numSquares], in temp);
                 MagicRookDb[i][(tempocc * MagicmovesRMagics[i]) >> 52] = InitmagicmovesRmoves(i, tempocc);
             }
         }
@@ -153,7 +153,7 @@ public static class MagicBB
         return numSquares;
     }
 
-    private static ulong InitmagicmovesOcc(ReadOnlySpan<int> squares, ulong linocc)
+    private static ulong InitmagicmovesOcc(ReadOnlySpan<int> squares, in ulong linocc)
     {
         var ret = 0ul;
         for (var i = 0; i < squares.Length; ++i)

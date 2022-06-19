@@ -36,12 +36,12 @@ using System.Runtime.CompilerServices;
 /// </summary>
 public readonly struct Square : IComparable<Square>
 {
-    private static readonly string[] SquareStrings;
-
-    static Square()
-    {
-        SquareStrings = Enum.GetValues(typeof(Squares)).Cast<Squares>().Take(64).Select(x => x.ToString()).ToArray();
-    }
+    private static readonly string[] SquareStrings = Enum
+        .GetValues(typeof(Squares))
+        .Cast<Squares>()
+        .Take(64)
+        .Select(x => x.ToString())
+        .ToArray();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Square(int square) => Value = (Squares)square;
@@ -68,21 +68,29 @@ public readonly struct Square : IComparable<Square>
 
     public readonly Squares Value;
 
-    public Rank Rank => (Ranks)(AsInt() >> 3);
+    public Rank Rank
+        => (Ranks)(AsInt() >> 3);
 
-    public char RankChar => Rank.Char;
+    public char RankChar
+        => Rank.Char;
 
-    public File File => AsInt() & 7;
+    public File File
+        => AsInt() & 7;
 
-    public char FileChar => File.FileChar();
+    public char FileChar
+        => File.FileChar();
 
-    public (Rank, File) RankFile => (Rank, File);
+    public (Rank, File) RankFile
+        => (Rank, File);
 
-    public bool IsOk => Value >= Squares.a1 && Value <= Squares.h8;
+    public bool IsOk
+        => Value >= Squares.a1 && Value <= Squares.h8;
 
-    public bool IsPromotionRank => !(BitBoards.PromotionRanksBB & this).IsEmpty;
+    public bool IsPromotionRank
+        => !(BitBoards.PromotionRanksBB & this).IsEmpty;
 
-    public bool IsDark => !(BitBoards.DarkSquares & this).IsEmpty;
+    public bool IsDark
+        => !(BitBoards.DarkSquares & this).IsEmpty;
 
     public static readonly Square None = new(Squares.none);
 

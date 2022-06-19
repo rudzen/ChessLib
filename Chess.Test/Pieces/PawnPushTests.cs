@@ -26,7 +26,6 @@ SOFTWARE.
 
 namespace Chess.Test.Pieces;
 
-using Rudz.Chess.Enums;
 using Rudz.Chess.Types;
 using Xunit;
 
@@ -35,8 +34,8 @@ public sealed class PawnPushTests
     [Fact]
     public void PawnPushNorth()
     {
-        BitBoard fullBoard = 0xffffffffffff00;
-        Direction direction = Directions.North;
+        var fullBoard = BitBoards.PawnSquares;
+        var direction = Direction.North;
 
         const int expected = 1;
 
@@ -51,8 +50,8 @@ public sealed class PawnPushTests
     [Fact]
     public void PawnPushSouth()
     {
-        BitBoard fullBoard = 0xffffffffffff00;
-        Direction direction = Directions.South;
+        var fullBoard = BitBoards.PawnSquares;
+        var direction = Direction.South;
 
         const int expected = 1;
 
@@ -68,13 +67,13 @@ public sealed class PawnPushTests
     public void PawnDoublePushNorth()
     {
         var fullBoard = BitBoards.RANK2;
-        Direction direction = Directions.North;
+        var direction = Direction.NorthDouble;
 
         const int expected = 2;
 
         foreach (var sq in fullBoard)
         {
-            var toSq = sq + 2 * direction;
+            var toSq = sq + direction;
             var actual = sq.Distance(toSq);
             Assert.Equal(expected, actual);
         }
@@ -84,13 +83,13 @@ public sealed class PawnPushTests
     public void PawnDoublePushSouth()
     {
         var fullBoard = BitBoards.RANK7;
-        Direction direction = Directions.South;
+        var direction = Direction.SouthDouble;
 
         const int expected = 2;
 
         foreach (var sq in fullBoard)
         {
-            var toSq = sq + 2 * direction;
+            var toSq = sq + direction;
             var actual = sq.Distance(toSq);
             Assert.Equal(expected, actual);
         }

@@ -49,6 +49,8 @@ public interface IUci
 
     Move MoveFromUci(IPosition pos, string uciMove);
 
+    IEnumerable<Move> MovesFromUci(IPosition pos, Stack<State> states, IEnumerable<string> moves);
+
     string UciOk();
 
     string ReadyOk();

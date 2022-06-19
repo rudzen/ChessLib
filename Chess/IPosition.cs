@@ -68,13 +68,13 @@ public interface IPosition : IEnumerable<Piece>
 
     void Clear();
 
-    void AddPiece(Piece pc, Square sq);
+    void AddPiece(in Piece pc, in Square sq);
 
-    void MakeMove(Move m, State newState);
+    void MakeMove(Move m, in State newState);
 
-    void MakeMove(Move m, State newState, bool givesCheck);
+    void MakeMove(Move m, in State newState, bool givesCheck);
 
-    void MakeNullMove(State newState);
+    void MakeNullMove(in State newState);
 
     void TakeMove(Move m);
 
@@ -128,7 +128,7 @@ public interface IPosition : IEnumerable<Piece>
 
     void RemovePiece(Square sq);
 
-    BitBoard AttacksTo(Square sq, BitBoard occupied);
+    BitBoard AttacksTo(Square sq, in BitBoard occupied);
 
     BitBoard AttacksTo(Square sq);
 
@@ -156,17 +156,17 @@ public interface IPosition : IEnumerable<Piece>
 
     FenData GenerateFen();
 
-    void SetFen(FenData fen, bool validate = false);
+    void SetFen(in FenData fen, bool validate = false);
 
     HashKey GetPiecesKey();
 
     HashKey GetPawnKey();
 
-    BitBoard GetAttacks(Square sq, PieceTypes pt, BitBoard occupied);
+    BitBoard GetAttacks(Square sq, PieceTypes pt, in BitBoard occupied);
 
     BitBoard GetAttacks(Square sq, PieceTypes pt);
 
-    void MoveToString(Move m, StringBuilder output);
+    void MoveToString(Move m, in StringBuilder output);
 
     bool HasGameCycle(int ply);
 

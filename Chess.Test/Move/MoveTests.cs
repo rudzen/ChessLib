@@ -139,7 +139,7 @@ public sealed class MoveTests
         {
             result.Clear();
             result.Append(' ');
-            game.Pos.MoveToString(moves[i], result);
+            game.Pos.MoveToString(moves[i], in result);
             Assert.Equal(result.ToString(), movesString[i].ToString());
         }
     }

@@ -37,7 +37,7 @@ public sealed class PositionValidator : IPositionValidator
     private readonly IBoard _board;
     private readonly IPosition _pos;
 
-    public PositionValidator(IPosition pos, IBoard board)
+    public PositionValidator(in IPosition pos, in IBoard board)
     {
         _pos = pos;
         _board = board;

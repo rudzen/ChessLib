@@ -117,7 +117,7 @@ public sealed class PieceAttacksRookTests : PieceAttacksSliders
 
         foreach (var square in border)
         {
-            var attacks = pos.GetAttacks(square, PieceTypes.Rook, borderInner);
+            var attacks = pos.GetAttacks(square, PieceTypes.Rook, in borderInner);
             attacks.IsEmpty.Should().BeFalse();
             var expected = corners & square ? expectedCorner : expectedSide;
             var actual = attacks.Count;

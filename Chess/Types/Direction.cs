@@ -32,6 +32,32 @@ using System.Runtime.CompilerServices;
 
 public readonly struct Direction : IEquatable<Direction>
 {
+    public static Direction North { get; } = new(Directions.North);
+
+    public static Direction South { get; } = new(Directions.South);
+
+    public static Direction East { get; } = new(Directions.East);
+
+    public static Direction West { get; } = new(Directions.West);
+
+    public static Direction NorthEast { get; } = new(Directions.NorthEast);
+
+    public static Direction NorthWest { get; } = new(Directions.NorthWest);
+
+    public static Direction SouthEast { get; } = new(Directions.SouthEast);
+
+    public static Direction SouthWest { get; } = new(Directions.SouthWest);
+
+    public static Direction NorthDouble { get; } = new(Directions.NorthDouble);
+
+    public static Direction SouthDouble { get; } = new(Directions.SouthDouble);
+
+    public static Direction SouthFill { get; } = new(Directions.SouthFill);
+
+    public static Direction NorthFill { get; } = new(Directions.NorthFill);
+
+    public static Direction None { get; } = new(Directions.NoDirection);
+
     public Directions Value { get; }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

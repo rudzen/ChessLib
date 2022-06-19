@@ -185,23 +185,22 @@ public static class Fen
 
     private static (int, int) CountSpacesAndSeparators(ReadOnlySpan<char> str)
     {
-        var spaceCount = 0;
-        var separatorCount = 0;
+        var result = (spaceCount: 0, separatorCount: 0);
 
         foreach (var c in str)
         {
             switch (c)
             {
                 case Separator:
-                    separatorCount++;
+                    result.separatorCount++;
                     break;
 
                 case Space:
-                    spaceCount++;
+                    result.spaceCount++;
                     break;
             }
         }
 
-        return (spaceCount, separatorCount);
+        return result;
     }
 }

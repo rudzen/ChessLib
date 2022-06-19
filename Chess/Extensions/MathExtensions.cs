@@ -37,7 +37,7 @@ public static class MathExtensions
     public static bool InBetween(this int v, int min, int max) => (uint)v - (uint)min <= (uint)max - (uint)min;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool InBetween(this byte v, byte min, byte max) => (uint)v - (uint)min <= (uint)max - (uint)min;
+    public static bool InBetween(this byte v, byte min, byte max) => v - (uint)min <= max - (uint)min;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool InBetween(this char v, char min, char max) => v - (uint)min <= max - min;

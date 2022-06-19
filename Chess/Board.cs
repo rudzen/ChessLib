@@ -87,7 +87,7 @@ public sealed class Board : IBoard
     public bool IsEmpty(Square sq)
         => _pieces[sq.AsInt()] == Piece.EmptyPiece;
 
-    public void AddPiece(Piece pc, Square sq)
+    public void AddPiece(in Piece pc, in Square sq)
     {
         _pieces[sq.AsInt()] = pc;
         _byType[PieceTypes.AllPieces.AsInt()] |= sq;

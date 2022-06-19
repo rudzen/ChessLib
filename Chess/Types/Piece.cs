@@ -133,12 +133,12 @@ public readonly struct Piece : IEquatable<Piece>
         return character switch
         {
             'P' => Pieces.WhitePawn,
+            'p' => Pieces.BlackPawn,
             'N' => Pieces.WhiteKnight,
             'B' => Pieces.WhiteBishop,
             'R' => Pieces.WhiteRook,
             'Q' => Pieces.WhiteQueen,
             'K' => Pieces.WhiteKing,
-            'p' => Pieces.BlackPawn,
             'n' => Pieces.BlackKnight,
             'b' => Pieces.BlackBishop,
             'r' => Pieces.BlackRook,

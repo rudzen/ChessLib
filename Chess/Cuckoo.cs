@@ -95,7 +95,7 @@ public static class Cuckoo
         Debug.Assert(count == 3668);
     }
 
-    public static bool HashCuckooCycle(IPosition pos, int end, int ply)
+    public static bool HashCuckooCycle(in IPosition pos, int end, int ply)
     {
         var state = pos.State;
         var originalKey = state.Key;
