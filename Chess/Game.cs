@@ -71,7 +71,12 @@ public sealed class Game : IGame
     public bool IsRepetition => Pos.IsRepetition;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void NewGame(string fen = Fen.Fen.StartPositionFen) => Pos.SetFen(new FenData(fen), true);
+    public void NewGame(string fen = Fen.Fen.StartPositionFen)
+    {
+        var fenData = new FenData(fen);
+        var state = new State();
+        Pos.Set(in fenData, ChessMode.NORMAL, in state, true);
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public FenData GetFen() => Pos.GenerateFen();

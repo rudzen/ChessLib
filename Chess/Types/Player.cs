@@ -43,6 +43,8 @@ public readonly struct Player : IEquatable<Player>
 
     private static readonly string[] PlayerColors = { "White", "Black" };
 
+    private static readonly char[] PlayerFen = { 'w', 'b' };
+
     private static readonly Func<BitBoard, BitBoard>[] PawnPushModifiers = { BitBoards.NorthOne, BitBoards.SouthOne };
 
     public Player(byte side)
@@ -59,6 +61,8 @@ public readonly struct Player : IEquatable<Player>
     public bool IsWhite => Side == 0;
 
     public bool IsBlack => Side != 0;
+
+    public char Fen => PlayerFen[Side];
 
     public static readonly Player White = 0;
 

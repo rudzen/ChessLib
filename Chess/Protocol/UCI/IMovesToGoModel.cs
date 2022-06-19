@@ -32,15 +32,9 @@ public interface IMovesToGoModel
 {
     ulong BlackTimeMilliseconds { get; set; }
 
-    int[] MovesToGo { get; set; }
-
-    int WhiteMovesToGo { get; set; }
-
-    int BlackMovesToGo { get; set; }
+    int MovesToGo { get; set; }
 
     ulong WhiteTimeMilliseconds { get; set; }
-
-    int this[Player index] { get; set; }
 
     ulong Time(Player player);
 }

@@ -36,7 +36,7 @@ using Types;
 
 public class Uci : IUci
 {
-    private static readonly OptionComparer OptionComparer = new OptionComparer();
+    private static readonly OptionComparer OptionComparer = new();
 
     private static readonly string[] OptionTypeStrings = Enum.GetNames(typeof(UciOptionType));
 

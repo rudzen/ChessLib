@@ -30,7 +30,8 @@ public class FenBenchmark
         for (var i = 0; i < N; ++i)
         {
             var fp = new FenData(F);
-            _game.Pos.SetFen(fp);
+            var state = new State();
+            _game.Pos.Set(in fp, Rudz.Chess.Enums.ChessMode.NORMAL, in state);
         }
     }
 
@@ -40,7 +41,8 @@ public class FenBenchmark
         for (var i = 0; i < N; ++i)
         {
             var fp = new FenData(F);
-            _game.Pos.SetFen(fp);
+            var state = new State();
+            _game.Pos.Set(in fp, Rudz.Chess.Enums.ChessMode.NORMAL, in state);
         }
     }
 }

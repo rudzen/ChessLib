@@ -18,6 +18,7 @@
     <PackageProjectUrl>http://github.com/rudzen/chesslib</PackageProjectUrl>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <Nullable>disable</Nullable>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(IsWindows)'=='true'">

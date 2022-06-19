@@ -75,7 +75,7 @@ public sealed class Position : IPosition
     public BitBoard Checkers
         => State.Checkers;
 
-    public bool Chess960 { get; set; }
+    public ChessMode ChessMode { get; set; }
 
     public Square EnPassantSquare
         => State.EnPassantSquare;
@@ -192,11 +192,10 @@ public sealed class Position : IPosition
         _castlingRightsMask.Fill(CastlelingRights.None);
         _castlingRookSquare.Fill(Square.None);
         _sideToMove = Players.White;
-        Chess960 = false;
+        ChessMode = ChessMode.NORMAL;
+
         if (State == null)
             State = new State();
-        else
-            State.Clear();
     }
 
     /// <summary>
@@ -233,16 +232,16 @@ public sealed class Position : IPosition
         else
         {
             if (CanCastle(CastlelingRights.WhiteOo))
-                sb.Append(Chess960 ? CastlingRookSquare(CastlelingRights.WhiteOo).FileChar : 'K');
+                sb.Append(ChessMode == ChessMode.CHESS_960 ? CastlingRookSquare(CastlelingRights.WhiteOo).FileChar : 'K');
 
             if (CanCastle(CastlelingRights.WhiteOoo))
-                sb.Append(Chess960 ? CastlingRookSquare(CastlelingRights.WhiteOoo).FileChar : 'Q');
+                sb.Append(ChessMode == ChessMode.CHESS_960 ? CastlingRookSquare(CastlelingRights.WhiteOoo).FileChar : 'Q');
 
             if (CanCastle(CastlelingRights.BlackOo))
-                sb.Append(Chess960 ? CastlingRookSquare(CastlelingRights.BlackOo).FileChar : 'k');
+                sb.Append(ChessMode == ChessMode.CHESS_960 ? CastlingRookSquare(CastlelingRights.BlackOo).FileChar : 'k');
 
             if (CanCastle(CastlelingRights.BlackOoo))
-                sb.Append(Chess960 ? CastlingRookSquare(CastlelingRights.BlackOoo).FileChar : 'q');
+                sb.Append(ChessMode == ChessMode.CHESS_960 ? CastlingRookSquare(CastlelingRights.BlackOoo).FileChar : 'q');
         }
 
         sb.Append(' ');
@@ -446,7 +445,7 @@ public sealed class Position : IPosition
             // In case of Chess960, verify that when moving the castling rook we do not discover
             // some hidden checker. For instance an enemy queen in SQ_A1 when castling rook is
             // in SQ_B1.
-            return !Chess960 || (GetAttacks(
+            return ChessMode == ChessMode.NORMAL || (GetAttacks(
                 to,
                 PieceTypes.Rook,
                 Board.Pieces() ^ m.ToSquare()) & Board.Pieces(~us, PieceTypes.Rook, PieceTypes.Queen)
@@ -754,7 +753,7 @@ public sealed class Position : IPosition
         var from = m.FromSquare();
         var to = m.ToSquare();
 
-        if (m.IsCastlelingMove() && !Chess960)
+        if (m.IsCastlelingMove() && ChessMode == ChessMode.NORMAL)
         {
             var file = to > from ? Files.FileG : Files.FileC;
             to = new Square(from.Rank, file);
@@ -929,11 +928,116 @@ public sealed class Position : IPosition
         return res > 0;
     }
 
+    private void SetupPieces(ReadOnlySpan<char> fenChunk)
+    {
+        var f = 1; // file (column)
+        var r = 8; // rank (row)
+
+        foreach (var c in fenChunk)
+        {
+            if (char.IsNumber(c))
+                f += c - '0';
+            else if (c == '/')
+            {
+                r--;
+                f = 1;
+            }
+            else
+            {
+                var pieceIndex = PieceExtensions.PieceChars.IndexOf(c);
+
+                Player player = char.IsLower(PieceExtensions.PieceChars[pieceIndex]);
+
+                var square = new Square(r - 1, f - 1);
+
+                var pc = ((PieceTypes)pieceIndex).MakePiece(player);
+                AddPiece(in pc, in square);
+
+                f++;
+            }
+        }
+    }
+
+    private void SetupPlayer(ReadOnlySpan<char> fenChunk)
+    {
+        _sideToMove = (fenChunk[0] != 'w').ToInt();
+    }
+
+    private void SetupEnPassant(ReadOnlySpan<char> fenChunk)
+    {
+        var enpassant = fenChunk.Length == 2
+            && fenChunk[0] != '-'
+            && fenChunk[0].InBetween('a', 'h')
+            && fenChunk[1] == (_sideToMove.IsWhite ? '6' : '3');
+
+        if (enpassant)
+        {
+            State.EnPassantSquare = new Square(fenChunk[1] - '1', fenChunk[0] - 'a');
+
+            var otherSide = ~_sideToMove;
+
+            enpassant = !(BitBoards.PawnAttack(State.EnPassantSquare, otherSide) & Pieces(PieceTypes.Pawn, _sideToMove)).IsEmpty
+                && !(Pieces(PieceTypes.Pawn, otherSide) & (State.EnPassantSquare + otherSide.PawnPushDistance())).IsEmpty
+                && (Pieces() & (State.EnPassantSquare | (State.EnPassantSquare + _sideToMove.PawnPushDistance()))).IsEmpty;
+        }
+
+        if (!enpassant)
+            State.EnPassantSquare = Square.None;
+    }
+
+    private void SetupMoveNumber(FenData fenData)
+    {
+        var moveNum = 0;
+        var halfMoveNum = 0;
+
+        var chunk = fenData.Chunk();
+
+        if (!chunk.IsEmpty)
+        {
+            chunk.ToIntegral(out halfMoveNum);
+
+            // half move number
+            chunk = fenData.Chunk();
+
+            chunk.ToIntegral(out moveNum);
+
+            if (moveNum > 0)
+                moveNum--;
+        }
+
+        State.Rule50 = halfMoveNum;
+        Ply = moveNum;
+    }
+
     /// <summary>
-    /// Apply a FEN string board setup to the board structure.
+    /// Apply FEN to this position.
+    /// 
     /// </summary>
-    /// <param name="fen">The fen data to set</param>
-    /// <param name="validate">If true, the fen string is validated, otherwise not</param>
+    /// <param name="fenData">The fen data to set</param>
+    /// <param name="chessMode">The chessmode to apply</param>
+    /// <param name="state">State reference to use. Allows to keep track of states if pre-created (i.e. in a stack) before engine search start</param>
+    /// <param name="validate">If true, the fen should be validated, otherwise not</param>
+    public void Set(in FenData fenData, ChessMode chessMode, in State state, bool validate = false)
+    {
+        if (validate)
+            Fen.Fen.Validate(fenData.Fen.ToString());
+
+        Clear();
+
+        state.CopyTo(State);
+
+        SetupPieces(fenData.Chunk());
+        SetupPlayer(fenData.Chunk());
+        SetupCastleling(fenData.Chunk());
+        SetupEnPassant(fenData.Chunk());
+        SetupMoveNumber(fenData);
+
+        ChessMode = chessMode;
+
+        SetState();
+    }
+
+
     public void SetFen(in FenData fen, bool validate = false)
     {
         if (validate)

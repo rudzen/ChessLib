@@ -40,7 +40,7 @@ public interface IPosition : IEnumerable<Piece>
 
     Action<Piece, Square> PieceUpdated { get; set; }
 
-    bool Chess960 { get; set; }
+    ChessMode ChessMode { get; set; }
 
     Player SideToMove { get; }
 
@@ -156,7 +156,7 @@ public interface IPosition : IEnumerable<Piece>
 
     FenData GenerateFen();
 
-    void SetFen(in FenData fen, bool validate = false);
+    void Set(in FenData fenData, ChessMode chessMode, in State state, bool validate = false);
 
     HashKey GetPiecesKey();
 

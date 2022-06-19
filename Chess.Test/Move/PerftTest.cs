@@ -158,22 +158,4 @@ public sealed class PerftTest
             Assert.Equal(expected, actual);
         }
     }
-
-    [Fact]
-    public async Task PerftFull2()
-    {
-        foreach (var perftPosition in Positions)
-        {
-            var perft = PerftFactory.Create();
-            perft.AddPosition(perftPosition);
-            var expected = perft.GetPositionCount(0, Positions.Count);
-            var perftResult = perft.DoPerft(Positions.Count);
-
-            var actual = 0ul;
-            await foreach (var result in perftResult.ConfigureAwait(false))
-                actual += result;
-
-            Assert.Equal(expected, actual);
-        }
-    }
 }

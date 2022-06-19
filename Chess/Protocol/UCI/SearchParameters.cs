@@ -41,13 +41,16 @@ public sealed class SearchParameters : ISearchParameters
 
     private readonly ulong[] _inc;
 
+    private readonly IList<Move> _searchMoves;
+
     private readonly StringBuilder _output = new(256);
+
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public SearchParameters()
     {
         _time = _inc = new ulong[2];
-        MovesToGo = new int[2];
+        _searchMoves = new List<Move>();
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -71,10 +74,9 @@ public sealed class SearchParameters : ISearchParameters
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public SearchParameters(ulong whiteTimeMilliseconds, ulong blackTimeMilliseconds, ulong whiteIncrementTimeMilliseconds, ulong blackIncrementTimeMilliseconds, IReadOnlyList<int> movesToGo, int moveTime)
+    public SearchParameters(ulong whiteTimeMilliseconds, ulong blackTimeMilliseconds, ulong whiteIncrementTimeMilliseconds, ulong blackIncrementTimeMilliseconds, int moveTime)
         : this(whiteTimeMilliseconds, blackTimeMilliseconds, whiteIncrementTimeMilliseconds, blackIncrementTimeMilliseconds)
     {
-        MovesToGo = new[] { movesToGo[0], movesToGo[1] };
         MoveTime = moveTime;
     }
 
@@ -82,7 +84,9 @@ public sealed class SearchParameters : ISearchParameters
 
     public int MoveTime { get; set; }
 
-    public int[] MovesToGo { get; set; }
+    public int MovesToGo { get; set; }
+
+    public int Depth { get; set; }
 
     public ulong WhiteTimeMilliseconds
     {
@@ -119,7 +123,6 @@ public sealed class SearchParameters : ISearchParameters
     {
         _time.Clear();
         _inc.Clear();
-        MovesToGo.Clear();
         MoveTime = 0;
         Infinite = false;
     }
@@ -150,15 +153,20 @@ public sealed class SearchParameters : ISearchParameters
 
         _output.AppendFormat(incFormatString, WhiteIncrementTimeMilliseconds, BlackIncrementTimeMilliseconds);
 
-        if (MovesToGo[side.Side] > 0)
+        if (MovesToGo > 0)
         {
             _output.Append(" movestogo ");
-            _output.Append(MovesToGo[side.Side]);
+            _output.Append(MovesToGo);
         }
 
         return _output.ToString();
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool DecreaseMovesToGo(Player side) => --MovesToGo[side.Side] == 0;
+    public bool DecreaseMovesToGo() => --MovesToGo == 0;
+
+    public void AddSearchMove(Move move)
+    {
+        _searchMoves.Add(move);
+    }
 }

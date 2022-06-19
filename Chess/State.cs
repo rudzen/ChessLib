@@ -44,26 +44,31 @@ public sealed class State : IEquatable<State>
 
     public int Rule50 { get; set; }
 
-    public HashKey Key { get; set; }
-
     public CastlelingRights CastlelingRights { get; set; }
 
     public Square EnPassantSquare { get; set; }
 
-    public Piece CapturedPiece { get; set; }
+    public HashKey Key { get; set; }
 
-    public BitBoard[] BlockersForKing { get; set; }
-
-    public BitBoard[] Pinners { get; set; }
+    // -----------------------------
+    // Properties below this point are not copied from other state
+    // since they are always recomputed
+    // -----------------------------
 
     /// <summary>
     /// Represents checked squares for side to move
     /// </summary>
     public BitBoard Checkers { get; set; }
 
+    public State Previous { get; set; }
+
+    public BitBoard[] BlockersForKing { get; set; }
+
+    public BitBoard[] Pinners { get; set; }
+
     public BitBoard[] CheckedSquares { get; set; }
 
-    public State Previous { get; set; }
+    public Piece CapturedPiece { get; set; }
 
     public int Repetition { get; set; }
 
@@ -78,26 +83,26 @@ public sealed class State : IEquatable<State>
         Rule50 = other.Rule50;
         PliesFromNull = other.PliesFromNull;
         EnPassantSquare = other.EnPassantSquare;
-        NonPawnMaterial = new Value[2];
-        Array.Copy(other.NonPawnMaterial, NonPawnMaterial, other.NonPawnMaterial.Length);
+        NonPawnMaterial = new Value[] { other.NonPawnMaterial[0], other.NonPawnMaterial[1] };
         Previous = other;
 
-        CheckedSquares = new BitBoard[PieceTypes.PieceTypeNb.AsInt()];
-        Pinners = new BitBoard[2];
+        Checkers = BitBoard.Empty;
         BlockersForKing = new BitBoard[2];
+        Pinners = new BitBoard[2];
+        CheckedSquares = new BitBoard[PieceTypes.PieceTypeNb.AsInt()];
+        CapturedPiece = Piece.EmptyPiece;
     }
 
     public State()
     {
         LastMove = Move.EmptyMove;
-        NonPawnMaterial = new Value[2];
-        Array.Fill(NonPawnMaterial, Value.ValueZero);
+        NonPawnMaterial = new Value[] { Value.ValueZero, Value.ValueZero };
         CastlelingRights = CastlelingRights.None;
         EnPassantSquare = Square.None;
         Checkers = BitBoard.Empty;
         CheckedSquares = new BitBoard[PieceTypes.PieceTypeNb.AsInt()];
-        Pinners = new BitBoard[2];
-        BlockersForKing = new BitBoard[2];
+        Pinners = new BitBoard[] { BitBoard.Empty, BitBoard.Empty };
+        BlockersForKing = new BitBoard[] { BitBoard.Empty, BitBoard.Empty };
         CapturedPiece = Piece.EmptyPiece;
     }
 
@@ -115,9 +120,13 @@ public sealed class State : IEquatable<State>
         Array.Copy(NonPawnMaterial, other.NonPawnMaterial, NonPawnMaterial.Length);
 
         // initialize the rest of the values
-        other.CheckedSquares = new BitBoard[PieceTypes.PieceTypeNb.AsInt()];
-        other.Pinners = new BitBoard[2];
-        other.BlockersForKing = new BitBoard[2];
+        if (other.CheckedSquares == null)
+            other.CheckedSquares = new BitBoard[PieceTypes.PieceTypeNb.AsInt()];
+        else
+            other.CheckedSquares.Fill(BitBoard.Empty);
+
+        other.Pinners = new BitBoard[] { BitBoard.Empty, BitBoard.Empty };
+        other.BlockersForKing = new BitBoard[] { BitBoard.Empty, BitBoard.Empty };
 
         return other;
     }
@@ -162,14 +171,13 @@ public sealed class State : IEquatable<State>
     public bool Equals(State other)
     {
         if (other is null) return false;
-        // if (ReferenceEquals(this, other)) return true;
         return LastMove.Equals(other.LastMove)
                && Key.Equals(other.Key)
                && PawnStructureKey.Equals(other.PawnStructureKey)
                && EnPassantSquare.Equals(other.EnPassantSquare)
                && CastlelingRights == other.CastlelingRights
-               && NonPawnMaterial.First() == other.NonPawnMaterial.First()
-               && NonPawnMaterial.Last() == other.NonPawnMaterial.Last()
+               && NonPawnMaterial[0] == other.NonPawnMaterial[0]
+               && NonPawnMaterial[1] == other.NonPawnMaterial[1]
                && PliesFromNull == other.PliesFromNull
                && Rule50 == other.Rule50
                && Pinners.Equals(other.Pinners)
