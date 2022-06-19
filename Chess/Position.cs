@@ -206,33 +206,21 @@ public sealed class Position : IPosition
     public FenData GenerateFen()
     {
         var sb = new StringBuilder(Fen.Fen.MaxFenLen);
+        int empty;
 
         for (var rank = Ranks.Rank8; rank >= Ranks.Rank1; rank--)
         {
-            var empty = 0;
-
-            for (var file = Files.FileA; file < Files.FileNb; file++)
+            for (var file = Files.FileA; file <= Files.FileH; file++)
             {
-                var square = new Square(rank, file);
-                var piece = Board.PieceAt(square);
-
-                if (piece == Piece.EmptyPiece)
-                {
-                    empty++;
-                    continue;
-                }
+                for (empty = 0; file <= Files.FileH && Board.IsEmpty(new Square(rank, file)); ++file)
+                    ++empty;
 
                 if (empty != 0)
-                {
                     sb.Append(empty);
-                    empty = 0;
-                }
 
-                sb.Append(piece.GetPieceChar());
+                if (file <= Files.FileH)
+                    sb.Append(Board.PieceAt(new Square(rank, file)).GetPieceChar());
             }
-
-            if (empty != 0)
-                sb.Append(empty);
 
             if (rank > Ranks.Rank1)
                 sb.Append('/');
@@ -240,57 +228,32 @@ public sealed class Position : IPosition
 
         sb.Append(_sideToMove.IsWhite ? " w " : " b ");
 
-        var castleRights = State.CastlelingRights;
-
-        if (castleRights != CastlelingRights.None)
-        {
-            char castlelingChar;
-
-            if (castleRights.HasFlagFast(CastlelingRights.WhiteOo))
-            {
-                castlelingChar = Chess960
-                    ? CastlingRookSquare(CastlelingRights.WhiteOo).FileChar
-                    : 'K';
-                sb.Append(castlelingChar);
-            }
-
-            if (castleRights.HasFlagFast(CastlelingRights.WhiteOoo))
-            {
-                castlelingChar = Chess960
-                    ? CastlingRookSquare(CastlelingRights.WhiteOoo).FileChar
-                    : 'Q';
-                sb.Append(castlelingChar);
-            }
-
-            if (castleRights.HasFlagFast(CastlelingRights.BlackOo))
-            {
-                castlelingChar = Chess960
-                    ? CastlingRookSquare(CastlelingRights.BlackOo).FileChar
-                    : 'k';
-                sb.Append(castlelingChar);
-            }
-
-            if (castleRights.HasFlagFast(CastlelingRights.BlackOoo))
-            {
-                castlelingChar = Chess960
-                    ? CastlingRookSquare(CastlelingRights.BlackOoo).FileChar
-                    : 'q';
-                sb.Append(castlelingChar);
-            }
-        }
-        else
+        if (State.CastlelingRights == CastlelingRights.None)
             sb.Append('-');
+        else
+        {
+            if (CanCastle(CastlelingRights.WhiteOo))
+                sb.Append(Chess960 ? CastlingRookSquare(CastlelingRights.WhiteOo).FileChar : 'K');
+
+            if (CanCastle(CastlelingRights.WhiteOoo))
+                sb.Append(Chess960 ? CastlingRookSquare(CastlelingRights.WhiteOoo).FileChar : 'Q');
+
+            if (CanCastle(CastlelingRights.BlackOo))
+                sb.Append(Chess960 ? CastlingRookSquare(CastlelingRights.BlackOo).FileChar : 'k');
+
+            if (CanCastle(CastlelingRights.BlackOoo))
+                sb.Append(Chess960 ? CastlingRookSquare(CastlelingRights.BlackOoo).FileChar : 'q');
+        }
 
         sb.Append(' ');
-
         if (State.EnPassantSquare == Square.None)
             sb.Append('-');
         else
             sb.Append(State.EnPassantSquare.ToString());
 
         sb.Append(' ');
-
         sb.Append(State.Rule50);
+
         sb.Append(' ');
         sb.Append(1 + (Ply - _sideToMove.IsBlack.AsByte() / 2));
 
