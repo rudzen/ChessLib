@@ -600,6 +600,15 @@ public static class BitBoards
         throw new ArgumentException("Invalid shift argument.", nameof(direction));
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static BitBoard PawnAttackBB(this in BitBoard bb, Player c)
+    {
+        var (northWest, northEast) = c == Player.White
+            ? (Direction.NorthWest, Direction.NorthEast)
+            : (Direction.SouthWest, Direction.SouthEast);
+        return bb.Shift(northWest) | bb.Shift(northEast);
+    }
+
     /* non extension methods */
 
     /// <summary>
