@@ -67,6 +67,10 @@ public sealed class FenData : EventArgs, IFenData
     public FenData(string fen) : this(fen.AsMemory())
     { }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static implicit operator FenData(string value)
+    => new(value);
+
     public int Index { get; private set; }
 
     public ReadOnlyMemory<char> Fen { get; }

@@ -29,7 +29,6 @@ namespace Rudz.Chess;
 using Enums;
 using Extensions;
 using System;
-using System.Linq;
 using Types;
 
 public sealed class State : IEquatable<State>
@@ -50,6 +49,8 @@ public sealed class State : IEquatable<State>
 
     public Square EnPassantSquare { get; set; }
 
+    public State Previous { get; set; }
+
     // -----------------------------
     // Properties below this point are not copied from other state
     // since they are always recomputed
@@ -61,8 +62,6 @@ public sealed class State : IEquatable<State>
     /// Represents checked squares for side to move
     /// </summary>
     public BitBoard Checkers { get; set; }
-
-    public State Previous { get; set; }
 
     public BitBoard[] BlockersForKing { get; set; }
 
@@ -140,12 +139,13 @@ public sealed class State : IEquatable<State>
         LastMove = Move.EmptyMove;
         NonPawnMaterial.Clear();
         PawnStructureKey = Key = MaterialKey = 0UL;
-        PliesFromNull = Repetition = 0;
+        PliesFromNull = 0;
+        Repetition = 0;
         CastlelingRights = CastlelingRights.None;
         EnPassantSquare = Square.None;
         CheckedSquares.Fill(BitBoard.Empty);
-        Pinners.Fill(BitBoard.Empty);
-        BlockersForKing.Fill(BitBoard.Empty);
+        Pinners[0] = Pinners[1] = BitBoard.Empty;
+        BlockersForKing[0] = BlockersForKing[1] = BitBoard.Empty;
         CapturedPiece = Piece.EmptyPiece;
         Previous = null;
     }
@@ -199,10 +199,11 @@ public sealed class State : IEquatable<State>
         hashCode.Add(LastMove);
         hashCode.Add(NonPawnMaterial);
         hashCode.Add(PawnStructureKey);
+        hashCode.Add(MaterialKey);
         hashCode.Add(PliesFromNull);
         hashCode.Add(Rule50);
         hashCode.Add(Key);
-        hashCode.Add((int)CastlelingRights);
+        hashCode.Add(CastlelingRights.AsInt());
         hashCode.Add(EnPassantSquare);
         hashCode.Add(Checkers);
         hashCode.Add(Previous);

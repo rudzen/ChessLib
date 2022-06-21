@@ -140,6 +140,8 @@ public interface IPosition : IEnumerable<Piece>
 
     bool AttackedByKing(Square sq, Player c);
 
+    BitBoard AttacksBy(PieceTypes pt, Player c);
+
     bool CanCastle(CastlelingRights cr);
 
     bool CanCastle(Player c);

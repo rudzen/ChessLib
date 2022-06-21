@@ -31,8 +31,6 @@ using Types;
 
 public interface IKillerMoves : IEquatable<IKillerMoves>
 {
-    void Initialize(int maxDepth);
-
     int GetValue(int depth, Move move, Piece fromPiece);
 
     IPieceSquare Get(int depth, int index);

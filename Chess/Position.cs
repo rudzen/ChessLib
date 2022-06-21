@@ -143,6 +143,21 @@ public sealed class Position : IPosition
         return (Board.Pieces(c, PieceTypes.Queen) & (bishopAttacks | rookAttacks)) != 0;
     }
 
+    public BitBoard AttacksBy(PieceTypes pt, Player c)
+    {
+        var attackers = Pieces(pt, c);
+
+        if (pt == PieceTypes.Pawn)
+            return attackers.PawnAttackBB(c);
+        else
+        {
+            var threats = BitBoard.Empty;
+            while (attackers)
+                threats |= GetAttacks(BitBoards.PopLsb(ref attackers), pt);
+            return threats;
+        }
+    }
+
     public BitBoard AttacksTo(Square sq, in BitBoard occupied)
     {
         Debug.Assert(sq >= Enums.Squares.a1 && sq <= Enums.Squares.h8);
