@@ -34,18 +34,28 @@ using Types;
 public sealed class KillerMoves : IKillerMoves
 {
     private IPieceSquare[,] _killerMoves;
-    private int _maxDepth;
+    private readonly int _maxDepth;
 
-    public void Initialize(int maxDepth)
+    public static IKillerMoves Create(int maxDepth)
     {
-        _maxDepth = maxDepth;
-        _killerMoves = new IPieceSquare[maxDepth + 1, 2];
-        for (var depth = 0; depth <= maxDepth; depth++)
+        return new KillerMoves(maxDepth).Initialize();
+    }
+
+    public KillerMoves(int maxDepth)
+    {
+        _maxDepth = maxDepth + 1;
+    }
+
+    private IKillerMoves Initialize()
+    {
+        _killerMoves = new IPieceSquare[_maxDepth, 2];
+        for (var depth = 0; depth < _maxDepth; depth++)
         {
             _killerMoves[depth, 0] = new PieceSquare(Piece.EmptyPiece, Square.None);
             _killerMoves[depth, 1] = new PieceSquare(Piece.EmptyPiece, Square.None);
         }
         Reset();
+        return this;
     }
 
     public int GetValue(int depth, Move move, Piece fromPiece)
@@ -53,8 +63,7 @@ public sealed class KillerMoves : IKillerMoves
         if (Equals(_killerMoves[depth, 0], move, fromPiece))
             return 2;
 
-        var result = Equals(_killerMoves[depth, 1], move, fromPiece).AsByte();
-        return result;
+        return Equals(_killerMoves[depth, 1], move, fromPiece).AsByte();
     }
 
     public void UpdateValue(int depth, Move move, Piece fromPiece)
@@ -71,7 +80,7 @@ public sealed class KillerMoves : IKillerMoves
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private bool Equals(IPieceSquare killerMove, Move move, Piece fromPiece)
+    private static bool Equals(IPieceSquare killerMove, Move move, Piece fromPiece)
         => killerMove.Piece == fromPiece && killerMove.Square == move.ToSquare();
 
     public IPieceSquare Get(int depth, int index)
@@ -103,8 +112,8 @@ public sealed class KillerMoves : IKillerMoves
 
     public void Reset()
     {
-        Array.Clear(_killerMoves, 0, _killerMoves.Length);
-        for (var i = 0; i < _killerMoves.Length; i++)
+        //Array.Clear(_killerMoves, 0, _killerMoves.Length);
+        for (var i = 0; i < _maxDepth; i++)
         {
             _killerMoves[i, 0].Piece = Piece.EmptyPiece;
             _killerMoves[i, 0].Square = Square.None;

@@ -49,7 +49,7 @@ public interface IGame : IEnumerable<Piece>
 
     string ToString();
 
-    BitBoard OccupiedBySide(Player c);
+    BitBoard OccupiedBySide(in Player c);
 
     Player CurrentPlayer();
 

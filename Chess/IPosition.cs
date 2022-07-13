@@ -40,7 +40,7 @@ public interface IPosition : IEnumerable<Piece>
 
     Action<Piece, Square> PieceUpdated { get; set; }
 
-    bool Chess960 { get; set; }
+    ChessMode ChessMode { get; set; }
 
     Player SideToMove { get; }
 
@@ -68,13 +68,13 @@ public interface IPosition : IEnumerable<Piece>
 
     void Clear();
 
-    void AddPiece(Piece pc, Square sq);
+    void AddPiece(in Piece pc, in Square sq);
 
-    void MakeMove(Move m, State newState);
+    void MakeMove(Move m, in State newState);
 
-    void MakeMove(Move m, State newState, bool givesCheck);
+    void MakeMove(Move m, in State newState, bool givesCheck);
 
-    void MakeNullMove(State newState);
+    void MakeNullMove(in State newState);
 
     void TakeMove(Move m);
 
@@ -128,7 +128,7 @@ public interface IPosition : IEnumerable<Piece>
 
     void RemovePiece(Square sq);
 
-    BitBoard AttacksTo(Square sq, BitBoard occupied);
+    BitBoard AttacksTo(Square sq, in BitBoard occupied);
 
     BitBoard AttacksTo(Square sq);
 
@@ -139,6 +139,8 @@ public interface IPosition : IEnumerable<Piece>
     bool AttackedByPawn(Square sq, Player c);
 
     bool AttackedByKing(Square sq, Player c);
+
+    BitBoard AttacksBy(PieceTypes pt, Player c);
 
     bool CanCastle(CastlelingRights cr);
 
@@ -156,19 +158,23 @@ public interface IPosition : IEnumerable<Piece>
 
     FenData GenerateFen();
 
-    void SetFen(FenData fen, bool validate = false);
+    void Set(in FenData fenData, ChessMode chessMode, in State state, bool validate = false);
 
     HashKey GetPiecesKey();
 
     HashKey GetPawnKey();
 
-    BitBoard GetAttacks(Square sq, PieceTypes pt, BitBoard occupied);
+    BitBoard GetAttacks(Square sq, PieceTypes pt, in BitBoard occupied);
 
     BitBoard GetAttacks(Square sq, PieceTypes pt);
 
-    void MoveToString(Move m, StringBuilder output);
+    void MoveToString(Move m, in StringBuilder output);
 
     bool HasGameCycle(int ply);
+
+    bool HasRepetition();
+
+    bool IsDraw(int ply);
 
     bool SeeGe(Move m, Value threshold);
 

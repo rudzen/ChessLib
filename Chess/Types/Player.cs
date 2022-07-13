@@ -33,15 +33,17 @@ using System.Runtime.CompilerServices;
 
 public readonly struct Player : IEquatable<Player>
 {
-    private static readonly Direction[] PawnPushDist = { Directions.North, Directions.South };
+    private static readonly Direction[] PawnPushDist = { Direction.North, Direction.South };
 
-    private static readonly Direction[] PawnDoublePushDist = { Directions.NorthDouble, Directions.SouthDouble };
+    private static readonly Direction[] PawnDoublePushDist = { Direction.NorthDouble, Direction.SouthDouble };
 
-    private static readonly Direction[] PawnWestAttackDist = { Directions.NorthEast, Directions.SouthEast };
+    private static readonly Direction[] PawnWestAttackDist = { Direction.NorthEast, Direction.SouthEast };
 
-    private static readonly Direction[] PawnEastAttackDist = { Directions.NorthWest, Directions.SouthWest };
+    private static readonly Direction[] PawnEastAttackDist = { Direction.NorthWest, Direction.SouthWest };
 
     private static readonly string[] PlayerColors = { "White", "Black" };
+
+    private static readonly char[] PlayerFen = { 'w', 'b' };
 
     private static readonly Func<BitBoard, BitBoard>[] PawnPushModifiers = { BitBoards.NorthOne, BitBoards.SouthOne };
 
@@ -59,6 +61,8 @@ public readonly struct Player : IEquatable<Player>
     public bool IsWhite => Side == 0;
 
     public bool IsBlack => Side != 0;
+
+    public char Fen => PlayerFen[Side];
 
     public static readonly Player White = 0;
 

@@ -87,7 +87,7 @@ public sealed class Board : IBoard
     public bool IsEmpty(Square sq)
         => _pieces[sq.AsInt()] == Piece.EmptyPiece;
 
-    public void AddPiece(Piece pc, Square sq)
+    public void AddPiece(in Piece pc, in Square sq)
     {
         _pieces[sq.AsInt()] = pc;
         _byType[PieceTypes.AllPieces.AsInt()] |= sq;
@@ -170,11 +170,14 @@ public sealed class Board : IBoard
             : squares.AsSpan()[..idx];
     }
 
+    public int PieceCount(Piece pc)
+        => _pieceCount[pc.AsInt()];
+
     public int PieceCount(PieceTypes pt, Player c)
-        => _pieceCount[pt.MakePiece(c).AsInt()];
+        => PieceCount(pt.MakePiece(c));
 
     public int PieceCount(PieceTypes pt)
-        => _pieceCount[pt.MakePiece(Player.White).AsInt()] + _pieceCount[pt.MakePiece(Player.Black).AsInt()];
+        => PieceCount(pt.MakePiece(Player.White)) + PieceCount(pt.MakePiece(Player.Black));
 
     public int PieceCount()
         => PieceCount(PieceTypes.AllPieces);

@@ -64,7 +64,7 @@ public sealed class Blockage : IBlockage
     private BitBoard _fence;
     private BitBoard _processed;
 
-    public Blockage(IPosition pos)
+    public Blockage(in IPosition pos)
     {
         _pos = pos;
         _fenceRank = new Rank[(int)Files.FileNb];
@@ -129,16 +129,17 @@ public sealed class Blockage : IBlockage
                         return false;
 
                     if (f != Files.FileA
-                        && _pos.GetPiece(sq + Directions.West) != _ourPawn
+                        && _pos.GetPiece(sq + Direction.West) != _ourPawn
                         || BitBoards.PopCount(_ourPawns & PreviousFile(f)) > 1
-                        || (_fixedPawn & (sq + Directions.West)).IsEmpty
-                        || (_fence & (sq + Directions.West)).IsEmpty)
+                        || (_fixedPawn & (sq + Direction.West)).IsEmpty
+                        || (_fence & (sq + Direction.West)).IsEmpty)
                         return false;
+
                     if (f != Files.FileH
-                        && _pos.GetPiece(sq + Directions.East) != _ourPawn
+                        && _pos.GetPiece(sq + Direction.East) != _ourPawn
                         || BitBoards.PopCount(_ourPawns & NextFile(f)) > 1
-                        || (_fixedPawn & (sq + Directions.East)).IsEmpty
-                        || (_fence & (sq + Directions.East)).IsEmpty)
+                        || (_fixedPawn & (sq + Direction.East)).IsEmpty
+                        || (_fence & (sq + Direction.East)).IsEmpty)
                         return false;
                 }
 
@@ -178,13 +179,14 @@ public sealed class Blockage : IBlockage
                         return false;
 
                     if (f != Files.FileA
-                        && _pos.GetPiece(sq + Directions.West) != _ourPawn
+                        && _pos.GetPiece(sq + Direction.West) != _ourPawn
                         || BitBoards.PopCount(_ourPawns & (f - 1)) > 1
                         || (_fixedPawn & Square.Make(r, PreviousFile(f))).IsEmpty
                         || (_fence & Square.Make(r, PreviousFile(f))).IsEmpty)
                         return false;
+
                     if (f != Files.FileH
-                        && _pos.GetPiece(sq + Directions.East) != _ourPawn
+                        && _pos.GetPiece(sq + Direction.East) != _ourPawn
                         || BitBoards.PopCount(_ourPawns & (f + 1)) > 1
                         || (_fixedPawn & Square.Make(r, NextFile(f))).IsEmpty
                         || (_fence & Square.Make(r, NextFile(f))).IsEmpty)
@@ -243,8 +245,8 @@ public sealed class Blockage : IBlockage
     private void MarkTheirPawns()
     {
         var (southEast, southWest) = _us.IsWhite
-            ? (Directions.SouthEast, Directions.SouthWest)
-            : (Directions.NorthEast, Directions.NorthWest);
+            ? (Direction.SouthEast, Direction.SouthWest)
+            : (Direction.NorthEast, Direction.NorthWest);
 
         _marked |= _theirPawns.Shift(southEast) | _theirPawns.Shift(southWest);
     }
@@ -301,8 +303,8 @@ public sealed class Blockage : IBlockage
     {
         // reverse order of Down
         var down = them.IsBlack
-            ? Directions.South
-            : Directions.North;
+            ? Direction.South
+            : Direction.North;
 
         var result = BitBoard.Empty;
 

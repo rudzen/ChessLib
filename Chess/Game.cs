@@ -71,7 +71,12 @@ public sealed class Game : IGame
     public bool IsRepetition => Pos.IsRepetition;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void NewGame(string fen = Fen.Fen.StartPositionFen) => Pos.SetFen(new FenData(fen), true);
+    public void NewGame(string fen = Fen.Fen.StartPositionFen)
+    {
+        var fenData = new FenData(fen);
+        var state = new State();
+        Pos.Set(in fenData, ChessMode.NORMAL, in state, true);
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public FenData GetFen() => Pos.GenerateFen();
@@ -104,7 +109,7 @@ public sealed class Game : IGame
         => Pos.GetEnumerator();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public BitBoard OccupiedBySide(Player c)
+    public BitBoard OccupiedBySide(in Player c)
         => Pos.Pieces(c);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -136,7 +141,7 @@ public sealed class Game : IGame
         foreach (var em in ml)
         {
             move = em.Move;
-            Pos.MakeMove(move, state);
+            Pos.MakeMove(move, in state);
             tot += Perft(depth - 1);
             Pos.TakeMove(move);
         }

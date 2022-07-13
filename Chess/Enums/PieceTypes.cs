@@ -26,6 +26,7 @@ SOFTWARE.
 
 namespace Rudz.Chess.Enums;
 
+using System.Runtime.CompilerServices;
 using Types;
 
 public enum PieceTypes
@@ -43,9 +44,15 @@ public enum PieceTypes
 
 public static class PieceTypesExtensions
 {
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int AsInt(this PieceTypes p) => (int)p;
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Piece MakePiece(this PieceTypes @this, Player side) => (int)@this | (side.Side << 3);
 
-    public static bool IsSlider(this PieceTypes @this) => @this == PieceTypes.Bishop | @this == PieceTypes.Rook | @this == PieceTypes.Queen;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool IsSlider(this PieceTypes @this) => @this.InBetween(PieceTypes.Bishop, PieceTypes.Queen);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool InBetween(this PieceTypes v, PieceTypes min, PieceTypes max) => (uint)v - (uint)min <= (uint)max - (uint)min;
 }

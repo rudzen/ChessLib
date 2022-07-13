@@ -37,7 +37,8 @@ public static class GameFactory
     {
         var g = Create();
         var fenData = new FenData(fen);
-        g.Pos.SetFen(fenData);
+        var state = new State();
+        g.Pos.Set(in fenData, Enums.ChessMode.NORMAL, in state);
         return g;
     }
 

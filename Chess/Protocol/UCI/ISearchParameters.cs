@@ -36,9 +36,11 @@ public interface ISearchParameters
 
     bool Infinite { get; set; }
 
-    int[] MovesToGo { get; set; }
+    int MovesToGo { get; set; }
 
     int MoveTime { get; set; }
+
+    int Depth { get; set; }
 
     ulong WhiteIncrementTimeMilliseconds { get; set; }
 
@@ -52,5 +54,5 @@ public interface ISearchParameters
 
     string Get(Player side);
 
-    bool DecreaseMovesToGo(Player side);
+    bool DecreaseMovesToGo();
 }

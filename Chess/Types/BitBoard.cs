@@ -57,7 +57,7 @@ public readonly struct BitBoard : IEnumerable<Square>, IEquatable<BitBoard>
 
     public readonly ulong Value;
 
-    public int Count => BitBoards.PopCount(Value);
+    public int Count => BitBoards.PopCount(in this);
 
     public bool IsEmpty => Value == 0;
 

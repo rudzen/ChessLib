@@ -109,9 +109,7 @@ internal static class Program
         perftRunner.Options = options;
         perftRunner.SaveResults = true;
 
-        returnValue = await perftRunner.Run().ConfigureAwait(false);
-
-        return returnValue;
+        return await perftRunner.Run().ConfigureAwait(false);
     }
 
     private static void BuildConfiguration(IConfigurationBuilder builder)

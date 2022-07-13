@@ -152,7 +152,7 @@ public static class BitBoards
 
     private static readonly BitBoard[][] DistanceRingBB;
 
-    private static readonly IDictionary<Directions, Func<BitBoard, BitBoard>> ShiftFuncs = MakeShiftFuncs();
+    private static readonly IDictionary<Direction, Func<BitBoard, BitBoard>> ShiftFuncs = MakeShiftFuncs();
 
     private static readonly Func<BitBoard, BitBoard>[] FillFuncs = MakeFillFuncs();
 
@@ -310,7 +310,7 @@ public static class BitBoards
             {
                 KingRingBB[player.Side][sq] = PseudoAttacksBB[pt][sq];
                 if (s1.RelativeRank(player) == Ranks.Rank1)
-                    KingRingBB[player.Side][sq] |= KingRingBB[player.Side][sq].Shift(player.IsWhite ? Directions.North : Directions.South);
+                    KingRingBB[player.Side][sq] |= KingRingBB[player.Side][sq].Shift(player.IsWhite ? Direction.North : Direction.South);
 
                 if (file == Files.FileH)
                     KingRingBB[player.Side][sq] |= KingRingBB[player.Side][sq].WestOne();
@@ -378,7 +378,7 @@ public static class BitBoards
     /// <param name="sq">The square</param>
     /// <returns>The bitboard of square rank</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard BitBoardRank(this in Square sq)
+    public static BitBoard BitBoardRank(this Square sq)
         => sq.Rank.BitBoardRank();
 
     /// <summary>
@@ -387,7 +387,7 @@ public static class BitBoards
     /// <param name="r">The rank</param>
     /// <returns>The bitboard of square rank</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard BitBoardRank(this in Rank r)
+    public static BitBoard BitBoardRank(this Rank r)
         => RANK1 << (8 * r.AsInt());
 
     /// <summary>
@@ -396,7 +396,7 @@ public static class BitBoards
     /// <param name="this">The square</param>
     /// <returns>The bitboard of square file</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard BitBoardFile(this in Square @this)
+    public static BitBoard BitBoardFile(this Square @this)
         => @this.File.BitBoardFile();
 
     /// <summary>
@@ -405,7 +405,7 @@ public static class BitBoards
     /// <param name="this">The file</param>
     /// <returns>The bitboard of file</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard BitBoardFile(this in File @this)
+    public static BitBoard BitBoardFile(this File @this)
         => FILEA << @this.AsInt();
 
     /// <summary>
@@ -415,7 +415,7 @@ public static class BitBoards
     /// <param name="side">The side, white is north and black is south</param>
     /// <returns>The bitboard of all forward file squares</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard ForwardFile(this in Square @this, in Player side)
+    public static BitBoard ForwardFile(this Square @this, Player side)
         => ForwardFileBB[side.Side][@this.AsInt()];
 
     /// <summary>
@@ -425,7 +425,7 @@ public static class BitBoards
     /// <param name="side">White = north, Black = south</param>
     /// <returns>The bitboard representation</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard PawnAttackSpan(this in Square @this, in Player side)
+    public static BitBoard PawnAttackSpan(this Square @this, Player side)
         => PawnAttackSpanBB[side.Side][@this.AsInt()];
 
     /// <summary>
@@ -436,15 +436,15 @@ public static class BitBoards
     /// <param name="side">White = north, Black = south</param>
     /// <returns>The bitboard representation</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard PassedPawnFrontAttackSpan(this in Square @this, in Player side)
+    public static BitBoard PassedPawnFrontAttackSpan(this Square @this, Player side)
         => PassedPawnMaskBB[side.Side][@this.AsInt()];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard ForwardRanks(this in Square @this, in Player side)
+    public static BitBoard ForwardRanks(this Square @this, Player side)
         => ForwardRanksBB[side.Side][@this.AsInt()];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard BitboardBetween(this in Square firstSquare, in Square secondSquare)
+    public static BitBoard BitboardBetween(this Square firstSquare, Square secondSquare)
         => BetweenBB[firstSquare.AsInt()][secondSquare.AsInt()];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -464,27 +464,27 @@ public static class BitBoards
         => bb.Msb();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard Line(this in Square s1, in Square s2)
+    public static BitBoard Line(this Square s1, Square s2)
         => LineBB[s1.AsInt()][s2.AsInt()];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool Aligned(this in Square s1, in Square s2, in Square s3)
+    public static bool Aligned(this Square s1, Square s2, Square s3)
         => (Line(s1, s2) & s3) != 0;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard KingRing(this in Square sq, in Player side)
+    public static BitBoard KingRing(this Square sq, Player side)
         => KingRingBB[side.Side][sq.AsInt()];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static int Distance(this in Square source, in Square destination)
+    public static int Distance(this Square source, Square destination)
         => SquareDistance[source.AsInt()][destination.AsInt()];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard DistanceRing(this in Square square, int length)
+    public static BitBoard DistanceRing(this Square square, int length)
         => DistanceRingBB[square.AsInt()][length];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard PromotionRank(this in Player us)
+    public static BitBoard PromotionRank(this Player us)
         => PromotionRanks[us.Side];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -588,16 +588,25 @@ public static class BitBoards
     /// <param name="side">The direction to fill in, white = north, black = south</param>
     /// <returns>Filled bitboard</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard Fill(this in BitBoard bb, in Player side)
+    public static BitBoard Fill(this in BitBoard bb, Player side)
         => FillFuncs[side.Side](bb);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard Shift(this in BitBoard bb, in Direction direction)
+    public static BitBoard Shift(this in BitBoard bb, Direction direction)
     {
-        if (ShiftFuncs.TryGetValue(direction.Value, out var func))
+        if (ShiftFuncs.TryGetValue(direction, out var func))
             return func(bb);
 
         throw new ArgumentException("Invalid shift argument.", nameof(direction));
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static BitBoard PawnAttackBB(this in BitBoard bb, Player c)
+    {
+        var (northWest, northEast) = c == Player.White
+            ? (Direction.NorthWest, Direction.NorthEast)
+            : (Direction.SouthWest, Direction.SouthEast);
+        return bb.Shift(northWest) | bb.Shift(northEast);
     }
 
     /* non extension methods */
@@ -648,23 +657,23 @@ public static class BitBoards
     /// Helper method to generate shift function dictionary for all directions.
     /// </summary>
     /// <returns>The generated shift dictionary</returns>
-    private static IDictionary<Directions, Func<BitBoard, BitBoard>> MakeShiftFuncs()
+    private static IDictionary<Direction, Func<BitBoard, BitBoard>> MakeShiftFuncs()
     {
-        var sf = new Dictionary<Directions, Func<BitBoard, BitBoard>>(13)
+        var sf = new Dictionary<Direction, Func<BitBoard, BitBoard>>(13)
             {
-                {Directions.NoDirection, board => board},
-                {Directions.North, board => board.NorthOne()},
-                {Directions.NorthDouble, board => board.NorthOne().NorthOne()},
-                {Directions.NorthEast, board => board.NorthEastOne()},
-                {Directions.NorthWest, board => board.NorthWestOne()},
-                {Directions.NorthFill, board => board.NorthFill()},
-                {Directions.South, board => board.SouthOne()},
-                {Directions.SouthDouble, board => board.SouthOne().SouthOne()},
-                {Directions.SouthEast, board => board.SouthEastOne()},
-                {Directions.SouthWest, board => board.SouthWestOne()},
-                {Directions.SouthFill, board => board.SouthFill()},
-                {Directions.East, board => board.EastOne()},
-                {Directions.West, board => board.WestOne()}
+                {Direction.None, board => board},
+                {Direction.North, board => board.NorthOne()},
+                {Direction.NorthDouble, board => board.NorthOne().NorthOne()},
+                {Direction.NorthEast, board => board.NorthEastOne()},
+                {Direction.NorthWest, board => board.NorthWestOne()},
+                {Direction.NorthFill, board => board.NorthFill()},
+                {Direction.South, board => board.SouthOne()},
+                {Direction.SouthDouble, board => board.SouthOne().SouthOne()},
+                {Direction.SouthEast, board => board.SouthEastOne()},
+                {Direction.SouthWest, board => board.SouthWestOne()},
+                {Direction.SouthFill, board => board.SouthFill()},
+                {Direction.East, board => board.EastOne()},
+                {Direction.West, board => board.WestOne()}
             };
 
         return sf;

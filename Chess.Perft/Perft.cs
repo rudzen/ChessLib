@@ -86,7 +86,8 @@ public sealed class Perft : IPerft
         foreach (var fd in Positions.Select(p => new FenData(p.Fen)))
         {
             Game.Table.NewSearch();
-            CurrentGame.Pos.SetFen(fd);
+            var state = new State();
+            CurrentGame.Pos.Set(in fd,Rudz.Chess.Enums.ChessMode.NORMAL, in state);
 
             if (_results.TryGetValue(CurrentGame.Pos.State.Key, out var result))
             {
@@ -113,7 +114,8 @@ public sealed class Perft : IPerft
     public void SetGamePosition(IPerftPosition pp)
     {
         var fp = new FenData(pp.Fen);
-        CurrentGame.Pos.SetFen(fp);
+        var state = new State();
+        CurrentGame.Pos.Set(in fp, Rudz.Chess.Enums.ChessMode.NORMAL, in state);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

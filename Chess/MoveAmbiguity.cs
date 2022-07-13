@@ -45,7 +45,7 @@ public sealed class MoveAmbiguity : IMoveAmbiguity
 
     private readonly IPosition _pos;
 
-    public MoveAmbiguity(IPosition pos)
+    public MoveAmbiguity(in IPosition pos)
     {
         _pos = pos;
         _notationFuncs = new Dictionary<MoveNotations, Func<Move, string>>

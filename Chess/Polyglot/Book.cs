@@ -60,6 +60,14 @@ public sealed class Book : IDisposable
         public ushort move;
         public ushort count;
         public uint learn;
+
+        public Entry(ulong key, ushort move, ushort count, uint learn)
+        {
+            this.key = key;
+            this.move = move;
+            this.count = count;
+            this.learn = learn;
+        }
     }
 
     public unsafe Book(IPosition pos)
@@ -172,15 +180,12 @@ public sealed class Book : IDisposable
         return emMoves.FirstOrDefault(Move.EmptyMove);
     }
 
-    private Entry ReadEntry()
-    {
-        Entry e;
-        e.key = _binaryReader.ReadUInt64();
-        e.move = _binaryReader.ReadUInt16();
-        e.count = _binaryReader.ReadUInt16();
-        e.learn = _binaryReader.ReadUInt32();
-        return e;
-    }
+    private Entry ReadEntry() => new(
+            _binaryReader.ReadUInt64(),
+            _binaryReader.ReadUInt16(),
+            _binaryReader.ReadUInt16(),
+            _binaryReader.ReadUInt32()
+        );
 
     public HashKey ComputePolyglotKey()
     {

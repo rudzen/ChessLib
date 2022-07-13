@@ -38,6 +38,22 @@ using System.Runtime.InteropServices;
 [StructLayout(LayoutKind.Explicit, Size = 1)]
 public readonly struct Piece : IEquatable<Piece>
 {
+    private static readonly Piece[] ValidPieces =
+    {
+        Pieces.WhitePawn,
+        Pieces.WhiteKnight,
+        Pieces.WhiteBishop,
+        Pieces.WhiteRook,
+        Pieces.WhiteQueen,
+        Pieces.WhiteKing,
+        Pieces.BlackPawn,
+        Pieces.BlackKnight,
+        Pieces.BlackBishop,
+        Pieces.BlackRook,
+        Pieces.BlackQueen,
+        Pieces.BlackKing
+    };
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private Piece(int piece) => Value = (Pieces)piece;
 
@@ -55,6 +71,8 @@ public readonly struct Piece : IEquatable<Piece>
     public bool IsBlack => ColorOf().IsBlack;
 
     public static readonly Piece EmptyPiece = Pieces.NoPiece;
+
+    public static Piece[] AllPieces => ValidPieces;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator Piece(char value) => new(GetPiece(value));
@@ -133,12 +151,12 @@ public readonly struct Piece : IEquatable<Piece>
         return character switch
         {
             'P' => Pieces.WhitePawn,
+            'p' => Pieces.BlackPawn,
             'N' => Pieces.WhiteKnight,
             'B' => Pieces.WhiteBishop,
             'R' => Pieces.WhiteRook,
             'Q' => Pieces.WhiteQueen,
             'K' => Pieces.WhiteKing,
-            'p' => Pieces.BlackPawn,
             'n' => Pieces.BlackKnight,
             'b' => Pieces.BlackBishop,
             'r' => Pieces.BlackRook,

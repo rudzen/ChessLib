@@ -44,8 +44,9 @@ public class MoveGeneratorTests
         var pieceValue = new PieceValue();
         var pos = new Position(board, pieceValue);
         var fd = new FenData(fen);
+        var state = new State();
 
-        pos.SetFen(fd);
+        pos.Set(in fd, Rudz.Chess.Enums.ChessMode.NORMAL, in state);
 
         // make sure black is in check
         Assert.True(pos.InCheck);

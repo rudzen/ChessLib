@@ -99,7 +99,9 @@ public static class Zobrist
 
         Span<PieceTypes> pieceTypes = stackalloc PieceTypes[]
             { PieceTypes.Pawn, PieceTypes.Knight, PieceTypes.Bishop, PieceTypes.Rook, PieceTypes.Queen, PieceTypes.King };
-        Span<Player> players = stackalloc Player[] { Player.White, Player.Black };
+
+        Span<Player> players = stackalloc Player[]
+            { Player.White, Player.Black };
 
         foreach (var side in players)
         {

@@ -37,22 +37,10 @@ public sealed class MovesToGoModel : EventArgs, IMovesToGoModel
     public MovesToGoModel(ISearchParameters original)
     {
         _time = new[] { original.WhiteTimeMilliseconds, original.BlackTimeMilliseconds };
-        MovesToGo = new[] { original.MovesToGo[0], original.MovesToGo[1] };
+        MovesToGo = original.MovesToGo;
     }
 
-    public int[] MovesToGo { get; set; }
-
-    public int WhiteMovesToGo
-    {
-        get => MovesToGo[0];
-        set => MovesToGo[0] = value;
-    }
-
-    public int BlackMovesToGo
-    {
-        get => MovesToGo[1];
-        set => MovesToGo[1] = value;
-    }
+    public int MovesToGo { get; set; }
 
     public ulong WhiteTimeMilliseconds
     {
@@ -64,12 +52,6 @@ public sealed class MovesToGoModel : EventArgs, IMovesToGoModel
     {
         get => _time[1];
         set => _time[1] = value;
-    }
-
-    public int this[Player side]
-    {
-        get => MovesToGo[side.Side];
-        set => MovesToGo[side.Side] = value;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
