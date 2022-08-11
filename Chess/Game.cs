@@ -119,10 +119,6 @@ public sealed class Game : IGame
     {
         var posKey = Pos.State.Key;
 
-        var (found, entry) = Table.Probe(posKey);
-        if (found && entry.Key32 == posKey.LowerKey)
-            return (ulong)entry.Value;
-
         var ml = _moveLists.Get();
         ml.Generate(Pos);
 
@@ -136,20 +132,14 @@ public sealed class Game : IGame
         var state = new State();
         ulong tot = 0;
 
-        var move = Move.EmptyMove;
-
-        foreach (var em in ml)
+        foreach (var move in ml.Select(em => em.Move))
         {
-            move = em.Move;
             Pos.MakeMove(move, in state);
             tot += Perft(depth - 1);
             Pos.TakeMove(move);
         }
 
         _moveLists.Return(ml);
-
-        if (tot <= int.MaxValue && move != Move.EmptyMove)
-            Table.Store(posKey.Key, (int)tot, Bound.Exact, (sbyte)depth, move, 0);
 
         return tot;
     }
