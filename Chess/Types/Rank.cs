@@ -47,6 +47,8 @@ public readonly struct Rank : IEquatable<Rank>
 
     public char Char => RankChars[AsInt()];
 
+    public static int Count => (int)Ranks.RankNb;
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator Rank(int value) => new(value);
 

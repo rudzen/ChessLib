@@ -45,7 +45,7 @@ public sealed class MoveAmbiguity : IMoveAmbiguity
 
     private readonly IPosition _pos;
 
-    public MoveAmbiguity(in IPosition pos)
+    private MoveAmbiguity(in IPosition pos)
     {
         _pos = pos;
         _notationFuncs = new Dictionary<MoveNotations, Func<Move, string>>
@@ -56,6 +56,11 @@ public sealed class MoveAmbiguity : IMoveAmbiguity
             {MoveNotations.Ran, ToRan},
             {MoveNotations.Uci, ToUci}
         };
+    }
+
+    public static IMoveAmbiguity Create(in IPosition pos)
+    {
+        return new MoveAmbiguity(in pos);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

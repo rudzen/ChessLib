@@ -94,6 +94,8 @@ public readonly struct Square : IComparable<Square>
 
     public static readonly Square None = new(Squares.none);
 
+    public static int Count => 64;
+
     public static Square Make(Rank r, File f) => new(r, f);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

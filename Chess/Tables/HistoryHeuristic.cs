@@ -36,7 +36,7 @@ public sealed class HistoryHeuristic : IHistoryHeuristic
 
     public HistoryHeuristic()
     {
-        _table = new int[(int)Players.PlayerNb][][];
+        _table = new int[Player.Count][][];
         Initialize(Player.White);
         Initialize(Player.Black);
     }

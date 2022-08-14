@@ -57,6 +57,10 @@ public sealed class Position : IPosition
     private readonly IPositionValidator _positionValidator;
     private Player _sideToMove;
 
+    public Position(IPieceValue pieceValues) : this(new Board(), pieceValues)
+    {
+    }
+
     public Position(IBoard board, IPieceValue pieceValues)
     {
         Board = board;
@@ -1074,7 +1078,6 @@ public sealed class Position : IPosition
 
         SetState();
     }
-
 
     public void SetFen(in FenData fen, bool validate = false)
     {

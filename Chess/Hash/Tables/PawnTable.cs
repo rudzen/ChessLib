@@ -38,7 +38,7 @@ public struct PawnTableEntry
     {
         Key = key;
         Score = Score.Zero;
-        PassedPawns = new BitBoard[2];
+        PassedPawns = new BitBoard[Player.Count];
     }
 }
 

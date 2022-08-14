@@ -56,7 +56,7 @@ public sealed class Board : IBoard
     public Board()
     {
         _pieces = new Piece[64];
-        _bySide = new BitBoard[2];
+        _bySide = new BitBoard[Player.Count];
         _byType = new BitBoard[PieceTypes.PieceTypeNb.AsInt()];
         _pieceCount = new int[16];
         _pieceList = new Square[64][];
