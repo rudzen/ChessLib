@@ -40,6 +40,8 @@ using Xunit;
 
 public class PolyglotTests
 {
+    private const string BookFile = @"BookTests\gm2600.bin";
+
     [Fact]
     public void UnsetBookFileYieldsEmptyMove()
     {
@@ -61,7 +63,7 @@ public class PolyglotTests
         const string fen = Fen.StartPositionFen;
 
         var game = GameFactory.Create(fen);
-        var path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), @"Book\gm2600.bin");
+        var path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), BookFile);
         var book = new Book(game.Pos)
         {
             FileName = path

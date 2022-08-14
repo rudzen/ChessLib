@@ -63,7 +63,7 @@ public sealed class MoveNotationTests
         var w1 = new Move(fromOneSquare, toSquare);
         var w2 = new Move(fromTwoSquare, toSquare);
 
-        var ambiguity = new MoveAmbiguity(pos);
+        var ambiguity = MoveAmbiguity.Create(pos);
 
         var actualPrimary = ambiguity.ToNotation(w1);
         var actualSecondary = ambiguity.ToNotation(w2);
@@ -100,7 +100,7 @@ public sealed class MoveNotationTests
         var w1 = new Move(fromOneSquare, toSquare);
         var w2 = new Move(fromTwoSquare, toSquare);
 
-        var ambiguity = new MoveAmbiguity(pos);
+        var ambiguity = MoveAmbiguity.Create(pos);
 
         var actualPrimary = ambiguity.ToNotation(w1, notation);
         var actualSecondary = ambiguity.ToNotation(w2, notation);
@@ -137,7 +137,7 @@ public sealed class MoveNotationTests
         var w1 = new Move(fromOneSquare, toSquare);
         var w2 = new Move(fromTwoSquare, toSquare);
 
-        var ambiguity = new MoveAmbiguity(pos);
+        var ambiguity = MoveAmbiguity.Create(pos);
 
         var actualPrimary = ambiguity.ToNotation(w1, notation);
         var actualSecondary = ambiguity.ToNotation(w2, notation);
@@ -174,7 +174,7 @@ public sealed class MoveNotationTests
         var w1 = new Move(fromOneSquare, toSquare);
         var w2 = new Move(fromTwoSquare, toSquare);
 
-        var ambiguity = new MoveAmbiguity(pos);
+        var ambiguity = MoveAmbiguity.Create(pos);
 
         var actualPrimary = ambiguity.ToNotation(w1, notation);
         var actualSecondary = ambiguity.ToNotation(w2, notation);
@@ -211,7 +211,7 @@ public sealed class MoveNotationTests
         var w1 = new Move(fromOneSquare, toSquare);
         var w2 = new Move(fromTwoSquare, toSquare);
 
-        var ambiguity = new MoveAmbiguity(pos);
+        var ambiguity = MoveAmbiguity.Create(pos);
 
         var actualPrimary = ambiguity.ToNotation(w1, notation);
         var actualSecondary = ambiguity.ToNotation(w2, notation);
@@ -248,7 +248,7 @@ public sealed class MoveNotationTests
         var w1 = new Move(fromOneSquare, toSquare);
         var w2 = new Move(fromTwoSquare, toSquare);
 
-        var ambiguity = new MoveAmbiguity(pos);
+        var ambiguity = MoveAmbiguity.Create(pos);
 
         var actualPrimary = ambiguity.ToNotation(w1, notation);
         var actualSecondary = ambiguity.ToNotation(w2, notation);
@@ -285,7 +285,7 @@ public sealed class MoveNotationTests
         var w1 = new Move(fromOneSquare, toSquare);
         var w2 = new Move(fromTwoSquare, toSquare);
 
-        var ambiguity = new MoveAmbiguity(pos);
+        var ambiguity = MoveAmbiguity.Create(pos);
 
         var actualPrimary = ambiguity.ToNotation(w1, notation);
         var actualSecondary = ambiguity.ToNotation(w2, notation);
@@ -322,7 +322,7 @@ public sealed class MoveNotationTests
         var w1 = new Move(fromOneSquare, toSquare);
         var w2 = new Move(fromTwoSquare, toSquare);
 
-        var ambiguity = new MoveAmbiguity(pos);
+        var ambiguity = MoveAmbiguity.Create(pos);
 
         var actualPrimary = ambiguity.ToNotation(w1, notation);
         var actualSecondary = ambiguity.ToNotation(w2, notation);
@@ -359,7 +359,7 @@ public sealed class MoveNotationTests
         var w1 = new Move(fromOneSquare, toSquare);
         var w2 = new Move(fromTwoSquare, toSquare);
 
-        var ambiguity = new MoveAmbiguity(pos);
+        var ambiguity = MoveAmbiguity.Create(pos);
 
         var actualPrimary = ambiguity.ToNotation(w1, notation);
         var actualSecondary = ambiguity.ToNotation(w2, notation);
@@ -396,7 +396,7 @@ public sealed class MoveNotationTests
         var w1 = new Move(fromOneSquare, toSquare);
         var w2 = new Move(fromTwoSquare, toSquare);
 
-        var ambiguity = new MoveAmbiguity(pos);
+        var ambiguity = MoveAmbiguity.Create(pos);
 
         var actualPrimary = ambiguity.ToNotation(w1, notation);
         var actualSecondary = ambiguity.ToNotation(w2, notation);
@@ -433,7 +433,7 @@ public sealed class MoveNotationTests
         var w1 = new Move(fromOneSquare, toSquare);
         var w2 = new Move(fromTwoSquare, toSquare);
 
-        var ambiguity = new MoveAmbiguity(pos);
+        var ambiguity = MoveAmbiguity.Create(pos);
 
         var actualPrimary = ambiguity.ToNotation(w1, notation);
         var actualSecondary = ambiguity.ToNotation(w2, notation);
@@ -470,7 +470,7 @@ public sealed class MoveNotationTests
         var w1 = new Move(fromOneSquare, toSquare);
         var w2 = new Move(fromTwoSquare, toSquare);
 
-        var ambiguity = new MoveAmbiguity(pos);
+        var ambiguity = MoveAmbiguity.Create(pos);
 
         var actualPrimary = ambiguity.ToNotation(w1, notation);
         var actualSecondary = ambiguity.ToNotation(w2, notation);
@@ -492,7 +492,7 @@ public sealed class MoveNotationTests
 
         var sanMoves = game.Pos
             .GenerateMoves()
-            .Select(m => new MoveAmbiguity(game.Pos).ToNotation(m, notation))
+            .Select(m => MoveAmbiguity.Create(game.Pos).ToNotation(m, notation))
             .ToArray();
 
         foreach (var notationResult in expectedNotations)
