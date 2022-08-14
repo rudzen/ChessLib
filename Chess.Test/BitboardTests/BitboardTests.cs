@@ -24,7 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Test.Bitboard;
+namespace Chess.Test.BitboardTests;
 
 using Rudz.Chess.Enums;
 using Rudz.Chess.Types;
@@ -34,7 +34,7 @@ using Xunit;
 public sealed class BitboardTests
 {
     [Fact]
-    public void MakeBitBoardTest()
+    public void MakeBitBoard()
     {
         // a few squares
         var b1 = BitBoards.MakeBitboard(Squares.a1, Squares.b1, Squares.a2, Squares.b2);
@@ -48,7 +48,7 @@ public sealed class BitboardTests
     }
 
     [Fact]
-    public void BitBoardOrALlTest()
+    public void BitBoardOrAll()
     {
         var baseSquares = new Square[] { Squares.a1, Squares.a2, Squares.a3, Squares.a4, Squares.a5, Squares.a6, Squares.a7, Squares.a8 };
         var bb = BitBoard.Empty.OrAll(baseSquares);

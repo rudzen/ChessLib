@@ -24,20 +24,20 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Test.File;
+namespace Chess.Test.FileTests;
 
 using Rudz.Chess.Enums;
+using Rudz.Chess.Types;
 using Xunit;
-using F = Rudz.Chess.Types.File;
 
 public sealed class FileTests
 {
     [Fact]
-    public void FileStructureIntTest()
+    public void FileStructureInt()
     {
         const int val = 3;
         const Files expected = (Files)val;
-        var f = new F(val);
+        var f = new File(val);
         var actual = f.Value;
         Assert.Equal(expected, actual);
 
@@ -47,10 +47,10 @@ public sealed class FileTests
     }
 
     [Fact]
-    public void FileStructureEFileTest()
+    public void FileStructureEFile()
     {
         const Files expected = Files.FileG;
-        var f = new F(expected);
+        var f = new File(expected);
         var actual = f.Value;
         Assert.Equal(expected, actual);
 

@@ -24,7 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Test.Pieces;
+namespace Chess.Test.PiecesTest;
 
 using FluentAssertions;
 using Rudz.Chess.Types;
@@ -72,7 +72,7 @@ public sealed class PieceAttacksPawnTests : PieceAttacks
     private static readonly int[] PawnExpected = { 1, 2, 2, 2 };
 
     [Fact]
-    public override void AlphaPattern()
+    public void AlphaPattern()
     {
         const int index = (int)EBands.Alpha;
         var us = Player.White;
@@ -89,7 +89,7 @@ public sealed class PieceAttacksPawnTests : PieceAttacks
     }
 
     [Fact]
-    public override void BetaPattern()
+    public void BetaPattern()
     {
         const int index = (int)EBands.Beta;
         var us = Player.White;
@@ -106,7 +106,7 @@ public sealed class PieceAttacksPawnTests : PieceAttacks
     }
 
     [Fact]
-    public override void GammaPattern()
+    public void GammaPattern()
     {
         const int index = (int)EBands.Gamma;
         var us = Player.White;
@@ -123,7 +123,7 @@ public sealed class PieceAttacksPawnTests : PieceAttacks
     }
 
     [Fact]
-    public override void DeltaPattern()
+    public void DeltaPattern()
     {
         const int index = (int)EBands.Delta;
         var us = Player.White;

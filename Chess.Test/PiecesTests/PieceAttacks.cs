@@ -24,7 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Test.Pieces;
+namespace Chess.Test.PiecesTest;
 
 using Rudz.Chess.Types;
 
@@ -35,7 +35,7 @@ using Rudz.Chess.Types;
 /// Gamma = 3rd band
 /// Delta = 4th band (inner 4 squares)
 /// </summary>
-public abstract class PieceAttacks : IPieceAttacks
+public abstract class PieceAttacks
 {
     protected enum EBands
     {
@@ -70,13 +70,15 @@ public abstract class PieceAttacks : IPieceAttacks
      *
      */
 
-    protected static readonly BitBoard[] Bands = { 0xff818181818181ff, 0x7e424242427e00, 0x3c24243c0000, 0x1818000000 };
+    protected const ulong Alpha = 0xff818181818181ff;
 
-    public abstract void AlphaPattern();
+    protected const ulong Beta = 0x7e424242427e00;
 
-    public abstract void BetaPattern();
+    protected const ulong Gamma = 0x3c24243c0000;
 
-    public abstract void GammaPattern();
+    protected const ulong Delta = 0x1818000000;
 
-    public abstract void DeltaPattern();
+    protected static readonly BitBoard[] Bands = { Alpha, Beta, Gamma, Delta };
+
+    protected static readonly BitBoard[] EEBands = { 0xff818181818181ff, 0x7e424242427e00, 0x3c24243c0000, 0x1818000000 };
 }

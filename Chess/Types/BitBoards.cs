@@ -647,6 +647,14 @@ public static class BitBoards
     /// <summary>
     /// Generate a bitboard based on a variadic amount of squares.
     /// </summary>
+    /// <param name="square">The square to generate bitboard from</param>
+    /// <returns>The generated bitboard</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static BitBoard MakeBitboard(Square square) => square.AsBb();
+
+    /// <summary>
+    /// Generate a bitboard based on a variadic amount of squares.
+    /// </summary>
     /// <param name="squares">The squares to generate bitboard from</param>
     /// <returns>The generated bitboard</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

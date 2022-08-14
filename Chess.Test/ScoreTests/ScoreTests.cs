@@ -24,7 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Test.Score;
+namespace Chess.Test.ScoreTests;
 
 using Rudz.Chess.Types;
 using System.Collections.Generic;
@@ -61,7 +61,7 @@ public sealed class ScoreTests
     }
 
     [Fact]
-    public void ScoreMgTest()
+    public void ScoreMg()
     {
         var scores = TestValues.Select(x => new Score(x.Key, x.Value));
         var i = 0;

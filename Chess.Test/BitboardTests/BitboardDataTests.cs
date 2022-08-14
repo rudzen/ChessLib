@@ -24,7 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Test.Bitboard;
+namespace Chess.Test.BitboardTests;
 
 using Rudz.Chess.Enums;
 using Rudz.Chess.Types;
@@ -35,7 +35,7 @@ using Xunit;
 public sealed class BitboardDataTests
 {
     [Fact]
-    public void AlignedSimplePositiveTest()
+    public void AlignedSimplePositive()
     {
         const bool expected = true;
 
@@ -49,7 +49,7 @@ public sealed class BitboardDataTests
     }
 
     [Fact]
-    public async Task AlignedSimpleTotalTest()
+    public async Task AlignedSimpleTotal()
     {
         const int expected = 10640;
 
@@ -67,7 +67,7 @@ public sealed class BitboardDataTests
     }
 
     [Fact]
-    public async Task AlignedSimpleTotalNoIdenticalsTest()
+    public async Task AlignedSimpleTotalNoIdenticals()
     {
         const int expected = 9184;
 

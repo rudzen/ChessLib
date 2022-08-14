@@ -24,7 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Test.HashTable;
+namespace Chess.Test.HashTableTests;
 
 using Rudz.Chess.Hash;
 using Rudz.Chess.Hash.Tables;
@@ -36,7 +36,7 @@ using Xunit;
 public class PawnHashTableTest
 {
     [Fact]
-    public void BaseInitializeTest()
+    public void BaseInitialize()
     {
         const int tableSizeMb = 8;
 

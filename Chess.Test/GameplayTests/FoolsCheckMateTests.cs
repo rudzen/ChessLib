@@ -24,24 +24,23 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Test.Gameplay;
+namespace Chess.Test.GameplayTests;
 
 using Rudz.Chess;
 using Rudz.Chess.Enums;
 using Rudz.Chess.Factories;
 using Rudz.Chess.MoveGeneration;
 using Rudz.Chess.Types;
-using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 
 public sealed class FoolsCheckMateTests
 {
     [Fact]
-    public void FoolsCheckMateTest()
+    public void FoolsCheckMate()
     {
         // generate moves
-        var moves = new List<Move>(4) {
+        var moves = new Move[] {
                                                       Move.Create(Squares.f2, Squares.f3),
                                                       Move.Create(Squares.e7, Squares.e5),
                                                       Move.Create(Squares.g2, Squares.g4),

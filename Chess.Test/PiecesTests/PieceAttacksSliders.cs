@@ -24,25 +24,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Test.Pieces;
-
-using System;
-using Rudz.Chess;
-using Rudz.Chess.Types;
+namespace Chess.Test.PiecesTest;
 
 public abstract class PieceAttacksSliders : PieceAttacks
 {
     protected static readonly int[] BishopExpected = { 7, 9, 11, 13 };
 
-    protected static readonly int[] RookExpected = { 14, 14, 14, 14 }; // rooks always 14 :>
-
-    protected readonly Func<Square, BitBoard, BitBoard>[] SlideAttacks = { MagicBB.BishopAttacks, MagicBB.RookAttacks, MagicBB.QueenAttacks };
-
-    public abstract override void AlphaPattern();
-
-    public abstract override void BetaPattern();
-
-    public abstract override void GammaPattern();
-
-    public abstract override void DeltaPattern();
+    protected static readonly int[] RookExpected = { 14, 14, 14, 14 };
 }

@@ -24,15 +24,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Test.Material;
+namespace Chess.Test.MaterialTests;
 
 using Xunit;
-using Rudz.Chess.Enums;
-using System;
-using System.Collections.Generic;
-using Rudz.Chess;
-using Rudz.Chess.Types;
-using Pieces;
 
 public sealed class MaterialTests
 {

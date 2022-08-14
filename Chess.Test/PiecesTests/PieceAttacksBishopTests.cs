@@ -24,8 +24,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Test.Pieces;
+namespace Chess.Test.PiecesTest;
 
+using Chess.Test.PiecesTests;
 using FluentAssertions;
 using Rudz.Chess;
 using Rudz.Chess.Enums;
@@ -34,50 +35,30 @@ using System.Linq;
 using Xunit;
 
 /// <inheritdoc/>
-public sealed class PieceAttacksBishopTests : PieceAttacksSliders
+public sealed class PieceAttacksBishopTests : PieceAttacks, IClassFixture<SliderMobilityFixture>
 {
-    [Fact]
-    public override void AlphaPattern()
-    {
-        const int index = (int)EBands.Alpha;
-        const int sliderIndex = 0;
-        var expected = BishopExpected[index];
-        var actuals = Bands[index].Select(x => SlideAttacks[sliderIndex](x, BitBoard.Empty).Count);
+    private readonly SliderMobilityFixture fixture;
 
-        actuals.Should().AllBeEquivalentTo(expected);
+    public PieceAttacksBishopTests(SliderMobilityFixture fixture)
+    {
+        this.fixture = fixture;
     }
 
-    [Fact]
-    public override void BetaPattern()
+    // Slider index 
+
+    [Theory]
+    [InlineData(Alpha, 0, 7)]
+    [InlineData(Beta, 0, 9)]
+    [InlineData(Gamma, 0, 11)]
+    [InlineData(Delta, 0, 13)]
+    public void BishopMobility(ulong pattern, int sliderIndex, int expectedMobility)
     {
-        const int index = (int)EBands.Beta;
-        const int sliderIndex = 0;
-        var expected = BishopExpected[index];
-        var actuals = Bands[index].Select(x => SlideAttacks[sliderIndex](x, BitBoard.Empty).Count);
+        var bb = new BitBoard(pattern);
 
-        actuals.Should().AllBeEquivalentTo(expected);
-    }
+        var expected = bb.Count * expectedMobility;
+        var actual = bb.Select(x => fixture.SliderAttacks[sliderIndex](x, BitBoard.Empty).Count).Sum();
 
-    [Fact]
-    public override void GammaPattern()
-    {
-        const int index = (int)EBands.Gamma;
-        const int sliderIndex = 0;
-        var expected = BishopExpected[index];
-        var actuals = Bands[index].Select(x => SlideAttacks[sliderIndex](x, BitBoard.Empty).Count);
-
-        actuals.Should().AllBeEquivalentTo(expected);
-    }
-
-    [Fact]
-    public override void DeltaPattern()
-    {
-        const int index = (int)EBands.Delta;
-        const int sliderIndex = 0;
-        var expected = BishopExpected[index];
-        var actuals = Bands[index].Select(x => SlideAttacks[sliderIndex](x, BitBoard.Empty).Count);
-
-        actuals.Should().AllBeEquivalentTo(expected);
+        Assert.Equal(expected, actual);
     }
 
     /// <summary>
@@ -87,8 +68,8 @@ public sealed class PieceAttacksBishopTests : PieceAttacksSliders
     [Fact]
     public void BishopBorderBlocked()
     {
-        BitBoard border = 0xff818181818181ff;
-        BitBoard borderInner = 0x7e424242427e00;
+        BitBoard border = Alpha;
+        BitBoard borderInner = Beta;
         var corners = BitBoards.MakeBitboard(Squares.a1, Squares.a8, Squares.h1, Squares.h8);
 
         const int expectedCorner = 1; // just a single attack square no matter what

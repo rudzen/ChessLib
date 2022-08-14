@@ -24,8 +24,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Test.Pieces;
+namespace Chess.Test.PiecesTest;
 
+using Chess.Test.PiecesTests;
 using FluentAssertions;
 using Rudz.Chess;
 using Rudz.Chess.Enums;
@@ -33,50 +34,29 @@ using Rudz.Chess.Types;
 using System.Linq;
 using Xunit;
 
-public sealed class PieceAttacksRookTests : PieceAttacksSliders
+public sealed class PieceAttacksRookTests : PieceAttacksSliders, IClassFixture<SliderMobilityFixture>
 {
-    [Fact]
-    public override void AlphaPattern()
-    {
-        const int index = (int)EBands.Alpha;
-        const int sliderIndex = 1;
-        var expected = RookExpected[index];
-        var actuals = Bands[index].Select(x => SlideAttacks[sliderIndex](sliderIndex, BitBoard.Empty).Count);
+    private readonly SliderMobilityFixture fixture;
 
-        actuals.Should().AllBeEquivalentTo(expected);
+    public PieceAttacksRookTests(SliderMobilityFixture fixture)
+    {
+        this.fixture = fixture;
     }
 
-    [Fact]
-    public override void BetaPattern()
+    [Theory]
+    [InlineData(Alpha, 14)]
+    [InlineData(Beta, 14)]
+    [InlineData(Gamma, 14)]
+    [InlineData(Delta, 14)]
+    public void RookMobility(ulong pattern, int expectedMobility)
     {
-        const int index = (int)EBands.Beta;
         const int sliderIndex = 1;
-        var expected = RookExpected[index];
-        var actuals = Bands[index].Select(x => SlideAttacks[sliderIndex](sliderIndex, BitBoard.Empty).Count);
+        BitBoard bb = pattern;
 
-        actuals.Should().AllBeEquivalentTo(expected);
-    }
+        var expected = bb.Count * expectedMobility;
+        var actual = bb.Select(x => fixture.SliderAttacks[sliderIndex](sliderIndex, BitBoard.Empty).Count).Sum();
 
-    [Fact]
-    public override void GammaPattern()
-    {
-        const int index = (int)EBands.Gamma;
-        const int sliderIndex = 1;
-        var expected = RookExpected[index];
-        var actuals = Bands[index].Select(x => SlideAttacks[sliderIndex](sliderIndex, BitBoard.Empty).Count);
-
-        actuals.Should().AllBeEquivalentTo(expected);
-    }
-
-    [Fact]
-    public override void DeltaPattern()
-    {
-        const int index = (int)EBands.Delta;
-        const int sliderIndex = 1;
-        var expected = RookExpected[index];
-        var actuals = Bands[index].Select(x => SlideAttacks[sliderIndex](sliderIndex, BitBoard.Empty).Count);
-
-        actuals.Should().AllBeEquivalentTo(expected);
+        Assert.Equal(expected, actual);
     }
 
     /// <summary>

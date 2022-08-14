@@ -24,7 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Test.Data;
+namespace Chess.Test.DataTests;
 
 using Rudz.Chess.Enums;
 using Rudz.Chess.Types;
@@ -34,7 +34,7 @@ using Xunit;
 public sealed class DataTests
 {
     [Fact]
-    public void TestSquareChars()
+    public void SquareChars()
     {
         var chars = new StringBuilder(1024);
         var strings = new StringBuilder(1024);

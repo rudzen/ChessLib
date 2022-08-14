@@ -24,7 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Test.FEN;
+namespace Chess.Test.FENTests;
 
 using FluentAssertions;
 using Rudz.Chess;
@@ -36,18 +36,7 @@ using Xunit;
 public sealed class FenTests
 {
     [Fact]
-    public void SetFenTest()
-    {
-        var board = new Board();
-        var pieceValue = new PieceValue();
-        var pos = new Position(board, pieceValue);
-        var game = GameFactory.Create(pos);
-
-        game.NewGame();
-    }
-
-    [Fact]
-    public void GetFenTest()
+    public void GetFen()
     {
         var board = new Board();
         var pieceValue = new PieceValue();

@@ -24,7 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Test.Pieces;
+namespace Chess.Test.PiecesTest;
 
 using Rudz.Chess.Enums;
 using Rudz.Chess.Types;
@@ -44,12 +44,4 @@ public abstract class PieceAttacksRegular : PieceAttacks
 
     // pawn = 0 (N/A for now), knight = 1, king = 2
     protected readonly Func<Square, BitBoard>[] RegAttacks = { BitBoards.KnightAttacks, BitBoards.KnightAttacks, BitBoards.KingAttacks };
-
-    public abstract override void AlphaPattern();
-
-    public abstract override void BetaPattern();
-
-    public abstract override void GammaPattern();
-
-    public abstract override void DeltaPattern();
 }

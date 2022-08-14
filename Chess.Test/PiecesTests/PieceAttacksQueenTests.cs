@@ -24,55 +24,63 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Test.Pieces;
+namespace Chess.Test.PiecesTest;
 
+using Chess.Test.PiecesTests;
 using FluentAssertions;
 using Rudz.Chess.Types;
 using System.Linq;
 using Xunit;
 
-public sealed class PieceAttacksQueenTests : PieceAttacksSliders
+public sealed class PieceAttacksQueenTests : PieceAttacksSliders, IClassFixture<SliderMobilityFixture>
 {
+    private readonly SliderMobilityFixture fixture;
+
+    public PieceAttacksQueenTests(SliderMobilityFixture fixture)
+    {
+        this.fixture = fixture;
+    }
+
     [Fact]
-    public override void AlphaPattern()
+    public void AlphaPattern()
     {
         const int index = (int)EBands.Alpha;
         const int sliderIndex = 2;
         var expected = BishopExpected[index] + RookExpected[index];
-        var actuals = Bands[index].Select(x => SlideAttacks[sliderIndex](x, BitBoard.Empty).Count);
+        var actuals = Bands[index].Select(x => fixture.SliderAttacks[sliderIndex](x, BitBoard.Empty).Count);
 
         actuals.Should().AllBeEquivalentTo(expected);
     }
 
     [Fact]
-    public override void BetaPattern()
+    public void BetaPattern()
     {
         const int index = (int)EBands.Beta;
         const int sliderIndex = 2;
         var expected = BishopExpected[index] + RookExpected[index];
-        var actuals = Bands[index].Select(x => SlideAttacks[sliderIndex](x, BitBoard.Empty).Count);
+        var actuals = Bands[index].Select(x => fixture.SliderAttacks[sliderIndex](x, BitBoard.Empty).Count);
 
         actuals.Should().AllBeEquivalentTo(expected);
     }
 
     [Fact]
-    public override void GammaPattern()
+    public void GammaPattern()
     {
         const int index = (int)EBands.Gamma;
         const int sliderIndex = 2;
         var expected = BishopExpected[index] + RookExpected[index];
-        var actuals = Bands[index].Select(x => SlideAttacks[sliderIndex](x, BitBoard.Empty).Count);
+        var actuals = Bands[index].Select(x => fixture.SliderAttacks[sliderIndex](x, BitBoard.Empty).Count);
 
         actuals.Should().AllBeEquivalentTo(expected);
     }
 
     [Fact]
-    public override void DeltaPattern()
+    public void DeltaPattern()
     {
         const int index = (int)EBands.Delta;
         const int sliderIndex = 2;
         var expected = BishopExpected[index] + RookExpected[index];
-        var actuals = Bands[index].Select(x => SlideAttacks[sliderIndex](x, BitBoard.Empty).Count);
+        var actuals = Bands[index].Select(x => fixture.SliderAttacks[sliderIndex](x, BitBoard.Empty).Count);
 
         actuals.Should().AllBeEquivalentTo(expected);
     }

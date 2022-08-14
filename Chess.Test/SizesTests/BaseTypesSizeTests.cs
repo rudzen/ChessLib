@@ -24,7 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Test.Sizes;
+namespace Chess.Test.SizesTests;
 
 using FluentAssertions;
 using Xunit;
@@ -32,7 +32,7 @@ using Xunit;
 public class BaseTypesSizeTests
 {
     [Fact]
-    public unsafe void MoveSizeTest()
+    public unsafe void MoveSize()
     {
         const int expected = 2;
         var actual = sizeof(Rudz.Chess.Types.Move);
@@ -40,7 +40,7 @@ public class BaseTypesSizeTests
     }
 
     [Fact]
-    public unsafe void PieceSizeTest()
+    public unsafe void PieceSize()
     {
         const int expected = 1;
         var actual = sizeof(Rudz.Chess.Types.Piece);
@@ -48,7 +48,7 @@ public class BaseTypesSizeTests
     }
 
     [Fact]
-    public unsafe void SquareSizeTest()
+    public unsafe void SquareSize()
     {
         const int expected = 4;
         var actual = sizeof(Rudz.Chess.Types.Square);
@@ -56,7 +56,7 @@ public class BaseTypesSizeTests
     }
 
     [Fact]
-    public unsafe void RankSizeTest()
+    public unsafe void RankSize()
     {
         const int expected = 4;
         var actual = sizeof(Rudz.Chess.Types.Rank);

@@ -24,7 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Test.Protocol;
+namespace Chess.Test.ProtocolTests;
 
 using FluentAssertions;
 using Rudz.Chess.Enums;
@@ -36,7 +36,7 @@ using Xunit;
 public sealed class UciTests
 {
     [Fact]
-    public void NpsSimpleTest()
+    public void NpsSimple()
     {
         const ulong expected = 0UL;
 
@@ -52,7 +52,7 @@ public sealed class UciTests
     }
 
     [Fact]
-    public void MoveFromUciBasicTest()
+    public void MoveFromUciBasic()
     {
         const string uciMove = "a2a3";
         var expected = new Rudz.Chess.Types.Move(Squares.a2, Squares.a3);

@@ -24,7 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Test.Data;
+namespace Chess.Test.DataTests;
 
 using Rudz.Chess.Enums;
 using Rudz.Chess.Types;
@@ -33,7 +33,7 @@ using Xunit;
 public sealed class PieceSquareTests
 {
     [Fact]
-    public void GetSquareTest()
+    public void GetSquare()
     {
         const Squares expected = Squares.a5;
         var ps = new PieceSquare(Piece.EmptyPiece, expected);
@@ -43,7 +43,7 @@ public sealed class PieceSquareTests
     }
 
     [Fact]
-    public void GetPieceTest()
+    public void GetPiece()
     {
         const Pieces expected = Pieces.BlackKnight;
         var ps = new PieceSquare(expected, Square.None);
@@ -53,7 +53,7 @@ public sealed class PieceSquareTests
     }
 
     [Fact]
-    public void GetPieceAndSquareTest()
+    public void GetPieceAndSquare()
     {
         for (var pc = Pieces.NoPiece; pc < Pieces.PieceNb; ++pc)
         {

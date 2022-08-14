@@ -24,7 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Test.Move;
+namespace Chess.Test.MoveTests;
 
 using Rudz.Chess;
 using Rudz.Chess.Enums;
@@ -37,7 +37,7 @@ using Xunit;
 public sealed class MoveNotationTests
 {
     [Fact]
-    public void FanRankAmbiguationPositiveTest()
+    public void FanRankAmbiguationPositive()
     {
         // Tests both knights moving to same square for Rank ambiguity
 
@@ -73,7 +73,7 @@ public sealed class MoveNotationTests
     }
 
     [Fact]
-    public void FanRankFileAmbiguationPositiveTest()
+    public void FanRankFileAmbiguationPositive()
     {
         // Tests both knights moving to same square for Rank ambiguity
 
@@ -110,7 +110,7 @@ public sealed class MoveNotationTests
     }
 
     [Fact]
-    public void FanFileAmbiguationPositiveTest()
+    public void FanFileAmbiguationPositive()
     {
         // Tests both knights moving to same square for File ambiguity
 
@@ -147,7 +147,7 @@ public sealed class MoveNotationTests
     }
 
     [Fact]
-    public void SanRankAmbiguationPositiveTest()
+    public void SanRankAmbiguationPositive()
     {
         // Tests both knights moving to same square for Rank ambiguity
 
@@ -184,7 +184,7 @@ public sealed class MoveNotationTests
     }
 
     [Fact]
-    public void SanRankFileAmbiguationPositiveTest()
+    public void SanRankFileAmbiguationPositive()
     {
         // Tests both knights moving to same square for Rank ambiguity
 
@@ -221,7 +221,7 @@ public sealed class MoveNotationTests
     }
 
     [Fact]
-    public void SanFileAmbiguationPositiveTest()
+    public void SanFileAmbiguationPositive()
     {
         // Tests both knights moving to same square for File ambiguity
 
@@ -258,7 +258,7 @@ public sealed class MoveNotationTests
     }
 
     [Fact]
-    public void LanRankAmbiguationPositiveTest()
+    public void LanRankAmbiguationPositive()
     {
         // Tests both knights moving to same square for Rank ambiguity
 
@@ -295,7 +295,7 @@ public sealed class MoveNotationTests
     }
 
     [Fact]
-    public void LanRankFileAmbiguationPositiveTest()
+    public void LanRankFileAmbiguationPositive()
     {
         // Tests both knights moving to same square for Rank ambiguity
 
@@ -332,7 +332,7 @@ public sealed class MoveNotationTests
     }
 
     [Fact]
-    public void LanFileAmbiguationPositiveTest()
+    public void LanFileAmbiguationPositive()
     {
         // Tests both knights moving to same square for File ambiguity
 
@@ -369,7 +369,7 @@ public sealed class MoveNotationTests
     }
 
     [Fact]
-    public void RanRankAmbiguationPositiveTest()
+    public void RanRankAmbiguationPositive()
     {
         // Tests both knights moving to same square for Rank ambiguity
 
@@ -406,7 +406,7 @@ public sealed class MoveNotationTests
     }
 
     [Fact]
-    public void RanRankFileAmbiguationPositiveTest()
+    public void RanRankFileAmbiguationPositive()
     {
         // Tests both knights moving to same square for Rank ambiguity
 
@@ -443,7 +443,7 @@ public sealed class MoveNotationTests
     }
 
     [Fact]
-    public void RanFileAmbiguationPositiveTest()
+    public void RanFileAmbiguationPositive()
     {
         // Tests both knights moving to same square for File ambiguity
 
@@ -480,7 +480,7 @@ public sealed class MoveNotationTests
     }
 
     [Fact]
-    public void RookSanAmbiguityTest()
+    public void RookSanAmbiguity()
     {
         // Tests rook ambiguity notation for white rooks @ e1 and g2. Author : johnathandavis
 

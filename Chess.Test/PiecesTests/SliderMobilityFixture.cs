@@ -24,15 +24,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Test.Pieces;
+using Rudz.Chess.Types;
+using Rudz.Chess;
+using System;
 
-public interface IPieceAttacks
+namespace Chess.Test.PiecesTests;
+
+public sealed class SliderMobilityFixture
 {
-    void AlphaPattern();
+    private static readonly Func<Square, BitBoard, BitBoard>[] SlideAttacks = { MagicBB.BishopAttacks, MagicBB.RookAttacks, MagicBB.QueenAttacks };
 
-    void BetaPattern();
+    public SliderMobilityFixture()
+    {
+    }
 
-    void GammaPattern();
-
-    void DeltaPattern();
+    public Func<Square, BitBoard, BitBoard>[] SliderAttacks => SlideAttacks;
 }

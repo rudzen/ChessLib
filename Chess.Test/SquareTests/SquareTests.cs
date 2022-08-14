@@ -24,7 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Test.Square;
+namespace Chess.Test.SquareTests;
 
 using Rudz.Chess.Enums;
 using Rudz.Chess.Types;
@@ -33,7 +33,7 @@ using Xunit;
 public sealed class SquareTests
 {
     [Fact]
-    public void SquareOppositeColorPositiveTest()
+    public void SquareOppositeColorPositive()
     {
         const bool expected = true;
 
@@ -46,7 +46,7 @@ public sealed class SquareTests
     }
 
     [Fact]
-    public void SquareOppositeColorNegativeTest()
+    public void SquareOppositeColorNegative()
     {
         const bool expected = false;
 
@@ -59,7 +59,7 @@ public sealed class SquareTests
     }
 
     [Fact]
-    public void RelativeSquareBlackTest()
+    public void RelativeSquareBlack()
     {
         const Squares expected = Squares.h8;
 
@@ -71,7 +71,7 @@ public sealed class SquareTests
     }
 
     [Fact]
-    public void RelativeSquareWhiteTest()
+    public void RelativeSquareWhite()
     {
         const Squares expected = Squares.c3;
 

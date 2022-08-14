@@ -24,7 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Test.Pieces;
+namespace Chess.Test.PiecesTest;
 
 using FluentAssertions;
 using System.Linq;
@@ -33,7 +33,7 @@ using Xunit;
 public sealed class PieceAttacksKnightTests : PieceAttacksRegular
 {
     [Fact]
-    public override void AlphaPattern()
+    public void AlphaPattern()
     {
         const int index = (int)EBands.Alpha;
         const int attackIndex = 1;
@@ -53,7 +53,7 @@ public sealed class PieceAttacksKnightTests : PieceAttacksRegular
     }
 
     [Fact]
-    public override void BetaPattern()
+    public void BetaPattern()
     {
         const int index = (int)EBands.Beta;
         const int attackIndex = 1;
@@ -71,7 +71,7 @@ public sealed class PieceAttacksKnightTests : PieceAttacksRegular
     }
 
     [Fact]
-    public override void GammaPattern()
+    public void GammaPattern()
     {
         const int index = (int)EBands.Gamma;
         const int attackIndex = 1;
@@ -82,7 +82,7 @@ public sealed class PieceAttacksKnightTests : PieceAttacksRegular
     }
 
     [Fact]
-    public override void DeltaPattern()
+    public void DeltaPattern()
     {
         const int index = (int)EBands.Delta;
         const int attackIndex = 1;

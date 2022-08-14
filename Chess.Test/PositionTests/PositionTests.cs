@@ -24,7 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Test.Position;
+namespace Chess.Test.PositionTests;
 
 using FluentAssertions;
 using Rudz.Chess;
@@ -69,7 +69,7 @@ public sealed class PositionTests
     }
 
     [Fact]
-    public void KingBlockerTest()
+    public void KingBlocker()
     {
         // black has an absolute pinned piece at e6
         const string fen = "1rk5/8/4n3/5B2/1N6/8/8/1Q1K4 b - - 3 53";

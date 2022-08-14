@@ -37,7 +37,7 @@ using Xunit;
 public sealed class MoveTests
 {
     [Fact]
-    public void TestSquares()
+    public void MoveSquares()
     {
         // test all squares, including invalid moves (same from and to)
         for (var i = 0; i < 64; i++)
@@ -70,7 +70,7 @@ public sealed class MoveTests
     }
 
     [Fact]
-    public void TestAllBasicMove()
+    public void AllBasicMove()
     {
         Square expectedFrom = Squares.a2;
         Square expectedTo = Squares.h8;
@@ -105,7 +105,7 @@ public sealed class MoveTests
     }
 
     [Fact]
-    public void MoveToStringTest()
+    public void MoveToString()
     {
         var moves = new List<Move>(128);
         var movesString = new List<Movestrings>(128);
@@ -117,9 +117,9 @@ public sealed class MoveTests
         var tmp = new StringBuilder(128);
 
         // build move list and expected result
-        for (Square s1 = Squares.a1; s1; s1++)
+        for (Square s1 = Squares.a1; s1 <= Squares.h8; s1++)
         {
-            for (Square s2 = Squares.a2; s2; s2++)
+            for (Square s2 = Squares.a2; s2 <= Squares.h8; s2++)
             {
                 if (s1 == s2)
                     continue;

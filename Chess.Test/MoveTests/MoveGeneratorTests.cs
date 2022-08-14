@@ -24,7 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Test.Move;
+namespace Chess.Test.MoveTests;
 
 using Rudz.Chess;
 using Rudz.Chess.Fen;
@@ -35,7 +35,7 @@ using Xunit;
 public class MoveGeneratorTests
 {
     [Fact]
-    public void InCheckMoveGenerationTest()
+    public void InCheckMoveGeneration()
     {
         const string fen = "rnbqkbnr/1ppQpppp/p2p4/8/8/2P5/PP1PPPPP/RNB1KBNR b KQkq - 1 6";
         const int expectedMoves = 4;
