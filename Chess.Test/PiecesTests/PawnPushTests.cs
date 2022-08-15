@@ -26,34 +26,18 @@ SOFTWARE.
 
 namespace Chess.Test.PiecesTest;
 
+using Rudz.Chess.Enums;
 using Rudz.Chess.Types;
 using Xunit;
 
 public sealed class PawnPushTests
 {
-    [Fact]
-    public void PawnPushNorth()
+    [Theory]
+    [InlineData(Directions.North, 1)]
+    [InlineData(Directions.South, 1)]
+    public void PawnPush(Directions direction, int expected)
     {
         var fullBoard = BitBoards.PawnSquares;
-        var direction = Direction.North;
-
-        const int expected = 1;
-
-        foreach (var sq in fullBoard)
-        {
-            var toSq = sq + direction;
-            var actual = sq.Distance(toSq);
-            Assert.Equal(expected, actual);
-        }
-    }
-
-    [Fact]
-    public void PawnPushSouth()
-    {
-        var fullBoard = BitBoards.PawnSquares;
-        var direction = Direction.South;
-
-        const int expected = 1;
 
         foreach (var sq in fullBoard)
         {

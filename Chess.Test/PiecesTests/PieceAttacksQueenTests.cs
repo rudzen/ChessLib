@@ -32,7 +32,7 @@ using Rudz.Chess.Types;
 using System.Linq;
 using Xunit;
 
-public sealed class PieceAttacksQueenTests : PieceAttacksSliders, IClassFixture<SliderMobilityFixture>
+public sealed class PieceAttacksQueenTests : PieceAttacks, IClassFixture<SliderMobilityFixture>
 {
     private readonly SliderMobilityFixture fixture;
 
@@ -46,7 +46,7 @@ public sealed class PieceAttacksQueenTests : PieceAttacksSliders, IClassFixture<
     {
         const int index = (int)EBands.Alpha;
         const int sliderIndex = 2;
-        var expected = BishopExpected[index] + RookExpected[index];
+        var expected = fixture.BishopExpected[index] + fixture.RookExpected[index];
         var actuals = Bands[index].Select(x => fixture.SliderAttacks[sliderIndex](x, BitBoard.Empty).Count);
 
         actuals.Should().AllBeEquivalentTo(expected);
@@ -57,7 +57,7 @@ public sealed class PieceAttacksQueenTests : PieceAttacksSliders, IClassFixture<
     {
         const int index = (int)EBands.Beta;
         const int sliderIndex = 2;
-        var expected = BishopExpected[index] + RookExpected[index];
+        var expected = fixture.BishopExpected[index] + fixture.RookExpected[index];
         var actuals = Bands[index].Select(x => fixture.SliderAttacks[sliderIndex](x, BitBoard.Empty).Count);
 
         actuals.Should().AllBeEquivalentTo(expected);
@@ -68,7 +68,7 @@ public sealed class PieceAttacksQueenTests : PieceAttacksSliders, IClassFixture<
     {
         const int index = (int)EBands.Gamma;
         const int sliderIndex = 2;
-        var expected = BishopExpected[index] + RookExpected[index];
+        var expected = fixture.BishopExpected[index] + fixture.RookExpected[index];
         var actuals = Bands[index].Select(x => fixture.SliderAttacks[sliderIndex](x, BitBoard.Empty).Count);
 
         actuals.Should().AllBeEquivalentTo(expected);
@@ -79,7 +79,7 @@ public sealed class PieceAttacksQueenTests : PieceAttacksSliders, IClassFixture<
     {
         const int index = (int)EBands.Delta;
         const int sliderIndex = 2;
-        var expected = BishopExpected[index] + RookExpected[index];
+        var expected = fixture.BishopExpected[index] + fixture.RookExpected[index];
         var actuals = Bands[index].Select(x => fixture.SliderAttacks[sliderIndex](x, BitBoard.Empty).Count);
 
         actuals.Should().AllBeEquivalentTo(expected);

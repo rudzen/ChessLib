@@ -34,7 +34,7 @@ using Rudz.Chess.Types;
 using System.Linq;
 using Xunit;
 
-public sealed class PieceAttacksRookTests : PieceAttacksSliders, IClassFixture<SliderMobilityFixture>
+public sealed class PieceAttacksRookTests : PieceAttacks, IClassFixture<SliderMobilityFixture>
 {
     private readonly SliderMobilityFixture fixture;
 
@@ -60,8 +60,8 @@ public sealed class PieceAttacksRookTests : PieceAttacksSliders, IClassFixture<S
     }
 
     /// <summary>
-    /// Testing results of blocked rook attacks, they should always return 7 on the sides, and
-    /// 14 in the corner
+    /// Testing results of blocked rook attacks, they should always return 7 on the sides, and 14 in
+    /// the corner
     /// </summary>
     [Fact]
     public void RookBorderBlocked()

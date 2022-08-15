@@ -26,24 +26,33 @@ SOFTWARE.
 
 namespace Chess.Test.PiecesTest;
 
+using Chess.Test.PiecesTests;
 using FluentAssertions;
 using System.Linq;
 using Xunit;
 
-public sealed class PieceAttacksKingTests : PieceAttacksRegular
+public sealed class PieceAttacksKingTests : PieceAttacks, IClassFixture<RegularMobilityFixture>
 {
+    private readonly RegularMobilityFixture _fixture;
+
+    public PieceAttacksKingTests(RegularMobilityFixture fixture)
+    {
+        _fixture = fixture;
+    }
+
     [Fact]
     public void AlphaPattern()
     {
         const int index = (int)EBands.Alpha;
         const int attackIndex = 2;
 
-        // special case, as the expected values vary depending on the kings location on the
-        // outer rim
+        // special case, as the expected values vary depending on the kings location on the outer rim
         foreach (var pieceLocation in Bands[index])
         {
-            var attacks = RegAttacks[attackIndex](pieceLocation);
-            var expected = (BoardCorners & pieceLocation) != 0 ? KingExpected[index] - 2 /* for corners */ : KingExpected[index];
+            var attacks = _fixture.RegAttacks[attackIndex](pieceLocation);
+            var expected = (_fixture.BoardCorners & pieceLocation) != 0
+                ? _fixture.KingExpected[index] - 2 /* for corners */
+                : _fixture.KingExpected[index];
             Assert.Equal(expected, attacks.Count);
         }
     }
@@ -53,8 +62,8 @@ public sealed class PieceAttacksKingTests : PieceAttacksRegular
     {
         const int index = (int)EBands.Beta;
         const int attackIndex = 2;
-        var expected = KingExpected[index];
-        var actuals = Bands[index].Select(x => RegAttacks[attackIndex](x).Count);
+        var expected = _fixture.KingExpected[index];
+        var actuals = Bands[index].Select(x => _fixture.RegAttacks[attackIndex](x).Count);
 
         actuals.Should().AllBeEquivalentTo(expected);
     }
@@ -64,8 +73,8 @@ public sealed class PieceAttacksKingTests : PieceAttacksRegular
     {
         const int index = (int)EBands.Gamma;
         const int attackIndex = 2;
-        var expected = KingExpected[index];
-        var actuals = Bands[index].Select(x => RegAttacks[attackIndex](x).Count);
+        var expected = _fixture.KingExpected[index];
+        var actuals = Bands[index].Select(x => _fixture.RegAttacks[attackIndex](x).Count);
 
         actuals.Should().AllBeEquivalentTo(expected);
     }
@@ -75,8 +84,8 @@ public sealed class PieceAttacksKingTests : PieceAttacksRegular
     {
         const int index = (int)EBands.Delta;
         const int attackIndex = 2;
-        var expected = KingExpected[index];
-        var actuals = Bands[index].Select(x => RegAttacks[attackIndex](x).Count);
+        var expected = _fixture.KingExpected[index];
+        var actuals = Bands[index].Select(x => _fixture.RegAttacks[attackIndex](x).Count);
 
         actuals.Should().AllBeEquivalentTo(expected);
     }

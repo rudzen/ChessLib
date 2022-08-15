@@ -24,24 +24,24 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Test.PiecesTest;
-
 using Rudz.Chess.Enums;
 using Rudz.Chess.Types;
 using System;
 
-public abstract class PieceAttacksRegular : PieceAttacks
+namespace Chess.Test.PiecesTests;
+
+public sealed class RegularMobilityFixture
 {
     // special case with alpha and beta bands in the corners are taken care of
-    protected static readonly int[] KnightExpected = { 4, 6, 8, 8 };
+    public int[] KnightExpected { get; } = { 4, 6, 8, 8 };
 
     // special case with alpha band is taken care of
-    protected static readonly int[] KingExpected = { 5, 8, 8, 8 };
+    public int[] KingExpected { get; } = { 5, 8, 8, 8 };
 
-    protected static readonly BitBoard BoardCorners
+    public BitBoard BoardCorners { get; }
         = BitBoards.MakeBitboard(Squares.a1) | BitBoards.MakeBitboard(Squares.a8)
         | BitBoards.MakeBitboard(Squares.h1) | BitBoards.MakeBitboard(Squares.h8);
 
     // pawn = 0 (N/A for now), knight = 1, king = 2
-    protected readonly Func<Square, BitBoard>[] RegAttacks = { BitBoards.KnightAttacks, BitBoards.KnightAttacks, BitBoards.KingAttacks };
+    public Func<Square, BitBoard>[] RegAttacks { get; } = { BitBoards.KnightAttacks, BitBoards.KnightAttacks, BitBoards.KingAttacks };
 }

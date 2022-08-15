@@ -24,7 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Test.Move;
+namespace Chess.Test.MoveTests;
 
 using Rudz.Chess.Enums;
 using Rudz.Chess.Factories;

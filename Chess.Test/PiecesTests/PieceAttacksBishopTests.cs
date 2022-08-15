@@ -44,7 +44,7 @@ public sealed class PieceAttacksBishopTests : PieceAttacks, IClassFixture<Slider
         this.fixture = fixture;
     }
 
-    // Slider index 
+    // Slider index
 
     [Theory]
     [InlineData(Alpha, 0, 7)]
@@ -62,8 +62,8 @@ public sealed class PieceAttacksBishopTests : PieceAttacks, IClassFixture<Slider
     }
 
     /// <summary>
-    /// Testing results of blocked bishop attacks, they should always return 2 on the sides, and
-    /// 1 in the corner
+    /// Testing results of blocked bishop attacks, they should always return 2 on the sides, and 1
+    /// in the corner
     /// </summary>
     [Fact]
     public void BishopBorderBlocked()

@@ -57,10 +57,6 @@ public sealed class Position : IPosition
     private readonly IPositionValidator _positionValidator;
     private Player _sideToMove;
 
-    public Position(IPieceValue pieceValues) : this(new Board(), pieceValues)
-    {
-    }
-
     public Position(IBoard board, IPieceValue pieceValues)
     {
         Board = board;
@@ -453,6 +449,7 @@ public sealed class Position : IPosition
         var ksq = GetKingSquare(us);
 
         Debug.Assert(GetPiece(GetKingSquare(us)) == PieceTypes.King.MakePiece(us));
+        Debug.Assert(to != from);
 
         // En passant captures are a tricky special case. Because they are rather uncommon, we
         // do it simply by testing whether the king is attacked after the move is made.

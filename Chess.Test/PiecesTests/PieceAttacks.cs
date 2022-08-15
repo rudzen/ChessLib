@@ -29,10 +29,7 @@ namespace Chess.Test.PiecesTest;
 using Rudz.Chess.Types;
 
 /// <summary>
-/// Position indication is as follows:
-/// Alpha = Outer band (edge)
-/// Beta  = 2nd band
-/// Gamma = 3rd band
+/// Position indication is as follows: Alpha = Outer band (edge) Beta = 2nd band Gamma = 3rd band
 /// Delta = 4th band (inner 4 squares)
 /// </summary>
 public abstract class PieceAttacks

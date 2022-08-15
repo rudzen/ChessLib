@@ -24,8 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using Rudz.Chess.Types;
 using Rudz.Chess;
+using Rudz.Chess.Types;
 using System;
 
 namespace Chess.Test.PiecesTests;
@@ -33,6 +33,10 @@ namespace Chess.Test.PiecesTests;
 public sealed class SliderMobilityFixture
 {
     private static readonly Func<Square, BitBoard, BitBoard>[] SlideAttacks = { MagicBB.BishopAttacks, MagicBB.RookAttacks, MagicBB.QueenAttacks };
+
+    public int[] BishopExpected { get; } = { 7, 9, 11, 13 };
+
+    public int[] RookExpected { get; } = { 14, 14, 14, 14 };
 
     public SliderMobilityFixture()
     {
