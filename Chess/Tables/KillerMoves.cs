@@ -51,8 +51,8 @@ public sealed class KillerMoves : IKillerMoves
         _killerMoves = new IPieceSquare[_maxDepth, 2];
         for (var depth = 0; depth < _maxDepth; depth++)
         {
-            _killerMoves[depth, 0] = new PieceSquare(Piece.EmptyPiece, Square.None);
-            _killerMoves[depth, 1] = new PieceSquare(Piece.EmptyPiece, Square.None);
+            _killerMoves[depth, 0] = new PieceSquareEventArgs(Piece.EmptyPiece, Square.None);
+            _killerMoves[depth, 1] = new PieceSquareEventArgs(Piece.EmptyPiece, Square.None);
         }
         Reset();
         return this;

@@ -36,7 +36,7 @@ public sealed class PieceSquareTests
     public void GetSquare()
     {
         const Squares expected = Squares.a5;
-        var ps = new PieceSquare(Piece.EmptyPiece, expected);
+        var ps = new PieceSquareEventArgs(Piece.EmptyPiece, expected);
         var actual = ps.Square;
         var expectedSquare = new Square(expected);
         Assert.Equal(expectedSquare, actual);
@@ -46,7 +46,7 @@ public sealed class PieceSquareTests
     public void GetPiece()
     {
         const Pieces expected = Pieces.BlackKnight;
-        var ps = new PieceSquare(expected, Square.None);
+        var ps = new PieceSquareEventArgs(expected, Square.None);
         var actual = ps.Piece;
         var expectedPiece = new Piece(expected);
         Assert.Equal(expectedPiece, actual);
@@ -61,7 +61,7 @@ public sealed class PieceSquareTests
             foreach (var sq in BitBoards.AllSquares)
             {
                 var expectedSquare = new Square(sq);
-                var ps = new PieceSquare(expectedPiece, expectedSquare);
+                var ps = new PieceSquareEventArgs(expectedPiece, expectedSquare);
                 Assert.Equal(expectedPiece, ps.Piece);
                 Assert.Equal(expectedSquare, sq);
             }

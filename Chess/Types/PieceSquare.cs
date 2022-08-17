@@ -32,9 +32,9 @@ using System;
 /// Model for data transfer of piece and square Used for notification when a piece is updated in
 /// the chess structure
 /// </summary>
-public class PieceSquare : EventArgs, IPieceSquare
+public sealed class PieceSquareEventArgs : EventArgs, IPieceSquare
 {
-    public PieceSquare(Piece piece, Square square)
+    public PieceSquareEventArgs(Piece piece, Square square)
     {
         Piece = piece;
         Square = square;
@@ -48,7 +48,7 @@ public class PieceSquare : EventArgs, IPieceSquare
         => other is not null && (ReferenceEquals(this, other) || Piece.Equals(other.Piece) && Square.Equals(other.Square));
 
     public override bool Equals(object obj)
-        => obj is not null && (ReferenceEquals(this, obj) || obj.GetType() == GetType() && Equals((PieceSquare)obj));
+        => obj is not null && (ReferenceEquals(this, obj) || obj.GetType() == GetType() && Equals((PieceSquareEventArgs)obj));
 
     public override int GetHashCode()
     {
