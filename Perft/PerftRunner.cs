@@ -57,8 +57,6 @@ public sealed class PerftRunner : IPerftRunner
 
     private static readonly Lazy<string> CurrentDirectory = new(() => System.Environment.CurrentDirectory);
 
-    private readonly IDictionary<HashKey, ulong> _resultCache;
-
     private readonly Func<CancellationToken, IAsyncEnumerable<IPerftPosition>>[] _runners;
 
     private readonly IEpdParser _epdParser;
@@ -103,8 +101,6 @@ public sealed class PerftRunner : IPerftRunner
         TranspositionTableOptions = Framework.IoC.Resolve<IOptions>(OptionType.TTOptions) as TTOptions;
         configuration.Bind("TranspositionTable", TranspositionTableOptions);
 
-        _resultCache = new Dictionary<HashKey, ulong>(256);
-
         _outputSettings = new JsonSerializerSettings
         {
             Formatting = Formatting.Indented
@@ -125,8 +121,7 @@ public sealed class PerftRunner : IPerftRunner
     {
         LogInfoHeader();
 
-        if (Options == null)
-            throw new ArgumentNullException(nameof(Options), "Cannot be null");
+        InternalRunArgumentCheck(Options);
 
         if (TranspositionTableOptions.Use)
             Game.Table.SetSize(TranspositionTableOptions.Size);
@@ -158,6 +153,12 @@ public sealed class PerftRunner : IPerftRunner
         }
 
         return errors;
+    }
+
+    private static void InternalRunArgumentCheck(IOptions options)
+    {
+        if (options == null)
+            throw new ArgumentNullException(nameof(options), "Cannot be null");
     }
 
     private IAsyncEnumerable<IPerftPosition> ParseEpd(CancellationToken cancellationToken)

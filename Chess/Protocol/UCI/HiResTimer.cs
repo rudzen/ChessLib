@@ -35,7 +35,7 @@ using Types;
 /// <summary>
 /// Idea From https://stackoverflow.com/a/41697139/548894
 /// </summary>
-public sealed class HiResTimer : IHiResTimer
+public sealed class HiResTimer : IHiResTimer, IEquatable<HiResTimer>
 {
     public static readonly double TickLength = 1000f / Stopwatch.Frequency; // ms
 
@@ -173,7 +173,7 @@ public sealed class HiResTimer : IHiResTimer
             nextTrigger += Interval;
             double elapsed;
 
-            while (true)
+            do
             {
                 elapsed = ElapsedHiRes(stopwatch);
                 var diff = nextTrigger - elapsed;
@@ -191,7 +191,7 @@ public sealed class HiResTimer : IHiResTimer
 
                 if (cancellationToken.IsCancellationRequested)
                     return;
-            }
+            } while (true);
 
             var delay = elapsed - nextTrigger;
             Elapsed?.Invoke(new HiResTimerArgs(delay, Id));

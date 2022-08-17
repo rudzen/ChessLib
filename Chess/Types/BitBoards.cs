@@ -152,6 +152,8 @@ public static class BitBoards
 
     private static readonly BitBoard[][] DistanceRingBB;
 
+    private static readonly Direction[] PawnPushDirections = new Direction[] { Direction.North, Direction.South };
+
     private static readonly IDictionary<Direction, Func<BitBoard, BitBoard>> ShiftFuncs = MakeShiftFuncs();
 
     private static readonly Func<BitBoard, BitBoard>[] FillFuncs = MakeFillFuncs();
@@ -310,7 +312,7 @@ public static class BitBoards
             {
                 KingRingBB[player.Side][sq] = PseudoAttacksBB[pt][sq];
                 if (s1.RelativeRank(player) == Ranks.Rank1)
-                    KingRingBB[player.Side][sq] |= KingRingBB[player.Side][sq].Shift(player.IsWhite ? Direction.North : Direction.South);
+                    KingRingBB[player.Side][sq] |= KingRingBB[player.Side][sq].Shift(PawnPushDirections[player.Side]);
 
                 if (file == Files.FileH)
                     KingRingBB[player.Side][sq] |= KingRingBB[player.Side][sq].WestOne();

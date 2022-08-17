@@ -545,7 +545,7 @@ public sealed class Position : IPosition
         if (pc.Type() == PieceTypes.Pawn)
         {
             // We have already handled promotion moves, so destination cannot be on the 8th/1st rank.
-            if (to.Rank == Ranks.Rank8.RelativeRank(us))
+            if (to.Rank == Rank.RANK_8.RelativeRank(us))
                 return false;
 
             if ((from.PawnAttack(us) & Pieces(~us) & to).IsEmpty // Not a capture
@@ -705,7 +705,7 @@ public sealed class Position : IPosition
             {
                 var promotionPiece = m.PromotedPieceType().MakePiece(us);
 
-                Debug.Assert(to.RelativeRank(us) == Ranks.Rank8);
+                Debug.Assert(to.RelativeRank(us) == Rank.RANK_8);
                 Debug.Assert(promotionPiece.Type().InBetween(PieceTypes.Knight, PieceTypes.Queen));
 
                 RemovePiece(to);
@@ -1196,7 +1196,7 @@ public sealed class Position : IPosition
         if (m.IsPromotionMove())
         {
             Debug.Assert(pc.Type() == m.PromotedPieceType());
-            Debug.Assert(to.RelativeRank(us) == Ranks.Rank8);
+            Debug.Assert(to.RelativeRank(us) == Rank.RANK_8);
             Debug.Assert(m.PromotedPieceType() >= PieceTypes.Knight && m.PromotedPieceType() <= PieceTypes.Queen);
 
             RemovePiece(to);

@@ -64,9 +64,9 @@ public readonly struct Player : IEquatable<Player>
 
     public char Fen => PlayerFen[Side];
 
-    public static readonly Player White = 0;
+    public static Player White { get; } = 0;
 
-    public static readonly Player Black = 1;
+    public static Player Black { get; } = 1;
 
     public static readonly int Count = (int)Players.PlayerNb;
 

@@ -28,13 +28,26 @@ namespace Rudz.Chess.Types;
 
 using Enums;
 using System;
+using System.IO;
+using System.Linq;
 using System.Runtime.CompilerServices;
 
 public readonly struct Rank : IEquatable<Rank>
 {
     private static readonly char[] RankChars = { '1', '2', '3', '4', '5', '6', '7', '8' };
 
+    private static readonly string[] RankStrings = RankChars.Select(x => x.ToString()).ToArray();
+
     private readonly Ranks _value;
+
+    public static Rank RANK_1 { get; } = new(Ranks.Rank1);
+    public static Rank RANK_2 { get; } = new(Ranks.Rank2);
+    public static Rank RANK_3 { get; } = new(Ranks.Rank3);
+    public static Rank RANK_4 { get; } = new(Ranks.Rank4);
+    public static Rank RANK_5 { get; } = new(Ranks.Rank5);
+    public static Rank RANK_6 { get; } = new(Ranks.Rank6);
+    public static Rank RANK_7 { get; } = new(Ranks.Rank7);
+    public static Rank RANK_8 { get; } = new(Ranks.Rank8);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Rank(int file) => _value = (Ranks)file;
@@ -141,7 +154,7 @@ public readonly struct Rank : IEquatable<Rank>
 
     public bool IsValid() => _value < Ranks.RankNb;
 
-    public override string ToString() => ((int)_value + 1).ToString();
+    public override string ToString() => RankStrings[(int)_value + 1];
 
     public bool Equals(Rank other) => _value == other._value;
 

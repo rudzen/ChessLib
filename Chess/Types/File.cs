@@ -35,7 +35,7 @@ public readonly struct File : IEquatable<File>
 {
     private static readonly char[] FileChars = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' };
 
-    private static readonly string[] FileStrings;
+    private static readonly string[] FileStrings = FileChars.Select(x => x.ToString()).ToArray();
 
     public readonly Files Value;
 
@@ -47,8 +47,6 @@ public readonly struct File : IEquatable<File>
     public static File FILE_F { get; } = new(Files.FileF);
     public static File FILE_G { get; } = new(Files.FileG);
     public static File FILE_H { get; } = new(Files.FileH);
-
-    static File() => FileStrings = FileChars.Select(x => x.ToString()).ToArray();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public File(int file) => Value = (Files)file;

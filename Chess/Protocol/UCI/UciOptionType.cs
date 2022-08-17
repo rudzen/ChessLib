@@ -31,5 +31,6 @@ public enum UciOptionType
     Button,
     Check,
     Text,
-    Spin
+    Spin,
+    Combo
 }

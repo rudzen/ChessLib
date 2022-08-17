@@ -29,6 +29,7 @@ namespace Rudz.Chess;
 using Enums;
 using Extensions;
 using System;
+using System.Linq;
 using Types;
 
 public sealed class State : IEquatable<State>
@@ -208,12 +209,8 @@ public sealed class State : IEquatable<State>
         hashCode.Add(Checkers);
         hashCode.Add(Previous);
         hashCode.Add(CapturedPiece);
-        foreach (var pinner in Pinners)
-            if (!pinner.IsEmpty)
-                hashCode.Add(pinner);
-        foreach (var checkedSquare in CheckedSquares)
-            if (!checkedSquare.IsEmpty)
-                hashCode.Add(checkedSquare);
+        hashCode.Add(Pinners.Where(p => !p.IsEmpty));
+        hashCode.Add(CheckedSquares.Where(csq => !csq.IsEmpty));
         return hashCode.ToHashCode();
     }
 }
