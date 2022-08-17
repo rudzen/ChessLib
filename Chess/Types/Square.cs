@@ -66,6 +66,10 @@ public readonly struct Square : IComparable<Square>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private Square(Squares square) => Value = square;
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static implicit operator Square(string value)
+    => new(new Square(value[1] - '1', value[0] - 'a'));
+
     public readonly Squares Value;
 
     public Rank Rank
