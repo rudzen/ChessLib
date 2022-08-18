@@ -188,7 +188,6 @@ public static class Fen
         var result = (spaceCount: 0, separatorCount: 0);
 
         foreach (var c in str)
-        {
             switch (c)
             {
                 case Separator:
@@ -199,7 +198,6 @@ public static class Fen
                     result.spaceCount++;
                     break;
             }
-        }
 
         return result;
     }

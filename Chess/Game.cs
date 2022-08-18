@@ -66,7 +66,7 @@ public sealed class Game : IGame
 
     public GameEndTypes GameEndType { get; set; }
 
-    public static TranspositionTable Table { get; set; }
+    public static TranspositionTable Table { get; }
 
     public bool IsRepetition => Pos.IsRepetition;
 

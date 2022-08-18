@@ -119,7 +119,7 @@ public static class MoveGenerator
         Player us,
         MoveGenerationType type)
     {
-        Debug.Assert(type == MoveGenerationType.Captures || type == MoveGenerationType.Quiets || type == MoveGenerationType.NonEvasions);
+        Debug.Assert(type is MoveGenerationType.Captures or MoveGenerationType.Quiets or MoveGenerationType.NonEvasions);
         Debug.Assert(!pos.InCheck);
         var target = type switch
         {
@@ -204,13 +204,11 @@ public static class MoveGenerator
         // it's an en-pessant move the move is checked, otherwise we assume the move is legal.
         var pinnedIsEmpty = pinned.IsEmpty;
         while (index != end)
-        {
             if ((!pinnedIsEmpty || moves[index].Move.FromSquare() == ksq || moves[index].Move.IsEnPassantMove())
                 && !pos.IsLegal(moves[index].Move))
                 moves[index].Move = moves[--end].Move;
             else
                 ++index;
-        }
 
         return end;
     }
@@ -302,7 +300,7 @@ public static class MoveGenerator
         // Single and double pawn pushes, no promotions
         if (type != MoveGenerationType.Captures)
         {
-            emptySquares = type == MoveGenerationType.Quiets || type == MoveGenerationType.QuietChecks
+            emptySquares = type is MoveGenerationType.Quiets or MoveGenerationType.QuietChecks
                 ? target
                 : ~pos.Pieces();
 

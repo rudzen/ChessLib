@@ -111,7 +111,7 @@ public struct Score : IEquatable<Score>
     public readonly int Mg()
         => _data.mg;
 
-    public override string ToString()
+    public readonly override string ToString()
         => $"Mg:{_data.mg}, Eg:{_data.eg}";
 
     public bool Equals(Score other)

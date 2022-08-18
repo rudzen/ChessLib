@@ -28,7 +28,6 @@ namespace Rudz.Chess.Types;
 
 using Enums;
 using System;
-using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 

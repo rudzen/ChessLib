@@ -33,7 +33,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 [StructLayout(LayoutKind.Explicit, Size = 8)]
-public struct HashKey : IEquatable<HashKey>
+public readonly struct HashKey : IEquatable<HashKey>
 {
     [FieldOffset(0)]
     private readonly uint _lowerKey32;
@@ -108,15 +108,15 @@ public struct HashKey : IEquatable<HashKey>
         => left._key ^ right.GetZobristEnPessant();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public readonly bool Equals(HashKey other)
+    public bool Equals(HashKey other)
         => _key == other._key;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override readonly bool Equals(object obj)
+    public override bool Equals(object obj)
         => obj is HashKey other && Equals(other);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override readonly int GetHashCode()
+    public override int GetHashCode()
         => _key.GetHashCode();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

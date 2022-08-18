@@ -88,8 +88,8 @@ public sealed class PositionTests
         pinnedCount.Should().Be(expected);
 
         // test for correct square
-        var pinnedSquare = b.Lsb();
+        var actual = b.Lsb();
 
-        pinnedSquare.Should().Be(expectedSquare);
+        Assert.Equal(expectedSquare, actual);
     }
 }

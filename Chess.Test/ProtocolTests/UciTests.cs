@@ -63,6 +63,6 @@ public sealed class UciTests
 
         var actual = uci.MoveFromUci(game.Pos, uciMove);
 
-        actual.Should().Be(expected);
+        Assert.Equal(expected, actual);
     }
 }

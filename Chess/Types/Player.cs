@@ -68,7 +68,7 @@ public readonly struct Player : IEquatable<Player>
 
     public static Player Black { get; } = 1;
 
-    public static readonly int Count = (int)Players.PlayerNb;
+    public const int Count = (int)Players.PlayerNb;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator Player(int value) => new((byte)value);

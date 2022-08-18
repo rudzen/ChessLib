@@ -24,6 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+// ReSharper disable MemberCanBeInternal
 namespace Rudz.Chess;
 
 using Enums;
@@ -86,7 +87,7 @@ public sealed class State : IEquatable<State>
         Rule50 = other.Rule50;
         PliesFromNull = other.PliesFromNull;
         EnPassantSquare = other.EnPassantSquare;
-        NonPawnMaterial = new Value[] { other.NonPawnMaterial[0], other.NonPawnMaterial[1] };
+        NonPawnMaterial = new[] { other.NonPawnMaterial[0], other.NonPawnMaterial[1] };
         Previous = other;
 
         Checkers = BitBoard.Empty;
@@ -99,13 +100,13 @@ public sealed class State : IEquatable<State>
     public State()
     {
         LastMove = Move.EmptyMove;
-        NonPawnMaterial = new Value[] { Value.ValueZero, Value.ValueZero };
+        NonPawnMaterial = new[] { Value.ValueZero, Value.ValueZero };
         CastlelingRights = CastlelingRights.None;
         EnPassantSquare = Square.None;
         Checkers = BitBoard.Empty;
         CheckedSquares = new BitBoard[PieceTypes.PieceTypeNb.AsInt()];
-        Pinners = new BitBoard[] { BitBoard.Empty, BitBoard.Empty };
-        BlockersForKing = new BitBoard[] { BitBoard.Empty, BitBoard.Empty };
+        Pinners = new[] { BitBoard.Empty, BitBoard.Empty };
+        BlockersForKing = new[] { BitBoard.Empty, BitBoard.Empty };
         CapturedPiece = Piece.EmptyPiece;
     }
 
@@ -129,8 +130,8 @@ public sealed class State : IEquatable<State>
         else
             other.CheckedSquares.Fill(BitBoard.Empty);
 
-        other.Pinners = new BitBoard[] { BitBoard.Empty, BitBoard.Empty };
-        other.BlockersForKing = new BitBoard[] { BitBoard.Empty, BitBoard.Empty };
+        other.Pinners = new[] { BitBoard.Empty, BitBoard.Empty };
+        other.BlockersForKing = new[] { BitBoard.Empty, BitBoard.Empty };
 
         return other;
     }

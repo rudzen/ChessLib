@@ -24,15 +24,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Protocol.UCI;
-
-using Microsoft.Extensions.ObjectPool;
-using MoveGeneration;
-using Rudz.Chess.Enums;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Types;
+using Microsoft.Extensions.ObjectPool;
+using Rudz.Chess.Enums;
+using Rudz.Chess.MoveGeneration;
+using Rudz.Chess.Types;
+
+namespace Rudz.Chess.Protocol.UCI;
 
 public class Uci : IUci
 {
@@ -160,7 +160,7 @@ public class Uci : IUci
         else if (score <= alpha)
             sb.Append("upperbound ");
 
-        sb.AppendFormat("nodes {0} nps {1} tbhits {2} time {3} ", nodes, Nps(nodes, time), Game.Table.Hits, time.Milliseconds);
+        sb.Append($"nodes {nodes} nps {Nps(nodes, time)} tbhits {Game.Table.Hits} time {time.Milliseconds} ");
         sb.AppendJoin(' ', pvLine);
 
         var result = sb.ToString();

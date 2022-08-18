@@ -38,9 +38,5 @@ public sealed class SliderMobilityFixture
 
     public int[] RookExpected { get; } = { 14, 14, 14, 14 };
 
-    public SliderMobilityFixture()
-    {
-    }
-
     public Func<Square, BitBoard, BitBoard>[] SliderAttacks => SlideAttacks;
 }

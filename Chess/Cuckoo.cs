@@ -27,7 +27,6 @@ SOFTWARE.
 namespace Rudz.Chess;
 
 using Hash;
-using System;
 using System.Diagnostics;
 using Types;
 
@@ -45,36 +44,32 @@ public static class Cuckoo
     {
         var count = 0;
         foreach (var pc in Piece.AllPieces)
-        {
-            foreach (var sq1 in BitBoards.AllSquares)
+        foreach (var sq1 in BitBoards.AllSquares)
+            for (var sq2 = sq1 + 1; sq2 <= Enums.Squares.h8; ++sq2)
             {
-                for (var sq2 = sq1 + 1; sq2 <= Enums.Squares.h8; ++sq2)
+                if ((pc.Type().PseudoAttacks(sq1) & sq2).IsEmpty)
+                    continue;
+
+                var move = Move.Create(sq1, sq2);
+                HashKey key = pc.GetZobristPst(sq1) ^ pc.GetZobristPst(sq2) ^ Zobrist.GetZobristSide();
+                var i = CuckooHashOne(key);
+                while (true)
                 {
-                    if ((pc.Type().PseudoAttacks(sq1) & sq2).IsEmpty)
-                        continue;
+                    (CuckooKeys[i], key) = (key, CuckooKeys[i].Key);
+                    (CuckooMoves[i], move) = (move, CuckooMoves[i]);
 
-                    var move = Move.Create(sq1, sq2);
-                    HashKey key = pc.GetZobristPst(sq1) ^ pc.GetZobristPst(sq2) ^ Zobrist.GetZobristSide();
-                    var i = CuckooHashOne(key);
-                    while (true)
-                    {
-                        (CuckooKeys[i], key) = (key, CuckooKeys[i].Key);
-                        (CuckooMoves[i], move) = (move, CuckooMoves[i]);
+                    // check for empty slot
+                    if (move.IsNullMove())
+                        break;
 
-                        // check for empty slot
-                        if (move.IsNullMove())
-                            break;
-
-                        // Push victim to alternative slot
-                        i = i == CuckooHashOne(key)
-                            ? CuckooHashTwo(key)
-                            : CuckooHashOne(key);
-                    }
-
-                    count++;
+                    // Push victim to alternative slot
+                    i = i == CuckooHashOne(key)
+                        ? CuckooHashTwo(key)
+                        : CuckooHashOne(key);
                 }
+
+                count++;
             }
-        }
 
         Debug.Assert(count == 3668);
     }

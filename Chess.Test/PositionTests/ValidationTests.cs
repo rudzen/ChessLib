@@ -33,7 +33,7 @@ using Rudz.Chess.Types;
 using Rudz.Chess.Validation;
 using Xunit;
 
-public class ValidationTests
+public sealed class ValidationTests
 {
     [Fact]
     public void ValidationKingsNegative()

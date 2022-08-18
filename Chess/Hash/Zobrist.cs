@@ -80,7 +80,7 @@ public static class Zobrist
     /// <summary>
     /// To use as base for pawn hash table
     /// </summary>
-    public static readonly ulong ZobristNoPawn;
+    public static readonly HashKey ZobristNoPawn;
 
     static Zobrist()
     {
@@ -104,13 +104,11 @@ public static class Zobrist
             { Player.White, Player.Black };
 
         foreach (var side in players)
+        foreach (var pieceType in pieceTypes)
         {
-            foreach (var pieceType in pieceTypes)
-            {
-                var pieceIndex = pieceType.MakePiece(side).AsInt();
-                foreach (var sq in BitBoards.AllSquares)
-                    ZobristPst[pieceIndex][sq.AsInt()] = rnd.Rand();
-            }
+            var pieceIndex = pieceType.MakePiece(side).AsInt();
+            foreach (var sq in BitBoards.AllSquares)
+                ZobristPst[pieceIndex][sq.AsInt()] = rnd.Rand();
         }
     }
 

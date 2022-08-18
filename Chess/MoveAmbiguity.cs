@@ -346,7 +346,7 @@ public sealed class MoveAmbiguity : IMoveAmbiguity
         var from = move.FromSquare();
         var pt = _pos.GetPieceType(from);
 
-        return pt == PieceTypes.Pawn || pt == PieceTypes.King
+        return pt is PieceTypes.Pawn or PieceTypes.King
             ? BitBoard.Empty
             : _pos.GetAttacks(move.ToSquare(), pt, _pos.Pieces()) ^ from;
     }

@@ -32,10 +32,10 @@ internal static class PerftTable
 {
     private const int ENTRY_SIZE = 24;
     private const int HASH_MEMORY = 256;
-    private const int TT_SIZE = (HASH_MEMORY * 1024 * 1024) / ENTRY_SIZE;
+    private const int TT_SIZE = HASH_MEMORY * 1024 * 1024 / ENTRY_SIZE;
     private static readonly PerftHashEntry[] _table = new PerftHashEntry[TT_SIZE];
 
-    struct PerftHashEntry
+    private struct PerftHashEntry
     {
         public ulong Hash;
         public ulong Count;

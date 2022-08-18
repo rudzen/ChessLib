@@ -36,16 +36,16 @@ using Types;
 public sealed class MoveList : IMoveList
 {
     private readonly ExtMove[] _moves;
-    private int _cur, _last;
+    private int _cur;
 
     public MoveList()
     {
         _moves = new ExtMove[218];
     }
 
-    int IReadOnlyCollection<ExtMove>.Count => _last;
+    int IReadOnlyCollection<ExtMove>.Count => Length;
 
-    public int Length => _last;
+    public int Length { get; private set; }
 
     public Move CurrentMove => _moves[_cur].Move;
 
@@ -61,16 +61,16 @@ public sealed class MoveList : IMoveList
         set => _moves[index] = value;
     }
 
-    public void Add(ExtMove item) => _moves[_last++] = item;
+    public void Add(ExtMove item) => _moves[Length++] = item;
 
-    public void Add(Move item) => _moves[_last++] = item;
+    public void Add(Move item) => _moves[Length++] = item;
 
     /// <summary>
     /// Reset the moves
     /// </summary>
     public void Clear()
     {
-        _cur = _last = 0;
+        _cur = Length = 0;
         _moves[0].Move = ExtMove.Empty;
     }
 
@@ -79,7 +79,7 @@ public sealed class MoveList : IMoveList
 
     public bool Contains(Move item)
     {
-        for (var i = 0; i < _last; ++i)
+        for (var i = 0; i < Length; ++i)
             if (_moves[i].Move == item)
                 return true;
 
@@ -88,7 +88,7 @@ public sealed class MoveList : IMoveList
 
     public bool Contains(Square from, Square to)
     {
-        for (var i = 0; i < _last; ++i)
+        for (var i = 0; i < Length; ++i)
         {
             var move = _moves[i].Move;
             if (move.FromSquare() == from && move.ToSquare() == to)
@@ -101,17 +101,17 @@ public sealed class MoveList : IMoveList
     public void Generate(IPosition pos, MoveGenerationType type = MoveGenerationType.Legal)
     {
         _cur = 0;
-        _last = MoveGenerator.Generate(pos, _moves, 0, pos.SideToMove, type);
-        _moves[_last] = Move.EmptyMove;
+        Length = MoveGenerator.Generate(pos, _moves, 0, pos.SideToMove, type);
+        _moves[Length] = Move.EmptyMove;
     }
 
     public ReadOnlySpan<ExtMove> Get() =>
-        _last == 0
+        Length == 0
             ? ReadOnlySpan<ExtMove>.Empty
-            : _moves.AsSpan()[.._last];
+            : _moves.AsSpan()[..Length];
 
     public IEnumerator<ExtMove> GetEnumerator()
-        => _moves.Take(_last).GetEnumerator();
+        => _moves.Take(Length).GetEnumerator();
 
     IEnumerator IEnumerable.GetEnumerator()
         => GetEnumerator();

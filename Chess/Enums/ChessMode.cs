@@ -1,8 +1,7 @@
-﻿namespace Rudz.Chess.Enums
+﻿namespace Rudz.Chess.Enums;
+
+public enum ChessMode
 {
-    public enum ChessMode
-    {
-        CHESS_960,
-        NORMAL
-    }
+    CHESS_960,
+    NORMAL
 }

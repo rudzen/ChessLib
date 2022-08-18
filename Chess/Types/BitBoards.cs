@@ -509,9 +509,9 @@ public static class BitBoards
             s.AppendLine($"| {title}");
         for (var r = Ranks.Rank8; r >= Ranks.Rank1; --r)
         {
-            s.AppendFormat("| {0} ", (int)r + 1);
+            s.Append($"| {(int)r + 1} ");
             for (var f = Files.FileA; f <= Files.FileH; ++f)
-                s.AppendFormat("| {0} ", (b & new Square(r, f)).IsEmpty ? ' ' : 'X');
+                s.Append($"| {((b & new Square(r, f)).IsEmpty ? ' ' : 'X')} ");
             s.AppendLine("|\n+---+---+---+---+---+---+---+---+---+");
         }
 

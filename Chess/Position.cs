@@ -149,13 +149,11 @@ public sealed class Position : IPosition
 
         if (pt == PieceTypes.Pawn)
             return attackers.PawnAttackBB(c);
-        else
-        {
-            var threats = BitBoard.Empty;
-            while (attackers)
-                threats |= GetAttacks(BitBoards.PopLsb(ref attackers), pt);
-            return threats;
-        }
+
+        var threats = BitBoard.Empty;
+        while (attackers)
+            threats |= GetAttacks(BitBoards.PopLsb(ref attackers), pt);
+        return threats;
     }
 
     public BitBoard AttacksTo(Square sq, in BitBoard occupied)
@@ -187,13 +185,13 @@ public sealed class Position : IPosition
 
     public bool CastlingImpeded(CastlelingRights cr)
     {
-        Debug.Assert(cr == CastlelingRights.WhiteOo || cr == CastlelingRights.WhiteOoo || cr == CastlelingRights.BlackOo || cr == CastlelingRights.BlackOoo);
+        Debug.Assert(cr is CastlelingRights.WhiteOo or CastlelingRights.WhiteOoo or CastlelingRights.BlackOo or CastlelingRights.BlackOoo);
         return !(Board.Pieces() & _castlingPath[cr.AsInt()]).IsEmpty;
     }
 
     public Square CastlingRookSquare(CastlelingRights cr)
     {
-        Debug.Assert(cr == CastlelingRights.WhiteOo || cr == CastlelingRights.WhiteOoo || cr == CastlelingRights.BlackOo || cr == CastlelingRights.BlackOoo);
+        Debug.Assert(cr is CastlelingRights.WhiteOo or CastlelingRights.WhiteOoo or CastlelingRights.BlackOo or CastlelingRights.BlackOoo);
         return _castlingRookSquare[cr.AsInt()];
     }
 
@@ -206,11 +204,10 @@ public sealed class Position : IPosition
         _castlingPath.Fill(BitBoard.Empty);
         _castlingRightsMask.Fill(CastlelingRights.None);
         _castlingRookSquare.Fill(Square.None);
-        _sideToMove = Players.White;
+        _sideToMove = Player.White;
         ChessMode = ChessMode.NORMAL;
 
-        if (State == null)
-            State = new State();
+        State ??= new State();
     }
 
     /// <summary>
@@ -220,12 +217,12 @@ public sealed class Position : IPosition
     public FenData GenerateFen()
     {
         var sb = new StringBuilder(Fen.Fen.MaxFenLen);
-        int empty;
 
         for (var rank = Ranks.Rank8; rank >= Ranks.Rank1; rank--)
         {
             for (var file = Files.FileA; file <= Files.FileH; file++)
             {
+                int empty;
                 for (empty = 0; file <= Files.FileH && Board.IsEmpty(new Square(rank, file)); ++file)
                     ++empty;
 
@@ -389,7 +386,9 @@ public sealed class Position : IPosition
                 }
             case MoveTypes.Castling:
                 {
+                    // ReSharper disable once InlineTemporaryVariable
                     var kingFrom = from;
+                    // ReSharper disable once InlineTemporaryVariable
                     var rookFrom = to; // Castling is encoded as 'King captures the rook'
                     var kingTo = (rookFrom > kingFrom ? Enums.Squares.g1 : Enums.Squares.c1).RelativeSquare(us);
                     var rookTo = (rookFrom > kingFrom ? Enums.Squares.f1 : Enums.Squares.d1).RelativeSquare(us);
@@ -973,7 +972,6 @@ public sealed class Position : IPosition
         var r = 8; // rank (row)
 
         foreach (var c in fenChunk)
-        {
             if (char.IsNumber(c))
                 f += c - '0';
             else if (c == '/')
@@ -994,7 +992,6 @@ public sealed class Position : IPosition
 
                 f++;
             }
-        }
     }
 
     private void SetupPlayer(ReadOnlySpan<char> fenChunk)
@@ -1015,7 +1012,7 @@ public sealed class Position : IPosition
 
             var otherSide = ~_sideToMove;
 
-            enpassant = !(BitBoards.PawnAttack(State.EnPassantSquare, otherSide) & Pieces(PieceTypes.Pawn, _sideToMove)).IsEmpty
+            enpassant = !(State.EnPassantSquare.PawnAttack(otherSide) & Pieces(PieceTypes.Pawn, _sideToMove)).IsEmpty
                 && !(Pieces(PieceTypes.Pawn, otherSide) & (State.EnPassantSquare + otherSide.PawnPushDistance())).IsEmpty
                 && (Pieces() & (State.EnPassantSquare | (State.EnPassantSquare + _sideToMove.PawnPushDistance()))).IsEmpty;
         }
@@ -1072,105 +1069,6 @@ public sealed class Position : IPosition
         SetupMoveNumber(fenData);
 
         ChessMode = chessMode;
-
-        SetState();
-    }
-
-    public void SetFen(in FenData fen, bool validate = false)
-    {
-        if (validate)
-            Fen.Fen.Validate(fen.Fen.ToString());
-
-        Clear();
-
-        var chunk = fen.Chunk();
-
-        if (chunk.IsEmpty)
-            throw new InvalidFen($"Invalid board layout detected for : {fen.Fen}");
-
-        var f = 1; // file (column)
-        var r = 8; // rank (row)
-
-        foreach (var c in chunk)
-        {
-            if (char.IsNumber(c))
-            {
-                f += c - '0';
-                if (f > 9)
-                    throw new InvalidFen($"File exceeded at index {fen.Index}");
-            }
-            else if (c == '/')
-            {
-                if (f != 9)
-                    throw new InvalidFen($"File value mismatch at index {fen.Index}");
-
-                r--;
-                f = 1;
-            }
-            else
-            {
-                var pieceIndex = PieceExtensions.PieceChars.IndexOf(c);
-
-                if (pieceIndex == -1)
-                    throw new InvalidFen($"Invalid piece information '{c}' at index {fen.Index}");
-
-                Player player = char.IsLower(PieceExtensions.PieceChars[pieceIndex]);
-
-                var square = new Square(r - 1, f - 1);
-
-                var pc = ((PieceTypes)pieceIndex).MakePiece(player);
-                AddPiece(in pc, in square);
-
-                f++;
-            }
-        }
-
-        // player
-        chunk = fen.Chunk();
-
-        if (chunk.IsEmpty || chunk.Length != 1)
-            throw new InvalidFen($"Player information not found at index {fen.Index}");
-
-        _sideToMove = (chunk[0] != 'w').ToInt();
-
-        // castleling
-        chunk = fen.Chunk();
-
-        if (chunk.IsEmpty)
-            throw new InvalidFen($"Castleling information not found at index {fen.Index}");
-
-        SetupCastleling(chunk);
-
-        // en-passant
-        chunk = fen.Chunk();
-
-        State.EnPassantSquare = chunk.Length == 1 || chunk[0] == '-' || !chunk[0].InBetween('a', 'h')
-            ? Square.None
-            : chunk[1] != '3' && chunk[1] != '6'
-                ? Square.None
-                : new Square(chunk[1] - '1', chunk[0] - 'a').Value;
-
-        // move number
-        chunk = fen.Chunk();
-
-        var moveNum = 0;
-        var halfMoveNum = 0;
-
-        if (!chunk.IsEmpty)
-        {
-            chunk.ToIntegral(out halfMoveNum);
-
-            // half move number
-            chunk = fen.Chunk();
-
-            chunk.ToIntegral(out moveNum);
-
-            if (moveNum > 0)
-                moveNum--;
-        }
-
-        State.Rule50 = halfMoveNum;
-        Ply = moveNum;
 
         SetState();
     }
@@ -1381,8 +1279,8 @@ public sealed class Position : IPosition
 
         var materialKey = 0UL;
         foreach (var pc in Piece.AllPieces)
-            for (int cnt = 0; cnt < Board.PieceCount(pc); ++cnt)
-                materialKey ^= Zobrist.GetZobristPst(pc, cnt);
+            for (var cnt = 0; cnt < Board.PieceCount(pc); ++cnt)
+                materialKey ^= pc.GetZobristPst(cnt);
 
         State.Key = key;
         State.PawnStructureKey = pawnKey;

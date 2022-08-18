@@ -29,7 +29,7 @@ namespace Rudz.Chess.Polyglot;
 using System;
 using System.IO;
 
-internal class LittleEndianBinaryStreamReader : BinaryReader
+internal sealed class LittleEndianBinaryStreamReader : BinaryReader
 {
     public LittleEndianBinaryStreamReader(Stream stream) : base(stream) { }
 

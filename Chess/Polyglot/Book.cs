@@ -80,7 +80,7 @@ public sealed class Book : IDisposable
     public string FileName
     {
         get => _fileName;
-        set
+        init
         {
             if (string.IsNullOrEmpty(value))
                 return;
@@ -117,7 +117,7 @@ public sealed class Book : IDisposable
             // Choose book move according to its score. If a move has a very high score it has
             // higher probability to be choosen than a move with lower score. Note that first entry
             // is always chosen.
-            if (sum > 0 && (_rnd.Next() % sum) < e.count || pickBest && e.count == best)
+            if (sum > 0 && _rnd.Next() % sum < e.count || pickBest && e.count == best)
                 polyMove = e.move;
 
             // Stop if we wan't the top pick and move exists

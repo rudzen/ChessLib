@@ -31,8 +31,7 @@ using Types;
 
 internal static class BookZobrist
 {
-    private static readonly ulong[,] psq = new[,]
-        {
+    private static readonly ulong[,] psq = {
                 {
                     0x9D39247E33776D41UL, 0x2AF7398005AAA5C7UL, 0x44DB015024623547UL,
                     0x9C15F73E62A76AE2UL, 0x75834465489C0C89UL, 0x3290AC3A203001BFUL,
@@ -320,11 +319,10 @@ internal static class BookZobrist
                     0x71F1CE2490D20B07UL, 0xF1BCC3D275AFE51AUL, 0xE728E8C83C334074UL,
                     0x96FBF83A12884624UL, 0x81A1549FD6573DA5UL, 0x5FA7867CAF35E149UL,
                     0x56986E2EF3ED091BUL, 0x917F1DD5F8886C61UL, 0xD20D8C88C8FFE65FUL
-                },
-            };
+                }
+        };
 
-    private static readonly ulong[] castle = new[]
-        {
+    private static readonly ulong[] castle = {
             0UL,
             0x31D71DCE64B2C310UL, // white short
             0xF165B587DF898190UL, // white long
@@ -336,8 +334,7 @@ internal static class BookZobrist
             0x1EF6E6DBB1961EC9UL // black long
             };
 
-    private static readonly ulong[] enpassant = new[]
-    {
+    private static readonly ulong[] enpassant = {
         0x70CC73D90BC26E24UL, 0xE21A6B35DF0C3AD7UL, 0x003A93D8B2806962UL, 0x1C99DED33CB890A1UL,
         0xCF3145DE0ADD4289UL, 0xD0E4427A5514FB72UL, 0x77C621CC9FB3A483UL, 0x67A34DAC4356550BUL
     };
@@ -345,22 +342,14 @@ internal static class BookZobrist
     private static readonly ulong turn = 0xF8D626AAAF278509UL;
 
     internal static ulong Psq(int piece, Square sq)
-    {
-        return psq[piece, sq.AsInt()];
-    }
+        => psq[piece, sq.AsInt()];
 
     internal static ulong Castle(CastlelingRights rights)
-    {
-        return castle[rights.AsInt()];
-    }
+        => castle[rights.AsInt()];
 
     internal static ulong EnPassant(File f)
-    {
-        return enpassant[f.AsInt()];
-    }
+        => enpassant[f.AsInt()];
 
     internal static ulong Turn()
-    {
-        return turn;
-    }
+        => turn;
 }

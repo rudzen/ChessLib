@@ -30,13 +30,13 @@ using Xunit;
 
 namespace Chess.Test.TablesTests;
 
-public class KillerMovesTests
+public sealed class KillerMovesTests
 {
     [Fact]
     public void BaseAddMove()
     {
         var km = KillerMoves.Create(128);
-        var depth = 1;
+        const int depth = 1;
         var move = Rudz.Chess.Types.Move.Create(Squares.a2, Squares.a3);
         var pc = PieceTypes.Pawn.MakePiece(Players.White);
 
@@ -51,7 +51,7 @@ public class KillerMovesTests
     public void GetValueWithWrongDepthYieldsZero()
     {
         var km = KillerMoves.Create(128);
-        var depth = 1;
+        const int depth = 1;
         var move = Rudz.Chess.Types.Move.Create(Squares.a2, Squares.a3);
         var pc = PieceTypes.Pawn.MakePiece(Players.White);
 
