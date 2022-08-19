@@ -507,11 +507,25 @@ public static class BitBoards
         var s = new StringBuilder("+---+---+---+---+---+---+---+---+---+\n", 1024);
         if (!title.IsNullOrWhiteSpace())
             s.AppendLine($"| {title}");
+
+        Span<char> row = stackalloc char[36];
         for (var r = Ranks.Rank8; r >= Ranks.Rank1; --r)
         {
-            s.Append($"| {(int)r + 1} ");
+            row.Clear();
+            var rowIndex = 0;
+            row[rowIndex++] = '|';
+            row[rowIndex++] = ' ';
+            row[rowIndex++] = (char)('0' + (int)r + 1);
             for (var f = Files.FileA; f <= Files.FileH; ++f)
-                s.Append($"| {((b & new Square(r, f)).IsEmpty ? ' ' : 'X')} ");
+            {
+                row[rowIndex++] = '|';
+                row[rowIndex++] = ' ';
+                var c = (b & new Square(r, f)).IsEmpty ? ' ' : 'X';
+                row[rowIndex++] = c;
+                row[rowIndex++] = ' ';
+            }
+
+            s.Append(new string(row));
             s.AppendLine("|\n+---+---+---+---+---+---+---+---+---+");
         }
 

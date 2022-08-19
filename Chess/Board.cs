@@ -177,7 +177,7 @@ public sealed class Board : IBoard
         => PieceCount(pt.MakePiece(c));
 
     public int PieceCount(PieceTypes pt)
-        => PieceCount(pt.MakePiece(Player.White)) + PieceCount(pt.MakePiece(Player.Black));
+        => _pieceCount[pt.MakePiece(Player.White).AsInt()] + _pieceCount[pt.MakePiece(Player.Black).AsInt()];
 
     public int PieceCount()
         => PieceCount(PieceTypes.AllPieces);

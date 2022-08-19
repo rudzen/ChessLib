@@ -82,14 +82,14 @@ public static class StringExtensions
     public static IEnumerable<int> GetLocations(this string @this, char token = ' ')
     {
         var pos = 0;
-        while (true)
+        do
         {
             var index = @this.IndexOf(token, pos);
             if (index == -1)
                 yield break;
             yield return index;
             pos = index;
-        }
+        } while (true);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

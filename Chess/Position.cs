@@ -820,10 +820,18 @@ public sealed class Position : IPosition
             to = new Square(from.Rank, file);
         }
 
-        output.Append(from.ToString()).Append(to.ToString());
+        Span<char> s = stackalloc char[5];
+        var index = 0;
+
+        s[index++] = from.FileChar;
+        s[index++] = from.RankChar;
+        s[index++] = to.FileChar;
+        s[index++] = to.RankChar;
 
         if (m.IsPromotionMove())
-            output.Append(char.ToLower(m.PromotedPieceType().GetPieceChar()));
+            s[index++] = char.ToLower(m.PromotedPieceType().GetPieceChar());
+
+        output.Append(new string(s[..index]));
     }
 
     /// <summary>
@@ -1195,7 +1203,7 @@ public sealed class Position : IPosition
                 row[rowIndex++] = space;
             }
 
-            row[rowIndex++] = splitter;
+            row[rowIndex] = splitter;
 
             output.Append(new string(row));
             output.Append(separator);

@@ -322,12 +322,11 @@ public sealed class MoveAmbiguity : IMoveAmbiguity
         var ambiguity = MoveAmbiguities.None;
         var c = _pos.SideToMove;
         var from = move.FromSquare();
+        var pinned = _pos.PinnedPieces(c);
 
         foreach (var square in similarTypeAttacks)
         {
-            var pinned = _pos.PinnedPieces(c);
-
-            if (square & pinned)
+            if (pinned & square)
                 continue;
 
             if (_pos.GetPieceType(from) != _pos.GetPieceType(square))

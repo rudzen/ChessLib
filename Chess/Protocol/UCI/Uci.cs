@@ -153,7 +153,7 @@ public class Uci : IUci
     {
         var sb = _pvPool.Get();
 
-        sb.AppendFormat("info multipv {0} depth {1} seldepth {2} score {3} ", count + 1, depth, selectiveDepth, score);
+        sb.Append($"info multipv {count + 1} depth {depth} seldepth {selectiveDepth} score {score} ");
 
         if (score >= beta)
             sb.Append("lowerbound ");
@@ -182,10 +182,18 @@ public class Uci : IUci
         if (m.IsCastlelingMove() && chessMode != ChessMode.CHESS_960)
             to = Square.Make(from.Rank, to > from ? File.FILE_G : File.FILE_C);
 
-        if (m.IsPromotionMove())
-            return from.ToString() + to.ToString() + m.PromotedPieceType().GetPieceChar();
+        Span<char> s = stackalloc char[5];
+        var index = 0;
 
-        return from.ToString() + to.ToString();
+        s[index++] = from.FileChar;
+        s[index++] = from.RankChar;
+        s[index++] = to.FileChar;
+        s[index++] = to.RankChar;
+
+        if (m.IsPromotionMove())
+            s[index++] = m.PromotedPieceType().GetPieceChar();
+
+        return new string(s[..index]);
     }
 
     /// <summary>
