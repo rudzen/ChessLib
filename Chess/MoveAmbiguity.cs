@@ -39,8 +39,6 @@ using Types;
 
 public sealed class MoveAmbiguity : IMoveAmbiguity
 {
-    private readonly ObjectPool<StringBuilder> _sbPool = new DefaultObjectPool<StringBuilder>(new StringBuilderPooledObjectPolicy(), 128);
-
     private readonly IDictionary<MoveNotations, Func<Move, string>> _notationFuncs;
 
     private readonly IPosition _pos;
@@ -50,11 +48,11 @@ public sealed class MoveAmbiguity : IMoveAmbiguity
         _pos = pos;
         _notationFuncs = new Dictionary<MoveNotations, Func<Move, string>>
         {
-            {MoveNotations.Fan, ToFan},
-            {MoveNotations.San, ToSan},
-            {MoveNotations.Lan, ToLan},
-            {MoveNotations.Ran, ToRan},
-            {MoveNotations.Uci, ToUci}
+            { MoveNotations.Fan, ToFan },
+            { MoveNotations.San, ToSan },
+            { MoveNotations.Lan, ToLan },
+            { MoveNotations.Ran, ToRan },
+            { MoveNotations.Uci, ToUci }
         };
     }
 
@@ -89,48 +87,51 @@ public sealed class MoveAmbiguity : IMoveAmbiguity
         var from = move.FromSquare();
         var to = move.ToSquare();
 
-        var notation = _sbPool.Get();
-
         if (move.IsCastlelingMove())
-            notation.Append(CastlelingExtensions.GetCastlelingString(to, from));
-        else
+            return CastlelingExtensions.GetCastlelingString(to, from);
+
+        var pc = _pos.MovedPiece(move);
+        var pt = pc.Type();
+
+        Span<char> re = stackalloc char[6];
+        var i = 0;
+
+        if (pt != PieceTypes.Pawn)
         {
-            var pc = _pos.MovedPiece(move);
-            var pt = pc.Type();
-
-            if (pt != PieceTypes.Pawn)
-            {
-                notation.Append(pc.GetUnicodeChar());
-                Disambiguation(move, from, notation);
-            }
-
-            if (move.IsEnPassantMove())
-                notation.Append("ep").Append(from.FileChar);
-            else
-            {
-                var capturedPiece = _pos.GetPiece(to);
-                if (capturedPiece != Piece.EmptyPiece)
-                {
-                    if (pt == PieceTypes.Pawn)
-                        notation.Append(from.FileChar);
-                    notation.Append('x');
-                }
-            }
-
-            notation.Append(to.ToString());
-
-            if (move.IsPromotionMove())
-                notation.Append('=').Append(move.PromotedPieceType().MakePiece(_pos.SideToMove).GetUnicodeChar());
-
-            if (_pos.InCheck)
-                notation.Append(GetCheckChar());
+            re[i++] = pc.GetUnicodeChar();
+            foreach (var c in Disambiguation(move, from))
+                re[i++] = c;
         }
 
-        var result = notation.ToString();
+        if (move.IsEnPassantMove())
+        {
+            re[i++] = 'e';
+            re[i++] = 'p';
+            re[i++] = from.FileChar;
+        }
+        else
+        {
+            if (_pos.GetPiece(to) != Piece.EmptyPiece)
+            {
+                if (pt == PieceTypes.Pawn)
+                    re[i++] = from.FileChar;
+                re[i++] = 'x';
+            }
+        }
 
-        _sbPool.Return(notation);
+        re[i++] = to.FileChar;
+        re[i++] = to.RankChar;
 
-        return result;
+        if (move.IsPromotionMove())
+        {
+            re[i++] = '=';
+            re[i++] = move.PromotedPieceType().MakePiece(_pos.SideToMove).GetUnicodeChar();
+        }
+
+        if (_pos.InCheck)
+            re[i++] = GetCheckChar();
+
+        return new string(re[..i]);
     }
 
     /// <summary>
@@ -144,47 +145,50 @@ public sealed class MoveAmbiguity : IMoveAmbiguity
         var from = move.FromSquare();
         var to = move.ToSquare();
 
-        var notation = _sbPool.Get();
-
         if (move.IsCastlelingMove())
-            notation.Append(CastlelingExtensions.GetCastlelingString(to, from));
-        else
+            return CastlelingExtensions.GetCastlelingString(to, from);
+
+        Span<char> re = stackalloc char[6];
+        var i = 0;
+
+        var pt = _pos.GetPieceType(from);
+
+        if (pt != PieceTypes.Pawn)
         {
-            var pt = _pos.GetPieceType(from);
-
-            if (pt != PieceTypes.Pawn)
-            {
-                notation.Append(_pos.GetPiece(from).GetPgnChar());
-                Disambiguation(move, from, notation);
-            }
-
-            if (move.IsEnPassantMove())
-                notation.Append("ep").Append(from.FileChar);
-            else
-            {
-                var capturedPiece = _pos.GetPiece(to);
-                if (capturedPiece != Piece.EmptyPiece)
-                {
-                    if (pt == PieceTypes.Pawn)
-                        notation.Append(from.FileChar);
-                    notation.Append('x');
-                }
-            }
-
-            notation.Append(to.ToString());
-
-            if (move.IsPromotionMove())
-                notation.Append('=').Append(move.PromotedPieceType().MakePiece(_pos.SideToMove).GetPgnChar());
-
-            if (_pos.InCheck)
-                notation.Append(GetCheckChar());
+            re[i++] = _pos.GetPiece(from).GetPgnChar();
+            foreach (var amb in Disambiguation(move, from))
+                re[i++] = amb;
         }
 
-        var result = notation.ToString();
+        if (move.IsEnPassantMove())
+        {
+            re[i++] = 'e';
+            re[i++] = 'p';
+            re[i++] = from.FileChar;
+        }
+        else
+        {
+            if (_pos.GetPiece(to) != Piece.EmptyPiece)
+            {
+                if (pt == PieceTypes.Pawn)
+                    re[i++] = from.FileChar;
+                re[i++] = 'x';
+            }
+        }
 
-        _sbPool.Return(notation);
+        re[i++] = to.FileChar;
+        re[i++] = to.RankChar;
 
-        return result;
+        if (move.IsPromotionMove())
+        {
+            re[i++] = '=';
+            re[i++] = move.PromotedPieceType().MakePiece(_pos.SideToMove).GetPgnChar();
+        }
+
+        if (_pos.InCheck)
+            re[i++] = GetCheckChar();
+
+        return new string(re[..i]);
     }
 
     /// <summary>
@@ -198,49 +202,53 @@ public sealed class MoveAmbiguity : IMoveAmbiguity
         var from = move.FromSquare();
         var to = move.ToSquare();
 
-        var notation = _sbPool.Get();
-
         if (move.IsCastlelingMove())
-            notation.Append(CastlelingExtensions.GetCastlelingString(to, from));
+            return CastlelingExtensions.GetCastlelingString(to, from);
+
+        Span<char> re = stackalloc char[6];
+        var i = 0;
+
+        var pt = _pos.GetPieceType(from);
+
+        if (pt != PieceTypes.Pawn)
+            re[i++] = pt.GetPieceChar();
+
+        re[i++] = from.FileChar;
+        re[i++] = from.RankChar;
+
+        if (move.IsEnPassantMove())
+        {
+            re[i++] = 'e';
+            re[i++] = 'p';
+            re[i++] = from.FileChar;
+        }
         else
         {
-            var pt = _pos.GetPieceType(from);
-
-            if (pt != PieceTypes.Pawn)
-                notation.Append(pt.GetPieceChar());
-
-            notation.Append(from.ToString());
-
-            if (move.IsEnPassantMove())
-                notation.Append("ep").Append(from.FileChar);
-            else
+            var capturedPiece = _pos.GetPiece(to);
+            if (capturedPiece != Piece.EmptyPiece)
             {
-                var capturedPiece = _pos.GetPiece(to);
-                if (capturedPiece != Piece.EmptyPiece)
-                {
-                    if (pt == PieceTypes.Pawn)
-                        notation.Append(from.FileChar);
+                if (pt == PieceTypes.Pawn)
+                    re[i++] = from.FileChar;
 
-                    notation.Append('x');
-                }
-                else
-                    notation.Append('-');
+                re[i++] = 'x';
             }
-
-            notation.Append(to.ToString());
-
-            if (move.IsPromotionMove())
-                notation.Append('=').Append(move.PromotedPieceType().MakePiece(_pos.SideToMove).GetUnicodeChar());
-
-            if (_pos.InCheck)
-                notation.Append(GetCheckChar());
+            else
+                re[i++] = '-';
         }
 
-        var result = notation.ToString();
+        re[i++] = to.FileChar;
+        re[i++] = to.RankChar;
 
-        _sbPool.Return(notation);
+        if (move.IsPromotionMove())
+        {
+            re[i++] = '=';
+            re[i++] = move.PromotedPieceType().MakePiece(_pos.SideToMove).GetUnicodeChar();
+        }
 
-        return result;
+        if (_pos.InCheck)
+            re[i++] = GetCheckChar();
+
+        return new string(re[..i]);
     }
 
     /// <summary>
@@ -254,49 +262,54 @@ public sealed class MoveAmbiguity : IMoveAmbiguity
         var from = move.FromSquare();
         var to = move.ToSquare();
 
-        var notation = _sbPool.Get();
-
         if (move.IsCastlelingMove())
-            notation.Append(CastlelingExtensions.GetCastlelingString(to, from));
+            return CastlelingExtensions.GetCastlelingString(to, from);
+
+        Span<char> re = stackalloc char[6];
+        var i = 0;
+
+        var pt = _pos.GetPieceType(from);
+
+        if (pt != PieceTypes.Pawn)
+            re[i++] = pt.GetPieceChar();
+
+        re[i++] = from.FileChar;
+        re[i++] = from.RankChar;
+
+        if (move.IsEnPassantMove())
+        {
+            re[i++] = 'e';
+            re[i++] = 'p';
+            re[i++] = from.FileChar;
+        }
         else
         {
-            var pt = _pos.GetPieceType(from);
-
-            if (pt != PieceTypes.Pawn)
-                notation.Append(pt.GetPieceChar());
-
-            notation.Append(from.ToString());
-
-            if (move.IsEnPassantMove())
-                notation.Append("ep").Append(from.FileChar);
-            else
+            var capturedPiece = _pos.GetPiece(to);
+            if (capturedPiece != Piece.EmptyPiece)
             {
-                var capturedPiece = _pos.GetPiece(to);
-                if (capturedPiece != Piece.EmptyPiece)
-                {
-                    if (pt == PieceTypes.Pawn)
-                        notation.Append(from.FileChar);
+                if (pt == PieceTypes.Pawn)
+                    re[i++] = from.FileChar;
 
-                    notation.Append('x').Append(capturedPiece.Type().GetPieceChar());
-                }
-                else
-                    notation.Append('-');
+                re[i++] = 'x';
+                re[i++] = capturedPiece.Type().GetPieceChar();
             }
-
-            notation.Append(to.ToString());
-
-            if (move.IsPromotionMove())
-                notation.Append('=').Append(move.PromotedPieceType().MakePiece(_pos.SideToMove).GetUnicodeChar());
-
-            if (_pos.InCheck)
-                notation.Append(GetCheckChar());
+            else
+                re[i++] = '-';
         }
 
-        var result = notation.ToString();
+        re[i++] = to.FileChar;
+        re[i++] = to.RankChar;
 
-        _sbPool.Return(notation);
+        if (move.IsPromotionMove())
+        {
+            re[i++] = '=';
+            re[i++] = move.PromotedPieceType().MakePiece(_pos.SideToMove).GetUnicodeChar();
+        }
 
-        return result;
+        if (_pos.InCheck)
+            re[i++] = GetCheckChar();
+
+        return new string(re[..i]);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -360,19 +373,19 @@ public sealed class MoveAmbiguity : IMoveAmbiguity
     /// <param name="from">The from square</param>
     /// <param name="sb">The StringBuilder to append to if needed</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private void Disambiguation(Move move, Square from, StringBuilder sb)
+    private ReadOnlySpan<char> Disambiguation(Move move, Square from)
     {
         var similarAttacks = GetSimilarAttacks(move);
         var ambiguity = Ambiguity(move, similarAttacks);
 
         if (!ambiguity.HasFlagFast(MoveAmbiguities.Move))
-            return;
+            return Array.Empty<char>();
 
         if (!ambiguity.HasFlagFast(MoveAmbiguities.File))
-            sb.Append(from.FileChar);
-        else if (!ambiguity.HasFlagFast(MoveAmbiguities.Rank))
-            sb.Append(from.RankChar);
-        else
-            sb.Append(from.ToString());
+            return new[] { from.FileChar };
+
+        return !ambiguity.HasFlagFast(MoveAmbiguities.Rank)
+            ? new[] { from.RankChar }
+            : new[] { from.FileChar, from.RankChar };
     }
 }
