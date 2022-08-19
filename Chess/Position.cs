@@ -27,7 +27,6 @@ SOFTWARE.
 namespace Rudz.Chess;
 
 using Enums;
-using Exceptions;
 using Extensions;
 using Fen;
 using Hash;
@@ -216,7 +215,8 @@ public sealed class Position : IPosition
     /// <returns>The FenData which contains the fen string that was generated.</returns>
     public FenData GenerateFen()
     {
-        var sb = new StringBuilder(Fen.Fen.MaxFenLen);
+        Span<char> fen = stackalloc char[Fen.Fen.MaxFenLen];
+        var length = 0;
 
         for (var rank = Ranks.Rank8; rank >= Ranks.Rank1; rank--)
         {
@@ -227,48 +227,71 @@ public sealed class Position : IPosition
                     ++empty;
 
                 if (empty != 0)
-                    sb.Append(empty);
+                    fen[length++] = (char)('0' + empty);
 
                 if (file <= Files.FileH)
-                    sb.Append(Board.PieceAt(new Square(rank, file)).GetPieceChar());
+                    fen[length++] = Board.PieceAt(new Square(rank, file)).GetPieceChar();
             }
 
             if (rank > Ranks.Rank1)
-                sb.Append('/');
+                fen[length++] = '/';
         }
 
-        sb.Append(_sideToMove.IsWhite ? " w " : " b ");
+        static ReadOnlySpan<char> IntegralToSpan(int value)
+        {
+            var s = value.ToString();
+            return s.AsSpan();
+        }
+
+        fen[length++] = ' ';
+        fen[length++] = _sideToMove.IsWhite ? 'w' : 'b';
+        fen[length++] = ' ';
 
         if (State.CastlelingRights == CastlelingRights.None)
-            sb.Append('-');
+            fen[length++] = '-';
         else
         {
             if (CanCastle(CastlelingRights.WhiteOo))
-                sb.Append(ChessMode == ChessMode.CHESS_960 ? CastlingRookSquare(CastlelingRights.WhiteOo).FileChar : 'K');
+                fen[length++] = ChessMode == ChessMode.CHESS_960
+                    ? CastlingRookSquare(CastlelingRights.WhiteOo).FileChar
+                    : 'K';
 
             if (CanCastle(CastlelingRights.WhiteOoo))
-                sb.Append(ChessMode == ChessMode.CHESS_960 ? CastlingRookSquare(CastlelingRights.WhiteOoo).FileChar : 'Q');
+                fen[length++] = ChessMode == ChessMode.CHESS_960
+                    ? CastlingRookSquare(CastlelingRights.WhiteOoo).FileChar
+                    : 'Q';
 
             if (CanCastle(CastlelingRights.BlackOo))
-                sb.Append(ChessMode == ChessMode.CHESS_960 ? CastlingRookSquare(CastlelingRights.BlackOo).FileChar : 'k');
+                fen[length++] = ChessMode == ChessMode.CHESS_960
+                    ? CastlingRookSquare(CastlelingRights.BlackOo).FileChar
+                    : 'k';
 
             if (CanCastle(CastlelingRights.BlackOoo))
-                sb.Append(ChessMode == ChessMode.CHESS_960 ? CastlingRookSquare(CastlelingRights.BlackOoo).FileChar : 'q');
+                fen[length++] = ChessMode == ChessMode.CHESS_960
+                    ? CastlingRookSquare(CastlelingRights.BlackOoo).FileChar
+                    : 'q';
         }
 
-        sb.Append(' ');
+        fen[length++] = ' ';
         if (State.EnPassantSquare == Square.None)
-            sb.Append('-');
+            fen[length++] = '-';
         else
-            sb.Append(State.EnPassantSquare.ToString());
+        {
+            fen[length++] = State.EnPassantSquare.FileChar;
+            fen[length++] = State.EnPassantSquare.RankChar;
+        }
 
-        sb.Append(' ');
-        sb.Append(State.Rule50);
+        fen[length++] = ' ';
 
-        sb.Append(' ');
-        sb.Append(1 + (Ply - _sideToMove.IsBlack.AsByte() / 2));
+        foreach (var c in State.Rule50.ToString().AsSpan())
+            fen[length++] = c;
 
-        return new FenData(sb.ToString());
+        fen[length++] = ' ';
+
+        foreach (var c in IntegralToSpan(1 + (Ply - _sideToMove.IsBlack.AsByte() / 2)))
+            fen[length++] = c;
+
+        return new FenData(new string(fen[..length]));
     }
 
     public BitBoard GetAttacks(Square sq, PieceTypes pt, in BitBoard occupied)
