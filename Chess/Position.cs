@@ -1177,17 +1177,27 @@ public sealed class Position : IPosition
         const char space = ' ';
         var output = _outputObjectPool.Get();
         output.Append(separator);
+        Span<char> row = stackalloc char[35];
         for (var rank = Ranks.Rank8; rank >= Ranks.Rank1; rank--)
         {
-            output.Append(rank.AsInt() + 1);
-            output.Append(space);
+            row.Clear();
+            var rowIndex = 0;
+
+            row[rowIndex++] = (char)('0' + rank.AsInt() + 1);
+            row[rowIndex++] = space;
+
             for (var file = Files.FileA; file <= Files.FileH; file++)
             {
                 var piece = GetPiece(new Square(rank, file));
-                output.AppendFormat("{0}{1}{2}{1}", splitter, space, piece.GetPieceChar());
+                row[rowIndex++] = splitter;
+                row[rowIndex++] = space;
+                row[rowIndex++] = piece.GetPieceChar();
+                row[rowIndex++] = space;
             }
 
-            output.Append(splitter);
+            row[rowIndex++] = splitter;
+
+            output.Append(new string(row));
             output.Append(separator);
         }
 
