@@ -369,7 +369,6 @@ public sealed class MoveAmbiguity : IMoveAmbiguity
     /// </summary>
     /// <param name="move">The move to check</param>
     /// <param name="from">The from square</param>
-    /// <param name="sb">The StringBuilder to append to if needed</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private ReadOnlySpan<char> Disambiguation(Move move, Square from)
     {

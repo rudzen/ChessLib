@@ -46,7 +46,7 @@ public sealed class BasicCastleTests
         var pos = g.Pos;
         var fd = new FenData(fen);
         var state = new State();
-        pos.Set(in fd, ChessMode.NORMAL, state);
+        pos.Set(in fd, ChessMode.Normal, state);
         var actual = pos.CanCastle(cr);
         Assert.Equal(expected, actual);
     }
@@ -70,7 +70,7 @@ public sealed class BasicCastleTests
         var pos = g.Pos;
         var fd = new FenData(fen);
         var state = new State();
-        pos.Set(in fd, ChessMode.NORMAL, state);
+        pos.Set(in fd, ChessMode.Normal, state);
         var actual = pos.CastlingImpeded(cr);
         Assert.Equal(expected, actual);
     }

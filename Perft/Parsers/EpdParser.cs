@@ -59,8 +59,7 @@ public class EpdParser : IEpdParser
         var idSet = false;
         var epdSet = false;
         var perftData = new List<string>(16);
-        string s;
-        while ((s = await sr.ReadLineAsync().ConfigureAwait(false)) != null)
+        while (await sr.ReadLineAsync().ConfigureAwait(false) is { } s)
         {
             // skip comments
             if (s.Length < 4 || s[0] == '#')

@@ -207,8 +207,7 @@ public sealed class PositionValidator : IPositionValidator
             let pt = pc.Type()
             let c = pc.ColorOf()
             where _board.PieceCount(pt, c) != _board.Pieces(c, pt).Count
-            select pc).Aggregate(error,
-            (current, pc) => AddError(current, $"piece count does not match for piece {pc}"));
+            select pc).Aggregate(error, static (current, pc) => AddError(current, $"piece count does not match for piece {pc}"));
     }
 
     private string ValidatePieceTypes(string error)

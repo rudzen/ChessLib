@@ -49,25 +49,25 @@ public sealed class Book : IDisposable
     };
 
     private readonly IPosition _pos;
-    private FileStream _fileStream;
-    private BinaryReader _binaryReader;
-    private string _fileName;
+    private readonly FileStream _fileStream;
+    private readonly BinaryReader _binaryReader;
+    private readonly string _fileName;
     private readonly int _entrySize;
     private readonly Random _rnd;
 
     private struct Entry
     {
-        public ulong key;
-        public ushort move;
-        public ushort count;
-        public uint learn;
+        public readonly ulong Key;
+        public readonly ushort Move;
+        public readonly ushort Count;
+        public uint Learn;
 
         public Entry(ulong key, ushort move, ushort count, uint learn)
         {
-            this.key = key;
-            this.move = move;
-            this.count = count;
-            this.learn = learn;
+            Key = key;
+            Move = move;
+            Count = count;
+            Learn = learn;
         }
     }
 
@@ -108,18 +108,18 @@ public sealed class Book : IDisposable
 
         var e = ReadEntry();
 
-        while (e.key == key)
+        while (e.Key == key)
         {
-            if (best <= e.count)
-                best = e.count;
+            if (best <= e.Count)
+                best = e.Count;
 
-            sum += e.count;
+            sum += e.Count;
 
             // Choose book move according to its score. If a move has a very high score it has
             // higher probability to be choosen than a move with lower score. Note that first entry
             // is always chosen.
-            if (sum > 0 && _rnd.Next() % sum < e.count || pickBest && e.count == best)
-                polyMove = e.move;
+            if (sum > 0 && _rnd.Next() % sum < e.Count || pickBest && e.Count == best)
+                polyMove = e.Move;
 
             // Stop if we wan't the top pick and move exists
             if (pickBest && polyMove != 0)
@@ -231,7 +231,7 @@ public sealed class Book : IDisposable
             _fileStream.Seek(mid * _entrySize, SeekOrigin.Begin);
             var e = ReadEntry();
 
-            if (key.Key <= e.key)
+            if (key.Key <= e.Key)
                 high = mid;
             else
                 low = mid + 1;

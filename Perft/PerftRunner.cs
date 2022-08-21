@@ -245,7 +245,7 @@ public sealed class PerftRunner : IPerftRunner
         return result;
     }
 
-    private async ValueTask WriteOutput(IPerftResult result, string baseFileName, CancellationToken cancellationToken)
+    private static async ValueTask WriteOutput(IPerftResult result, string baseFileName, CancellationToken cancellationToken)
     {
         // ReSharper disable once MethodHasAsyncOverload
         var contents = JsonSerializer.Serialize(result);

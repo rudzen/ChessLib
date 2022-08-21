@@ -32,13 +32,15 @@ namespace Rudz.Chess.Types;
 
 public enum Depths
 {
-    ZERO = 0,
-    QS_CHECK = 0,
-    QS_NO_CHECK = -1,
-    QS_RECAP = -5,
-    NONE = -6,
-    OFFSET = NONE - 1,
-    MAX_PLY = 256 + OFFSET - 4, // Used only for TT entry occupancy check
+    Zero = 0,
+#pragma warning disable CA1069
+    QsCheck = 0,
+#pragma warning restore CA1069
+    QsNoCheck = -1,
+    QsRecap = -5,
+    None = -6,
+    Offset = None - 1,
+    MaxPly = 256 + Offset - 4, // Used only for TT entry occupancy check
 }
 
 public static class DepthsExtensions
@@ -49,23 +51,23 @@ public static class DepthsExtensions
 
 public readonly struct Depth : IEquatable<Depth>
 {
-    public Depth(int depth) => Value = depth;
+    private Depth(int depth) => Value = depth;
 
-    public Depth(Depths depth) => Value = (int)depth;
+    private Depth(Depths depth) => Value = (int)depth;
 
     public int Value { get; }
 
-    public static Depth Zero => new(Depths.ZERO);
+    public static Depth Zero => new(Depths.Zero);
 
-    public static Depth QsCheck => new(Depths.QS_CHECK);
+    public static Depth QsCheck => new(Depths.QsCheck);
 
-    public static Depth QsNoCheck => new(Depths.QS_NO_CHECK);
+    public static Depth QsNoCheck => new(Depths.QsNoCheck);
 
-    public static Depth QsRecap => new(Depths.QS_RECAP);
+    public static Depth QsRecap => new(Depths.QsRecap);
 
-    public static Depth None => new(Depths.NONE);
+    public static Depth None => new(Depths.None);
 
-    public static Depth MaxPly => new(Depths.MAX_PLY);
+    public static Depth MaxPly => new(Depths.MaxPly);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator Depth(string value)

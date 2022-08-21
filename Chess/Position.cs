@@ -208,7 +208,7 @@ public sealed class Position : IPosition
         _castlingRightsMask.Fill(CastlelingRights.None);
         _castlingRookSquare.Fill(Square.None);
         _sideToMove = Player.White;
-        ChessMode = ChessMode.NORMAL;
+        ChessMode = ChessMode.Normal;
 
         State ??= new State();
     }
@@ -256,22 +256,22 @@ public sealed class Position : IPosition
         else
         {
             if (CanCastle(CastlelingRights.WhiteOo))
-                fen[length++] = ChessMode == ChessMode.CHESS_960
+                fen[length++] = ChessMode == ChessMode.Chess960
                     ? CastlingRookSquare(CastlelingRights.WhiteOo).FileChar
                     : 'K';
 
             if (CanCastle(CastlelingRights.WhiteOoo))
-                fen[length++] = ChessMode == ChessMode.CHESS_960
+                fen[length++] = ChessMode == ChessMode.Chess960
                     ? CastlingRookSquare(CastlelingRights.WhiteOoo).FileChar
                     : 'Q';
 
             if (CanCastle(CastlelingRights.BlackOo))
-                fen[length++] = ChessMode == ChessMode.CHESS_960
+                fen[length++] = ChessMode == ChessMode.Chess960
                     ? CastlingRookSquare(CastlelingRights.BlackOo).FileChar
                     : 'k';
 
             if (CanCastle(CastlelingRights.BlackOoo))
-                fen[length++] = ChessMode == ChessMode.CHESS_960
+                fen[length++] = ChessMode == ChessMode.Chess960
                     ? CastlingRookSquare(CastlelingRights.BlackOoo).FileChar
                     : 'q';
         }
@@ -515,7 +515,7 @@ public sealed class Position : IPosition
             // In case of Chess960, verify that when moving the castling rook we do not discover
             // some hidden checker. For instance an enemy queen in SQ_A1 when castling rook is
             // in SQ_B1.
-            return ChessMode == ChessMode.NORMAL || (GetAttacks(
+            return ChessMode == ChessMode.Normal || (GetAttacks(
                         to,
                         PieceTypes.Rook,
                         Board.Pieces() ^ m.ToSquare()) & Board.Pieces(~us, PieceTypes.Rook, PieceTypes.Queen)
@@ -825,7 +825,7 @@ public sealed class Position : IPosition
         var from = m.FromSquare();
         var to = m.ToSquare();
 
-        if (m.IsCastlelingMove() && ChessMode == ChessMode.NORMAL)
+        if (m.IsCastlelingMove() && ChessMode == ChessMode.Normal)
         {
             var file = to > from ? Files.FileG : Files.FileC;
             to = new Square(from.Rank, file);
@@ -1066,7 +1066,7 @@ public sealed class Position : IPosition
             State.EnPassantSquare = Square.None;
     }
 
-    private void SetupMoveNumber(FenData fenData)
+    private void SetupMoveNumber(IFenData fenData)
     {
         var moveNum = 0;
         var halfMoveNum = 0;

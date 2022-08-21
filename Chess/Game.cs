@@ -80,7 +80,7 @@ public sealed class Game : IGame
     {
         var fenData = new FenData(fen);
         var state = new State();
-        Pos.Set(in fenData, ChessMode.NORMAL, state, true);
+        Pos.Set(in fenData, ChessMode.Normal, state, true);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -98,7 +98,7 @@ public sealed class Game : IGame
 
         var moveList = _moveLists.Get();
         moveList.Generate(Pos);
-        if (moveList.Any(move => !Pos.IsLegal(move)))
+        if (moveList.Any(move => !Pos.IsLegal(move.Move)))
             gameEndType |= GameEndTypes.Pat;
 
         GameEndType = gameEndType;
@@ -135,7 +135,7 @@ public sealed class Game : IGame
         var state = new State();
         ulong tot = 0;
 
-        foreach (var move in ml.Select(em => em.Move))
+        foreach (var move in ml.Select(static em => em.Move))
         {
             Pos.MakeMove(move, in state);
             tot += Perft(depth - 1);

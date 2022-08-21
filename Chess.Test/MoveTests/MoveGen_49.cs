@@ -46,7 +46,7 @@ public sealed class MoveGen_49
         var fd = new FenData(fen);
         var state = new State();
 
-        pos.Set(in fd, ChessMode.NORMAL, state);
+        pos.Set(in fd, ChessMode.Normal, state);
 
         var ml = pos.GenerateMoves();
 

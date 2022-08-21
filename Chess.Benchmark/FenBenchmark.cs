@@ -24,7 +24,7 @@ public class FenBenchmark
         _game = new Game(pos);
         var fp = new FenData(F);
         var state = new State();
-        _game.Pos.Set(in fp, Rudz.Chess.Enums.ChessMode.NORMAL, state);
+        _game.Pos.Set(in fp, Rudz.Chess.Enums.ChessMode.Normal, state);
     }
 
     [Benchmark(Description = "StringBuilder - NOT PRESENT")]

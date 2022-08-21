@@ -180,14 +180,21 @@ public sealed class HiResTimer : IHiResTimer, IEquatable<HiResTimer>
                 if (diff <= 0f)
                     break;
 
-                if (diff < 1f)
-                    Thread.SpinWait(10);
-                else if (diff < 5f)
-                    Thread.SpinWait(100);
-                else if (diff < 15f)
-                    Thread.Sleep(1);
-                else
-                    Thread.Sleep(10);
+                switch (diff)
+                {
+                    case < 1f:
+                        Thread.SpinWait(10);
+                        break;
+                    case < 5f:
+                        Thread.SpinWait(100);
+                        break;
+                    case < 15f:
+                        Thread.Sleep(1);
+                        break;
+                    default:
+                        Thread.Sleep(10);
+                        break;
+                }
 
                 if (cancellationToken.IsCancellationRequested)
                     return;

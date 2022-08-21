@@ -102,14 +102,12 @@ public static class Zobrist
             Pieces.WhitePawn, Pieces.WhiteKnight, Pieces.WhiteBishop,
             Pieces.WhiteRook, Pieces.WhiteQueen,  Pieces.WhiteKing,
             Pieces.BlackPawn, Pieces.BlackKnight, Pieces.BlackBishop,
-            Pieces.BlackRook, Pieces.BlackQueen,  Pieces.BlackKing,
+            Pieces.BlackRook, Pieces.BlackQueen,  Pieces.BlackKing
         };
 
         foreach (var pc in pieces)
-        {
-            foreach (var sq in BitBoards.AllSquares)
-                ZobristPst[pc.AsInt()][sq.AsInt()] = rnd.Rand();
-        }
+        foreach (var sq in BitBoards.AllSquares)
+            ZobristPst[pc.AsInt()][sq.AsInt()] = rnd.Rand();
     }
 
     private static void InitializeRandomArray(Span<ulong> array, IRKiss rnd)

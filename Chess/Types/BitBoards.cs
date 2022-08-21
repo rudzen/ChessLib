@@ -82,7 +82,7 @@ public static class BitBoards
 
     public static readonly BitBoard RANK8 = 0xff00000000000000;
 
-    public static readonly BitBoard EmptyBitBoard = new(0UL);
+    public static readonly BitBoard EmptyBitBoard = new(ulong.MinValue);
 
     public static readonly BitBoard AllSquares = ~EmptyBitBoard;
 

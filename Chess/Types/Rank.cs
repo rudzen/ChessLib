@@ -55,7 +55,7 @@ public readonly struct Rank : IEquatable<Rank>
 {
     private static readonly char[] RankChars = { '1', '2', '3', '4', '5', '6', '7', '8' };
 
-    private static readonly string[] RankStrings = RankChars.Select(x => x.ToString()).ToArray();
+    private static readonly string[] RankStrings = RankChars.Select(static x => x.ToString()).ToArray();
 
     private readonly Ranks _value;
 

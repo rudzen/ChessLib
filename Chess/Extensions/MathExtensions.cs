@@ -28,6 +28,7 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Rudz.Chess.Types;
+// ReSharper disable RedundantCast
 
 namespace Rudz.Chess.Extensions;
 

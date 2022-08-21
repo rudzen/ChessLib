@@ -47,7 +47,7 @@ public static class MagicBB
 
     private static readonly BitBoard[][] MagicBishopDb = new BitBoard[64][];
 
-    private static readonly ulong[] MagicmovesBMagics =
+    private static readonly ulong[] BishopMagics =
         {
                 0x0002020202020200UL, 0x0002020202020000UL, 0x0004010202000000UL, 0x0004040080000000UL, 0x0001104000000000UL, 0x0000821040000000UL, 0x0000410410400000UL, 0x0000104104104000UL,
                 0x0000040404040400UL, 0x0000020202020200UL, 0x0000040102020000UL, 0x0000040400800000UL, 0x0000011040000000UL, 0x0000008210400000UL, 0x0000004104104000UL, 0x0000002082082000UL,
@@ -59,7 +59,7 @@ public static class MagicBB
                 0x0000104104104000UL, 0x0000002082082000UL, 0x0000000020841000UL, 0x0000000000208800UL, 0x0000000010020200UL, 0x0000000404080200UL, 0x0000040404040400UL, 0x0002020202020200UL
             };
 
-    private static readonly ulong[] MagicmovesBMask =
+    private static readonly ulong[] BishopMask =
         {
                 0x0040201008040200UL, 0x0000402010080400UL, 0x0000004020100A00UL, 0x0000000040221400UL, 0x0000000002442800UL, 0x0000000204085000UL, 0x0000020408102000UL, 0x0002040810204000UL,
                 0x0020100804020000UL, 0x0040201008040000UL, 0x00004020100A0000UL, 0x0000004022140000UL, 0x0000000244280000UL, 0x0000020408500000UL, 0x0002040810200000UL, 0x0004081020400000UL,
@@ -73,7 +73,7 @@ public static class MagicBB
 
     private static readonly BitBoard[][] MagicRookDb = new BitBoard[64][];
 
-    private static readonly ulong[] MagicmovesRMagics =
+    private static readonly ulong[] RookMagics =
         {
                 0x0080001020400080UL, 0x0040001000200040UL, 0x0080081000200080UL, 0x0080040800100080UL, 0x0080020400080080UL, 0x0080010200040080UL, 0x0080008001000200UL, 0x0080002040800100UL,
                 0x0000800020400080UL, 0x0000400020005000UL, 0x0000801000200080UL, 0x0000800800100080UL, 0x0000800400080080UL, 0x0000800200040080UL, 0x0000800100020080UL, 0x0000800040800100UL,
@@ -85,7 +85,7 @@ public static class MagicBB
                 0x0000102040800101UL, 0x0000102040008101UL, 0x0000081020004101UL, 0x0000040810002101UL, 0x0001000204080011UL, 0x0001000204000801UL, 0x0001000082000401UL, 0x0000002040810402UL
             };
 
-    private static readonly ulong[] MagicmovesRMask = {
+    private static readonly ulong[] RookMask = {
                 0x000101010101017EUL, 0x000202020202027CUL, 0x000404040404047AUL, 0x0008080808080876UL, 0x001010101010106EUL, 0x002020202020205EUL, 0x004040404040403EUL, 0x008080808080807EUL,
                 0x0001010101017E00UL, 0x0002020202027C00UL, 0x0004040404047A00UL, 0x0008080808087600UL, 0x0010101010106E00UL, 0x0020202020205E00UL, 0x0040404040403E00UL, 0x0080808080807E00UL,
                 0x00010101017E0100UL, 0x00020202027C0200UL, 0x00040404047A0400UL, 0x0008080808760800UL, 0x00101010106E1000UL, 0x00202020205E2000UL, 0x00404040403E4000UL, 0x00808080807E8000UL,
@@ -121,21 +121,21 @@ public static class MagicBB
 
         for (var i = 0; i < squares.Length; ++i)
         {
-            var numSquares = InitSquares(squares, MagicmovesBMask[i], initMagicMovesDb);
+            var numSquares = InitSquares(squares, BishopMask[i], initMagicMovesDb);
             for (var temp = 0UL; temp < One << numSquares; ++temp)
             {
-                var tempocc = InitmagicmovesOcc(squares[..numSquares], in temp);
-                MagicBishopDb[i][(tempocc * MagicmovesBMagics[i]) >> 55] = InitmagicmovesBmoves(i, tempocc);
+                var occ = InitMagicMovesOccupancy(squares[..numSquares], in temp);
+                MagicBishopDb[i][(occ * BishopMagics[i]) >> 55] = InitmagicmovesBmoves(i, occ);
             }
         }
 
         for (var i = 0; i < squares.Length; ++i)
         {
-            var numSquares = InitSquares(squares, MagicmovesRMask[i], initMagicMovesDb);
+            var numSquares = InitSquares(squares, RookMask[i], initMagicMovesDb);
             for (var temp = 0UL; temp < One << numSquares; ++temp)
             {
-                var tempocc = InitmagicmovesOcc(squares[..numSquares], in temp);
-                MagicRookDb[i][(tempocc * MagicmovesRMagics[i]) >> 52] = InitmagicmovesRmoves(i, tempocc);
+                var occ = InitMagicMovesOccupancy(squares[..numSquares], in temp);
+                MagicRookDb[i][(occ * RookMagics[i]) >> 52] = InitmagicmovesRmoves(i, occ);
             }
         }
     }
@@ -153,29 +153,29 @@ public static class MagicBB
         return numSquares;
     }
 
-    private static ulong InitmagicmovesOcc(ReadOnlySpan<int> squares, in ulong linocc)
+    private static ulong InitMagicMovesOccupancy(ReadOnlySpan<int> squares, in ulong lineOccupancy)
     {
         var ret = 0ul;
         for (var i = 0; i < squares.Length; ++i)
-            if ((linocc & (One << i)) != 0)
+            if ((lineOccupancy & (One << i)) != 0)
                 ret |= One << squares[i];
 
         return ret;
     }
 
     public static BitBoard BishopAttacks(this Square square, BitBoard occupied)
-        => MagicBishopDb[square.AsInt()][((occupied.Value & MagicmovesBMask[square.AsInt()]) * MagicmovesBMagics[square.AsInt()]) >> 55];
+        => MagicBishopDb[square.AsInt()][((occupied.Value & BishopMask[square.AsInt()]) * BishopMagics[square.AsInt()]) >> 55];
 
     public static BitBoard RookAttacks(this Square square, BitBoard occupied)
-        => MagicRookDb[square.AsInt()][((occupied.Value & MagicmovesRMask[square.AsInt()]) * MagicmovesRMagics[square.AsInt()]) >> 52];
+        => MagicRookDb[square.AsInt()][((occupied.Value & RookMask[square.AsInt()]) * RookMagics[square.AsInt()]) >> 52];
 
     public static BitBoard QueenAttacks(this Square square, BitBoard occupied)
         => BishopAttacks(square, occupied) | RookAttacks(square, occupied);
 
     private static ulong InitmagicmovesRmoves(int square, ulong occ)
     {
-        var ret = 0ul;
-        var rowbits = Ff << (8 * (square / 8));
+        var ret = ulong.MinValue;
+        var rowBits = Ff << (8 * (square / 8));
 
         var bit = One << square;
         do
@@ -197,7 +197,7 @@ public static class MagicBB
         do
         {
             bit <<= 1;
-            if ((bit & rowbits) != 0)
+            if ((bit & rowBits) != 0)
                 ret |= bit;
             else
                 break;
@@ -208,7 +208,7 @@ public static class MagicBB
         do
         {
             bit >>= 1;
-            if ((bit & rowbits) != 0)
+            if ((bit & rowBits) != 0)
                 ret |= bit;
             else
                 break;
@@ -220,8 +220,8 @@ public static class MagicBB
 
     private static ulong InitmagicmovesBmoves(int square, ulong occ)
     {
-        var ret = 0UL;
-        var rowbits = Ff << (8 * (square / 8));
+        var ret = ulong.MinValue;
+        var rowBits = Ff << (8 * (square / 8));
 
         var bit = One << square;
         var bit2 = bit;
@@ -229,7 +229,7 @@ public static class MagicBB
         {
             bit <<= 8 - 1;
             bit2 >>= 1;
-            if ((bit2 & rowbits) != 0)
+            if ((bit2 & rowBits) != 0)
                 ret |= bit;
             else
                 break;
@@ -242,7 +242,7 @@ public static class MagicBB
         {
             bit <<= 8 + 1;
             bit2 <<= 1;
-            if ((bit2 & rowbits) != 0)
+            if ((bit2 & rowBits) != 0)
                 ret |= bit;
             else
                 break;
@@ -255,7 +255,7 @@ public static class MagicBB
         {
             bit >>= 8 - 1;
             bit2 <<= 1;
-            if ((bit2 & rowbits) != 0)
+            if ((bit2 & rowBits) != 0)
                 ret |= bit;
             else
                 break;
@@ -268,7 +268,7 @@ public static class MagicBB
         {
             bit >>= 8 + 1;
             bit2 >>= 1;
-            if ((bit2 & rowbits) != 0)
+            if ((bit2 & rowBits) != 0)
                 ret |= bit;
             else
                 break;

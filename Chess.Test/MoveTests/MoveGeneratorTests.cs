@@ -47,7 +47,7 @@ public sealed class MoveGeneratorTests
         var fd = new FenData(fen);
         var state = new State();
 
-        pos.Set(in fd, ChessMode.NORMAL, state);
+        pos.Set(in fd, ChessMode.Normal, state);
 
         // make sure black is in check
         Assert.True(pos.InCheck);

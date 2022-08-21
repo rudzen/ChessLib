@@ -55,7 +55,7 @@ public static class Cuckoo
                 var i = CuckooHashOne(key);
                 do
                 {
-                    (CuckooKeys[i], key) = (key, CuckooKeys[i].Key);
+                    (CuckooKeys[i], key) = (key, CuckooKeys[i]);
                     (CuckooMoves[i], move) = (move, CuckooMoves[i]);
 
                     // check for empty slot
@@ -76,6 +76,9 @@ public static class Cuckoo
 
     public static bool HashCuckooCycle(in IPosition pos, int end, int ply)
     {
+        if (end < 3)
+            return false;
+
         var state = pos.State;
         var originalKey = state.Key;
         var statePrevious = state.Previous;

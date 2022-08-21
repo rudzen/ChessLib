@@ -92,10 +92,8 @@ public class Uci : IUci
         var moveList = pos.GenerateMoves();
 
         foreach (var move in moveList.Get())
-        {
             if (uciMove.Equals(move.Move.ToString(), StringComparison.InvariantCultureIgnoreCase))
                 return move.Move;
-        }
 
         return Move.EmptyMove;
     }
@@ -173,7 +171,7 @@ public class Uci : IUci
         =>
             $"info hashfull {Game.Table.Fullness()} tbhits {tbHits} nodes {nodes} time {time.Milliseconds} nps {Nps(nodes, time)}";
 
-    public string MoveToString(Move m, ChessMode chessMode = ChessMode.NORMAL)
+    public string MoveToString(Move m, ChessMode chessMode = ChessMode.Normal)
     {
         if (m.IsNullMove())
             return "(none)";
@@ -181,7 +179,7 @@ public class Uci : IUci
         var from = m.FromSquare();
         var to = m.ToSquare();
 
-        if (m.IsCastlelingMove() && chessMode != ChessMode.CHESS_960)
+        if (m.IsCastlelingMove() && chessMode != ChessMode.Chess960)
             to = Square.Make(from.Rank, to > from ? File.FILE_G : File.FILE_C);
 
         Span<char> s = stackalloc char[5];

@@ -29,7 +29,7 @@ using Rudz.Chess.MoveGeneration;
 
 namespace Rudz.Chess.ObjectPoolPolicies;
 
-public class MoveListPolicy : IPooledObjectPolicy<IMoveList>
+public sealed class MoveListPolicy : IPooledObjectPolicy<IMoveList>
 {
     public IMoveList Create() => new MoveList();
 

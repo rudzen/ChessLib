@@ -26,7 +26,6 @@ SOFTWARE.
 
 using System;
 using System.Runtime.CompilerServices;
-using Rudz.Chess.Enums;
 using Rudz.Chess.Extensions;
 
 namespace Rudz.Chess.Types;
@@ -77,9 +76,9 @@ public readonly struct Player : IEquatable<Player>
 
     public char Fen => PlayerFen[Side];
 
-    public static Player White { get; } = 0;
+    public static Player White { get; } = new(Players.White);
 
-    public static Player Black { get; } = 1;
+    public static Player Black { get; } = new(Players.Black);
 
     public const int Count = (int)Players.PlayerNb;
 
