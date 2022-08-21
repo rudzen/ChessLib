@@ -24,16 +24,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Perft;
-
-using Interfaces;
-using Rudz.Chess;
-using Rudz.Chess.Fen;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using Chess.Perft.Interfaces;
+using Rudz.Chess;
+using Rudz.Chess.Enums;
+using Rudz.Chess.Fen;
+
+namespace Chess.Perft;
 
 /*
 // (first version)
@@ -85,7 +86,7 @@ public sealed class Perft : IPerft
         {
             Game.Table.NewSearch();
             var state = new State();
-            CurrentGame.Pos.Set(in fd,Rudz.Chess.Enums.ChessMode.NORMAL, state);
+            CurrentGame.Pos.Set(in fd, ChessMode.NORMAL, state);
 
             if (PerftTable.Retrieve(CurrentGame.Pos.State.Key.Key, depth, out var result))
                 yield return result;
@@ -109,7 +110,7 @@ public sealed class Perft : IPerft
     {
         var fp = new FenData(pp.Fen);
         var state = new State();
-        CurrentGame.Pos.Set(in fp, Rudz.Chess.Enums.ChessMode.NORMAL, state);
+        CurrentGame.Pos.Set(in fp, ChessMode.NORMAL, state);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

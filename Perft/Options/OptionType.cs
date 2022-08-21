@@ -24,9 +24,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Perft.Options;
-
 using System;
+
+namespace Perft.Options;
 
 [Flags]
 public enum OptionType

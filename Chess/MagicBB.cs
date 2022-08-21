@@ -29,10 +29,10 @@
 *
 */
 
-namespace Rudz.Chess;
-
 using System;
-using Types;
+using Rudz.Chess.Types;
+
+namespace Rudz.Chess;
 
 // ReSharper disable once InconsistentNaming
 public static class MagicBB

@@ -27,9 +27,9 @@
 
  */
 
-namespace Rudz.Chess.Hash;
-
 using System.Collections.Generic;
+
+namespace Rudz.Chess.Hash;
 
 public interface IRKiss
 {

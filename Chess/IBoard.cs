@@ -24,12 +24,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess;
-
-using Enums;
 using System;
 using System.Collections.Generic;
-using Types;
+using Rudz.Chess.Types;
+
+namespace Rudz.Chess;
 
 public interface IBoard : IEnumerable<Piece>
 {

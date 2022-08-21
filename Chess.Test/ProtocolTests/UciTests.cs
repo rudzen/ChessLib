@@ -24,14 +24,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Test.ProtocolTests;
-
+using System;
 using FluentAssertions;
-using Rudz.Chess.Enums;
 using Rudz.Chess.Factories;
 using Rudz.Chess.Protocol.UCI;
-using System;
+using Rudz.Chess.Types;
 using Xunit;
+
+namespace Chess.Test.ProtocolTests;
 
 public sealed class UciTests
 {
@@ -55,7 +55,7 @@ public sealed class UciTests
     public void MoveFromUciBasic()
     {
         const string uciMove = "a2a3";
-        var expected = new Rudz.Chess.Types.Move(Squares.a2, Squares.a3);
+        var expected = new Move(Squares.a2, Squares.a3);
         var uci = new Uci();
 
         var game = GameFactory.Create();

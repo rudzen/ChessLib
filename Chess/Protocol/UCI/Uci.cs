@@ -29,6 +29,7 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.Extensions.ObjectPool;
 using Rudz.Chess.Enums;
+using Rudz.Chess.Extensions;
 using Rudz.Chess.MoveGeneration;
 using Rudz.Chess.Types;
 
@@ -169,7 +170,8 @@ public class Uci : IUci
     }
 
     public string Fullness(ulong tbHits, ulong nodes, TimeSpan time)
-        => $"info hashfull {Game.Table.Fullness()} tbhits {tbHits} nodes {nodes} time {time.Milliseconds} nps {Nps(nodes, time)}";
+        =>
+            $"info hashfull {Game.Table.Fullness()} tbhits {tbHits} nodes {nodes} time {time.Milliseconds} nps {Nps(nodes, time)}";
 
     public string MoveToString(Move m, ChessMode chessMode = ChessMode.NORMAL)
     {

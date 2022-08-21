@@ -24,25 +24,24 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Types;
-
-using Enums;
-using Newtonsoft.Json;
 using System;
+
+namespace Rudz.Chess.Types;
 
 /// <summary>
 /// Represents a single value. Used for e.g. Piece value etc
 /// </summary>
 public readonly struct Value : IEquatable<Value>
 {
-    [JsonProperty("Value")]
     public readonly PieceValues Raw;
 
     public Value(Value value) : this(value.Raw)
-    { }
+    {
+    }
 
     public Value(int value) : this((PieceValues)value)
-    { }
+    {
+    }
 
     private Value(PieceValues value) => Raw = value;
 

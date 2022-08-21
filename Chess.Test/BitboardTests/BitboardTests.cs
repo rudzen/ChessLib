@@ -24,12 +24,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Test.BitboardTests;
-
-using Rudz.Chess.Enums;
 using Rudz.Chess.Types;
 using System;
 using Xunit;
+
+namespace Chess.Test.BitboardTests;
 
 public sealed class BitboardTests
 {

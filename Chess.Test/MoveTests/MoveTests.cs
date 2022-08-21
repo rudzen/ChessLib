@@ -24,15 +24,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Test.MoveTests;
-
-using Rudz.Chess.Enums;
-using Rudz.Chess.Factories;
-using Rudz.Chess.Types;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Rudz.Chess.Factories;
+using Rudz.Chess.Types;
 using Xunit;
+
+namespace Chess.Test.MoveTests;
 
 public sealed class MoveTests
 {

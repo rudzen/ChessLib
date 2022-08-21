@@ -24,12 +24,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Test.DataTests;
-
-using Rudz.Chess.Enums;
-using Rudz.Chess.Types;
 using System.Text;
+using Rudz.Chess.Types;
 using Xunit;
+
+namespace Chess.Test.DataTests;
 
 public sealed class DataTests
 {

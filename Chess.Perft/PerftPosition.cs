@@ -24,10 +24,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Perft;
-
-using Interfaces;
 using System.Collections.Generic;
+using Chess.Perft.Interfaces;
+
+namespace Chess.Perft;
 
 public sealed class PerftPosition : IPerftPosition
 {

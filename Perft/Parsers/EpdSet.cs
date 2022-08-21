@@ -24,10 +24,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Perft.Parsers;
-
 using System;
 using System.Collections.Generic;
+
+namespace Perft.Parsers;
 
 public sealed class EpdSet : IEpdSet
 {

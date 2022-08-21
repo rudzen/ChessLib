@@ -24,11 +24,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Hash.Tables.Transposition;
-
 using System;
 using System.Runtime.InteropServices;
-using Types;
+using Rudz.Chess.Types;
+
+namespace Rudz.Chess.Hash.Tables.Transposition;
 
 [StructLayout(LayoutKind.Sequential, Pack = 2)]
 public struct TranspositionTableEntry

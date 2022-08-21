@@ -24,15 +24,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess;
-
-using Enums;
-using Fen;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Types;
-using Validation;
+using Rudz.Chess.Enums;
+using Rudz.Chess.Fen;
+using Rudz.Chess.Types;
+using Rudz.Chess.Validation;
+
+namespace Rudz.Chess;
 
 public interface IPosition : IEnumerable<Piece>
 {

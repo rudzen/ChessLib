@@ -24,12 +24,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Test.ScoreTests;
-
-using Rudz.Chess.Types;
 using System.Collections.Generic;
 using System.Linq;
+using Rudz.Chess.Types;
 using Xunit;
+
+namespace Chess.Test.ScoreTests;
 
 public sealed class ScoreTests
 {

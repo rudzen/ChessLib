@@ -24,42 +24,51 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Test.SizesTests;
-
-using FluentAssertions;
+using Rudz.Chess.Types;
 using Xunit;
 
-public class BaseTypesSizeTests
+namespace Chess.Test.SizesTests;
+
+public sealed class BaseTypesSizeTests
 {
     [Fact]
     public unsafe void MoveSize()
     {
         const int expected = 2;
-        var actual = sizeof(Rudz.Chess.Types.Move);
-        actual.Should().Be(expected);
+        var actual = sizeof(Move);
+        Assert.Equal(expected, actual);
     }
 
     [Fact]
     public unsafe void PieceSize()
     {
         const int expected = 1;
-        var actual = sizeof(Rudz.Chess.Types.Piece);
-        actual.Should().Be(expected);
+        var actual = sizeof(Piece);
+        Assert.Equal(expected, actual);
     }
 
     [Fact]
     public unsafe void SquareSize()
     {
         const int expected = 4;
-        var actual = sizeof(Rudz.Chess.Types.Square);
-        actual.Should().Be(expected);
+        var actual = sizeof(Square);
+        Assert.Equal(expected, actual);
     }
 
     [Fact]
     public unsafe void RankSize()
     {
         const int expected = 4;
-        var actual = sizeof(Rudz.Chess.Types.Rank);
-        actual.Should().Be(expected);
+        var actual = sizeof(Rank);
+        Assert.Equal(expected, actual);
     }
+
+    [Fact]
+    public unsafe void DepthSize()
+    {
+        const int expected = 4;
+        var actual = sizeof(Depth);
+        Assert.Equal(expected, actual);
+    }
+
 }

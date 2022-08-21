@@ -24,12 +24,32 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Types;
-
-using Enums;
 using System;
 using System.Linq;
 using System.Runtime.CompilerServices;
+
+namespace Rudz.Chess.Types;
+
+public enum Ranks
+{
+    Rank1 = 0,
+    Rank2 = 1,
+    Rank3 = 2,
+    Rank4 = 3,
+    Rank5 = 4,
+    Rank6 = 5,
+    Rank7 = 6,
+    Rank8 = 7,
+    RankNb = 8
+}
+
+public static class RanksExtensions
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Rank RelativeRank(this Ranks rank, Player color) => (Ranks)(rank.AsInt() ^ (color.Side * 7));
+
+    public static int AsInt(this Ranks r) => (int)r;
+}
 
 public readonly struct Rank : IEquatable<Rank>
 {

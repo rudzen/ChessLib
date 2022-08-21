@@ -24,14 +24,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Test.PositionTests;
-
-using Rudz.Chess.Enums;
 using Rudz.Chess.Extensions;
 using Rudz.Chess.Factories;
 using Rudz.Chess.Types;
 using Rudz.Chess.Validation;
 using Xunit;
+
+namespace Chess.Test.PositionTests;
 
 public sealed class ValidationTests
 {

@@ -24,15 +24,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using System;
 using System.Runtime.CompilerServices;
+using Rudz.Chess.Types;
 
 [assembly: InternalsVisibleTo("Chess.Test")]
 
 namespace Rudz.Chess;
-
-using Enums;
-using System;
-using Types;
 
 /// <summary>
 /// Computes pawn blockage (fences) See https://pdfs.semanticscholar.org/31c2/d37c80ea1aef0676ba30393bc46c0ccc70e9.pdf
@@ -115,7 +113,8 @@ public sealed class Blockage : IBlockage
 
             if (r > _fenceRank[f.AsInt()])
             {
-                if ((_theirPawns & sq.PassedPawnFrontAttackSpan(_us)).IsEmpty && (theirKsq.File != f || theirKsq.Rank.RelativeRank(_us) < rr))
+                if ((_theirPawns & sq.PassedPawnFrontAttackSpan(_us)).IsEmpty &&
+                    (theirKsq.File != f || theirKsq.Rank.RelativeRank(_us) < rr))
                     return false;
             }
             else if (_fence & sq)
@@ -268,7 +267,8 @@ public sealed class Blockage : IBlockage
             return true;
         }
 
-        Span<Direction> directions = stackalloc Direction[] { _us.PawnPushDistance(), Directions.East, _them.PawnPushDistance() };
+        Span<Direction> directions = stackalloc Direction[]
+            { _us.PawnPushDistance(), Directions.East, _them.PawnPushDistance() };
 
         foreach (var direction in directions)
         {

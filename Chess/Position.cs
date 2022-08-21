@@ -24,14 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess;
-
-using Enums;
-using Extensions;
-using Fen;
-using Hash;
 using Microsoft.Extensions.ObjectPool;
-using MoveGeneration;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -39,8 +32,15 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
-using Types;
-using Validation;
+using Rudz.Chess.Enums;
+using Rudz.Chess.Extensions;
+using Rudz.Chess.Fen;
+using Rudz.Chess.Hash;
+using Rudz.Chess.MoveGeneration;
+using Rudz.Chess.Types;
+using Rudz.Chess.Validation;
+
+namespace Rudz.Chess;
 
 /// <summary>
 /// The main board representation class. It stores all the information about the current board
@@ -159,7 +159,7 @@ public sealed class Position : IPosition
 
     public BitBoard AttacksTo(Square sq, in BitBoard occupied)
     {
-        Debug.Assert(sq >= Enums.Squares.a1 && sq <= Enums.Squares.h8);
+        Debug.Assert(sq >= Types.Squares.a1 && sq <= Types.Squares.h8);
 
         return (sq.PawnAttack(Player.White) & Board.Pieces(Player.Black, PieceTypes.Pawn))
                | (sq.PawnAttack(Player.Black) & Board.Pieces(Player.White, PieceTypes.Pawn))
@@ -419,8 +419,8 @@ public sealed class Position : IPosition
                 var kingFrom = from;
                 // ReSharper disable once InlineTemporaryVariable
                 var rookFrom = to; // Castling is encoded as 'King captures the rook'
-                var kingTo = (rookFrom > kingFrom ? Enums.Squares.g1 : Enums.Squares.c1).RelativeSquare(us);
-                var rookTo = (rookFrom > kingFrom ? Enums.Squares.f1 : Enums.Squares.d1).RelativeSquare(us);
+                var kingTo = (rookFrom > kingFrom ? Types.Squares.g1 : Types.Squares.c1).RelativeSquare(us);
+                var rookTo = (rookFrom > kingFrom ? Types.Squares.f1 : Types.Squares.d1).RelativeSquare(us);
                 var ksq = GetKingSquare(them);
 
                 return !(PieceTypes.Rook.PseudoAttacks(rookTo) & ksq).IsEmpty && !(GetAttacks(rookTo, PieceTypes.Rook,
@@ -505,7 +505,7 @@ public sealed class Position : IPosition
             // they would be in standard chess.
 
             var isKingSide = to > from;
-            to = (isKingSide ? Enums.Squares.g1 : Enums.Squares.c1).RelativeSquare(us);
+            to = (isKingSide ? Types.Squares.g1 : Types.Squares.c1).RelativeSquare(us);
             var step = isKingSide ? Direction.West : Direction.East;
 
             for (var s = to; s != from; s += step)
@@ -1251,8 +1251,8 @@ public sealed class Position : IPosition
         var doCastleling = castlelingPerform == CastlelingPerform.Do;
 
         rookFrom = to; // Castling is encoded as "king captures friendly rook"
-        rookTo = (kingSide ? Enums.Squares.f1 : Enums.Squares.d1).RelativeSquare(us);
-        to = (kingSide ? Enums.Squares.g1 : Enums.Squares.c1).RelativeSquare(us);
+        rookTo = (kingSide ? Types.Squares.f1 : Types.Squares.d1).RelativeSquare(us);
+        to = (kingSide ? Types.Squares.g1 : Types.Squares.c1).RelativeSquare(us);
 
         // Remove both pieces first since squares could overlap in Chess960
         RemovePiece(doCastleling ? from : to);
@@ -1287,8 +1287,8 @@ public sealed class Position : IPosition
         _castlingRightsMask[rookFrom.AsInt()] |= cr;
         _castlingRookSquare[cr.AsInt()] = rookFrom;
 
-        var kingTo = (isKingSide ? Enums.Squares.g1 : Enums.Squares.c1).RelativeSquare(stm);
-        var rookTo = (isKingSide ? Enums.Squares.f1 : Enums.Squares.d1).RelativeSquare(stm);
+        var kingTo = (isKingSide ? Types.Squares.g1 : Types.Squares.c1).RelativeSquare(stm);
+        var rookTo = (isKingSide ? Types.Squares.f1 : Types.Squares.d1).RelativeSquare(stm);
 
         _castlingPath[cr.AsInt()] =
             (rookFrom.BitboardBetween(rookTo) | kingFrom.BitboardBetween(kingTo) | rookTo | kingTo)
@@ -1367,13 +1367,13 @@ public sealed class Position : IPosition
             switch (token)
             {
                 case 'K':
-                    for (rsq = Enums.Squares.h1.RelativeSquare(c); GetPiece(rsq) != rook; --rsq)
+                    for (rsq = Types.Squares.h1.RelativeSquare(c); GetPiece(rsq) != rook; --rsq)
                     {
                     }
 
                     break;
                 case 'Q':
-                    for (rsq = Enums.Squares.a1.RelativeSquare(c); GetPiece(rsq) != rook; --rsq)
+                    for (rsq = Types.Squares.a1.RelativeSquare(c); GetPiece(rsq) != rook; --rsq)
                     {
                     }
 

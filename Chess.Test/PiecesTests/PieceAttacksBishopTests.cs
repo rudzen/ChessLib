@@ -25,7 +25,6 @@ SOFTWARE.
 */
 
 using Rudz.Chess;
-using Rudz.Chess.Enums;
 using Rudz.Chess.Types;
 using Xunit;
 

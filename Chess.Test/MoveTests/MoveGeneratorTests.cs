@@ -24,15 +24,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Test.MoveTests;
-
 using Rudz.Chess;
+using Rudz.Chess.Enums;
 using Rudz.Chess.Fen;
 using Rudz.Chess.MoveGeneration;
 using Rudz.Chess.Types;
 using Xunit;
 
-public class MoveGeneratorTests
+namespace Chess.Test.MoveTests;
+
+public sealed class MoveGeneratorTests
 {
     [Fact]
     public void InCheckMoveGeneration()
@@ -46,7 +47,7 @@ public class MoveGeneratorTests
         var fd = new FenData(fen);
         var state = new State();
 
-        pos.Set(in fd, Rudz.Chess.Enums.ChessMode.NORMAL, state);
+        pos.Set(in fd, ChessMode.NORMAL, state);
 
         // make sure black is in check
         Assert.True(pos.InCheck);

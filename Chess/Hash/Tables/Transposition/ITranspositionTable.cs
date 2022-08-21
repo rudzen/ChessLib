@@ -24,9 +24,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Hash.Tables.Transposition;
+using Rudz.Chess.Types;
 
-using Types;
+namespace Rudz.Chess.Hash.Tables.Transposition;
 
 public interface ITranspositionTable
 {

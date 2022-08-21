@@ -34,6 +34,27 @@ using Hash;
 using System;
 using Types;
 
+[Flags]
+public enum PositionValidationTypes
+{
+    None = 0,
+    Basic = 1,
+    Castleling = 1 << 1,
+    Kings = 1 << 2,
+    Pawns = 1 << 3,
+    PieceConsistency = 1 << 4,
+    PieceCount = 1 << 5,
+    PieceTypes = 1 << 6,
+    State = 1 << 7,
+    All = Basic | Castleling | Kings | Pawns | PieceConsistency | PieceCount | PieceTypes | State
+}
+
+public static class PositionValidationTypesExtensions
+{
+    public static bool HasFlagFast(this PositionValidationTypes @this, PositionValidationTypes flag)
+        => (@this & flag) != 0;
+}
+
 public sealed class PositionValidator : IPositionValidator
 {
     private readonly IBoard _board;

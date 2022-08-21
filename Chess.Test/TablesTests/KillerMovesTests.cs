@@ -24,8 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using Rudz.Chess.Enums;
 using Rudz.Chess.Tables;
+using Rudz.Chess.Types;
 using Xunit;
 
 namespace Chess.Test.TablesTests;
@@ -37,7 +37,7 @@ public sealed class KillerMovesTests
     {
         var km = KillerMoves.Create(128);
         const int depth = 1;
-        var move = Rudz.Chess.Types.Move.Create(Squares.a2, Squares.a3);
+        var move = Move.Create(Squares.a2, Squares.a3);
         var pc = PieceTypes.Pawn.MakePiece(Players.White);
 
         km.UpdateValue(depth, move, pc);
@@ -52,7 +52,7 @@ public sealed class KillerMovesTests
     {
         var km = KillerMoves.Create(128);
         const int depth = 1;
-        var move = Rudz.Chess.Types.Move.Create(Squares.a2, Squares.a3);
+        var move = Move.Create(Squares.a2, Squares.a3);
         var pc = PieceTypes.Pawn.MakePiece(Players.White);
 
         km.UpdateValue(depth, move, pc);

@@ -24,12 +24,24 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Types;
-
-using Enums;
 using System;
 using System.Linq;
 using System.Runtime.CompilerServices;
+
+namespace Rudz.Chess.Types;
+
+public enum Files
+{
+    FileA = 0,
+    FileB = 1,
+    FileC = 2,
+    FileD = 3,
+    FileE = 4,
+    FileF = 5,
+    FileG = 6,
+    FileH = 7,
+    FileNb = 8
+}
 
 public readonly struct File : IEquatable<File>
 {
@@ -121,7 +133,7 @@ public readonly struct File : IEquatable<File>
     public static BitBoard operator ~(File left) => ~left.BitBoardFile();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static int operator >>(File left, int right) => left.AsInt() >> right;
+    public static int operator >> (File left, int right) => left.AsInt() >> right;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool operator >(File left, File right) => left.AsInt() > right.AsInt();

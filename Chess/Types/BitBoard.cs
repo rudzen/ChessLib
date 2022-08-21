@@ -24,14 +24,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-// ReSharper disable MemberCanBeInternal
-namespace Rudz.Chess.Types;
-
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+
+// ReSharper disable MemberCanBeInternal
+namespace Rudz.Chess.Types;
 
 /// <summary>
 /// Bitboard struct, wraps an unsigned long with some nifty helper functionality and operators.

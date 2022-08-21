@@ -24,15 +24,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Test.GameplayTests;
-
+using System.Linq;
 using Rudz.Chess;
-using Rudz.Chess.Enums;
 using Rudz.Chess.Factories;
 using Rudz.Chess.MoveGeneration;
 using Rudz.Chess.Types;
-using System.Linq;
 using Xunit;
+
+namespace Chess.Test.GameplayTests;
 
 public sealed class FoolsCheckMateTests
 {
@@ -40,12 +39,13 @@ public sealed class FoolsCheckMateTests
     public void FoolsCheckMate()
     {
         // generate moves
-        var moves = new Move[] {
-                                                      Move.Create(Squares.f2, Squares.f3),
-                                                      Move.Create(Squares.e7, Squares.e5),
-                                                      Move.Create(Squares.g2, Squares.g4),
-                                                      Move.Create(Squares.d8, Squares.h4)
-                                                  };
+        var moves = new Move[]
+        {
+            Move.Create(Squares.f2, Squares.f3),
+            Move.Create(Squares.e7, Squares.e5),
+            Move.Create(Squares.g2, Squares.g4),
+            Move.Create(Squares.d8, Squares.h4)
+        };
 
         // construct game and start a new game
         var board = new Board();

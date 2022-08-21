@@ -24,24 +24,25 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Protocol.UCI;
-
 using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
+
+namespace Rudz.Chess.Protocol.UCI;
 
 public sealed class InputOutput : IInputOutput
 {
     private static readonly char[] SplitChar = { ' ' };
 
-    private readonly System.Threading.Mutex _mutex;
+    private readonly Mutex _mutex;
 
     private string[] _words;
     private int _index = -1;
 
     public InputOutput()
     {
-        _mutex = new System.Threading.Mutex();
+        _mutex = new Mutex();
         LastLineRead = string.Empty;
         _words = Array.Empty<string>();
     }

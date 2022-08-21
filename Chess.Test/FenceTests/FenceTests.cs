@@ -24,10 +24,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Test.FenceTests;
-
 using Rudz.Chess.Factories;
 using Xunit;
+
+namespace Chess.Test.FenceTests;
 
 public class FenceTests
 {

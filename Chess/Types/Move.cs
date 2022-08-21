@@ -24,11 +24,26 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Types;
-
-using Enums;
 using System;
 using System.Runtime.CompilerServices;
+using Rudz.Chess.Enums;
+using Rudz.Chess.Extensions;
+
+namespace Rudz.Chess.Types;
+
+public enum MoveTypes : ushort
+{
+    Normal = 0,
+    Promotion = 1 << 14,
+    Enpassant = 2 << 14,
+    Castling = 3 << 14
+}
+
+public static class MoveTypesExtensions
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static int AsInt(this MoveTypes @this) => (int)@this;
+}
 
 /// <summary>
 /// Move struct. Contains a single ushort for move related information. Also includes set and

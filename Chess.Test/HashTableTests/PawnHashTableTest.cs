@@ -24,16 +24,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Test.HashTableTests;
-
+using System;
+using System.Runtime.InteropServices;
 using Rudz.Chess.Hash;
 using Rudz.Chess.Hash.Tables;
 using Rudz.Chess.Types;
-using System;
-using System.Runtime.InteropServices;
 using Xunit;
 
-public class PawnHashTableTest
+namespace Chess.Test.HashTableTests;
+
+public sealed class PawnHashTableTest
 {
     [Fact]
     public void BaseInitialize()

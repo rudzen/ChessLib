@@ -24,10 +24,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Tables;
-
 using System;
-using Types;
+using Rudz.Chess.Types;
+
+namespace Rudz.Chess.Tables;
 
 public interface IKillerMoves : IEquatable<IKillerMoves>
 {

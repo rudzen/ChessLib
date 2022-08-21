@@ -24,14 +24,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Perft.Parsers;
-
-using Rudz.Chess.Extensions;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Rudz.Chess.Extensions;
+
+namespace Perft.Parsers;
 
 /// <summary>
 /// Fast epd file parser

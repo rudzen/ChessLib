@@ -24,9 +24,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Hash.Tables;
-
 using System;
+
+namespace Rudz.Chess.Hash.Tables;
 
 public interface IHashTable<T> where T : new()
 {

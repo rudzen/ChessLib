@@ -24,9 +24,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Types;
-
 using System;
+
+namespace Rudz.Chess.Types;
 
 /// <summary>
 /// Model for data transfer of piece and square Used for notification when a piece is updated in
@@ -45,10 +45,12 @@ public sealed class PieceSquareEventArgs : EventArgs, IPieceSquare
     public Square Square { get; set; }
 
     public bool Equals(IPieceSquare other)
-        => other is not null && (ReferenceEquals(this, other) || Piece.Equals(other.Piece) && Square.Equals(other.Square));
+        => other is not null &&
+           (ReferenceEquals(this, other) || Piece.Equals(other.Piece) && Square.Equals(other.Square));
 
     public override bool Equals(object obj)
-        => obj is not null && (ReferenceEquals(this, obj) || obj.GetType() == GetType() && Equals((PieceSquareEventArgs)obj));
+        => obj is not null &&
+           (ReferenceEquals(this, obj) || obj.GetType() == GetType() && Equals((PieceSquareEventArgs)obj));
 
     public override int GetHashCode()
     {

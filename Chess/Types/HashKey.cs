@@ -48,14 +48,11 @@ public readonly struct HashKey : IEquatable<HashKey>
         LowerKey = key32;
     }
 
-    [field: FieldOffset(0)]
-    public uint LowerKey { get; }
+    [field: FieldOffset(0)] public uint LowerKey { get; }
 
-    [field: FieldOffset(0)]
-    public ulong Key { get; }
+    [field: FieldOffset(0)] public ulong Key { get; }
 
-    [field: FieldOffset(4)]
-    public uint UpperKey { get; }
+    [field: FieldOffset(4)] public uint UpperKey { get; }
 
     public static HashKey Empty => new();
 
@@ -76,7 +73,7 @@ public readonly struct HashKey : IEquatable<HashKey>
         => left.Key != right.Key;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static HashKey operator >>(HashKey left, int right)
+    public static HashKey operator >> (HashKey left, int right)
         => left.Key >> right;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

@@ -25,7 +25,6 @@ SOFTWARE.
 */
 
 using Rudz.Chess;
-using Rudz.Chess.Enums;
 using Rudz.Chess.Types;
 using Xunit;
 
@@ -33,7 +32,6 @@ namespace Chess.Test.PiecesTests;
 
 public sealed class PieceAttacksRookTests : PieceAttacks
 {
-
     /// <summary>
     /// Testing results of blocked rook attacks, they should always return 7 on the sides, and 14 in
     /// the corner

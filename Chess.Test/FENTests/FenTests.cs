@@ -24,14 +24,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Test.FENTests;
-
-using FluentAssertions;
 using Rudz.Chess;
 using Rudz.Chess.Factories;
 using Rudz.Chess.Fen;
 using Rudz.Chess.Types;
 using Xunit;
+
+namespace Chess.Test.FENTests;
 
 public sealed class FenTests
 {
@@ -48,6 +47,6 @@ public sealed class FenTests
 
         var actualFen = game.GetFen();
 
-        actualFen.Should().Be(expectedFen);
+        Assert.Equal(expectedFen, actualFen);
     }
 }

@@ -24,12 +24,25 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Types;
-
-using Enums;
-using Extensions;
 using System;
 using System.Runtime.CompilerServices;
+using Rudz.Chess.Enums;
+using Rudz.Chess.Extensions;
+
+namespace Rudz.Chess.Types;
+
+public enum Players
+{
+    White = 0,
+    Black = 1,
+    PlayerNb = 2
+}
+
+public enum PlayerTypes
+{
+    Engine = 0,
+    Human = 1
+}
 
 public readonly struct Player : IEquatable<Player>
 {

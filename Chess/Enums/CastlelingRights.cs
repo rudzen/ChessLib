@@ -24,10 +24,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Enums;
-
 using System;
-using Types;
+using Rudz.Chess.Types;
+
+namespace Rudz.Chess.Enums;
 
 [Flags]
 public enum CastlelingRights

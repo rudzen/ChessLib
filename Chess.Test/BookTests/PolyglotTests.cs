@@ -24,19 +24,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Test.BookTests;
-
+using System.IO;
+using System.Reflection;
 using FluentAssertions;
 using Rudz.Chess;
-using Rudz.Chess.Enums;
 using Rudz.Chess.Factories;
 using Rudz.Chess.Fen;
 using Rudz.Chess.Polyglot;
 using Rudz.Chess.Protocol.UCI;
 using Rudz.Chess.Types;
-using System.IO;
-using System.Reflection;
 using Xunit;
+
+namespace Chess.Test.BookTests;
 
 public class PolyglotTests
 {

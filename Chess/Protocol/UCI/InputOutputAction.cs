@@ -24,9 +24,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Protocol.UCI;
-
 using System.Runtime.CompilerServices;
+
+namespace Rudz.Chess.Protocol.UCI;
 
 public enum InputOutputMutex
 {
@@ -39,11 +39,14 @@ public enum InputOutputMutex
 internal static class InputOutputMutexExtensions
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool IsReleasable(this InputOutputMutex @this) => @this.InBetween(InputOutputMutex.Acquire, InputOutputMutex.Atomic);
+    public static bool IsReleasable(this InputOutputMutex @this) =>
+        @this.InBetween(InputOutputMutex.Acquire, InputOutputMutex.Atomic);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool IsWaitable(this InputOutputMutex @this) => @this.InBetween(InputOutputMutex.Atomic, InputOutputMutex.Relax);
+    public static bool IsWaitable(this InputOutputMutex @this) =>
+        @this.InBetween(InputOutputMutex.Atomic, InputOutputMutex.Relax);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static bool InBetween(this InputOutputMutex v, InputOutputMutex min, InputOutputMutex max) => (uint)v - (uint)min <= (uint)max - (uint)min;
+    private static bool InBetween(this InputOutputMutex v, InputOutputMutex min, InputOutputMutex max) =>
+        (uint)v - (uint)min <= (uint)max - (uint)min;
 }

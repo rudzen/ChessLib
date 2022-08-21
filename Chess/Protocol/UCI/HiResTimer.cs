@@ -24,13 +24,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Protocol.UCI;
-
 using System;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
-using Types;
+using Rudz.Chess.Types;
+
+namespace Rudz.Chess.Protocol.UCI;
 
 /// <summary>
 /// Idea From https://stackoverflow.com/a/41697139/548894

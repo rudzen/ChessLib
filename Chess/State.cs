@@ -24,14 +24,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-// ReSharper disable MemberCanBeInternal
-namespace Rudz.Chess;
-
-using Enums;
-using Extensions;
 using System;
 using System.Linq;
-using Types;
+using Rudz.Chess.Enums;
+using Rudz.Chess.Extensions;
+using Rudz.Chess.Types;
+
+// ReSharper disable MemberCanBeInternal
+namespace Rudz.Chess;
 
 public sealed class State : IEquatable<State>
 {

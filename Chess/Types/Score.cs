@@ -24,11 +24,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Types;
-
 using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+
+namespace Rudz.Chess.Types;
 
 /// <summary>
 /// Score type with support for Eg/Mg values
@@ -38,11 +38,9 @@ public struct Score : IEquatable<Score>
     [StructLayout(LayoutKind.Explicit)]
     private struct ScoreUnion : IEquatable<ScoreUnion>
     {
-        [FieldOffset(0)]
-        public int mg;
+        [FieldOffset(0)] public int mg;
 
-        [FieldOffset(16)]
-        public int eg;
+        [FieldOffset(16)] public int eg;
 
         public bool Equals(ScoreUnion other)
             => mg == other.mg && eg == other.eg;

@@ -1,19 +1,39 @@
-﻿using Rudz.Chess;
+﻿/*
+ChessLib, a chess data structure library
+
+MIT License
+
+Copyright (c) 2017-2022 Rudy Alex Kohn
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
+using Rudz.Chess;
 using Rudz.Chess.Enums;
-using Rudz.Chess.Factories;
 using Rudz.Chess.Fen;
 using Rudz.Chess.MoveGeneration;
 using Rudz.Chess.Types;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace Chess.Test.MoveTests;
 
-public class MoveGen_49
+public sealed class MoveGen_49
 {
     [Fact]
     public void MoveListContainsMismatchedElement()
@@ -22,7 +42,7 @@ public class MoveGen_49
 
         var board = new Board();
         var pieceValue = new PieceValue();
-        var pos = new Rudz.Chess.Position(board, pieceValue);
+        var pos = new Position(board, pieceValue);
         var fd = new FenData(fen);
         var state = new State();
 
@@ -31,9 +51,9 @@ public class MoveGen_49
         var ml = pos.GenerateMoves();
 
         const bool expected = false;
-        var actual = ml.Contains(new Rudz.Chess.Types.Move(new Rudz.Chess.Types.Square(Ranks.Rank1, Files.FileE), new Rudz.Chess.Types.Square(Ranks.Rank1, Files.FileG), MoveTypes.Castling));
+        var actual = ml.Contains(new Move(new Square(Ranks.Rank1, Files.FileE), new Square(Ranks.Rank1, Files.FileG),
+            MoveTypes.Castling));
 
         Assert.Equal(expected, actual);
-
     }
 }

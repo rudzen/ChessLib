@@ -24,13 +24,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Hash.Tables.Transposition;
-
-using Exceptions;
 using System;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using Types;
+using Rudz.Chess.Exceptions;
+using Rudz.Chess.Types;
+
+namespace Rudz.Chess.Hash.Tables.Transposition;
 
 public sealed class TranspositionTable : ITranspositionTable
 {

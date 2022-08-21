@@ -24,10 +24,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Enums;
-
 using System;
 using System.Runtime.CompilerServices;
+
+namespace Rudz.Chess.Enums;
 
 [Flags]
 public enum MoveAmbiguities

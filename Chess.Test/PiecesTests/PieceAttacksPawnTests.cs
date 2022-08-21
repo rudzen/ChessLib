@@ -41,7 +41,8 @@ public sealed class PieceAttacksPawnTests : PieceAttacks
      * - Each band tests cover both the white and black side
      */
 
-    private static readonly BitBoard[] PawnBands = { 0x81818181818100, 0x42424242424200, 0x24242424242400, 0x18181818181800 };
+    private static readonly BitBoard[] PawnBands =
+        { 0x81818181818100, 0x42424242424200, 0x24242424242400, 0x18181818181800 };
 
     /*
      * Pawn bands :

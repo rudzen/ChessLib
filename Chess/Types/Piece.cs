@@ -24,13 +24,61 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Types;
-
-using Enums;
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Rudz.Chess.Enums;
+using Rudz.Chess.Extensions;
+
+namespace Rudz.Chess.Types;
+
+public enum Pieces : byte
+{
+    NoPiece = 0,
+    WhitePawn = 1,
+    WhiteKnight = 2,
+    WhiteBishop = 3,
+    WhiteRook = 4,
+    WhiteQueen = 5,
+    WhiteKing = 6,
+    BlackPawn = 9,
+    BlackKnight = 10,
+    BlackBishop = 11,
+    BlackRook = 12,
+    BlackQueen = 13,
+    BlackKing = 14,
+    PieceNb = 15
+}
+
+public enum PieceTypes
+{
+    NoPieceType = 0,
+    Pawn = 1,
+    Knight = 2,
+    Bishop = 3,
+    Rook = 4,
+    Queen = 5,
+    King = 6,
+    PieceTypeNb = 7,
+    AllPieces = 0
+}
+
+public static class PieceTypesExtensions
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static int AsInt(this PieceTypes p) => (int)p;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Piece MakePiece(this PieceTypes @this, Player side) => (int)@this | (side.Side << 3);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool IsSlider(this PieceTypes @this) => @this.InBetween(PieceTypes.Bishop, PieceTypes.Queen);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool InBetween(this PieceTypes v, PieceTypes min, PieceTypes max) =>
+        (uint)v - (uint)min <= (uint)max - (uint)min;
+}
 
 /// <summary>
 /// Piece. Contains the piece type which indicate what type and color the piece is
@@ -38,7 +86,24 @@ using System.Runtime.InteropServices;
 [StructLayout(LayoutKind.Explicit, Size = 1)]
 public readonly struct Piece : IEquatable<Piece>
 {
-    private static readonly Piece[] ValidPieces =
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private Piece(int piece) => Value = (Pieces)piece;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private Piece(Piece piece) => Value = piece.Value;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Piece(Pieces piece) => Value = piece;
+
+    [FieldOffset(0)] public readonly Pieces Value;
+
+    public bool IsWhite => ColorOf().IsWhite;
+
+    public bool IsBlack => ColorOf().IsBlack;
+
+    public static readonly Piece EmptyPiece = Pieces.NoPiece;
+
+    public static Piece[] AllPieces { get; } =
     {
         Pieces.WhitePawn,
         Pieces.WhiteKnight,
@@ -53,26 +118,6 @@ public readonly struct Piece : IEquatable<Piece>
         Pieces.BlackQueen,
         Pieces.BlackKing
     };
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private Piece(int piece) => Value = (Pieces)piece;
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private Piece(Piece piece) => Value = piece.Value;
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Piece(Pieces piece) => Value = piece;
-
-    [FieldOffset(0)]
-    public readonly Pieces Value;
-
-    public bool IsWhite => ColorOf().IsWhite;
-
-    public bool IsBlack => ColorOf().IsBlack;
-
-    public static readonly Piece EmptyPiece = Pieces.NoPiece;
-
-    public static Piece[] AllPieces => ValidPieces;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator Piece(char value) => new(GetPiece(value));
@@ -90,7 +135,7 @@ public readonly struct Piece : IEquatable<Piece>
     public static Piece operator +(Piece left, Player right) => new(left.Value + (byte)(right << 3));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Piece operator >>(Piece left, int right) => (int)left.Value >> right;
+    public static Piece operator >> (Piece left, int right) => (int)left.Value >> right;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Piece operator <<(Piece left, int right) => (int)left.Value << right;

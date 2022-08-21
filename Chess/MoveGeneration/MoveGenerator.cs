@@ -24,17 +24,20 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.MoveGeneration;
-
-using Enums;
 using System;
 using System.Diagnostics;
-using Types;
+using Rudz.Chess.Enums;
+using Rudz.Chess.Types;
+
+namespace Rudz.Chess.MoveGeneration;
 
 public static class MoveGenerator
 {
     private static readonly (CastlelingRights, CastlelingRights)[] CastleSideRights
-        = { (CastlelingRights.WhiteOo, CastlelingRights.WhiteOoo), (CastlelingRights.BlackOo, CastlelingRights.BlackOoo) };
+        =
+        {
+            (CastlelingRights.WhiteOo, CastlelingRights.WhiteOoo), (CastlelingRights.BlackOo, CastlelingRights.BlackOoo)
+        };
 
     public static int Generate(
         in IPosition pos,
@@ -119,7 +122,8 @@ public static class MoveGenerator
         Player us,
         MoveGenerationType type)
     {
-        Debug.Assert(type is MoveGenerationType.Captures or MoveGenerationType.Quiets or MoveGenerationType.NonEvasions);
+        Debug.Assert(type is MoveGenerationType.Captures or MoveGenerationType.Quiets
+            or MoveGenerationType.NonEvasions);
         Debug.Assert(!pos.InCheck);
         var target = type switch
         {
@@ -243,7 +247,8 @@ public static class MoveGenerator
         foreach (var from in squares)
         {
             if (checks
-                && (!(pos.BlockersForKing(~us) & from).IsEmpty || (pt.PseudoAttacks(from) & target & pos.CheckedSquares(pt)).IsEmpty))
+                && (!(pos.BlockersForKing(~us) & from).IsEmpty ||
+                    (pt.PseudoAttacks(from) & target & pos.CheckedSquares(pt)).IsEmpty))
                 continue;
 
             var b = pos.GetAttacks(from, pt) & target;
@@ -307,6 +312,7 @@ public static class MoveGenerator
             pawnOne = pawnsNotOn7.Shift(up) & emptySquares;
             pawnTwo = (pawnOne & rank3Bb).Shift(up) & emptySquares;
 
+            // ReSharper disable once SwitchStatementMissingSomeEnumCasesNoDefault
             switch (type)
             {
                 // Consider only blocking squares
@@ -316,26 +322,26 @@ public static class MoveGenerator
                     break;
 
                 case MoveGenerationType.QuietChecks:
+                {
+                    pawnOne &= ksq.PawnAttack(them);
+                    pawnTwo &= ksq.PawnAttack(them);
+
+                    var dcCandidates = pos.BlockersForKing(them);
+
+                    // Add pawn pushes which give discovered check. This is possible only if
+                    // the pawn is not on the same file as the enemy king, because we don't
+                    // generate captures. Note that a possible discovery check promotion has
+                    // been already generated among captures.
+                    if (!(pawnsNotOn7 & dcCandidates).IsEmpty)
                     {
-                        pawnOne &= ksq.PawnAttack(them);
-                        pawnTwo &= ksq.PawnAttack(them);
-
-                        var dcCandidates = pos.BlockersForKing(them);
-
-                        // Add pawn pushes which give discovered check. This is possible only if
-                        // the pawn is not on the same file as the enemy king, because we don't
-                        // generate captures. Note that a possible discovery check promotion has
-                        // been already generated among captures.
-                        if (!(pawnsNotOn7 & dcCandidates).IsEmpty)
-                        {
-                            var dc1 = (pawnsNotOn7 & dcCandidates).Shift(up) & emptySquares & ~ksq;
-                            var dc2 = (dc1 & rank3Bb).Shift(up) & emptySquares;
-                            pawnOne |= dc1;
-                            pawnTwo |= dc2;
-                        }
-
-                        break;
+                        var dc1 = (pawnsNotOn7 & dcCandidates).Shift(up) & emptySquares & ~ksq;
+                        var dc2 = (dc1 & rank3Bb).Shift(up) & emptySquares;
+                        pawnOne |= dc1;
+                        pawnTwo |= dc2;
                     }
+
+                    break;
+                }
             }
 
             while (!pawnOne.IsEmpty)

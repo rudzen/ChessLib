@@ -26,10 +26,6 @@ SOFTWARE.
 
 // ReSharper disable InconsistentNaming
 
-namespace Rudz.Chess.Types;
-
-using Enums;
-using Extensions;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -38,6 +34,9 @@ using System.Linq;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Text;
+using Rudz.Chess.Extensions;
+
+namespace Rudz.Chess.Types;
 
 public static class BitBoards
 {

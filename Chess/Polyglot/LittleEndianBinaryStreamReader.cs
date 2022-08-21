@@ -24,14 +24,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Polyglot;
-
 using System;
 using System.IO;
 
+namespace Rudz.Chess.Polyglot;
+
 internal sealed class LittleEndianBinaryStreamReader : BinaryReader
 {
-    public LittleEndianBinaryStreamReader(Stream stream) : base(stream) { }
+    public LittleEndianBinaryStreamReader(Stream stream) : base(stream)
+    {
+    }
 
     public override short ReadInt16()
     {

@@ -27,11 +27,11 @@
 
  */
 
-namespace Rudz.Chess.Hash;
-
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+
+namespace Rudz.Chess.Hash;
 
 public sealed class RKiss : IRKiss
 {

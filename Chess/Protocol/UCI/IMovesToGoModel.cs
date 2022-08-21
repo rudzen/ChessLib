@@ -24,9 +24,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Protocol.UCI;
+using Rudz.Chess.Types;
 
-using Types;
+namespace Rudz.Chess.Protocol.UCI;
 
 public interface IMovesToGoModel
 {

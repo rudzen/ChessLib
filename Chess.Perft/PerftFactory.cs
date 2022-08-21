@@ -24,13 +24,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Perft;
-
-using Interfaces;
-using Rudz.Chess.Factories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Chess.Perft.Interfaces;
+using Rudz.Chess.Factories;
+
+namespace Chess.Perft;
 
 public static class PerftFactory
 {

@@ -24,9 +24,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Protocol.UCI;
-
 using System;
+
+namespace Rudz.Chess.Protocol.UCI;
 
 public interface IOption
 {

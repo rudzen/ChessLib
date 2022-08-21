@@ -24,12 +24,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Hash;
-
-using Enums;
 using System;
 using System.Runtime.CompilerServices;
-using Types;
+using Rudz.Chess.Enums;
+using Rudz.Chess.Types;
+
+namespace Rudz.Chess.Hash;
 
 /// <summary>
 /// Class responsible for keeping random values for use with Zobrist hashing.
@@ -99,8 +99,10 @@ public static class Zobrist
 
         Span<Piece> pieces = stackalloc Piece[]
         {
-            Pieces.WhitePawn, Pieces.WhiteKnight, Pieces.WhiteBishop, Pieces.WhiteRook, Pieces.WhiteQueen, Pieces.WhiteKing,
-            Pieces.BlackPawn, Pieces.BlackKnight, Pieces.BlackBishop, Pieces.BlackRook, Pieces.BlackQueen, Pieces.BlackKing,
+            Pieces.WhitePawn, Pieces.WhiteKnight, Pieces.WhiteBishop,
+            Pieces.WhiteRook, Pieces.WhiteQueen,  Pieces.WhiteKing,
+            Pieces.BlackPawn, Pieces.BlackKnight, Pieces.BlackBishop,
+            Pieces.BlackRook, Pieces.BlackQueen,  Pieces.BlackKing,
         };
 
         foreach (var pc in pieces)

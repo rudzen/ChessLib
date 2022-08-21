@@ -24,30 +24,29 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Perft;
-
-using Chess.Perft;
-using Chess.Perft.Interfaces;
-using DryIoc;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.ObjectPool;
-using Newtonsoft.Json;
-using Options;
-using Parsers;
-using Rudz.Chess;
-using Rudz.Chess.Extensions;
-using Rudz.Chess.Protocol.UCI;
-using Rudz.Chess.Types;
-using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using TimeStamp;
+using Chess.Perft;
+using Chess.Perft.Interfaces;
+using DryIoc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.ObjectPool;
+using Perft.Options;
+using Perft.Parsers;
+using Perft.TimeStamp;
+using Rudz.Chess;
+using Rudz.Chess.Extensions;
+using Rudz.Chess.Protocol.UCI;
+using Serilog;
+
+namespace Perft;
 
 public sealed class PerftRunner : IPerftRunner
 {
@@ -66,8 +65,6 @@ public sealed class PerftRunner : IPerftRunner
     private readonly IBuildTimeStamp _buildTimeStamp;
 
     private readonly IPerft _perft;
-
-    private readonly JsonSerializerSettings _outputSettings;
 
     private readonly ObjectPool<PerftResult> _resultPool;
 
@@ -100,11 +97,6 @@ public sealed class PerftRunner : IPerftRunner
 
         TranspositionTableOptions = Framework.IoC.Resolve<IOptions>(OptionType.TTOptions) as TTOptions;
         configuration.Bind("TranspositionTable", TranspositionTableOptions);
-
-        _outputSettings = new JsonSerializerSettings
-        {
-            Formatting = Formatting.Indented
-        };
 
         _cpu = new CPU();
     }
@@ -198,7 +190,8 @@ public sealed class PerftRunner : IPerftRunner
 
         var depths = options.Depths.Select(d => (d, zero)).ToList();
 
-        var perftPositions = options.Fens.Select(f => PerftPositionFactory.Create(Guid.NewGuid().ToString(), f, depths));
+        var perftPositions =
+            options.Fens.Select(f => PerftPositionFactory.Create(Guid.NewGuid().ToString(), f, depths));
 
         foreach (var perftPosition in perftPositions)
             yield return perftPosition;
@@ -255,12 +248,12 @@ public sealed class PerftRunner : IPerftRunner
     private async ValueTask WriteOutput(IPerftResult result, string baseFileName, CancellationToken cancellationToken)
     {
         // ReSharper disable once MethodHasAsyncOverload
-        var contents = JsonConvert.SerializeObject(result, _outputSettings);
+        var contents = JsonSerializer.Serialize(result);
         var outputFileName = $"{baseFileName}{result.Depth}].json";
-        await System.IO.File.WriteAllTextAsync(
-            outputFileName,
-            contents,
-            cancellationToken)
+        await File.WriteAllTextAsync(
+                outputFileName,
+                contents,
+                cancellationToken)
             .ConfigureAwait(false);
     }
 
@@ -301,6 +294,7 @@ public sealed class PerftRunner : IPerftRunner
             }
             else
                 _log.Information("Result      : {0}", result.Result);
+
             _log.Information("TT hits     : {0}", Game.Table.Hits);
 
             var error = 0;

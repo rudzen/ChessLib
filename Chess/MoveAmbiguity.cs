@@ -24,18 +24,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess;
-
-using Enums;
-using Exceptions;
-using Microsoft.Extensions.ObjectPool;
-using MoveGeneration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using Types;
+using Rudz.Chess.Enums;
+using Rudz.Chess.Exceptions;
+using Rudz.Chess.Extensions;
+using Rudz.Chess.MoveGeneration;
+using Rudz.Chess.Types;
+
+namespace Rudz.Chess;
 
 public sealed class MoveAmbiguity : IMoveAmbiguity
 {

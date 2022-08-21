@@ -24,11 +24,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess;
-
-using Hash;
 using System.Diagnostics;
-using Types;
+using Rudz.Chess.Hash;
+using Rudz.Chess.Types;
+
+namespace Rudz.Chess;
 
 /// <summary>
 /// Marcel van Kervinck's cuckoo algorithm for fast detection of "upcoming repetition"
@@ -45,7 +45,7 @@ public static class Cuckoo
         var count = 0;
         foreach (var pc in Piece.AllPieces)
         foreach (var sq1 in BitBoards.AllSquares)
-            for (var sq2 = sq1 + 1; sq2 <= Enums.Squares.h8; ++sq2)
+            for (var sq2 = sq1 + 1; sq2 <= Squares.h8; ++sq2)
             {
                 if ((pc.Type().PseudoAttacks(sq1) & sq2).IsEmpty)
                     continue;

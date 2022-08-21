@@ -24,15 +24,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Fen;
-
-using Enums;
-using Exceptions;
-using Extensions;
 using System;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
-using Types;
+using Rudz.Chess.Exceptions;
+using Rudz.Chess.Extensions;
+using Rudz.Chess.Types;
+
+namespace Rudz.Chess.Fen;
 
 public static class Fen
 {

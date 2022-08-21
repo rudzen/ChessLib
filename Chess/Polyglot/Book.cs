@@ -24,16 +24,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Polyglot;
-
-using Enums;
-using Extensions;
-using MoveGeneration;
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using Types;
+using Rudz.Chess.Enums;
+using Rudz.Chess.Extensions;
+using Rudz.Chess.MoveGeneration;
+using Rudz.Chess.Types;
+
+namespace Rudz.Chess.Polyglot;
 
 public sealed class Book : IDisposable
 {
@@ -203,7 +203,8 @@ public sealed class Book : IDisposable
 
         k ^= CastleRights
             .Where(cr => _pos.State.CastlelingRights.HasFlagFast(cr))
-            .Aggregate(ulong.MinValue, (current, validCastlelingFlag) => current ^ BookZobrist.Castle(validCastlelingFlag));
+            .Aggregate(ulong.MinValue,
+                (current, validCastlelingFlag) => current ^ BookZobrist.Castle(validCastlelingFlag));
 
         if (_pos.State.EnPassantSquare != Square.None)
             k ^= BookZobrist.EnPassant(_pos.State.EnPassantSquare.File);

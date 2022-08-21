@@ -24,12 +24,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Perft.Interfaces;
-
-using Rudz.Chess;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Rudz.Chess;
+
+namespace Chess.Perft.Interfaces;
 
 public interface IPerft
 {

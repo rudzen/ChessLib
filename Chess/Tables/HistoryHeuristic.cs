@@ -24,11 +24,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Tables;
+using Rudz.Chess.Extensions;
+using Rudz.Chess.Types;
 
-using Enums;
-using Extensions;
-using Types;
+namespace Rudz.Chess.Tables;
 
 public sealed class HistoryHeuristic : IHistoryHeuristic
 {

@@ -24,9 +24,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Perft;
-
 using System;
+
+namespace Perft;
 
 public sealed class PerftResult : IPerftResult
 {
@@ -40,6 +40,7 @@ public sealed class PerftResult : IPerftResult
     public ulong TableHits { get; set; }
     public bool Passed { get; set; }
     public int Errors { get; set; }
+
     public void Clear()
     {
         Fen = string.Empty;

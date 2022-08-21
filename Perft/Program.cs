@@ -24,25 +24,25 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Perft;
-
+using System;
+using System.IO;
+using System.Threading.Tasks;
 using Chess.Perft;
 using Chess.Perft.Interfaces;
 using CommandLine;
 using DryIoc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.ObjectPool;
-using Options;
-using Parsers;
+using Perft.Options;
+using Perft.Parsers;
+using Perft.TimeStamp;
 using Rudz.Chess;
 using Rudz.Chess.Protocol.UCI;
 using Rudz.Chess.Tables;
 using Rudz.Chess.Types;
 using Serilog;
-using System;
-using System.IO;
-using System.Threading.Tasks;
-using TimeStamp;
+
+namespace Perft;
 
 /*
  *
@@ -143,7 +143,7 @@ internal static class Program
 
         // Bind chess perft classes
         container.Register<IPerftPosition, PerftPosition>(Reuse.Transient);
-        container.Register<IPerft, Perft>(Reuse.Transient);
+        container.Register<IPerft, Chess.Perft.Perft>(Reuse.Transient);
         container.Register<IPerftRunner, PerftRunner>(Reuse.Transient);
 
         // Bind perft classes

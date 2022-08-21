@@ -24,11 +24,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Protocol.UCI;
-
-using Extensions;
 using System;
 using System.Diagnostics;
+using Rudz.Chess.Extensions;
+
+namespace Rudz.Chess.Protocol.UCI;
 
 public sealed class Option : IOption
 {

@@ -24,10 +24,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Protocol.UCI;
-
 using System;
 using System.Diagnostics;
+
+namespace Rudz.Chess.Protocol.UCI;
 
 public sealed class CPU
 {
@@ -61,7 +61,8 @@ public sealed class CPU
 
         double percentage;
 
-        if (now <= _lastCpu || total.Milliseconds < _lastSysCpu.Milliseconds || user.Milliseconds < _lastUserCpu.Milliseconds)
+        if (now <= _lastCpu || total.Milliseconds < _lastSysCpu.Milliseconds ||
+            user.Milliseconds < _lastUserCpu.Milliseconds)
         {
             //Overflow detection. Just skip this value.
             percentage = DefaultOverflow;

@@ -32,7 +32,7 @@ using Xunit;
 
 namespace Chess.Test.CastleTests;
 
-public class BasicCastleTests
+public sealed class BasicCastleTests
 {
     [Theory]
     [InlineData(Fen.StartPositionFen, CastlelingRights.None, false)]

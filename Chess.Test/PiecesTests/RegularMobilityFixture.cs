@@ -24,9 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using Rudz.Chess.Enums;
-using Rudz.Chess.Types;
 using System;
+using Rudz.Chess.Types;
 
 namespace Chess.Test.PiecesTests;
 
@@ -41,8 +40,9 @@ public sealed class RegularMobilityFixture
 
     public BitBoard BoardCorners { get; }
         = BitBoards.MakeBitboard(Squares.a1) | BitBoards.MakeBitboard(Squares.a8)
-        | BitBoards.MakeBitboard(Squares.h1) | BitBoards.MakeBitboard(Squares.h8);
+                                             | BitBoards.MakeBitboard(Squares.h1) | BitBoards.MakeBitboard(Squares.h8);
 
     // pawn = 0 (N/A for now), knight = 1, king = 2
-    public Func<Square, BitBoard>[] RegAttacks { get; } = { BitBoards.KnightAttacks, BitBoards.KnightAttacks, BitBoards.KingAttacks };
+    public Func<Square, BitBoard>[] RegAttacks { get; } =
+        { BitBoards.KnightAttacks, BitBoards.KnightAttacks, BitBoards.KingAttacks };
 }

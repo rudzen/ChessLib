@@ -30,10 +30,10 @@ namespace Chess.Perft;
 
 internal static class PerftTable
 {
-    private const int ENTRY_SIZE = 24;
-    private const int HASH_MEMORY = 256;
-    private const int TT_SIZE = HASH_MEMORY * 1024 * 1024 / ENTRY_SIZE;
-    private static readonly PerftHashEntry[] _table = new PerftHashEntry[TT_SIZE];
+    private const int EntrySize = 24;
+    private const int HashMemory = 256;
+    private const int TtSize = HashMemory * 1024 * 1024 / EntrySize;
+    private static readonly PerftHashEntry[] Table = new PerftHashEntry[TtSize];
 
     private struct PerftHashEntry
     {
@@ -44,23 +44,23 @@ internal static class PerftTable
 
     public static void Store(ulong zobristHash, int depth, ulong childCount)
     {
-        var slot = (int)(zobristHash % TT_SIZE);
-        _table[slot].Hash = zobristHash;
-        _table[slot].Count = childCount;
-        _table[slot].Depth = depth;
+        var slot = (int)(zobristHash % TtSize);
+        Table[slot].Hash = zobristHash;
+        Table[slot].Count = childCount;
+        Table[slot].Depth = depth;
     }
 
     public static bool Retrieve(ulong zobristHash, int depth, out ulong childCount)
     {
-        var slot = (int)(zobristHash % TT_SIZE);
-        var match = _table[slot].Depth == depth && _table[slot].Hash == zobristHash;
+        var slot = (int)(zobristHash % TtSize);
+        var match = Table[slot].Depth == depth && Table[slot].Hash == zobristHash;
 
-        childCount = match ? _table[slot].Count : 0;
+        childCount = match ? Table[slot].Count : 0;
         return match;
     }
 
     public static void Clear()
     {
-        Array.Clear(_table, 0, TT_SIZE);
+        Array.Clear(Table, 0, TtSize);
     }
 }
