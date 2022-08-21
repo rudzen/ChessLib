@@ -100,11 +100,11 @@ public sealed class Blockage : IBlockage
         ComputeFenceRanks();
 
         var ourKsq = _pos.GetKingSquare(_us);
-        var theirKsq = _pos.GetKingSquare(_them);
 
         if (ourKsq.Rank.RelativeRank(_us) > _fenceRank[ourKsq.File.AsInt()].RelativeRank(_us))
             return false;
 
+        var theirKsq = _pos.GetKingSquare(_them);
         _dynamicPawns |= ComputeDynamicFencedPawns(_them);
 
         while (_dynamicPawns)
@@ -312,7 +312,7 @@ public sealed class Blockage : IBlockage
         {
             var sq = NextFenceRankSquare(f, them);
             var b = sq.ForwardFile(them) & _theirPawns;
-            while (!b.IsEmpty)
+            while (b)
             {
                 sq = BitBoards.PopLsb(ref b) + down;
                 if (_pos.GetPiece(sq) == _ourPawn)

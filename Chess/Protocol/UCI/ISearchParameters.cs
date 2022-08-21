@@ -36,11 +36,17 @@ public interface ISearchParameters
 
     bool Infinite { get; set; }
 
-    int MovesToGo { get; set; }
+    bool Ponder { get; set; }
 
-    int MoveTime { get; set; }
+    ulong MovesToGo { get; set; }
 
-    int Depth { get; set; }
+    ulong MoveTime { get; set; }
+
+    ulong Depth { get; set; }
+
+    ulong Nodes { get; set; }
+
+    ulong Mate { get; set; }
 
     ulong WhiteIncrementTimeMilliseconds { get; set; }
 

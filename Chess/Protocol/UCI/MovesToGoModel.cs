@@ -40,7 +40,7 @@ public sealed class MovesToGoModel : EventArgs, IMovesToGoModel
         MovesToGo = original.MovesToGo;
     }
 
-    public int MovesToGo { get; set; }
+    public ulong MovesToGo { get; set; }
 
     public ulong WhiteTimeMilliseconds
     {

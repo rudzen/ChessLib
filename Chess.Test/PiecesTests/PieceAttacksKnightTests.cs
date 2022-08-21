@@ -24,12 +24,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Test.PiecesTest;
-
-using Chess.Test.PiecesTests;
-using FluentAssertions;
 using System.Linq;
+using FluentAssertions;
 using Xunit;
+
+namespace Chess.Test.PiecesTests;
 
 public sealed class PieceAttacksKnightTests : PieceAttacks, IClassFixture<RegularMobilityFixture>
 {

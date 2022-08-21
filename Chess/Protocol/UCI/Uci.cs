@@ -86,14 +86,14 @@ public class Uci : IUci
     public ulong Nps(ulong nodes, TimeSpan time)
         => (ulong)(nodes * 1000.0 / time.Milliseconds);
 
-    public Move MoveFromUci(IPosition pos, string uciMove)
+    public Move MoveFromUci(IPosition pos, ReadOnlySpan<char> uciMove)
     {
         var moveList = pos.GenerateMoves();
 
         foreach (var move in moveList.Get())
         {
             if (uciMove.Equals(move.Move.ToString(), StringComparison.InvariantCultureIgnoreCase))
-                return move;
+                return move.Move;
         }
 
         return Move.EmptyMove;
@@ -201,7 +201,7 @@ public class Uci : IUci
     /// and in the format defined by the UCI protocol.
     /// </summary>
     /// <returns>the current UCI options as string</returns>
-    public override string ToString()
+    public new string ToString()
     {
         var list = new List<IOption>(O.Values);
         list.Sort(OptionComparer);

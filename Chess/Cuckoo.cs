@@ -53,7 +53,7 @@ public static class Cuckoo
                 var move = Move.Create(sq1, sq2);
                 HashKey key = pc.GetZobristPst(sq1) ^ pc.GetZobristPst(sq2) ^ Zobrist.GetZobristSide();
                 var i = CuckooHashOne(key);
-                while (true)
+                do
                 {
                     (CuckooKeys[i], key) = (key, CuckooKeys[i].Key);
                     (CuckooMoves[i], move) = (move, CuckooMoves[i]);
@@ -66,7 +66,7 @@ public static class Cuckoo
                     i = i == CuckooHashOne(key)
                         ? CuckooHashTwo(key)
                         : CuckooHashOne(key);
-                }
+                } while (true);
 
                 count++;
             }

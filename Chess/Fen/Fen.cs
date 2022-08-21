@@ -155,7 +155,7 @@ public static class Fen
         spaceIndex = s.LastIndexOf(' ');
         var endSection = s[spaceIndex..];
 
-        if (endSection.ToString().ToIntegral() >= 2048)
+        if (Maths.ToIntegral(endSection) >= 2048)
             throw new InvalidFen($"Invalid half move count for fen {s.ToString()}");
 
         return true;

@@ -30,6 +30,7 @@ using System;
 
 namespace Chess.Test.PiecesTests;
 
+// ReSharper disable once ClassNeverInstantiated.Global
 public sealed class SliderMobilityFixture
 {
     private static readonly Func<Square, BitBoard, BitBoard>[] SlideAttacks = { MagicBB.BishopAttacks, MagicBB.RookAttacks, MagicBB.QueenAttacks };

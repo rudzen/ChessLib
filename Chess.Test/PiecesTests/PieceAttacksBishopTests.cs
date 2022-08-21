@@ -24,43 +24,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Test.PiecesTest;
-
-using Chess.Test.PiecesTests;
-using FluentAssertions;
 using Rudz.Chess;
 using Rudz.Chess.Enums;
 using Rudz.Chess.Types;
-using System.Linq;
 using Xunit;
 
+namespace Chess.Test.PiecesTests;
+
 /// <inheritdoc/>
-public sealed class PieceAttacksBishopTests : PieceAttacks, IClassFixture<SliderMobilityFixture>
+public sealed class PieceAttacksBishopTests : PieceAttacks
 {
-    private readonly SliderMobilityFixture fixture;
-
-    public PieceAttacksBishopTests(SliderMobilityFixture fixture)
-    {
-        this.fixture = fixture;
-    }
-
-    // Slider index
-
-    [Theory]
-    [InlineData(Alpha, 0, 7)]
-    [InlineData(Beta, 0, 9)]
-    [InlineData(Gamma, 0, 11)]
-    [InlineData(Delta, 0, 13)]
-    public void BishopMobility(ulong pattern, int sliderIndex, int expectedMobility)
-    {
-        var bb = new BitBoard(pattern);
-
-        var expected = bb.Count * expectedMobility;
-        var actual = bb.Select(x => fixture.SliderAttacks[sliderIndex](x, BitBoard.Empty).Count).Sum();
-
-        Assert.Equal(expected, actual);
-    }
-
     /// <summary>
     /// Testing results of blocked bishop attacks, they should always return 2 on the sides, and 1
     /// in the corner
@@ -91,7 +64,7 @@ public sealed class PieceAttacksBishopTests : PieceAttacks, IClassFixture<Slider
         foreach (var square in border)
         {
             var attacks = square.BishopAttacks(borderInner);
-            attacks.IsEmpty.Should().BeFalse();
+            Assert.False(attacks.IsEmpty);
             var expected = corners & square ? expectedCorner : expectedSide;
             var actual = attacks.Count;
             Assert.Equal(expected, actual);

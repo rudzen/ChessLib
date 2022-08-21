@@ -118,19 +118,17 @@ public sealed class MoveTests
 
         // build move list and expected result
         for (Square s1 = Squares.a1; s1 <= Squares.h8; s1++)
+        for (Square s2 = Squares.a2; s2 <= Squares.h8; s2++)
         {
-            for (Square s2 = Squares.a2; s2 <= Squares.h8; s2++)
-            {
-                if (s1 == s2)
-                    continue;
+            if (s1 == s2)
+                continue;
 
-                moves.Add(new Move(s1, s2));
-                tmp.Clear();
-                tmp.Append(' ');
-                tmp.Append(s1.ToString());
-                tmp.Append(s2.ToString());
-                movesString.Add(new Movestrings(tmp.ToString()));
-            }
+            moves.Add(new Move(s1, s2));
+            tmp.Clear();
+            tmp.Append(' ');
+            tmp.Append(s1.ToString());
+            tmp.Append(s2.ToString());
+            movesString.Add(new Movestrings(tmp.ToString()));
         }
 
         var result = new StringBuilder(128);

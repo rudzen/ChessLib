@@ -24,11 +24,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Fen;
-
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Text;
+
+namespace Rudz.Chess.Fen;
 
 /// <summary>
 /// FenData contains a FEN string and an index pointer to a location in the FEN string.
@@ -61,6 +62,37 @@ public sealed class FenData : EventArgs, IFenData
         _splitPoints.Enqueue((start, s.Length));
     }
 
+    public FenData(ReadOnlySpan<string> fen)
+    {
+        _splitPoints = new Queue<(int, int)>(6);
+        var sb = new StringBuilder();
+
+        for (var i = 0; i < fen.Length; ++i)
+        {
+            sb.Append(fen[i]);
+            if (i < fen.Length - 1)
+                sb.Append(' ');
+        }
+
+        Fen = sb.ToString().AsMemory();
+        var start = 0;
+
+        var s = Fen.Span;
+
+        // determine split points
+        for (var i = 0; i < s.Length; i++)
+        {
+            if (s[i] != ' ')
+                continue;
+
+            _splitPoints.Enqueue((start, i));
+            start = i + 1;
+        }
+
+        // add last
+        _splitPoints.Enqueue((start, s.Length));
+    }
+
     public FenData(char[] fen) : this(fen.AsMemory())
     { }
 
@@ -69,7 +101,7 @@ public sealed class FenData : EventArgs, IFenData
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator FenData(string value)
-    => new(value);
+        => new(value);
 
     public int Index { get; private set; }
 
@@ -92,9 +124,6 @@ public sealed class FenData : EventArgs, IFenData
     {
         if (other is null) return false;
         if (ReferenceEquals(this, other)) return true;
-
-        if (_splitPoints.Count != other._splitPoints.Count)
-            return false;
 
         if (Fen.Length != other.Fen.Length)
             return false;

@@ -115,14 +115,10 @@ public sealed class Option : IOption
     /// <returns></returns>
     public IOption SetCurrentValue(string v)
     {
-        if (Type != UciOptionType.Button && (v == null || v.IsNullOrEmpty())
-            || Type == UciOptionType.Check && !bool.TryParse(v, out var r)
-            || Type == UciOptionType.Spin)
-        {
-            v.ToIntegral(out int val);
-            if (val < Min || val > Max)
-                return this;
-        }
+        if ((Type != UciOptionType.Button && (v == null || v.IsNullOrEmpty())
+             || Type == UciOptionType.Check && !bool.TryParse(v, out var r)
+             || Type == UciOptionType.Spin) && Maths.ToIntegral(v, out int val) && val < Min && val > Max)
+            return this;
 
         if (Type != UciOptionType.Button)
             _currentValue = v;

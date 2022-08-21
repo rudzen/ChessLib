@@ -110,8 +110,8 @@ public class EpdParser : IEpdParser
     {
         var s = perftData.Split(' ', StringSplitOptions.RemoveEmptyEntries);
         var result = (depth: 0, count: 0ul);
-        s[0].ToIntegral(out result.depth);
-        s[1].ToIntegral(out result.count);
+        Maths.ToIntegral(s[0], out result.depth);
+        Maths.ToIntegral(s[1], out result.count);
         return result;
     }
 }

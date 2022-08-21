@@ -66,6 +66,8 @@ public interface IPosition : IEnumerable<Piece>
 
     bool IsMate { get; }
 
+    int Searcher { get;}
+    
     void Clear();
 
     void AddPiece(in Piece pc, in Square sq);
@@ -158,7 +160,7 @@ public interface IPosition : IEnumerable<Piece>
 
     FenData GenerateFen();
 
-    void Set(in FenData fenData, ChessMode chessMode, in State state, bool validate = false);
+    void Set(in FenData fenData, ChessMode chessMode, State state, bool validate = false, int searcher = 0);
 
     HashKey GetPiecesKey();
 

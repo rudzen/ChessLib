@@ -30,6 +30,7 @@ using System;
 
 namespace Chess.Test.PiecesTests;
 
+// ReSharper disable once ClassNeverInstantiated.Global
 public sealed class RegularMobilityFixture
 {
     // special case with alpha and beta bands in the corners are taken care of

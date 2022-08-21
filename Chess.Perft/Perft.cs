@@ -85,7 +85,7 @@ public sealed class Perft : IPerft
         {
             Game.Table.NewSearch();
             var state = new State();
-            CurrentGame.Pos.Set(in fd,Rudz.Chess.Enums.ChessMode.NORMAL, in state);
+            CurrentGame.Pos.Set(in fd,Rudz.Chess.Enums.ChessMode.NORMAL, state);
 
             if (PerftTable.Retrieve(CurrentGame.Pos.State.Key.Key, depth, out var result))
                 yield return result;
@@ -109,7 +109,7 @@ public sealed class Perft : IPerft
     {
         var fp = new FenData(pp.Fen);
         var state = new State();
-        CurrentGame.Pos.Set(in fp, Rudz.Chess.Enums.ChessMode.NORMAL, in state);
+        CurrentGame.Pos.Set(in fp, Rudz.Chess.Enums.ChessMode.NORMAL, state);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

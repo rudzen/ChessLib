@@ -661,12 +661,21 @@ public static class BitBoards
         => Rank3BitBoards[player.Side];
 
     /// <summary>
-    /// Generate a bitboard based on a variadic amount of squares.
+    /// Generate a bitboard based on a square.
     /// </summary>
-    /// <param name="square">The square to generate bitboard from</param>
+    /// <param name="sq">The square to generate bitboard from</param>
     /// <returns>The generated bitboard</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard MakeBitboard(Square square) => square.AsBb();
+    public static BitBoard MakeBitboard(Square sq) => sq.AsBb();
+
+    /// <summary>
+    /// Generate a bitboard based on two squares.
+    /// </summary>
+    /// <param name="sq">The square to generate bitboard from</param>
+    /// <param name="sq2">The second square to generate bitboard from</param>
+    /// <returns>The generated bitboard</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static BitBoard MakeBitboard(Square sq, Square sq2) => sq.AsBb() | sq2.AsBb();
 
     /// <summary>
     /// Generate a bitboard based on a variadic amount of squares.

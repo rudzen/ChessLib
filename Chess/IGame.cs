@@ -24,13 +24,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess;
-
-using Enums;
-using Fen;
 using System;
 using System.Collections.Generic;
-using Types;
+using Rudz.Chess.Enums;
+using Rudz.Chess.Fen;
+using Rudz.Chess.Protocol.UCI;
+using Rudz.Chess.Types;
+
+namespace Rudz.Chess;
 
 public interface IGame : IEnumerable<Piece>
 {
@@ -38,6 +39,10 @@ public interface IGame : IEnumerable<Piece>
     BitBoard Occupied { get; }
     IPosition Pos { get; }
     GameEndTypes GameEndType { get; set; }
+
+    SearchParameters SearchParameters { get; }
+
+    IUci Uci { get; }
 
     bool IsRepetition { get; }
 

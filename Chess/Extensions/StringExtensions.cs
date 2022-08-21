@@ -53,7 +53,7 @@ public static class StringExtensions
             if (i == command.Length - 1)
             {
                 // return last token.
-                q.Enqueue(new string(command.Slice(startIndex, i - startIndex + 1).TrimEnd(tokenizer).ToArray()));
+                q.Enqueue(new string(command.Slice(startIndex, i - startIndex + 1).TrimEnd(tokenizer)));
                 break;
             }
 
@@ -66,7 +66,7 @@ public static class StringExtensions
                     continue;
 
                 // return token
-                q.Enqueue(new string(command[startIndex..i].TrimEnd(tokenizer).ToArray()));
+                q.Enqueue(new string(command[startIndex..i].TrimEnd(tokenizer)));
                 startIndex = i + 1;
             }
             else if (character == tokenizer)
@@ -88,12 +88,12 @@ public static class StringExtensions
             if (index == -1)
                 yield break;
             yield return index;
-            pos = index;
+            pos = index + 1;
         } while (true);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static MemoryStream GenerateStream(this string @this) => new(Encoding.UTF8.GetBytes(@this ?? ""));
+    public static MemoryStream GenerateStream(this string @this) => new(Encoding.UTF8.GetBytes(@this ?? string.Empty));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsNullOrEmpty(this string @this) => string.IsNullOrEmpty(@this);

@@ -24,9 +24,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System.Linq;
-using Chess.Test.PiecesTest;
-using FluentAssertions;
 using Rudz.Chess;
 using Rudz.Chess.Enums;
 using Rudz.Chess.Types;
@@ -34,30 +31,8 @@ using Xunit;
 
 namespace Chess.Test.PiecesTests;
 
-public sealed class PieceAttacksRookTests : PieceAttacks, IClassFixture<SliderMobilityFixture>
+public sealed class PieceAttacksRookTests : PieceAttacks
 {
-    private readonly SliderMobilityFixture fixture;
-
-    public PieceAttacksRookTests(SliderMobilityFixture fixture)
-    {
-        this.fixture = fixture;
-    }
-
-    [Theory]
-    [InlineData(Alpha, 14)]
-    [InlineData(Beta, 14)]
-    [InlineData(Gamma, 14)]
-    [InlineData(Delta, 14)]
-    public void RookMobility(ulong pattern, int expectedMobility)
-    {
-        const int sliderIndex = 1;
-        BitBoard bb = pattern;
-
-        var expected = bb.Count * expectedMobility;
-        var actual = bb.Select(x => fixture.SliderAttacks[sliderIndex](sliderIndex, BitBoard.Empty).Count).Sum();
-
-        Assert.Equal(expected, actual);
-    }
 
     /// <summary>
     /// Testing results of blocked rook attacks, they should always return 7 on the sides, and 14 in
@@ -98,10 +73,10 @@ public sealed class PieceAttacksRookTests : PieceAttacks, IClassFixture<SliderMo
         foreach (var square in border)
         {
             var attacks = pos.GetAttacks(square, PieceTypes.Rook, in borderInner);
-            attacks.IsEmpty.Should().BeFalse();
+            Assert.False(attacks.IsEmpty);
             var expected = corners & square ? expectedCorner : expectedSide;
             var actual = attacks.Count;
-            actual.Should().Be(expected);
+            Assert.Equal(expected, actual);
         }
     }
 }

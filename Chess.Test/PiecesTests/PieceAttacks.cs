@@ -24,9 +24,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Test.PiecesTest;
-
 using Rudz.Chess.Types;
+
+namespace Chess.Test.PiecesTests;
 
 /// <summary>
 /// Position indication is as follows: Alpha = Outer band (edge) Beta = 2nd band Gamma = 3rd band

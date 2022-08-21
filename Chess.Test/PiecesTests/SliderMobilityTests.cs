@@ -1,4 +1,4 @@
-﻿/*
+/*
 ChessLib, a chess data structure library
 
 MIT License
@@ -24,58 +24,45 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using Rudz.Chess.Enums;
+using System.Linq;
 using Rudz.Chess.Types;
 using Xunit;
 
 namespace Chess.Test.PiecesTests;
 
-public sealed class PawnPushTests
+public sealed class SliderMobilityTests : PieceAttacks, IClassFixture<SliderMobilityFixture>
 {
+    private const int BishopIndex = 0;
+    private const int RookIndex = 1;
+    private const int QueenIndex = 2;
+
+    private readonly SliderMobilityFixture _fixture;
+
+    public SliderMobilityTests(SliderMobilityFixture fixture)
+    {
+        _fixture = fixture;
+    }
+
     [Theory]
-    [InlineData(Directions.North, 1)]
-    [InlineData(Directions.South, 1)]
-    public void PawnPush(Directions direction, int expected)
+    [InlineData(Alpha, BishopIndex, 7)]
+    [InlineData(Beta, BishopIndex, 9)]
+    [InlineData(Gamma, BishopIndex, 11)]
+    [InlineData(Delta, BishopIndex, 13)]
+    [InlineData(Alpha, RookIndex, 14)]
+    [InlineData(Beta, RookIndex, 14)]
+    [InlineData(Gamma, RookIndex, 14)]
+    [InlineData(Delta, RookIndex, 14)]
+    [InlineData(Alpha, QueenIndex, 21)]
+    [InlineData(Beta, QueenIndex, 23)]
+    [InlineData(Gamma, QueenIndex, 25)]
+    [InlineData(Delta, QueenIndex, 27)]
+    public void BishopMobility(ulong pattern, int sliderIndex, int expectedMobility)
     {
-        var fullBoard = BitBoards.PawnSquares;
+        var bb = new BitBoard(pattern);
 
-        foreach (var sq in fullBoard)
-        {
-            var toSq = sq + direction;
-            var actual = sq.Distance(toSq);
-            Assert.Equal(expected, actual);
-        }
-    }
+        var expected = bb.Count * expectedMobility;
+        var actual = bb.Select(x => _fixture.SliderAttacks[sliderIndex](x, BitBoard.Empty).Count).Sum();
 
-    [Fact]
-    public void PawnDoublePushNorth()
-    {
-        var fullBoard = BitBoards.RANK2;
-        var direction = Direction.NorthDouble;
-
-        const int expected = 2;
-
-        foreach (var sq in fullBoard)
-        {
-            var toSq = sq + direction;
-            var actual = sq.Distance(toSq);
-            Assert.Equal(expected, actual);
-        }
-    }
-
-    [Fact]
-    public void PawnDoublePushSouth()
-    {
-        var fullBoard = BitBoards.RANK7;
-        var direction = Direction.SouthDouble;
-
-        const int expected = 2;
-
-        foreach (var sq in fullBoard)
-        {
-            var toSq = sq + direction;
-            var actual = sq.Distance(toSq);
-            Assert.Equal(expected, actual);
-        }
+        Assert.Equal(expected, actual);
     }
 }

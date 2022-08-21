@@ -97,18 +97,16 @@ public static class Zobrist
         for (var i = 0; i < ZobristPst.Length; i++)
             ZobristPst[i] = new ulong[64];
 
-        Span<PieceTypes> pieceTypes = stackalloc PieceTypes[]
-            { PieceTypes.Pawn, PieceTypes.Knight, PieceTypes.Bishop, PieceTypes.Rook, PieceTypes.Queen, PieceTypes.King };
-
-        Span<Player> players = stackalloc Player[]
-            { Player.White, Player.Black };
-
-        foreach (var side in players)
-        foreach (var pieceType in pieceTypes)
+        Span<Piece> pieces = stackalloc Piece[]
         {
-            var pieceIndex = pieceType.MakePiece(side).AsInt();
+            Pieces.WhitePawn, Pieces.WhiteKnight, Pieces.WhiteBishop, Pieces.WhiteRook, Pieces.WhiteQueen, Pieces.WhiteKing,
+            Pieces.BlackPawn, Pieces.BlackKnight, Pieces.BlackBishop, Pieces.BlackRook, Pieces.BlackQueen, Pieces.BlackKing,
+        };
+
+        foreach (var pc in pieces)
+        {
             foreach (var sq in BitBoards.AllSquares)
-                ZobristPst[pieceIndex][sq.AsInt()] = rnd.Rand();
+                ZobristPst[pc.AsInt()][sq.AsInt()] = rnd.Rand();
         }
     }
 

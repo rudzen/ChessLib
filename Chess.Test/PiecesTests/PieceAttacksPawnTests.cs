@@ -24,12 +24,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Test.PiecesTest;
-
+using System.Linq;
 using FluentAssertions;
 using Rudz.Chess.Types;
-using System.Linq;
 using Xunit;
+
+namespace Chess.Test.PiecesTests;
 
 public sealed class PieceAttacksPawnTests : PieceAttacks
 {

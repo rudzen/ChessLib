@@ -52,9 +52,9 @@ public class PolyglotTests
 
         var bookMove = book.Probe();
 
-        Move m = Move.EmptyMove;
+        var m = Move.EmptyMove;
 
-        m.Should().Be(bookMove);
+        Assert.Equal(m, bookMove);
     }
 
     [Fact]

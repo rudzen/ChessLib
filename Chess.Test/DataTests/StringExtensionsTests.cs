@@ -1,4 +1,4 @@
-﻿/*
+/*
 ChessLib, a chess data structure library
 
 MIT License
@@ -24,17 +24,38 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Protocol.UCI;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using Rudz.Chess.Extensions;
+using Xunit;
 
-using Types;
+namespace Chess.Test.DataTests;
 
-public interface IMovesToGoModel
+public sealed class StringExtensionsTests
 {
-    ulong BlackTimeMilliseconds { get; set; }
+    [Theory]
+    [InlineData("this is a simple spaced string", new[] { 4, 7, 9, 16, 23 })]
+    [InlineData("yet another", new[] { 3 })]
+    [InlineData("another", new int[0])]
+    public void GetLocations(string s, int[] positions)
+    {
+        var actual = s.GetLocations().ToArray();
 
-    ulong MovesToGo { get; set; }
+        Assert.Equal(positions.Length, actual.Length);
+        Assert.Equal(positions, actual);
+    }
 
-    ulong WhiteTimeMilliseconds { get; set; }
+    [Theory]
+    [InlineData("setoption name UCI_Chess960 value false", ' ', ' ')]
+    public void ParseBaseSplit(string command, char separator, char trimToken)
+    {
+        var q = StringExtensions.Parse(command, separator, trimToken);
 
-    ulong Time(Player player);
+        var qq = new Queue<string>(command.Split(' '));
+
+        Assert.Equal(q, qq);
+        Assert.NotNull(q);
+    }
 }
