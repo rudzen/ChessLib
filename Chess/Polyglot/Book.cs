@@ -40,13 +40,14 @@ public sealed class Book : IDisposable
     // PolyGlot pieces are: BP = 0, WP = 1, BN = 2, ... BK = 10, WK = 11
     private static readonly int[] PieceMapping = { -1, 1, 3, 5, 7, 9, 11, -1, -1, 0, 2, 4, 6, 8, 10 };
 
-    private static readonly CastlelingRights[] CastleRights = {
+    private static readonly CastlelingRights[] CastleRights =
+    {
         CastlelingRights.WhiteOo,
         CastlelingRights.WhiteOoo,
         CastlelingRights.BlackOo,
         CastlelingRights.BlackOoo
     };
-    
+
     private readonly IPosition _pos;
     private FileStream _fileStream;
     private BinaryReader _binaryReader;
@@ -181,15 +182,15 @@ public sealed class Book : IDisposable
     }
 
     private Entry ReadEntry() => new(
-            _binaryReader.ReadUInt64(),
-            _binaryReader.ReadUInt16(),
-            _binaryReader.ReadUInt16(),
-            _binaryReader.ReadUInt32()
-        );
+        _binaryReader.ReadUInt64(),
+        _binaryReader.ReadUInt16(),
+        _binaryReader.ReadUInt16(),
+        _binaryReader.ReadUInt32()
+    );
 
     public HashKey ComputePolyglotKey()
     {
-        var k = new HashKey();
+        var k = HashKey.Empty;
         var b = _pos.Pieces();
 
         while (b)
@@ -202,7 +203,7 @@ public sealed class Book : IDisposable
 
         k ^= CastleRights
             .Where(cr => _pos.State.CastlelingRights.HasFlagFast(cr))
-            .Aggregate(0UL, (current, validCastlelingFlag) => current ^ BookZobrist.Castle(validCastlelingFlag));
+            .Aggregate(ulong.MinValue, (current, validCastlelingFlag) => current ^ BookZobrist.Castle(validCastlelingFlag));
 
         if (_pos.State.EnPassantSquare != Square.None)
             k ^= BookZobrist.EnPassant(_pos.State.EnPassantSquare.File);
@@ -234,6 +235,7 @@ public sealed class Book : IDisposable
             else
                 low = mid + 1;
         }
+
         Debug.Assert(low == high);
 
         return low;

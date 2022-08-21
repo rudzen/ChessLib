@@ -45,7 +45,7 @@ public static class Maths
             return false;
         }
 
-        var x = 0ul;
+        var x = ulong.MinValue;
         var pos = 0;
         var max = str.Length - 1;
         while (pos <= max && str[pos].InBetween('0', '9'))

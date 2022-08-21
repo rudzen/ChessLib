@@ -115,7 +115,7 @@ public sealed class PerftTest
             var expected = perft.GetPositionCount(0, ShortCount);
             var perftResults = perft.DoPerft(ShortCount);
 
-            var actual = 0ul;
+            var actual = ulong.MinValue;
             await foreach (var result in perftResults.ConfigureAwait(false))
                 actual += result;
 
@@ -133,7 +133,7 @@ public sealed class PerftTest
             var expected = perft.GetPositionCount(0, MediumCount);
             var perftResults = perft.DoPerft(MediumCount);
 
-            var actual = 0ul;
+            var actual = ulong.MinValue;
             await foreach (var result in perftResults.ConfigureAwait(false))
                 actual += result;
 
@@ -151,7 +151,7 @@ public sealed class PerftTest
             var expected = perft.GetPositionCount(0, Positions.Count);
             var perftResults = perft.DoPerft(Positions.Count);
 
-            var actual = 0ul;
+            var actual = ulong.MinValue;
             await foreach (var result in perftResults.ConfigureAwait(false))
                 actual += result;
 

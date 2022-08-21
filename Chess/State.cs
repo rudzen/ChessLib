@@ -140,7 +140,7 @@ public sealed class State : IEquatable<State>
     {
         LastMove = Move.EmptyMove;
         NonPawnMaterial.Clear();
-        PawnStructureKey = Key = MaterialKey = 0UL;
+        PawnStructureKey = Key = MaterialKey = HashKey.Empty;
         PliesFromNull = 0;
         Repetition = 0;
         CastlelingRights = CastlelingRights.None;

@@ -109,7 +109,7 @@ public class EpdParser : IEpdParser
     private static (int, ulong) ParsePerftLines(string perftData)
     {
         var s = perftData.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-        var result = (depth: 0, count: 0ul);
+        var result = (depth: 0, count: ulong.MinValue);
         Maths.ToIntegral(s[0], out result.depth);
         Maths.ToIntegral(s[1], out result.count);
         return result;

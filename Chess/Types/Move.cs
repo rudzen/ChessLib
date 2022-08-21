@@ -150,7 +150,7 @@ public readonly struct Move : IEquatable<Move>
         return MoveType() switch
         {
             MoveTypes.Normal => $"{FromSquare()}{ToSquare()}",
-            MoveTypes.Castling => FromSquare() < ToSquare() ? "0-0" : "0-0-0",
+            MoveTypes.Castling => CastlelingExtensions.GetCastlelingString(ToSquare(), FromSquare()),
             MoveTypes.Promotion => $"{FromSquare()}{ToSquare()}{PromotedPieceType().GetPromotionChar()}",
             MoveTypes.Enpassant => $"{FromSquare()}{ToSquare()}",
             _ => "(error)"

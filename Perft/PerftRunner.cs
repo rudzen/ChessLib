@@ -194,7 +194,7 @@ public sealed class PerftRunner : IPerftRunner
     private static async IAsyncEnumerable<IPerftPosition> ParseFen(FenOptions options)
 #pragma warning restore 1998
     {
-        const ulong zero = 0UL;
+        const ulong zero = ulong.MinValue;
 
         var depths = options.Depths.Select(d => (d, zero)).ToList();
 

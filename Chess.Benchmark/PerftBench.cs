@@ -72,7 +72,7 @@ public class PerftBench
     [Benchmark]
     public async Task<ulong> PerftIAsync()
     {
-        var total = 0ul;
+        var total = ulong.MinValue;
         for (var i = 0; i < N; i++)
         {
             await foreach (var res in _perft.DoPerft(N).ConfigureAwait(false))
@@ -84,7 +84,7 @@ public class PerftBench
     [Benchmark]
     public async Task<ulong> Perft()
     {
-        var total = 0ul;
+        var total = ulong.MinValue;
         for (var i = 0; i < N; ++i)
         {
             total += await _perft.DoPerftAsync(N);

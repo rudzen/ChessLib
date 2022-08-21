@@ -70,7 +70,7 @@ public sealed class Game : IGame
     public static TranspositionTable Table { get; }
 
     public SearchParameters SearchParameters { get; }
-    
+
     public IUci Uci { get; }
 
     public bool IsRepetition => Pos.IsRepetition;

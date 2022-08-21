@@ -38,7 +38,7 @@ public sealed class UciTests
     [Fact]
     public void NpsSimple()
     {
-        const ulong expected = 0UL;
+        const ulong expected = ulong.MinValue;
 
         const ulong nodes = 1000UL;
 

@@ -349,7 +349,7 @@ public sealed class Position : IPosition
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public HashKey GetPiecesKey()
     {
-        var result = new HashKey();
+        var result = HashKey.Empty;
         var pieces = Board.Pieces();
         while (pieces)
         {
@@ -1315,7 +1315,7 @@ public sealed class Position : IPosition
 
     private void SetState()
     {
-        var key = new HashKey();
+        var key = HashKey.Empty;
         var pawnKey = Zobrist.ZobristNoPawn;
 
         State.Checkers = AttacksTo(GetKingSquare(_sideToMove)) & Board.Pieces(~_sideToMove);
@@ -1345,7 +1345,7 @@ public sealed class Position : IPosition
 
         key ^= State.CastlelingRights.GetZobristCastleling();
 
-        var materialKey = 0UL;
+        var materialKey = HashKey.Empty;
         foreach (var pc in Piece.AllPieces)
             for (var cnt = 0; cnt < Board.PieceCount(pc); ++cnt)
                 materialKey ^= pc.GetZobristPst(cnt);

@@ -44,7 +44,7 @@ public sealed class PerftResult : IPerftResult
     {
         Fen = string.Empty;
         Depth = Errors = 0;
-        Result = CorrectResult = Nps = TableHits = 0UL;
+        Result = CorrectResult = Nps = TableHits = ulong.MinValue;
         Elapsed = TimeSpan.Zero;
         Passed = false;
     }
