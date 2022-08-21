@@ -91,8 +91,8 @@ public sealed class State : IEquatable<State>
         Previous = other;
 
         Checkers = BitBoard.Empty;
-        BlockersForKing = new BitBoard[2];
-        Pinners = new BitBoard[2];
+        BlockersForKing = new[] { BitBoard.Empty, BitBoard.Empty };
+        Pinners = new[] { BitBoard.Empty, BitBoard.Empty };
         CheckedSquares = new BitBoard[PieceTypes.PieceTypeNb.AsInt()];
         CapturedPiece = Piece.EmptyPiece;
     }

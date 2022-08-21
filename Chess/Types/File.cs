@@ -27,6 +27,7 @@ SOFTWARE.
 using System;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using Rudz.Chess.Extensions;
 
 namespace Rudz.Chess.Types;
 
@@ -59,6 +60,7 @@ public readonly struct File : IEquatable<File>
     public static File FILE_F { get; } = new(Files.FileF);
     public static File FILE_G { get; } = new(Files.FileG);
     public static File FILE_H { get; } = new(Files.FileH);
+    public static File[] AllFiles { get; } = { FILE_A, FILE_B, FILE_C, FILE_D, FILE_E, FILE_F, FILE_G, FILE_H };
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public File(int file) => Value = (Files)file;
@@ -151,7 +153,7 @@ public readonly struct File : IEquatable<File>
     public int AsInt() => (int)Value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool IsValid() => Value <= Files.FileH;
+    public bool IsValid() => (((int)Value - (int)Files.FileA) | ((int)Files.FileH - (int)Value)) >= 0;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override string ToString() => FileStrings[AsInt()];

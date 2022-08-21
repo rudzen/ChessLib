@@ -68,6 +68,8 @@ public readonly struct Rank : IEquatable<Rank>
     public static Rank RANK_7 { get; } = new(Ranks.Rank7);
     public static Rank RANK_8 { get; } = new(Ranks.Rank8);
 
+    public static Rank[] PawnRanks { get; } = { RANK_2, RANK_3, RANK_4, RANK_5, RANK_6, RANK_7 };
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Rank(int file) => _value = (Ranks)file;
 

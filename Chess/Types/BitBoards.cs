@@ -686,29 +686,35 @@ public static class BitBoards
         => squares.Aggregate(EmptyBitBoard, (current, t) => current | t);
 
     /// <summary>
+    /// Tests if a bitboard has more than one bit set
+    /// </summary>
+    /// <param name="bb">The bitboard to set</param>
+    /// <returns>true if more than one bit set, otherwise false</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool MoreThanOne(BitBoard bb) => (bb.Value & (bb.Value - 1)) != 0;
+
+    /// <summary>
     /// Helper method to generate shift function dictionary for all directions.
     /// </summary>
     /// <returns>The generated shift dictionary</returns>
     private static IDictionary<Direction, Func<BitBoard, BitBoard>> MakeShiftFuncs()
     {
-        var sf = new Dictionary<Direction, Func<BitBoard, BitBoard>>(13)
-            {
-                {Direction.None, board => board},
-                {Direction.North, board => board.NorthOne()},
-                {Direction.NorthDouble, board => board.NorthOne().NorthOne()},
-                {Direction.NorthEast, board => board.NorthEastOne()},
-                {Direction.NorthWest, board => board.NorthWestOne()},
-                {Direction.NorthFill, board => board.NorthFill()},
-                {Direction.South, board => board.SouthOne()},
-                {Direction.SouthDouble, board => board.SouthOne().SouthOne()},
-                {Direction.SouthEast, board => board.SouthEastOne()},
-                {Direction.SouthWest, board => board.SouthWestOne()},
-                {Direction.SouthFill, board => board.SouthFill()},
-                {Direction.East, board => board.EastOne()},
-                {Direction.West, board => board.WestOne()}
-            };
-
-        return sf;
+        return new Dictionary<Direction, Func<BitBoard, BitBoard>>(13)
+        {
+            { Direction.None, static board => board },
+            { Direction.North, static board => board.NorthOne() },
+            { Direction.NorthDouble, static board => board.NorthOne().NorthOne() },
+            { Direction.NorthEast, static board => board.NorthEastOne() },
+            { Direction.NorthWest, static board => board.NorthWestOne() },
+            { Direction.NorthFill, static board => board.NorthFill() },
+            { Direction.South, static board => board.SouthOne() },
+            { Direction.SouthDouble, static board => board.SouthOne().SouthOne() },
+            { Direction.SouthEast, static board => board.SouthEastOne() },
+            { Direction.SouthWest, static board => board.SouthWestOne() },
+            { Direction.SouthFill, static board => board.SouthFill() },
+            { Direction.East, static board => board.EastOne() },
+            { Direction.West, static board => board.WestOne() }
+        };
     }
 
     private static Func<BitBoard, BitBoard>[] MakeFillFuncs()

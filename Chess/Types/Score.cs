@@ -120,4 +120,14 @@ public struct Score : IEquatable<Score>
 
     public override int GetHashCode()
         => _data.GetHashCode();
+
+    public static bool operator ==(Score left, Score right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(Score left, Score right)
+    {
+        return !(left == right);
+    }
 }

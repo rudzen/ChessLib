@@ -122,7 +122,7 @@ public static class MagicBB
         for (var i = 0; i < squares.Length; ++i)
         {
             var numSquares = InitSquares(squares, BishopMask[i], initMagicMovesDb);
-            for (var temp = 0UL; temp < One << numSquares; ++temp)
+            for (var temp = ulong.MinValue; temp < One << numSquares; ++temp)
             {
                 var occ = InitMagicMovesOccupancy(squares[..numSquares], in temp);
                 MagicBishopDb[i][(occ * BishopMagics[i]) >> 55] = InitmagicmovesBmoves(i, occ);
@@ -132,7 +132,7 @@ public static class MagicBB
         for (var i = 0; i < squares.Length; ++i)
         {
             var numSquares = InitSquares(squares, RookMask[i], initMagicMovesDb);
-            for (var temp = 0UL; temp < One << numSquares; ++temp)
+            for (var temp = ulong.MinValue; temp < One << numSquares; ++temp)
             {
                 var occ = InitMagicMovesOccupancy(squares[..numSquares], in temp);
                 MagicRookDb[i][(occ * RookMagics[i]) >> 52] = InitmagicmovesRmoves(i, occ);
@@ -155,7 +155,7 @@ public static class MagicBB
 
     private static ulong InitMagicMovesOccupancy(ReadOnlySpan<int> squares, in ulong lineOccupancy)
     {
-        var ret = 0ul;
+        var ret = ulong.MinValue;
         for (var i = 0; i < squares.Length; ++i)
             if ((lineOccupancy & (One << i)) != 0)
                 ret |= One << squares[i];

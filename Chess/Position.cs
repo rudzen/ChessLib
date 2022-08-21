@@ -932,7 +932,7 @@ public sealed class Position : IPosition
         var attackers = AttacksTo(to, in occupied);
         var res = 1;
 
-        while (true)
+        do
         {
             stm = ~stm;
             attackers &= occupied;
@@ -995,8 +995,10 @@ public sealed class Position : IPosition
                     break;
 
                 occupied ^= bb.Lsb();
-                attackers |= (GetAttacks(to, PieceTypes.Bishop, in occupied) & Board.Pieces(PieceTypes.Bishop, PieceTypes.Queen))
-                          |  (GetAttacks(to, PieceTypes.Rook, in occupied) & Board.Pieces(PieceTypes.Rook, PieceTypes.Queen));
+                attackers |= (GetAttacks(to, PieceTypes.Bishop, in occupied) &
+                              Board.Pieces(PieceTypes.Bishop, PieceTypes.Queen))
+                             | (GetAttacks(to, PieceTypes.Rook, in occupied) &
+                                Board.Pieces(PieceTypes.Rook, PieceTypes.Queen));
             }
             else // KING
                 // If we "capture" with the king but opponent still has attackers, reverse the result.
@@ -1006,7 +1008,7 @@ public sealed class Position : IPosition
                     res ^= 1;
                 return res > 0;
             }
-        }
+        } while (true);
 
         return res > 0;
     }
@@ -1046,23 +1048,23 @@ public sealed class Position : IPosition
 
     private void SetupEnPassant(ReadOnlySpan<char> fenChunk)
     {
-        var enpassant = fenChunk.Length == 2
+        var enPassant = fenChunk.Length == 2
                         && fenChunk[0] != '-'
                         && fenChunk[0].InBetween('a', 'h')
                         && fenChunk[1] == (_sideToMove.IsWhite ? '6' : '3');
 
-        if (enpassant)
+        if (enPassant)
         {
             State.EnPassantSquare = new Square(fenChunk[1] - '1', fenChunk[0] - 'a');
 
             var otherSide = ~_sideToMove;
 
-            enpassant = !(State.EnPassantSquare.PawnAttack(otherSide) & Pieces(PieceTypes.Pawn, _sideToMove)).IsEmpty
+            enPassant = !(State.EnPassantSquare.PawnAttack(otherSide) & Pieces(PieceTypes.Pawn, _sideToMove)).IsEmpty
                         && !(Pieces(PieceTypes.Pawn, otherSide) & (State.EnPassantSquare + otherSide.PawnPushDistance())).IsEmpty
                         && (Pieces() & (State.EnPassantSquare | (State.EnPassantSquare + _sideToMove.PawnPushDistance()))).IsEmpty;
         }
 
-        if (!enpassant)
+        if (!enPassant)
             State.EnPassantSquare = Square.None;
     }
 
@@ -1096,7 +1098,7 @@ public sealed class Position : IPosition
     /// 
     /// </summary>
     /// <param name="fenData">The fen data to set</param>
-    /// <param name="chessMode">The chessmode to apply</param>
+    /// <param name="chessMode">The chess mode to apply</param>
     /// <param name="state">State reference to use. Allows to keep track of states if pre-created (i.e. in a stack) before engine search start</param>
     /// <param name="validate">If true, the fen should be validated, otherwise not</param>
     public void Set(in FenData fenData, ChessMode chessMode, State state, bool validate = false, int searcher = 0)

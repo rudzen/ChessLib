@@ -48,39 +48,29 @@ public sealed class BitboardDataTests
     }
 
     [Fact]
-    public async Task AlignedSimpleTotal()
+    public void AlignedSimpleTotal()
     {
         const int expected = 10640;
 
-        var actual = await Task.Run(() =>
-        {
-            var sum = 0;
-            foreach (var s1 in BitBoards.AllSquares)
-                sum += BitBoards.AllSquares
-                    .Sum(s2 => BitBoards.AllSquares
-                        .Count(s3 => s1.Aligned(s2, s3)));
-            return sum;
-        }).ConfigureAwait(false);
+        var actual = 0;
+        foreach (var s1 in BitBoards.AllSquares)
+            actual += BitBoards.AllSquares
+                .Sum(s2 => BitBoards.AllSquares
+                    .Count(s3 => s1.Aligned(s2, s3)));
 
         Assert.Equal(expected, actual);
     }
 
     [Fact]
-    public async Task AlignedSimpleTotalNoIdenticals()
+    public void AlignedSimpleTotalNoIdentical()
     {
         const int expected = 9184;
 
-        var actual = await Task.Run(() =>
-        {
-            var sum = 0;
-            foreach (var s1 in BitBoards.AllSquares)
-                sum += BitBoards.AllSquares
-                    .Where(x2 => x2 != s1)
-                    .Sum(s2 => BitBoards.AllSquares
-                        .Where(x3 => x3 != s2)
-                        .Count(s3 => s1.Aligned(s2, s3)));
-            return sum;
-        }).ConfigureAwait(false);
+        var actual = 0;
+        foreach (var s1 in BitBoards.AllSquares)
+            actual += BitBoards.AllSquares.Where(x2 => x2 != s1)
+                .Sum(s2 => BitBoards.AllSquares.Where(x3 => x3 != s2)
+                    .Count(s3 => s1.Aligned(s2, s3)));
 
         Assert.Equal(expected, actual);
     }

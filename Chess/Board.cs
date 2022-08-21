@@ -181,7 +181,7 @@ public sealed class Board : IBoard
         => PieceCount(PieceTypes.AllPieces);
 
     public IEnumerator<Piece> GetEnumerator()
-        => _pieces.Where(piece => piece != Piece.EmptyPiece).GetEnumerator();
+        => _pieces.Where(static piece => piece != Piece.EmptyPiece).GetEnumerator();
 
     IEnumerator IEnumerable.GetEnumerator()
         => GetEnumerator();
