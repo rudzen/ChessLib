@@ -26,7 +26,6 @@ SOFTWARE.
 
 using System.Linq;
 using Rudz.Chess;
-using Rudz.Chess.Enums;
 using Rudz.Chess.Extensions;
 using Rudz.Chess.Factories;
 using Rudz.Chess.MoveGeneration;

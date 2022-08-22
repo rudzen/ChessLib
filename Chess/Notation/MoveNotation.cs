@@ -25,7 +25,6 @@ SOFTWARE.
 */
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Rudz.Chess.Enums;
@@ -36,9 +35,8 @@ using Rudz.Chess.Types;
 
 namespace Rudz.Chess.Notation;
 
-// TODO : implement Crn/Smith/Descriptive/Coordinate notations
+// TODO : implement Cran/Descriptive notations
 
-[Flags]
 public enum MoveNotations
 {
     /// <summary>
@@ -59,34 +57,34 @@ public enum MoveNotations
     /// <summary>
     /// Reversible algebraic notation
     /// </summary>
-    Ran = 4,
+    Ran = 3,
 
     /// <summary>
     /// Concise reversible algebraic notation
     /// todo: implement
     /// </summary>
-    Cran = 8,
+    Cran = 4,
 
     /// <summary>
     /// The smith notation
-    /// todo: implement
     /// </summary>
-    Smith = 16,
+    Smith = 5,
 
     /// <summary>
     /// The descriptive notation
+    /// todo: implement
     /// </summary>
-    Descriptive = 32,
+    Descriptive = 6,
 
-    Coordinate = 64,
+    Coordinate = 7,
 
     // ReSharper disable once InconsistentNaming
-    ICCF = 128,
+    ICCF = 8,
 
     /// <summary>
     /// Universal chess interface notation
     /// </summary>
-    Uci = 256
+    Uci = 9
 }
 
 /// <summary>
@@ -95,23 +93,25 @@ public enum MoveNotations
 /// </summary>
 public sealed class MoveNotation : IMoveNotation
 {
-    private readonly IDictionary<MoveNotations, Func<Move, string>> _notationFuncs;
+    private readonly Func<Move, string>[] _notationFuncs;
 
     private readonly IPosition _pos;
 
     private MoveNotation(in IPosition pos)
     {
         _pos = pos;
-        _notationFuncs = new Dictionary<MoveNotations, Func<Move, string>>(6)
+        _notationFuncs = new[]
         {
-            { MoveNotations.Fan, ToFan },
-            { MoveNotations.San, ToSan },
-            { MoveNotations.Lan, ToLan },
-            { MoveNotations.Ran, ToRan },
-            { MoveNotations.Smith, ToSmith },
-            { MoveNotations.Coordinate, ToCoordinate },
-            { MoveNotations.ICCF, ToIccf },
-            { MoveNotations.Uci, ToUci }
+            ToSan,
+            ToFan,
+            ToLan,
+            ToRan,
+            new Func<Move, string>(static _ => string.Empty), // Cran
+            ToSmith,
+            new Func<Move, string>(static _ => string.Empty), // Descriptive
+            ToCoordinate,
+            ToIccf,
+            ToUci
         };
     }
 
@@ -124,7 +124,9 @@ public sealed class MoveNotation : IMoveNotation
         if (move.IsNullMove())
             return "(none)";
 
-        if (!_notationFuncs.TryGetValue(notation, out var func))
+        var func = _notationFuncs[(int)notation];
+
+        if (func == null)
             throw new InvalidMove("Invalid move notation detected.");
 
         return func(move);
@@ -451,11 +453,10 @@ public sealed class MoveNotation : IMoveNotation
         => _pos.GenerateMoves().Any() ? '+' : '#';
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private MoveAmbiguities Ambiguity(Move move, BitBoard similarTypeAttacks)
+    private MoveAmbiguities Ambiguity(Square from, BitBoard similarTypeAttacks)
     {
         var ambiguity = MoveAmbiguities.None;
         var c = _pos.SideToMove;
-        var from = move.FromSquare();
         var pinned = _pos.PinnedPieces(c);
 
         while (similarTypeAttacks)
@@ -494,7 +495,7 @@ public sealed class MoveNotation : IMoveNotation
     private ReadOnlySpan<char> Disambiguation(Move move, Square from)
     {
         var similarAttacks = GetSimilarAttacks(move);
-        var ambiguity = Ambiguity(move, similarAttacks);
+        var ambiguity = Ambiguity(move.FromSquare(), similarAttacks);
 
         if (!ambiguity.HasFlagFast(MoveAmbiguities.Move))
             return Array.Empty<char>();
