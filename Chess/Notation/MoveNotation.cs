@@ -36,6 +36,63 @@ using Rudz.Chess.Types;
 
 namespace Rudz.Chess.Notation;
 
+// TODO : implement Crn/Smith/Descriptive/Coordinate notations
+
+[Flags]
+public enum MoveNotations
+{
+    /// <summary>
+    /// Standard algebraic Notation [implemented]
+    /// </summary>
+    San = 0,
+
+    /// <summary>
+    /// Figurine algebraic Notation [implemented]
+    /// </summary>
+    Fan = 1,
+
+    /// <summary>
+    /// The Long algebraic Notation [almost implemented]
+    /// </summary>
+    Lan = 2,
+
+    /// <summary>
+    /// Reversible algebraic notation
+    /// </summary>
+    Ran = 4,
+
+    /// <summary>
+    /// Concise reversible algebraic notation
+    /// todo: implement
+    /// </summary>
+    Cran = 8,
+
+    /// <summary>
+    /// The smith notation
+    /// todo: implement
+    /// </summary>
+    Smith = 16,
+
+    /// <summary>
+    /// The descriptive notation
+    /// </summary>
+    Descriptive = 32,
+
+    Coordinate = 64,
+
+    // ReSharper disable once InconsistentNaming
+    ICCF = 128,
+
+    /// <summary>
+    /// Universal chess interface notation
+    /// </summary>
+    Uci = 256
+}
+
+/// <summary>
+/// Constructs string representation of a move based on specified move notation type.
+/// See https://en.wikipedia.org/wiki/Chess_notation
+/// </summary>
 public sealed class MoveNotation : IMoveNotation
 {
     private readonly IDictionary<MoveNotations, Func<Move, string>> _notationFuncs;
@@ -51,6 +108,8 @@ public sealed class MoveNotation : IMoveNotation
             { MoveNotations.San, ToSan },
             { MoveNotations.Lan, ToLan },
             { MoveNotations.Ran, ToRan },
+            { MoveNotations.Smith, ToSmith },
+            { MoveNotations.Coordinate, ToCoordinate },
             { MoveNotations.ICCF, ToIccf },
             { MoveNotations.Uci, ToUci }
         };
@@ -69,67 +128,6 @@ public sealed class MoveNotation : IMoveNotation
             throw new InvalidMove("Invalid move notation detected.");
 
         return func(move);
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static string ToUci(Move move)
-        => move.ToString();
-
-    /// <summary>
-    /// <para>Converts a move to FAN notation.</para>
-    /// </summary>
-    /// <param name="move">The move to convert</param>
-    /// <returns>FAN move string</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private string ToFan(Move move)
-    {
-        var (from, to) = move.FromTo();
-
-        if (move.IsCastlelingMove())
-            return CastlelingExtensions.GetCastlelingString(to, from);
-
-        var pc = _pos.MovedPiece(move);
-        var pt = pc.Type();
-
-        Span<char> re = stackalloc char[6];
-        var i = 0;
-
-        if (pt != PieceTypes.Pawn)
-        {
-            re[i++] = pc.GetUnicodeChar();
-            foreach (var c in Disambiguation(move, from))
-                re[i++] = c;
-        }
-
-        if (move.IsEnPassantMove())
-        {
-            re[i++] = 'e';
-            re[i++] = 'p';
-            re[i++] = from.FileChar;
-        }
-        else
-        {
-            if (_pos.GetPiece(to) != Piece.EmptyPiece)
-            {
-                if (pt == PieceTypes.Pawn)
-                    re[i++] = from.FileChar;
-                re[i++] = 'x';
-            }
-        }
-
-        re[i++] = to.FileChar;
-        re[i++] = to.RankChar;
-
-        if (move.IsPromotionMove())
-        {
-            re[i++] = '=';
-            re[i++] = move.PromotedPieceType().MakePiece(_pos.SideToMove).GetUnicodeChar();
-        }
-
-        if (_pos.InCheck)
-            re[i++] = GetCheckChar();
-
-        return new string(re[..i]);
     }
 
     /// <summary>
@@ -180,6 +178,63 @@ public sealed class MoveNotation : IMoveNotation
         {
             re[i++] = '=';
             re[i++] = move.PromotedPieceType().MakePiece(_pos.SideToMove).GetPgnChar();
+        }
+
+        if (_pos.InCheck)
+            re[i++] = GetCheckChar();
+
+        return new string(re[..i]);
+    }
+
+    /// <summary>
+    /// <para>Converts a move to FAN notation.</para>
+    /// </summary>
+    /// <param name="move">The move to convert</param>
+    /// <returns>FAN move string</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private string ToFan(Move move)
+    {
+        var (from, to) = move.FromTo();
+
+        if (move.IsCastlelingMove())
+            return CastlelingExtensions.GetCastlelingString(to, from);
+
+        var pc = _pos.MovedPiece(move);
+        var pt = pc.Type();
+
+        Span<char> re = stackalloc char[6];
+        var i = 0;
+
+        if (pt != PieceTypes.Pawn)
+        {
+            re[i++] = pc.GetUnicodeChar();
+            foreach (var c in Disambiguation(move, from))
+                re[i++] = c;
+        }
+
+        if (move.IsEnPassantMove())
+        {
+            re[i++] = 'e';
+            re[i++] = 'p';
+            re[i++] = from.FileChar;
+        }
+        else
+        {
+            if (_pos.GetPiece(to) != Piece.EmptyPiece)
+            {
+                if (pt == PieceTypes.Pawn)
+                    re[i++] = from.FileChar;
+                re[i++] = 'x';
+            }
+        }
+
+        re[i++] = to.FileChar;
+        re[i++] = to.RankChar;
+
+        if (move.IsPromotionMove())
+        {
+            re[i++] = '=';
+            re[i++] = move.PromotedPieceType().MakePiece(_pos.SideToMove).GetUnicodeChar();
         }
 
         if (_pos.InCheck)
@@ -307,6 +362,55 @@ public sealed class MoveNotation : IMoveNotation
         return new string(re[..i]);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private string ToSmith(Move move)
+    {
+        var (from, to) = move.FromTo();
+
+        Span<char> re = stackalloc char[5];
+        var i = 0;
+
+        re[i++] = from.FileChar;
+        re[i++] = from.RankChar;
+        re[i++] = to.FileChar;
+        re[i++] = to.RankChar;
+
+        var captured = _pos.GetPiece(to);
+
+        if (captured != Piece.EmptyPiece)
+            re[i++] = captured.GetPieceChar();
+
+        return new string(re[..i]);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private string ToCoordinate(Move move)
+    {
+        var (from, to) = move.FromTo();
+
+        Span<char> re = stackalloc char[8];
+        var i = 0;
+
+        re[i++] = char.ToUpper(from.FileChar);
+        re[i++] = from.RankChar;
+        re[i++] = '-';
+        re[i++] = char.ToUpper(to.FileChar);
+        re[i++] = to.RankChar;
+
+        var captured = _pos.GetPiece(to);
+
+        // ReSharper disable once InvertIf
+        if (captured != Piece.EmptyPiece)
+        {
+            re[i++] = '(';
+            re[i++] = char.ToUpper(captured.GetPieceChar());
+            re[i++] = ')';
+        }
+
+        return new string(re[..i]);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static string ToIccf(Move move)
     {
         var (from, to) = move.FromTo();
@@ -319,8 +423,10 @@ public sealed class MoveNotation : IMoveNotation
         re[i++] = (char)('1' + to.File.AsInt());
         re[i++] = (char)('1' + to.Rank.AsInt());
 
+        // ReSharper disable once InvertIf
         if (move.IsPromotionMove())
         {
+            // ReSharper disable once SwitchExpressionHandlesSomeKnownEnumValuesWithExceptionInDefault
             var c = move.PromotedPieceType() switch
             {
                 PieceTypes.Queen => 1,
@@ -335,6 +441,10 @@ public sealed class MoveNotation : IMoveNotation
 
         return new string(re[..i]);
     }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static string ToUci(Move move)
+        => move.ToString();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private char GetCheckChar()
@@ -368,7 +478,6 @@ public sealed class MoveNotation : IMoveNotation
 
                 ambiguity |= MoveAmbiguities.Move;
             }
-
         }
 
         return ambiguity;
@@ -397,7 +506,7 @@ public sealed class MoveNotation : IMoveNotation
             ? new[] { from.RankChar }
             : new[] { from.FileChar, from.RankChar };
     }
-    
+
     /// <summary>
     /// Get similar attacks based on the move
     /// </summary>
