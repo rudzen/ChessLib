@@ -34,31 +34,30 @@ using Rudz.Chess.Extensions;
 using Rudz.Chess.MoveGeneration;
 using Rudz.Chess.Types;
 
-namespace Rudz.Chess;
+namespace Rudz.Chess.Notation;
 
-public sealed class MoveAmbiguity : IMoveAmbiguity
+public sealed class MoveNotation : IMoveNotation
 {
     private readonly IDictionary<MoveNotations, Func<Move, string>> _notationFuncs;
 
     private readonly IPosition _pos;
 
-    private MoveAmbiguity(in IPosition pos)
+    private MoveNotation(in IPosition pos)
     {
         _pos = pos;
-        _notationFuncs = new Dictionary<MoveNotations, Func<Move, string>>
+        _notationFuncs = new Dictionary<MoveNotations, Func<Move, string>>(6)
         {
             { MoveNotations.Fan, ToFan },
             { MoveNotations.San, ToSan },
             { MoveNotations.Lan, ToLan },
             { MoveNotations.Ran, ToRan },
+            { MoveNotations.ICCF, ToIccf },
             { MoveNotations.Uci, ToUci }
         };
     }
 
-    public static IMoveAmbiguity Create(in IPosition pos)
-    {
-        return new MoveAmbiguity(in pos);
-    }
+    public static IMoveNotation Create(in IPosition pos)
+        => new MoveNotation(in pos);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public string ToNotation(Move move, MoveNotations notation = MoveNotations.Fan)
@@ -73,7 +72,8 @@ public sealed class MoveAmbiguity : IMoveAmbiguity
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static string ToUci(Move move) => move.ToString();
+    private static string ToUci(Move move)
+        => move.ToString();
 
     /// <summary>
     /// <para>Converts a move to FAN notation.</para>
@@ -83,8 +83,7 @@ public sealed class MoveAmbiguity : IMoveAmbiguity
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private string ToFan(Move move)
     {
-        var from = move.FromSquare();
-        var to = move.ToSquare();
+        var (from, to) = move.FromTo();
 
         if (move.IsCastlelingMove())
             return CastlelingExtensions.GetCastlelingString(to, from);
@@ -141,8 +140,7 @@ public sealed class MoveAmbiguity : IMoveAmbiguity
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private string ToSan(Move move)
     {
-        var from = move.FromSquare();
-        var to = move.ToSquare();
+        var (from, to) = move.FromTo();
 
         if (move.IsCastlelingMove())
             return CastlelingExtensions.GetCastlelingString(to, from);
@@ -198,8 +196,7 @@ public sealed class MoveAmbiguity : IMoveAmbiguity
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private string ToLan(Move move)
     {
-        var from = move.FromSquare();
-        var to = move.ToSquare();
+        var (from, to) = move.FromTo();
 
         if (move.IsCastlelingMove())
             return CastlelingExtensions.GetCastlelingString(to, from);
@@ -258,8 +255,7 @@ public sealed class MoveAmbiguity : IMoveAmbiguity
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private string ToRan(Move move)
     {
-        var from = move.FromSquare();
-        var to = move.ToSquare();
+        var (from, to) = move.FromTo();
 
         if (move.IsCastlelingMove())
             return CastlelingExtensions.GetCastlelingString(to, from);
@@ -311,6 +307,35 @@ public sealed class MoveAmbiguity : IMoveAmbiguity
         return new string(re[..i]);
     }
 
+    private static string ToIccf(Move move)
+    {
+        var (from, to) = move.FromTo();
+
+        Span<char> re = stackalloc char[5];
+        var i = 0;
+
+        re[i++] = (char)('1' + from.File.AsInt());
+        re[i++] = (char)('1' + from.Rank.AsInt());
+        re[i++] = (char)('1' + to.File.AsInt());
+        re[i++] = (char)('1' + to.Rank.AsInt());
+
+        if (move.IsPromotionMove())
+        {
+            var c = move.PromotedPieceType() switch
+            {
+                PieceTypes.Queen => 1,
+                PieceTypes.Rook => 2,
+                PieceTypes.Bishop => 3,
+                PieceTypes.Knight => 4,
+                _ => throw new NotImplementedException()
+            };
+
+            re[i++] = (char)('0' + c);
+        }
+
+        return new string(re[..i]);
+    }
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private char GetCheckChar()
         => _pos.GenerateMoves().Any() ? '+' : '#';
@@ -323,8 +348,10 @@ public sealed class MoveAmbiguity : IMoveAmbiguity
         var from = move.FromSquare();
         var pinned = _pos.PinnedPieces(c);
 
-        foreach (var square in similarTypeAttacks)
+        while (similarTypeAttacks)
         {
+            var square = BitBoards.PopLsb(ref similarTypeAttacks);
+
             if (pinned & square)
                 continue;
 
@@ -341,25 +368,10 @@ public sealed class MoveAmbiguity : IMoveAmbiguity
 
                 ambiguity |= MoveAmbiguities.Move;
             }
+
         }
 
         return ambiguity;
-    }
-
-    /// <summary>
-    /// Get similar attacks based on the move
-    /// </summary>
-    /// <param name="move">The move to get similar attacks from</param>
-    /// <returns>Squares for all similar attacks without the moves from square</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private BitBoard GetSimilarAttacks(Move move)
-    {
-        var from = move.FromSquare();
-        var pt = _pos.GetPieceType(from);
-
-        return pt is PieceTypes.Pawn or PieceTypes.King
-            ? BitBoard.Empty
-            : _pos.GetAttacks(move.ToSquare(), pt, _pos.Pieces()) ^ from;
     }
 
     /// <summary>
@@ -384,5 +396,21 @@ public sealed class MoveAmbiguity : IMoveAmbiguity
         return !ambiguity.HasFlagFast(MoveAmbiguities.Rank)
             ? new[] { from.RankChar }
             : new[] { from.FileChar, from.RankChar };
+    }
+    
+    /// <summary>
+    /// Get similar attacks based on the move
+    /// </summary>
+    /// <param name="move">The move to get similar attacks from</param>
+    /// <returns>Squares for all similar attacks without the moves from square</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private BitBoard GetSimilarAttacks(Move move)
+    {
+        var from = move.FromSquare();
+        var pt = _pos.GetPieceType(from);
+
+        return pt is PieceTypes.Pawn or PieceTypes.King
+            ? BitBoard.Empty
+            : _pos.GetAttacks(move.ToSquare(), pt, _pos.Pieces()) ^ from;
     }
 }

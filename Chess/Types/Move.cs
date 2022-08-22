@@ -83,7 +83,7 @@ public readonly struct Move : IEquatable<Move>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int Create(Span<ExtMove> moves, int index, Square from, BitBoard to)
     {
-        while (!to.IsEmpty)
+        while (to)
             moves[index++].Move = Create(from, BitBoards.PopLsb(ref to));
         return index;
     }
@@ -102,11 +102,15 @@ public readonly struct Move : IEquatable<Move>
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Square FromSquare()
-        => (_data >> 6) & 0x3F;
+        => new((_data >> 6) & 0x3F);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Square ToSquare()
         => new(_data & 0x3F);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public (Square, Square) FromTo()
+        => (FromSquare(), ToSquare());
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public PieceTypes PromotedPieceType()

@@ -30,10 +30,11 @@ using Rudz.Chess.Enums;
 using Rudz.Chess.Extensions;
 using Rudz.Chess.Factories;
 using Rudz.Chess.MoveGeneration;
+using Rudz.Chess.Notation;
 using Rudz.Chess.Types;
 using Xunit;
 
-namespace Chess.Test.MoveTests;
+namespace Chess.Test.NotationTests;
 
 public sealed class MoveNotationTests
 {
@@ -61,10 +62,10 @@ public sealed class MoveNotationTests
         var g = GameFactory.Create(pos);
         g.NewGame(fen);
 
-        var w1 = new Move(fromOneSquare, toSquare);
-        var w2 = new Move(fromTwoSquare, toSquare);
+        var w1 = Move.Create(fromOneSquare, toSquare);
+        var w2 = Move.Create(fromTwoSquare, toSquare);
 
-        var ambiguity = MoveAmbiguity.Create(pos);
+        var ambiguity = MoveNotation.Create(pos);
 
         var actualPrimary = ambiguity.ToNotation(w1);
         var actualSecondary = ambiguity.ToNotation(w2);
@@ -98,10 +99,10 @@ public sealed class MoveNotationTests
         var g = GameFactory.Create(pos);
         g.NewGame(fen);
 
-        var w1 = new Move(fromOneSquare, toSquare);
-        var w2 = new Move(fromTwoSquare, toSquare);
+        var w1 = Move.Create(fromOneSquare, toSquare);
+        var w2 = Move.Create(fromTwoSquare, toSquare);
 
-        var ambiguity = MoveAmbiguity.Create(pos);
+        var ambiguity = MoveNotation.Create(pos);
 
         var actualPrimary = ambiguity.ToNotation(w1, notation);
         var actualSecondary = ambiguity.ToNotation(w2, notation);
@@ -135,10 +136,10 @@ public sealed class MoveNotationTests
         var g = GameFactory.Create(pos);
         g.NewGame(fen);
 
-        var w1 = new Move(fromOneSquare, toSquare);
-        var w2 = new Move(fromTwoSquare, toSquare);
+        var w1 = Move.Create(fromOneSquare, toSquare);
+        var w2 = Move.Create(fromTwoSquare, toSquare);
 
-        var ambiguity = MoveAmbiguity.Create(pos);
+        var ambiguity = MoveNotation.Create(pos);
 
         var actualPrimary = ambiguity.ToNotation(w1, notation);
         var actualSecondary = ambiguity.ToNotation(w2, notation);
@@ -172,10 +173,10 @@ public sealed class MoveNotationTests
         var g = GameFactory.Create(pos);
         g.NewGame(fen);
 
-        var w1 = new Move(fromOneSquare, toSquare);
-        var w2 = new Move(fromTwoSquare, toSquare);
+        var w1 = Move.Create(fromOneSquare, toSquare);
+        var w2 = Move.Create(fromTwoSquare, toSquare);
 
-        var ambiguity = MoveAmbiguity.Create(pos);
+        var ambiguity = MoveNotation.Create(pos);
 
         var actualPrimary = ambiguity.ToNotation(w1, notation);
         var actualSecondary = ambiguity.ToNotation(w2, notation);
@@ -209,10 +210,10 @@ public sealed class MoveNotationTests
         var g = GameFactory.Create(pos);
         g.NewGame(fen);
 
-        var w1 = new Move(fromOneSquare, toSquare);
-        var w2 = new Move(fromTwoSquare, toSquare);
+        var w1 = Move.Create(fromOneSquare, toSquare);
+        var w2 = Move.Create(fromTwoSquare, toSquare);
 
-        var ambiguity = MoveAmbiguity.Create(pos);
+        var ambiguity = MoveNotation.Create(pos);
 
         var actualPrimary = ambiguity.ToNotation(w1, notation);
         var actualSecondary = ambiguity.ToNotation(w2, notation);
@@ -246,10 +247,10 @@ public sealed class MoveNotationTests
         var g = GameFactory.Create(pos);
         g.NewGame(fen);
 
-        var w1 = new Move(fromOneSquare, toSquare);
-        var w2 = new Move(fromTwoSquare, toSquare);
+        var w1 = Move.Create(fromOneSquare, toSquare);
+        var w2 = Move.Create(fromTwoSquare, toSquare);
 
-        var ambiguity = MoveAmbiguity.Create(pos);
+        var ambiguity = MoveNotation.Create(pos);
 
         var actualPrimary = ambiguity.ToNotation(w1, notation);
         var actualSecondary = ambiguity.ToNotation(w2, notation);
@@ -283,10 +284,10 @@ public sealed class MoveNotationTests
         var g = GameFactory.Create(pos);
         g.NewGame(fen);
 
-        var w1 = new Move(fromOneSquare, toSquare);
-        var w2 = new Move(fromTwoSquare, toSquare);
+        var w1 = Move.Create(fromOneSquare, toSquare);
+        var w2 = Move.Create(fromTwoSquare, toSquare);
 
-        var ambiguity = MoveAmbiguity.Create(pos);
+        var ambiguity = MoveNotation.Create(pos);
 
         var actualPrimary = ambiguity.ToNotation(w1, notation);
         var actualSecondary = ambiguity.ToNotation(w2, notation);
@@ -320,10 +321,10 @@ public sealed class MoveNotationTests
         var g = GameFactory.Create(pos);
         g.NewGame(fen);
 
-        var w1 = new Move(fromOneSquare, toSquare);
-        var w2 = new Move(fromTwoSquare, toSquare);
+        var w1 = Move.Create(fromOneSquare, toSquare);
+        var w2 = Move.Create(fromTwoSquare, toSquare);
 
-        var ambiguity = MoveAmbiguity.Create(pos);
+        var ambiguity = MoveNotation.Create(pos);
 
         var actualPrimary = ambiguity.ToNotation(w1, notation);
         var actualSecondary = ambiguity.ToNotation(w2, notation);
@@ -357,10 +358,10 @@ public sealed class MoveNotationTests
         var g = GameFactory.Create(pos);
         g.NewGame(fen);
 
-        var w1 = new Move(fromOneSquare, toSquare);
-        var w2 = new Move(fromTwoSquare, toSquare);
+        var w1 = Move.Create(fromOneSquare, toSquare);
+        var w2 = Move.Create(fromTwoSquare, toSquare);
 
-        var ambiguity = MoveAmbiguity.Create(pos);
+        var ambiguity = MoveNotation.Create(pos);
 
         var actualPrimary = ambiguity.ToNotation(w1, notation);
         var actualSecondary = ambiguity.ToNotation(w2, notation);
@@ -394,10 +395,10 @@ public sealed class MoveNotationTests
         var g = GameFactory.Create(pos);
         g.NewGame(fen);
 
-        var w1 = new Move(fromOneSquare, toSquare);
-        var w2 = new Move(fromTwoSquare, toSquare);
+        var w1 = Move.Create(fromOneSquare, toSquare);
+        var w2 = Move.Create(fromTwoSquare, toSquare);
 
-        var ambiguity = MoveAmbiguity.Create(pos);
+        var ambiguity = MoveNotation.Create(pos);
 
         var actualPrimary = ambiguity.ToNotation(w1, notation);
         var actualSecondary = ambiguity.ToNotation(w2, notation);
@@ -431,10 +432,10 @@ public sealed class MoveNotationTests
         var g = GameFactory.Create(pos);
         g.NewGame(fen);
 
-        var w1 = new Move(fromOneSquare, toSquare);
-        var w2 = new Move(fromTwoSquare, toSquare);
+        var w1 = Move.Create(fromOneSquare, toSquare);
+        var w2 = Move.Create(fromTwoSquare, toSquare);
 
-        var ambiguity = MoveAmbiguity.Create(pos);
+        var ambiguity = MoveNotation.Create(pos);
 
         var actualPrimary = ambiguity.ToNotation(w1, notation);
         var actualSecondary = ambiguity.ToNotation(w2, notation);
@@ -468,16 +469,62 @@ public sealed class MoveNotationTests
         var g = GameFactory.Create(pos);
         g.NewGame(fen);
 
-        var w1 = new Move(fromOneSquare, toSquare);
-        var w2 = new Move(fromTwoSquare, toSquare);
+        var w1 = Move.Create(fromOneSquare, toSquare);
+        var w2 = Move.Create(fromTwoSquare, toSquare);
 
-        var ambiguity = MoveAmbiguity.Create(pos);
+        var ambiguity = MoveNotation.Create(pos);
 
         var actualPrimary = ambiguity.ToNotation(w1, notation);
         var actualSecondary = ambiguity.ToNotation(w2, notation);
 
         Assert.Equal(expectedPrimary, actualPrimary);
         Assert.Equal(expectedSecondary, actualSecondary);
+    }
+
+    [Fact]
+    public void IccfRegularMove()
+    {
+        const string fen = "8/6k1/8/8/3N4/8/1K1N4/8 w - - 0 1";
+        const MoveNotations notation = MoveNotations.ICCF;
+        const string expectedPrimary = "4263";
+
+        var board = new Board();
+        var pieceValue = new PieceValue();
+        var pos = new Position(board, pieceValue);
+        var g = GameFactory.Create(pos);
+        g.NewGame(fen);
+
+        var w1 = Move.Create(Squares.d2, Squares.f3);
+
+        var ambiguity = MoveNotation.Create(pos);
+
+        var actualPrimary = ambiguity.ToNotation(w1, notation);
+
+        Assert.Equal(expectedPrimary, actualPrimary);
+    }
+
+    [Theory]
+    [InlineData("8/1P4k1/8/8/8/8/1K6/8 w - - 0 1", PieceTypes.Queen, "27281")]
+    [InlineData("8/1P4k1/8/8/8/8/1K6/8 w - - 0 1", PieceTypes.Rook, "27282")]
+    [InlineData("8/1P4k1/8/8/8/8/1K6/8 w - - 0 1", PieceTypes.Bishop, "27283")]
+    [InlineData("8/1P4k1/8/8/8/8/1K6/8 w - - 0 1", PieceTypes.Knight, "27284")]
+    public void IccfPromotionMove(string fen, PieceTypes promoPt, string expected)
+    {
+        const MoveNotations notation = MoveNotations.ICCF;
+
+        var board = new Board();
+        var pieceValue = new PieceValue();
+        var pos = new Position(board, pieceValue);
+        var g = GameFactory.Create(pos);
+        g.NewGame(fen);
+
+        var w1 = Move.Create(Squares.b7, Squares.b8, MoveTypes.Promotion, promoPt);
+
+        var ambiguity = MoveNotation.Create(pos);
+
+        var actual = ambiguity.ToNotation(w1, notation);
+
+        Assert.Equal(expected, actual);
     }
 
     [Fact]
@@ -493,7 +540,7 @@ public sealed class MoveNotationTests
 
         var sanMoves = game.Pos
             .GenerateMoves()
-            .Select(m => MoveAmbiguity.Create(game.Pos).ToNotation(m, notation))
+            .Select(m => MoveNotation.Create(game.Pos).ToNotation(m, notation))
             .ToArray();
 
         foreach (var notationResult in expectedNotations)

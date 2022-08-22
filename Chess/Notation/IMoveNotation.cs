@@ -27,9 +27,9 @@ SOFTWARE.
 using Rudz.Chess.Enums;
 using Rudz.Chess.Types;
 
-namespace Rudz.Chess;
+namespace Rudz.Chess.Notation;
 
-public interface IMoveAmbiguity
+public interface IMoveNotation
 {
     string ToNotation(Move move, MoveNotations notation = MoveNotations.Fan);
 }
