@@ -160,7 +160,7 @@ public static class MoveGenerator
         // Find all the squares attacked by slider checkers. We will remove them from the king
         // evasions in order to skip known illegal moves, which avoids any useless legality
         // checks later on.
-        while (!sliders.IsEmpty)
+        while (sliders)
         {
             checkSquare = BitBoards.PopLsb(ref sliders);
             var fullLine = checkSquare.Line(ksq);
@@ -344,13 +344,13 @@ public static class MoveGenerator
                 }
             }
 
-            while (!pawnOne.IsEmpty)
+            while (pawnOne)
             {
                 var to = BitBoards.PopLsb(ref pawnOne);
                 moves[index++].Move = Move.Create(to - up, to);
             }
 
-            while (!pawnTwo.IsEmpty)
+            while (pawnTwo)
             {
                 var to = BitBoards.PopLsb(ref pawnTwo);
                 moves[index++].Move = Move.Create(to - up - up, to);
@@ -363,7 +363,7 @@ public static class MoveGenerator
             : (Direction.SouthWest, Direction.SouthEast);
 
         // Promotions and underpromotions
-        if (!pawnsOn7.IsEmpty)
+        if (pawnsOn7)
         {
             switch (type)
             {
@@ -380,13 +380,13 @@ public static class MoveGenerator
             var pawnPromoLeft = pawnsOn7.Shift(left) & enemies;
             var pawnPromoUp = pawnsOn7.Shift(up) & emptySquares;
 
-            while (!pawnPromoRight.IsEmpty)
+            while (pawnPromoRight)
                 index = MakePromotions(moves, index, BitBoards.PopLsb(ref pawnPromoRight), ksq, right, type);
 
-            while (!pawnPromoLeft.IsEmpty)
+            while (pawnPromoLeft)
                 index = MakePromotions(moves, index, BitBoards.PopLsb(ref pawnPromoLeft), ksq, left, type);
 
-            while (!pawnPromoUp.IsEmpty)
+            while (pawnPromoUp)
                 index = MakePromotions(moves, index, BitBoards.PopLsb(ref pawnPromoUp), ksq, up, type);
         }
 
@@ -399,13 +399,13 @@ public static class MoveGenerator
         pawnOne = pawnsNotOn7.Shift(right) & enemies;
         pawnTwo = pawnsNotOn7.Shift(left) & enemies;
 
-        while (!pawnOne.IsEmpty)
+        while (pawnOne)
         {
             var to = BitBoards.PopLsb(ref pawnOne);
             moves[index++].Move = Move.Create(to - right, to);
         }
 
-        while (!pawnTwo.IsEmpty)
+        while (pawnTwo)
         {
             var to = BitBoards.PopLsb(ref pawnTwo);
             moves[index++].Move = Move.Create(to - left, to);
@@ -424,7 +424,7 @@ public static class MoveGenerator
 
         pawnOne = pawnsNotOn7 & pos.EnPassantSquare.PawnAttack(them);
         Debug.Assert(!pawnOne.IsEmpty);
-        while (!pawnOne.IsEmpty)
+        while (pawnOne)
             moves[index++].Move = Move.Create(BitBoards.PopLsb(ref pawnOne), pos.EnPassantSquare, MoveTypes.Enpassant);
 
         return index;
@@ -448,7 +448,7 @@ public static class MoveGenerator
         Debug.Assert(!pos.InCheck);
         var dc = pos.BlockersForKing(~us) & pos.Pieces(us);
 
-        while (!dc.IsEmpty)
+        while (dc)
         {
             var from = BitBoards.PopLsb(ref dc);
             var pt = pos.GetPiece(from).Type();

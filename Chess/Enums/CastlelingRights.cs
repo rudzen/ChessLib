@@ -74,7 +74,5 @@ public static class CastlelingExtensions
     public static int AsInt(this CastlelingRights value) => (int)value;
 
     public static CastlelingRights Without(this CastlelingRights @this, CastlelingRights remove)
-    {
-        return @this & ~remove;
-    }
+        => @this & ~remove;
 }

@@ -342,7 +342,7 @@ internal static class BookZobrist
         0xCF3145DE0ADD4289UL, 0xD0E4427A5514FB72UL, 0x77C621CC9FB3A483UL, 0x67A34DAC4356550BUL
     };
 
-    private static readonly ulong turn = 0xF8D626AAAF278509UL;
+    private const ulong turn = 0xF8D626AAAF278509UL;
 
     internal static ulong Psq(int piece, Square sq)
         => psq[piece, sq.AsInt()];

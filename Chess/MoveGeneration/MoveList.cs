@@ -38,10 +38,7 @@ public sealed class MoveList : IMoveList
     private readonly ExtMove[] _moves;
     private int _cur;
 
-    public MoveList()
-    {
-        _moves = new ExtMove[218];
-    }
+    public MoveList() => _moves = new ExtMove[218];
 
     int IReadOnlyCollection<ExtMove>.Count => Length;
 
@@ -102,7 +99,7 @@ public sealed class MoveList : IMoveList
     {
         _cur = 0;
         Length = MoveGenerator.Generate(pos, _moves, 0, pos.SideToMove, type);
-        _moves[Length] = Move.EmptyMove;
+        _moves[Length] = ExtMove.Empty;
     }
 
     public ReadOnlySpan<ExtMove> Get() =>

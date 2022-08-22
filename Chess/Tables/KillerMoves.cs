@@ -37,14 +37,10 @@ public sealed class KillerMoves : IKillerMoves
     private readonly int _maxDepth;
 
     public static IKillerMoves Create(int maxDepth)
-    {
-        return new KillerMoves(maxDepth).Initialize();
-    }
+        => new KillerMoves(maxDepth).Initialize();
 
     public KillerMoves(int maxDepth)
-    {
-        _maxDepth = maxDepth + 1;
-    }
+        => _maxDepth = maxDepth + 1;
 
     private IKillerMoves Initialize()
     {

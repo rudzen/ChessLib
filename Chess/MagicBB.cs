@@ -143,7 +143,7 @@ public static class MagicBB
     private static int InitSquares(Span<int> squares, ulong mask, ReadOnlySpan<int> bbInits)
     {
         var numSquares = 0;
-        while (mask != 0)
+        while (mask != ulong.MinValue)
         {
             var bit = (ulong)((long)mask & -(long)mask);
             squares[numSquares++] = bbInits[(int)((bit * 0x07EDD5E59A4E28C2UL) >> 58)];

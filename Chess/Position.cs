@@ -372,8 +372,7 @@ public sealed class Position : IPosition
         Debug.Assert(!m.IsNullMove());
         Debug.Assert(MovedPiece(m).ColorOf() == _sideToMove);
 
-        var from = m.FromSquare();
-        var to = m.ToSquare();
+        var (from, to) = m.FromTo();
 
         var pc = Board.PieceAt(from);
         var pt = pc.Type();
