@@ -82,7 +82,7 @@ public sealed class Perft : IPerft
         if (Positions.Count == 0)
             yield break;
 
-        foreach (var fd in Positions.Select(p => new FenData(p.Fen)))
+        foreach (var fd in Positions.Select(static p => new FenData(p.Fen)))
         {
             Game.Table.NewSearch();
             var state = new State();

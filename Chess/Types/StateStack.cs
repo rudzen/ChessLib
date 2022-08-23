@@ -142,7 +142,7 @@ public sealed class StateStack : IEnumerable<State>
         => _stack.AsSpan()[..Count];
 
     IEnumerator<State> IEnumerable<State>.GetEnumerator()
-        => _stack.TakeWhile(state => state != null).GetEnumerator();
+        => _stack.TakeWhile(static state => state != null).GetEnumerator();
 
     public override string ToString()
     {

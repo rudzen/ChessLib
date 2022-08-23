@@ -150,8 +150,7 @@ public sealed class Book : IDisposable
 
         Move move = m;
 
-        var from = move.FromSquare();
-        var to = move.ToSquare();
+        var (from, to) = move.FromTo();
 
         // Promotion type move needs to be converted from PG format.
         var polyPt = (m >> 12) & 7;
@@ -166,7 +165,7 @@ public sealed class Book : IDisposable
 
         // Iterate all known moves for current position to find a match.
 
-        var emMoves = ml.Select(em => em.Move)
+        var emMoves = ml.Select(static em => em.Move)
             .Where(m => from == m.FromSquare())
             .Where(m => to == m.ToSquare())
             .Where(m =>
@@ -203,8 +202,7 @@ public sealed class Book : IDisposable
 
         k ^= CastleRights
             .Where(cr => _pos.State.CastlelingRights.HasFlagFast(cr))
-            .Aggregate(ulong.MinValue,
-                (current, validCastlelingFlag) => current ^ BookZobrist.Castle(validCastlelingFlag));
+            .Aggregate(ulong.MinValue, static (current, validCastlelingFlag) => current ^ BookZobrist.Castle(validCastlelingFlag));
 
         if (_pos.State.EnPassantSquare != Square.None)
             k ^= BookZobrist.EnPassant(_pos.State.EnPassantSquare.File);

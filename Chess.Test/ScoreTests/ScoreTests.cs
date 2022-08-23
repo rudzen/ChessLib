@@ -63,7 +63,7 @@ public sealed class ScoreTests
     [Fact]
     public void ScoreMg()
     {
-        var scores = TestValues.Select(x => new Score(x.Key, x.Value));
+        var scores = TestValues.Select(static x => new Score(x.Key, x.Value));
         var i = 0;
         foreach (var score in scores)
         {

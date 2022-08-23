@@ -176,8 +176,7 @@ public class Uci : IUci
         if (m.IsNullMove())
             return "(none)";
 
-        var from = m.FromSquare();
-        var to = m.ToSquare();
+        var (from, to) = m.FromTo();
 
         if (m.IsCastlelingMove() && chessMode != ChessMode.Chess960)
             to = Square.Make(from.Rank, to > from ? File.FILE_G : File.FILE_C);

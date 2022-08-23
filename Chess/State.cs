@@ -37,7 +37,7 @@ public sealed class State : IEquatable<State>
 {
     public Move LastMove { get; set; }
 
-    public Value[] NonPawnMaterial { get; set; }
+    public Value[] NonPawnMaterial { get; }
 
     public HashKey PawnStructureKey { get; set; }
 
@@ -51,7 +51,7 @@ public sealed class State : IEquatable<State>
 
     public Square EnPassantSquare { get; set; }
 
-    public State Previous { get; set; }
+    public State Previous { get; private set; }
 
     // -----------------------------
     // Properties below this point are not copied from other state
@@ -65,11 +65,11 @@ public sealed class State : IEquatable<State>
     /// </summary>
     public BitBoard Checkers { get; set; }
 
-    public BitBoard[] BlockersForKing { get; set; }
+    public BitBoard[] BlockersForKing { get; }
 
-    public BitBoard[] Pinners { get; set; }
+    public BitBoard[] Pinners { get; }
 
-    public BitBoard[] CheckedSquares { get; set; }
+    public BitBoard[] CheckedSquares { get; private set; }
 
     public Piece CapturedPiece { get; set; }
 
@@ -122,7 +122,8 @@ public sealed class State : IEquatable<State>
         other.Previous = this;
 
         // copy over material
-        Array.Copy(NonPawnMaterial, other.NonPawnMaterial, NonPawnMaterial.Length);
+        other.NonPawnMaterial[0] = NonPawnMaterial[0];
+        other.NonPawnMaterial[1] = NonPawnMaterial[1];
 
         // initialize the rest of the values
         if (other.CheckedSquares == null)
@@ -130,8 +131,8 @@ public sealed class State : IEquatable<State>
         else
             other.CheckedSquares.Fill(BitBoard.Empty);
 
-        other.Pinners = new[] { BitBoard.Empty, BitBoard.Empty };
-        other.BlockersForKing = new[] { BitBoard.Empty, BitBoard.Empty };
+        other.Pinners[0] = other.Pinners[1] = BitBoard.Empty;
+        other.BlockersForKing[0] = other.BlockersForKing[1] = BitBoard.Empty;
 
         return other;
     }
@@ -210,8 +211,8 @@ public sealed class State : IEquatable<State>
         hashCode.Add(Checkers);
         hashCode.Add(Previous);
         hashCode.Add(CapturedPiece);
-        hashCode.Add(Pinners.Where(p => !p.IsEmpty));
-        hashCode.Add(CheckedSquares.Where(csq => !csq.IsEmpty));
+        hashCode.Add(Pinners.Where(static p => !p.IsEmpty));
+        hashCode.Add(CheckedSquares.Where(static csq => !csq.IsEmpty));
         return hashCode.ToHashCode();
     }
 }

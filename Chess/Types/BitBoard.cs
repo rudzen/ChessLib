@@ -202,17 +202,17 @@ public readonly struct BitBoard : IEnumerable<Square>, IEquatable<BitBoard>
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public BitBoard OrAll(params BitBoard[] bbs)
-        => bbs.Aggregate(Value, (current, b) => current | b.Value);
+        => bbs.Aggregate(Value, static (current, b) => current | b.Value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public BitBoard OrAll(IEnumerable<BitBoard> bbs)
-        => bbs.Aggregate(Value, (current, bb) => current | bb.Value);
+        => bbs.Aggregate(Value, static (current, bb) => current | bb.Value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public BitBoard OrAll(IEnumerable<Square> sqs)
     {
         var b = this;
-        return sqs.Aggregate(b, (current, sq) => current | sq);
+        return sqs.Aggregate(b, static (current, sq) => current | sq);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

@@ -44,7 +44,7 @@ public sealed class PawnHashTableTest
 
         var key = new RKiss(1234567).Rand();
         var size = Marshal.SizeOf(typeof(PawnTableEntry));
-        var initEntry = new Func<PawnTableEntry>(() => new PawnTableEntry(0));
+        var initEntry = new Func<PawnTableEntry>(static () => new PawnTableEntry(0));
 
         t.Initialize(size, tableSizeMb, initEntry);
 

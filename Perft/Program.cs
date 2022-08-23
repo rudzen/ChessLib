@@ -100,7 +100,7 @@ internal static class Program
                 (EpdOptions opts) => setEdp(opts),
                 (FenOptions opts) => setFen(opts),
                 (TTOptions opts) => setTT(opts),
-                errs => 1);
+                static errs => 1);
 
         if (returnValue != 0)
             return returnValue;
@@ -169,7 +169,7 @@ internal static class Program
             .Enrich.WithThreadId()
             .Enrich.FromLogContext()
             .CreateLogger();
-        AppDomain.CurrentDomain.ProcessExit += (s, e) => Log.CloseAndFlush();
+        AppDomain.CurrentDomain.ProcessExit += static (s, e) => Log.CloseAndFlush();
         return Log.Logger;
     }
 }

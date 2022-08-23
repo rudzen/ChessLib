@@ -683,7 +683,7 @@ public static class BitBoards
     /// <returns>The generated bitboard</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static BitBoard MakeBitboard(params Square[] squares)
-        => squares.Aggregate(EmptyBitBoard, (current, t) => current | t);
+        => squares.Aggregate(EmptyBitBoard, static (current, t) => current | t);
 
     /// <summary>
     /// Tests if a bitboard has more than one bit set

@@ -54,7 +54,7 @@ public sealed class PerftRunner : IPerftRunner
 
     private static readonly string Line = new('-', 65);
 
-    private static readonly Lazy<string> CurrentDirectory = new(() => System.Environment.CurrentDirectory);
+    private static readonly Lazy<string> CurrentDirectory = new(static () => System.Environment.CurrentDirectory);
 
     private readonly Func<CancellationToken, IAsyncEnumerable<IPerftPosition>>[] _runners;
 
@@ -170,7 +170,7 @@ public sealed class PerftRunner : IPerftRunner
         var elapsedMs = sw.ElapsedMilliseconds;
         _log.Information("Parsed {0} epd entries in {1} ms", parsedCount, elapsedMs);
 
-        var perftPositions = _epdParser.Sets.Select(set => PerftPositionFactory.Create(set.Id, set.Epd, set.Perft));
+        var perftPositions = _epdParser.Sets.Select(static set => PerftPositionFactory.Create(set.Id, set.Epd, set.Perft));
 
         foreach (var perftPosition in perftPositions)
             yield return perftPosition;
@@ -188,7 +188,7 @@ public sealed class PerftRunner : IPerftRunner
     {
         const ulong zero = ulong.MinValue;
 
-        var depths = options.Depths.Select(d => (d, zero)).ToList();
+        var depths = options.Depths.Select(static d => (d, zero)).ToList();
 
         var perftPositions =
             options.Fens.Select(f => PerftPositionFactory.Create(Guid.NewGuid().ToString(), f, depths));

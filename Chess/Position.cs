@@ -472,8 +472,7 @@ public sealed class Position : IPosition
         Debug.Assert(!m.IsNullMove());
 
         var us = _sideToMove;
-        var from = m.FromSquare();
-        var to = m.ToSquare();
+        var (from, to) = m.FromTo();
         var ksq = GetKingSquare(us);
 
         Debug.Assert(GetPiece(GetKingSquare(us)) == PieceTypes.King.MakePiece(us));
@@ -559,8 +558,7 @@ public sealed class Position : IPosition
 
         var us = _sideToMove;
         var pc = MovedPiece(m);
-        var from = m.FromSquare();
-        var to = m.ToSquare();
+        var (from, to) = m.FromTo();
 
         // If the from square is not occupied by a piece belonging to the side to move, the move
         // is obviously not legal.
@@ -634,8 +632,7 @@ public sealed class Position : IPosition
 
         var us = _sideToMove;
         var them = ~us;
-        var to = m.ToSquare();
-        var from = m.FromSquare();
+        var (from, to) = m.FromTo();
         var pc = GetPiece(from);
         var pt = pc.Type();
         var isPawn = pt == PieceTypes.Pawn;
@@ -821,8 +818,7 @@ public sealed class Position : IPosition
             return;
         }
 
-        var from = m.FromSquare();
-        var to = m.ToSquare();
+        var (from, to) = m.FromTo();
 
         if (m.IsCastlelingMove() && ChessMode == ChessMode.Normal)
         {
@@ -915,8 +911,7 @@ public sealed class Position : IPosition
         if (m.MoveType() != MoveTypes.Normal)
             return Value.ValueZero >= threshold;
 
-        var from = m.FromSquare();
-        var to = m.ToSquare();
+        var (from, to) = m.FromTo();
 
         var swap = PieceValue.GetPieceValue(GetPiece(to), Phases.Mg) - threshold;
         if (swap < Value.ValueZero)
@@ -1133,8 +1128,7 @@ public sealed class Position : IPosition
         _sideToMove = ~_sideToMove;
 
         var us = _sideToMove;
-        var from = m.FromSquare();
-        var to = m.ToSquare();
+        var (from, to) = m.FromTo();
         var pc = GetPiece(to);
 
         Debug.Assert(!IsOccupied(from) || m.IsCastlelingMove());

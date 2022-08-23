@@ -67,7 +67,7 @@ public readonly struct Square : IComparable<Square>
         .GetValues(typeof(Squares))
         .Cast<Squares>()
         .Take(64)
-        .Select(x => x.ToString())
+        .Select(static x => x.ToString())
         .ToArray();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
