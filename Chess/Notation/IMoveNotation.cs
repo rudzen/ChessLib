@@ -24,12 +24,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using Rudz.Chess.Enums;
-using Rudz.Chess.Types;
+using Rudz.Chess.Notation.Notations;
 
 namespace Rudz.Chess.Notation;
 
 public interface IMoveNotation
 {
-    string ToNotation(Move move, MoveNotations notation = MoveNotations.Fan);
+    INotation ToNotation(MoveNotations moveNotation = MoveNotations.Fan);
 }

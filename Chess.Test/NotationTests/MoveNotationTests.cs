@@ -30,6 +30,7 @@ using Rudz.Chess.Extensions;
 using Rudz.Chess.Factories;
 using Rudz.Chess.MoveGeneration;
 using Rudz.Chess.Notation;
+using Rudz.Chess.Notation.Notations;
 using Rudz.Chess.Types;
 using Xunit;
 
@@ -66,8 +67,8 @@ public sealed class MoveNotationTests
 
         var ambiguity = MoveNotation.Create(pos);
 
-        var actualPrimary = ambiguity.ToNotation(w1);
-        var actualSecondary = ambiguity.ToNotation(w2);
+        var actualPrimary = ambiguity.ToNotation().Convert(w1);
+        var actualSecondary = ambiguity.ToNotation().Convert(w2);
 
         Assert.Equal(expectedPrimary, actualPrimary);
         Assert.Equal(expectedSecondary, actualSecondary);
@@ -103,8 +104,8 @@ public sealed class MoveNotationTests
 
         var ambiguity = MoveNotation.Create(pos);
 
-        var actualPrimary = ambiguity.ToNotation(w1, notation);
-        var actualSecondary = ambiguity.ToNotation(w2, notation);
+        var actualPrimary = ambiguity.ToNotation(notation).Convert(w1);
+        var actualSecondary = ambiguity.ToNotation(notation).Convert(w2);
 
         Assert.Equal(expectedPrimary, actualPrimary);
         Assert.Equal(expectedSecondary, actualSecondary);
@@ -140,8 +141,8 @@ public sealed class MoveNotationTests
 
         var ambiguity = MoveNotation.Create(pos);
 
-        var actualPrimary = ambiguity.ToNotation(w1, notation);
-        var actualSecondary = ambiguity.ToNotation(w2, notation);
+        var actualPrimary = ambiguity.ToNotation(notation).Convert(w1);
+        var actualSecondary = ambiguity.ToNotation(notation).Convert(w2);
 
         Assert.Equal(expectedPrimary, actualPrimary);
         Assert.Equal(expectedSecondary, actualSecondary);
@@ -177,8 +178,8 @@ public sealed class MoveNotationTests
 
         var ambiguity = MoveNotation.Create(pos);
 
-        var actualPrimary = ambiguity.ToNotation(w1, notation);
-        var actualSecondary = ambiguity.ToNotation(w2, notation);
+        var actualPrimary = ambiguity.ToNotation(notation).Convert(w1);
+        var actualSecondary = ambiguity.ToNotation(notation).Convert(w2);
 
         Assert.Equal(expectedPrimary, actualPrimary);
         Assert.Equal(expectedSecondary, actualSecondary);
@@ -214,8 +215,8 @@ public sealed class MoveNotationTests
 
         var ambiguity = MoveNotation.Create(pos);
 
-        var actualPrimary = ambiguity.ToNotation(w1, notation);
-        var actualSecondary = ambiguity.ToNotation(w2, notation);
+        var actualPrimary = ambiguity.ToNotation(notation).Convert(w1);
+        var actualSecondary = ambiguity.ToNotation(notation).Convert(w2);
 
         Assert.Equal(expectedPrimary, actualPrimary);
         Assert.Equal(expectedSecondary, actualSecondary);
@@ -251,8 +252,8 @@ public sealed class MoveNotationTests
 
         var ambiguity = MoveNotation.Create(pos);
 
-        var actualPrimary = ambiguity.ToNotation(w1, notation);
-        var actualSecondary = ambiguity.ToNotation(w2, notation);
+        var actualPrimary = ambiguity.ToNotation(notation).Convert(w1);
+        var actualSecondary = ambiguity.ToNotation(notation).Convert(w2);
 
         Assert.Equal(expectedPrimary, actualPrimary);
         Assert.Equal(expectedSecondary, actualSecondary);
@@ -288,8 +289,8 @@ public sealed class MoveNotationTests
 
         var ambiguity = MoveNotation.Create(pos);
 
-        var actualPrimary = ambiguity.ToNotation(w1, notation);
-        var actualSecondary = ambiguity.ToNotation(w2, notation);
+        var actualPrimary = ambiguity.ToNotation(notation).Convert(w1);
+        var actualSecondary = ambiguity.ToNotation(notation).Convert(w2);
 
         Assert.Equal(expectedPrimary, actualPrimary);
         Assert.Equal(expectedSecondary, actualSecondary);
@@ -325,8 +326,8 @@ public sealed class MoveNotationTests
 
         var ambiguity = MoveNotation.Create(pos);
 
-        var actualPrimary = ambiguity.ToNotation(w1, notation);
-        var actualSecondary = ambiguity.ToNotation(w2, notation);
+        var actualPrimary = ambiguity.ToNotation(notation).Convert(w1);
+        var actualSecondary = ambiguity.ToNotation(notation).Convert(w2);
 
         Assert.Equal(expectedPrimary, actualPrimary);
         Assert.Equal(expectedSecondary, actualSecondary);
@@ -362,8 +363,8 @@ public sealed class MoveNotationTests
 
         var ambiguity = MoveNotation.Create(pos);
 
-        var actualPrimary = ambiguity.ToNotation(w1, notation);
-        var actualSecondary = ambiguity.ToNotation(w2, notation);
+        var actualPrimary = ambiguity.ToNotation(notation).Convert(w1);
+        var actualSecondary = ambiguity.ToNotation(notation).Convert(w2);
 
         Assert.Equal(expectedPrimary, actualPrimary);
         Assert.Equal(expectedSecondary, actualSecondary);
@@ -399,8 +400,8 @@ public sealed class MoveNotationTests
 
         var ambiguity = MoveNotation.Create(pos);
 
-        var actualPrimary = ambiguity.ToNotation(w1, notation);
-        var actualSecondary = ambiguity.ToNotation(w2, notation);
+        var actualPrimary = ambiguity.ToNotation(notation).Convert(w1);
+        var actualSecondary = ambiguity.ToNotation(notation).Convert(w2);
 
         Assert.Equal(expectedPrimary, actualPrimary);
         Assert.Equal(expectedSecondary, actualSecondary);
@@ -436,8 +437,8 @@ public sealed class MoveNotationTests
 
         var ambiguity = MoveNotation.Create(pos);
 
-        var actualPrimary = ambiguity.ToNotation(w1, notation);
-        var actualSecondary = ambiguity.ToNotation(w2, notation);
+        var actualPrimary = ambiguity.ToNotation(notation).Convert(w1);
+        var actualSecondary = ambiguity.ToNotation(notation).Convert(w2);
 
         Assert.Equal(expectedPrimary, actualPrimary);
         Assert.Equal(expectedSecondary, actualSecondary);
@@ -473,8 +474,8 @@ public sealed class MoveNotationTests
 
         var ambiguity = MoveNotation.Create(pos);
 
-        var actualPrimary = ambiguity.ToNotation(w1, notation);
-        var actualSecondary = ambiguity.ToNotation(w2, notation);
+        var actualPrimary = ambiguity.ToNotation(notation).Convert(w1);
+        var actualSecondary = ambiguity.ToNotation(notation).Convert(w2);
 
         Assert.Equal(expectedPrimary, actualPrimary);
         Assert.Equal(expectedSecondary, actualSecondary);
@@ -497,7 +498,7 @@ public sealed class MoveNotationTests
 
         var ambiguity = MoveNotation.Create(pos);
 
-        var actualPrimary = ambiguity.ToNotation(w1, notation);
+        var actualPrimary = ambiguity.ToNotation(notation).Convert(w1);
 
         Assert.Equal(expectedPrimary, actualPrimary);
     }
@@ -521,7 +522,7 @@ public sealed class MoveNotationTests
 
         var ambiguity = MoveNotation.Create(pos);
 
-        var actual = ambiguity.ToNotation(w1, notation);
+        var actual = ambiguity.ToNotation(notation).Convert(w1);
 
         Assert.Equal(expected, actual);
     }
@@ -539,7 +540,7 @@ public sealed class MoveNotationTests
 
         var sanMoves = game.Pos
             .GenerateMoves()
-            .Select(m => MoveNotation.Create(game.Pos).ToNotation(m, notation))
+            .Select(m => MoveNotation.Create(game.Pos).ToNotation(notation).Convert(m))
             .ToArray();
 
         foreach (var notationResult in expectedNotations)
