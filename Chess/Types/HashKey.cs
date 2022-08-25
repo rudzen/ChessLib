@@ -98,7 +98,7 @@ public readonly struct HashKey : IEquatable<HashKey>
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static HashKey operator ^(HashKey left, File right)
-        => left.Key ^ right.GetZobristEnPessant();
+        => left.Key ^ right.GetZobristEnPassant();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Equals(HashKey other)

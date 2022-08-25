@@ -50,8 +50,8 @@ public sealed class MoveNotation : IMoveNotation
             new SmithNotation(pos),
             null, // Descriptive
             new CoordinateNotation(pos),
-            new IccfNotation(pos),
-            new UciNotation(pos)
+            new IccfNotation(),
+            new UciNotation()
         };
     }
 

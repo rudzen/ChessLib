@@ -101,22 +101,46 @@ public readonly struct Piece : IEquatable<Piece>
 
     public bool IsBlack => ColorOf().IsBlack;
 
-    public static readonly Piece EmptyPiece = Pieces.NoPiece;
+    public static Piece EmptyPiece { get; } = new(Pieces.NoPiece);
+
+    public static Piece WhitePawn { get; } = new(Pieces.WhitePawn);
+
+    public static Piece BlackPawn { get; } = new(Pieces.BlackPawn);
+
+    public static Piece WhiteKnight { get; } = new(Pieces.WhiteKnight);
+
+    public static Piece BlackKnight { get; } = new(Pieces.BlackKnight);
+
+    public static Piece WhiteBishop { get; } = new(Pieces.WhiteBishop);
+
+    public static Piece BlackBishop { get; } = new(Pieces.BlackBishop);
+
+    public static Piece WhiteRook { get; } = new(Pieces.WhiteRook);
+
+    public static Piece BlackRook { get; } = new(Pieces.BlackRook);
+
+    public static Piece WhiteQueen { get; } = new(Pieces.WhiteQueen);
+
+    public static Piece BlackQueen { get; } = new(Pieces.BlackQueen);
+
+    public static Piece WhiteKing { get; } = new(Pieces.WhiteKing);
+
+    public static Piece BlackKing { get; } = new(Pieces.BlackKing);
 
     public static Piece[] AllPieces { get; } =
     {
-        Pieces.WhitePawn,
-        Pieces.WhiteKnight,
-        Pieces.WhiteBishop,
-        Pieces.WhiteRook,
-        Pieces.WhiteQueen,
-        Pieces.WhiteKing,
-        Pieces.BlackPawn,
-        Pieces.BlackKnight,
-        Pieces.BlackBishop,
-        Pieces.BlackRook,
-        Pieces.BlackQueen,
-        Pieces.BlackKing
+        WhitePawn,
+        WhiteKnight,
+        WhiteBishop,
+        WhiteRook,
+        WhiteQueen,
+        WhiteKing,
+        BlackPawn,
+        BlackKnight,
+        BlackBishop,
+        BlackRook,
+        BlackQueen,
+        BlackKing
     };
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -195,19 +219,19 @@ public readonly struct Piece : IEquatable<Piece>
     {
         return character switch
         {
-            'P' => Pieces.WhitePawn,
-            'p' => Pieces.BlackPawn,
-            'N' => Pieces.WhiteKnight,
-            'B' => Pieces.WhiteBishop,
-            'R' => Pieces.WhiteRook,
-            'Q' => Pieces.WhiteQueen,
-            'K' => Pieces.WhiteKing,
-            'n' => Pieces.BlackKnight,
-            'b' => Pieces.BlackBishop,
-            'r' => Pieces.BlackRook,
-            'q' => Pieces.BlackQueen,
-            'k' => Pieces.BlackKing,
-            _ => Pieces.NoPiece
+            'P' => WhitePawn,
+            'p' => BlackPawn,
+            'N' => WhiteKnight,
+            'B' => WhiteBishop,
+            'R' => WhiteRook,
+            'Q' => WhiteQueen,
+            'K' => WhiteKing,
+            'n' => BlackKnight,
+            'b' => BlackBishop,
+            'r' => BlackRook,
+            'q' => BlackQueen,
+            'k' => BlackKing,
+            _ => EmptyPiece
         };
     }
 

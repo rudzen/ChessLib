@@ -99,10 +99,10 @@ public static class Zobrist
 
         Span<Piece> pieces = stackalloc Piece[]
         {
-            Pieces.WhitePawn, Pieces.WhiteKnight, Pieces.WhiteBishop,
-            Pieces.WhiteRook, Pieces.WhiteQueen,  Pieces.WhiteKing,
-            Pieces.BlackPawn, Pieces.BlackKnight, Pieces.BlackBishop,
-            Pieces.BlackRook, Pieces.BlackQueen,  Pieces.BlackKing
+            Piece.WhitePawn, Piece.WhiteKnight, Piece.WhiteBishop,
+            Piece.WhiteRook, Piece.WhiteQueen,  Piece.WhiteKing,
+            Piece.BlackPawn, Piece.BlackKnight, Piece.BlackBishop,
+            Piece.BlackRook, Piece.BlackQueen,  Piece.BlackKing
         };
 
         foreach (var pc in pieces)
@@ -126,5 +126,5 @@ public static class Zobrist
     public static ulong GetZobristSide() => ZobristSide;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ulong GetZobristEnPessant(this File file) => ZobristEpFile[file.AsInt()];
+    public static ulong GetZobristEnPassant(this File file) => ZobristEpFile[file.AsInt()];
 }

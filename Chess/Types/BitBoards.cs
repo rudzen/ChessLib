@@ -151,7 +151,7 @@ public static class BitBoards
 
     private static readonly BitBoard[][] DistanceRingBB;
 
-    private static readonly Direction[] PawnPushDirections = new Direction[] { Direction.North, Direction.South };
+    private static readonly Direction[] PawnPushDirections = { Direction.North, Direction.South };
 
     private static readonly IDictionary<Direction, Func<BitBoard, BitBoard>> ShiftFuncs = MakeShiftFuncs();
 

@@ -30,14 +30,10 @@ using Rudz.Chess.Types;
 
 namespace Rudz.Chess.Notation.Notations;
 
-public sealed class IccfNotation : Notation
+public sealed class IccfNotation : INotation
 {
-    public IccfNotation(IPosition pos) : base(pos)
-    {
-    }
-
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override string Convert(Move move)
+    public string Convert(Move move)
     {
         var (from, to) = move.FromTo();
 

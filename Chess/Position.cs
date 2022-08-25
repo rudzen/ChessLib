@@ -614,10 +614,7 @@ public sealed class Position : IPosition
     }
 
     public void MakeMove(Move m, in State newState)
-    {
-        var givesCheck = GivesCheck(m);
-        MakeMove(m, newState, givesCheck);
-    }
+        => MakeMove(m, newState, GivesCheck(m));
 
     public void MakeMove(Move m, in State newState, bool givesCheck)
     {
@@ -703,7 +700,7 @@ public sealed class Position : IPosition
         // reset en-passant square if it is set
         if (State.EnPassantSquare != Square.None)
         {
-            k ^= State.EnPassantSquare.File.GetZobristEnPessant();
+            k ^= State.EnPassantSquare.File.GetZobristEnPassant();
             State.EnPassantSquare = Square.None;
         }
 
@@ -728,7 +725,7 @@ public sealed class Position : IPosition
                 && !((to - us.PawnPushDistance()).PawnAttack(us) & Pieces(PieceTypes.Pawn, them)).IsEmpty)
             {
                 State.EnPassantSquare = to - us.PawnPushDistance();
-                k ^= State.EnPassantSquare.File.GetZobristEnPessant();
+                k ^= State.EnPassantSquare.File.GetZobristEnPassant();
             }
             else if (m.IsPromotionMove())
             {
@@ -782,7 +779,7 @@ public sealed class Position : IPosition
         if (State.EnPassantSquare != Square.None)
         {
             var enPassantFile = State.EnPassantSquare.File;
-            State.Key ^= enPassantFile.GetZobristEnPessant();
+            State.Key ^= enPassantFile.GetZobristEnPassant();
             State.EnPassantSquare = Square.None;
         }
 
@@ -1333,7 +1330,7 @@ public sealed class Position : IPosition
         }
 
         if (State.EnPassantSquare != Square.None)
-            key ^= State.EnPassantSquare.File.GetZobristEnPessant();
+            key ^= State.EnPassantSquare.File.GetZobristEnPassant();
 
         if (_sideToMove.IsBlack)
             key ^= Zobrist.GetZobristSide();

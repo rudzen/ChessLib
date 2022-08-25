@@ -125,15 +125,16 @@ public sealed class Game : IGame
         var ml = _moveLists.Get();
         ml.Generate(Pos);
 
+        ulong tot = 0;
+
         if (depth == 1)
         {
-            var res = ml.Count;
+            tot = (ulong)ml.Count;
             _moveLists.Return(ml);
-            return (ulong)res;
+            return tot;
         }
 
         var state = new State();
-        ulong tot = 0;
 
         foreach (var move in ml.Select(static em => em.Move))
         {

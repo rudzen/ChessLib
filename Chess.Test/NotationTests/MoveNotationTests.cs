@@ -45,7 +45,7 @@ public sealed class MoveNotationTests
 
         const string fen = "8/6k1/8/8/8/8/1K1N1N2/8 w - - 0 1";
 
-        var movingPiece = new Piece(Pieces.WhiteKnight);
+        var movingPiece = Piece.WhiteKnight;
         var fromOneSquare = new Square(Squares.d2);
         var fromTwoSquare = new Square(Squares.f2);
         var toSquare = new Square(Squares.e4);
@@ -82,7 +82,7 @@ public sealed class MoveNotationTests
         const string fen = "8/6k1/8/8/8/8/1K1N1N2/8 w - - 0 1";
         const MoveNotations notation = MoveNotations.Fan;
 
-        var movingPiece = new Piece(Pieces.WhiteKnight);
+        var movingPiece = Piece.WhiteKnight;
         var fromOneSquare = new Square(Squares.d2);
         var fromTwoSquare = new Square(Squares.f2);
         var toSquare = new Square(Squares.e4);
@@ -119,7 +119,7 @@ public sealed class MoveNotationTests
         const string fen = "8/6k1/8/8/3N4/8/1K1N4/8 w - - 0 1";
         const MoveNotations notation = MoveNotations.Fan;
 
-        var movingPiece = new Piece(Pieces.WhiteKnight);
+        var movingPiece = Piece.WhiteKnight;
         var fromOneSquare = new Square(Squares.d2);
         var fromTwoSquare = new Square(Squares.d4);
         var toSquare = new Square(Squares.f3);
@@ -156,7 +156,7 @@ public sealed class MoveNotationTests
         const string fen = "8/6k1/8/8/8/8/1K1N1N2/8 w - - 0 1";
         const MoveNotations notation = MoveNotations.San;
 
-        var movingPiece = new Piece(Pieces.WhiteKnight);
+        var movingPiece = Piece.WhiteKnight;
         var fromOneSquare = new Square(Squares.d2);
         var fromTwoSquare = new Square(Squares.f2);
         var toSquare = new Square(Squares.e4);
@@ -193,7 +193,7 @@ public sealed class MoveNotationTests
         const string fen = "8/6k1/8/8/8/8/1K1N1N2/8 w - - 0 1";
         const MoveNotations notation = MoveNotations.San;
 
-        var movingPiece = new Piece(Pieces.WhiteKnight);
+        var movingPiece = Piece.WhiteKnight;
         var fromOneSquare = new Square(Squares.d2);
         var fromTwoSquare = new Square(Squares.f2);
         var toSquare = new Square(Squares.e4);
@@ -230,7 +230,7 @@ public sealed class MoveNotationTests
         const string fen = "8/6k1/8/8/3N4/8/1K1N4/8 w - - 0 1";
         const MoveNotations notation = MoveNotations.San;
 
-        var movingPiece = new Piece(Pieces.WhiteKnight);
+        var movingPiece = Piece.WhiteKnight;
         var fromOneSquare = new Square(Squares.d2);
         var fromTwoSquare = new Square(Squares.d4);
         var toSquare = new Square(Squares.f3);
@@ -267,7 +267,7 @@ public sealed class MoveNotationTests
         const string fen = "8/6k1/8/8/8/8/1K1N1N2/8 w - - 0 1";
         const MoveNotations notation = MoveNotations.Lan;
 
-        var movingPiece = new Piece(Pieces.WhiteKnight);
+        var movingPiece = Piece.WhiteKnight;
         var fromOneSquare = new Square(Squares.d2);
         var fromTwoSquare = new Square(Squares.f2);
         var toSquare = new Square(Squares.e4);
@@ -304,7 +304,7 @@ public sealed class MoveNotationTests
         const string fen = "8/6k1/8/8/8/8/1K1N1N2/8 w - - 0 1";
         const MoveNotations notation = MoveNotations.Lan;
 
-        var movingPiece = new Piece(Pieces.WhiteKnight);
+        var movingPiece = Piece.WhiteKnight;
         var fromOneSquare = new Square(Squares.d2);
         var fromTwoSquare = new Square(Squares.f2);
         var toSquare = new Square(Squares.e4);
@@ -341,7 +341,7 @@ public sealed class MoveNotationTests
         const string fen = "8/6k1/8/8/3N4/8/1K1N4/8 w - - 0 1";
         const MoveNotations notation = MoveNotations.Lan;
 
-        var movingPiece = new Piece(Pieces.WhiteKnight);
+        var movingPiece = Piece.WhiteKnight;
         var fromOneSquare = new Square(Squares.d2);
         var fromTwoSquare = new Square(Squares.d4);
         var toSquare = new Square(Squares.f3);
@@ -378,7 +378,7 @@ public sealed class MoveNotationTests
         const string fen = "8/6k1/8/8/8/8/1K1N1N2/8 w - - 0 1";
         const MoveNotations notation = MoveNotations.Ran;
 
-        var movingPiece = new Piece(Pieces.WhiteKnight);
+        var movingPiece = Piece.WhiteKnight;
         var fromOneSquare = new Square(Squares.d2);
         var fromTwoSquare = new Square(Squares.f2);
         var toSquare = new Square(Squares.e4);
@@ -415,7 +415,7 @@ public sealed class MoveNotationTests
         const string fen = "8/6k1/8/8/8/8/1K1N1N2/8 w - - 0 1";
         const MoveNotations notation = MoveNotations.Ran;
 
-        var movingPiece = new Piece(Pieces.WhiteKnight);
+        var movingPiece = Piece.WhiteKnight;
         var fromOneSquare = new Square(Squares.d2);
         var fromTwoSquare = new Square(Squares.f2);
         var toSquare = new Square(Squares.e4);
@@ -452,7 +452,7 @@ public sealed class MoveNotationTests
         const string fen = "8/6k1/8/8/3N4/8/1K1N4/8 w - - 0 1";
         const MoveNotations notation = MoveNotations.Ran;
 
-        var movingPiece = new Piece(Pieces.WhiteKnight);
+        var movingPiece = Piece.WhiteKnight;
         var fromOneSquare = new Square(Squares.d2);
         var fromTwoSquare = new Square(Squares.d4);
         var toSquare = new Square(Squares.f3);
