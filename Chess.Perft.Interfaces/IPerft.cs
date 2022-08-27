@@ -45,7 +45,7 @@ public interface IPerft
 
     IAsyncEnumerable<ulong> DoPerft(int depth);
 
-    ulong DoPerftAsync(int depth);
+    Task<ulong> DoPerftAsync(int depth);
 
     void ClearPositions();
 

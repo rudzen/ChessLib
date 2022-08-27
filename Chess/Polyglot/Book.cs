@@ -98,17 +98,17 @@ public sealed class Book : IDisposable
         if (_fileName.IsNullOrEmpty() || _fileStream == null)
             return Move.EmptyMove;
 
-        ushort polyMove = 0;
-        ushort best = 0;
-        uint sum = 0;
+        var polyMove = ushort.MinValue;
+        var best = ushort.MinValue;
+        var sum = uint.MinValue;
         var key = ComputePolyglotKey();
-        var firstIndex = FindFirst(key);
+        var firstIndex = FindFirst(in key);
 
         _fileStream.Seek(firstIndex * _entrySize, SeekOrigin.Begin);
 
         var e = ReadEntry();
 
-        while (e.Key == key)
+        while (e.Key == key.Key)
         {
             if (best <= e.Count)
                 best = e.Count;
@@ -201,7 +201,7 @@ public sealed class Book : IDisposable
         }
 
         k ^= CastleRights
-            .Where(cr => _pos.State.CastlelingRights.HasFlagFast(cr))
+            .Where(cr => _pos.State.CastlelingRights.Has(cr))
             .Aggregate(ulong.MinValue, static (current, validCastlelingFlag) => current ^ BookZobrist.Castle(validCastlelingFlag));
 
         if (_pos.State.EnPassantSquare != Square.None)
@@ -213,7 +213,7 @@ public sealed class Book : IDisposable
         return k;
     }
 
-    private long FindFirst(HashKey key)
+    private long FindFirst(in HashKey key)
     {
         var low = 0L;
         var high = _fileStream.Length / _entrySize - 1;

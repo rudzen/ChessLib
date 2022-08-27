@@ -84,6 +84,7 @@ public sealed class Perft : IPerft
 
         foreach (var fd in Positions.Select(static p => new FenData(p.Fen)))
         {
+            Game.Table.NewSearch();
             var state = new State();
             CurrentGame.Pos.Set(in fd, ChessMode.Normal, state);
 
@@ -98,8 +99,9 @@ public sealed class Perft : IPerft
         }
     }
 
-    public ulong DoPerftAsync(int depth)
-        => CurrentGame.Perft(depth, true);
+    public Task<ulong> DoPerftAsync(int depth)
+        => Task.Run(()
+            => CurrentGame.Perft(depth, true));
 
     public string GetBoard()
         => CurrentGame.ToString();

@@ -45,7 +45,7 @@ public sealed class ValidationTests
 
         var pc = PieceTypes.King.MakePiece(Player.White);
 
-        game.Pos.AddPiece(in pc, Squares.e4);
+        game.Pos.AddPiece(pc, Squares.e4);
 
         var validator = game.Pos.Validate(type);
 

@@ -49,7 +49,7 @@ public static class Fen
 
     private const int SeparatorCount = 7;
 
-    private static readonly Lazy<Regex> ValidFenRegex = new(() => new Regex(
+    private static readonly Lazy<Regex> ValidFenRegex = new(static () => new Regex(
        string.Format(@"^ \s* {0}/{0}/{0}/{0}/{0}/{0}/{0}/{0} \s+ (?:w|b) \s+ (?:[KkQq]+|\-) \s+ (?:[a-h][1-8]|\-) \s+ \d+ \s+ \d+ \s* $", FenRankRegexSnippet),
        RegexOptions.Compiled | RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline));
 

@@ -29,10 +29,13 @@ using Rudz.Chess.Types;
 
 namespace Rudz.Chess.Notation.Notations;
 
-public sealed class UciNotation : INotation
+public sealed class UciNotation : Notation
 {
+    public UciNotation(IPosition pos) : base(pos)
+    {
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public string Convert(Move move)
+    public override string Convert(Move move)
         => move.ToString();
 }

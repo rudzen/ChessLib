@@ -82,12 +82,12 @@ public class PerftBench
     }
 
     [Benchmark]
-    public ulong Perft()
+    public async Task<ulong> Perft()
     {
         var total = ulong.MinValue;
         for (var i = 0; i < N; ++i)
         {
-            total += _perft.DoPerftAsync(N);
+            total += await _perft.DoPerftAsync(N);
         }
 
         return total;

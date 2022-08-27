@@ -47,7 +47,7 @@ public sealed class PositionTests
         square.Value.Should().Be(Squares.a7);
 
         var piece = position.GetPiece(square);
-        Assert.Equal(Piece.WhiteKing, piece);
+        Assert.Equal(Pieces.WhiteKing, piece.Value);
 
         // test overload
         pieces = position.Pieces(piece);
@@ -64,7 +64,7 @@ public sealed class PositionTests
         Assert.Equal(Squares.d5, square.Value);
 
         piece = position.GetPiece(square);
-        Assert.Equal(Piece.BlackKnight, piece);
+        Assert.Equal(Pieces.BlackKnight, piece.Value);
     }
 
     [Fact]

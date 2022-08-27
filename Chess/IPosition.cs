@@ -67,10 +67,10 @@ public interface IPosition : IEnumerable<Piece>
     bool IsMate { get; }
 
     int Searcher { get;}
-    
+
     void Clear();
 
-    void AddPiece(in Piece pc, in Square sq);
+    void AddPiece(Piece pc, Square sq);
 
     void MakeMove(Move m, in State newState);
 
@@ -144,15 +144,15 @@ public interface IPosition : IEnumerable<Piece>
 
     BitBoard AttacksBy(PieceTypes pt, Player c);
 
-    bool CanCastle(CastlelingRights cr);
+    bool CanCastle(CastleRight cr);
 
     bool CanCastle(Player c);
 
-    bool CastlingImpeded(CastlelingRights cr);
+    bool CastlingImpeded(CastleRight cr);
 
-    Square CastlingRookSquare(CastlelingRights cr);
+    Square CastlingRookSquare(CastleRight cr);
 
-    CastlelingRights GetCastlelingRightsMask(Square sq);
+    CastleRight GetCastlelingRightsMask(Square sq);
 
     bool IsPseudoLegal(Move m);
 

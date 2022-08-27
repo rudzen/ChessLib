@@ -35,7 +35,7 @@ public interface IBoard : IEnumerable<Piece>
     void Clear();
     Piece PieceAt(Square sq);
     bool IsEmpty(Square sq);
-    void AddPiece(in Piece pc, in Square sq);
+    void AddPiece(Piece pc, Square sq);
     void RemovePiece(Square sq);
     void ClearPiece(Square sq);
     void MovePiece(Square from, Square to);

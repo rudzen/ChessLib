@@ -50,7 +50,7 @@ namespace Rudz.Chess;
 public sealed class Position : IPosition
 {
     private readonly BitBoard[] _castlingPath;
-    private readonly CastlelingRights[] _castlingRightsMask;
+    private readonly CastleRight[] _castlingRightsMask;
     private readonly Square[] _castlingRookSquare;
     private readonly ObjectPool<StringBuilder> _outputObjectPool;
     private readonly IPositionValidator _positionValidator;
@@ -64,7 +64,8 @@ public sealed class Position : IPosition
         _positionValidator = new PositionValidator(this, Board);
         _castlingPath = new BitBoard[CastlelingRights.CastleRightsNb.AsInt()];
         _castlingRookSquare = new Square[CastlelingRights.CastleRightsNb.AsInt()];
-        _castlingRightsMask = new CastlelingRights[64];
+        _castlingRightsMask = new CastleRight[64];
+        _castlingRightsMask.Fill(CastleRight.NONE);
         IsProbing = true;
         Clear();
     }
@@ -112,9 +113,9 @@ public sealed class Position : IPosition
     public int Searcher { get; private set; }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void AddPiece(in Piece pc, in Square sq)
+    public void AddPiece(Piece pc, Square sq)
     {
-        Board.AddPiece(in pc, in sq);
+        Board.AddPiece(pc, sq);
 
         if (!IsProbing)
             PieceUpdated?.Invoke(pc, sq);
@@ -175,27 +176,27 @@ public sealed class Position : IPosition
     public BitBoard BlockersForKing(Player c)
         => State.BlockersForKing[c.Side];
 
-    public bool CanCastle(CastlelingRights cr)
-        => State.CastlelingRights.HasFlagFast(cr);
+    public bool CanCastle(CastleRight cr)
+        => State.CastlelingRights.Has(cr.Rights);
 
     public bool CanCastle(Player c)
     {
         var cr = (CastlelingRights)((int)(CastlelingRights.WhiteOo | CastlelingRights.WhiteOoo) << (2 * c.Side));
-        return State.CastlelingRights.HasFlagFast(cr);
+        return State.CastlelingRights.Has(cr);
     }
 
-    public bool CastlingImpeded(CastlelingRights cr)
+    public bool CastlingImpeded(CastleRight cr)
     {
-        Debug.Assert(cr is CastlelingRights.WhiteOo or CastlelingRights.WhiteOoo or CastlelingRights.BlackOo
+        Debug.Assert(cr.Rights is CastlelingRights.WhiteOo or CastlelingRights.WhiteOoo or CastlelingRights.BlackOo
             or CastlelingRights.BlackOoo);
-        return !(Board.Pieces() & _castlingPath[cr.AsInt()]).IsEmpty;
+        return !(Board.Pieces() & _castlingPath[cr.Rights.AsInt()]).IsEmpty;
     }
 
-    public Square CastlingRookSquare(CastlelingRights cr)
+    public Square CastlingRookSquare(CastleRight cr)
     {
-        Debug.Assert(cr is CastlelingRights.WhiteOo or CastlelingRights.WhiteOoo or CastlelingRights.BlackOo
+        Debug.Assert(cr.Rights is CastlelingRights.WhiteOo or CastlelingRights.WhiteOoo or CastlelingRights.BlackOo
             or CastlelingRights.BlackOoo);
-        return _castlingRookSquare[cr.AsInt()];
+        return _castlingRookSquare[cr.Rights.AsInt()];
     }
 
     public BitBoard CheckedSquares(PieceTypes pt)
@@ -248,31 +249,31 @@ public sealed class Position : IPosition
         }
 
         fen[length++] = ' ';
-        fen[length++] = _sideToMove.IsWhite ? 'w' : 'b';
+        fen[length++] = _sideToMove.Fen;
         fen[length++] = ' ';
 
         if (State.CastlelingRights == CastlelingRights.None)
             fen[length++] = '-';
         else
         {
-            if (CanCastle(CastlelingRights.WhiteOo))
+            if (CanCastle( CastleRight.WHITE_OO))
                 fen[length++] = ChessMode == ChessMode.Chess960
-                    ? CastlingRookSquare(CastlelingRights.WhiteOo).FileChar
+                    ? CastlingRookSquare(CastleRight.WHITE_OO).FileChar
                     : 'K';
 
-            if (CanCastle(CastlelingRights.WhiteOoo))
+            if (CanCastle( CastleRight.WHITE_OOO))
                 fen[length++] = ChessMode == ChessMode.Chess960
-                    ? CastlingRookSquare(CastlelingRights.WhiteOoo).FileChar
+                    ? CastlingRookSquare( CastleRight.WHITE_OOO).FileChar
                     : 'Q';
 
-            if (CanCastle(CastlelingRights.BlackOo))
+            if (CanCastle( CastleRight.BLACK_OO))
                 fen[length++] = ChessMode == ChessMode.Chess960
-                    ? CastlingRookSquare(CastlelingRights.BlackOo).FileChar
+                    ? CastlingRookSquare( CastleRight.BLACK_OOO).FileChar
                     : 'k';
 
-            if (CanCastle(CastlelingRights.BlackOoo))
+            if (CanCastle( CastleRight.BLACK_OOO))
                 fen[length++] = ChessMode == ChessMode.Chess960
-                    ? CastlingRookSquare(CastlelingRights.BlackOoo).FileChar
+                    ? CastlingRookSquare( CastleRight.BLACK_OOO).FileChar
                     : 'q';
         }
 
@@ -316,7 +317,7 @@ public sealed class Position : IPosition
     public BitBoard GetAttacks(Square sq, PieceTypes pt)
         => GetAttacks(sq, pt, Pieces());
 
-    public CastlelingRights GetCastlelingRightsMask(Square sq)
+    public CastleRight GetCastlelingRightsMask(Square sq)
         => _castlingRightsMask[sq.AsInt()];
 
     public IEnumerator<Piece> GetEnumerator()
@@ -614,7 +615,10 @@ public sealed class Position : IPosition
     }
 
     public void MakeMove(Move m, in State newState)
-        => MakeMove(m, newState, GivesCheck(m));
+    {
+        var givesCheck = GivesCheck(m);
+        MakeMove(m, newState, givesCheck);
+    }
 
     public void MakeMove(Move m, in State newState, bool givesCheck)
     {
@@ -706,10 +710,10 @@ public sealed class Position : IPosition
 
         // Update castling rights if needed
         if (State.CastlelingRights != CastlelingRights.None &&
-            (_castlingRightsMask[from.AsInt()] | _castlingRightsMask[to.AsInt()]) != 0)
+            (_castlingRightsMask[from.AsInt()] | _castlingRightsMask[to.AsInt()]) != CastleRight.NONE)
         {
             var cr = _castlingRightsMask[from.AsInt()] | _castlingRightsMask[to.AsInt()];
-            k ^= (State.CastlelingRights & cr).GetZobristCastleling();
+            k ^= (State.CastlelingRights & cr).Key();
             State.CastlelingRights &= ~cr;
         }
 
@@ -735,7 +739,7 @@ public sealed class Position : IPosition
                 Debug.Assert(promotionPiece.Type().InBetween(PieceTypes.Knight, PieceTypes.Queen));
 
                 RemovePiece(to);
-                AddPiece(in promotionPiece, in to);
+                AddPiece(promotionPiece, to);
 
                 // Update hash keys
                 k ^= pc.GetZobristPst(to) ^ promotionPiece.GetZobristPst(to);
@@ -1026,7 +1030,7 @@ public sealed class Position : IPosition
                 var square = new Square(r - 1, f - 1);
 
                 var pc = ((PieceTypes)pieceIndex).MakePiece(player);
-                AddPiece(in pc, in square);
+                AddPiece(pc, square);
 
                 f++;
             }
@@ -1139,7 +1143,7 @@ public sealed class Position : IPosition
 
             RemovePiece(to);
             pc = PieceTypes.Pawn.MakePiece(us);
-            AddPiece(in pc, in to);
+            AddPiece(pc, to);
         }
 
         if (m.IsCastlelingMove())
@@ -1166,7 +1170,7 @@ public sealed class Position : IPosition
                     Debug.Assert(!IsOccupied(captureSquare));
                 }
 
-                AddPiece(State.CapturedPiece, in captureSquare);
+                AddPiece(State.CapturedPiece, captureSquare);
             }
         }
 
@@ -1335,7 +1339,7 @@ public sealed class Position : IPosition
         if (_sideToMove.IsBlack)
             key ^= Zobrist.GetZobristSide();
 
-        key ^= State.CastlelingRights.GetZobristCastleling();
+        key ^= State.CastlelingRights.Key();
 
         var materialKey = HashKey.Empty;
         foreach (var pc in Piece.AllPieces)
@@ -1351,28 +1355,34 @@ public sealed class Position : IPosition
     {
         foreach (var ca in castleling)
         {
-            var c = char.IsLower(ca) ? Player.Black : Player.White;
+            Player c = char.IsLower(ca);
             var rook = PieceTypes.Rook.MakePiece(c);
             var token = char.ToUpper(ca);
 
             Square rsq;
+
+            Square RookSquare(Square startSq)
+            {
+                for (rsq = startSq; GetPiece(rsq) != rook; --rsq)
+                {
+                }
+
+                return rsq;
+            }
+
             switch (token)
             {
                 case 'K':
-                    for (rsq = Types.Squares.h1.RelativeSquare(c); GetPiece(rsq) != rook; --rsq)
-                    {
-                    }
+                    rsq = RookSquare(Types.Squares.h1.RelativeSquare(c));
 
                     break;
                 case 'Q':
-                    for (rsq = Types.Squares.a1.RelativeSquare(c); GetPiece(rsq) != rook; --rsq)
-                    {
-                    }
+                    rsq = RookSquare(Types.Squares.a1.RelativeSquare(c));
 
                     break;
                 default:
                     if (token.InBetween('A', 'H'))
-                        rsq = new Square(Ranks.Rank1.RelativeRank(c), new File(token - 'A'));
+                        rsq = new Square(Rank.RANK_1.RelativeRank(c), new File(token - 'A'));
                     else
                         continue;
                     break;

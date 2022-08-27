@@ -31,17 +31,14 @@ using Rudz.Chess.Types;
 
 namespace Rudz.Chess.Notation.Notations;
 
-public sealed class CoordinateNotation : INotation
+public sealed class CoordinateNotation : Notation
 {
-    private readonly IPosition _pos;
-
-    public CoordinateNotation(IPosition pos)
+    public CoordinateNotation(IPosition pos) : base(pos)
     {
-        _pos = pos;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public string Convert(Move move)
+    public override string Convert(Move move)
     {
         var (from, to) = move.FromTo();
 

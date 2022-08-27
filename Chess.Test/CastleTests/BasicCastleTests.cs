@@ -28,6 +28,7 @@ using Rudz.Chess;
 using Rudz.Chess.Enums;
 using Rudz.Chess.Factories;
 using Rudz.Chess.Fen;
+using Rudz.Chess.Types;
 using Xunit;
 
 namespace Chess.Test.CastleTests;

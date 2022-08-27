@@ -54,7 +54,7 @@ public interface IGame : IEnumerable<Piece>
 
     string ToString();
 
-    BitBoard OccupiedBySide(in Player c);
+    BitBoard OccupiedBySide(Player c);
 
     Player CurrentPlayer();
 

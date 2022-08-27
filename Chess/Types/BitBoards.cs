@@ -343,7 +343,7 @@ public static class BitBoards
         return attacks ^ square.RookAttacks(occupied ^ blockers);
     }
 
-    public static BitBoard XrayAttacks(this in Square square, PieceTypes pieceType, in BitBoard occupied, in BitBoard blockers)
+    public static BitBoard XrayAttacks(this Square square, PieceTypes pieceType, in BitBoard occupied, in BitBoard blockers)
     {
         return pieceType switch
         {
@@ -370,7 +370,7 @@ public static class BitBoards
     /// <param name="side">The player side</param>
     /// <returns>ref to bitboard of attack</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard PawnAttack(this in Square @this, in Player side)
+    public static BitBoard PawnAttack(this Square @this, Player side)
         => PseudoAttacksBB[side.Side][@this.AsInt()];
 
     /// <summary>
@@ -534,13 +534,22 @@ public static class BitBoards
     }
 
     /// <summary>
-    /// Retrieves the least significant bit in a ulong word.
+    /// Retrieves the least significant bit in an ulong word.
     /// </summary>
     /// <param name="bb">The word to get lsb from</param>
     /// <returns>The index of the found bit</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Square Lsb(this in BitBoard bb)
         => BitOperations.TrailingZeroCount(bb.Value);
+
+    /// <summary>
+    /// Retrieves the least significant bit in an int word.
+    /// </summary>
+    /// <param name="v">The word to get lsb from</param>
+    /// <returns>The index of the found bit</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static int Lsb(this int v)
+        => BitOperations.TrailingZeroCount(v);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Square Msb(this in BitBoard bb)
@@ -634,11 +643,27 @@ public static class BitBoards
     public static void ResetLsb(ref BitBoard bb)
         => bb &= bb - 1;
 
+    /// <summary>
+    /// Reset the least significant bit in-place
+    /// </summary>
+    /// <param name="v">The integer as reference</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void ResetLsb(ref int v)
+        => v &= v - 1;
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Square PopLsb(ref BitBoard bb)
     {
         var sq = bb.Lsb();
         ResetLsb(ref bb);
+        return sq;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static int PopLsb(ref int v)
+    {
+        var sq = v.Lsb();
+        ResetLsb(ref v);
         return sq;
     }
 
@@ -652,11 +677,11 @@ public static class BitBoards
         => BitOperations.PopCount(bb.Value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard Rank7(this in Player player)
+    public static BitBoard Rank7(this Player player)
         => Rank7BitBoards[player.Side];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard Rank3(this in Player player)
+    public static BitBoard Rank3(this Player player)
         => Rank3BitBoards[player.Side];
 
     /// <summary>
@@ -691,7 +716,7 @@ public static class BitBoards
     /// <param name="bb">The bitboard to set</param>
     /// <returns>true if more than one bit set, otherwise false</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool MoreThanOne(BitBoard bb) => (bb.Value & (bb.Value - 1)) != 0;
+    public static bool MoreThanOne(in BitBoard bb) => (bb.Value & (bb.Value - 1)) != 0;
 
     /// <summary>
     /// Helper method to generate shift function dictionary for all directions.

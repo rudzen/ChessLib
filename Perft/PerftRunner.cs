@@ -223,7 +223,7 @@ public sealed class PerftRunner : IPerftRunner
             _log.Information("Depth       : {0}", depth);
             sw.Restart();
 
-            var perftResult = _perft.DoPerftAsync(depth);
+            var perftResult = await _perft.DoPerftAsync(depth).ConfigureAwait(false);
             sw.Stop();
 
             var elapsedMs = sw.ElapsedMilliseconds;

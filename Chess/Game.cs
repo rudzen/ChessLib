@@ -114,7 +114,7 @@ public sealed class Game : IGame
         => Pos.GetEnumerator();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public BitBoard OccupiedBySide(in Player c)
+    public BitBoard OccupiedBySide(Player c)
         => Pos.Pieces(c);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -125,16 +125,15 @@ public sealed class Game : IGame
         var ml = _moveLists.Get();
         ml.Generate(Pos);
 
-        ulong tot = 0;
-
         if (depth == 1)
         {
-            tot = (ulong)ml.Count;
+            var res = ml.Count;
             _moveLists.Return(ml);
-            return tot;
+            return (ulong)res;
         }
 
         var state = new State();
+        ulong tot = 0;
 
         foreach (var move in ml.Select(static em => em.Move))
         {

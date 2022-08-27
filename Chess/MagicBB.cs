@@ -125,7 +125,7 @@ public static class MagicBB
             for (var temp = ulong.MinValue; temp < One << numSquares; ++temp)
             {
                 var occ = InitMagicMovesOccupancy(squares[..numSquares], in temp);
-                MagicBishopDb[i][(occ * BishopMagics[i]) >> 55] = InitmagicmovesBmoves(i, occ);
+                MagicBishopDb[i][(occ * BishopMagics[i]) >> 55] = InitmagicmovesBmoves(i, in occ);
             }
         }
 
@@ -135,7 +135,7 @@ public static class MagicBB
             for (var temp = ulong.MinValue; temp < One << numSquares; ++temp)
             {
                 var occ = InitMagicMovesOccupancy(squares[..numSquares], in temp);
-                MagicRookDb[i][(occ * RookMagics[i]) >> 52] = InitmagicmovesRmoves(i, occ);
+                MagicRookDb[i][(occ * RookMagics[i]) >> 52] = InitmagicmovesRmoves(i, in occ);
             }
         }
     }
@@ -172,7 +172,7 @@ public static class MagicBB
     public static BitBoard QueenAttacks(this Square square, BitBoard occupied)
         => BishopAttacks(square, occupied) | RookAttacks(square, occupied);
 
-    private static ulong InitmagicmovesRmoves(int square, ulong occ)
+    private static ulong InitmagicmovesRmoves(int square, in ulong occ)
     {
         var ret = ulong.MinValue;
         var rowBits = Ff << (8 * (square / 8));
@@ -218,7 +218,7 @@ public static class MagicBB
         return ret;
     }
 
-    private static ulong InitmagicmovesBmoves(int square, ulong occ)
+    private static ulong InitmagicmovesBmoves(int square, in ulong occ)
     {
         var ret = ulong.MinValue;
         var rowBits = Ff << (8 * (square / 8));

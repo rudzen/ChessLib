@@ -201,14 +201,13 @@ public sealed class PositionValidator : IPositionValidator
         return error;
     }
 
-    private string ValidatePieceCount(string error)
-    {
-        return (from pc in Piece.AllPieces
-            let pt = pc.Type()
-            let c = pc.ColorOf()
-            where _board.PieceCount(pt, c) != _board.Pieces(c, pt).Count
-            select pc).Aggregate(error, static (current, pc) => AddError(current, $"piece count does not match for piece {pc}"));
-    }
+    private string ValidatePieceCount(string error) =>
+        Piece.AllPieces
+            .Select(static pc => new { pc, pt = pc.Type() })
+            .Select(static t => new { t, c = t.pc.ColorOf() })
+            .Where(t => _board.PieceCount(t.t.pt, t.c) != _board.Pieces(t.c, t.t.pt).Count)
+            .Select(static t => t.t.pc)
+            .Aggregate(error, static (current, pc) => AddError(current, $"piece count does not match for piece {pc}"));
 
     private string ValidatePieceTypes(string error)
     {
@@ -245,7 +244,7 @@ public sealed class PositionValidator : IPositionValidator
         }
 
         if (state.Key.Key == 0 && !_board.Pieces().IsEmpty)
-            error = AddError(error, "state key is no valid");
+            error = AddError(error, "state key is invalid");
 
         if (_board.Pieces(_pos.SideToMove, PieceTypes.Pawn).IsEmpty &&
             state.PawnStructureKey.Key != Zobrist.ZobristNoPawn)

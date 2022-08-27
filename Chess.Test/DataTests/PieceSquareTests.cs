@@ -44,22 +44,26 @@ public sealed class PieceSquareTests
     [Fact]
     public void GetPiece()
     {
-        var expectedPiece = Piece.BlackKnight;
-        var ps = new PieceSquareEventArgs(expectedPiece, Square.None);
+        const Pieces expected = Pieces.BlackKnight;
+        var ps = new PieceSquareEventArgs(expected, Square.None);
         var actual = ps.Piece;
+        var expectedPiece = new Piece(expected);
         Assert.Equal(expectedPiece, actual);
     }
 
     [Fact]
     public void GetPieceAndSquare()
     {
-        foreach (var expectedPiece in Piece.AllPieces)
-        foreach (var sq in BitBoards.AllSquares)
+        for (var pc = Pieces.NoPiece; pc < Pieces.PieceNb; ++pc)
         {
-            var expectedSquare = new Square(sq);
-            var ps = new PieceSquareEventArgs(expectedPiece, expectedSquare);
-            Assert.Equal(expectedPiece, ps.Piece);
-            Assert.Equal(expectedSquare, sq);
+            var expectedPiece = new Piece(pc);
+            foreach (var sq in BitBoards.AllSquares)
+            {
+                var expectedSquare = new Square(sq);
+                var ps = new PieceSquareEventArgs(expectedPiece, expectedSquare);
+                Assert.Equal(expectedPiece, ps.Piece);
+                Assert.Equal(expectedSquare, sq);
+            }
         }
     }
 }
