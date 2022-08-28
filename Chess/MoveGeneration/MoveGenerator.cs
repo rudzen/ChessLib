@@ -414,7 +414,7 @@ public static class MoveGenerator
         if (pos.EnPassantSquare == Square.None)
             return index;
 
-        Debug.Assert(pos.EnPassantSquare.Rank == Ranks.Rank6.RelativeRank(us));
+        Debug.Assert(pos.EnPassantSquare.Rank == Rank.RANK_6.Relative(us));
 
         // An en passant capture can be an evasion only if the checking piece is the double
         // pushed pawn and so is in the target. Otherwise this is a discovery check and we are

@@ -25,7 +25,6 @@ SOFTWARE.
 */
 
 using System;
-using FluentAssertions;
 using Rudz.Chess.Factories;
 using Rudz.Chess.Protocol.UCI;
 using Rudz.Chess.Types;
@@ -47,14 +46,14 @@ public sealed class UciTests
 
         var actual = uci.Nps(nodes, ts);
 
-        actual.Should().Be(expected);
+        Assert.Equal(expected, actual);
     }
 
     [Fact]
     public void MoveFromUciBasic()
     {
         const string uciMove = "a2a3";
-        var expected = new Move(Squares.a2, Squares.a3);
+        var expected = Move.Create(Square.A2, Square.A3);
         var uci = new Uci();
 
         var game = GameFactory.Create();

@@ -70,7 +70,7 @@ public class PolyglotTests
 
         book.FileName.Should().NotBeNull();
 
-        var expected = Move.Create(Squares.d2, Squares.d4);
+        var expected = Move.Create(Square.D2, Square.D4);
         var actual = book.Probe();
 
         Assert.False(actual.IsNullMove());

@@ -62,7 +62,7 @@ public static class SquaresExtensions
 /// <summary>
 /// Square data struct. Contains a single enum value which represents a square on the board.
 /// </summary>
-public readonly struct Square : IComparable<Square>
+public readonly struct Square : IComparable<Square>, IEquatable<Square>
 {
     private static readonly string[] SquareStrings = Enum
         .GetValues(typeof(Squares))
@@ -118,7 +118,7 @@ public readonly struct Square : IComparable<Square>
         => AsInt() & 7;
 
     public char FileChar
-        => File.FileChar();
+        => File.Char;
 
     public (Rank, File) RankFile
         => (Rank, File);
@@ -358,18 +358,23 @@ public readonly struct Square : IComparable<Square>
     public override int GetHashCode()
         => AsInt();
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public int AsInt()
         => (int)Value;
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public BitBoard AsBb()
         => BitBoards.BbSquares[AsInt()];
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Rank RelativeRank(Player color)
         => Rank.Relative(color);
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool IsOppositeColor(Square other)
         => ((Value.AsInt() + Rank.AsInt() + (int)other.Value + other.Rank.AsInt()) & 1) != 0;
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public int CompareTo(Square other)
         => Value.CompareTo(other.Value);
 }

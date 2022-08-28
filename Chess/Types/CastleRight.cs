@@ -79,50 +79,43 @@ public static class CastlelingExtensions
         => @this & ~remove;
 }
 
-public readonly struct CastleRight : IEnumerable<CastlelingRights>, IEquatable<CastleRight>
+public readonly struct CastleRight : IEquatable<CastleRight>
 {
-    private CastleRight(CastlelingRights cr) => Rights = cr;
+    private CastleRight(CastlelingRights cr)
+        => Rights = cr;
 
-    private CastleRight(int cr) => Rights = (CastlelingRights)cr;
+    private CastleRight(int cr)
+        => Rights = (CastlelingRights)cr;
 
     public CastlelingRights Rights { get; }
 
-    public bool None => Rights == CastlelingRights.None;
+    public bool IsNone => Rights == CastlelingRights.None;
 
-    public static CastleRight NONE = new(CastlelingRights.None);
+    public static CastleRight NONE { get; } = new(CastlelingRights.None);
 
-    public static CastleRight WHITE_OO = new(CastlelingRights.WhiteOo);
+    public static CastleRight WHITE_OO { get; } = new(CastlelingRights.WhiteOo);
 
-    public static CastleRight BLACK_OO = new(CastlelingRights.BlackOo);
+    public static CastleRight BLACK_OO { get; } = new(CastlelingRights.BlackOo);
 
-    public static CastleRight WHITE_OOO = new(CastlelingRights.WhiteOoo);
+    public static CastleRight WHITE_OOO { get; } = new(CastlelingRights.WhiteOoo);
 
-    public static CastleRight BLACK_OOO = new(CastlelingRights.BlackOoo);
+    public static CastleRight BLACK_OOO { get; } = new(CastlelingRights.BlackOoo);
 
-    public static CastleRight KING_SIDE = new(CastlelingRights.KingSide);
+    public static CastleRight KING_SIDE { get; } = new(CastlelingRights.KingSide);
 
-    public static CastleRight QUEEN_SIDE = new(CastlelingRights.QueenSide);
+    public static CastleRight QUEEN_SIDE { get; } = new(CastlelingRights.QueenSide);
 
-    public static CastleRight WHITE_CASTLELING = new(CastlelingRights.WhiteCastleling);
+    public static CastleRight WHITE_CASTLELING { get; } = new(CastlelingRights.WhiteCastleling);
 
-    public static CastleRight BLACK_CASTLELING = new(CastlelingRights.BlackCastleling);
+    public static CastleRight BLACK_CASTLELING  { get; }= new(CastlelingRights.BlackCastleling);
 
-    public static CastleRight ANY = new(CastlelingRights.Any);
+    public static CastleRight ANY { get; } = new(CastlelingRights.Any);
 
-    public static implicit operator CastleRight(CastlelingRights cr) => new(cr);
+    public static implicit operator CastleRight(CastlelingRights cr)
+        => new(cr);
 
     public bool Equals(CastleRight other)
         => Rights == other.Rights;
-
-    public IEnumerator<CastlelingRights> GetEnumerator()
-    {
-        if (None)
-            yield break;
-
-        var cr = (int)Rights;
-        while (cr != 0)
-            yield return (CastlelingRights)BitBoards.PopLsb(ref cr);
-    }
 
     public override bool Equals(object obj)
         => obj is CastleRight other && Equals(other);
@@ -130,33 +123,44 @@ public readonly struct CastleRight : IEnumerable<CastlelingRights>, IEquatable<C
     public override int GetHashCode()
         => (int)Rights;
 
-    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+    public static bool operator ==(CastleRight cr1, CastleRight cr2)
+        => cr1.Rights == cr2.Rights;
 
-    public static bool operator ==(CastleRight cr1, CastleRight cr2) => cr1.Rights == cr2.Rights;
+    public static bool operator !=(CastleRight cr1, CastleRight cr2)
+        => cr1.Rights != cr2.Rights;
 
-    public static bool operator !=(CastleRight cr1, CastleRight cr2) => cr1.Rights != cr2.Rights;
+    public static bool operator true(CastleRight cr)
+        => cr.Rights != CastlelingRights.None;
 
-    public static bool operator true(CastleRight cr) => cr.Rights != CastlelingRights.None;
+    public static bool operator false(CastleRight cr)
+        => cr.Rights == CastlelingRights.None;
 
-    public static bool operator false(CastleRight cr) => cr.Rights == CastlelingRights.None;
+    public static CastleRight operator |(CastleRight cr1, CastleRight cr2)
+        => cr1.Rights | cr2.Rights;
 
-    public static CastleRight operator |(CastleRight cr1, CastleRight cr2) => cr1.Rights | cr2.Rights;
+    public static CastleRight operator |(CastleRight cr1, CastlelingRights cr2)
+        => cr1.Rights | cr2;
 
-    public static CastleRight operator |(CastleRight cr1, CastlelingRights cr2) => cr1.Rights | cr2;
+    public static CastleRight operator ^(CastleRight cr1, CastleRight cr2)
+        => cr1.Rights ^ cr2.Rights;
 
-    public static CastleRight operator ^(CastleRight cr1, CastleRight cr2) => cr1.Rights ^ cr2.Rights;
+    public static CastleRight operator ^(CastleRight cr1, CastlelingRights cr2)
+        => cr1.Rights ^ cr2;
 
-    public static CastleRight operator ^(CastleRight cr1, CastlelingRights cr2) => cr1.Rights ^ cr2;
+    public static CastleRight operator &(CastleRight cr1, CastleRight cr2)
+        => cr1.Rights & cr2.Rights;
 
-    public static CastleRight operator &(CastleRight cr1, CastleRight cr2) => cr1.Rights & cr2.Rights;
+    public static CastleRight operator &(CastleRight cr1, CastlelingRights cr2)
+        => cr1.Rights & cr2;
 
-    public static CastleRight operator &(CastleRight cr1, CastlelingRights cr2) => cr1.Rights & cr2;
+    public static CastleRight operator ~(CastleRight cr)
+        => ~cr.Rights;
 
-    public static CastleRight operator ~(CastleRight cr) => ~cr.Rights;
+    public HashKey Key()
+        => Rights.GetZobristCastleling();
 
-    public HashKey Key() => Rights.GetZobristCastleling();
-
-    public bool Has(CastlelingRights cr) => Rights.HasFlagFast(cr);
+    public bool Has(CastlelingRights cr)
+        => Rights.HasFlagFast(cr);
 
     public CastleRight Not(CastlelingRights cr)
         => Rights & ~cr;

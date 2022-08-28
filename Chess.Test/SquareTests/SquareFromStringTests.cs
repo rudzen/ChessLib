@@ -28,7 +28,7 @@ using Rudz.Chess.Types;
 
 namespace Chess.Test.SquareTests;
 
-public class SquareFromStringTests
+public sealed class SquareFromStringTests
 {
     [Fact]
     public void SquareFromStringIsValid()

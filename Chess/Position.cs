@@ -580,7 +580,7 @@ public sealed class Position : IPosition
             if ((from.PawnAttack(us) & Pieces(~us) & to).IsEmpty // Not a capture
                 && !(from + us.PawnPushDistance() == to && !IsOccupied(to)) // Not a single push
                 && !(from + us.PawnDoublePushDistance() == to // Not a double push
-                     && from.Rank == Ranks.Rank2.RelativeRank(us)
+                     && from.Rank == Rank.RANK_2.Relative(us)
                      && !IsOccupied(to)
                      && !IsOccupied(to - us.PawnPushDistance())))
                 return false;

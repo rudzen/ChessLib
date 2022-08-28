@@ -634,9 +634,9 @@ public static class BitBoards
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int PopLsb(ref int v)
     {
-        var sq = v.Lsb();
+        var i = v.Lsb();
         ResetLsb(ref v);
-        return sq;
+        return i;
     }
 
     /// <summary>

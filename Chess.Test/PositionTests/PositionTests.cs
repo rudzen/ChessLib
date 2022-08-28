@@ -24,7 +24,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using FluentAssertions;
 using Rudz.Chess;
 using Rudz.Chess.Factories;
 using Rudz.Chess.Types;
@@ -40,10 +39,10 @@ public sealed class PositionTests
         var board = new Board();
         var position = new Position(board, pieceValue);
 
-        position.AddPiece(Pieces.WhiteKing, Squares.a7);
+        position.AddPiece(Pieces.WhiteKing, Square.A7);
         var pieces = position.Pieces();
         var square = pieces.Lsb();
-        square.Value.Should().Be(Squares.a7);
+        Assert.Equal(square, Square.A7);
 
         var piece = position.GetPiece(square);
         Assert.Equal(Pieces.WhiteKing, piece.Value);
@@ -57,10 +56,10 @@ public sealed class PositionTests
         board = new Board();
         position = new Position(board, pieceValue);
 
-        position.AddPiece(PieceTypes.Knight.MakePiece(Player.Black), Squares.d5);
+        position.AddPiece(PieceTypes.Knight.MakePiece(Player.Black), Square.D5);
         pieces = position.Pieces();
         square = pieces.Lsb();
-        Assert.Equal(Squares.d5, square.Value);
+        Assert.Equal(Square.D5, square.Value);
 
         piece = position.GetPiece(square);
         Assert.Equal(Pieces.BlackKnight, piece.Value);
@@ -83,7 +82,7 @@ public sealed class PositionTests
         // b must contain one square at this point
         var pinnedCount = b.Count;
 
-        pinnedCount.Should().Be(expected);
+        Assert.Equal(expected, pinnedCount);
 
         // test for correct square
         var actual = b.Lsb();

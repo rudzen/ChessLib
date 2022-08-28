@@ -35,8 +35,8 @@ public sealed class SquareTests
     {
         const bool expected = true;
 
-        var sq1 = new Square(Squares.a1);
-        var sq2 = new Square(Squares.a2);
+        var sq1 = Square.A1;
+        var sq2 = Square.A2;
 
         var actual = sq1.IsOppositeColor(sq2);
 
@@ -48,8 +48,8 @@ public sealed class SquareTests
     {
         const bool expected = false;
 
-        var sq1 = new Square(Squares.a1);
-        var sq2 = new Square(Squares.a3);
+        var sq1 = Square.A1;
+        var sq2 = Square.A3;
 
         var actual = sq1.IsOppositeColor(sq2);
 
@@ -61,7 +61,7 @@ public sealed class SquareTests
     {
         const Squares expected = Squares.h8;
 
-        var s = new Square(Ranks.Rank1, Files.FileH);
+        var s = new Square(Rank.RANK_1, File.FILE_H);
 
         var actual = s.Relative(Player.Black);
 
@@ -73,7 +73,7 @@ public sealed class SquareTests
     {
         const Squares expected = Squares.c3;
 
-        var s = new Square(Ranks.Rank3, Files.FileC);
+        var s = new Square(Rank.RANK_3,  File.FILE_C);
 
         var actual = s.Relative(Player.White);
 
