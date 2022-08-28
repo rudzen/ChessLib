@@ -24,7 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System.Text;
+using System;
 using Rudz.Chess.Types;
 using Xunit;
 
@@ -35,17 +35,14 @@ public sealed class DataTests
     [Fact]
     public void SquareChars()
     {
-        var chars = new StringBuilder(1024);
-        var strings = new StringBuilder(1024);
-
-        for (Square sq = Squares.a1; sq; ++sq)
+        Span<char> c = stackalloc char[2];
+        var all = BitBoards.AllSquares;
+        while (all)
         {
-            chars.Clear();
-            strings.Clear();
-            chars.Append(sq.FileChar);
-            chars.Append(sq.RankChar);
-            strings.Append(sq.ToString());
-            Assert.Equal(chars.ToString(), strings.ToString());
+            var sq = BitBoards.PopLsb(ref all);
+            c[0] = sq.FileChar;
+            c[1] = sq.RankChar;
+            Assert.Equal(sq.ToString(), new string(c));
         }
     }
 }

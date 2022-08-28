@@ -183,5 +183,5 @@ public readonly struct Rank : IEquatable<Rank>
 
     public override int GetHashCode() => AsInt();
 
-    public Rank RelativeRank(Player color) => AsInt() ^ (color.Side * 7);
+    public Rank Relative(Player color) => AsInt() ^ (color.Side * 7);
 }

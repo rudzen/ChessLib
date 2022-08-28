@@ -82,7 +82,7 @@ public sealed class TranspositionTable : ITranspositionTable
         var size = (int)(((ulong)mbSize << 20) / (ulong)ClusterSize);
         var resize = false;
         var currentSize = _table.Length;
-        if (!_table.Any())
+        if (_table.Length == 0)
         {
             _table = new ITTCluster[size];
             PopulateTable(0, size);

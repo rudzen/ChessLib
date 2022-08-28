@@ -65,6 +65,6 @@ public sealed class FoolsCheckMateTests
         var resultingMoves = position.GenerateMoves();
 
         // verify that no legal moves actually exists.
-        Assert.True(!resultingMoves.Any());
+        Assert.True(resultingMoves.Length == 0);
     }
 }

@@ -38,11 +38,7 @@ public sealed class BitboardDataTests
     {
         const bool expected = true;
 
-        const Squares sq1 = Squares.a1;
-        const Squares sq2 = Squares.a2;
-        const Squares sq3 = Squares.a3;
-
-        var actual = BitBoards.Aligned(sq1, sq2, sq3);
+        var actual = Square.A1.Aligned(Square.A2, Square.A3);
 
         Assert.Equal(expected, actual);
     }

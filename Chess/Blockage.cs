@@ -103,7 +103,7 @@ public sealed class Blockage : IBlockage
 
         var ourKsq = _pos.GetKingSquare(_us);
 
-        if (ourKsq.Rank.RelativeRank(_us) > _fenceRank[ourKsq.File.AsInt()].RelativeRank(_us))
+        if (ourKsq.Rank.Relative(_us) > _fenceRank[ourKsq.File.AsInt()].Relative(_us))
             return false;
 
         var theirKsq = _pos.GetKingSquare(_them);
@@ -118,7 +118,7 @@ public sealed class Blockage : IBlockage
             if (r > _fenceRank[f.AsInt()])
             {
                 if ((_theirPawns & sq.PassedPawnFrontAttackSpan(_us)).IsEmpty &&
-                    (theirKsq.File != f || theirKsq.Rank.RelativeRank(_us) < rr))
+                    (theirKsq.File != f || theirKsq.Rank.Relative(_us) < rr))
                     return false;
             }
             else if (_fence & sq)
@@ -128,7 +128,7 @@ public sealed class Blockage : IBlockage
 
                 if (_pos.GetPiece(sq + _us.PawnDoublePushDistance()) != _theirPawn)
                 {
-                    if (theirKsq.File != f || theirKsq.Rank.RelativeRank(_us) < rr)
+                    if (theirKsq.File != f || theirKsq.Rank.Relative(_us) < rr)
                         return false;
 
                     if (f != File.FILE_A)
@@ -194,7 +194,7 @@ public sealed class Blockage : IBlockage
 
                 if ((_theirPawns & (sq + _us.PawnDoublePushDistance())).IsEmpty)
                 {
-                    if (theirKsq.File != f || theirKsq.Rank.RelativeRank(_us) < rr)
+                    if (theirKsq.File != f || theirKsq.Rank.Relative(_us) < rr)
                         return false;
 
                     if (f != File.FILE_A)

@@ -27,6 +27,7 @@ SOFTWARE.
 using System;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using Rudz.Chess.Extensions;
 
 namespace Rudz.Chess.Types;
 
@@ -78,26 +79,34 @@ public readonly struct Square : IComparable<Square>
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Square(int rank, int file)
-        : this((Squares)(rank << 3) + file) { }
+        : this((Squares)(rank << 3) + file)
+    {
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Square(Ranks rank, Files file)
-        : this((int)rank, (int)file) { }
+        : this((int)rank, (int)file)
+    {
+    }
 
     public Square(Rank rank, File file)
-        : this(rank.AsInt(), file.AsInt()) { }
+        : this(rank.AsInt(), file.AsInt())
+    {
+    }
 
     public Square((Rank, File) rankFile)
-        : this(rankFile.Item1, rankFile.Item2) { }
+        : this(rankFile.Item1, rankFile.Item2)
+    {
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private Square(Squares square) => Value = square;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator Square(string value)
-    => new(new Square(value[1] - '1', value[0] - 'a'));
+        => new(new Square(value[1] - '1', value[0] - 'a'));
 
-    public readonly Squares Value;
+    public Squares Value { get; }
 
     public Rank Rank
         => (Ranks)(AsInt() >> 3);
@@ -115,7 +124,7 @@ public readonly struct Square : IComparable<Square>
         => (Rank, File);
 
     public bool IsOk
-        => Value >= Squares.a1 && Value <= Squares.h8;
+        => ((int)Value).InBetween((int)Squares.a1, (int)Squares.h8);
 
     public bool IsPromotionRank
         => !(BitBoards.PromotionRanksBB & this).IsEmpty;
@@ -123,9 +132,81 @@ public readonly struct Square : IComparable<Square>
     public bool IsDark
         => !(BitBoards.DarkSquares & this).IsEmpty;
 
-    public static readonly Square None = new(Squares.none);
+    public static Square None { get; } = new(Squares.none);
 
-    public static int Count => 64;
+    public static Square A1 { get; } = new(Squares.a1);
+    public static Square B1 { get; } = new(Squares.b1);
+    public static Square C1 { get; } = new(Squares.c1);
+    public static Square D1 { get; } = new(Squares.d1);
+    public static Square E1 { get; } = new(Squares.e1);
+    public static Square F1 { get; } = new(Squares.f1);
+    public static Square G1 { get; } = new(Squares.g1);
+    public static Square H1 { get; } = new(Squares.h1);
+
+    public static Square A2 { get; } = new(Squares.a2);
+    public static Square B2 { get; } = new(Squares.b2);
+    public static Square C2 { get; } = new(Squares.c2);
+    public static Square D2 { get; } = new(Squares.d2);
+    public static Square E2 { get; } = new(Squares.e2);
+    public static Square F2 { get; } = new(Squares.f2);
+    public static Square G2 { get; } = new(Squares.g2);
+    public static Square H2 { get; } = new(Squares.h2);
+
+    public static Square A3 { get; } = new(Squares.a3);
+    public static Square B3 { get; } = new(Squares.b3);
+    public static Square C3 { get; } = new(Squares.c3);
+    public static Square D3 { get; } = new(Squares.d3);
+    public static Square E3 { get; } = new(Squares.e3);
+    public static Square F3 { get; } = new(Squares.f3);
+    public static Square G3 { get; } = new(Squares.g3);
+    public static Square H3 { get; } = new(Squares.h3);
+
+    public static Square A4 { get; } = new(Squares.a4);
+    public static Square B4 { get; } = new(Squares.b4);
+    public static Square C4 { get; } = new(Squares.c4);
+    public static Square D4 { get; } = new(Squares.d4);
+    public static Square E4 { get; } = new(Squares.e4);
+    public static Square F4 { get; } = new(Squares.f4);
+    public static Square G4 { get; } = new(Squares.g4);
+    public static Square H4 { get; } = new(Squares.h4);
+
+    public static Square A5 { get; } = new(Squares.a5);
+    public static Square B5 { get; } = new(Squares.b5);
+    public static Square C5 { get; } = new(Squares.c5);
+    public static Square D5 { get; } = new(Squares.d5);
+    public static Square E5 { get; } = new(Squares.e5);
+    public static Square F5 { get; } = new(Squares.f5);
+    public static Square G5 { get; } = new(Squares.g5);
+    public static Square H5 { get; } = new(Squares.h5);
+
+    public static Square A6 { get; } = new(Squares.a6);
+    public static Square B6 { get; } = new(Squares.b6);
+    public static Square C6 { get; } = new(Squares.c6);
+    public static Square D6 { get; } = new(Squares.d6);
+    public static Square E6 { get; } = new(Squares.e6);
+    public static Square F6 { get; } = new(Squares.f6);
+    public static Square G6 { get; } = new(Squares.g6);
+    public static Square H6 { get; } = new(Squares.h6);
+
+    public static Square A7 { get; } = new(Squares.a7);
+    public static Square B7 { get; } = new(Squares.b7);
+    public static Square C7 { get; } = new(Squares.c7);
+    public static Square D7 { get; } = new(Squares.d7);
+    public static Square E7 { get; } = new(Squares.e7);
+    public static Square F7 { get; } = new(Squares.f7);
+    public static Square G7 { get; } = new(Squares.g7);
+    public static Square H7 { get; } = new(Squares.h7);
+
+    public static Square A8 { get; } = new(Squares.a8);
+    public static Square B8 { get; } = new(Squares.b8);
+    public static Square C8 { get; } = new(Squares.c8);
+    public static Square D8 { get; } = new(Squares.d8);
+    public static Square E8 { get; } = new(Squares.e8);
+    public static Square F8 { get; } = new(Squares.f8);
+    public static Square G8 { get; } = new(Squares.g8);
+    public static Square H8 { get; } = new(Squares.h8);
+
+    public static int Count { get; } = 64;
 
     public static Square Make(Rank r, File f) => new(r, f);
 
@@ -222,7 +303,7 @@ public readonly struct Square : IComparable<Square>
         => ~left.AsBb();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static int operator >>(Square left, int right)
+    public static int operator >> (Square left, int right)
         => left.AsInt() >> right;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -284,7 +365,7 @@ public readonly struct Square : IComparable<Square>
         => BitBoards.BbSquares[AsInt()];
 
     public Rank RelativeRank(Player color)
-        => Rank.RelativeRank(color);
+        => Rank.Relative(color);
 
     public bool IsOppositeColor(Square other)
         => ((Value.AsInt() + Rank.AsInt() + (int)other.Value + other.Rank.AsInt()) & 1) != 0;

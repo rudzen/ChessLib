@@ -199,10 +199,10 @@ public static class BitBoards
         for (var i = 0; i < SquareDistance.Length; i++)
             DistanceRingBB[i] = new BitBoard[8];
 
-        CornerA1 = MakeBitboard(Squares.a1, Squares.b1, Squares.a2, Squares.b2);
-        CornerA8 = MakeBitboard(Squares.a8, Squares.b8, Squares.a7, Squares.b7);
-        CornerH1 = MakeBitboard(Squares.h1, Squares.g1, Squares.h2, Squares.g2);
-        CornerH8 = MakeBitboard(Squares.h8, Squares.g8, Squares.h7, Squares.g7);
+        CornerA1 = MakeBitboard(Square.A1, Square.B1, Square.A2, Square.B2);
+        CornerA8 = MakeBitboard(Square.A8, Square.B8, Square.A7, Square.B7);
+        CornerH1 = MakeBitboard(Square.H1, Square.G1, Square.H2, Square.G2);
+        CornerH8 = MakeBitboard(Square.H8, Square.G8, Square.H7, Square.G7);
 
         // local helper functions to calculate distance
         static int distance(int x, int y) => Math.Abs(x - y);
@@ -326,34 +326,6 @@ public static class BitBoards
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static BitBoard PseudoAttacks(this PieceTypes pt, Square sq)
         => PseudoAttacksBB[pt.AsInt()][sq.AsInt()];
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard XrayBishopAttacks(this Square square, in BitBoard occupied, BitBoard blockers)
-    {
-        var attacks = square.BishopAttacks(occupied);
-        blockers &= attacks;
-        return attacks ^ square.BishopAttacks(occupied ^ blockers);
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard XrayRookAttacks(this Square square, in BitBoard occupied, BitBoard blockers)
-    {
-        var attacks = square.RookAttacks(occupied);
-        blockers &= attacks;
-        return attacks ^ square.RookAttacks(occupied ^ blockers);
-    }
-
-    public static BitBoard XrayAttacks(this Square square, PieceTypes pieceType, in BitBoard occupied, in BitBoard blockers)
-    {
-        return pieceType switch
-        {
-            PieceTypes.Bishop => square.XrayBishopAttacks(occupied, blockers),
-            PieceTypes.Rook => square.XrayRookAttacks(occupied, blockers),
-            PieceTypes.Queen => XrayBishopAttacks(square, occupied, blockers) |
-                                XrayRookAttacks(square, occupied, blockers),
-            _ => EmptyBitBoard
-        };
-    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static BitBoard KnightAttacks(this Square square)
@@ -722,9 +694,8 @@ public static class BitBoards
     /// Helper method to generate shift function dictionary for all directions.
     /// </summary>
     /// <returns>The generated shift dictionary</returns>
-    private static IDictionary<Direction, Func<BitBoard, BitBoard>> MakeShiftFuncs()
-    {
-        return new Dictionary<Direction, Func<BitBoard, BitBoard>>(13)
+    private static IDictionary<Direction, Func<BitBoard, BitBoard>> MakeShiftFuncs() =>
+        new Dictionary<Direction, Func<BitBoard, BitBoard>>(13)
         {
             { Direction.None, static board => board },
             { Direction.North, static board => board.NorthOne() },
@@ -740,7 +711,6 @@ public static class BitBoards
             { Direction.East, static board => board.EastOne() },
             { Direction.West, static board => board.WestOne() }
         };
-    }
 
     private static Func<BitBoard, BitBoard>[] MakeFillFuncs()
         => new Func<BitBoard, BitBoard>[] { NorthFill, SouthFill };

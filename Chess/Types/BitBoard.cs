@@ -209,10 +209,13 @@ public readonly struct BitBoard : IEnumerable<Square>, IEquatable<BitBoard>
         => bbs.Aggregate(Value, static (current, bb) => current | bb.Value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public BitBoard OrAll(IEnumerable<Square> sqs)
+    public BitBoard OrAll(ReadOnlySpan<Square> sqs)
     {
         var b = this;
-        return sqs.Aggregate(b, static (current, sq) => current | sq);
+        foreach (var sq in sqs)
+            b |= sq;
+
+        return b;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

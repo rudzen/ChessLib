@@ -87,7 +87,7 @@ public sealed class Position : IPosition
         => !State.Checkers.IsEmpty;
 
     public bool IsMate
-        => !this.GenerateMoves().Any();
+        => this.GenerateMoves().Length == 0;
 
     public bool IsProbing { get; set; }
 
@@ -160,7 +160,7 @@ public sealed class Position : IPosition
 
     public BitBoard AttacksTo(Square sq, in BitBoard occupied)
     {
-        Debug.Assert(sq >= Types.Squares.a1 && sq <= Types.Squares.h8);
+        Debug.Assert(sq.IsOk);
 
         return (sq.PawnAttack(Player.White) & Board.Pieces(Player.Black, PieceTypes.Pawn))
                | (sq.PawnAttack(Player.Black) & Board.Pieces(Player.White, PieceTypes.Pawn))
@@ -419,8 +419,8 @@ public sealed class Position : IPosition
                 var kingFrom = from;
                 // ReSharper disable once InlineTemporaryVariable
                 var rookFrom = to; // Castling is encoded as 'King captures the rook'
-                var kingTo = (rookFrom > kingFrom ? Types.Squares.g1 : Types.Squares.c1).RelativeSquare(us);
-                var rookTo = (rookFrom > kingFrom ? Types.Squares.f1 : Types.Squares.d1).RelativeSquare(us);
+                var kingTo = (rookFrom > kingFrom ? Square.G1 : Square.C1).Relative(us);
+                var rookTo = (rookFrom > kingFrom ? Square.F1 : Square.D1).Relative(us);
                 var ksq = GetKingSquare(them);
 
                 return !(PieceTypes.Rook.PseudoAttacks(rookTo) & ksq).IsEmpty && !(GetAttacks(rookTo, PieceTypes.Rook,
@@ -504,7 +504,7 @@ public sealed class Position : IPosition
             // they would be in standard chess.
 
             var isKingSide = to > from;
-            to = (isKingSide ? Types.Squares.g1 : Types.Squares.c1).RelativeSquare(us);
+            to = (isKingSide ? Square.G1 : Square.C1).Relative(us);
             var step = isKingSide ? Direction.West : Direction.East;
 
             for (var s = to; s != from; s += step)
@@ -574,7 +574,7 @@ public sealed class Position : IPosition
         if (pc.Type() == PieceTypes.Pawn)
         {
             // We have already handled promotion moves, so destination cannot be on the 8th/1st rank.
-            if (to.Rank == Rank.RANK_8.RelativeRank(us))
+            if (to.Rank == Rank.RANK_8.Relative(us))
                 return false;
 
             if ((from.PawnAttack(us) & Pieces(~us) & to).IsEmpty // Not a capture
@@ -1247,8 +1247,8 @@ public sealed class Position : IPosition
         var doCastleling = castlelingPerform == CastlelingPerform.Do;
 
         rookFrom = to; // Castling is encoded as "king captures friendly rook"
-        rookTo = (kingSide ? Types.Squares.f1 : Types.Squares.d1).RelativeSquare(us);
-        to = (kingSide ? Types.Squares.g1 : Types.Squares.c1).RelativeSquare(us);
+        rookTo = (kingSide ? Square.F1 : Square.D1).Relative(us);
+        to = (kingSide ? Square.G1 : Square.C1).Relative(us);
 
         // Remove both pieces first since squares could overlap in Chess960
         RemovePiece(doCastleling ? from : to);
@@ -1283,8 +1283,8 @@ public sealed class Position : IPosition
         _castlingRightsMask[rookFrom.AsInt()] |= cr;
         _castlingRookSquare[cr.AsInt()] = rookFrom;
 
-        var kingTo = (isKingSide ? Types.Squares.g1 : Types.Squares.c1).RelativeSquare(stm);
-        var rookTo = (isKingSide ? Types.Squares.f1 : Types.Squares.d1).RelativeSquare(stm);
+        var kingTo = (isKingSide ? Square.G1 : Square.C1).Relative(stm);
+        var rookTo = (isKingSide ? Square.F1 : Square.D1).Relative(stm);
 
         _castlingPath[cr.AsInt()] =
             (rookFrom.BitboardBetween(rookTo) | kingFrom.BitboardBetween(kingTo) | rookTo | kingTo)
@@ -1373,16 +1373,16 @@ public sealed class Position : IPosition
             switch (token)
             {
                 case 'K':
-                    rsq = RookSquare(Types.Squares.h1.RelativeSquare(c));
+                    rsq = RookSquare(Square.H1.Relative(c));
 
                     break;
                 case 'Q':
-                    rsq = RookSquare(Types.Squares.a1.RelativeSquare(c));
+                    rsq = RookSquare(Square.A1.Relative(c));
 
                     break;
                 default:
                     if (token.InBetween('A', 'H'))
-                        rsq = new Square(Rank.RANK_1.RelativeRank(c), new File(token - 'A'));
+                        rsq = new Square(Rank.RANK_1.Relative(c), new File(token - 'A'));
                     else
                         continue;
                     break;

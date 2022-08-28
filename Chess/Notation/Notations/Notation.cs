@@ -46,7 +46,7 @@ public abstract class Notation : INotation
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     protected char GetCheckChar()
-        => _pos.GenerateMoves().Any() ? '+' : '#';
+        => _pos.GenerateMoves().Length != 0 ? '+' : '#';
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private MoveAmbiguities Ambiguity(Square from, BitBoard similarTypeAttacks)

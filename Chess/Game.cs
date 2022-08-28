@@ -98,8 +98,13 @@ public sealed class Game : IGame
 
         var moveList = _moveLists.Get();
         moveList.Generate(Pos);
-        if (moveList.Any(move => !Pos.IsLegal(move.Move)))
-            gameEndType |= GameEndTypes.Pat;
+        // ReSharper disable once LoopCanBeConvertedToQuery
+        foreach (var em in moveList)
+            if (!Pos.IsLegal(em.Move))
+            {
+                gameEndType |= GameEndTypes.Pat;
+                break;
+            }
 
         GameEndType = gameEndType;
     }

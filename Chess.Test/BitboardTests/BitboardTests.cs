@@ -36,25 +36,25 @@ public sealed class BitboardTests
     public void MakeBitBoard()
     {
         // a few squares
-        var b1 = BitBoards.MakeBitboard(Squares.a1, Squares.b1, Squares.a2, Squares.b2);
-        var b2 = Squares.a1.BitBoardSquare() | Squares.b1.BitBoardSquare() | Squares.a2.BitBoardSquare() | Squares.b2.BitBoardSquare();
+        var b1 = BitBoards.MakeBitboard(Square.A1, Square.B1, Square.A2, Square.B2);
+        var b2 = Square.A1.AsBb() | Square.B1.AsBb() | Square.A2.AsBb() | Square.B2.AsBb();
         Assert.Equal(b1, b2);
 
         // a single square (not needed, but still has to work in case of list of squares etc)
-        var b3 = BitBoards.MakeBitboard(Squares.h3);
-        var b4 = Squares.h3.BitBoardSquare();
+        var b3 = BitBoards.MakeBitboard(Square.H3);
+        var b4 = Square.H3.AsBb();
         Assert.Equal(b3, b4);
     }
 
     [Fact]
     public void BitBoardOrAll()
     {
-        var baseSquares = new Square[] { Squares.a1, Squares.a2, Squares.a3, Squares.a4, Squares.a5, Squares.a6, Squares.a7, Squares.a8 };
+        Span<Square> baseSquares = stackalloc Square[8] { Square.A1, Square.A2, Square.A3, Square.A4, Square.A5, Square.A6, Square.A7, Square.A8 };
         var bb = BitBoard.Empty.OrAll(baseSquares);
-        while (!bb.IsEmpty)
+        while (bb)
         {
             var s = BitBoards.PopLsb(ref bb);
-            var valid = Array.BinarySearch(baseSquares, s) > -1;
+            var valid = baseSquares.BinarySearch(s) > -1;
             Assert.True(valid);
         }
     }

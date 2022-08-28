@@ -48,7 +48,7 @@ public static class Cuckoo
             while (bb)
             {
                 var sq1 = BitBoards.PopLsb(ref bb);
-                for (var sq2 = sq1 + 1; sq2 <= Squares.h8; ++sq2)
+                for (var sq2 = sq1 + 1; sq2 <= Square.H8; ++sq2)
                 {
                     if ((pc.Type().PseudoAttacks(sq1) & sq2).IsEmpty)
                         continue;
