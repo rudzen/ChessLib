@@ -25,7 +25,6 @@ SOFTWARE.
 */
 
 using Rudz.Chess.Types;
-using Xunit;
 
 namespace Chess.Test.SizesTests;
 

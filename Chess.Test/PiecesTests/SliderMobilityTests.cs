@@ -32,10 +32,6 @@ namespace Chess.Test.PiecesTests;
 
 public sealed class SliderMobilityTests : PieceAttacks, IClassFixture<SliderMobilityFixture>
 {
-    private const int BishopIndex = 0;
-    private const int RookIndex = 1;
-    private const int QueenIndex = 2;
-
     private readonly SliderMobilityFixture _fixture;
 
     public SliderMobilityTests(SliderMobilityFixture fixture)
@@ -44,20 +40,21 @@ public sealed class SliderMobilityTests : PieceAttacks, IClassFixture<SliderMobi
     }
 
     [Theory]
-    [InlineData(Alpha, BishopIndex, 7)]
-    [InlineData(Beta, BishopIndex, 9)]
-    [InlineData(Gamma, BishopIndex, 11)]
-    [InlineData(Delta, BishopIndex, 13)]
-    [InlineData(Alpha, RookIndex, 14)]
-    [InlineData(Beta, RookIndex, 14)]
-    [InlineData(Gamma, RookIndex, 14)]
-    [InlineData(Delta, RookIndex, 14)]
-    [InlineData(Alpha, QueenIndex, 21)]
-    [InlineData(Beta, QueenIndex, 23)]
-    [InlineData(Gamma, QueenIndex, 25)]
-    [InlineData(Delta, QueenIndex, 27)]
-    public void BishopMobility(ulong pattern, int sliderIndex, int expectedMobility)
+    [InlineData(Alpha, PieceTypes.Bishop, 7)]
+    [InlineData(Beta, PieceTypes.Bishop, 9)]
+    [InlineData(Gamma, PieceTypes.Bishop, 11)]
+    [InlineData(Delta, PieceTypes.Bishop, 13)]
+    [InlineData(Alpha, PieceTypes.Rook, 14)]
+    [InlineData(Beta, PieceTypes.Rook, 14)]
+    [InlineData(Gamma, PieceTypes.Rook, 14)]
+    [InlineData(Delta, PieceTypes.Rook, 14)]
+    [InlineData(Alpha, PieceTypes.Queen, 21)]
+    [InlineData(Beta, PieceTypes.Queen, 23)]
+    [InlineData(Gamma, PieceTypes.Queen, 25)]
+    [InlineData(Delta, PieceTypes.Queen, 27)]
+    public void BishopMobility(ulong pattern, PieceTypes pt, int expectedMobility)
     {
+        var sliderIndex = _fixture.SliderIndex(pt);
         var bb = new BitBoard(pattern);
 
         var expected = bb.Count * expectedMobility;

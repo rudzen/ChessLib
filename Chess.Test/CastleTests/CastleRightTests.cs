@@ -1,6 +1,4 @@
-using Rudz.Chess.Enums;
 using Rudz.Chess.Types;
-using Xunit;
 
 namespace Chess.Test.CastleTests;
 

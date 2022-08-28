@@ -25,7 +25,6 @@ SOFTWARE.
 */
 
 using Rudz.Chess.Types;
-using Xunit;
 
 namespace Chess.Test.PiecesTests;
 
@@ -37,9 +36,9 @@ public sealed class PawnPushTests
     public void PawnPush(Directions direction, int expected)
     {
         var fullBoard = BitBoards.PawnSquares;
-
-        foreach (var sq in fullBoard)
+        while (fullBoard)
         {
+            var sq = BitBoards.PopLsb(ref fullBoard);
             var toSq = sq + direction;
             var actual = sq.Distance(toSq);
             Assert.Equal(expected, actual);
@@ -54,8 +53,9 @@ public sealed class PawnPushTests
 
         const int expected = 2;
 
-        foreach (var sq in fullBoard)
+        while (fullBoard)
         {
+            var sq = BitBoards.PopLsb(ref fullBoard);
             var toSq = sq + direction;
             var actual = sq.Distance(toSq);
             Assert.Equal(expected, actual);
@@ -70,8 +70,9 @@ public sealed class PawnPushTests
 
         const int expected = 2;
 
-        foreach (var sq in fullBoard)
+        while (fullBoard)
         {
+            var sq = BitBoards.PopLsb(ref fullBoard);
             var toSq = sq + direction;
             var actual = sq.Distance(toSq);
             Assert.Equal(expected, actual);

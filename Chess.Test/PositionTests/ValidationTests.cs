@@ -28,7 +28,6 @@ using Rudz.Chess.Extensions;
 using Rudz.Chess.Factories;
 using Rudz.Chess.Types;
 using Rudz.Chess.Validation;
-using Xunit;
 
 namespace Chess.Test.PositionTests;
 

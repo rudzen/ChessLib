@@ -39,8 +39,9 @@ public sealed class RegularMobilityFixture
     public int[] KingExpected { get; } = { 5, 8, 8, 8 };
 
     public BitBoard BoardCorners { get; }
-        = BitBoards.MakeBitboard(Squares.a1) | BitBoards.MakeBitboard(Squares.a8)
-                                             | BitBoards.MakeBitboard(Squares.h1) | BitBoards.MakeBitboard(Squares.h8);
+        = BitBoards.MakeBitboard(Square.A1) | BitBoards.MakeBitboard(Square.A8)
+                                            | BitBoards.MakeBitboard(Square.H1)
+                                            | BitBoards.MakeBitboard(Square.H8);
 
     // pawn = 0 (N/A for now), knight = 1, king = 2
     public Func<Square, BitBoard>[] RegAttacks { get; } =

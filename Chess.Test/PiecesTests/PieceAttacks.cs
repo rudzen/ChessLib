@@ -34,7 +34,7 @@ namespace Chess.Test.PiecesTests;
 /// </summary>
 public abstract class PieceAttacks
 {
-    protected enum EBands
+    public enum EBands
     {
         Alpha = 0,
         Beta = 1,
@@ -74,6 +74,14 @@ public abstract class PieceAttacks
     protected const ulong Gamma = 0x3c24243c0000;
 
     protected const ulong Delta = 0x1818000000;
+
+    protected const ulong PawnAlpha = 0x81818181818100;
+
+    protected const ulong PawnBeta = 0x42424242424200;
+
+    protected const ulong PawnGamma = 0x24242424242400;
+
+    protected const ulong PawnDelta = 0x18181818181800;
 
     protected static readonly BitBoard[] Bands = { Alpha, Beta, Gamma, Delta };
 

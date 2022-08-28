@@ -26,7 +26,6 @@ SOFTWARE.
 
 using Rudz.Chess.Factories;
 using Rudz.Chess.Types;
-using Xunit;
 
 namespace Chess.Test.PositionTests;
 

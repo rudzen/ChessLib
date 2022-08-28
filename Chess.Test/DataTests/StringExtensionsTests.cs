@@ -27,7 +27,6 @@ SOFTWARE.
 using System.Collections.Generic;
 using System.Linq;
 using Rudz.Chess.Extensions;
-using Xunit;
 
 namespace Chess.Test.DataTests;
 

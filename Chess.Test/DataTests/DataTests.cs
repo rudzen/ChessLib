@@ -26,7 +26,6 @@ SOFTWARE.
 
 using System;
 using Rudz.Chess.Types;
-using Xunit;
 
 namespace Chess.Test.DataTests;
 

@@ -30,7 +30,6 @@ using System.Threading.Tasks;
 using Chess.Perft;
 using Chess.Perft.Interfaces;
 using Rudz.Chess.Fen;
-using Xunit;
 
 namespace Chess.Test.MoveTests;
 

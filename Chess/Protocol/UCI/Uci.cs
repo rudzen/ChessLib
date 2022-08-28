@@ -179,7 +179,7 @@ public class Uci : IUci
         var (from, to) = m.FromTo();
 
         if (m.IsCastlelingMove() && chessMode != ChessMode.Chess960)
-            to = Square.Make(from.Rank, to > from ? File.FILE_G : File.FILE_C);
+            to = Square.Create(from.Rank, to > from ? File.FILE_G : File.FILE_C);
 
         Span<char> s = stackalloc char[5];
         var index = 0;

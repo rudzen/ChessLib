@@ -25,6 +25,7 @@ SOFTWARE.
 */
 
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using FluentAssertions;
 using Rudz.Chess;
@@ -33,7 +34,6 @@ using Rudz.Chess.Fen;
 using Rudz.Chess.Polyglot;
 using Rudz.Chess.Protocol.UCI;
 using Rudz.Chess.Types;
-using Xunit;
 
 namespace Chess.Test.BookTests;
 
@@ -109,9 +109,8 @@ public class PolyglotTests
         var book = new Book(game.Pos);
         var state = new State();
 
-        foreach (var uciMove in uciMoves)
+        foreach (var m in uciMoves.Select(uciMove => uci.MoveFromUci(game.Pos, uciMove)))
         {
-            var m = uci.MoveFromUci(game.Pos, uciMove);
             Assert.False(m.IsNullMove());
             game.Pos.MakeMove(m, state);
         }

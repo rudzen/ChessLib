@@ -29,7 +29,6 @@ using FluentAssertions;
 using Rudz.Chess.Factories;
 using Rudz.Chess.Protocol.UCI;
 using Rudz.Chess.Types;
-using Xunit;
 
 namespace Chess.Test.ProtocolTests;
 

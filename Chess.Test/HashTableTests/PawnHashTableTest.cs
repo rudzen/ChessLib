@@ -29,7 +29,6 @@ using System.Runtime.InteropServices;
 using Rudz.Chess.Hash;
 using Rudz.Chess.Hash.Tables;
 using Rudz.Chess.Types;
-using Xunit;
 
 namespace Chess.Test.HashTableTests;
 

@@ -86,6 +86,14 @@ public readonly struct BitBoard : IEnumerable<Square>, IEquatable<BitBoard>
         => new(square.AsBb());
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static BitBoard Create(ulong value)
+        => new BitBoard(value);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static BitBoard Create(uint value)
+        => new BitBoard(value);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static BitBoard operator *(BitBoard left, ulong right)
         => left.Value * right;
 

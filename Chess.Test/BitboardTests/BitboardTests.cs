@@ -24,9 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using Rudz.Chess.Types;
 using System;
-using Xunit;
+using Rudz.Chess.Types;
 
 namespace Chess.Test.BitboardTests;
 

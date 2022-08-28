@@ -32,7 +32,6 @@ using Rudz.Chess.MoveGeneration;
 using Rudz.Chess.Notation;
 using Rudz.Chess.Notation.Notations;
 using Rudz.Chess.Types;
-using Xunit;
 
 namespace Chess.Test.NotationTests;
 

@@ -95,6 +95,10 @@ public readonly struct Player : IEquatable<Player>
     public static implicit operator Player(bool value) => new(value.AsByte());
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Player Create(Players player)
+        => new Player(player);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Player operator ~(Player player) => new(player.Side ^ 1);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

@@ -173,7 +173,7 @@ public sealed class Blockage : IBlockage
                 sq += up;
                 r = sq.Rank;
                 rr = sq.RelativeRank(_us);
-                while ((_fence & Square.Make(r, f)).IsEmpty)
+                while ((_fence & Square.Create(r, f)).IsEmpty)
                 {
                     var pawnAttacks = sq.PawnAttack(_us);
                     if (_theirPawns & pawnAttacks)
@@ -186,7 +186,7 @@ public sealed class Blockage : IBlockage
                     r = sq.Rank;
                 }
 
-                if ((_fence & Square.Make(r, f)).IsEmpty || _pos.IsOccupied(sq))
+                if ((_fence & Square.Create(r, f)).IsEmpty || _pos.IsOccupied(sq))
                     continue;
 
                 if (rr >= Ranks.Rank6)
@@ -205,10 +205,10 @@ public sealed class Blockage : IBlockage
                         if (BitBoards.PopCount(_ourPawns & (f - 1)) > 1)
                             return false;
 
-                        if ((_fixedPawn & Square.Make(r, PreviousFile(f))).IsEmpty)
+                        if ((_fixedPawn & Square.Create(r, PreviousFile(f))).IsEmpty)
                             return false;
 
-                        if ((_fence & Square.Make(r, PreviousFile(f))).IsEmpty)
+                        if ((_fence & Square.Create(r, PreviousFile(f))).IsEmpty)
                             return false;
                     }
 
@@ -220,10 +220,10 @@ public sealed class Blockage : IBlockage
                         if (BitBoards.PopCount(_ourPawns & (f + 1)) > 1)
                             return false;
 
-                        if ((_fixedPawn & Square.Make(r, NextFile(f))).IsEmpty)
+                        if ((_fixedPawn & Square.Create(r, NextFile(f))).IsEmpty)
                             return false;
 
-                        if ((_fence & Square.Make(r, NextFile(f))).IsEmpty)
+                        if ((_fence & Square.Create(r, NextFile(f))).IsEmpty)
                             return false;
                     }
                 }

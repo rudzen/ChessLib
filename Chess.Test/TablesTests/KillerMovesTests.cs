@@ -26,7 +26,6 @@ SOFTWARE.
 
 using Rudz.Chess.Tables;
 using Rudz.Chess.Types;
-using Xunit;
 
 namespace Chess.Test.TablesTests;
 

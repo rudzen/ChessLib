@@ -25,11 +25,10 @@ SOFTWARE.
 */
 
 using Rudz.Chess.Factories;
-using Xunit;
 
 namespace Chess.Test.FenceTests;
 
-public class FenceTests
+public sealed class FenceTests
 {
     [Theory]
     [InlineData("8/8/k7/p1p1p1p1/P1P1P1P1/8/8/4K3 w - - 0 1", true)]
@@ -40,8 +39,7 @@ public class FenceTests
     [InlineData("8/2p5/kp2p1p1/p1p1P1P1/P1P2P2/1P4K1/8/8 w - - 0 1", false)]
     public void Blocked(string fen, bool expected)
     {
-        var g = GameFactory.Create();
-        g.NewGame(fen);
+        var g = GameFactory.Create(fen);
         var pos = g.Pos;
 
         var actual = BlockageFactory.IsBlocked(pos);

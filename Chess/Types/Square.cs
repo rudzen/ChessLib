@@ -208,7 +208,7 @@ public readonly struct Square : IComparable<Square>
 
     public static int Count { get; } = 64;
 
-    public static Square Make(Rank r, File f) => new(r, f);
+    public static Square Create(Rank r, File f) => new(r, f);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator Square(int value)

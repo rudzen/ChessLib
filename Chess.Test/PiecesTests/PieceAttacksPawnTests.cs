@@ -24,10 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System.Linq;
-using FluentAssertions;
 using Rudz.Chess.Types;
-using Xunit;
 
 namespace Chess.Test.PiecesTests;
 
@@ -40,9 +37,6 @@ public sealed class PieceAttacksPawnTests : PieceAttacks
      * - Pawns never move to 1st or 8th rank
      * - Each band tests cover both the white and black side
      */
-
-    private static readonly BitBoard[] PawnBands =
-        { 0x81818181818100, 0x42424242424200, 0x24242424242400, 0x18181818181800 };
 
     /*
      * Pawn bands :
@@ -70,73 +64,25 @@ public sealed class PieceAttacksPawnTests : PieceAttacks
      * 0 0 0 0 0 0 0 0      0 0 0 0 0 0 0 0
      */
 
-    private static readonly int[] PawnExpected = { 1, 2, 2, 2 };
-
-    [Fact]
-    public void AlphaPattern()
+    [Theory]
+    [InlineData(PawnAlpha, Players.White, 1)]
+    [InlineData(PawnAlpha, Players.Black, 1)]
+    [InlineData(PawnBeta, Players.White, 2)]
+    [InlineData(PawnBeta, Players.Black, 2)]
+    [InlineData(PawnGamma, Players.White, 2)]
+    [InlineData(PawnGamma, Players.Black, 2)]
+    [InlineData(PawnDelta, Players.White, 2)]
+    [InlineData(PawnDelta, Players.Black, 2)]
+    public void PawnAttacks(ulong squares, Players side, int expected)
     {
-        const int index = (int)EBands.Alpha;
-        var us = Player.White;
-        var expected = PawnExpected[index];
+        var bb = BitBoard.Create(squares);
+        var us = Player.Create(side);
 
-        var actuals = PawnBands[index].Select(w => w.PawnAttack(us).Count);
-        actuals.Should().AllBeEquivalentTo(expected);
-
-        // black
-        us = ~us;
-
-        actuals = PawnBands[index].Select(x => x.PawnAttack(us).Count);
-        actuals.Should().AllBeEquivalentTo(expected);
-    }
-
-    [Fact]
-    public void BetaPattern()
-    {
-        const int index = (int)EBands.Beta;
-        var us = Player.White;
-        var expected = PawnExpected[index];
-        var actuals = PawnBands[index].Select(w => w.PawnAttack(us).Count);
-
-        actuals.Should().AllBeEquivalentTo(expected);
-
-        // black
-        us = ~us;
-
-        actuals = PawnBands[index].Select(x => x.PawnAttack(us).Count);
-        actuals.Should().AllBeEquivalentTo(expected);
-    }
-
-    [Fact]
-    public void GammaPattern()
-    {
-        const int index = (int)EBands.Gamma;
-        var us = Player.White;
-        var expected = PawnExpected[index];
-        var actuals = PawnBands[index].Select(w => w.PawnAttack(us).Count);
-
-        actuals.Should().AllBeEquivalentTo(expected);
-
-        // black
-        us = ~us;
-
-        actuals = PawnBands[index].Select(x => x.PawnAttack(us).Count);
-        actuals.Should().AllBeEquivalentTo(expected);
-    }
-
-    [Fact]
-    public void DeltaPattern()
-    {
-        const int index = (int)EBands.Delta;
-        var us = Player.White;
-        var expected = PawnExpected[index];
-        var actuals = PawnBands[index].Select(w => w.PawnAttack(us).Count);
-
-        actuals.Should().AllBeEquivalentTo(expected);
-
-        // black
-        us = ~us;
-
-        actuals = PawnBands[index].Select(x => x.PawnAttack(us).Count);
-        actuals.Should().AllBeEquivalentTo(expected);
+        while (bb)
+        {
+            var sq = BitBoards.PopLsb(ref bb);
+            var actual = sq.PawnAttack(us).Count;
+            Assert.Equal(expected, actual);
+        }
     }
 }

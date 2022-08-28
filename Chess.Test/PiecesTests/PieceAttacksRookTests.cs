@@ -26,7 +26,6 @@ SOFTWARE.
 
 using Rudz.Chess;
 using Rudz.Chess.Types;
-using Xunit;
 
 namespace Chess.Test.PiecesTests;
 
@@ -68,11 +67,12 @@ public sealed class PieceAttacksRookTests : PieceAttacks
         var pieceValue = new PieceValue();
         var pos = new Position(board, pieceValue);
 
-        foreach (var square in border)
+        while (border)
         {
-            var attacks = pos.GetAttacks(square, PieceTypes.Rook, in borderInner);
+            var sq = BitBoards.PopLsb(ref border);
+            var attacks = pos.GetAttacks(sq, PieceTypes.Rook, in borderInner);
             Assert.False(attacks.IsEmpty);
-            var expected = corners & square ? expectedCorner : expectedSide;
+            var expected = corners & sq ? expectedCorner : expectedSide;
             var actual = attacks.Count;
             Assert.Equal(expected, actual);
         }

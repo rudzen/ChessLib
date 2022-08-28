@@ -29,7 +29,6 @@ using Rudz.Chess.Enums;
 using Rudz.Chess.Fen;
 using Rudz.Chess.MoveGeneration;
 using Rudz.Chess.Types;
-using Xunit;
 
 namespace Chess.Test.MoveTests;
 

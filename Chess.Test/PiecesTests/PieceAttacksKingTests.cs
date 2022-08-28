@@ -26,7 +26,7 @@ SOFTWARE.
 
 using System.Linq;
 using FluentAssertions;
-using Xunit;
+using Rudz.Chess.Types;
 
 namespace Chess.Test.PiecesTests;
 
@@ -46,12 +46,16 @@ public sealed class PieceAttacksKingTests : PieceAttacks, IClassFixture<RegularM
         const int attackIndex = 2;
 
         // special case, as the expected values vary depending on the kings location on the outer rim
-        foreach (var pieceLocation in Bands[index])
+
+        var bb = Bands[index];
+        while (bb)
         {
-            var attacks = _fixture.RegAttacks[attackIndex](pieceLocation);
-            var expected = (_fixture.BoardCorners & pieceLocation) != 0
-                ? _fixture.KingExpected[index] - 2 /* for corners */
-                : _fixture.KingExpected[index];
+            var sq = BitBoards.PopLsb(ref bb);
+            var attacks = _fixture.RegAttacks[attackIndex](sq);
+            var isCorner = !(_fixture.BoardCorners & sq).IsEmpty;
+            var expected = _fixture.KingExpected[index];
+            if (isCorner)
+                expected -= 2; /* for corners */
             Assert.Equal(expected, attacks.Count);
         }
     }

@@ -24,9 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System.Linq;
-using FluentAssertions;
-using Xunit;
+using Rudz.Chess.Types;
 
 namespace Chess.Test.PiecesTests;
 
@@ -46,12 +44,15 @@ public sealed class PieceAttacksKnightTests : PieceAttacks, IClassFixture<Regula
         const int attackIndex = 1;
         const ulong narrowLocations = 0x4281000000008142;
 
-        foreach (var pieceLocation in Bands[index])
+        var bb = Bands[index];
+
+        while (bb)
         {
-            var attacks = _fixture.RegAttacks[attackIndex](pieceLocation);
-            var expected = (_fixture.BoardCorners & pieceLocation) != 0
+            var sq = BitBoards.PopLsb(ref bb);
+            var attacks = _fixture.RegAttacks[attackIndex](sq);
+            var expected = (_fixture.BoardCorners & sq) != 0
                 ? _fixture.KnightExpected[index] >> 1 /* for corners */
-                : (narrowLocations & pieceLocation) != 0
+                : (narrowLocations & sq) != 0
                     ? _fixture.KnightExpected[index] - 1 /* narrowLocations */
                     : _fixture.KnightExpected[index];
             var actual = attacks.Count;
@@ -66,10 +67,13 @@ public sealed class PieceAttacksKnightTests : PieceAttacks, IClassFixture<Regula
         const int attackIndex = 1;
         const ulong narrowLocations = 0x42000000004200;
 
-        foreach (var pieceLocation in Bands[index])
+        var bb = Bands[index];
+
+        while (bb)
         {
-            var attacks = _fixture.RegAttacks[attackIndex](pieceLocation);
-            var expected = (narrowLocations & pieceLocation) != 0
+            var sq = BitBoards.PopLsb(ref bb);
+            var attacks = _fixture.RegAttacks[attackIndex](sq);
+            var expected = (narrowLocations & sq) != 0
                 ? _fixture.KnightExpected[index] - 2
                 : _fixture.KnightExpected[index];
             var actual = attacks.Count;
@@ -83,9 +87,15 @@ public sealed class PieceAttacksKnightTests : PieceAttacks, IClassFixture<Regula
         const int index = (int)EBands.Gamma;
         const int attackIndex = 1;
         var expected = _fixture.KnightExpected[index];
-        var actuals = Bands[index].Select(x => _fixture.RegAttacks[attackIndex](x).Count);
 
-        actuals.Should().AllBeEquivalentTo(expected);
+        var bb = Bands[index];
+
+        while (bb)
+        {
+            var pieceLocation = BitBoards.PopLsb(ref bb);
+            var actual = _fixture.RegAttacks[attackIndex](pieceLocation).Count;
+            Assert.Equal(expected, actual);
+        }
     }
 
     [Fact]
@@ -94,8 +104,14 @@ public sealed class PieceAttacksKnightTests : PieceAttacks, IClassFixture<Regula
         const int index = (int)EBands.Delta;
         const int attackIndex = 1;
         var expected = _fixture.KnightExpected[index];
-        var actuals = Bands[index].Select(x => _fixture.RegAttacks[attackIndex](x).Count);
 
-        actuals.Should().AllBeEquivalentTo(expected);
+        var bb = Bands[index];
+
+        while (bb)
+        {
+            var pieceLocation = BitBoards.PopLsb(ref bb);
+            var actual = _fixture.RegAttacks[attackIndex](pieceLocation).Count;
+            Assert.Equal(expected, actual);
+        }
     }
 }

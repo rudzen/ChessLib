@@ -29,7 +29,6 @@ using System.Collections.Generic;
 using System.Text;
 using Rudz.Chess.Factories;
 using Rudz.Chess.Types;
-using Xunit;
 
 namespace Chess.Test.MoveTests;
 
@@ -38,32 +37,23 @@ public sealed class MoveTests
     [Fact]
     public void MoveSquares()
     {
-        // test all squares, including invalid moves (same from and to)
-        for (var i = 0; i < 64; i++)
+        var bb = BitBoards.AllSquares;
+        while (bb)
         {
-            Square expectedFrom = i;
-            var actualInt = expectedFrom.AsInt();
-            Assert.Equal(i, actualInt);
-            for (var j = 1 /* NOTE! from 1 !! */; j < 64; j++)
+            var expectedFrom =  BitBoards.PopLsb(ref bb);
+            var bb2 = bb;
+            while (bb2)
             {
-                Square expectedTo = j;
-
-                // on purpose.. creating the move in this loop
-                var move = new Move(expectedFrom, expectedTo);
+                var expectedTo = BitBoards.PopLsb(ref bb2);
+                var move = Move.Create(expectedFrom, expectedTo);
 
                 Assert.False(move.IsNullMove());
 
-                var actualFrom = move.FromSquare();
-                var actualTo = move.ToSquare();
+                var (actualFrom, actualTo) = move.FromTo();
 
                 Assert.Equal(expectedFrom, actualFrom);
                 Assert.Equal(expectedTo, actualTo);
-
-                // valid move check, if from and to are the same, the move is "invalid"
-                if (i == j)
-                    Assert.False(move.IsValidMove());
-                else
-                    Assert.True(move.IsValidMove());
+                Assert.True(move.IsValidMove());
             }
         }
     }
@@ -73,7 +63,7 @@ public sealed class MoveTests
     {
         Square expectedFrom = Squares.a2;
         Square expectedTo = Squares.h8;
-        var expectedPromotionPiece = PieceTypes.Queen;
+        const PieceTypes expectedPromotionPiece = PieceTypes.Queen;
         const MoveTypes expectedMoveType = MoveTypes.Promotion;
 
         // full move spectrum
@@ -107,7 +97,7 @@ public sealed class MoveTests
     public void MoveToString()
     {
         var moves = new List<Move>(128);
-        var movesString = new List<Movestrings>(128);
+        var movesString = new List<MoveStrings>(128);
 
         var game = GameFactory.Create();
 
@@ -122,12 +112,12 @@ public sealed class MoveTests
             if (s1 == s2)
                 continue;
 
-            moves.Add(new Move(s1, s2));
+            moves.Add(Move.Create(s1, s2));
             tmp.Clear();
             tmp.Append(' ');
             tmp.Append(s1.ToString());
             tmp.Append(s2.ToString());
-            movesString.Add(new Movestrings(tmp.ToString()));
+            movesString.Add(new MoveStrings(tmp.ToString()));
         }
 
         var result = new StringBuilder(128);
@@ -165,7 +155,7 @@ public sealed class MoveTests
             if (rndSquareFrom == rndSquareTo)
                 continue;
 
-            moves.Add(new Move(rndSquareFrom, rndSquareTo));
+            moves.Add(Move.Create(rndSquareFrom, rndSquareTo));
 
             expected.Append(' ');
             expected.Append(rndSquareFrom.ToString());
@@ -182,11 +172,11 @@ public sealed class MoveTests
         Assert.Equal(expected.ToString(), result.ToString());
     }
 
-    private readonly struct Movestrings
+    private readonly struct MoveStrings
     {
         private readonly string _s;
 
-        public Movestrings(string s) => _s = s;
+        public MoveStrings(string s) => _s = s;
 
         public override string ToString() => _s;
     }

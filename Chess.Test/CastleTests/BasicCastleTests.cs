@@ -29,7 +29,6 @@ using Rudz.Chess.Enums;
 using Rudz.Chess.Factories;
 using Rudz.Chess.Fen;
 using Rudz.Chess.Types;
-using Xunit;
 
 namespace Chess.Test.CastleTests;
 
@@ -43,8 +42,7 @@ public sealed class BasicCastleTests
     [InlineData("r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 1", CastlelingRights.QueenSide, true)]
     public void CanPotentiallyCastle(string fen, CastlelingRights cr, bool expected)
     {
-        var g = GameFactory.Create();
-        var pos = g.Pos;
+        var pos = GameFactory.Create(fen).Pos;
         var fd = new FenData(fen);
         var state = new State();
         pos.Set(in fd, ChessMode.Normal, state);
@@ -67,8 +65,7 @@ public sealed class BasicCastleTests
     [InlineData("r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 1", CastlelingRights.BlackOoo, false)]
     public void IsCastleImpeeded(string fen, CastlelingRights cr, bool expected)
     {
-        var g = GameFactory.Create();
-        var pos = g.Pos;
+        var pos = GameFactory.Create(fen).Pos;
         var fd = new FenData(fen);
         var state = new State();
         pos.Set(in fd, ChessMode.Normal, state);

@@ -25,9 +25,7 @@ SOFTWARE.
 */
 
 using System.Linq;
-using System.Threading.Tasks;
 using Rudz.Chess.Types;
-using Xunit;
 
 namespace Chess.Test.BitboardTests;
 

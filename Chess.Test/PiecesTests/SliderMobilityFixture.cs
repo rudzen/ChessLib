@@ -33,12 +33,12 @@ namespace Chess.Test.PiecesTests;
 // ReSharper disable once ClassNeverInstantiated.Global
 public sealed class SliderMobilityFixture
 {
-    private static readonly Func<Square, BitBoard, BitBoard>[] SlideAttacks =
-        { MagicBB.BishopAttacks, MagicBB.RookAttacks, MagicBB.QueenAttacks };
-
     public int[] BishopExpected { get; } = { 7, 9, 11, 13 };
 
     public int[] RookExpected { get; } = { 14, 14, 14, 14 };
 
-    public Func<Square, BitBoard, BitBoard>[] SliderAttacks => SlideAttacks;
+    public Func<Square, BitBoard, BitBoard>[] SliderAttacks { get; } = { MagicBB.BishopAttacks, MagicBB.RookAttacks, MagicBB.QueenAttacks };
+
+    public int SliderIndex(PieceTypes pt)
+        => pt.AsInt() - 3;
 }

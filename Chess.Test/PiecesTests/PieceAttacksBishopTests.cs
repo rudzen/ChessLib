@@ -26,7 +26,6 @@ SOFTWARE.
 
 using Rudz.Chess;
 using Rudz.Chess.Types;
-using Xunit;
 
 namespace Chess.Test.PiecesTests;
 
@@ -42,7 +41,7 @@ public sealed class PieceAttacksBishopTests : PieceAttacks
     {
         BitBoard border = Alpha;
         BitBoard borderInner = Beta;
-        var corners = BitBoards.MakeBitboard(Squares.a1, Squares.a8, Squares.h1, Squares.h8);
+        var corners = BitBoards.MakeBitboard(Square.A1, Square.A8, Square.H1, Square.H8);
 
         const int expectedCorner = 1; // just a single attack square no matter what
         const int expectedSide = 2;
@@ -60,13 +59,16 @@ public sealed class PieceAttacksBishopTests : PieceAttacks
                      * 0 0 0 0 0 0 0 0
                      *
                      */
-        foreach (var square in border)
+
+        while (border)
         {
-            var attacks = square.BishopAttacks(borderInner);
+            var sq = BitBoards.PopLsb(ref border);
+            var attacks = sq.BishopAttacks(borderInner);
             Assert.False(attacks.IsEmpty);
-            var expected = corners & square ? expectedCorner : expectedSide;
+            var expected = corners & sq ? expectedCorner : expectedSide;
             var actual = attacks.Count;
             Assert.Equal(expected, actual);
         }
+
     }
 }
