@@ -49,13 +49,13 @@ public static class DepthsExtensions
     public static int AsInt(this Depths @this) => (int)@this;
 }
 
-public readonly struct Depth : IEquatable<Depth>
+public struct Depth : IEquatable<Depth>
 {
     private Depth(int depth) => Value = depth;
 
     private Depth(Depths depth) => Value = (int)depth;
 
-    public int Value { get; }
+    public int Value { get; set; }
 
     public static Depth Zero => new(Depths.Zero);
 

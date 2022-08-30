@@ -24,7 +24,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System;
 using System.Runtime.CompilerServices;
 
 namespace Rudz.Chess.Types;
@@ -50,11 +49,9 @@ public static class RanksExtensions
     public static int AsInt(this Ranks r) => (int)r;
 }
 
-public readonly struct Rank : IEquatable<Rank>
+public readonly record struct Rank(Ranks Value)
 {
     private static readonly string[] RankStrings = { "1", "2", "3", "4", "5", "6", "7", "8" };
-
-    private readonly Ranks _value;
 
     public static Rank RANK_1 { get; } = new(Ranks.Rank1);
     public static Rank RANK_2 { get; } = new(Ranks.Rank2);
@@ -68,15 +65,16 @@ public readonly struct Rank : IEquatable<Rank>
     public static Rank[] PawnRanks { get; } = { RANK_2, RANK_3, RANK_4, RANK_5, RANK_6, RANK_7 };
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Rank(int file) => _value = (Ranks)file;
+    public Rank(int rank) : this((Ranks)rank)
+    {
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Rank(Ranks file) => _value = file;
+    public Rank(Rank rank) :this(rank.Value)
+    {
+    }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Rank(Rank file) => _value = file._value;
-
-    public char Char => (char)('1'+_value.AsInt());
+    public char Char => (char)('1' + Value.AsInt());
 
     public static int Count => (int)Ranks.RankNb;
 
@@ -89,28 +87,20 @@ public readonly struct Rank : IEquatable<Rank>
         => new(value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator ==(Rank left, Rank right)
-        => left.Equals(right);
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator !=(Rank left, Rank right)
-        => !left.Equals(right);
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool operator ==(Rank left, Ranks right)
-        => left._value == right;
+        => left.Value == right;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool operator !=(Rank left, Ranks right)
-        => left._value != right;
+        => left.Value != right;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool operator ==(Rank left, int right)
-        => left._value == (Ranks)right;
+        => left.Value == (Ranks)right;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool operator !=(Rank left, int right)
-        => left._value != (Ranks)right;
+        => left.Value != (Ranks)right;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Rank operator +(Rank left, Rank right)
@@ -138,11 +128,11 @@ public readonly struct Rank : IEquatable<Rank>
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Rank operator ++(Rank rank)
-        => rank._value + 1;
+        => rank.Value + 1;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Rank operator --(Rank rank)
-        => rank._value - 1;
+        => rank.Value - 1;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static BitBoard operator &(Rank left, ulong right)
@@ -174,7 +164,7 @@ public readonly struct Rank : IEquatable<Rank>
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool operator >=(Rank left, Ranks right)
-        => left._value >= right;
+        => left.Value >= right;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool operator >(Rank left, Rank right)
@@ -182,7 +172,7 @@ public readonly struct Rank : IEquatable<Rank>
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool operator <=(Rank left, Ranks right)
-        => left._value <= right;
+        => left.Value <= right;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool operator <(Rank left, Rank right)
@@ -198,11 +188,11 @@ public readonly struct Rank : IEquatable<Rank>
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public int AsInt()
-        => (int)_value;
+        => (int)Value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool IsValid()
-        => _value < Ranks.RankNb;
+        => Value < Ranks.RankNb;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override string ToString()
@@ -210,11 +200,7 @@ public readonly struct Rank : IEquatable<Rank>
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Equals(Rank other)
-        => _value == other._value;
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override bool Equals(object obj)
-        => obj is Rank file && Equals(file);
+        => Value == other.Value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override int GetHashCode()

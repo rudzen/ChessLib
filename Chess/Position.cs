@@ -97,7 +97,7 @@ public sealed class Position : IPosition
     /// <summary>
     /// To let something outside the library be aware of changes (like a UI etc)
     /// </summary>
-    public Action<Piece, Square> PieceUpdated { get; set; }
+    public Action<IPieceSquare> PieceUpdated { get; set; }
 
     public IPieceValue PieceValue { get; }
 
@@ -118,7 +118,7 @@ public sealed class Position : IPosition
         Board.AddPiece(pc, sq);
 
         if (!IsProbing)
-            PieceUpdated?.Invoke(pc, sq);
+            PieceUpdated?.Invoke(new PieceSquareEventArgs(pc, sq));
     }
 
     public bool AttackedByKing(Square sq, Player c)
@@ -220,6 +220,11 @@ public sealed class Position : IPosition
     /// <returns>The FenData which contains the fen string that was generated.</returns>
     public FenData GenerateFen()
     {
+        const char space = ' ';
+        const char zero = '0';
+        const char slash = '/';
+        const char dash = '-';
+
         Span<char> fen = stackalloc char[Fen.Fen.MaxFenLen];
         var length = 0;
 
@@ -232,28 +237,22 @@ public sealed class Position : IPosition
                     ++empty;
 
                 if (empty != 0)
-                    fen[length++] = (char)('0' + empty);
+                    fen[length++] = (char)(zero + empty);
 
                 if (file <= Files.FileH)
                     fen[length++] = Board.PieceAt(new Square(rank, file)).GetPieceChar();
             }
 
             if (rank > Ranks.Rank1)
-                fen[length++] = '/';
+                fen[length++] = slash;
         }
 
-        static ReadOnlySpan<char> IntegralToSpan(int value)
-        {
-            var s = value.ToString();
-            return s.AsSpan();
-        }
-
-        fen[length++] = ' ';
+        fen[length++] = space;
         fen[length++] = _sideToMove.Fen;
-        fen[length++] = ' ';
+        fen[length++] = space;
 
         if (State.CastlelingRights == CastlelingRights.None)
-            fen[length++] = '-';
+            fen[length++] = dash;
         else
         {
             if (CanCastle( CastleRight.WHITE_OO))
@@ -277,23 +276,23 @@ public sealed class Position : IPosition
                     : 'q';
         }
 
-        fen[length++] = ' ';
+        fen[length++] = space;
         if (State.EnPassantSquare == Square.None)
-            fen[length++] = '-';
+            fen[length++] = dash;
         else
         {
             fen[length++] = State.EnPassantSquare.FileChar;
             fen[length++] = State.EnPassantSquare.RankChar;
         }
 
-        fen[length++] = ' ';
+        fen[length++] = space;
 
         foreach (var c in State.Rule50.ToString().AsSpan())
             fen[length++] = c;
 
-        fen[length++] = ' ';
+        fen[length++] = space;
 
-        foreach (var c in IntegralToSpan(1 + (Ply - _sideToMove.IsBlack.AsByte() / 2)))
+        foreach (var c in (1 + (Ply - _sideToMove.IsBlack.AsByte() / 2)).ToString().AsSpan())
             fen[length++] = c;
 
         return new FenData(new string(fen[..length]));
@@ -373,7 +372,7 @@ public sealed class Position : IPosition
         Debug.Assert(!m.IsNullMove());
         Debug.Assert(MovedPiece(m).ColorOf() == _sideToMove);
 
-        var (from, to) = m.FromTo();
+        var (from, to) = m;
 
         var pc = Board.PieceAt(from);
         var pt = pc.Type();
@@ -473,7 +472,7 @@ public sealed class Position : IPosition
         Debug.Assert(!m.IsNullMove());
 
         var us = _sideToMove;
-        var (from, to) = m.FromTo();
+        var (from, to) = m;
         var ksq = GetKingSquare(us);
 
         Debug.Assert(GetPiece(GetKingSquare(us)) == PieceTypes.King.MakePiece(us));
@@ -483,43 +482,13 @@ public sealed class Position : IPosition
         // do it simply by testing whether the king is attacked after the move is made.
         if (m.IsEnPassantMove())
         {
-            var captureSquare = to - us.PawnPushDistance();
-            var occupied = (Board.Pieces() ^ from ^ captureSquare) | to;
-
-            Debug.Assert(to == EnPassantSquare);
             Debug.Assert(MovedPiece(m) == PieceTypes.Pawn.MakePiece(us));
-            Debug.Assert(GetPiece(captureSquare) == PieceTypes.Pawn.MakePiece(~us));
-            Debug.Assert(GetPiece(to) == Piece.EmptyPiece);
-
-            return (GetAttacks(ksq, PieceTypes.Rook, in occupied) &
-                    Board.Pieces(~us, PieceTypes.Rook, PieceTypes.Queen)).IsEmpty
-                   && (GetAttacks(ksq, PieceTypes.Bishop, in occupied) &
-                       Board.Pieces(~us, PieceTypes.Bishop, PieceTypes.Queen)).IsEmpty;
+            return IsEnPassantMoveLegal(to, us, from, ksq);
         }
 
         // Check for legal castleling move
         if (m.IsCastlelingMove())
-        {
-            // After castling, the rook and king final positions are the same in Chess960 as
-            // they would be in standard chess.
-
-            var isKingSide = to > from;
-            to = (isKingSide ? Square.G1 : Square.C1).Relative(us);
-            var step = isKingSide ? Direction.West : Direction.East;
-
-            for (var s = to; s != from; s += step)
-                if (AttacksTo(s) & Board.Pieces(~us))
-                    return false;
-
-            // In case of Chess960, verify that when moving the castling rook we do not discover
-            // some hidden checker. For instance an enemy queen in SQ_A1 when castling rook is
-            // in SQ_B1.
-            return ChessMode == ChessMode.Normal || (GetAttacks(
-                        to,
-                        PieceTypes.Rook,
-                        Board.Pieces() ^ m.ToSquare()) & Board.Pieces(~us, PieceTypes.Rook, PieceTypes.Queen)
-                ).IsEmpty;
-        }
+            return IsCastlelingMoveLegal(m, to, from, us);
 
         // If the moving piece is a king, check whether the destination square is attacked by
         // the opponent.
@@ -529,6 +498,44 @@ public sealed class Position : IPosition
         // A non-king move is legal if and only if it is not pinned or it is moving along the
         // ray towards or away from the king.
         return (BlockersForKing(us) & from).IsEmpty || from.Aligned(to, ksq);
+    }
+
+    private bool IsCastlelingMoveLegal(Move m, Square to, Square from, Player us)
+    {
+        // After castling, the rook and king final positions are the same in Chess960 as
+        // they would be in standard chess.
+
+        var isKingSide = to > from;
+        to = (isKingSide ? Square.G1 : Square.C1).Relative(us);
+        var step = isKingSide ? Direction.West : Direction.East;
+
+        for (var s = to; s != from; s += step)
+            if (AttacksTo(s) & Board.Pieces(~us))
+                return false;
+
+        // In case of Chess960, verify that when moving the castling rook we do not discover
+        // some hidden checker. For instance an enemy queen in SQ_A1 when castling rook is
+        // in SQ_B1.
+        return ChessMode == ChessMode.Normal || (GetAttacks(
+                    to,
+                    PieceTypes.Rook,
+                    Board.Pieces() ^ m.ToSquare()) & Board.Pieces(~us, PieceTypes.Rook, PieceTypes.Queen)
+            ).IsEmpty;
+    }
+
+    private bool IsEnPassantMoveLegal(Square to, Player us, Square from, Square ksq)
+    {
+        var captureSquare = to - us.PawnPushDistance();
+        var occupied = (Board.Pieces() ^ from ^ captureSquare) | to;
+
+        Debug.Assert(to == EnPassantSquare);
+        Debug.Assert(GetPiece(captureSquare) == PieceTypes.Pawn.MakePiece(~us));
+        Debug.Assert(GetPiece(to) == Piece.EmptyPiece);
+
+        return (GetAttacks(ksq, PieceTypes.Rook, in occupied) &
+                Board.Pieces(~us, PieceTypes.Rook, PieceTypes.Queen)).IsEmpty
+               && (GetAttacks(ksq, PieceTypes.Bishop, in occupied) &
+                   Board.Pieces(~us, PieceTypes.Bishop, PieceTypes.Queen)).IsEmpty;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -559,7 +566,7 @@ public sealed class Position : IPosition
 
         var us = _sideToMove;
         var pc = MovedPiece(m);
-        var (from, to) = m.FromTo();
+        var (from, to) = m;
 
         // If the from square is not occupied by a piece belonging to the side to move, the move
         // is obviously not legal.
@@ -615,10 +622,7 @@ public sealed class Position : IPosition
     }
 
     public void MakeMove(Move m, in State newState)
-    {
-        var givesCheck = GivesCheck(m);
-        MakeMove(m, newState, givesCheck);
-    }
+        => MakeMove(m, newState, GivesCheck(m));
 
     public void MakeMove(Move m, in State newState, bool givesCheck)
     {
@@ -633,7 +637,7 @@ public sealed class Position : IPosition
 
         var us = _sideToMove;
         var them = ~us;
-        var (from, to) = m.FromTo();
+        var (from, to) = m;
         var pc = GetPiece(from);
         var pt = pc.Type();
         var isPawn = pt == PieceTypes.Pawn;
@@ -819,7 +823,7 @@ public sealed class Position : IPosition
             return;
         }
 
-        var (from, to) = m.FromTo();
+        var (from, to) = m;
 
         if (m.IsCastlelingMove() && ChessMode == ChessMode.Normal)
         {
@@ -901,7 +905,7 @@ public sealed class Position : IPosition
     {
         Board.RemovePiece(sq);
         if (!IsProbing)
-            PieceUpdated?.Invoke(Piece.EmptyPiece, sq);
+            PieceUpdated?.Invoke( new PieceSquareEventArgs(Piece.EmptyPiece, sq));
     }
 
     public bool SeeGe(Move m, Value threshold)
@@ -912,7 +916,7 @@ public sealed class Position : IPosition
         if (m.MoveType() != MoveTypes.Normal)
             return Value.ValueZero >= threshold;
 
-        var (from, to) = m.FromTo();
+        var (from, to) = m;
 
         var swap = PieceValue.GetPieceValue(GetPiece(to), Phases.Mg) - threshold;
         if (swap < Value.ValueZero)
@@ -1129,7 +1133,7 @@ public sealed class Position : IPosition
         _sideToMove = ~_sideToMove;
 
         var us = _sideToMove;
-        var (from, to) = m.FromTo();
+        var (from, to) = m;
         var pc = GetPiece(to);
 
         Debug.Assert(!IsOccupied(from) || m.IsCastlelingMove());
@@ -1267,7 +1271,7 @@ public sealed class Position : IPosition
             return;
 
         var pc = Board.PieceAt(from);
-        PieceUpdated?.Invoke(pc, to);
+        PieceUpdated?.Invoke(new PieceSquareEventArgs(pc, to));
     }
 
     /// IPosition.SetCastlingRight() is an helper function used to set castling rights given the

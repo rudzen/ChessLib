@@ -39,7 +39,7 @@ public sealed class IccfNotation : Notation
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override string Convert(Move move)
     {
-        var (from, to) = move.FromTo();
+        var (from, to) = move;
 
         Span<char> re = stackalloc char[5];
         var i = 0;

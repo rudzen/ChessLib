@@ -40,7 +40,7 @@ public sealed class SmithNotation : Notation
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override string Convert(Move move)
     {
-        var (from, to) = move.FromTo();
+        var (from, to) = move;
 
         Span<char> re = stackalloc char[5];
         var i = 0;
@@ -50,7 +50,7 @@ public sealed class SmithNotation : Notation
         re[i++] = to.FileChar;
         re[i++] = to.RankChar;
 
-        var captured = _pos.GetPiece(to);
+        var captured = Pos.GetPiece(to);
 
         if (captured != Piece.EmptyPiece)
             re[i++] = captured.GetPieceChar();

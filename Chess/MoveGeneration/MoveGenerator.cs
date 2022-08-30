@@ -33,10 +33,10 @@ namespace Rudz.Chess.MoveGeneration;
 
 public static class MoveGenerator
 {
-    private static readonly (CastlelingRights, CastlelingRights)[] CastleSideRights
-        =
+    private static readonly (CastlelingRights, CastlelingRights)[] CastleSideRights =
         {
-            (CastlelingRights.WhiteOo, CastlelingRights.WhiteOoo), (CastlelingRights.BlackOo, CastlelingRights.BlackOoo)
+            (CastlelingRights.WhiteOo, CastlelingRights.WhiteOoo),
+            (CastlelingRights.BlackOo, CastlelingRights.BlackOoo)
         };
 
     public static int Generate(
@@ -76,8 +76,9 @@ public static class MoveGenerator
         Player us,
         MoveGenerationType type)
     {
-        var checks = type == MoveGenerationType.QuietChecks;
         index = GeneratePawnMoves(in pos, moves, index, target, us, type);
+
+        var checks = type == MoveGenerationType.QuietChecks;
 
         for (var pt = PieceTypes.Knight; pt <= PieceTypes.Queen; ++pt)
             index = GenerateMoves(in pos, moves, index, us, target, pt, checks);
@@ -97,10 +98,10 @@ public static class MoveGenerator
         if (!pos.CanCastle(kingSide | queenSide))
             return index;
 
-        if (!pos.CastlingImpeded(kingSide) && pos.CanCastle(kingSide))
+        if (pos.CanCastle(kingSide) && !pos.CastlingImpeded(kingSide))
             moves[index++].Move = Move.Create(ksq, pos.CastlingRookSquare(kingSide), MoveTypes.Castling);
 
-        if (!pos.CastlingImpeded(queenSide) && pos.CanCastle(queenSide))
+        if (pos.CanCastle(queenSide) && !pos.CastlingImpeded(queenSide))
             moves[index++].Move = Move.Create(ksq, pos.CastlingRookSquare(queenSide), MoveTypes.Castling);
 
         return index;
@@ -205,7 +206,7 @@ public static class MoveGenerator
             : Generate(in pos, moves, index, us, MoveGenerationType.NonEvasions);
 
         // In case there exists pinned pieces, the move is a king move (including castleling) or
-        // it's an en-pessant move the move is checked, otherwise we assume the move is legal.
+        // it's an en-passant move the move is checked, otherwise we assume the move is legal.
         var pinnedIsEmpty = pinned.IsEmpty;
         while (index != end)
             if ((!pinnedIsEmpty || moves[index].Move.FromSquare() == ksq || moves[index].Move.IsEnPassantMove())
@@ -284,7 +285,6 @@ public static class MoveGenerator
 
         var them = ~us;
         var rank7Bb = us.Rank7();
-        var rank3Bb = us.Rank3();
 
         var pawns = pos.Pieces(PieceTypes.Pawn, us);
 
@@ -310,7 +310,7 @@ public static class MoveGenerator
                 : ~pos.Pieces();
 
             pawnOne = pawnsNotOn7.Shift(up) & emptySquares;
-            pawnTwo = (pawnOne & rank3Bb).Shift(up) & emptySquares;
+            pawnTwo = (pawnOne & us.Rank3()).Shift(up) & emptySquares;
 
             // ReSharper disable once SwitchStatementMissingSomeEnumCasesNoDefault
             switch (type)
@@ -335,7 +335,7 @@ public static class MoveGenerator
                     if (!(pawnsNotOn7 & dcCandidates).IsEmpty)
                     {
                         var dc1 = (pawnsNotOn7 & dcCandidates).Shift(up) & emptySquares & ~ksq;
-                        var dc2 = (dc1 & rank3Bb).Shift(up) & emptySquares;
+                        var dc2 = (dc1 & us.Rank3()).Shift(up) & emptySquares;
                         pawnOne |= dc1;
                         pawnTwo |= dc2;
                     }
@@ -362,7 +362,7 @@ public static class MoveGenerator
             ? (Direction.NorthEast, Direction.NorthWest)
             : (Direction.SouthWest, Direction.SouthEast);
 
-        // Promotions and underpromotions
+        // Promotions and under-promotions
         if (pawnsOn7)
         {
             switch (type)

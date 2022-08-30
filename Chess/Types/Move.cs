@@ -49,20 +49,25 @@ public static class MoveTypesExtensions
 /// Move struct. Contains a single ushort for move related information. Also includes set and
 /// get functions for the relevant data stored in the bits.
 /// </summary>
-public readonly struct Move : IEquatable<Move>
+public record struct Move(ushort Data)
 {
-    private readonly ushort _data;
-
-    private Move(ushort value)
-        => _data = value;
-
-    public Move(Square from, Square to)
-        => _data = (ushort)(to | (from.AsInt() << 6));
+    public Move(Square from, Square to) : this((ushort)(to | (from.AsInt() << 6)))
+    {
+    }
 
     public Move(Square from, Square to, MoveTypes moveType, PieceTypes promoPt = PieceTypes.Knight)
-        => _data = (ushort)(to | (from.AsInt() << 6) | moveType.AsInt() | ((promoPt - PieceTypes.Knight) << 12));
+        : this((ushort)(to | (from.AsInt() << 6) | moveType.AsInt() | ((promoPt - PieceTypes.Knight) << 12)))
+    {
+    }
 
     public static readonly Move EmptyMove = new();
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Deconstruct(out Square from, out Square to)
+    {
+        from = FromSquare();
+        to = ToSquare();
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator Move(string value)
@@ -93,28 +98,16 @@ public readonly struct Move : IEquatable<Move>
         => new(from, to, moveType, promoPt);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator ==(Move left, Move right)
-        => left._data == right._data;
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator !=(Move left, Move right)
-        => left._data != right._data;
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Square FromSquare()
-        => new((_data >> 6) & 0x3F);
+        => new((Data >> 6) & 0x3F);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Square ToSquare()
-        => new(_data & 0x3F);
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public (Square, Square) FromTo()
-        => (FromSquare(), ToSquare());
+        => new(Data & 0x3F);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public PieceTypes PromotedPieceType()
-        => (PieceTypes)(((_data >> 12) & 3) + 2);
+        => (PieceTypes)(((Data >> 12) & 3) + 2);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool IsQueenPromotion()
@@ -122,7 +115,7 @@ public readonly struct Move : IEquatable<Move>
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public MoveTypes MoveType()
-        => (MoveTypes)(_data & (3 << 14));
+        => (MoveTypes)(Data & (3 << 14));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool IsType(MoveTypes moveType)
@@ -142,7 +135,7 @@ public readonly struct Move : IEquatable<Move>
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool IsNullMove()
-        => _data == 0;
+        => Data == 0;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool IsValidMove()
@@ -150,15 +143,11 @@ public readonly struct Move : IEquatable<Move>
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Equals(Move other)
-        => _data == other._data;
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override bool Equals(object obj)
-        => obj is Move move && Equals(move);
+        => Data == other.Data;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override int GetHashCode()
-        => _data;
+        => Data;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override string ToString()

@@ -38,7 +38,7 @@ public interface IPosition : IEnumerable<Piece>
 {
     bool IsProbing { get; set; }
 
-    Action<Piece, Square> PieceUpdated { get; set; }
+    Action<IPieceSquare> PieceUpdated { get; set; }
 
     ChessMode ChessMode { get; set; }
 

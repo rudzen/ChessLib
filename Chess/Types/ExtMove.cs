@@ -36,9 +36,9 @@ public struct ExtMove : IEquatable<ExtMove>
 {
     public static readonly ExtMove Empty = new();
 
-    public Move Move;
+    public Move Move { get; set; }
 
-    public int Score;
+    public int Score { get; set; }
 
     private ExtMove(Move m, int s)
     {

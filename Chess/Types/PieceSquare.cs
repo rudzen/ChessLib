@@ -44,6 +44,12 @@ public sealed class PieceSquareEventArgs : EventArgs, IPieceSquare
 
     public Square Square { get; set; }
 
+    public void Deconstruct(out Piece pc, out Square sq)
+    {
+        pc = Piece;
+        sq = Square;
+    }
+
     public bool Equals(IPieceSquare other)
         => other is not null &&
            (ReferenceEquals(this, other) || Piece.Equals(other.Piece) && Square.Equals(other.Square));

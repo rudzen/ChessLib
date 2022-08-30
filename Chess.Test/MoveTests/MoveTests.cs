@@ -49,7 +49,7 @@ public sealed class MoveTests
 
                 Assert.False(move.IsNullMove());
 
-                var (actualFrom, actualTo) = move.FromTo();
+                var (actualFrom, actualTo) = move;
 
                 Assert.Equal(expectedFrom, actualFrom);
                 Assert.Equal(expectedTo, actualTo);
@@ -61,8 +61,8 @@ public sealed class MoveTests
     [Fact]
     public void AllBasicMove()
     {
-        Square expectedFrom = Squares.a2;
-        Square expectedTo = Squares.h8;
+        var expectedFrom = Square.A2;
+        var expectedTo = Square.H8;
         const PieceTypes expectedPromotionPiece = PieceTypes.Queen;
         const MoveTypes expectedMoveType = MoveTypes.Promotion;
 

@@ -212,6 +212,13 @@ public readonly struct Piece : IEquatable<Piece>
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Deconstruct(out PieceTypes pt, out Player c)
+    {
+        pt = Type();
+        c = ColorOf();
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public int AsInt() => (int)Value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

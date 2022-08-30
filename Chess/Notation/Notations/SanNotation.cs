@@ -46,7 +46,7 @@ public sealed class SanNotation : Notation
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override string Convert(Move move)
     {
-        var (from, to) = move.FromTo();
+        var (from, to) = move;
 
         if (move.IsCastlelingMove())
             return CastlelingExtensions.GetCastlelingString(to, from);
@@ -54,11 +54,11 @@ public sealed class SanNotation : Notation
         Span<char> re = stackalloc char[6];
         var i = 0;
 
-        var pt = _pos.GetPieceType(from);
+        var pt = Pos.GetPieceType(from);
 
         if (pt != PieceTypes.Pawn)
         {
-            re[i++] = _pos.GetPiece(from).GetPgnChar();
+            re[i++] = Pos.GetPiece(from).GetPgnChar();
             foreach (var amb in Disambiguation(move, from))
                 re[i++] = amb;
         }
@@ -71,7 +71,7 @@ public sealed class SanNotation : Notation
         }
         else
         {
-            if (_pos.GetPiece(to) != Piece.EmptyPiece)
+            if (Pos.GetPiece(to) != Piece.EmptyPiece)
             {
                 if (pt == PieceTypes.Pawn)
                     re[i++] = from.FileChar;
@@ -85,10 +85,10 @@ public sealed class SanNotation : Notation
         if (move.IsPromotionMove())
         {
             re[i++] = '=';
-            re[i++] = move.PromotedPieceType().MakePiece(_pos.SideToMove).GetPgnChar();
+            re[i++] = move.PromotedPieceType().MakePiece(Pos.SideToMove).GetPgnChar();
         }
 
-        if (_pos.InCheck)
+        if (Pos.InCheck)
             re[i++] = GetCheckChar();
 
         return new string(re[..i]);

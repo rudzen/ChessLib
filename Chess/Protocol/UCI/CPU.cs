@@ -79,6 +79,10 @@ public sealed class CPU
         _lastUserCpu = user;
         CpuUse = percentage;
 
-        return percentage <= 0 ? 0 : Math.Round(percentage * 1000, MidpointRounding.ToEven);
+        return percentage switch
+        {
+            <= 0 => 0,
+            _ => Math.Round(percentage * 1000, MidpointRounding.ToEven)
+        };
     }
 }

@@ -40,7 +40,7 @@ public sealed class CoordinateNotation : Notation
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override string Convert(Move move)
     {
-        var (from, to) = move.FromTo();
+        var (from, to) = move;
 
         Span<char> re = stackalloc char[8];
         var i = 0;
@@ -51,7 +51,7 @@ public sealed class CoordinateNotation : Notation
         re[i++] = char.ToUpper(to.FileChar);
         re[i++] = to.RankChar;
 
-        var captured = _pos.GetPiece(to);
+        var captured = Pos.GetPiece(to);
 
         // ReSharper disable once InvertIf
         if (captured != Piece.EmptyPiece)

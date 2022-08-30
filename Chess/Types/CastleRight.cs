@@ -79,15 +79,14 @@ public static class CastlelingExtensions
         => @this & ~remove;
 }
 
-public readonly struct CastleRight : IEquatable<CastleRight>
+public readonly record struct CastleRight(CastlelingRights Rights) : IEquatable<CastleRight>
 {
-    private CastleRight(CastlelingRights cr)
-        => Rights = cr;
+    // private CastleRight(CastlelingRights cr)
+    //     => Rights = cr;
 
-    private CastleRight(int cr)
-        => Rights = (CastlelingRights)cr;
+    private CastleRight(int cr) : this((CastlelingRights)cr) {}
 
-    public CastlelingRights Rights { get; }
+    // public CastlelingRights Rights { get; }
 
     public bool IsNone => Rights == CastlelingRights.None;
 
@@ -117,17 +116,8 @@ public readonly struct CastleRight : IEquatable<CastleRight>
     public bool Equals(CastleRight other)
         => Rights == other.Rights;
 
-    public override bool Equals(object obj)
-        => obj is CastleRight other && Equals(other);
-
     public override int GetHashCode()
         => (int)Rights;
-
-    public static bool operator ==(CastleRight cr1, CastleRight cr2)
-        => cr1.Rights == cr2.Rights;
-
-    public static bool operator !=(CastleRight cr1, CastleRight cr2)
-        => cr1.Rights != cr2.Rights;
 
     public static bool operator true(CastleRight cr)
         => cr.Rights != CastlelingRights.None;

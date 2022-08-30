@@ -26,13 +26,6 @@ SOFTWARE.
 
 namespace Rudz.Chess.Protocol.UCI;
 
-public struct Clock
+public record struct Clock(ulong[] Inc, ulong[] Time)
 {
-    public Clock()
-    {
-    }
-
-    public ulong[] Inc { get; } = new ulong[2];
-
-    public ulong[] Time { get; } = new ulong[2];
 }

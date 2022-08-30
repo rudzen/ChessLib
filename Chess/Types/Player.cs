@@ -70,6 +70,12 @@ public readonly struct Player : IEquatable<Player>
 
     public readonly byte Side;
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Deconstruct(out byte side)
+        => side = Side;
+
+    // public readonly byte Side;
+
     public bool IsWhite => Side == 0;
 
     public bool IsBlack => Side != 0;
@@ -126,26 +132,34 @@ public readonly struct Player : IEquatable<Player>
     public override int GetHashCode() => Side << 24;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override string ToString() => PlayerColors[Side];
+    public override string ToString()
+        => PlayerColors[Side];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool IsOk() => Side.InBetween(White.Side, Black.Side);
+    public bool IsOk()
+        => Side.InBetween(White.Side, Black.Side);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public string GetName() => PlayerColors[Side];
+    public string GetName()
+        => PlayerColors[Side];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Direction PawnPushDistance() => PawnPushDist[Side];
+    public Direction PawnPushDistance()
+        => PawnPushDist[Side];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Direction PawnDoublePushDistance() => PawnDoublePushDist[Side];
+    public Direction PawnDoublePushDistance()
+        => PawnDoublePushDist[Side];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Direction PawnWestAttackDistance() => PawnWestAttackDist[Side];
+    public Direction PawnWestAttackDistance()
+        => PawnWestAttackDist[Side];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Direction PawnEastAttackDistance() => PawnEastAttackDist[Side];
+    public Direction PawnEastAttackDistance()
+        => PawnEastAttackDist[Side];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public BitBoard PawnPush(BitBoard bitBoard) => PawnPushModifiers[Side](bitBoard);
+    public BitBoard PawnPush(BitBoard bitBoard)
+        => PawnPushModifiers[Side](bitBoard);
 }

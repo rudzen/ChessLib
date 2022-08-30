@@ -96,13 +96,17 @@ public sealed class Option : IOption
 
     public int GetInt()
     {
-        Debug.Assert(Type == UciOptionType.Check || Type == UciOptionType.Spin);
-        return Type == UciOptionType.Spin ? Convert.ToInt32(_currentValue) : bool.Parse(_currentValue).ToInt();
+        Debug.Assert(Type is UciOptionType.Check or UciOptionType.Spin);
+        return Type switch
+        {
+            UciOptionType.Spin => Convert.ToInt32(_currentValue),
+            _ => bool.Parse(_currentValue).ToInt()
+        };
     }
 
     public string GetText()
     {
-        Debug.Assert(Type != UciOptionType.Check || Type != UciOptionType.Spin);
+        Debug.Assert(Type is not (UciOptionType.Check and UciOptionType.Spin));
         return _currentValue;
     }
 

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Attributes;
 using Rudz.Chess.Types;
@@ -5,68 +6,64 @@ using Rudz.Chess.Types;
 namespace Chess.Benchmark;
 
 [MemoryDiagnoser]
-public class CharConvertBenchmark
+public sealed class CharConvertBenchmark
 {
-    
+
     private static readonly char[] FileChars = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' };
 
     private static readonly string[] FileStrings = FileChars.Select(static x => x.ToString()).ToArray();
 
-    private static readonly File[] _files = File.AllFiles;
-
-    [Benchmark]
-    public void CharFromArray()
+    public static IEnumerable<object> FileParams()
     {
-
-        foreach (var file in _files)
-        {
-            char c = FileChars[file.AsInt()];
-        }
+        yield return File.FILE_A;
+        yield return File.FILE_B;
+        yield return File.FILE_C;
+        yield return File.FILE_D;
+        yield return File.FILE_E;
+        yield return File.FILE_F;
+        yield return File.FILE_G;
+        yield return File.FILE_H;
     }
 
     [Benchmark]
-    public void CharFromConvert()
+    [ArgumentsSource(nameof(FileParams))]
+    public char CharFromArray(File f)
     {
-        foreach (var file in _files)
-        {
-            char c = (char)('a' + file.AsInt());
-        }
+        return FileChars[f.AsInt()];
     }
 
     [Benchmark]
-    public void StringFromArray()
+    [ArgumentsSource(nameof(FileParams))]
+    public char CharFromConvert(File f)
     {
-        foreach (var file in _files)
-        {
-            string s = FileStrings[file.AsInt()];
-        }
+        return (char)('a' + f.AsInt());
     }
 
     [Benchmark]
-    public void StringFromCreate()
+    [ArgumentsSource(nameof(FileParams))]
+    public string StringFromArray(File f)
     {
-        foreach (var file in _files)
-        {
-            string s = string.Create(1, file.Value, static (span, v) => span[0] = (char)('a' + v));
-        }
+        return FileStrings[f.AsInt()];
     }
 
     [Benchmark]
-    public void StringFromCharConvert()
+    [ArgumentsSource(nameof(FileParams))]
+    public string StringFromCreate(File f)
     {
-        foreach (var file in _files)
-        {
-            string s = new string((char)('a' + file.AsInt()), 1);
-        }
+        return string.Create(1, f.Value, static (span, v) => span[0] = (char)('a' + v));
+    }
+
+    [Benchmark]
+    [ArgumentsSource(nameof(FileParams))]
+    public string StringFromCharConvert(File f)
+    {
+        return new string((char)('a' + f.AsInt()), 1);
     }
     
     [Benchmark]
-    public void StringFromChar()
+    [ArgumentsSource(nameof(FileParams))]
+    public string StringFromChar(File f)
     {
-        foreach (var file in _files)
-        {
-            string s = ((char)('a' + file.AsInt())).ToString();
-        }
+        return ((char)('a' + f.AsInt())).ToString();
     }
-
 }

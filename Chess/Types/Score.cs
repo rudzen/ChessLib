@@ -94,6 +94,13 @@ public struct Score : IEquatable<Score>
     public static readonly Score Zero = new();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public readonly void Deconstruct(out int mg, out int eg)
+    {
+        mg = Mg();
+        eg = Eg();
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void SetMg(int v)
         => _data.mg = v;
 

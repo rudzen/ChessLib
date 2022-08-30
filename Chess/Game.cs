@@ -57,7 +57,7 @@ public sealed class Game : IGame
         Table = new TranspositionTable(256);
     }
 
-    public Action<Piece, Square> PieceUpdated => Pos.PieceUpdated;
+    public Action<IPieceSquare> PieceUpdated => Pos.PieceUpdated;
 
     public int MoveNumber => 0; //(PositionIndex - 1) / 2 + 1;
 

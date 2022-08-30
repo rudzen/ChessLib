@@ -103,7 +103,7 @@ public sealed class Blockage : IBlockage
 
         var ourKsq = _pos.GetKingSquare(_us);
 
-        if (ourKsq.Rank.Relative(_us) > _fenceRank[ourKsq.File.AsInt()].Relative(_us))
+        if (ourKsq.RelativeRank(_us) > _fenceRank[ourKsq.File.AsInt()].Relative(_us))
             return false;
 
         var theirKsq = _pos.GetKingSquare(_them);
@@ -112,8 +112,8 @@ public sealed class Blockage : IBlockage
         while (_dynamicPawns)
         {
             var sq = BitBoards.PopLsb(ref _dynamicPawns);
-            var (r, f) = sq.RankFile;
-            var rr = sq.RelativeRank(_us);
+            var (r, f) = sq;
+            var rr = r.Relative(_us);
 
             if (r > _fenceRank[f.AsInt()])
             {
@@ -128,7 +128,7 @@ public sealed class Blockage : IBlockage
 
                 if (_pos.GetPiece(sq + _us.PawnDoublePushDistance()) != _theirPawn)
                 {
-                    if (theirKsq.File != f || theirKsq.Rank.Relative(_us) < rr)
+                    if (theirKsq.File != f || theirKsq.RelativeRank(_us) < rr)
                         return false;
 
                     if (f != File.FILE_A)
@@ -172,7 +172,8 @@ public sealed class Blockage : IBlockage
             {
                 sq += up;
                 r = sq.Rank;
-                rr = sq.RelativeRank(_us);
+                rr = r.Relative(_us);
+
                 while ((_fence & Square.Create(r, f)).IsEmpty)
                 {
                     var pawnAttacks = sq.PawnAttack(_us);
@@ -186,7 +187,7 @@ public sealed class Blockage : IBlockage
                     r = sq.Rank;
                 }
 
-                if ((_fence & Square.Create(r, f)).IsEmpty || _pos.IsOccupied(sq))
+                if (_pos.IsOccupied(sq) || (_fence & Square.Create(r, f)).IsEmpty)
                     continue;
 
                 if (rr >= Ranks.Rank6)
@@ -194,7 +195,7 @@ public sealed class Blockage : IBlockage
 
                 if ((_theirPawns & (sq + _us.PawnDoublePushDistance())).IsEmpty)
                 {
-                    if (theirKsq.File != f || theirKsq.Rank.Relative(_us) < rr)
+                    if (theirKsq.File != f || theirKsq.RelativeRank(_us) < rr)
                         return false;
 
                     if (f != File.FILE_A)
@@ -246,7 +247,7 @@ public sealed class Blockage : IBlockage
         while (covered)
         {
             var sq = BitBoards.PopLsb(ref covered);
-            var (r, f) = sq.RankFile;
+            var (r, f) = sq;
             _fenceRank[f.AsInt()] = r;
         }
     }

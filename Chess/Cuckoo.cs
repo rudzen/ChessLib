@@ -104,8 +104,7 @@ public static class Cuckoo
             if (!found)
                 continue;
 
-            var move = CuckooMoves[j];
-            var (s1, s2) = move.FromTo();
+            var (s1, s2) = CuckooMoves[j];
 
             if ((s1.BitboardBetween(s2) & pos.Board.Pieces()).IsEmpty)
                 continue;

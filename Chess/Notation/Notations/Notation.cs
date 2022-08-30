@@ -35,25 +35,26 @@ namespace Rudz.Chess.Notation.Notations;
 
 public abstract class Notation : INotation
 {
-    protected readonly IPosition _pos;
+    protected readonly IPosition Pos;
 
-    protected Notation(IPosition pos)
-    {
-        _pos = pos;
-    }
+    protected Notation(IPosition pos) => Pos = pos;
 
     public abstract string Convert(Move move);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    protected char GetCheckChar()
-        => _pos.GenerateMoves().Length != 0 ? '+' : '#';
+    protected char GetCheckChar() =>
+        Pos.GenerateMoves().Length switch
+        {
+            0 => '+',
+            _ => '#'
+        };
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private MoveAmbiguities Ambiguity(Square from, BitBoard similarTypeAttacks)
     {
         var ambiguity = MoveAmbiguities.None;
-        var c = _pos.SideToMove;
-        var pinned = _pos.PinnedPieces(c);
+        var c = Pos.SideToMove;
+        var pinned = Pos.PinnedPieces(c);
 
         while (similarTypeAttacks)
         {
@@ -62,11 +63,11 @@ public abstract class Notation : INotation
             if (pinned & square)
                 continue;
 
-            if (_pos.GetPieceType(from) != _pos.GetPieceType(square))
+            if (Pos.GetPieceType(from) != Pos.GetPieceType(square))
                 continue;
 
             // ReSharper disable once InvertIf
-            if (_pos.Pieces(c) & square)
+            if (Pos.Pieces(c) & square)
             {
                 if (square.File == from.File)
                     ambiguity |= MoveAmbiguities.File;
@@ -116,10 +117,12 @@ public abstract class Notation : INotation
     private BitBoard GetSimilarAttacks(Move move)
     {
         var from = move.FromSquare();
-        var pt = _pos.GetPieceType(from);
+        var pt = Pos.GetPieceType(from);
 
-        return pt is PieceTypes.Pawn or PieceTypes.King
-            ? BitBoard.Empty
-            : _pos.GetAttacks(move.ToSquare(), pt, _pos.Pieces()) ^ from;
+        return pt switch
+        {
+            PieceTypes.Pawn or PieceTypes.King => BitBoard.Empty,
+            _ => Pos.GetAttacks(move.ToSquare(), pt, Pos.Pieces()) ^ from
+        };
     }
 }

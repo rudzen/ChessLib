@@ -137,7 +137,7 @@ public sealed class Book : IDisposable
         _binaryReader?.Dispose();
     }
 
-    private Move ConvertMove(ushort m)
+    private Move ConvertMove(ushort polyMove)
     {
         // A PolyGlot book move is encoded as follows:
         //
@@ -148,12 +148,12 @@ public sealed class Book : IDisposable
         // In case book move is a non-normal move, the move have to be converted. Castleling moves
         // are especially converted to reflect castleling move format.
 
-        Move move = m;
+        Move move = polyMove;
 
-        var (from, to) = move.FromTo();
+        var (from, to) = move;
 
         // Promotion type move needs to be converted from PG format.
-        var polyPt = (m >> 12) & 7;
+        var polyPt = (polyMove >> 12) & 7;
 
         if (polyPt > 0)
         {

@@ -62,7 +62,7 @@ public static class SquaresExtensions
 /// <summary>
 /// Square data struct. Contains a single enum value which represents a square on the board.
 /// </summary>
-public readonly struct Square : IComparable<Square>, IEquatable<Square>
+public readonly record struct Square(Squares Value) : IComparable<Square>
 {
     private static readonly string[] SquareStrings = Enum
         .GetValues(typeof(Squares))
@@ -72,10 +72,14 @@ public readonly struct Square : IComparable<Square>, IEquatable<Square>
         .ToArray();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Square(int square) => Value = (Squares)square;
+    public Square(int square) : this((Squares)square)
+    {
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Square(Square square) => Value = square.Value;
+    public Square(Square square) : this(square.Value)
+    {
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Square(int rank, int file)
@@ -100,13 +104,15 @@ public readonly struct Square : IComparable<Square>, IEquatable<Square>
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private Square(Squares square) => Value = square;
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator Square(string value)
         => new(new Square(value[1] - '1', value[0] - 'a'));
 
-    public Squares Value { get; }
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Deconstruct(out Rank rank, out File file)
+    {
+        rank = Rank;
+        file = File;
+    }
 
     public Rank Rank
         => (Ranks)(AsInt() >> 3);
@@ -119,9 +125,6 @@ public readonly struct Square : IComparable<Square>, IEquatable<Square>
 
     public char FileChar
         => File.Char;
-
-    public (Rank, File) RankFile
-        => (Rank, File);
 
     public bool IsOk
         => ((int)Value).InBetween((int)Squares.a1, (int)Squares.h8);
@@ -221,14 +224,6 @@ public readonly struct Square : IComparable<Square>, IEquatable<Square>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator Square((Rank, File) value)
         => new(value);
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator ==(Square left, Square right)
-        => left.Equals(right);
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator !=(Square left, Square right)
-        => !left.Equals(right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool operator ==(Square left, Squares right)
@@ -351,10 +346,6 @@ public readonly struct Square : IComparable<Square>, IEquatable<Square>
         => Value == other.Value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override bool Equals(object obj)
-        => obj is Square square && Equals(square);
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override int GetHashCode()
         => AsInt();
 
@@ -376,5 +367,9 @@ public readonly struct Square : IComparable<Square>, IEquatable<Square>
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public int CompareTo(Square other)
-        => Value.CompareTo(other.Value);
+    {
+        if (Value < other.Value)
+            return -1;
+        return Value > other.Value ? 1 : 0;
+    }
 }

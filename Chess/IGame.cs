@@ -35,7 +35,7 @@ namespace Rudz.Chess;
 
 public interface IGame : IEnumerable<Piece>
 {
-    Action<Piece, Square> PieceUpdated { get; }
+    Action<IPieceSquare> PieceUpdated { get; }
     BitBoard Occupied { get; }
     IPosition Pos { get; }
     GameEndTypes GameEndType { get; set; }
