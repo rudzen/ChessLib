@@ -24,22 +24,21 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess;
-
-using Enums;
-using Fen;
-using Hash.Tables.Transposition;
-using Microsoft.Extensions.ObjectPool;
-using MoveGeneration;
-using ObjectPoolPolicies;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using Types;
-using Piece = Types.Piece;
-using Square = Types.Square;
+using Microsoft.Extensions.ObjectPool;
+using Rudz.Chess.Enums;
+using Rudz.Chess.Fen;
+using Rudz.Chess.Hash.Tables.Transposition;
+using Rudz.Chess.MoveGeneration;
+using Rudz.Chess.ObjectPoolPolicies;
+using Rudz.Chess.Protocol.UCI;
+using Rudz.Chess.Types;
+
+namespace Rudz.Chess;
 
 public sealed class Game : IGame
 {
@@ -49,6 +48,8 @@ public sealed class Game : IGame
     {
         Pos = pos;
         _moveLists = new DefaultObjectPool<IMoveList>(new MoveListPolicy());
+        Uci = new Uci();
+        SearchParameters = new SearchParameters();
     }
 
     static Game()
@@ -56,9 +57,9 @@ public sealed class Game : IGame
         Table = new TranspositionTable(256);
     }
 
-    public Action<Piece, Square> PieceUpdated => Pos.PieceUpdated;
+    public Action<IPieceSquare> PieceUpdated => Pos.PieceUpdated;
 
-    public int MoveNumber => 0;//(PositionIndex - 1) / 2 + 1;
+    public int MoveNumber => 0; //(PositionIndex - 1) / 2 + 1;
 
     public BitBoard Occupied => Pos.Pieces();
 
@@ -66,7 +67,11 @@ public sealed class Game : IGame
 
     public GameEndTypes GameEndType { get; set; }
 
-    public static TranspositionTable Table { get; set; }
+    public static TranspositionTable Table { get; }
+
+    public SearchParameters SearchParameters { get; }
+
+    public IUci Uci { get; }
 
     public bool IsRepetition => Pos.IsRepetition;
 
@@ -75,7 +80,7 @@ public sealed class Game : IGame
     {
         var fenData = new FenData(fen);
         var state = new State();
-        Pos.Set(in fenData, ChessMode.NORMAL, in state, true);
+        Pos.Set(in fenData, ChessMode.Normal, state, true);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -93,8 +98,13 @@ public sealed class Game : IGame
 
         var moveList = _moveLists.Get();
         moveList.Generate(Pos);
-        if (moveList.Any(move => !Pos.IsLegal(move)))
-            gameEndType |= GameEndTypes.Pat;
+        // ReSharper disable once LoopCanBeConvertedToQuery
+        foreach (var em in moveList)
+            if (!Pos.IsLegal(em.Move))
+            {
+                gameEndType |= GameEndTypes.Pat;
+                break;
+            }
 
         GameEndType = gameEndType;
     }
@@ -109,7 +119,7 @@ public sealed class Game : IGame
         => Pos.GetEnumerator();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public BitBoard OccupiedBySide(in Player c)
+    public BitBoard OccupiedBySide(Player c)
         => Pos.Pieces(c);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -117,12 +127,6 @@ public sealed class Game : IGame
 
     public ulong Perft(int depth, bool root = false)
     {
-        var posKey = Pos.State.Key;
-
-        var (found, entry) = Table.Probe(posKey);
-        if (found && entry.Key32 == posKey.LowerKey)
-            return (ulong)entry.Value;
-
         var ml = _moveLists.Get();
         ml.Generate(Pos);
 
@@ -136,20 +140,14 @@ public sealed class Game : IGame
         var state = new State();
         ulong tot = 0;
 
-        var move = Move.EmptyMove;
-
-        foreach (var em in ml)
+        foreach (var move in ml.Select(static em => em.Move))
         {
-            move = em.Move;
             Pos.MakeMove(move, in state);
             tot += Perft(depth - 1);
             Pos.TakeMove(move);
         }
 
         _moveLists.Return(ml);
-
-        if (tot <= int.MaxValue && move != Move.EmptyMove)
-            Table.Store(posKey.Key, (int)tot, Bound.Exact, (sbyte)depth, move, 0);
 
         return tot;
     }

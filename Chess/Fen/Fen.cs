@@ -24,15 +24,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Fen;
-
-using Enums;
-using Exceptions;
-using Extensions;
 using System;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
-using Types;
+using Rudz.Chess.Exceptions;
+using Rudz.Chess.Extensions;
+using Rudz.Chess.Types;
+
+namespace Rudz.Chess.Fen;
 
 public static class Fen
 {
@@ -50,7 +49,7 @@ public static class Fen
 
     private const int SeparatorCount = 7;
 
-    private static readonly Lazy<Regex> ValidFenRegex = new(() => new Regex(
+    private static readonly Lazy<Regex> ValidFenRegex = new(static () => new Regex(
        string.Format(@"^ \s* {0}/{0}/{0}/{0}/{0}/{0}/{0}/{0} \s+ (?:w|b) \s+ (?:[KkQq]+|\-) \s+ (?:[a-h][1-8]|\-) \s+ \d+ \s+ \d+ \s* $", FenRankRegexSnippet),
        RegexOptions.Compiled | RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline));
 
@@ -155,7 +154,7 @@ public static class Fen
         spaceIndex = s.LastIndexOf(' ');
         var endSection = s[spaceIndex..];
 
-        if (endSection.ToString().ToIntegral() >= 2048)
+        if (Maths.ToIntegral(endSection) >= 2048)
             throw new InvalidFen($"Invalid half move count for fen {s.ToString()}");
 
         return true;
@@ -188,7 +187,6 @@ public static class Fen
         var result = (spaceCount: 0, separatorCount: 0);
 
         foreach (var c in str)
-        {
             switch (c)
             {
                 case Separator:
@@ -199,7 +197,6 @@ public static class Fen
                     result.spaceCount++;
                     break;
             }
-        }
 
         return result;
     }

@@ -24,12 +24,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Hash;
-
-using Enums;
 using System;
 using System.Runtime.CompilerServices;
-using Types;
+using Rudz.Chess.Enums;
+using Rudz.Chess.Types;
+
+namespace Rudz.Chess.Hash;
 
 /// <summary>
 /// Class responsible for keeping random values for use with Zobrist hashing.
@@ -60,75 +60,71 @@ public static class Zobrist
     /// <summary>
     /// Represents the piece index (as in EPieces), with each a square of the board value to match.
     /// </summary>
-    private static readonly ulong[][] ZobristPst = new ulong[16][];
+    private static readonly HashKey[][] ZobristPst = new HashKey[16][];
 
     /// <summary>
     /// Represents the castleling rights.
     /// </summary>
-    private static readonly ulong[] ZobristCastling = new ulong[16];
+    private static readonly HashKey[] ZobristCastling = new HashKey[16];
 
     /// <summary>
     /// En-Passant is only required to have 8 entries, one for each possible file where the En-Passant square can occur.
     /// </summary>
-    private static readonly ulong[] ZobristEpFile = new ulong[8];
+    private static readonly HashKey[] ZobristEpFile = new HashKey[8];
 
     /// <summary>
     /// This is used if the side to move is black, if the side is white, no hashing will occur.
     /// </summary>
-    private static readonly ulong ZobristSide;
+    private static readonly HashKey ZobristSide;
 
     /// <summary>
     /// To use as base for pawn hash table
     /// </summary>
-    public static readonly ulong ZobristNoPawn;
+    public static readonly HashKey ZobristNoPawn;
 
     static Zobrist()
     {
         var rnd = RKiss.Create(DefaultRandomSeed);
-        InitializePst(rnd);
+        InitializePst(in rnd);
         InitializeRandomArray(ZobristEpFile, rnd);
         InitializeRandomArray(ZobristCastling, rnd);
         ZobristSide = rnd.Rand();
         ZobristNoPawn = rnd.Rand();
     }
 
-    private static void InitializePst(IRKiss rnd)
+    private static void InitializePst(in IRKiss rnd)
     {
         for (var i = 0; i < ZobristPst.Length; i++)
-            ZobristPst[i] = new ulong[64];
+            ZobristPst[i] = new HashKey[64];
 
-        Span<PieceTypes> pieceTypes = stackalloc PieceTypes[]
-            { PieceTypes.Pawn, PieceTypes.Knight, PieceTypes.Bishop, PieceTypes.Rook, PieceTypes.Queen, PieceTypes.King };
-
-        Span<Player> players = stackalloc Player[]
-            { Player.White, Player.Black };
-
-        foreach (var side in players)
+        Span<Piece> pieces = stackalloc Piece[]
         {
-            foreach (var pieceType in pieceTypes)
-            {
-                var pieceIndex = pieceType.MakePiece(side).AsInt();
-                foreach (var sq in BitBoards.AllSquares)
-                    ZobristPst[pieceIndex][sq.AsInt()] = rnd.Rand();
-            }
-        }
+            Pieces.WhitePawn, Pieces.WhiteKnight, Pieces.WhiteBishop,
+            Pieces.WhiteRook, Pieces.WhiteQueen,  Pieces.WhiteKing,
+            Pieces.BlackPawn, Pieces.BlackKnight, Pieces.BlackBishop,
+            Pieces.BlackRook, Pieces.BlackQueen,  Pieces.BlackKing
+        };
+
+        foreach (var pc in pieces)
+        foreach (var sq in BitBoards.AllSquares)
+            ZobristPst[pc.AsInt()][sq.AsInt()] = rnd.Rand();
     }
 
-    private static void InitializeRandomArray(Span<ulong> array, IRKiss rnd)
+    private static void InitializeRandomArray(Span<HashKey> array, IRKiss rnd)
     {
         for (var i = 0; i < array.Length; i++)
             array[i] = rnd.Rand();
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ulong GetZobristPst(this Piece piece, Square square) => ZobristPst[piece.AsInt()][square.AsInt()];
+    public static HashKey GetZobristPst(this Piece piece, Square square) => ZobristPst[piece.AsInt()][square.AsInt()];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ulong GetZobristCastleling(this CastlelingRights index) => ZobristCastling[index.AsInt()];
+    public static HashKey GetZobristCastleling(this CastlelingRights index) => ZobristCastling[index.AsInt()];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ulong GetZobristSide() => ZobristSide;
+    public static HashKey GetZobristSide() => ZobristSide;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ulong GetZobristEnPessant(this File file) => ZobristEpFile[file.AsInt()];
+    public static HashKey GetZobristEnPassant(this File file) => ZobristEpFile[file.AsInt()];
 }

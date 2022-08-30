@@ -24,11 +24,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Perft;
-
-using Options;
 using System.Threading;
 using System.Threading.Tasks;
+using Perft.Options;
+
+namespace Perft;
 
 public interface IPerftRunner
 {

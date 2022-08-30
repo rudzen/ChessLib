@@ -26,10 +26,6 @@ SOFTWARE.
 
 // ReSharper disable InconsistentNaming
 
-namespace Rudz.Chess.Types;
-
-using Enums;
-using Extensions;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -38,6 +34,9 @@ using System.Linq;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Text;
+using Rudz.Chess.Extensions;
+
+namespace Rudz.Chess.Types;
 
 public static class BitBoards
 {
@@ -83,7 +82,7 @@ public static class BitBoards
 
     public static readonly BitBoard RANK8 = 0xff00000000000000;
 
-    public static readonly BitBoard EmptyBitBoard = new(0UL);
+    public static readonly BitBoard EmptyBitBoard = new(ulong.MinValue);
 
     public static readonly BitBoard AllSquares = ~EmptyBitBoard;
 
@@ -152,6 +151,8 @@ public static class BitBoards
 
     private static readonly BitBoard[][] DistanceRingBB;
 
+    private static readonly Direction[] PawnPushDirections = { Direction.North, Direction.South };
+
     private static readonly IDictionary<Direction, Func<BitBoard, BitBoard>> ShiftFuncs = MakeShiftFuncs();
 
     private static readonly Func<BitBoard, BitBoard>[] FillFuncs = MakeFillFuncs();
@@ -198,10 +199,10 @@ public static class BitBoards
         for (var i = 0; i < SquareDistance.Length; i++)
             DistanceRingBB[i] = new BitBoard[8];
 
-        CornerA1 = MakeBitboard(Squares.a1, Squares.b1, Squares.a2, Squares.b2);
-        CornerA8 = MakeBitboard(Squares.a8, Squares.b8, Squares.a7, Squares.b7);
-        CornerH1 = MakeBitboard(Squares.h1, Squares.g1, Squares.h2, Squares.g2);
-        CornerH8 = MakeBitboard(Squares.h8, Squares.g8, Squares.h7, Squares.g7);
+        CornerA1 = MakeBitboard(Square.A1, Square.B1, Square.A2, Square.B2);
+        CornerA8 = MakeBitboard(Square.A8, Square.B8, Square.A7, Square.B7);
+        CornerH1 = MakeBitboard(Square.H1, Square.G1, Square.H2, Square.G2);
+        CornerH8 = MakeBitboard(Square.H8, Square.G8, Square.H7, Square.G7);
 
         // local helper functions to calculate distance
         static int distance(int x, int y) => Math.Abs(x - y);
@@ -310,7 +311,7 @@ public static class BitBoards
             {
                 KingRingBB[player.Side][sq] = PseudoAttacksBB[pt][sq];
                 if (s1.RelativeRank(player) == Ranks.Rank1)
-                    KingRingBB[player.Side][sq] |= KingRingBB[player.Side][sq].Shift(player.IsWhite ? Direction.North : Direction.South);
+                    KingRingBB[player.Side][sq] |= KingRingBB[player.Side][sq].Shift(PawnPushDirections[player.Side]);
 
                 if (file == Files.FileH)
                     KingRingBB[player.Side][sq] |= KingRingBB[player.Side][sq].WestOne();
@@ -327,34 +328,6 @@ public static class BitBoards
         => PseudoAttacksBB[pt.AsInt()][sq.AsInt()];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard XrayBishopAttacks(this Square square, in BitBoard occupied, BitBoard blockers)
-    {
-        var attacks = square.BishopAttacks(occupied);
-        blockers &= attacks;
-        return attacks ^ square.BishopAttacks(occupied ^ blockers);
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard XrayRookAttacks(this Square square, in BitBoard occupied, BitBoard blockers)
-    {
-        var attacks = square.RookAttacks(occupied);
-        blockers &= attacks;
-        return attacks ^ square.RookAttacks(occupied ^ blockers);
-    }
-
-    public static BitBoard XrayAttacks(this in Square square, PieceTypes pieceType, in BitBoard occupied, in BitBoard blockers)
-    {
-        return pieceType switch
-        {
-            PieceTypes.Bishop => square.XrayBishopAttacks(occupied, blockers),
-            PieceTypes.Rook => square.XrayRookAttacks(occupied, blockers),
-            PieceTypes.Queen => XrayBishopAttacks(square, occupied, blockers) |
-                                XrayRookAttacks(square, occupied, blockers),
-            _ => EmptyBitBoard
-        };
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static BitBoard KnightAttacks(this Square square)
         => PseudoAttacksBB[PieceTypes.Knight.AsInt()][square.AsInt()];
 
@@ -369,7 +342,7 @@ public static class BitBoards
     /// <param name="side">The player side</param>
     /// <returns>ref to bitboard of attack</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard PawnAttack(this in Square @this, in Player side)
+    public static BitBoard PawnAttack(this Square @this, Player side)
         => PseudoAttacksBB[side.Side][@this.AsInt()];
 
     /// <summary>
@@ -505,11 +478,25 @@ public static class BitBoards
         var s = new StringBuilder("+---+---+---+---+---+---+---+---+---+\n", 1024);
         if (!title.IsNullOrWhiteSpace())
             s.AppendLine($"| {title}");
+
+        Span<char> row = stackalloc char[36];
         for (var r = Ranks.Rank8; r >= Ranks.Rank1; --r)
         {
-            s.AppendFormat("| {0} ", (int)r + 1);
+            row.Clear();
+            var rowIndex = 0;
+            row[rowIndex++] = '|';
+            row[rowIndex++] = ' ';
+            row[rowIndex++] = (char)('0' + (int)r + 1);
             for (var f = Files.FileA; f <= Files.FileH; ++f)
-                s.AppendFormat("| {0} ", (b & new Square(r, f)).IsEmpty ? ' ' : 'X');
+            {
+                row[rowIndex++] = '|';
+                row[rowIndex++] = ' ';
+                var c = (b & new Square(r, f)).IsEmpty ? ' ' : 'X';
+                row[rowIndex++] = c;
+                row[rowIndex++] = ' ';
+            }
+
+            s.Append(new string(row));
             s.AppendLine("|\n+---+---+---+---+---+---+---+---+---+");
         }
 
@@ -519,13 +506,22 @@ public static class BitBoards
     }
 
     /// <summary>
-    /// Retrieves the least significant bit in a ulong word.
+    /// Retrieves the least significant bit in an ulong word.
     /// </summary>
     /// <param name="bb">The word to get lsb from</param>
     /// <returns>The index of the found bit</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Square Lsb(this in BitBoard bb)
         => BitOperations.TrailingZeroCount(bb.Value);
+
+    /// <summary>
+    /// Retrieves the least significant bit in an int word.
+    /// </summary>
+    /// <param name="v">The word to get lsb from</param>
+    /// <returns>The index of the found bit</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static int Lsb(this int v)
+        => BitOperations.TrailingZeroCount(v);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Square Msb(this in BitBoard bb)
@@ -619,12 +615,28 @@ public static class BitBoards
     public static void ResetLsb(ref BitBoard bb)
         => bb &= bb - 1;
 
+    /// <summary>
+    /// Reset the least significant bit in-place
+    /// </summary>
+    /// <param name="v">The integer as reference</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void ResetLsb(ref int v)
+        => v &= v - 1;
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Square PopLsb(ref BitBoard bb)
     {
         var sq = bb.Lsb();
         ResetLsb(ref bb);
         return sq;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static int PopLsb(ref int v)
+    {
+        var i = v.Lsb();
+        ResetLsb(ref v);
+        return i;
     }
 
     /// <summary>
@@ -637,12 +649,29 @@ public static class BitBoards
         => BitOperations.PopCount(bb.Value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard Rank7(this in Player player)
+    public static BitBoard Rank7(this Player player)
         => Rank7BitBoards[player.Side];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard Rank3(this in Player player)
+    public static BitBoard Rank3(this Player player)
         => Rank3BitBoards[player.Side];
+
+    /// <summary>
+    /// Generate a bitboard based on a square.
+    /// </summary>
+    /// <param name="sq">The square to generate bitboard from</param>
+    /// <returns>The generated bitboard</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static BitBoard MakeBitboard(Square sq) => sq.AsBb();
+
+    /// <summary>
+    /// Generate a bitboard based on two squares.
+    /// </summary>
+    /// <param name="sq">The square to generate bitboard from</param>
+    /// <param name="sq2">The second square to generate bitboard from</param>
+    /// <returns>The generated bitboard</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static BitBoard MakeBitboard(Square sq, Square sq2) => sq.AsBb() | sq2.AsBb();
 
     /// <summary>
     /// Generate a bitboard based on a variadic amount of squares.
@@ -651,33 +680,37 @@ public static class BitBoards
     /// <returns>The generated bitboard</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static BitBoard MakeBitboard(params Square[] squares)
-        => squares.Aggregate(EmptyBitBoard, (current, t) => current | t);
+        => squares.Aggregate(EmptyBitBoard, static (current, t) => current | t);
+
+    /// <summary>
+    /// Tests if a bitboard has more than one bit set
+    /// </summary>
+    /// <param name="bb">The bitboard to set</param>
+    /// <returns>true if more than one bit set, otherwise false</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool MoreThanOne(in BitBoard bb) => (bb.Value & (bb.Value - 1)) != 0;
 
     /// <summary>
     /// Helper method to generate shift function dictionary for all directions.
     /// </summary>
     /// <returns>The generated shift dictionary</returns>
-    private static IDictionary<Direction, Func<BitBoard, BitBoard>> MakeShiftFuncs()
-    {
-        var sf = new Dictionary<Direction, Func<BitBoard, BitBoard>>(13)
-            {
-                {Direction.None, board => board},
-                {Direction.North, board => board.NorthOne()},
-                {Direction.NorthDouble, board => board.NorthOne().NorthOne()},
-                {Direction.NorthEast, board => board.NorthEastOne()},
-                {Direction.NorthWest, board => board.NorthWestOne()},
-                {Direction.NorthFill, board => board.NorthFill()},
-                {Direction.South, board => board.SouthOne()},
-                {Direction.SouthDouble, board => board.SouthOne().SouthOne()},
-                {Direction.SouthEast, board => board.SouthEastOne()},
-                {Direction.SouthWest, board => board.SouthWestOne()},
-                {Direction.SouthFill, board => board.SouthFill()},
-                {Direction.East, board => board.EastOne()},
-                {Direction.West, board => board.WestOne()}
-            };
-
-        return sf;
-    }
+    private static IDictionary<Direction, Func<BitBoard, BitBoard>> MakeShiftFuncs() =>
+        new Dictionary<Direction, Func<BitBoard, BitBoard>>(13)
+        {
+            { Direction.None, static board => board },
+            { Direction.North, static board => board.NorthOne() },
+            { Direction.NorthDouble, static board => board.NorthOne().NorthOne() },
+            { Direction.NorthEast, static board => board.NorthEastOne() },
+            { Direction.NorthWest, static board => board.NorthWestOne() },
+            { Direction.NorthFill, static board => board.NorthFill() },
+            { Direction.South, static board => board.SouthOne() },
+            { Direction.SouthDouble, static board => board.SouthOne().SouthOne() },
+            { Direction.SouthEast, static board => board.SouthEastOne() },
+            { Direction.SouthWest, static board => board.SouthWestOne() },
+            { Direction.SouthFill, static board => board.SouthFill() },
+            { Direction.East, static board => board.EastOne() },
+            { Direction.West, static board => board.WestOne() }
+        };
 
     private static Func<BitBoard, BitBoard>[] MakeFillFuncs()
         => new Func<BitBoard, BitBoard>[] { NorthFill, SouthFill };

@@ -24,11 +24,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Hash.Tables.Transposition;
-
 using System;
 using System.Runtime.InteropServices;
-using Types;
+using Rudz.Chess.Types;
+
+namespace Rudz.Chess.Hash.Tables.Transposition;
 
 [StructLayout(LayoutKind.Sequential, Pack = 2)]
 public struct TranspositionTableEntry
@@ -75,12 +75,12 @@ public struct TranspositionTableEntry
         Type = tte.Type;
     }
 
-    public readonly bool Equals(TranspositionTableEntry other)
+    private readonly bool Equals(TranspositionTableEntry other)
         => Key32 == other.Key32 && Generation == other.Generation;
 
-    public override readonly bool Equals(object obj)
+    public readonly override bool Equals(object obj)
         => obj is TranspositionTableEntry other && Equals(other);
 
-    public override readonly int GetHashCode()
+    public readonly override int GetHashCode()
         => HashCode.Combine(Key32, Move, Depth, Generation, Value, StaticValue, Type);
 }

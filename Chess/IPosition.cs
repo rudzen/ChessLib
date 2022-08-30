@@ -24,21 +24,21 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess;
-
-using Enums;
-using Fen;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Types;
-using Validation;
+using Rudz.Chess.Enums;
+using Rudz.Chess.Fen;
+using Rudz.Chess.Types;
+using Rudz.Chess.Validation;
+
+namespace Rudz.Chess;
 
 public interface IPosition : IEnumerable<Piece>
 {
     bool IsProbing { get; set; }
 
-    Action<Piece, Square> PieceUpdated { get; set; }
+    Action<IPieceSquare> PieceUpdated { get; set; }
 
     ChessMode ChessMode { get; set; }
 
@@ -66,9 +66,11 @@ public interface IPosition : IEnumerable<Piece>
 
     bool IsMate { get; }
 
+    int Searcher { get;}
+
     void Clear();
 
-    void AddPiece(in Piece pc, in Square sq);
+    void AddPiece(Piece pc, Square sq);
 
     void MakeMove(Move m, in State newState);
 
@@ -142,15 +144,15 @@ public interface IPosition : IEnumerable<Piece>
 
     BitBoard AttacksBy(PieceTypes pt, Player c);
 
-    bool CanCastle(CastlelingRights cr);
+    bool CanCastle(CastleRight cr);
 
     bool CanCastle(Player c);
 
-    bool CastlingImpeded(CastlelingRights cr);
+    bool CastlingImpeded(CastleRight cr);
 
-    Square CastlingRookSquare(CastlelingRights cr);
+    Square CastlingRookSquare(CastleRight cr);
 
-    CastlelingRights GetCastlelingRightsMask(Square sq);
+    CastleRight GetCastlelingRightsMask(Square sq);
 
     bool IsPseudoLegal(Move m);
 
@@ -158,7 +160,7 @@ public interface IPosition : IEnumerable<Piece>
 
     FenData GenerateFen();
 
-    void Set(in FenData fenData, ChessMode chessMode, in State state, bool validate = false);
+    void Set(in FenData fenData, ChessMode chessMode, State state, bool validate = false, int searcher = 0);
 
     HashKey GetPiecesKey();
 

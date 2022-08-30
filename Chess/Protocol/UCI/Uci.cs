@@ -24,15 +24,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Protocol.UCI;
-
-using Microsoft.Extensions.ObjectPool;
-using MoveGeneration;
-using Rudz.Chess.Enums;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Types;
+using Microsoft.Extensions.ObjectPool;
+using Rudz.Chess.Enums;
+using Rudz.Chess.Extensions;
+using Rudz.Chess.MoveGeneration;
+using Rudz.Chess.Types;
+
+namespace Rudz.Chess.Protocol.UCI;
 
 public class Uci : IUci
 {
@@ -86,15 +87,13 @@ public class Uci : IUci
     public ulong Nps(ulong nodes, TimeSpan time)
         => (ulong)(nodes * 1000.0 / time.Milliseconds);
 
-    public Move MoveFromUci(IPosition pos, string uciMove)
+    public Move MoveFromUci(IPosition pos, ReadOnlySpan<char> uciMove)
     {
         var moveList = pos.GenerateMoves();
 
         foreach (var move in moveList.Get())
-        {
             if (uciMove.Equals(move.Move.ToString(), StringComparison.InvariantCultureIgnoreCase))
-                return move;
-        }
+                return move.Move;
 
         return Move.EmptyMove;
     }
@@ -153,14 +152,14 @@ public class Uci : IUci
     {
         var sb = _pvPool.Get();
 
-        sb.AppendFormat("info multipv {0} depth {1} seldepth {2} score {3} ", count + 1, depth, selectiveDepth, score);
+        sb.Append($"info multipv {count + 1} depth {depth} seldepth {selectiveDepth} score {score} ");
 
         if (score >= beta)
             sb.Append("lowerbound ");
         else if (score <= alpha)
             sb.Append("upperbound ");
 
-        sb.AppendFormat("nodes {0} nps {1} tbhits {2} time {3} ", nodes, Nps(nodes, time), Game.Table.Hits, time.Milliseconds);
+        sb.Append($"nodes {nodes} nps {Nps(nodes, time)} tbhits {Game.Table.Hits} time {time.Milliseconds} ");
         sb.AppendJoin(' ', pvLine);
 
         var result = sb.ToString();
@@ -169,23 +168,31 @@ public class Uci : IUci
     }
 
     public string Fullness(ulong tbHits, ulong nodes, TimeSpan time)
-        => $"info hashfull {Game.Table.Fullness()} tbhits {tbHits} nodes {nodes} time {time.Milliseconds} nps {Nps(nodes, time)}";
+        =>
+            $"info hashfull {Game.Table.Fullness()} tbhits {tbHits} nodes {nodes} time {time.Milliseconds} nps {Nps(nodes, time)}";
 
-    public string MoveToString(Move m, ChessMode chessMode = ChessMode.NORMAL)
+    public string MoveToString(Move m, ChessMode chessMode = ChessMode.Normal)
     {
         if (m.IsNullMove())
             return "(none)";
 
-        var from = m.FromSquare();
-        var to = m.ToSquare();
+        var (from, to) = m;
 
-        if (m.IsCastlelingMove() && chessMode != ChessMode.CHESS_960)
-            to = Square.Make(from.Rank, to > from ? File.FILE_G : File.FILE_C);
+        if (m.IsCastlelingMove() && chessMode != ChessMode.Chess960)
+            to = Square.Create(from.Rank, to > from ? File.FILE_G : File.FILE_C);
+
+        Span<char> s = stackalloc char[5];
+        var index = 0;
+
+        s[index++] = from.FileChar;
+        s[index++] = from.RankChar;
+        s[index++] = to.FileChar;
+        s[index++] = to.RankChar;
 
         if (m.IsPromotionMove())
-            return from.ToString() + to.ToString() + m.PromotedPieceType().GetPieceChar();
+            s[index++] = m.PromotedPieceType().GetPieceChar();
 
-        return from.ToString() + to.ToString();
+        return new string(s[..index]);
     }
 
     /// <summary>
@@ -193,7 +200,7 @@ public class Uci : IUci
     /// and in the format defined by the UCI protocol.
     /// </summary>
     /// <returns>the current UCI options as string</returns>
-    public override string ToString()
+    public new string ToString()
     {
         var list = new List<IOption>(O.Values);
         list.Sort(OptionComparer);

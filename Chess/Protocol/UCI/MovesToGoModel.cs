@@ -24,11 +24,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Protocol.UCI;
-
 using System;
 using System.Runtime.CompilerServices;
-using Types;
+using Rudz.Chess.Types;
+
+namespace Rudz.Chess.Protocol.UCI;
 
 public sealed class MovesToGoModel : EventArgs, IMovesToGoModel
 {
@@ -40,7 +40,7 @@ public sealed class MovesToGoModel : EventArgs, IMovesToGoModel
         MovesToGo = original.MovesToGo;
     }
 
-    public int MovesToGo { get; set; }
+    public ulong MovesToGo { get; set; }
 
     public ulong WhiteTimeMilliseconds
     {

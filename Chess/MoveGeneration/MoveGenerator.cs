@@ -24,17 +24,20 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.MoveGeneration;
-
-using Enums;
 using System;
 using System.Diagnostics;
-using Types;
+using Rudz.Chess.Enums;
+using Rudz.Chess.Types;
+
+namespace Rudz.Chess.MoveGeneration;
 
 public static class MoveGenerator
 {
-    private static readonly (CastlelingRights, CastlelingRights)[] CastleSideRights
-        = { (CastlelingRights.WhiteOo, CastlelingRights.WhiteOoo), (CastlelingRights.BlackOo, CastlelingRights.BlackOoo) };
+    private static readonly (CastlelingRights, CastlelingRights)[] CastleSideRights =
+        {
+            (CastlelingRights.WhiteOo, CastlelingRights.WhiteOoo),
+            (CastlelingRights.BlackOo, CastlelingRights.BlackOoo)
+        };
 
     public static int Generate(
         in IPosition pos,
@@ -73,8 +76,9 @@ public static class MoveGenerator
         Player us,
         MoveGenerationType type)
     {
-        var checks = type == MoveGenerationType.QuietChecks;
         index = GeneratePawnMoves(in pos, moves, index, target, us, type);
+
+        var checks = type == MoveGenerationType.QuietChecks;
 
         for (var pt = PieceTypes.Knight; pt <= PieceTypes.Queen; ++pt)
             index = GenerateMoves(in pos, moves, index, us, target, pt, checks);
@@ -94,10 +98,10 @@ public static class MoveGenerator
         if (!pos.CanCastle(kingSide | queenSide))
             return index;
 
-        if (!pos.CastlingImpeded(kingSide) && pos.CanCastle(kingSide))
+        if (pos.CanCastle(kingSide) && !pos.CastlingImpeded(kingSide))
             moves[index++].Move = Move.Create(ksq, pos.CastlingRookSquare(kingSide), MoveTypes.Castling);
 
-        if (!pos.CastlingImpeded(queenSide) && pos.CanCastle(queenSide))
+        if (pos.CanCastle(queenSide) && !pos.CastlingImpeded(queenSide))
             moves[index++].Move = Move.Create(ksq, pos.CastlingRookSquare(queenSide), MoveTypes.Castling);
 
         return index;
@@ -119,7 +123,8 @@ public static class MoveGenerator
         Player us,
         MoveGenerationType type)
     {
-        Debug.Assert(type == MoveGenerationType.Captures || type == MoveGenerationType.Quiets || type == MoveGenerationType.NonEvasions);
+        Debug.Assert(type is MoveGenerationType.Captures or MoveGenerationType.Quiets
+            or MoveGenerationType.NonEvasions);
         Debug.Assert(!pos.InCheck);
         var target = type switch
         {
@@ -156,7 +161,7 @@ public static class MoveGenerator
         // Find all the squares attacked by slider checkers. We will remove them from the king
         // evasions in order to skip known illegal moves, which avoids any useless legality
         // checks later on.
-        while (!sliders.IsEmpty)
+        while (sliders)
         {
             checkSquare = BitBoards.PopLsb(ref sliders);
             var fullLine = checkSquare.Line(ksq);
@@ -201,16 +206,14 @@ public static class MoveGenerator
             : Generate(in pos, moves, index, us, MoveGenerationType.NonEvasions);
 
         // In case there exists pinned pieces, the move is a king move (including castleling) or
-        // it's an en-pessant move the move is checked, otherwise we assume the move is legal.
+        // it's an en-passant move the move is checked, otherwise we assume the move is legal.
         var pinnedIsEmpty = pinned.IsEmpty;
         while (index != end)
-        {
             if ((!pinnedIsEmpty || moves[index].Move.FromSquare() == ksq || moves[index].Move.IsEnPassantMove())
                 && !pos.IsLegal(moves[index].Move))
                 moves[index].Move = moves[--end].Move;
             else
                 ++index;
-        }
 
         return end;
     }
@@ -245,7 +248,8 @@ public static class MoveGenerator
         foreach (var from in squares)
         {
             if (checks
-                && (!(pos.BlockersForKing(~us) & from).IsEmpty || (pt.PseudoAttacks(from) & target & pos.CheckedSquares(pt)).IsEmpty))
+                && (!(pos.BlockersForKing(~us) & from).IsEmpty ||
+                    (pt.PseudoAttacks(from) & target & pos.CheckedSquares(pt)).IsEmpty))
                 continue;
 
             var b = pos.GetAttacks(from, pt) & target;
@@ -281,7 +285,6 @@ public static class MoveGenerator
 
         var them = ~us;
         var rank7Bb = us.Rank7();
-        var rank3Bb = us.Rank3();
 
         var pawns = pos.Pieces(PieceTypes.Pawn, us);
 
@@ -302,13 +305,14 @@ public static class MoveGenerator
         // Single and double pawn pushes, no promotions
         if (type != MoveGenerationType.Captures)
         {
-            emptySquares = type == MoveGenerationType.Quiets || type == MoveGenerationType.QuietChecks
+            emptySquares = type is MoveGenerationType.Quiets or MoveGenerationType.QuietChecks
                 ? target
                 : ~pos.Pieces();
 
             pawnOne = pawnsNotOn7.Shift(up) & emptySquares;
-            pawnTwo = (pawnOne & rank3Bb).Shift(up) & emptySquares;
+            pawnTwo = (pawnOne & us.Rank3()).Shift(up) & emptySquares;
 
+            // ReSharper disable once SwitchStatementMissingSomeEnumCasesNoDefault
             switch (type)
             {
                 // Consider only blocking squares
@@ -318,35 +322,35 @@ public static class MoveGenerator
                     break;
 
                 case MoveGenerationType.QuietChecks:
+                {
+                    pawnOne &= ksq.PawnAttack(them);
+                    pawnTwo &= ksq.PawnAttack(them);
+
+                    var dcCandidates = pos.BlockersForKing(them);
+
+                    // Add pawn pushes which give discovered check. This is possible only if
+                    // the pawn is not on the same file as the enemy king, because we don't
+                    // generate captures. Note that a possible discovery check promotion has
+                    // been already generated among captures.
+                    if (!(pawnsNotOn7 & dcCandidates).IsEmpty)
                     {
-                        pawnOne &= ksq.PawnAttack(them);
-                        pawnTwo &= ksq.PawnAttack(them);
-
-                        var dcCandidates = pos.BlockersForKing(them);
-
-                        // Add pawn pushes which give discovered check. This is possible only if
-                        // the pawn is not on the same file as the enemy king, because we don't
-                        // generate captures. Note that a possible discovery check promotion has
-                        // been already generated among captures.
-                        if (!(pawnsNotOn7 & dcCandidates).IsEmpty)
-                        {
-                            var dc1 = (pawnsNotOn7 & dcCandidates).Shift(up) & emptySquares & ~ksq;
-                            var dc2 = (dc1 & rank3Bb).Shift(up) & emptySquares;
-                            pawnOne |= dc1;
-                            pawnTwo |= dc2;
-                        }
-
-                        break;
+                        var dc1 = (pawnsNotOn7 & dcCandidates).Shift(up) & emptySquares & ~ksq;
+                        var dc2 = (dc1 & us.Rank3()).Shift(up) & emptySquares;
+                        pawnOne |= dc1;
+                        pawnTwo |= dc2;
                     }
+
+                    break;
+                }
             }
 
-            while (!pawnOne.IsEmpty)
+            while (pawnOne)
             {
                 var to = BitBoards.PopLsb(ref pawnOne);
                 moves[index++].Move = Move.Create(to - up, to);
             }
 
-            while (!pawnTwo.IsEmpty)
+            while (pawnTwo)
             {
                 var to = BitBoards.PopLsb(ref pawnTwo);
                 moves[index++].Move = Move.Create(to - up - up, to);
@@ -358,8 +362,8 @@ public static class MoveGenerator
             ? (Direction.NorthEast, Direction.NorthWest)
             : (Direction.SouthWest, Direction.SouthEast);
 
-        // Promotions and underpromotions
-        if (!pawnsOn7.IsEmpty)
+        // Promotions and under-promotions
+        if (pawnsOn7)
         {
             switch (type)
             {
@@ -376,13 +380,13 @@ public static class MoveGenerator
             var pawnPromoLeft = pawnsOn7.Shift(left) & enemies;
             var pawnPromoUp = pawnsOn7.Shift(up) & emptySquares;
 
-            while (!pawnPromoRight.IsEmpty)
+            while (pawnPromoRight)
                 index = MakePromotions(moves, index, BitBoards.PopLsb(ref pawnPromoRight), ksq, right, type);
 
-            while (!pawnPromoLeft.IsEmpty)
+            while (pawnPromoLeft)
                 index = MakePromotions(moves, index, BitBoards.PopLsb(ref pawnPromoLeft), ksq, left, type);
 
-            while (!pawnPromoUp.IsEmpty)
+            while (pawnPromoUp)
                 index = MakePromotions(moves, index, BitBoards.PopLsb(ref pawnPromoUp), ksq, up, type);
         }
 
@@ -395,13 +399,13 @@ public static class MoveGenerator
         pawnOne = pawnsNotOn7.Shift(right) & enemies;
         pawnTwo = pawnsNotOn7.Shift(left) & enemies;
 
-        while (!pawnOne.IsEmpty)
+        while (pawnOne)
         {
             var to = BitBoards.PopLsb(ref pawnOne);
             moves[index++].Move = Move.Create(to - right, to);
         }
 
-        while (!pawnTwo.IsEmpty)
+        while (pawnTwo)
         {
             var to = BitBoards.PopLsb(ref pawnTwo);
             moves[index++].Move = Move.Create(to - left, to);
@@ -410,7 +414,7 @@ public static class MoveGenerator
         if (pos.EnPassantSquare == Square.None)
             return index;
 
-        Debug.Assert(pos.EnPassantSquare.Rank == Ranks.Rank6.RelativeRank(us));
+        Debug.Assert(pos.EnPassantSquare.Rank == Rank.RANK_6.Relative(us));
 
         // An en passant capture can be an evasion only if the checking piece is the double
         // pushed pawn and so is in the target. Otherwise this is a discovery check and we are
@@ -420,7 +424,7 @@ public static class MoveGenerator
 
         pawnOne = pawnsNotOn7 & pos.EnPassantSquare.PawnAttack(them);
         Debug.Assert(!pawnOne.IsEmpty);
-        while (!pawnOne.IsEmpty)
+        while (pawnOne)
             moves[index++].Move = Move.Create(BitBoards.PopLsb(ref pawnOne), pos.EnPassantSquare, MoveTypes.Enpassant);
 
         return index;
@@ -444,7 +448,7 @@ public static class MoveGenerator
         Debug.Assert(!pos.InCheck);
         var dc = pos.BlockersForKing(~us) & pos.Pieces(us);
 
-        while (!dc.IsEmpty)
+        while (dc)
         {
             var from = BitBoards.PopLsb(ref dc);
             var pt = pos.GetPiece(from).Type();

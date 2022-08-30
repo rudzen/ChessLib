@@ -24,6 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using System.Linq;
+
 namespace Rudz.Chess.Validation;
 
 using Enums;
@@ -31,6 +33,27 @@ using Extensions;
 using Hash;
 using System;
 using Types;
+
+[Flags]
+public enum PositionValidationTypes
+{
+    None = 0,
+    Basic = 1,
+    Castleling = 1 << 1,
+    Kings = 1 << 2,
+    Pawns = 1 << 3,
+    PieceConsistency = 1 << 4,
+    PieceCount = 1 << 5,
+    PieceTypes = 1 << 6,
+    State = 1 << 7,
+    All = Basic | Castleling | Kings | Pawns | PieceConsistency | PieceCount | PieceTypes | State
+}
+
+public static class PositionValidationTypesExtensions
+{
+    public static bool HasFlagFast(this PositionValidationTypes @this, PositionValidationTypes flag)
+        => (@this & flag) != 0;
+}
 
 public sealed class PositionValidator : IPositionValidator
 {
@@ -122,7 +145,8 @@ public sealed class PositionValidator : IPositionValidator
                     error = AddError(error, $"castleling rights mask at {rookSq} does not match for player {c}");
 
                 if ((_pos.GetCastlelingRightsMask(_pos.GetKingSquare(c).AsInt()) & cr) != cr)
-                    error = AddError(error, $"castleling rights mask at {_pos.GetKingSquare(c)} does not match for player {c}");
+                    error = AddError(error,
+                        $"castleling rights mask at {_pos.GetKingSquare(c)} does not match for player {c}");
             }
         }
 
@@ -177,20 +201,13 @@ public sealed class PositionValidator : IPositionValidator
         return error;
     }
 
-    private string ValidatePieceCount(string error)
-    {
-        foreach (var pc in Piece.AllPieces)
-        {
-            var pt = pc.Type();
-            var c = pc.ColorOf();
-            if (_board.PieceCount(pt, c) != _board.Pieces(c, pt).Count)
-                error = AddError(error, $"piece count does not match for piece {pc}");
-
-            // TODO : Validate piece list
-        }
-
-        return error;
-    }
+    private string ValidatePieceCount(string error) =>
+        Piece.AllPieces
+            .Select(static pc => new { pc, pt = pc.Type() })
+            .Select(static t => new { t, c = t.pc.ColorOf() })
+            .Where(t => _board.PieceCount(t.t.pt, t.c) != _board.Pieces(t.c, t.t.pt).Count)
+            .Select(static t => t.t.pc)
+            .Aggregate(error, static (current, pc) => AddError(current, $"piece count does not match for piece {pc}"));
 
     private string ValidatePieceTypes(string error)
     {
@@ -205,13 +222,13 @@ public sealed class PositionValidator : IPositionValidator
         };
 
         foreach (var p1 in pts)
-            foreach (var p2 in pts)
-            {
-                if (p1 == p2 || (_board.Pieces(p1) & _board.Pieces(p2)).IsEmpty)
-                    continue;
+        foreach (var p2 in pts)
+        {
+            if (p1 == p2 || (_board.Pieces(p1) & _board.Pieces(p2)).IsEmpty)
+                continue;
 
-                error = AddError(error, $"piece types {p1} and {p2} doesn't align");
-            }
+            error = AddError(error, $"piece types {p1} and {p2} doesn't align");
+        }
 
         return error;
     }
@@ -227,9 +244,10 @@ public sealed class PositionValidator : IPositionValidator
         }
 
         if (state.Key.Key == 0 && !_board.Pieces().IsEmpty)
-            error = AddError(error, "state key is no valid");
+            error = AddError(error, "state key is invalid");
 
-        if (_board.Pieces(_pos.SideToMove, PieceTypes.Pawn).IsEmpty && state.PawnStructureKey.Key != Zobrist.ZobristNoPawn)
+        if (_board.Pieces(_pos.SideToMove, PieceTypes.Pawn).IsEmpty &&
+            state.PawnStructureKey.Key != Zobrist.ZobristNoPawn)
             error = AddError(error, "empty pawn key is invalid");
 
         if (state.Repetition < 0)

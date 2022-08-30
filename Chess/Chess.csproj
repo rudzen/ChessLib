@@ -12,13 +12,18 @@
     <TargetFramework>net6.0</TargetFramework>
     <PackageVersion>0.0.1</PackageVersion>
     <Description>Chess library with data structures and move generation.</Description>
-    <Copyright>(C) 2020 Rudy Alex Kohn</Copyright>
+    <Copyright>(C) 2022 Rudy Alex Kohn</Copyright>
     <AssemblyVersion>0.0.1.0</AssemblyVersion>
     <FileVersion>0.0.1.0</FileVersion>
     <PackageProjectUrl>http://github.com/rudzen/chesslib</PackageProjectUrl>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <Nullable>disable</Nullable>
+    <EnforceCodeStyleInBuild>False</EnforceCodeStyleInBuild>
+    <Title>RudzChessLib</Title>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>http://github.com/rudzen/chesslib</RepositoryUrl>
+    <PackageTags>chess bitboard datastructure movegeneration magic</PackageTags>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(IsWindows)'=='true'">
@@ -44,8 +49,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.ObjectPool" Version="6.0.5" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="Microsoft.Extensions.ObjectPool" Version="6.0.8" />
     <PackageReference Include="System.Memory" Version="4.5.5" />
   </ItemGroup>
   <ItemGroup>
@@ -53,6 +57,10 @@
     <Folder Include="Validation\" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
     <None Include="..\LICENSE">
       <Pack>True</Pack>
       <PackagePath></PackagePath>

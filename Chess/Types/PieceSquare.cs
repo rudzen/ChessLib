@@ -24,17 +24,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Types;
-
 using System;
+
+namespace Rudz.Chess.Types;
 
 /// <summary>
 /// Model for data transfer of piece and square Used for notification when a piece is updated in
 /// the chess structure
 /// </summary>
-public class PieceSquare : EventArgs, IPieceSquare
+public sealed class PieceSquareEventArgs : EventArgs, IPieceSquare
 {
-    public PieceSquare(Piece piece, Square square)
+    public PieceSquareEventArgs(Piece piece, Square square)
     {
         Piece = piece;
         Square = square;
@@ -44,11 +44,19 @@ public class PieceSquare : EventArgs, IPieceSquare
 
     public Square Square { get; set; }
 
+    public void Deconstruct(out Piece pc, out Square sq)
+    {
+        pc = Piece;
+        sq = Square;
+    }
+
     public bool Equals(IPieceSquare other)
-        => other is not null && (ReferenceEquals(this, other) || Piece.Equals(other.Piece) && Square.Equals(other.Square));
+        => other is not null &&
+           (ReferenceEquals(this, other) || Piece.Equals(other.Piece) && Square.Equals(other.Square));
 
     public override bool Equals(object obj)
-        => obj is not null && (ReferenceEquals(this, obj) || obj.GetType() == GetType() && Equals((PieceSquare)obj));
+        => obj is not null &&
+           (ReferenceEquals(this, obj) || obj.GetType() == GetType() && Equals((PieceSquareEventArgs)obj));
 
     public override int GetHashCode()
     {

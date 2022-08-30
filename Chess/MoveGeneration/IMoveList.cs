@@ -24,12 +24,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.MoveGeneration;
-
-using Enums;
 using System;
 using System.Collections.Generic;
-using Types;
+using Rudz.Chess.Enums;
+using Rudz.Chess.Types;
+
+namespace Rudz.Chess.MoveGeneration;
 
 public interface IMoveList : IReadOnlyCollection<ExtMove>
 {

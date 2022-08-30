@@ -24,9 +24,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Hash.Tables.Transposition;
+using Rudz.Chess.Types;
 
-using Types;
+namespace Rudz.Chess.Hash.Tables.Transposition;
 
 public interface ITranspositionTable
 {
@@ -54,7 +54,7 @@ public interface ITranspositionTable
     /// </summary>
     /// <param name="key">The position key</param>
     /// <returns>The cluster of the keys position in the table</returns>
-    ITTCluster FindCluster(HashKey key);
+    ITTCluster FindCluster(in HashKey key);
 
     void Refresh(TranspositionTableEntry tte);
 
@@ -63,14 +63,14 @@ public interface ITranspositionTable
     /// </summary>
     /// <param name="key">The position key</param>
     /// <returns>(true, entry) if one was found, (false, empty) if not found</returns>
-    (bool, TranspositionTableEntry) Probe(HashKey key);
+    (bool, TranspositionTableEntry) Probe(in HashKey key);
 
     /// <summary>
     /// Probes the table for the first cluster index which matches the position key
     /// </summary>
     /// <param name="key">The position key</param>
     /// <returns>The cluster entry</returns>
-    TranspositionTableEntry ProbeFirst(HashKey key);
+    TranspositionTableEntry ProbeFirst(in HashKey key);
 
     /// <summary>
     /// Stores a move in the transposition table. It will automatically detect the best cluster
@@ -83,7 +83,7 @@ public interface ITranspositionTable
     /// <param name="depth">The depth of the move</param>
     /// <param name="move">The move it self</param>
     /// <param name="statValue">The static value of the move</param>
-    void Store(HashKey key, int value, Bound type, sbyte depth, Move move, int statValue);
+    void Store(in HashKey key, int value, Bound type, sbyte depth, Move move, int statValue);
 
     /// <summary>
     /// Get the approximation full % of the table // todo : fix

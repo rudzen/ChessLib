@@ -24,10 +24,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Protocol.UCI;
-
 using System.IO;
 using System.Threading.Tasks;
+
+namespace Rudz.Chess.Protocol.UCI;
 
 public interface IInputOutput
 {

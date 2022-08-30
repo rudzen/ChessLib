@@ -24,33 +24,27 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Protocol.UCI;
-
-using Extensions;
+using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text;
-using Types;
+using Rudz.Chess.Types;
+
+namespace Rudz.Chess.Protocol.UCI;
 
 /// <summary>
 /// Contains the information related to search parameters for a UCI chess engine.
 /// </summary>
 public sealed class SearchParameters : ISearchParameters
 {
-    private readonly ulong[] _time;
-
-    private readonly ulong[] _inc;
-
-    private readonly IList<Move> _searchMoves;
+    private readonly Clock _clock;
 
     private readonly StringBuilder _output = new(256);
-
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public SearchParameters()
     {
-        _time = _inc = new ulong[2];
-        _searchMoves = new List<Move>();
+        SearchMoves = new List<Move>();
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -66,7 +60,8 @@ public sealed class SearchParameters : ISearchParameters
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public SearchParameters(ulong whiteTimeMilliseconds, ulong blackTimeMilliseconds, ulong whiteIncrementTimeMilliseconds, ulong blackIncrementTimeMilliseconds)
+    public SearchParameters(ulong whiteTimeMilliseconds, ulong blackTimeMilliseconds,
+        ulong whiteIncrementTimeMilliseconds, ulong blackIncrementTimeMilliseconds)
         : this(whiteTimeMilliseconds, blackTimeMilliseconds)
     {
         WhiteIncrementTimeMilliseconds = whiteIncrementTimeMilliseconds;
@@ -74,55 +69,65 @@ public sealed class SearchParameters : ISearchParameters
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public SearchParameters(ulong whiteTimeMilliseconds, ulong blackTimeMilliseconds, ulong whiteIncrementTimeMilliseconds, ulong blackIncrementTimeMilliseconds, int moveTime)
-        : this(whiteTimeMilliseconds, blackTimeMilliseconds, whiteIncrementTimeMilliseconds, blackIncrementTimeMilliseconds)
+    public SearchParameters(ulong whiteTimeMilliseconds, ulong blackTimeMilliseconds,
+        ulong whiteIncrementTimeMilliseconds, ulong blackIncrementTimeMilliseconds, ulong moveTime)
+        : this(whiteTimeMilliseconds, blackTimeMilliseconds, whiteIncrementTimeMilliseconds,
+            blackIncrementTimeMilliseconds)
     {
         MoveTime = moveTime;
     }
 
+    public IList<Move> SearchMoves { get; set; }
+
     public bool Infinite { get; set; }
 
-    public int MoveTime { get; set; }
+    public bool Ponder { get; set; }
 
-    public int MovesToGo { get; set; }
+    public ulong MoveTime { get; set; }
 
-    public int Depth { get; set; }
+    public ulong MovesToGo { get; set; }
+
+    public ulong Depth { get; set; }
+
+    public ulong Nodes { get; set; }
+
+    public ulong Mate { get; set; }
 
     public ulong WhiteTimeMilliseconds
     {
-        get => _time[0];
-        set => _time[0] = value;
+        get => _clock.Time[Player.White.Side];
+        set => _clock.Time[Player.White.Side] = value;
     }
 
     public ulong BlackTimeMilliseconds
     {
-        get => _time[1];
-        set => _time[1] = value;
+        get => _clock.Time[Player.Black.Side];
+        set => _clock.Time[Player.Black.Side] = value;
     }
 
     public ulong WhiteIncrementTimeMilliseconds
     {
-        get => _inc[0];
-        set => _inc[0] = value;
+        get => _clock.Inc[Player.White.Side];
+        set => _clock.Inc[Player.White.Side] = value;
     }
 
     public ulong BlackIncrementTimeMilliseconds
     {
-        get => _inc[1];
-        set => _inc[1] = value;
+        get => _clock.Inc[Player.Black.Side];
+        set => _clock.Inc[Player.Black.Side] = value;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public ulong Time(Player player) => _time[player.Side];
+    public ulong Time(Player player) => _clock.Time[player.Side];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public ulong Inc(Player player) => _inc[player.Side];
+    public ulong Inc(Player player) => _clock.Inc[player.Side];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Clear()
     {
-        _time.Clear();
-        _inc.Clear();
+        Array.Clear(_clock.Time);
+        Array.Clear(_clock.Inc);
         MoveTime = 0;
         Infinite = false;
     }
@@ -140,10 +145,7 @@ public sealed class SearchParameters : ISearchParameters
             return _output.ToString();
         }
 
-        const string timeFormatString = "wtime {0} btime {1}";
-        const string incFormatString = " winc {0} binc {1}";
-
-        _output.AppendFormat(timeFormatString, WhiteTimeMilliseconds, BlackTimeMilliseconds);
+        _output.Append($"wtime {WhiteTimeMilliseconds} btime {BlackTimeMilliseconds}");
 
         if (MoveTime > 0)
         {
@@ -151,7 +153,7 @@ public sealed class SearchParameters : ISearchParameters
             _output.Append(MoveTime);
         }
 
-        _output.AppendFormat(incFormatString, WhiteIncrementTimeMilliseconds, BlackIncrementTimeMilliseconds);
+        _output.Append($" winc {WhiteIncrementTimeMilliseconds} binc {BlackIncrementTimeMilliseconds}");
 
         if (MovesToGo > 0)
         {
@@ -165,8 +167,5 @@ public sealed class SearchParameters : ISearchParameters
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool DecreaseMovesToGo() => --MovesToGo == 0;
 
-    public void AddSearchMove(Move move)
-    {
-        _searchMoves.Add(move);
-    }
+    public void AddSearchMove(Move move) => SearchMoves.Add(move);
 }

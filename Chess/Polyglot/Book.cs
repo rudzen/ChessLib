@@ -24,49 +24,50 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Polyglot;
-
-using Enums;
-using Extensions;
-using MoveGeneration;
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using Types;
+using Rudz.Chess.Enums;
+using Rudz.Chess.Extensions;
+using Rudz.Chess.MoveGeneration;
+using Rudz.Chess.Types;
+
+namespace Rudz.Chess.Polyglot;
 
 public sealed class Book : IDisposable
 {
     // PolyGlot pieces are: BP = 0, WP = 1, BN = 2, ... BK = 10, WK = 11
     private static readonly int[] PieceMapping = { -1, 1, 3, 5, 7, 9, 11, -1, -1, 0, 2, 4, 6, 8, 10 };
 
-    private static readonly CastlelingRights[] CastleRights = {
+    private static readonly CastlelingRights[] CastleRights =
+    {
         CastlelingRights.WhiteOo,
         CastlelingRights.WhiteOoo,
         CastlelingRights.BlackOo,
         CastlelingRights.BlackOoo
     };
-    
+
     private readonly IPosition _pos;
-    private FileStream _fileStream;
-    private BinaryReader _binaryReader;
-    private string _fileName;
+    private readonly FileStream _fileStream;
+    private readonly BinaryReader _binaryReader;
+    private readonly string _fileName;
     private readonly int _entrySize;
     private readonly Random _rnd;
 
     private struct Entry
     {
-        public ulong key;
-        public ushort move;
-        public ushort count;
-        public uint learn;
+        public readonly ulong Key;
+        public readonly ushort Move;
+        public readonly ushort Count;
+        public uint Learn;
 
         public Entry(ulong key, ushort move, ushort count, uint learn)
         {
-            this.key = key;
-            this.move = move;
-            this.count = count;
-            this.learn = learn;
+            Key = key;
+            Move = move;
+            Count = count;
+            Learn = learn;
         }
     }
 
@@ -80,7 +81,7 @@ public sealed class Book : IDisposable
     public string FileName
     {
         get => _fileName;
-        set
+        init
         {
             if (string.IsNullOrEmpty(value))
                 return;
@@ -97,28 +98,28 @@ public sealed class Book : IDisposable
         if (_fileName.IsNullOrEmpty() || _fileStream == null)
             return Move.EmptyMove;
 
-        ushort polyMove = 0;
-        ushort best = 0;
-        uint sum = 0;
+        var polyMove = ushort.MinValue;
+        var best = ushort.MinValue;
+        var sum = uint.MinValue;
         var key = ComputePolyglotKey();
-        var firstIndex = FindFirst(key);
+        var firstIndex = FindFirst(in key);
 
         _fileStream.Seek(firstIndex * _entrySize, SeekOrigin.Begin);
 
         var e = ReadEntry();
 
-        while (e.key == key)
+        while (e.Key == key.Key)
         {
-            if (best <= e.count)
-                best = e.count;
+            if (best <= e.Count)
+                best = e.Count;
 
-            sum += e.count;
+            sum += e.Count;
 
             // Choose book move according to its score. If a move has a very high score it has
             // higher probability to be choosen than a move with lower score. Note that first entry
             // is always chosen.
-            if (sum > 0 && (_rnd.Next() % sum) < e.count || pickBest && e.count == best)
-                polyMove = e.move;
+            if (sum > 0 && _rnd.Next() % sum < e.Count || pickBest && e.Count == best)
+                polyMove = e.Move;
 
             // Stop if we wan't the top pick and move exists
             if (pickBest && polyMove != 0)
@@ -136,7 +137,7 @@ public sealed class Book : IDisposable
         _binaryReader?.Dispose();
     }
 
-    private Move ConvertMove(ushort m)
+    private Move ConvertMove(ushort polyMove)
     {
         // A PolyGlot book move is encoded as follows:
         //
@@ -147,13 +148,12 @@ public sealed class Book : IDisposable
         // In case book move is a non-normal move, the move have to be converted. Castleling moves
         // are especially converted to reflect castleling move format.
 
-        Move move = m;
+        Move move = polyMove;
 
-        var from = move.FromSquare();
-        var to = move.ToSquare();
+        var (from, to) = move;
 
         // Promotion type move needs to be converted from PG format.
-        var polyPt = (m >> 12) & 7;
+        var polyPt = (polyMove >> 12) & 7;
 
         if (polyPt > 0)
         {
@@ -165,7 +165,7 @@ public sealed class Book : IDisposable
 
         // Iterate all known moves for current position to find a match.
 
-        var emMoves = ml.Select(em => em.Move)
+        var emMoves = ml.Select(static em => em.Move)
             .Where(m => from == m.FromSquare())
             .Where(m => to == m.ToSquare())
             .Where(m =>
@@ -181,15 +181,15 @@ public sealed class Book : IDisposable
     }
 
     private Entry ReadEntry() => new(
-            _binaryReader.ReadUInt64(),
-            _binaryReader.ReadUInt16(),
-            _binaryReader.ReadUInt16(),
-            _binaryReader.ReadUInt32()
-        );
+        _binaryReader.ReadUInt64(),
+        _binaryReader.ReadUInt16(),
+        _binaryReader.ReadUInt16(),
+        _binaryReader.ReadUInt32()
+    );
 
     public HashKey ComputePolyglotKey()
     {
-        var k = new HashKey();
+        var k = HashKey.Empty;
         var b = _pos.Pieces();
 
         while (b)
@@ -201,8 +201,8 @@ public sealed class Book : IDisposable
         }
 
         k ^= CastleRights
-            .Where(cr => _pos.State.CastlelingRights.HasFlagFast(cr))
-            .Aggregate(0UL, (current, validCastlelingFlag) => current ^ BookZobrist.Castle(validCastlelingFlag));
+            .Where(cr => _pos.State.CastlelingRights.Has(cr))
+            .Aggregate(ulong.MinValue, static (current, validCastlelingFlag) => current ^ BookZobrist.Castle(validCastlelingFlag));
 
         if (_pos.State.EnPassantSquare != Square.None)
             k ^= BookZobrist.EnPassant(_pos.State.EnPassantSquare.File);
@@ -213,7 +213,7 @@ public sealed class Book : IDisposable
         return k;
     }
 
-    private long FindFirst(HashKey key)
+    private long FindFirst(in HashKey key)
     {
         var low = 0L;
         var high = _fileStream.Length / _entrySize - 1;
@@ -229,11 +229,12 @@ public sealed class Book : IDisposable
             _fileStream.Seek(mid * _entrySize, SeekOrigin.Begin);
             var e = ReadEntry();
 
-            if (key.Key <= e.key)
+            if (key.Key <= e.Key)
                 high = mid;
             else
                 low = mid + 1;
         }
+
         Debug.Assert(low == high);
 
         return low;

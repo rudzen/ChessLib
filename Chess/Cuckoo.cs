@@ -24,12 +24,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess;
-
-using Hash;
-using System;
 using System.Diagnostics;
-using Types;
+using Rudz.Chess.Hash;
+using Rudz.Chess.Types;
+
+namespace Rudz.Chess;
 
 /// <summary>
 /// Marcel van Kervinck's cuckoo algorithm for fast detection of "upcoming repetition"
@@ -44,21 +43,22 @@ public static class Cuckoo
     static Cuckoo()
     {
         var count = 0;
+        var bb = BitBoards.AllSquares;
         foreach (var pc in Piece.AllPieces)
-        {
-            foreach (var sq1 in BitBoards.AllSquares)
+            while (bb)
             {
-                for (var sq2 = sq1 + 1; sq2 <= Enums.Squares.h8; ++sq2)
+                var sq1 = BitBoards.PopLsb(ref bb);
+                for (var sq2 = sq1 + 1; sq2 <= Square.H8; ++sq2)
                 {
                     if ((pc.Type().PseudoAttacks(sq1) & sq2).IsEmpty)
                         continue;
 
                     var move = Move.Create(sq1, sq2);
-                    HashKey key = pc.GetZobristPst(sq1) ^ pc.GetZobristPst(sq2) ^ Zobrist.GetZobristSide();
-                    var i = CuckooHashOne(key);
-                    while (true)
+                    var key = pc.GetZobristPst(sq1) ^ pc.GetZobristPst(sq2) ^ Zobrist.GetZobristSide();
+                    var i = CuckooHashOne(in key);
+                    do
                     {
-                        (CuckooKeys[i], key) = (key, CuckooKeys[i].Key);
+                        (CuckooKeys[i], key) = (key, CuckooKeys[i]);
                         (CuckooMoves[i], move) = (move, CuckooMoves[i]);
 
                         // check for empty slot
@@ -66,21 +66,23 @@ public static class Cuckoo
                             break;
 
                         // Push victim to alternative slot
-                        i = i == CuckooHashOne(key)
-                            ? CuckooHashTwo(key)
-                            : CuckooHashOne(key);
-                    }
+                        i = i == CuckooHashOne(in key)
+                            ? CuckooHashTwo(in key)
+                            : CuckooHashOne(in key);
+                    } while (true);
 
                     count++;
                 }
             }
-        }
 
         Debug.Assert(count == 3668);
     }
 
     public static bool HashCuckooCycle(in IPosition pos, int end, int ply)
     {
+        if (end < 3)
+            return false;
+
         var state = pos.State;
         var originalKey = state.Key;
         var statePrevious = state.Previous;
@@ -90,21 +92,19 @@ public static class Cuckoo
             statePrevious = statePrevious.Previous.Previous;
             var moveKey = originalKey ^ statePrevious.Key;
 
-            var j = CuckooHashOne(moveKey);
+            var j = CuckooHashOne(in moveKey);
             var found = CuckooKeys[j] == moveKey;
 
             if (!found)
             {
-                j = CuckooHashTwo(moveKey);
+                j = CuckooHashTwo(in moveKey);
                 found = CuckooKeys[j] == moveKey;
             }
 
             if (!found)
                 continue;
 
-            var move = CuckooMoves[j];
-            var s1 = move.FromSquare();
-            var s2 = move.ToSquare();
+            var (s1, s2) = CuckooMoves[j];
 
             if ((s1.BitboardBetween(s2) & pos.Board.Pieces()).IsEmpty)
                 continue;

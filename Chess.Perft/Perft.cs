@@ -24,17 +24,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Chess.Perft;
-
-using Interfaces;
-using Rudz.Chess;
-using Rudz.Chess.Fen;
-using Rudz.Chess.Types;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using Chess.Perft.Interfaces;
+using Rudz.Chess;
+using Rudz.Chess.Enums;
+using Rudz.Chess.Fen;
+
+namespace Chess.Perft;
 
 /*
 // (first version)
@@ -57,13 +57,10 @@ Result	6	1,912,300.6 us	3,551.167 us	3,148.017 us
 
 public sealed class Perft : IPerft
 {
-    private readonly IDictionary<HashKey, ulong> _results;
-
     public Perft(IGame game, IEnumerable<IPerftPosition> positions)
     {
         Positions = positions.ToList();
         CurrentGame = game;
-        _results = new Dictionary<HashKey, ulong>(Positions.Count);
     }
 
     public Action<string> BoardPrintCallback { get; set; }
@@ -78,29 +75,27 @@ public sealed class Perft : IPerft
     public ulong Expected { get; set; }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
     public async IAsyncEnumerable<ulong> DoPerft(int depth)
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
     {
         if (Positions.Count == 0)
             yield break;
 
-        foreach (var fd in Positions.Select(p => new FenData(p.Fen)))
+        foreach (var fd in Positions.Select(static p => new FenData(p.Fen)))
         {
             Game.Table.NewSearch();
             var state = new State();
-            CurrentGame.Pos.Set(in fd,Rudz.Chess.Enums.ChessMode.NORMAL, in state);
+            CurrentGame.Pos.Set(in fd, ChessMode.Normal, state);
 
-            if (_results.TryGetValue(CurrentGame.Pos.State.Key, out var result))
-            {
+            if (PerftTable.Retrieve(CurrentGame.Pos.State.Key.Key, depth, out var result))
                 yield return result;
-                continue;
+            else
+            {
+                result = CurrentGame.Perft(depth, true);
+                PerftTable.Store(CurrentGame.Pos.State.Key.Key, depth, result);
+                yield return result;
             }
-
-            result = CurrentGame.Perft(depth, true);
-
-            _results[CurrentGame.Pos.State.Key] = result;
-
-            // BoardPrintCallback?.Invoke(fd.ToString());
-            yield return result;
         }
     }
 
@@ -115,7 +110,7 @@ public sealed class Perft : IPerft
     {
         var fp = new FenData(pp.Fen);
         var state = new State();
-        CurrentGame.Pos.Set(in fp, Rudz.Chess.Enums.ChessMode.NORMAL, in state);
+        CurrentGame.Pos.Set(in fp, ChessMode.Normal, state);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -133,7 +128,7 @@ public sealed class Perft : IPerft
         if (pos.Value == null)
             return false;
 
-        if (!pos.Value.Any())
+        if (pos.Value.Count == 0)
             return false;
 
         var depthValue = pos.Value.FirstOrDefault(v => v.Item1 == depth && v.Item2 > 0);

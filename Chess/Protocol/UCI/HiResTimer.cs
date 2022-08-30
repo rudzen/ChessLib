@@ -24,18 +24,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Protocol.UCI;
-
 using System;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
-using Types;
+using Rudz.Chess.Types;
+
+namespace Rudz.Chess.Protocol.UCI;
 
 /// <summary>
 /// Idea From https://stackoverflow.com/a/41697139/548894
 /// </summary>
-public sealed class HiResTimer : IHiResTimer
+public sealed class HiResTimer : IHiResTimer, IEquatable<HiResTimer>
 {
     public static readonly double TickLength = 1000f / Stopwatch.Frequency; // ms
 
@@ -173,25 +173,32 @@ public sealed class HiResTimer : IHiResTimer
             nextTrigger += Interval;
             double elapsed;
 
-            while (true)
+            do
             {
                 elapsed = ElapsedHiRes(stopwatch);
                 var diff = nextTrigger - elapsed;
                 if (diff <= 0f)
                     break;
 
-                if (diff < 1f)
-                    Thread.SpinWait(10);
-                else if (diff < 5f)
-                    Thread.SpinWait(100);
-                else if (diff < 15f)
-                    Thread.Sleep(1);
-                else
-                    Thread.Sleep(10);
+                switch (diff)
+                {
+                    case < 1f:
+                        Thread.SpinWait(10);
+                        break;
+                    case < 5f:
+                        Thread.SpinWait(100);
+                        break;
+                    case < 15f:
+                        Thread.Sleep(1);
+                        break;
+                    default:
+                        Thread.Sleep(10);
+                        break;
+                }
 
                 if (cancellationToken.IsCancellationRequested)
                     return;
-            }
+            } while (true);
 
             var delay = elapsed - nextTrigger;
             Elapsed?.Invoke(new HiResTimerArgs(delay, Id));

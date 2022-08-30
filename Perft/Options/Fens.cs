@@ -24,10 +24,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Perft.Options;
-
-using CommandLine;
 using System.Collections.Generic;
+using CommandLine;
+
+namespace Perft.Options;
 
 [Verb("fens", HelpText = "Add fens to run")]
 public class FenOptions : IOptions

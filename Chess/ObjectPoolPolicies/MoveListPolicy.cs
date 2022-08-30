@@ -24,17 +24,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using Microsoft.Extensions.ObjectPool;
+using Rudz.Chess.MoveGeneration;
+
 namespace Rudz.Chess.ObjectPoolPolicies;
 
-using Microsoft.Extensions.ObjectPool;
-using MoveGeneration;
-
-public class MoveListPolicy : IPooledObjectPolicy<IMoveList>
+public sealed class MoveListPolicy : IPooledObjectPolicy<IMoveList>
 {
-    public IMoveList Create()
-    {
-        return new MoveList();
-    }
+    public IMoveList Create() => new MoveList();
 
     public bool Return(IMoveList obj)
     {

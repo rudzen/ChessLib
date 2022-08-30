@@ -24,12 +24,24 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Types;
-
-using Enums;
-using Extensions;
 using System;
 using System.Runtime.CompilerServices;
+using Rudz.Chess.Extensions;
+
+namespace Rudz.Chess.Types;
+
+public enum Players
+{
+    White = 0,
+    Black = 1,
+    PlayerNb = 2
+}
+
+public enum PlayerTypes
+{
+    Engine = 0,
+    Human = 1
+}
 
 public readonly struct Player : IEquatable<Player>
 {
@@ -58,15 +70,23 @@ public readonly struct Player : IEquatable<Player>
 
     public readonly byte Side;
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Deconstruct(out byte side)
+        => side = Side;
+
+    // public readonly byte Side;
+
     public bool IsWhite => Side == 0;
 
     public bool IsBlack => Side != 0;
 
     public char Fen => PlayerFen[Side];
 
-    public static readonly Player White = 0;
+    public static Player White { get; } = new(Players.White);
 
-    public static readonly Player Black = 1;
+    public static Player Black { get; } = new(Players.Black);
+
+    public const int Count = (int)Players.PlayerNb;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator Player(int value) => new((byte)value);
@@ -79,6 +99,10 @@ public readonly struct Player : IEquatable<Player>
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator Player(bool value) => new(value.AsByte());
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Player Create(Players player)
+        => new Player(player);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Player operator ~(Player player) => new(player.Side ^ 1);
@@ -108,26 +132,34 @@ public readonly struct Player : IEquatable<Player>
     public override int GetHashCode() => Side << 24;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override string ToString() => PlayerColors[Side];
+    public override string ToString()
+        => PlayerColors[Side];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool IsOk() => Side.InBetween(White.Side, Black.Side);
+    public bool IsOk()
+        => Side.InBetween(White.Side, Black.Side);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public string GetName() => PlayerColors[Side];
+    public string GetName()
+        => PlayerColors[Side];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Direction PawnPushDistance() => PawnPushDist[Side];
+    public Direction PawnPushDistance()
+        => PawnPushDist[Side];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Direction PawnDoublePushDistance() => PawnDoublePushDist[Side];
+    public Direction PawnDoublePushDistance()
+        => PawnDoublePushDist[Side];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Direction PawnWestAttackDistance() => PawnWestAttackDist[Side];
+    public Direction PawnWestAttackDistance()
+        => PawnWestAttackDist[Side];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Direction PawnEastAttackDistance() => PawnEastAttackDist[Side];
+    public Direction PawnEastAttackDistance()
+        => PawnEastAttackDist[Side];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public BitBoard PawnPush(BitBoard bitBoard) => PawnPushModifiers[Side](bitBoard);
+    public BitBoard PawnPush(BitBoard bitBoard)
+        => PawnPushModifiers[Side](bitBoard);
 }

@@ -24,9 +24,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Hash.Tables;
+using Rudz.Chess.Types;
 
-using Types;
+namespace Rudz.Chess.Hash.Tables;
 
 public struct PawnTableEntry
 {
@@ -38,7 +38,7 @@ public struct PawnTableEntry
     {
         Key = key;
         Score = Score.Zero;
-        PassedPawns = new BitBoard[2];
+        PassedPawns = new BitBoard[Player.Count];
     }
 }
 

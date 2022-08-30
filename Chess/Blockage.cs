@@ -24,21 +24,23 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using System;
 using System.Runtime.CompilerServices;
+using Rudz.Chess.Types;
 
 [assembly: InternalsVisibleTo("Chess.Test")]
 
 namespace Rudz.Chess;
 
-using Enums;
-using System;
-using Types;
-
 /// <summary>
-/// Computes pawn blockage (fences) See https://pdfs.semanticscholar.org/31c2/d37c80ea1aef0676ba30393bc46c0ccc70e9.pdf
+/// Computes pawn blockage (fences) See
+/// https://elidavid.com/pubs/blockage2.pdf
+/// https://pdfs.semanticscholar.org/31c2/d37c80ea1aef0676ba30393bc46c0ccc70e9.pdf
 /// </summary>
 public sealed class Blockage : IBlockage
 {
+    private static readonly BitBoard PawnFileASquares = BitBoards.FILEA & ~(BitBoards.RANK1 | BitBoards.RANK8);
+
     private readonly IPosition _pos;
 
     private readonly BitBoard _ourPawns;
@@ -100,22 +102,23 @@ public sealed class Blockage : IBlockage
         ComputeFenceRanks();
 
         var ourKsq = _pos.GetKingSquare(_us);
-        var theirKsq = _pos.GetKingSquare(_them);
 
-        if (ourKsq.Rank.RelativeRank(_us) > _fenceRank[ourKsq.File.AsInt()].RelativeRank(_us))
+        if (ourKsq.RelativeRank(_us) > _fenceRank[ourKsq.File.AsInt()].Relative(_us))
             return false;
 
+        var theirKsq = _pos.GetKingSquare(_them);
         _dynamicPawns |= ComputeDynamicFencedPawns(_them);
 
         while (_dynamicPawns)
         {
             var sq = BitBoards.PopLsb(ref _dynamicPawns);
-            var (r, f) = sq.RankFile;
-            var rr = sq.RelativeRank(_us);
+            var (r, f) = sq;
+            var rr = r.Relative(_us);
 
             if (r > _fenceRank[f.AsInt()])
             {
-                if ((_theirPawns & sq.PassedPawnFrontAttackSpan(_us)).IsEmpty && (theirKsq.File != f || theirKsq.Rank.RelativeRank(_us) < rr))
+                if ((_theirPawns & sq.PassedPawnFrontAttackSpan(_us)).IsEmpty &&
+                    (theirKsq.File != f || theirKsq.Rank.Relative(_us) < rr))
                     return false;
             }
             else if (_fence & sq)
@@ -125,36 +128,53 @@ public sealed class Blockage : IBlockage
 
                 if (_pos.GetPiece(sq + _us.PawnDoublePushDistance()) != _theirPawn)
                 {
-                    if (theirKsq.File != f || theirKsq.Rank.RelativeRank(_us) < rr)
+                    if (theirKsq.File != f || theirKsq.RelativeRank(_us) < rr)
                         return false;
 
-                    if (f != Files.FileA
-                        && _pos.GetPiece(sq + Direction.West) != _ourPawn
-                        || BitBoards.PopCount(_ourPawns & PreviousFile(f)) > 1
-                        || (_fixedPawn & (sq + Direction.West)).IsEmpty
-                        || (_fence & (sq + Direction.West)).IsEmpty)
-                        return false;
+                    if (f != File.FILE_A)
+                    {
+                        if (_pos.GetPiece(sq + Direction.West) != _ourPawn)
+                            return false;
 
-                    if (f != Files.FileH
-                        && _pos.GetPiece(sq + Direction.East) != _ourPawn
-                        || BitBoards.PopCount(_ourPawns & NextFile(f)) > 1
-                        || (_fixedPawn & (sq + Direction.East)).IsEmpty
-                        || (_fence & (sq + Direction.East)).IsEmpty)
-                        return false;
+                        if (BitBoards.PopCount(_ourPawns & PreviousFile(f)) > 1)
+                            return false;
+
+                        if ((_fixedPawn & (sq + Direction.West)).IsEmpty)
+                            return false;
+
+                        if ((_fence & (sq + Direction.West)).IsEmpty)
+                            return false;
+                    }
+
+                    if (f != File.FILE_H)
+                    {
+                        if (_pos.GetPiece(sq + Direction.East) != _ourPawn)
+                            return false;
+
+                        if (BitBoards.PopCount(_ourPawns & NextFile(f)) > 1)
+                            return false;
+
+                        if ((_fixedPawn & (sq + Direction.East)).IsEmpty)
+                            return false;
+
+                        if ((_fence & (sq + Direction.East)).IsEmpty)
+                            return false;
+                    }
                 }
 
                 if ((sq + _us.PawnDoublePushDistance()).PawnAttack(_us) & _theirPawns)
                     return false;
 
-                if (BitBoards.PopCount(_ourPawns & f) > 1)
+                if (BitBoards.MoreThanOne(_ourPawns & f))
                     return false;
             }
             else if (r < _fenceRank[f.AsInt()])
             {
                 sq += up;
                 r = sq.Rank;
-                rr = sq.RelativeRank(_us);
-                while ((_fence & Square.Make(r, f)).IsEmpty)
+                rr = r.Relative(_us);
+
+                while ((_fence & Square.Create(r, f)).IsEmpty)
                 {
                     var pawnAttacks = sq.PawnAttack(_us);
                     if (_theirPawns & pawnAttacks)
@@ -167,7 +187,7 @@ public sealed class Blockage : IBlockage
                     r = sq.Rank;
                 }
 
-                if ((_fence & Square.Make(r, f)).IsEmpty || _pos.IsOccupied(sq))
+                if (_pos.IsOccupied(sq) || (_fence & Square.Create(r, f)).IsEmpty)
                     continue;
 
                 if (rr >= Ranks.Rank6)
@@ -175,22 +195,38 @@ public sealed class Blockage : IBlockage
 
                 if ((_theirPawns & (sq + _us.PawnDoublePushDistance())).IsEmpty)
                 {
-                    if (theirKsq.File != f || theirKsq.Rank.RelativeRank(_us) < rr)
+                    if (theirKsq.File != f || theirKsq.RelativeRank(_us) < rr)
                         return false;
 
-                    if (f != Files.FileA
-                        && _pos.GetPiece(sq + Direction.West) != _ourPawn
-                        || BitBoards.PopCount(_ourPawns & (f - 1)) > 1
-                        || (_fixedPawn & Square.Make(r, PreviousFile(f))).IsEmpty
-                        || (_fence & Square.Make(r, PreviousFile(f))).IsEmpty)
-                        return false;
+                    if (f != File.FILE_A)
+                    {
+                        if (_pos.GetPiece(sq + Direction.West) != _ourPawn)
+                            return false;
 
-                    if (f != Files.FileH
-                        && _pos.GetPiece(sq + Direction.East) != _ourPawn
-                        || BitBoards.PopCount(_ourPawns & (f + 1)) > 1
-                        || (_fixedPawn & Square.Make(r, NextFile(f))).IsEmpty
-                        || (_fence & Square.Make(r, NextFile(f))).IsEmpty)
-                        return false;
+                        if (BitBoards.PopCount(_ourPawns & (f - 1)) > 1)
+                            return false;
+
+                        if ((_fixedPawn & Square.Create(r, PreviousFile(f))).IsEmpty)
+                            return false;
+
+                        if ((_fence & Square.Create(r, PreviousFile(f))).IsEmpty)
+                            return false;
+                    }
+
+                    if (f != File.FILE_H)
+                    {
+                        if (_pos.GetPiece(sq + Direction.East) != _ourPawn)
+                            return false;
+
+                        if (BitBoards.PopCount(_ourPawns & (f + 1)) > 1)
+                            return false;
+
+                        if ((_fixedPawn & Square.Create(r, NextFile(f))).IsEmpty)
+                            return false;
+
+                        if ((_fence & Square.Create(r, NextFile(f))).IsEmpty)
+                            return false;
+                    }
                 }
 
                 if ((sq + up).PawnAttack(_us) & _theirPawns)
@@ -211,7 +247,7 @@ public sealed class Blockage : IBlockage
         while (covered)
         {
             var sq = BitBoards.PopLsb(ref covered);
-            var (r, f) = sq.RankFile;
+            var (r, f) = sq;
             _fenceRank[f.AsInt()] = r;
         }
     }
@@ -222,12 +258,12 @@ public sealed class Blockage : IBlockage
     /// <param name="up">The up direction for the current player</param>
     private void MarkOurPawns(Direction up)
     {
-        var ourPawns = _pos.Board.Squares(PieceTypes.Pawn, _us);
+        var ourPawns = _pos.Pieces(PieceTypes.Pawn, _us);
 
         foreach (var psq in ourPawns)
         {
             var rr = psq.RelativeRank(_us);
-            if (rr < Ranks.Rank7
+            if (rr < Rank.RANK_7
                 && (_pos.GetPiece(psq + up) == _theirPawn || !(_fixedPawn & (psq + up)).IsEmpty)
                 && (psq.PawnAttack(_us) & _theirPawns).IsEmpty)
             {
@@ -262,13 +298,14 @@ public sealed class Blockage : IBlockage
         _processed |= sq;
 
         // File H is marked as fence if it is reached.
-        if (sq.File == Files.FileH)
+        if (sq.File == File.FILE_H)
         {
             _fence |= sq;
             return true;
         }
 
-        Span<Direction> directions = stackalloc Direction[] { _us.PawnPushDistance(), Directions.East, _them.PawnPushDistance() };
+        Span<Direction> directions = stackalloc Direction[]
+            { _us.PawnPushDistance(), Directions.East, _them.PawnPushDistance() };
 
         foreach (var direction in directions)
         {
@@ -287,9 +324,9 @@ public sealed class Blockage : IBlockage
 
     private bool IsFenceFormed()
     {
-        for (Rank rank = Ranks.Rank2; rank < Ranks.Rank8; ++rank)
+        // ReSharper disable once LoopCanBePartlyConvertedToQuery
+        foreach (var startSquare in PawnFileASquares)
         {
-            var startSquare = Square.Make(rank, Files.FileA);
             if ((_marked & startSquare).IsEmpty || !FormsFence(startSquare))
                 continue;
             _fence |= startSquare;
@@ -308,11 +345,11 @@ public sealed class Blockage : IBlockage
 
         var result = BitBoard.Empty;
 
-        for (File f = Files.FileA; f < Files.FileNb; ++f)
+        foreach (var f in File.AllFiles)
         {
             var sq = NextFenceRankSquare(f, them);
             var b = sq.ForwardFile(them) & _theirPawns;
-            while (!b.IsEmpty)
+            while (b)
             {
                 sq = BitBoards.PopLsb(ref b) + down;
                 if (_pos.GetPiece(sq) == _ourPawn)

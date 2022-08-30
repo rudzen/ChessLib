@@ -25,9 +25,9 @@ SOFTWARE.
 #1#
 */
 
-namespace Rudz.Chess.MoveGeneration;
+using Rudz.Chess.Enums;
 
-using Enums;
+namespace Rudz.Chess.MoveGeneration;
 
 public static class MoveFactory
 {

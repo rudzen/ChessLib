@@ -24,16 +24,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess;
-
-using Enums;
-using Extensions;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using Types;
+using Rudz.Chess.Extensions;
+using Rudz.Chess.Types;
+
+namespace Rudz.Chess;
 
 public sealed class Board : IBoard
 {
@@ -56,7 +55,7 @@ public sealed class Board : IBoard
     public Board()
     {
         _pieces = new Piece[64];
-        _bySide = new BitBoard[2];
+        _bySide = new BitBoard[Player.Count];
         _byType = new BitBoard[PieceTypes.PieceTypeNb.AsInt()];
         _pieceCount = new int[16];
         _pieceList = new Square[64][];
@@ -87,7 +86,7 @@ public sealed class Board : IBoard
     public bool IsEmpty(Square sq)
         => _pieces[sq.AsInt()] == Piece.EmptyPiece;
 
-    public void AddPiece(in Piece pc, in Square sq)
+    public void AddPiece(Piece pc, Square sq)
     {
         _pieces[sq.AsInt()] = pc;
         _byType[PieceTypes.AllPieces.AsInt()] |= sq;
@@ -164,10 +163,9 @@ public sealed class Board : IBoard
     public ReadOnlySpan<Square> Squares(PieceTypes pt, Player c)
     {
         var squares = _pieceList[pt.MakePiece(c).AsInt()];
-        var idx = Array.IndexOf(squares, Types.Square.None);
-        return idx == 0
+        return squares[0] == Types.Square.None
             ? ReadOnlySpan<Square>.Empty
-            : squares.AsSpan()[..idx];
+            : squares.AsSpan()[..Array.IndexOf(squares, Types.Square.None)];
     }
 
     public int PieceCount(Piece pc)
@@ -177,13 +175,13 @@ public sealed class Board : IBoard
         => PieceCount(pt.MakePiece(c));
 
     public int PieceCount(PieceTypes pt)
-        => PieceCount(pt.MakePiece(Player.White)) + PieceCount(pt.MakePiece(Player.Black));
+        => _pieceCount[pt.MakePiece(Player.White).AsInt()] + _pieceCount[pt.MakePiece(Player.Black).AsInt()];
 
     public int PieceCount()
         => PieceCount(PieceTypes.AllPieces);
 
     public IEnumerator<Piece> GetEnumerator()
-        => _pieces.Where(piece => piece != Piece.EmptyPiece).GetEnumerator();
+        => _pieces.Where(static piece => piece != Piece.EmptyPiece).GetEnumerator();
 
     IEnumerator IEnumerable.GetEnumerator()
         => GetEnumerator();

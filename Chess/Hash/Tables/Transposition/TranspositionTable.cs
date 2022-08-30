@@ -24,13 +24,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Hash.Tables.Transposition;
-
-using Exceptions;
 using System;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using Types;
+using Rudz.Chess.Exceptions;
+using Rudz.Chess.Types;
+
+namespace Rudz.Chess.Hash.Tables.Transposition;
 
 public sealed class TranspositionTable : ITranspositionTable
 {
@@ -82,7 +82,7 @@ public sealed class TranspositionTable : ITranspositionTable
         var size = (int)(((ulong)mbSize << 20) / (ulong)ClusterSize);
         var resize = false;
         var currentSize = _table.Length;
-        if (!_table.Any())
+        if (_table.Length == 0)
         {
             _table = new ITTCluster[size];
             PopulateTable(0, size);
@@ -110,7 +110,7 @@ public sealed class TranspositionTable : ITranspositionTable
     /// <param name="key">The position key</param>
     /// <returns>The cluster of the keys position in the table</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public ITTCluster FindCluster(HashKey key)
+    public ITTCluster FindCluster(in HashKey key)
     {
         var idx = (int)(key.LowerKey & (_elements - 1));
         return _table[idx];
@@ -124,7 +124,7 @@ public sealed class TranspositionTable : ITranspositionTable
     /// </summary>
     /// <param name="key">The position key</param>
     /// <returns>(true, entry) if one was found, (false, empty) if not found</returns>
-    public (bool, TranspositionTableEntry) Probe(HashKey key)
+    public (bool, TranspositionTableEntry) Probe(in HashKey key)
     {
         var ttc = FindCluster(key);
         var g = _generation;
@@ -155,7 +155,7 @@ public sealed class TranspositionTable : ITranspositionTable
     /// <param name="key">The position key</param>
     /// <returns>The cluster entry</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public TranspositionTableEntry ProbeFirst(HashKey key) => FindCluster(key)[0];
+    public TranspositionTableEntry ProbeFirst(in HashKey key) => FindCluster(key)[0];
 
     /// <summary>
     /// Stores a move in the transposition table. It will automatically detect the best cluster
@@ -168,9 +168,9 @@ public sealed class TranspositionTable : ITranspositionTable
     /// <param name="depth">The depth of the move</param>
     /// <param name="move">The move it self</param>
     /// <param name="statValue">The static value of the move</param>
-    public void Store(HashKey key, int value, Bound type, sbyte depth, Move move, int statValue)
+    public void Store(in HashKey key, int value, Bound type, sbyte depth, Move move, int statValue)
     {
-        var ttc = FindCluster(key);
+        var ttc = FindCluster(in key);
 
         var clusterIndex = 0;
         var found = false;

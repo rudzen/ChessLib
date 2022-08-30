@@ -24,25 +24,22 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Types;
-
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
+// ReSharper disable MemberCanBeInternal
+namespace Rudz.Chess.Types;
+
 /// <summary>
 /// Bitboard struct, wraps an unsigned long with some nifty helper functionality and operators.
 /// Enumeration will yield each set bit as a Square struct.
 /// <para>For more information - please see https://github.com/rudzen/ChessLib/wiki/BitBoard</para>
 /// </summary>
-public readonly struct BitBoard : IEnumerable<Square>, IEquatable<BitBoard>
+public readonly record struct BitBoard(ulong Value) : IEnumerable<Square>
 {
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public BitBoard(ulong value)
-        : this() => Value = value;
-
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public BitBoard(BitBoard value)
         : this(value.Value) { }
@@ -52,10 +49,8 @@ public readonly struct BitBoard : IEnumerable<Square>, IEquatable<BitBoard>
         : this(square.AsBb()) { }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public BitBoard(int value)
+    private BitBoard(int value)
         : this((ulong)value) { }
-
-    public readonly ulong Value;
 
     public int Count => BitBoards.PopCount(in this);
 
@@ -83,6 +78,14 @@ public readonly struct BitBoard : IEnumerable<Square>, IEquatable<BitBoard>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator BitBoard(Square square)
         => new(square.AsBb());
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static BitBoard Create(ulong value)
+        => new BitBoard(value);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static BitBoard Create(uint value)
+        => new BitBoard(value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static BitBoard operator *(BitBoard left, ulong right)
@@ -152,10 +155,6 @@ public readonly struct BitBoard : IEnumerable<Square>, IEquatable<BitBoard>
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator ==(BitBoard left, BitBoard right)
-        => left.Count == right.Count;
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool operator <(BitBoard left, BitBoard right)
         => left.Count < right.Count;
 
@@ -170,10 +169,6 @@ public readonly struct BitBoard : IEnumerable<Square>, IEquatable<BitBoard>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool operator <=(BitBoard left, BitBoard right)
         => left.Count <= right.Count;
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator !=(BitBoard left, BitBoard right)
-        => left.Value != right.Value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool operator true(BitBoard bitBoard)
@@ -201,17 +196,20 @@ public readonly struct BitBoard : IEnumerable<Square>, IEquatable<BitBoard>
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public BitBoard OrAll(params BitBoard[] bbs)
-        => bbs.Aggregate(Value, (current, b) => current | b.Value);
+        => bbs.Aggregate(Value, static (current, b) => current | b.Value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public BitBoard OrAll(IEnumerable<BitBoard> bbs)
-        => bbs.Aggregate(Value, (current, bb) => current | bb.Value);
+        => bbs.Aggregate(Value, static (current, bb) => current | bb.Value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public BitBoard OrAll(IEnumerable<Square> sqs)
+    public BitBoard OrAll(ReadOnlySpan<Square> sqs)
     {
         var b = this;
-        return sqs.Aggregate(b, (current, sq) => current | sq);
+        foreach (var sq in sqs)
+            b |= sq;
+
+        return b;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -224,7 +222,7 @@ public readonly struct BitBoard : IEnumerable<Square>, IEquatable<BitBoard>
         if (IsEmpty)
             yield break;
 
-        BitBoard bb = Value;
+        var bb = this;
         while (bb)
             yield return BitBoards.PopLsb(ref bb);
     }
@@ -242,10 +240,6 @@ public readonly struct BitBoard : IEnumerable<Square>, IEquatable<BitBoard>
         => Value == other.Value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override bool Equals(object obj)
-        => obj is BitBoard board && Equals(board);
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override int GetHashCode()
-        => (int)(Value >> 32);
+        => Value.GetHashCode();
 }

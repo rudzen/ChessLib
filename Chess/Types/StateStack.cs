@@ -24,13 +24,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Types;
-
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+
+namespace Rudz.Chess.Types;
 
 public sealed class StateStack : IEnumerable<State>
 {
@@ -142,7 +142,7 @@ public sealed class StateStack : IEnumerable<State>
         => _stack.AsSpan()[..Count];
 
     IEnumerator<State> IEnumerable<State>.GetEnumerator()
-        => _stack.TakeWhile(state => state != null).GetEnumerator();
+        => _stack.TakeWhile(static state => state != null).GetEnumerator();
 
     public override string ToString()
     {

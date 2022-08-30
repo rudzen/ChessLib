@@ -24,9 +24,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Perft.Options;
-
 using CommandLine;
+
+namespace Perft.Options;
 
 [Verb("tt", HelpText = "Configuration for transposition table")]
 public class TTOptions : IOptions

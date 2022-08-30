@@ -24,18 +24,20 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess;
-
-using Enums;
-using Extensions;
 using System;
-using Types;
+using System.Linq;
+using Rudz.Chess.Enums;
+using Rudz.Chess.Extensions;
+using Rudz.Chess.Types;
+
+// ReSharper disable MemberCanBeInternal
+namespace Rudz.Chess;
 
 public sealed class State : IEquatable<State>
 {
     public Move LastMove { get; set; }
 
-    public Value[] NonPawnMaterial { get; set; }
+    public Value[] NonPawnMaterial { get; }
 
     public HashKey PawnStructureKey { get; set; }
 
@@ -45,11 +47,11 @@ public sealed class State : IEquatable<State>
 
     public int Rule50 { get; set; }
 
-    public CastlelingRights CastlelingRights { get; set; }
+    public CastleRight CastlelingRights { get; set; }
 
     public Square EnPassantSquare { get; set; }
 
-    public State Previous { get; set; }
+    public State Previous { get; private set; }
 
     // -----------------------------
     // Properties below this point are not copied from other state
@@ -63,11 +65,11 @@ public sealed class State : IEquatable<State>
     /// </summary>
     public BitBoard Checkers { get; set; }
 
-    public BitBoard[] BlockersForKing { get; set; }
+    public BitBoard[] BlockersForKing { get; }
 
-    public BitBoard[] Pinners { get; set; }
+    public BitBoard[] Pinners { get; }
 
-    public BitBoard[] CheckedSquares { get; set; }
+    public BitBoard[] CheckedSquares { get; private set; }
 
     public Piece CapturedPiece { get; set; }
 
@@ -85,12 +87,12 @@ public sealed class State : IEquatable<State>
         Rule50 = other.Rule50;
         PliesFromNull = other.PliesFromNull;
         EnPassantSquare = other.EnPassantSquare;
-        NonPawnMaterial = new Value[] { other.NonPawnMaterial[0], other.NonPawnMaterial[1] };
+        NonPawnMaterial = new[] { other.NonPawnMaterial[0], other.NonPawnMaterial[1] };
         Previous = other;
 
         Checkers = BitBoard.Empty;
-        BlockersForKing = new BitBoard[2];
-        Pinners = new BitBoard[2];
+        BlockersForKing = new[] { BitBoard.Empty, BitBoard.Empty };
+        Pinners = new[] { BitBoard.Empty, BitBoard.Empty };
         CheckedSquares = new BitBoard[PieceTypes.PieceTypeNb.AsInt()];
         CapturedPiece = Piece.EmptyPiece;
     }
@@ -98,13 +100,13 @@ public sealed class State : IEquatable<State>
     public State()
     {
         LastMove = Move.EmptyMove;
-        NonPawnMaterial = new Value[] { Value.ValueZero, Value.ValueZero };
-        CastlelingRights = CastlelingRights.None;
+        NonPawnMaterial = new[] { Value.ValueZero, Value.ValueZero };
+        CastlelingRights = CastleRight.NONE;
         EnPassantSquare = Square.None;
         Checkers = BitBoard.Empty;
         CheckedSquares = new BitBoard[PieceTypes.PieceTypeNb.AsInt()];
-        Pinners = new BitBoard[] { BitBoard.Empty, BitBoard.Empty };
-        BlockersForKing = new BitBoard[] { BitBoard.Empty, BitBoard.Empty };
+        Pinners = new[] { BitBoard.Empty, BitBoard.Empty };
+        BlockersForKing = new[] { BitBoard.Empty, BitBoard.Empty };
         CapturedPiece = Piece.EmptyPiece;
     }
 
@@ -120,7 +122,8 @@ public sealed class State : IEquatable<State>
         other.Previous = this;
 
         // copy over material
-        Array.Copy(NonPawnMaterial, other.NonPawnMaterial, NonPawnMaterial.Length);
+        other.NonPawnMaterial[0] = NonPawnMaterial[0];
+        other.NonPawnMaterial[1] = NonPawnMaterial[1];
 
         // initialize the rest of the values
         if (other.CheckedSquares == null)
@@ -128,8 +131,8 @@ public sealed class State : IEquatable<State>
         else
             other.CheckedSquares.Fill(BitBoard.Empty);
 
-        other.Pinners = new BitBoard[] { BitBoard.Empty, BitBoard.Empty };
-        other.BlockersForKing = new BitBoard[] { BitBoard.Empty, BitBoard.Empty };
+        other.Pinners[0] = other.Pinners[1] = BitBoard.Empty;
+        other.BlockersForKing[0] = other.BlockersForKing[1] = BitBoard.Empty;
 
         return other;
     }
@@ -138,10 +141,10 @@ public sealed class State : IEquatable<State>
     {
         LastMove = Move.EmptyMove;
         NonPawnMaterial.Clear();
-        PawnStructureKey = Key = MaterialKey = 0UL;
+        PawnStructureKey = Key = MaterialKey = HashKey.Empty;
         PliesFromNull = 0;
         Repetition = 0;
-        CastlelingRights = CastlelingRights.None;
+        CastlelingRights = CastleRight.NONE;
         EnPassantSquare = Square.None;
         CheckedSquares.Fill(BitBoard.Empty);
         Pinners[0] = Pinners[1] = BitBoard.Empty;
@@ -203,17 +206,13 @@ public sealed class State : IEquatable<State>
         hashCode.Add(PliesFromNull);
         hashCode.Add(Rule50);
         hashCode.Add(Key);
-        hashCode.Add(CastlelingRights.AsInt());
+        hashCode.Add(CastlelingRights.Rights.AsInt());
         hashCode.Add(EnPassantSquare);
         hashCode.Add(Checkers);
         hashCode.Add(Previous);
         hashCode.Add(CapturedPiece);
-        foreach (var pinner in Pinners)
-            if (!pinner.IsEmpty)
-                hashCode.Add(pinner);
-        foreach (var checkedSquare in CheckedSquares)
-            if (!checkedSquare.IsEmpty)
-                hashCode.Add(checkedSquare);
+        hashCode.Add(Pinners.Where(static p => !p.IsEmpty));
+        hashCode.Add(CheckedSquares.Where(static csq => !csq.IsEmpty));
         return hashCode.ToHashCode();
     }
 }

@@ -24,11 +24,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Protocol.UCI;
-
 using System;
 using System.Collections.Generic;
-using Types;
+using Rudz.Chess.Types;
+
+namespace Rudz.Chess.Protocol.UCI;
 
 public interface IUci
 {
@@ -47,7 +47,7 @@ public interface IUci
 
     ulong Nps(ulong nodes, TimeSpan time);
 
-    Move MoveFromUci(IPosition pos, string uciMove);
+    Move MoveFromUci(IPosition pos, ReadOnlySpan<char> uciMove);
 
     IEnumerable<Move> MovesFromUci(IPosition pos, Stack<State> states, IEnumerable<string> moves);
 
@@ -70,4 +70,6 @@ public interface IUci
     string Pv(int count, int score, int depth, int selectiveDepth, int alpha, int beta, TimeSpan time, IEnumerable<Move> pvLine, ulong nodes);
 
     string Fullness(ulong tbHits, ulong nodes, TimeSpan time);
+
+    string ToString();
 }

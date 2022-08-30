@@ -24,11 +24,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Protocol.UCI;
-
-using Extensions;
 using System;
 using System.Diagnostics;
+using Rudz.Chess.Extensions;
+
+namespace Rudz.Chess.Protocol.UCI;
 
 public sealed class Option : IOption
 {
@@ -96,13 +96,17 @@ public sealed class Option : IOption
 
     public int GetInt()
     {
-        Debug.Assert(Type == UciOptionType.Check || Type == UciOptionType.Spin);
-        return Type == UciOptionType.Spin ? Convert.ToInt32(_currentValue) : bool.Parse(_currentValue).ToInt();
+        Debug.Assert(Type is UciOptionType.Check or UciOptionType.Spin);
+        return Type switch
+        {
+            UciOptionType.Spin => Convert.ToInt32(_currentValue),
+            _ => bool.Parse(_currentValue).ToInt()
+        };
     }
 
     public string GetText()
     {
-        Debug.Assert(Type != UciOptionType.Check || Type != UciOptionType.Spin);
+        Debug.Assert(Type is not (UciOptionType.Check and UciOptionType.Spin));
         return _currentValue;
     }
 
@@ -115,14 +119,10 @@ public sealed class Option : IOption
     /// <returns></returns>
     public IOption SetCurrentValue(string v)
     {
-        if (Type != UciOptionType.Button && (v == null || v.IsNullOrEmpty())
-            || Type == UciOptionType.Check && !bool.TryParse(v, out var r)
-            || Type == UciOptionType.Spin)
-        {
-            v.ToIntegral(out int val);
-            if (val < Min || val > Max)
-                return this;
-        }
+        if ((Type != UciOptionType.Button && (v == null || v.IsNullOrEmpty())
+             || Type == UciOptionType.Check && !bool.TryParse(v, out var r)
+             || Type == UciOptionType.Spin) && Maths.ToIntegral(v, out int val) && val < Min && val > Max)
+            return this;
 
         if (Type != UciOptionType.Button)
             _currentValue = v;

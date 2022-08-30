@@ -24,11 +24,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Types;
-
 using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+
+namespace Rudz.Chess.Types;
 
 /// <summary>
 /// Score type with support for Eg/Mg values
@@ -38,11 +38,9 @@ public struct Score : IEquatable<Score>
     [StructLayout(LayoutKind.Explicit)]
     private struct ScoreUnion : IEquatable<ScoreUnion>
     {
-        [FieldOffset(0)]
-        public int mg;
+        [FieldOffset(0)] public int mg;
 
-        [FieldOffset(16)]
-        public int eg;
+        [FieldOffset(16)] public int eg;
 
         public bool Equals(ScoreUnion other)
             => mg == other.mg && eg == other.eg;
@@ -96,6 +94,13 @@ public struct Score : IEquatable<Score>
     public static readonly Score Zero = new();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public readonly void Deconstruct(out int mg, out int eg)
+    {
+        mg = Mg();
+        eg = Eg();
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void SetMg(int v)
         => _data.mg = v;
 
@@ -111,7 +116,7 @@ public struct Score : IEquatable<Score>
     public readonly int Mg()
         => _data.mg;
 
-    public override string ToString()
+    public readonly override string ToString()
         => $"Mg:{_data.mg}, Eg:{_data.eg}";
 
     public bool Equals(Score other)
@@ -122,4 +127,14 @@ public struct Score : IEquatable<Score>
 
     public override int GetHashCode()
         => _data.GetHashCode();
+
+    public static bool operator ==(Score left, Score right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(Score left, Score right)
+    {
+        return !(left == right);
+    }
 }

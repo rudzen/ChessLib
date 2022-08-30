@@ -59,5 +59,5 @@ public enum MoveGenerationType
     /// <summary>
     /// Generate only moves which are not captures and gives check
     /// </summary>
-    QuietChecks,
+    QuietChecks
 }

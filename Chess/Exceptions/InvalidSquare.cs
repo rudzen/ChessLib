@@ -24,10 +24,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Exceptions;
-
 using System;
 using System.Runtime.Serialization;
+
+namespace Rudz.Chess.Exceptions;
 
 public class InvalidSquare : InvalidOperationException
 {

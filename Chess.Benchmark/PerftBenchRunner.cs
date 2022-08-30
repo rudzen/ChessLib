@@ -92,7 +92,7 @@ Result | 6 | 1,545.322 ms | 2.1404 ms | 1.7873 ms |
 
 */
 
-public class PerftBenchRunner
+public static class PerftBenchRunner
 {
     public static void Main(string[] args) => BenchmarkSwitcher.FromAssembly(typeof(PerftBenchRunner).Assembly).Run(args);
 }

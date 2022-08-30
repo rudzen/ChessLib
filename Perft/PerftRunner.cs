@@ -24,30 +24,29 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Perft;
-
-using Chess.Perft;
-using Chess.Perft.Interfaces;
-using DryIoc;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.ObjectPool;
-using Newtonsoft.Json;
-using Options;
-using Parsers;
-using Rudz.Chess;
-using Rudz.Chess.Extensions;
-using Rudz.Chess.Protocol.UCI;
-using Rudz.Chess.Types;
-using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using TimeStamp;
+using Chess.Perft;
+using Chess.Perft.Interfaces;
+using DryIoc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.ObjectPool;
+using Perft.Options;
+using Perft.Parsers;
+using Perft.TimeStamp;
+using Rudz.Chess;
+using Rudz.Chess.Extensions;
+using Rudz.Chess.Protocol.UCI;
+using Serilog;
+
+namespace Perft;
 
 public sealed class PerftRunner : IPerftRunner
 {
@@ -55,9 +54,7 @@ public sealed class PerftRunner : IPerftRunner
 
     private static readonly string Line = new('-', 65);
 
-    private static readonly Lazy<string> CurrentDirectory = new(() => System.Environment.CurrentDirectory);
-
-    private readonly IDictionary<HashKey, ulong> _resultCache;
+    private static readonly Lazy<string> CurrentDirectory = new(static () => System.Environment.CurrentDirectory);
 
     private readonly Func<CancellationToken, IAsyncEnumerable<IPerftPosition>>[] _runners;
 
@@ -68,8 +65,6 @@ public sealed class PerftRunner : IPerftRunner
     private readonly IBuildTimeStamp _buildTimeStamp;
 
     private readonly IPerft _perft;
-
-    private readonly JsonSerializerSettings _outputSettings;
 
     private readonly ObjectPool<PerftResult> _resultPool;
 
@@ -103,13 +98,6 @@ public sealed class PerftRunner : IPerftRunner
         TranspositionTableOptions = Framework.IoC.Resolve<IOptions>(OptionType.TTOptions) as TTOptions;
         configuration.Bind("TranspositionTable", TranspositionTableOptions);
 
-        _resultCache = new Dictionary<HashKey, ulong>(256);
-
-        _outputSettings = new JsonSerializerSettings
-        {
-            Formatting = Formatting.Indented
-        };
-
         _cpu = new CPU();
     }
 
@@ -125,8 +113,7 @@ public sealed class PerftRunner : IPerftRunner
     {
         LogInfoHeader();
 
-        if (Options == null)
-            throw new ArgumentNullException(nameof(Options), "Cannot be null");
+        InternalRunArgumentCheck(Options);
 
         if (TranspositionTableOptions.Use)
             Game.Table.SetSize(TranspositionTableOptions.Size);
@@ -160,6 +147,12 @@ public sealed class PerftRunner : IPerftRunner
         return errors;
     }
 
+    private static void InternalRunArgumentCheck(IOptions options)
+    {
+        if (options == null)
+            throw new ArgumentNullException(nameof(options), "Cannot be null");
+    }
+
     private IAsyncEnumerable<IPerftPosition> ParseEpd(CancellationToken cancellationToken)
     {
         var options = Options as EpdOptions;
@@ -177,7 +170,7 @@ public sealed class PerftRunner : IPerftRunner
         var elapsedMs = sw.ElapsedMilliseconds;
         _log.Information("Parsed {0} epd entries in {1} ms", parsedCount, elapsedMs);
 
-        var perftPositions = _epdParser.Sets.Select(set => PerftPositionFactory.Create(set.Id, set.Epd, set.Perft));
+        var perftPositions = _epdParser.Sets.Select(static set => PerftPositionFactory.Create(set.Id, set.Epd, set.Perft));
 
         foreach (var perftPosition in perftPositions)
             yield return perftPosition;
@@ -193,11 +186,12 @@ public sealed class PerftRunner : IPerftRunner
     private static async IAsyncEnumerable<IPerftPosition> ParseFen(FenOptions options)
 #pragma warning restore 1998
     {
-        const ulong zero = 0UL;
+        const ulong zero = ulong.MinValue;
 
-        var depths = options.Depths.Select(d => (d, zero)).ToList();
+        var depths = options.Depths.Select(static d => (d, zero)).ToList();
 
-        var perftPositions = options.Fens.Select(f => PerftPositionFactory.Create(Guid.NewGuid().ToString(), f, depths));
+        var perftPositions =
+            options.Fens.Select(f => PerftPositionFactory.Create(Guid.NewGuid().ToString(), f, depths));
 
         foreach (var perftPosition in perftPositions)
             yield return perftPosition;
@@ -251,15 +245,15 @@ public sealed class PerftRunner : IPerftRunner
         return result;
     }
 
-    private async ValueTask WriteOutput(IPerftResult result, string baseFileName, CancellationToken cancellationToken)
+    private static async ValueTask WriteOutput(IPerftResult result, string baseFileName, CancellationToken cancellationToken)
     {
         // ReSharper disable once MethodHasAsyncOverload
-        var contents = JsonConvert.SerializeObject(result, _outputSettings);
+        var contents = JsonSerializer.Serialize(result);
         var outputFileName = $"{baseFileName}{result.Depth}].json";
-        await System.IO.File.WriteAllTextAsync(
-            outputFileName,
-            contents,
-            cancellationToken)
+        await File.WriteAllTextAsync(
+                outputFileName,
+                contents,
+                cancellationToken)
             .ConfigureAwait(false);
     }
 
@@ -300,6 +294,7 @@ public sealed class PerftRunner : IPerftRunner
             }
             else
                 _log.Information("Result      : {0}", result.Result);
+
             _log.Information("TT hits     : {0}", Game.Table.Hits);
 
             var error = 0;

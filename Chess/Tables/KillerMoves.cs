@@ -37,34 +37,28 @@ public sealed class KillerMoves : IKillerMoves
     private readonly int _maxDepth;
 
     public static IKillerMoves Create(int maxDepth)
-    {
-        return new KillerMoves(maxDepth).Initialize();
-    }
+        => new KillerMoves(maxDepth).Initialize();
 
     public KillerMoves(int maxDepth)
-    {
-        _maxDepth = maxDepth + 1;
-    }
+        => _maxDepth = maxDepth + 1;
 
     private IKillerMoves Initialize()
     {
         _killerMoves = new IPieceSquare[_maxDepth, 2];
         for (var depth = 0; depth < _maxDepth; depth++)
         {
-            _killerMoves[depth, 0] = new PieceSquare(Piece.EmptyPiece, Square.None);
-            _killerMoves[depth, 1] = new PieceSquare(Piece.EmptyPiece, Square.None);
+            _killerMoves[depth, 0] = new PieceSquareEventArgs(Piece.EmptyPiece, Square.None);
+            _killerMoves[depth, 1] = new PieceSquareEventArgs(Piece.EmptyPiece, Square.None);
         }
+
         Reset();
         return this;
     }
 
     public int GetValue(int depth, Move move, Piece fromPiece)
-    {
-        if (Equals(_killerMoves[depth, 0], move, fromPiece))
-            return 2;
-
-        return Equals(_killerMoves[depth, 1], move, fromPiece).AsByte();
-    }
+        => Equals(_killerMoves[depth, 0], move, fromPiece)
+            ? 2
+            : Equals(_killerMoves[depth, 1], move, fromPiece).AsByte();
 
     public void UpdateValue(int depth, Move move, Piece fromPiece)
     {
@@ -84,9 +78,7 @@ public sealed class KillerMoves : IKillerMoves
         => killerMove.Piece == fromPiece && killerMove.Square == move.ToSquare();
 
     public IPieceSquare Get(int depth, int index)
-    {
-        return _killerMoves[depth, index];
-    }
+        => _killerMoves[depth, index];
 
     public void Shift(int depth)
     {
@@ -140,12 +132,8 @@ public sealed class KillerMoves : IKillerMoves
     }
 
     public override bool Equals(object obj)
-    {
-        return ReferenceEquals(this, obj) || obj is KillerMoves other && Equals(other);
-    }
+        => ReferenceEquals(this, obj) || obj is KillerMoves other && Equals(other);
 
     public override int GetHashCode()
-    {
-        return (_killerMoves != null ? _killerMoves.GetHashCode() : 0);
-    }
+        => _killerMoves != null ? _killerMoves.GetHashCode() : 0;
 }

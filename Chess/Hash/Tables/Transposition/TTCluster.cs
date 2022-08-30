@@ -24,9 +24,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Hash.Tables.Transposition;
+using Rudz.Chess.Types;
 
-using Types;
+namespace Rudz.Chess.Hash.Tables.Transposition;
 
 /// <summary>
 /// Stores an array of <see cref="TranspositionTableEntry"/>. In essence it acts like a entry
@@ -34,7 +34,14 @@ using Types;
 /// </summary>
 public sealed class TTCluster : ITTCluster
 {
-    public static readonly TranspositionTableEntry DefaultEntry = new(0, Move.EmptyMove, 0, 1, int.MaxValue, int.MaxValue, Bound.Void);
+    public static readonly TranspositionTableEntry DefaultEntry = new(
+        0,
+        Move.EmptyMove,
+        0,
+        1,
+        int.MaxValue,
+        int.MaxValue,
+        Bound.Void);
 
     public TTCluster()
     {

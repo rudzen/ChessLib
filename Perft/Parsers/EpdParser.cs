@@ -24,14 +24,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Perft.Parsers;
-
-using Rudz.Chess.Extensions;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Rudz.Chess.Extensions;
+
+namespace Perft.Parsers;
 
 /// <summary>
 /// Fast epd file parser
@@ -59,8 +59,7 @@ public class EpdParser : IEpdParser
         var idSet = false;
         var epdSet = false;
         var perftData = new List<string>(16);
-        string s;
-        while ((s = await sr.ReadLineAsync().ConfigureAwait(false)) != null)
+        while (await sr.ReadLineAsync().ConfigureAwait(false) is { } s)
         {
             // skip comments
             if (s.Length < 4 || s[0] == '#')
@@ -109,9 +108,9 @@ public class EpdParser : IEpdParser
     private static (int, ulong) ParsePerftLines(string perftData)
     {
         var s = perftData.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-        var result = (depth: 0, count: 0ul);
-        s[0].ToIntegral(out result.depth);
-        s[1].ToIntegral(out result.count);
+        var result = (depth: 0, count: ulong.MinValue);
+        Maths.ToIntegral(s[0], out result.depth);
+        Maths.ToIntegral(s[1], out result.count);
         return result;
     }
 }

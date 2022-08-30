@@ -24,10 +24,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess;
+using Rudz.Chess.Enums;
+using Rudz.Chess.Types;
 
-using Enums;
-using Types;
+namespace Rudz.Chess;
 
 public interface IPieceValue
 {

@@ -24,13 +24,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Extensions;
-
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text;
+
+namespace Rudz.Chess.Extensions;
 
 public static class StringExtensions
 {
@@ -53,7 +53,7 @@ public static class StringExtensions
             if (i == command.Length - 1)
             {
                 // return last token.
-                q.Enqueue(new string(command.Slice(startIndex, i - startIndex + 1).TrimEnd(tokenizer).ToArray()));
+                q.Enqueue(new string(command.Slice(startIndex, i - startIndex + 1).TrimEnd(tokenizer)));
                 break;
             }
 
@@ -66,7 +66,7 @@ public static class StringExtensions
                     continue;
 
                 // return token
-                q.Enqueue(new string(command[startIndex..i].TrimEnd(tokenizer).ToArray()));
+                q.Enqueue(new string(command[startIndex..i].TrimEnd(tokenizer)));
                 startIndex = i + 1;
             }
             else if (character == tokenizer)
@@ -82,18 +82,18 @@ public static class StringExtensions
     public static IEnumerable<int> GetLocations(this string @this, char token = ' ')
     {
         var pos = 0;
-        while (true)
+        do
         {
             var index = @this.IndexOf(token, pos);
             if (index == -1)
                 yield break;
             yield return index;
-            pos = index;
-        }
+            pos = index + 1;
+        } while (true);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static MemoryStream GenerateStream(this string @this) => new(Encoding.UTF8.GetBytes(@this ?? ""));
+    public static MemoryStream GenerateStream(this string @this) => new(Encoding.UTF8.GetBytes(@this ?? string.Empty));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsNullOrEmpty(this string @this) => string.IsNullOrEmpty(@this);

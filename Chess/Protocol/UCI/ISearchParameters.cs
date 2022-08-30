@@ -24,9 +24,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Protocol.UCI;
+using Rudz.Chess.Types;
 
-using Types;
+namespace Rudz.Chess.Protocol.UCI;
 
 public interface ISearchParameters
 {
@@ -36,11 +36,17 @@ public interface ISearchParameters
 
     bool Infinite { get; set; }
 
-    int MovesToGo { get; set; }
+    bool Ponder { get; set; }
 
-    int MoveTime { get; set; }
+    ulong MovesToGo { get; set; }
 
-    int Depth { get; set; }
+    ulong MoveTime { get; set; }
+
+    ulong Depth { get; set; }
+
+    ulong Nodes { get; set; }
+
+    ulong Mate { get; set; }
 
     ulong WhiteIncrementTimeMilliseconds { get; set; }
 
