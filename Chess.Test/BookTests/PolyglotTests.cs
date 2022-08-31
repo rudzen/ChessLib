@@ -27,7 +27,6 @@ SOFTWARE.
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using FluentAssertions;
 using Rudz.Chess;
 using Rudz.Chess.Factories;
 using Rudz.Chess.Fen;
@@ -37,9 +36,14 @@ using Rudz.Chess.Types;
 
 namespace Chess.Test.BookTests;
 
-public class PolyglotTests
+public sealed class PolyglotTests : IClassFixture<BookFixture>
 {
-    private const string BookFile = @"BookTests\gm2600.bin";
+    private readonly BookFixture _fixture;
+
+    public PolyglotTests(BookFixture fixture)
+    {
+        _fixture = fixture;
+    }
 
     [Fact]
     public void UnsetBookFileYieldsEmptyMove()
@@ -62,13 +66,13 @@ public class PolyglotTests
         const string fen = Fen.StartPositionFen;
 
         var game = GameFactory.Create(fen);
-        var path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), BookFile);
+        var path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), _fixture.BookFile);
         var book = new Book(game.Pos)
         {
             FileName = path
         };
 
-        book.FileName.Should().NotBeNull();
+        Assert.NotNull(book.FileName);
 
         var expected = Move.Create(Square.D2, Square.D4);
         var actual = book.Probe();
@@ -87,7 +91,8 @@ public class PolyglotTests
         var book = new Book(game.Pos);
 
         var actual = book.ComputePolyglotKey().Key;
-        actual.Should().Be(expected);
+
+        Assert.Equal(expected, actual);
     }
 
     [Theory]
@@ -100,7 +105,7 @@ public class PolyglotTests
     [InlineData(new[] { "e2e4", "d7d5", "e4e5", "f7f5", "e1e2", "e8f7" }, 71445182323015129UL)]
     [InlineData(new[] { "a2a4", "b7b5", "h2h4", "b5b4", "c2c4" }, 4359805404264691255UL)]
     [InlineData(new[] { "a2a4", "b7b5", "h2h4", "b5b4", "c2c4", "b4c3", "a1a3" }, 6647202560273257824UL)]
-    public void HashKeyFromInitialPositionIsComputedCorrectly(string[] uciMoves, ulong expectedHashKey)
+    public void HashKeyFromInitialPositionIsComputedCorrectly(string[] uciMoves, ulong expected)
     {
         const string fen = Fen.StartPositionFen;
 
@@ -117,6 +122,6 @@ public class PolyglotTests
 
         var actualKey = book.ComputePolyglotKey().Key;
 
-        actualKey.Should().Be(expectedHashKey);
+        Assert.Equal(expected, actualKey);
     }
 }
