@@ -24,13 +24,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudz.Chess.Types;
-
-using Enums;
-using Hash;
 using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Rudz.Chess.Hash;
+
+namespace Rudz.Chess.Types;
 
 [StructLayout(LayoutKind.Explicit, Size = 8)]
 public readonly struct HashKey : IEquatable<HashKey>
@@ -38,6 +37,7 @@ public readonly struct HashKey : IEquatable<HashKey>
     private HashKey(ulong key)
     {
         LowerKey = UpperKey = 0;
+        Key16 = 0;
         Key = key;
     }
 
@@ -45,8 +45,11 @@ public readonly struct HashKey : IEquatable<HashKey>
     {
         UpperKey = 0;
         Key = 0;
+        Key16 = 0;
         LowerKey = key32;
     }
+
+    [field: FieldOffset(0)] public ushort Key16 { get; }
 
     [field: FieldOffset(0)] public uint LowerKey { get; }
 

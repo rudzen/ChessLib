@@ -1100,6 +1100,7 @@ public sealed class Position : IPosition
     /// <param name="chessMode">The chess mode to apply</param>
     /// <param name="state">State reference to use. Allows to keep track of states if pre-created (i.e. in a stack) before engine search start</param>
     /// <param name="validate">If true, the fen should be validated, otherwise not</param>
+    /// <param name="searcher">Searcher index, to help point to a specific search index in thread-based search array</param>
     public void Set(in FenData fenData, ChessMode chessMode, State state, bool validate = false, int searcher = 0)
     {
         if (validate)

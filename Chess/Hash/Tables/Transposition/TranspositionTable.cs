@@ -124,15 +124,14 @@ public sealed class TranspositionTable : ITranspositionTable
     /// </summary>
     /// <param name="key">The position key</param>
     /// <returns>(true, entry) if one was found, (false, empty) if not found</returns>
-    public (bool, TranspositionTableEntry) Probe(in HashKey key)
+    public bool Probe(in HashKey key, ref TranspositionTableEntry e)
     {
-        var ttc = FindCluster(key);
+        var ttc = FindCluster(in key);
         var g = _generation;
 
         // Probing the Table will automatically update the generation of the entry in case the
         // probing retrieves an element.
 
-        TranspositionTableEntry e = default;
         var set = false;
         for (var i = 0; i < ttc.Cluster.Length; ++i)
         {
@@ -146,7 +145,27 @@ public sealed class TranspositionTable : ITranspositionTable
             break;
         }
 
-        return (set, !set ? TTCluster.DefaultEntry : e);
+        if (!set)
+            e = default;
+
+        return set;
+    }
+
+    public void Save(in HashKey key, in TranspositionTableEntry e)
+    {
+        var ttc = FindCluster(in key);
+        var entryIndex = 0;
+
+        for (var i = 0; i < ttc.Cluster.Length; ++i)
+        {
+            if (ttc.Cluster[i].Key32 != 0 && ttc.Cluster[i].Key32 != key.UpperKey)
+                continue;
+
+            entryIndex = i;
+            break;
+        }
+
+        ttc[entryIndex] = e;
     }
 
     /// <summary>

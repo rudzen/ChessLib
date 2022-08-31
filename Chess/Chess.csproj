@@ -49,6 +49,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="ClrHeapAllocationAnalyzer" Version="3.0.0" />
     <PackageReference Include="Microsoft.Extensions.ObjectPool" Version="6.0.8" />
     <PackageReference Include="System.Memory" Version="4.5.5" />
   </ItemGroup>

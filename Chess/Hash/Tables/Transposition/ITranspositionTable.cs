@@ -62,8 +62,9 @@ public interface ITranspositionTable
     /// Probes the transposition table for a entry that matches the position key.
     /// </summary>
     /// <param name="key">The position key</param>
+    /// <param name="e">The entry to apply, will be set to default if not found in table</param>
     /// <returns>(true, entry) if one was found, (false, empty) if not found</returns>
-    (bool, TranspositionTableEntry) Probe(in HashKey key);
+    bool Probe(in HashKey key, ref TranspositionTableEntry e);
 
     /// <summary>
     /// Probes the table for the first cluster index which matches the position key

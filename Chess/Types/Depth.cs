@@ -69,6 +69,8 @@ public struct Depth : IEquatable<Depth>
 
     public static Depth MaxPly => new(Depths.MaxPly);
 
+    public static Depth Offset => new(Depths.Offset);
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator Depth(string value)
         => new(Maths.ToIntegral(value));
@@ -79,6 +81,10 @@ public struct Depth : IEquatable<Depth>
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator Depth(int value)
+        => new(value);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static implicit operator Depth(byte value)
         => new(value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -106,6 +112,9 @@ public struct Depth : IEquatable<Depth>
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Depth operator --(Depth left) => new(left.Value - 1);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Depth operator -(Depth left, Depth right) => new(left.Value - right.Value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool operator ==(Depth left, int right)
