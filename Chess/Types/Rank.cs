@@ -25,6 +25,7 @@ SOFTWARE.
 */
 
 using System.Runtime.CompilerServices;
+using Rudz.Chess.Extensions;
 
 namespace Rudz.Chess.Types;
 
@@ -75,6 +76,9 @@ public readonly record struct Rank(Ranks Value)
     }
 
     public char Char => (char)('1' + Value.AsInt());
+
+    public bool IsOk
+        => Value.AsInt().InBetween(Ranks.Rank1.AsInt(), Ranks.Rank8.AsInt());
 
     public static int Count => (int)Ranks.RankNb;
 
@@ -179,20 +183,16 @@ public readonly record struct Rank(Ranks Value)
         => left.AsInt() < right.AsInt();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator true(Rank sq)
-        => sq.IsValid();
+    public static bool operator true(Rank r)
+        => r.IsOk;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator false(Rank sq)
-        => !sq.IsValid();
+    public static bool operator false(Rank r)
+        => !r.IsOk;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public int AsInt()
         => (int)Value;
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool IsValid()
-        => Value < Ranks.RankNb;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override string ToString()

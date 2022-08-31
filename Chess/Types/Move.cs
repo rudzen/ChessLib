@@ -137,9 +137,14 @@ public record struct Move(ushort Data)
     public bool IsNullMove()
         => Data == 0;
 
+    /// <summary>
+    /// Makes no assumption of the legality of the move,
+    /// only if it is different squares
+    /// </summary>
+    /// <returns>true if not the same from and to square</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool IsValidMove()
-        => FromSquare().AsInt() != ToSquare().AsInt();
+        => FromSquare() != ToSquare();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Equals(Move other)

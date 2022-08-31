@@ -26,6 +26,7 @@ SOFTWARE.
 
 using System;
 using System.Runtime.CompilerServices;
+using Rudz.Chess.Extensions;
 
 namespace Rudz.Chess.Types;
 
@@ -40,6 +41,13 @@ public enum Files
     FileG = 6,
     FileH = 7,
     FileNb = 8
+}
+
+public static class FilesExtensions
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static int AsInt(this Files f)
+        => (int)f;
 }
 
 public readonly struct File : IEquatable<File>
@@ -72,6 +80,9 @@ public readonly struct File : IEquatable<File>
 
     public char Char
         => (char)('a' + Value);
+
+    public bool IsOk
+        => Value.AsInt().InBetween(Files.FileA.AsInt(), Files.FileH.AsInt());
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator File(int value)
@@ -167,6 +178,14 @@ public readonly struct File : IEquatable<File>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool operator <(File left, File right)
         => left.AsInt() < right.AsInt();
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool operator >=(File left, File right)
+        => left.AsInt() >= right.AsInt();
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool operator <=(File left, File right)
+        => left.AsInt() <= right.AsInt();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool operator true(File f)
