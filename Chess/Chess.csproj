@@ -13,8 +13,8 @@
     <PackageVersion>0.0.1</PackageVersion>
     <Description>Chess library with data structures and move generation.</Description>
     <Copyright>(C) 2017-2022 Rudy Alex Kohn</Copyright>
-    <AssemblyVersion>0.0.1.0</AssemblyVersion>
-    <FileVersion>0.0.1.0</FileVersion>
+    <AssemblyVersion>0.0.1</AssemblyVersion>
+    <FileVersion>0.0.1</FileVersion>
     <PackageProjectUrl>https://github.com/rudzen/ChessLib</PackageProjectUrl>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
@@ -66,7 +66,7 @@
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
-    <None Include="Icon\ChessLib.png" Pack="true" PackagePath=""/>
+    <None Include="Icon\ChessLib.png" Pack="true" PackagePath="" />
   </ItemGroup>
 
 </Project>
