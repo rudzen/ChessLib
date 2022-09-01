@@ -11,6 +11,9 @@
     <IsLinux Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))' == 'true'">true</IsLinux>
     <TargetFramework>net6.0</TargetFramework>
     <PackageVersion>0.0.1</PackageVersion>
+    <Authors>Rudy Alex Kohn</Authors>
+    <Company>None</Company>
+    <Version>0.0.1</Version>
     <Description>Chess library with data structures and move generation.</Description>
     <Copyright>(C) 2017-2022 Rudy Alex Kohn</Copyright>
     <AssemblyVersion>0.0.1</AssemblyVersion>

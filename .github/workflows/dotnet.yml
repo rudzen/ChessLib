@@ -26,6 +26,6 @@ jobs:
     - name: Publish
       uses: brandedoutcast/publish-nuget@v2.5.5
       with:
-        PROJECT_FILE_PATH: ChessLib/Chess/Chess.csproj
+        PROJECT_FILE_PATH: Chess/Chess.csproj
         NUGET_KEY: ${{secrets.NUGET_API_KEY}}
         #VERSION_REGEX: ^\s*<Version>(.*)<\/Version>$
