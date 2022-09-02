@@ -24,8 +24,4 @@ jobs:
     - name: Test
       run: dotnet test --no-build --verbosity normal
     - name: Publish
-      uses: brandedoutcast/publish-nuget@v2.5.5
-      with:
-        PROJECT_FILE_PATH: Chess/Chess.csproj
-        NUGET_KEY: ${{secrets.NUGET_API_KEY}}
-        #VERSION_REGEX: ^\s*<Version>(.*)<\/Version>$
+      run: dotnet nuget push *.nupkg --api-key ${{secrets.NUGET_API_KEY}} --source "https://api.nuget.org/v3/index.json" --skip-duplicate
