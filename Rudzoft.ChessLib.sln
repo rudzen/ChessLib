@@ -5,17 +5,17 @@ VisualStudioVersion = 17.0.32112.339
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rudzoft.ChessLib", "Rudzoft.ChessLib\Rudzoft.ChessLib.csproj", "{44D2509D-D267-4416-92FB-FDE8381A3F46}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chess.Test", "Chess.Test\Chess.Test.csproj", "{45A5E2D9-97E5-49FA-8066-9FEA4609A312}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rudzoft.ChessLib.Test", "Rudzoft.ChessLib.Test\Rudzoft.ChessLib.Test.csproj", "{45A5E2D9-97E5-49FA-8066-9FEA4609A312}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chess.Benchmark", "Chess.Benchmark\Chess.Benchmark.csproj", "{BF9E9B6E-947E-40E3-956F-AE6A82D5C237}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rudzoft.ChessLib.Benchmark", "Rudzoft.ChessLib.Benchmark\Rudzoft.ChessLib.Benchmark.csproj", "{BF9E9B6E-947E-40E3-956F-AE6A82D5C237}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chess.Perft", "Chess.Perft\Chess.Perft.csproj", "{F253BA49-993B-4119-8226-A6C6DF0B556D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rudzoft.ChessLib.Perft", "Rudzoft.ChessLib.Perft\Rudzoft.ChessLib.Perft.csproj", "{F253BA49-993B-4119-8226-A6C6DF0B556D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chess.Perft.Interfaces", "Chess.Perft.Interfaces\Chess.Perft.Interfaces.csproj", "{4AD06BC1-F944-41E8-AAF8-3AA02642E18C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rudzoft.ChessLib.Perft.Interfaces", "Rudzoft.ChessLib.Perft.Interfaces\Rudzoft.ChessLib.Perft.Interfaces.csproj", "{4AD06BC1-F944-41E8-AAF8-3AA02642E18C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Perft", "Perft\Perft.csproj", "{8BE6ADD1-7347-412E-B974-02C5866E59A4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rudzoft.Perft", "Rudzoft.Perft\Rudzoft.Perft.csproj", "{8BE6ADD1-7347-412E-B974-02C5866E59A4}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chess.Perft.Framework", "Chess.Perft.Framework\Chess.Perft.Framework.csproj", "{55E449CF-B5AB-4405-8B64-2F1AB1346D90}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rudzoft.Perft.Framework", "Rudzoft.Perft.Framework\Rudzoft.Perft.Framework.csproj", "{55E449CF-B5AB-4405-8B64-2F1AB1346D90}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
