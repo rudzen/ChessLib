@@ -76,9 +76,9 @@ public readonly struct Player : IEquatable<Player>
 
     // public readonly byte Side;
 
-    public bool IsWhite => Side == 0;
+    public bool IsWhite => Side == byte.MinValue;
 
-    public bool IsBlack => Side != 0;
+    public bool IsBlack => Side != byte.MinValue;
 
     public char Fen => PlayerFen[Side];
 
@@ -89,41 +89,52 @@ public readonly struct Player : IEquatable<Player>
     public const int Count = (int)Players.PlayerNb;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator Player(int value) => new((byte)value);
+    public static implicit operator Player(int value)
+        => new((byte)value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator Player(uint value) => new((byte)value);
+    public static implicit operator Player(uint value)
+        => new((byte)value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator Player(Players value) => new(value);
+    public static implicit operator Player(Players value)
+        => new(value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator Player(bool value) => new(value.AsByte());
+    public static implicit operator Player(bool value)
+        => new(value.AsByte());
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Player Create(Players player)
         => new Player(player);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Player operator ~(Player player) => new(player.Side ^ 1);
+    public static Player operator ~(Player player)
+        => new(player.Side ^ 1);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator ==(Player left, Player right) => left.Side == right.Side;
+    public static bool operator ==(Player left, Player right)
+        => left.Side == right.Side;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator !=(Player left, Player right) => left.Side != right.Side;
+    public static bool operator !=(Player left, Player right)
+        => left.Side != right.Side;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static int operator <<(Player left, int right) => left.Side << right;
+    public static int operator <<(Player left, int right)
+        => left.Side << right;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static int operator >>(Player left, int right) => left.Side >> right;
+    public static int operator >>(Player left, int right)
+        => left.Side >> right;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Pieces operator +(PieceTypes pieceType, Player side) => (Pieces)pieceType + (byte)(side.Side << 3);
+    public static Pieces operator +(PieceTypes pieceType, Player side)
+        => (Pieces)pieceType + (byte)(side.Side << 3);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override bool Equals(object obj) => obj is Player player && Equals(player);
+    public override bool Equals(object obj)
+        => obj is Player player && Equals(player);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Equals(Player other) => Side == other.Side;

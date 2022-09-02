@@ -141,7 +141,7 @@ public sealed class Position : IPosition
         if (Board.Pieces(c, PieceTypes.Bishop) & bishopAttacks)
             return true;
 
-        return (Board.Pieces(c, PieceTypes.Queen) & (bishopAttacks | rookAttacks)) != 0;
+        return !(Board.Pieces(c, PieceTypes.Queen) & (bishopAttacks | rookAttacks)).IsEmpty;
     }
 
     public BitBoard AttacksBy(PieceTypes pt, Player c)
@@ -250,26 +250,26 @@ public sealed class Position : IPosition
         fen[length++] = _sideToMove.Fen;
         fen[length++] = space;
 
-        if (State.CastlelingRights == CastlelingRights.None)
+        if (State.CastlelingRights == CastleRight.NONE)
             fen[length++] = dash;
         else
         {
-            if (CanCastle( CastleRight.WHITE_OO))
+            if (CanCastle(CastleRight.WHITE_OO))
                 fen[length++] = ChessMode == ChessMode.Chess960
                     ? CastlingRookSquare(CastleRight.WHITE_OO).FileChar
                     : 'K';
 
-            if (CanCastle( CastleRight.WHITE_OOO))
+            if (CanCastle(CastleRight.WHITE_OOO))
                 fen[length++] = ChessMode == ChessMode.Chess960
                     ? CastlingRookSquare( CastleRight.WHITE_OOO).FileChar
                     : 'Q';
 
-            if (CanCastle( CastleRight.BLACK_OO))
+            if (CanCastle(CastleRight.BLACK_OO))
                 fen[length++] = ChessMode == ChessMode.Chess960
                     ? CastlingRookSquare( CastleRight.BLACK_OOO).FileChar
                     : 'k';
 
-            if (CanCastle( CastleRight.BLACK_OOO))
+            if (CanCastle(CastleRight.BLACK_OOO))
                 fen[length++] = ChessMode == ChessMode.Chess960
                     ? CastlingRookSquare( CastleRight.BLACK_OOO).FileChar
                     : 'q';

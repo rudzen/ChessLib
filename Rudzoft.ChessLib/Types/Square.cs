@@ -51,12 +51,15 @@ public enum Squares
 public static class SquaresExtensions
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard BitBoardSquare(this Squares sq) => BitBoards.BbSquares[sq.AsInt()];
+    public static BitBoard BitBoardSquare(this Squares sq)
+        => BitBoards.BbSquares[sq.AsInt()];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Square RelativeSquare(this Squares sq, Player c) => sq.AsInt() ^ (c.Side * 56);
+    public static Square RelativeSquare(this Squares sq, Player c)
+        => sq.AsInt() ^ (c.Side * 56);
 
-    public static int AsInt(this Squares sq) => (int)sq;
+    public static int AsInt(this Squares sq)
+        => (int)sq;
 }
 
 /// <summary>
@@ -211,7 +214,8 @@ public readonly record struct Square(Squares Value) : IComparable<Square>
 
     public static int Count { get; } = 64;
 
-    public static Square Create(Rank r, File f) => new(r, f);
+    public static Square Create(Rank r, File f)
+        => new(r, f);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator Square(int value)

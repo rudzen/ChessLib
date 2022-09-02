@@ -135,7 +135,7 @@ public sealed class TranspositionTable : ITranspositionTable
         var set = false;
         for (var i = 0; i < ttc.Cluster.Length; ++i)
         {
-            if (ttc.Cluster[i].Key32 != 0 && ttc.Cluster[i].Key32 != key.UpperKey)
+            if (ttc.Cluster[i].Key32 != uint.MinValue && ttc.Cluster[i].Key32 != key.UpperKey)
                 continue;
 
             ttc.Cluster[i].Generation = g;
@@ -158,7 +158,7 @@ public sealed class TranspositionTable : ITranspositionTable
 
         for (var i = 0; i < ttc.Cluster.Length; ++i)
         {
-            if (ttc.Cluster[i].Key32 != 0 && ttc.Cluster[i].Key32 != key.UpperKey)
+            if (ttc.Cluster[i].Key32 != uint.MinValue && ttc.Cluster[i].Key32 != key.UpperKey)
                 continue;
 
             entryIndex = i;
@@ -196,7 +196,7 @@ public sealed class TranspositionTable : ITranspositionTable
 
         for (var i = 0; i < ttc.Cluster.Length; ++i)
         {
-            if (ttc.Cluster[i].Key32 != 0 && ttc.Cluster[i].Key32 != key.UpperKey)
+            if (ttc.Cluster[i].Key32 != uint.MinValue && ttc.Cluster[i].Key32 != key.UpperKey)
                 continue;
 
             clusterIndex = i;
@@ -218,7 +218,7 @@ public sealed class TranspositionTable : ITranspositionTable
                         ttEntry.Type == Bound.Exact,
                         ttEntry.Depth <= candidate.Depth);
 
-                if (cc1 && cc4 || !(cc2 || cc3) && (cc4 || cc1))
+                if ((cc1 && cc4) || (!(cc2 || cc3) && (cc4 || cc1)))
                 {
                     index = i;
                     candidate = ttEntry;

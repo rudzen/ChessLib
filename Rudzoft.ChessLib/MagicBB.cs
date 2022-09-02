@@ -157,7 +157,7 @@ public static class MagicBB
     {
         var ret = ulong.MinValue;
         for (var i = 0; i < squares.Length; ++i)
-            if ((lineOccupancy & (One << i)) != 0)
+            if ((lineOccupancy & (One << i)) != ulong.MinValue)
                 ret |= One << squares[i];
 
         return ret;
@@ -183,7 +183,7 @@ public static class MagicBB
             bit <<= 8;
             ret |= bit;
         }
-        while (bit != 0 && (bit & occ) == 0);
+        while (bit != 0 && (bit & occ) == ulong.MinValue);
 
         bit = One << square;
         do
@@ -191,29 +191,29 @@ public static class MagicBB
             bit >>= 8;
             ret |= bit;
         }
-        while (bit != 0 && (bit & occ) == 0);
+        while (bit != 0 && (bit & occ) == ulong.MinValue);
 
         bit = One << square;
         do
         {
             bit <<= 1;
-            if ((bit & rowBits) != 0)
+            if ((bit & rowBits) != ulong.MinValue)
                 ret |= bit;
             else
                 break;
         }
-        while ((bit & occ) == 0);
+        while ((bit & occ) == ulong.MinValue);
 
         bit = One << square;
         do
         {
             bit >>= 1;
-            if ((bit & rowBits) != 0)
+            if ((bit & rowBits) != ulong.MinValue)
                 ret |= bit;
             else
                 break;
         }
-        while ((bit & occ) == 0);
+        while ((bit & occ) == ulong.MinValue);
 
         return ret;
     }
@@ -229,12 +229,12 @@ public static class MagicBB
         {
             bit <<= 8 - 1;
             bit2 >>= 1;
-            if ((bit2 & rowBits) != 0)
+            if ((bit2 & rowBits) != ulong.MinValue)
                 ret |= bit;
             else
                 break;
         }
-        while (bit != 0 && (bit & occ) == 0);
+        while (bit != 0 && (bit & occ) == ulong.MinValue);
 
         bit = One << square;
         bit2 = bit;
@@ -242,12 +242,12 @@ public static class MagicBB
         {
             bit <<= 8 + 1;
             bit2 <<= 1;
-            if ((bit2 & rowBits) != 0)
+            if ((bit2 & rowBits) != ulong.MinValue)
                 ret |= bit;
             else
                 break;
         }
-        while (bit != 0 && (bit & occ) == 0);
+        while (bit != 0 && (bit & occ) == ulong.MinValue);
 
         bit = One << square;
         bit2 = bit;
@@ -255,12 +255,12 @@ public static class MagicBB
         {
             bit >>= 8 - 1;
             bit2 <<= 1;
-            if ((bit2 & rowBits) != 0)
+            if ((bit2 & rowBits) != ulong.MinValue)
                 ret |= bit;
             else
                 break;
         }
-        while (bit != 0 && (bit & occ) == 0);
+        while (bit != 0 && (bit & occ) == ulong.MinValue);
 
         bit = One << square;
         bit2 = bit;
@@ -268,12 +268,12 @@ public static class MagicBB
         {
             bit >>= 8 + 1;
             bit2 >>= 1;
-            if ((bit2 & rowBits) != 0)
+            if ((bit2 & rowBits) != ulong.MinValue)
                 ret |= bit;
             else
                 break;
         }
-        while (bit != 0 && (bit & occ) == 0);
+        while (bit != 0 && (bit & occ) == ulong.MinValue);
 
         return ret;
     }

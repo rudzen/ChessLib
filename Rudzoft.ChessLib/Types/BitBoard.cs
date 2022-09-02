@@ -172,7 +172,7 @@ public readonly record struct BitBoard(ulong Value) : IEnumerable<Square>
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool operator true(BitBoard bitBoard)
-        => bitBoard.Value != 0;
+        => bitBoard.Value != ulong.MinValue;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool operator false(BitBoard bitBoard)

@@ -115,13 +115,13 @@ public sealed class Book : IDisposable
             sum += e.Count;
 
             // Choose book move according to its score. If a move has a very high score it has
-            // higher probability to be choosen than a move with lower score. Note that first entry
+            // higher probability to be chosen than a move with lower score. Note that first entry
             // is always chosen.
             if (sum > 0 && _rnd.Next() % sum < e.Count || pickBest && e.Count == best)
                 polyMove = e.Move;
 
             // Stop if we wan't the top pick and move exists
-            if (pickBest && polyMove != 0)
+            if (pickBest && polyMove != ushort.MinValue)
                 break;
         }
 

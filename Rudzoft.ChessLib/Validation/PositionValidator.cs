@@ -50,7 +50,7 @@ public enum PositionValidationTypes
 public static class PositionValidationTypesExtensions
 {
     public static bool HasFlagFast(this PositionValidationTypes @this, PositionValidationTypes flag)
-        => (@this & flag) != 0;
+        => (@this & flag) != PositionValidationTypes.None;
 }
 
 public sealed class PositionValidator : IPositionValidator

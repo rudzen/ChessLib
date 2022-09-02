@@ -24,7 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System.Linq;
+using Rudzoft.ChessLib.Extensions;
 using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Test.BitboardTests;
@@ -47,10 +47,22 @@ public sealed class BitboardDataTests
         const int expected = 10640;
 
         var actual = 0;
-        foreach (var s1 in BitBoards.AllSquares)
-            actual += BitBoards.AllSquares
-                .Sum(s2 => BitBoards.AllSquares
-                    .Count(s3 => s1.Aligned(s2, s3)));
+        var bb = BitBoards.AllSquares;
+        while (bb)
+        {
+            var s1 = BitBoards.PopLsb(ref bb);
+            var bb2 = BitBoards.AllSquares;
+            while (bb2)
+            {
+                var s2 = BitBoards.PopLsb(ref bb2);
+                var bb3 = BitBoards.AllSquares;
+                while (bb3)
+                {
+                    var s3 = BitBoards.PopLsb(ref bb3);
+                    actual += s1.Aligned(s2, s3).AsByte();
+                }
+            }
+        }
 
         Assert.Equal(expected, actual);
     }
@@ -61,10 +73,22 @@ public sealed class BitboardDataTests
         const int expected = 9184;
 
         var actual = 0;
-        foreach (var s1 in BitBoards.AllSquares)
-            actual += BitBoards.AllSquares.Where(x2 => x2 != s1)
-                .Sum(s2 => BitBoards.AllSquares.Where(x3 => x3 != s2)
-                    .Count(s3 => s1.Aligned(s2, s3)));
+        var bb = BitBoards.AllSquares;
+        while (bb)
+        {
+            var s1 = BitBoards.PopLsb(ref bb);
+            var bb2 = BitBoards.AllSquares & ~s1;
+            while (bb2)
+            {
+                var s2 = BitBoards.PopLsb(ref bb2);
+                var bb3 = BitBoards.AllSquares & ~s2;
+                while (bb3)
+                {
+                    var s3 = BitBoards.PopLsb(ref bb3);
+                    actual += s1.Aligned(s2, s3).AsByte();
+                }
+            }
+        }
 
         Assert.Equal(expected, actual);
     }

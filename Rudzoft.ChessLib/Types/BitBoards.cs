@@ -426,7 +426,7 @@ public static class BitBoards
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsSet(this in BitBoard bb, int pos)
-        => (bb.Value & (One << pos)) != 0;
+        => (bb.Value & (One << pos)) != ulong.MinValue;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Square First(this in BitBoard bb)
@@ -442,7 +442,7 @@ public static class BitBoards
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool Aligned(this Square s1, Square s2, Square s3)
-        => (Line(s1, s2) & s3) != 0;
+        => !(Line(s1, s2) & s3).IsEmpty;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static BitBoard KingRing(this Square sq, Player side)
