@@ -36,10 +36,10 @@ using Microsoft.Extensions.ObjectPool;
 using Perft.Options;
 using Perft.Parsers;
 using Perft.TimeStamp;
-using Rudz.Chess;
-using Rudz.Chess.Protocol.UCI;
-using Rudz.Chess.Tables;
-using Rudz.Chess.Types;
+using Rudzoft.ChessLib;
+using Rudzoft.ChessLib.Protocol.UCI;
+using Rudzoft.ChessLib.Tables;
+using Rudzoft.ChessLib.Types;
 using Serilog;
 
 namespace Perft;

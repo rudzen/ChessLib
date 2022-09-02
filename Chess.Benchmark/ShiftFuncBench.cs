@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
 using BenchmarkDotNet.Attributes;
-using Rudz.Chess.Types;
+using Rudzoft.ChessLib.Types;
 
 namespace Chess.Benchmark;
 
 [MemoryDiagnoser]
-public class ShiftFuncBench
+public sealed class ShiftFuncBench
 {
 
     private static readonly IDictionary<Direction, Func<BitBoard, BitBoard>> ShiftFuncs = MakeShiftFuncs();

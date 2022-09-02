@@ -25,8 +25,7 @@ SOFTWARE.
 */
 
 using System.Linq;
-using Rudz.Chess.Types;
-using Xunit;
+using Rudzoft.ChessLib.Types;
 
 namespace Chess.Test.PiecesTests;
 

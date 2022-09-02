@@ -30,9 +30,9 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Chess.Perft.Interfaces;
-using Rudz.Chess;
-using Rudz.Chess.Enums;
-using Rudz.Chess.Fen;
+using Rudzoft.ChessLib;
+using Rudzoft.ChessLib.Enums;
+using Rudzoft.ChessLib.Fen;
 
 namespace Chess.Perft;
 

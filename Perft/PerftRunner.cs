@@ -41,9 +41,9 @@ using Microsoft.Extensions.ObjectPool;
 using Perft.Options;
 using Perft.Parsers;
 using Perft.TimeStamp;
-using Rudz.Chess;
-using Rudz.Chess.Extensions;
-using Rudz.Chess.Protocol.UCI;
+using Rudzoft.ChessLib;
+using Rudzoft.ChessLib.Extensions;
+using Rudzoft.ChessLib.Protocol.UCI;
 using Serilog;
 
 namespace Perft;

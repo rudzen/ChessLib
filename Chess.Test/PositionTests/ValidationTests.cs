@@ -24,10 +24,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using Rudz.Chess.Extensions;
-using Rudz.Chess.Factories;
-using Rudz.Chess.Types;
-using Rudz.Chess.Validation;
+using Rudzoft.ChessLib.Extensions;
+using Rudzoft.ChessLib.Factories;
+using Rudzoft.ChessLib.Types;
+using Rudzoft.ChessLib.Validation;
 
 namespace Chess.Test.PositionTests;
 

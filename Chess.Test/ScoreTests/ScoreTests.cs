@@ -26,7 +26,7 @@ SOFTWARE.
 
 using System.Collections.Generic;
 using System.Linq;
-using Rudz.Chess.Types;
+using Rudzoft.ChessLib.Types;
 
 namespace Chess.Test.ScoreTests;
 

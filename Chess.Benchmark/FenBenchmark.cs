@@ -1,12 +1,13 @@
 ﻿using BenchmarkDotNet.Attributes;
-using Rudz.Chess;
-using Rudz.Chess.Fen;
-using Rudz.Chess.Types;
+using Rudzoft.ChessLib;
+using Rudzoft.ChessLib.Enums;
+using Rudzoft.ChessLib.Fen;
+using Rudzoft.ChessLib.Types;
 
 namespace Chess.Benchmark;
 
 [MemoryDiagnoser]
-public class FenBenchmark
+public sealed class FenBenchmark
 {
     private const string F = "rnkq1bnr/p3ppp1/1ppp3p/3B4/6b1/2PQ3P/PP1PPP2/RNB1K1NR w KQ 4 10";
 
@@ -24,7 +25,7 @@ public class FenBenchmark
         _game = new Game(pos);
         var fp = new FenData(F);
         var state = new State();
-        _game.Pos.Set(in fp, Rudz.Chess.Enums.ChessMode.Normal, state);
+        _game.Pos.Set(in fp, ChessMode.Normal, state);
     }
 
     [Benchmark(Description = "StringBuilder - NOT PRESENT")]

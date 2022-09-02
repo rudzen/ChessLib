@@ -25,9 +25,9 @@ SOFTWARE.
 */
 
 using System;
-using Rudz.Chess.Factories;
-using Rudz.Chess.Protocol.UCI;
-using Rudz.Chess.Types;
+using Rudzoft.ChessLib.Factories;
+using Rudzoft.ChessLib.Protocol.UCI;
+using Rudzoft.ChessLib.Types;
 
 namespace Chess.Test.ProtocolTests;
 

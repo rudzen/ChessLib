@@ -27,8 +27,8 @@ SOFTWARE.
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Rudz.Chess.Factories;
-using Rudz.Chess.Types;
+using Rudzoft.ChessLib.Factories;
+using Rudzoft.ChessLib.Types;
 
 namespace Chess.Test.MoveTests;
 

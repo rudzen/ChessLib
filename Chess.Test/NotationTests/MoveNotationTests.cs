@@ -25,13 +25,13 @@ SOFTWARE.
 */
 
 using System.Linq;
-using Rudz.Chess;
-using Rudz.Chess.Extensions;
-using Rudz.Chess.Factories;
-using Rudz.Chess.MoveGeneration;
-using Rudz.Chess.Notation;
-using Rudz.Chess.Notation.Notations;
-using Rudz.Chess.Types;
+using Rudzoft.ChessLib;
+using Rudzoft.ChessLib.Extensions;
+using Rudzoft.ChessLib.Factories;
+using Rudzoft.ChessLib.MoveGeneration;
+using Rudzoft.ChessLib.Notation;
+using Rudzoft.ChessLib.Notation.Notations;
+using Rudzoft.ChessLib.Types;
 
 namespace Chess.Test.NotationTests;
 

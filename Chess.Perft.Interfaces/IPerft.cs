@@ -27,7 +27,7 @@ SOFTWARE.
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Rudz.Chess;
+using Rudzoft.ChessLib;
 
 namespace Chess.Perft.Interfaces;
 

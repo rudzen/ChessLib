@@ -25,7 +25,7 @@ SOFTWARE.
 */
 
 using System;
-using Rudz.Chess.Types;
+using Rudzoft.ChessLib.Types;
 
 namespace Chess.Test.DataTests;
 

@@ -24,8 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using Rudz.Chess.Tables;
-using Rudz.Chess.Types;
+using Rudzoft.ChessLib.Tables;
+using Rudzoft.ChessLib.Types;
 
 namespace Chess.Test.TablesTests;
 

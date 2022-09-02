@@ -25,8 +25,8 @@ SOFTWARE.
 */
 
 using System;
-using Rudz.Chess;
-using Rudz.Chess.Types;
+using Rudzoft.ChessLib;
+using Rudzoft.ChessLib.Types;
 
 namespace Chess.Test.PiecesTests;
 

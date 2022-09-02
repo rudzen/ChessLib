@@ -4,7 +4,7 @@ using BenchmarkDotNet.Attributes;
 namespace Chess.Benchmark;
 
 [MemoryDiagnoser]
-public class InBetweenBenchmark
+public sealed class InBetweenBenchmark
 {
     [Params(10000, 50000)] public int N;
 

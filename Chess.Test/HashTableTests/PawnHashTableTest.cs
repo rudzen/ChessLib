@@ -26,9 +26,9 @@ SOFTWARE.
 
 using System;
 using System.Runtime.InteropServices;
-using Rudz.Chess.Hash;
-using Rudz.Chess.Hash.Tables;
-using Rudz.Chess.Types;
+using Rudzoft.ChessLib.Hash;
+using Rudzoft.ChessLib.Hash.Tables;
+using Rudzoft.ChessLib.Types;
 
 namespace Chess.Test.HashTableTests;
 

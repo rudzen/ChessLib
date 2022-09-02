@@ -1,42 +1,36 @@
-﻿using BenchmarkDotNet.Attributes;
-using Rudz.Chess.Enums;
-using Rudz.Chess.Types;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
+using BenchmarkDotNet.Attributes;
+using Rudzoft.ChessLib.Types;
 
-namespace Chess.Benchmark
+namespace Chess.Benchmark;
+
+[MemoryDiagnoser]
+public sealed class IterateBenchmark
 {
-    [MemoryDiagnoser]
-    public class IterateBenchmark
+    [Params(10000, 50000)]
+    public int N;
+
+    [Benchmark(Description = "Stackalloc")]
+    public void IterateOne()
     {
-        [Params(10000, 50000)]
-        public int N;
+        Span<Player> players = stackalloc Player[] { Player.White, Player.Black };
 
-        [Benchmark(Description = "Stackalloc")]
-        public void IterateOne()
-        {
-            Span<Player> players = stackalloc Player[] { Player.White, Player.Black };
+        var res = 0;
+        for (var i = 0; i < N; ++i)
+            foreach (var player in players)
+                res += player.Side;
 
-            var res = 0;
-            for (var i = 0; i < N; ++i)
-                foreach (var player in players)
-                    res += player.Side;
+        N = res;
+    }
 
-            N = res;
-        }
+    [Benchmark(Description = "For..Loop")]
+    public void IterateTwo()
+    {
+        var res = 0;
+        for (var i = 0; i < N; ++i)
+        for (var player = Players.White; player < Players.PlayerNb; ++player)
+            res += (int)player;
 
-        [Benchmark(Description = "For..Loop")]
-        public void IterateTwo()
-        {
-            var res = 0;
-            for (var i = 0; i < N; ++i)
-            for (var player = Players.White; player < Players.PlayerNb; ++player)
-                res += (int)player;
-
-            N = res;
-        }
+        N = res;
     }
 }

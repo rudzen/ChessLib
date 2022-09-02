@@ -24,11 +24,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using Rudz.Chess;
-using Rudz.Chess.Enums;
-using Rudz.Chess.Fen;
-using Rudz.Chess.MoveGeneration;
-using Rudz.Chess.Types;
+using Rudzoft.ChessLib;
+using Rudzoft.ChessLib.Enums;
+using Rudzoft.ChessLib.Fen;
+using Rudzoft.ChessLib.MoveGeneration;
+using Rudzoft.ChessLib.Types;
 
 namespace Chess.Test.MoveTests;
 

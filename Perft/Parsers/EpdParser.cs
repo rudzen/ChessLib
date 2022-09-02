@@ -29,7 +29,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Rudz.Chess.Extensions;
+using Rudzoft.ChessLib.Extensions;
 
 namespace Perft.Parsers;
 

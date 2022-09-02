@@ -27,17 +27,15 @@ SOFTWARE.
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Rudz.Chess.Fen;
+using BenchmarkDotNet.Attributes;
+using Chess.Perft;
+using Chess.Perft.Interfaces;
+using Rudzoft.ChessLib.Fen;
 
 namespace Chess.Benchmark;
 
-using BenchmarkDotNet.Attributes;
-using Perft;
-using Perft.Interfaces;
-
-//[ClrJob(true), CoreJob]
-//[RPlotExporter, RankColumn]
-public class PerftBench
+[MemoryDiagnoser]
+public sealed class PerftBench
 {
     private IPerft _perft;
 

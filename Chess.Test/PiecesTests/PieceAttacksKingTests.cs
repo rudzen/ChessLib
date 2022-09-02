@@ -26,7 +26,7 @@ SOFTWARE.
 
 using System.Linq;
 using FluentAssertions;
-using Rudz.Chess.Types;
+using Rudzoft.ChessLib.Types;
 
 namespace Chess.Test.PiecesTests;
 

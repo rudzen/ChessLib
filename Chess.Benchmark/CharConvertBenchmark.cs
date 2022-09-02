@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Attributes;
-using Rudz.Chess.Types;
+using Rudzoft.ChessLib.Types;
 
 namespace Chess.Benchmark;
 

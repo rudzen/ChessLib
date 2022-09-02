@@ -24,7 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using Rudz.Chess.Factories;
+using Rudzoft.ChessLib.Factories;
 
 namespace Chess.Test.FenceTests;
 

@@ -18,7 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Chess.Perft\Chess.Perft.csproj" />
-    <ProjectReference Include="..\Chess\Chess.csproj" />
+    <ProjectReference Include="..\Rudzoft.ChessLib\Rudzoft.ChessLib.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Numerics;
 using BenchmarkDotNet.Attributes;
-using Rudz.Chess.Types;
+using Rudzoft.ChessLib.Types;
 
 namespace Chess.Benchmark;
 
 [MemoryDiagnoser]
-public class BitOpBench
+public sealed class BitOpBench
 {
     private static readonly int[] Lsb64Table =
     {
