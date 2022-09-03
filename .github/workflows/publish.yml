@@ -20,4 +20,4 @@ jobs:
     - name: Build
       run: dotnet build --configuration Release --no-restore
     - name: Publish Rudzoft.ChessLib
-      run: dotnet nuget push *.nupkg --api-key ${{secrets.NUGET_API_KEY}} --source "https://api.nuget.org/v3/index.json" --skip-duplicate
+      run: dotnet nuget push "**/*.nupkg" --api-key ${{secrets.NUGET_API_KEY}} --source "https://api.nuget.org/v3/index.json" --skip-duplicate
