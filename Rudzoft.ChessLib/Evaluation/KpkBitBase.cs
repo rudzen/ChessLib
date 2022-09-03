@@ -189,8 +189,8 @@ public static class KpkBitBase
             while (b)
             {
                 var (bksq, wksq) = Stm.IsWhite
-                    ? (KingSquares[~Stm.Side], BitBoards.PopLsb(ref b))
-                    : (BitBoards.PopLsb(ref b), KingSquares[~Stm.Side]);
+                    ? (KingSquares[Player.Black.Side], BitBoards.PopLsb(ref b))
+                    : (BitBoards.PopLsb(ref b), KingSquares[Player.White.Side]);
                 r |= db[Index(~Stm, bksq, wksq, PawnSquare)].Result;
             }
 
