@@ -376,4 +376,16 @@ public readonly record struct Square(Squares Value) : IComparable<Square>
             return -1;
         return Value > other.Value ? 1 : 0;
     }
+
+    /// <summary>
+    /// Swap A1 <-> H1
+    /// </summary>
+    /// <returns>Flipped square by File</returns>
+    public Square FlipFile() => AsInt() ^ Squares.h1.AsInt();
+
+    /// <summary>
+    /// Swap A1 <-> A8
+    /// </summary>
+    /// <returns>Flipped square by Fank</returns>
+    public Square FlipRank() => AsInt() ^ Squares.a8.AsInt();
 }

@@ -167,12 +167,20 @@ public readonly record struct Rank(Ranks Value)
         => left.AsInt() >> right;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool operator >=(Rank left, Rank right)
+        => left.Value >= right.Value;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool operator >=(Rank left, Ranks right)
         => left.Value >= right;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool operator >(Rank left, Rank right)
         => left.AsInt() > right.AsInt();
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool operator <=(Rank left, Rank right)
+        => left.Value <= right.Value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool operator <=(Rank left, Ranks right)
