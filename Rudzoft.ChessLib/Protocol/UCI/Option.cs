@@ -106,7 +106,8 @@ public sealed class Option : IOption
 
     public string GetText()
     {
-        Debug.Assert(Type is not (UciOptionType.Check and UciOptionType.Spin));
+        Debug.Assert(Type != UciOptionType.Check);
+        Debug.Assert(Type != UciOptionType.Spin);
         return _currentValue;
     }
 
@@ -119,12 +120,13 @@ public sealed class Option : IOption
     /// <returns></returns>
     public IOption SetCurrentValue(string v)
     {
-        if ((Type != UciOptionType.Button && (v == null || v.IsNullOrEmpty())
-             || Type == UciOptionType.Check && !bool.TryParse(v, out var r)
+        var isButton = Type == UciOptionType.Button;
+        if (((!isButton && v.IsNullOrEmpty())
+             || (Type == UciOptionType.Check && !bool.TryParse(v, out _))
              || Type == UciOptionType.Spin) && Maths.ToIntegral(v, out int val) && val < Min && val > Max)
             return this;
 
-        if (Type != UciOptionType.Button)
+        if (!isButton)
             _currentValue = v;
 
         OnChange?.Invoke(this);
