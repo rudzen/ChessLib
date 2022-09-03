@@ -65,7 +65,7 @@ public sealed class FenData : EventArgs, IFenData
     public FenData(ReadOnlySpan<string> fen)
     {
         _splitPoints = new Queue<(int, int)>(6);
-        var sb = new StringBuilder();
+        var sb = new StringBuilder(128);
 
         for (var i = 0; i < fen.Length; ++i)
         {

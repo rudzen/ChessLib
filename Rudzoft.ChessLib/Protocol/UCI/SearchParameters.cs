@@ -149,7 +149,7 @@ public sealed class SearchParameters : ISearchParameters
         s[index++] = 'm';
         s[index++] = 'e';
         s[index++] = ' ';
-        index = ParseValue(index, WhiteTimeMilliseconds, s);
+        index = ParseValue(index, in _clock.Time[Player.White.Side], s);
 
         s[index++] = ' ';
         s[index++] = 'b';
@@ -158,9 +158,9 @@ public sealed class SearchParameters : ISearchParameters
         s[index++] = 'm';
         s[index++] = 'e';
         s[index++] = ' ';
-        index = ParseValue(index, BlackTimeMilliseconds, s);
+        index = ParseValue(index, in _clock.Time[Player.Black.Side], s);
 
-        if (MoveTime > 0)
+        if (MoveTime > ulong.MinValue)
         {
             s[index++] = ' ';
             s[index++] = 'm';
@@ -181,7 +181,7 @@ public sealed class SearchParameters : ISearchParameters
         s[index++] = 'n';
         s[index++] = 'c';
         s[index++] = ' ';
-        index = ParseValue(index, WhiteIncrementTimeMilliseconds, s);
+        index = ParseValue(index, in _clock.Inc[Player.White.Side], s);
 
         s[index++] = ' ';
         s[index++] = 'b';
@@ -190,9 +190,9 @@ public sealed class SearchParameters : ISearchParameters
         s[index++] = 'c';
         s[index++] = ' ';
 
-        index = ParseValue(index, BlackIncrementTimeMilliseconds, s);
+        index = ParseValue(index, in _clock.Inc[Player.Black.Side], s);
 
-        if (MovesToGo <= 0)
+        if (MovesToGo == ulong.MinValue)
             return new string(s[..index]);
 
         s[index++] = ' ';
@@ -216,7 +216,7 @@ public sealed class SearchParameters : ISearchParameters
 
     public void AddSearchMove(Move move) => SearchMoves.Add(move);
 
-    private static int ParseValue(int index, ulong value, Span<char> target)
+    private static int ParseValue(int index, in ulong value, Span<char> target)
     {
         Span<char> number = stackalloc char[32];
         value.TryFormat(number, out var numericWritten);
