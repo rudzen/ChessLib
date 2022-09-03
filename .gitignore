@@ -351,8 +351,5 @@ MigrationBackup/
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
 
-.idea/.idea.ChessLib/.idea/
-
-.idea/.idea.ChessLib/
-
 Perft/Logs/
+.idea
