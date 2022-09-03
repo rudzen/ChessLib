@@ -39,11 +39,10 @@ public sealed class SearchParameters : ISearchParameters
 {
     private readonly Clock _clock;
 
-    private readonly StringBuilder _output = new(256);
-
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public SearchParameters()
     {
+        _clock = new Clock(new ulong[Player.Count], new ulong[Player.Count]);
         SearchMoves = new List<Move>();
     }
 
@@ -133,39 +132,96 @@ public sealed class SearchParameters : ISearchParameters
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public string Get(Player side)
+    public string Get()
     {
-        _output.Clear();
-
-        _output.Append("go ");
-
         if (Infinite)
-        {
-            _output.Append("infinite");
-            return _output.ToString();
-        }
+            return "go infinite";
 
-        _output.Append($"wtime {WhiteTimeMilliseconds} btime {BlackTimeMilliseconds}");
+        Span<char> s = stackalloc char[128];
+        var index = 0;
+
+        s[index++] = 'g';
+        s[index++] = 'o';
+        s[index++] = ' ';
+        s[index++] = 'w';
+        s[index++] = 't';
+        s[index++] = 'i';
+        s[index++] = 'm';
+        s[index++] = 'e';
+        s[index++] = ' ';
+        index = ParseValue(index, WhiteTimeMilliseconds, s);
+
+        s[index++] = ' ';
+        s[index++] = 'b';
+        s[index++] = 't';
+        s[index++] = 'i';
+        s[index++] = 'm';
+        s[index++] = 'e';
+        s[index++] = ' ';
+        index = ParseValue(index, BlackTimeMilliseconds, s);
 
         if (MoveTime > 0)
         {
-            _output.Append(" movetime ");
-            _output.Append(MoveTime);
+            s[index++] = ' ';
+            s[index++] = 'm';
+            s[index++] = 'o';
+            s[index++] = 'v';
+            s[index++] = 'e';
+            s[index++] = 't';
+            s[index++] = 'i';
+            s[index++] = 'm';
+            s[index++] = 'e';
+            s[index++] = ' ';
+            index = ParseValue(index, MoveTime, s);
         }
 
-        _output.Append($" winc {WhiteIncrementTimeMilliseconds} binc {BlackIncrementTimeMilliseconds}");
+        s[index++] = ' ';
+        s[index++] = 'w';
+        s[index++] = 'i';
+        s[index++] = 'n';
+        s[index++] = 'c';
+        s[index++] = ' ';
+        index = ParseValue(index, WhiteIncrementTimeMilliseconds, s);
 
-        if (MovesToGo > 0)
-        {
-            _output.Append(" movestogo ");
-            _output.Append(MovesToGo);
-        }
+        s[index++] = ' ';
+        s[index++] = 'b';
+        s[index++] = 'i';
+        s[index++] = 'n';
+        s[index++] = 'c';
+        s[index++] = ' ';
 
-        return _output.ToString();
+        index = ParseValue(index, BlackIncrementTimeMilliseconds, s);
+
+        if (MovesToGo <= 0)
+            return new string(s[..index]);
+
+        s[index++] = ' ';
+        s[index++] = 'm';
+        s[index++] = 'o';
+        s[index++] = 'v';
+        s[index++] = 'e';
+        s[index++] = 's';
+        s[index++] = 't';
+        s[index++] = 'o';
+        s[index++] = 'g';
+        s[index++] = 'o';
+        s[index++] = ' ';
+        index = ParseValue(index, MovesToGo, s);
+
+        return new string(s[..index]);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool DecreaseMovesToGo() => --MovesToGo == 0;
 
     public void AddSearchMove(Move move) => SearchMoves.Add(move);
+
+    private static int ParseValue(int index, ulong value, Span<char> target)
+    {
+        Span<char> number = stackalloc char[32];
+        value.TryFormat(number, out var numericWritten);
+        for (var i = 0; i < numericWritten; ++i)
+            target[index++] = number[i];
+        return index;
+    }
 }
