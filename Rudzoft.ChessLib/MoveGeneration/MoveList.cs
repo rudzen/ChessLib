@@ -28,6 +28,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Rudzoft.ChessLib.Enums;
 using Rudzoft.ChessLib.Types;
 
@@ -46,6 +47,7 @@ public sealed class MoveList : IMoveList
 
     public Move CurrentMove => _moves[_cur].Move;
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static MoveList operator ++(MoveList moveList)
     {
         ++moveList._cur;
@@ -58,22 +60,27 @@ public sealed class MoveList : IMoveList
         set => _moves[index] = value;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Add(ExtMove item) => _moves[Length++] = item;
 
-    public void Add(Move item) => _moves[Length++] = item;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Add(Move item) => _moves[Length++].Move = item;
 
     /// <summary>
     /// Reset the moves
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Clear()
     {
         _cur = Length = 0;
-        _moves[0].Move = ExtMove.Empty;
+        _moves[0] = ExtMove.Empty;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Contains(ExtMove item)
         => Contains(item.Move);
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Contains(Move item)
     {
         for (var i = 0; i < Length; ++i)
@@ -83,6 +90,7 @@ public sealed class MoveList : IMoveList
         return false;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Contains(Square from, Square to)
     {
         for (var i = 0; i < Length; ++i)
@@ -95,6 +103,7 @@ public sealed class MoveList : IMoveList
         return false;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Generate(IPosition pos, MoveGenerationType type = MoveGenerationType.Legal)
     {
         _cur = 0;
@@ -102,14 +111,17 @@ public sealed class MoveList : IMoveList
         _moves[Length] = ExtMove.Empty;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public ReadOnlySpan<ExtMove> Get() =>
         Length == 0
             ? ReadOnlySpan<ExtMove>.Empty
             : _moves.AsSpan()[..Length];
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public IEnumerator<ExtMove> GetEnumerator()
         => _moves.Take(Length).GetEnumerator();
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     IEnumerator IEnumerable.GetEnumerator()
         => GetEnumerator();
 }
