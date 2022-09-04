@@ -25,6 +25,7 @@ SOFTWARE.
 */
 
 using Rudzoft.ChessLib.Enums;
+using Rudzoft.ChessLib.Factories;
 using Rudzoft.ChessLib.Fen;
 using Rudzoft.ChessLib.MoveGeneration;
 using Rudzoft.ChessLib.Types;
@@ -39,19 +40,13 @@ public sealed class MoveGeneratorTests
         const string fen = "rnbqkbnr/1ppQpppp/p2p4/8/8/2P5/PP1PPPPP/RNB1KBNR b KQkq - 1 6";
         const int expectedMoves = 4;
 
-        var board = new Board();
-        var pieceValue = new PieceValue();
-        var pos = new Position(board, pieceValue);
-        var fd = new FenData(fen);
-        var state = new State();
-
-        pos.Set(in fd, ChessMode.Normal, state);
+        var g = GameFactory.Create(fen);
 
         // make sure black is in check
-        Assert.True(pos.InCheck);
+        Assert.True(g.Pos.InCheck);
 
         // generate moves for black
-        var mg = pos.GenerateMoves();
+        var mg = g.Pos.GenerateMoves();
         var actualMoves = mg.Length;
 
         Assert.Equal(expectedMoves, actualMoves);
