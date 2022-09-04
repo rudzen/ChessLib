@@ -27,7 +27,6 @@ SOFTWARE.
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using Microsoft.Extensions.ObjectPool;
 using Rudzoft.ChessLib.Enums;
@@ -99,7 +98,7 @@ public sealed class Game : IGame
         var moveList = _moveLists.Get();
         moveList.Generate(Pos);
         // ReSharper disable once LoopCanBeConvertedToQuery
-        foreach (var em in moveList)
+        foreach (var em in moveList.Get())
             if (!Pos.IsLegal(em.Move))
             {
                 gameEndType |= GameEndTypes.Pat;

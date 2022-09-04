@@ -163,7 +163,6 @@ public sealed class Book : IDisposable
         var ml = _pos.GenerateMoves();
 
         // Iterate all known moves for current position to find a match.
-
         var emMoves = ml.Select(static em => em.Move)
             .Where(m => from == m.FromSquare())
             .Where(m => to == m.ToSquare())
