@@ -32,7 +32,7 @@ namespace Rudzoft.ChessLib.Types;
 /// <summary>
 /// Extended move structure which combines Move and Score
 /// </summary>
-public struct ExtMove : IEquatable<ExtMove>
+public struct ExtMove : IEquatable<ExtMove>, IComparable<ExtMove>
 {
     public static readonly ExtMove Empty = new();
 
@@ -62,6 +62,9 @@ public struct ExtMove : IEquatable<ExtMove>
 
     public bool Equals(ExtMove other)
         => Move.Equals(other.Move);
+
+    public readonly int CompareTo(ExtMove other)
+        => other.Score.CompareTo(Score);
 
     public override bool Equals(object obj)
         => obj is ExtMove other && Equals(other);

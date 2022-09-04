@@ -86,6 +86,8 @@ public readonly struct Player : IEquatable<Player>
 
     public static Player Black { get; } = new(Players.Black);
 
+    public static Player[] AllPlayers { get; } = { White, Black };
+
     public const int Count = (int)Players.PlayerNb;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
