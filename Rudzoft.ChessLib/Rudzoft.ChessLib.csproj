@@ -11,7 +11,7 @@
     <PackageVersion>0.0.2</PackageVersion>
     <Authors>Rudy Alex Kohn</Authors>
     <Company>None</Company>
-    <Version>0.0.1</Version>
+    <Version>0.0.2</Version>
     <Description>Chess library with data structures and move generation.</Description>
     <Copyright>(C) 2017-2022 Rudy Alex Kohn</Copyright>
     <AssemblyVersion>0.0.2</AssemblyVersion>

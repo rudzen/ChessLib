@@ -27,7 +27,7 @@ SOFTWARE.
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using System.Text;
+using Rudzoft.ChessLib.Extensions;
 using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Protocol.UCI;
@@ -38,6 +38,8 @@ namespace Rudzoft.ChessLib.Protocol.UCI;
 public sealed class SearchParameters : ISearchParameters
 {
     private readonly Clock _clock;
+    private ulong _movesToGo;
+    private ulong _moveTime;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public SearchParameters()
@@ -82,9 +84,17 @@ public sealed class SearchParameters : ISearchParameters
 
     public bool Ponder { get; set; }
 
-    public ulong MoveTime { get; set; }
+    public ulong MoveTime
+    {
+        get => _moveTime;
+        set => _moveTime = value;
+    }
 
-    public ulong MovesToGo { get; set; }
+    public ulong MovesToGo
+    {
+        get => _movesToGo;
+        set => _movesToGo = value;
+    }
 
     public ulong Depth { get; set; }
 
@@ -172,7 +182,7 @@ public sealed class SearchParameters : ISearchParameters
             s[index++] = 'm';
             s[index++] = 'e';
             s[index++] = ' ';
-            index = ParseValue(index, MoveTime, s);
+            index = s.Append(in _moveTime, index);
         }
 
         s[index++] = ' ';
@@ -192,7 +202,7 @@ public sealed class SearchParameters : ISearchParameters
 
         index = ParseValue(index, in _clock.Inc[Player.Black.Side], s);
 
-        if (MovesToGo == ulong.MinValue)
+        if (_movesToGo == ulong.MinValue)
             return new string(s[..index]);
 
         s[index++] = ' ';
@@ -206,13 +216,13 @@ public sealed class SearchParameters : ISearchParameters
         s[index++] = 'g';
         s[index++] = 'o';
         s[index++] = ' ';
-        index = ParseValue(index, MovesToGo, s);
+        index = s.Append(in _movesToGo, index);
 
         return new string(s[..index]);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool DecreaseMovesToGo() => --MovesToGo == 0;
+    public bool DecreaseMovesToGo() => --_movesToGo == 0;
 
     public void AddSearchMove(Move move) => SearchMoves.Add(move);
 
