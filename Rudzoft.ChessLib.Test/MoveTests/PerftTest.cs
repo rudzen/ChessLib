@@ -96,7 +96,7 @@ internal static class PerftVerify
     public static void AssertPerft(string fen, int depth, in ulong expected)
     {
         var g = GameFactory.Create(fen);
-        var actual = g.Perft(depth, true);
+        var actual = g.Perft(depth);
         Assert.Equal(expected, actual);
     }
 }
