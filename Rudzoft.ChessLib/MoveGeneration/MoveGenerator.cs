@@ -326,15 +326,15 @@ public static class MoveGenerator
                     pawnOne &= ksq.PawnAttack(them);
                     pawnTwo &= ksq.PawnAttack(them);
 
-                    var dcCandidates = pos.BlockersForKing(them);
+                    var dcCandidates = pawnsNotOn7 & pos.BlockersForKing(them);
 
                     // Add pawn pushes which give discovered check. This is possible only if
                     // the pawn is not on the same file as the enemy king, because we don't
                     // generate captures. Note that a possible discovery check promotion has
                     // been already generated among captures.
-                    if (!(pawnsNotOn7 & dcCandidates).IsEmpty)
+                    if (!dcCandidates.IsEmpty)
                     {
-                        var dc1 = (pawnsNotOn7 & dcCandidates).Shift(up) & emptySquares & ~ksq;
+                        var dc1 = dcCandidates.Shift(up) & emptySquares & ~ksq;
                         var dc2 = (dc1 & us.Rank3()).Shift(up) & emptySquares;
                         pawnOne |= dc1;
                         pawnTwo |= dc2;
