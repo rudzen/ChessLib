@@ -30,6 +30,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Rudzoft.ChessLib.Extensions;
+using Rudzoft.ChessLib.Perft.Interfaces;
 
 namespace Rudzoft.Perft.Parsers;
 
@@ -105,12 +106,12 @@ public class EpdParser : IEpdParser
         throw new NotImplementedException();
     }
 
-    private static (int, ulong) ParsePerftLines(string perftData)
+    private static PerftPositionValue ParsePerftLines(string perftData)
     {
         var s = perftData.Split(' ', StringSplitOptions.RemoveEmptyEntries);
         var result = (depth: 0, count: ulong.MinValue);
         Maths.ToIntegral(s[0], out result.depth);
         Maths.ToIntegral(s[1], out result.count);
-        return result;
+        return new PerftPositionValue(result.depth, result.count);
     }
 }

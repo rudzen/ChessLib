@@ -56,7 +56,7 @@ Result	6	1,912,300.6 us	3,551.167 us	3,148.017 us
 
 public sealed class Perft : IPerft
 {
-    public Perft(IGame game, IEnumerable<IPerftPosition> positions)
+    public Perft(IGame game, IEnumerable<PerftPosition> positions)
     {
         Positions = positions.ToList();
         CurrentGame = game;
@@ -67,7 +67,7 @@ public sealed class Perft : IPerft
     /// <summary>
     /// The positional data for the run
     /// </summary>
-    public List<IPerftPosition> Positions { get; set; }
+    public IList<PerftPosition> Positions { get; set; }
 
     public IGame CurrentGame { get; set; }
     public int Depth { get; set; }
@@ -105,7 +105,7 @@ public sealed class Perft : IPerft
     public string GetBoard()
         => CurrentGame.ToString();
 
-    public void SetGamePosition(IPerftPosition pp)
+    public void SetGamePosition(PerftPosition pp)
     {
         var fp = new FenData(pp.Fen);
         var state = new State();
@@ -116,7 +116,7 @@ public sealed class Perft : IPerft
     public void ClearPositions() => Positions.Clear();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void AddPosition(IPerftPosition pp)
+    public void AddPosition(PerftPosition pp)
         => Positions.Add(pp);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -130,12 +130,12 @@ public sealed class Perft : IPerft
         if (pos.Value.Count == 0)
             return false;
 
-        var depthValue = pos.Value.FirstOrDefault(v => v.Item1 == depth && v.Item2 > 0);
+        var depthValue = pos.Value.FirstOrDefault(v => v.Depth == depth && v.MoveCount > 0);
 
         return !depthValue.Equals(default);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public ulong GetPositionCount(int index, int depth)
-        => Positions[index].Value[depth - 1].Item2;
+        => Positions[index].Value[depth - 1].MoveCount;
 }

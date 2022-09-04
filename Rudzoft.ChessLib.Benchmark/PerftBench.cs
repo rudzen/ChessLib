@@ -38,21 +38,21 @@ public sealed class PerftBench
 {
     private IPerft _perft;
 
-    private readonly IPerftPosition _pp;
+    private readonly PerftPosition _pp;
 
     public PerftBench()
     {
         _pp = PerftPositionFactory.Create(
             Guid.NewGuid().ToString(),
             Fen.Fen.StartPositionFen,
-            new List<(int, ulong)>(6)
+            new List<PerftPositionValue>(6)
             {
-                    (1, 20),
-                    (2, 400),
-                    (3, 8902),
-                    (4, 197281),
-                    (5, 4865609),
-                    (6, 119060324)
+                    new(1, 20),
+                    new(2, 400),
+                    new(3, 8902),
+                    new(4, 197281),
+                    new(5, 4865609),
+                    new(6, 119060324)
             });
     }
 

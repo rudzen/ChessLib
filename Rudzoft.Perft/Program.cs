@@ -143,7 +143,6 @@ internal static class Program
         container.Register<IOptions, TTOptions>(Reuse.Singleton, serviceKey: OptionType.TTOptions);
 
         // Bind chess perft classes
-        container.Register<IPerftPosition, PerftPosition>(Reuse.Transient);
         container.Register<IPerft, ChessLib.Perft.Perft>(Reuse.Transient);
         container.Register<IPerftRunner, PerftRunner>(Reuse.Transient);
 
