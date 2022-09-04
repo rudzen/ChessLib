@@ -419,7 +419,7 @@ public static class MoveGenerator
         // An en passant capture can be an evasion only if the checking piece is the double
         // pushed pawn and so is in the target. Otherwise this is a discovery check and we are
         // forced to do otherwise.
-        if (type == MoveGenerationType.Evasions && (target & (pos.EnPassantSquare - up)) == 0)
+        if (type == MoveGenerationType.Evasions && (target & (pos.EnPassantSquare - up)).IsEmpty)
             return index;
 
         pawnOne = pawnsNotOn7 & pos.EnPassantSquare.PawnAttack(them);

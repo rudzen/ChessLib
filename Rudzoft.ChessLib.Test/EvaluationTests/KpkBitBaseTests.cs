@@ -53,8 +53,8 @@ public sealed class KpkBitBaseTests
 
         var us = strongSide == pos.SideToMove ? Player.White : Player.Black;
 
-        var isDrawn = !KpkBitBase.Probe(strongKing, strongPawn, weakKing, us);
+        var won = !KpkBitBase.Probe(strongKing, strongPawn, weakKing, us);
 
-        Assert.Equal(expected, isDrawn);
+        Assert.Equal(expected, won);
     }
 }
