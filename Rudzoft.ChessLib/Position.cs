@@ -285,14 +285,9 @@ public sealed class Position : IPosition
         }
 
         fen[length++] = space;
-
-        foreach (var c in State.Rule50.ToString().AsSpan())
-            fen[length++] = c;
-
+        length = fen.Append(State.Rule50, length);
         fen[length++] = space;
-
-        foreach (var c in (1 + (Ply - _sideToMove.IsBlack.AsByte() / 2)).ToString().AsSpan())
-            fen[length++] = c;
+        length = fen.Append(1 + (Ply - _sideToMove.IsBlack.AsByte() / 2), length);
 
         return new FenData(new string(fen[..length]));
     }
