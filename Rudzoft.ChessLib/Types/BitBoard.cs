@@ -65,7 +65,7 @@ public readonly record struct BitBoard(ulong Value) : IEnumerable<Square>
     /// </summary>
     /// <param name="index">the damn index</param>
     /// <returns>the Bit object if assigning</returns>
-    public BitBoard this[int index] => this.Get(index);
+    public Square this[int index] => this.Get(index);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator BitBoard(ulong value)
@@ -81,11 +81,11 @@ public readonly record struct BitBoard(ulong Value) : IEnumerable<Square>
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static BitBoard Create(ulong value)
-        => new BitBoard(value);
+        => new(value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static BitBoard Create(uint value)
-        => new BitBoard(value);
+        => new(value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static BitBoard operator *(BitBoard left, ulong right)
