@@ -34,10 +34,9 @@ namespace Rudzoft.ChessLib.Perft;
 
 public static class PerftFactory
 {
-    public static IPerft Create(Action<string> boardPrintCallback = null, IEnumerable<IPerftPosition> positions = null)
+    public static IPerft Create(Action<string> boardPrintCallback = null, IEnumerable<PerftPosition> positions = null)
     {
-        positions ??= Enumerable.Empty<IPerftPosition>();
-        var perft = new Perft(GameFactory.Create(), positions);
-        return perft;
+        positions ??= Enumerable.Empty<PerftPosition>();
+        return new Perft(GameFactory.Create(), positions);
     }
 }

@@ -34,7 +34,7 @@ public interface IPerft
 {
     Action<string> BoardPrintCallback { get; set; }
 
-    List<IPerftPosition> Positions { get; set; }
+    IList<PerftPosition> Positions { get; set; }
 
     int Depth { get; set; }
 
@@ -50,9 +50,9 @@ public interface IPerft
 
     string GetBoard();
 
-    void SetGamePosition(IPerftPosition pp);
+    void SetGamePosition(PerftPosition pp);
 
-    void AddPosition(IPerftPosition pp);
+    void AddPosition(PerftPosition pp);
 
     ulong GetPositionCount(int index, int depth);
 }

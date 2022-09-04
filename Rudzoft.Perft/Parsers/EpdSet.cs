@@ -26,6 +26,7 @@ SOFTWARE.
 
 using System;
 using System.Collections.Generic;
+using Rudzoft.ChessLib.Perft.Interfaces;
 
 namespace Rudzoft.Perft.Parsers;
 
@@ -35,7 +36,7 @@ public sealed class EpdSet : IEpdSet
 
     public string Epd { get; set; }
 
-    public List<(int, ulong)> Perft { get; set; }
+    public List<PerftPositionValue> Perft { get; set; }
 
     public bool Equals(IEpdSet x, IEpdSet y)
     {

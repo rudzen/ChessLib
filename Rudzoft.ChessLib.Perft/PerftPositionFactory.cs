@@ -33,6 +33,6 @@ namespace Rudzoft.ChessLib.Perft;
 public static class PerftPositionFactory
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static IPerftPosition Create(string id, string fen, List<(int, ulong)> values)
-        => new PerftPosition { Id = id, Fen = fen, Value = values };
+    public static PerftPosition Create(string id, string fen, List<PerftPositionValue> values)
+        => new(id, fen, values);
 }

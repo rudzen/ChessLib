@@ -55,9 +55,9 @@ public sealed class PerftRunner : IPerftRunner
 
     private static readonly string Line = new('-', 65);
 
-    private static readonly Lazy<string> CurrentDirectory = new(static () => System.Environment.CurrentDirectory);
+    private static readonly Lazy<string> CurrentDirectory = new(static () => Environment.CurrentDirectory);
 
-    private readonly Func<CancellationToken, IAsyncEnumerable<IPerftPosition>>[] _runners;
+    private readonly Func<CancellationToken, IAsyncEnumerable<PerftPosition>>[] _runners;
 
     private readonly IEpdParser _epdParser;
 
@@ -94,7 +94,7 @@ public sealed class PerftRunner : IPerftRunner
         _uci = uci;
         _uci.Initialize();
 
-        _runners = new Func<CancellationToken, IAsyncEnumerable<IPerftPosition>>[] { ParseEpd, ParseFen };
+        _runners = new Func<CancellationToken, IAsyncEnumerable<PerftPosition>>[] { ParseEpd, ParseFen };
 
         TranspositionTableOptions = Framework.IoC.Resolve<IOptions>(OptionType.TTOptions) as TTOptions;
         configuration.Bind("TranspositionTable", TranspositionTableOptions);
@@ -124,7 +124,7 @@ public sealed class PerftRunner : IPerftRunner
         _usingEpd = runnerIndex == 0;
         var positions = _runners[runnerIndex].Invoke(cancellationToken);
 
-        _perft.Positions = new List<IPerftPosition>();
+        _perft.Positions = new List<PerftPosition>();
 
         await foreach (var position in positions.WithCancellation(cancellationToken).ConfigureAwait(false))
         {
@@ -154,13 +154,13 @@ public sealed class PerftRunner : IPerftRunner
             throw new ArgumentNullException(nameof(options), "Cannot be null");
     }
 
-    private IAsyncEnumerable<IPerftPosition> ParseEpd(CancellationToken cancellationToken)
+    private IAsyncEnumerable<PerftPosition> ParseEpd(CancellationToken cancellationToken)
     {
         var options = Options as EpdOptions;
         return ParseEpd(options);
     }
 
-    private async IAsyncEnumerable<IPerftPosition> ParseEpd(EpdOptions options)
+    private async IAsyncEnumerable<PerftPosition> ParseEpd(EpdOptions options)
     {
         _epdParser.Settings.Filename = options.Epds.First();
         var sw = Stopwatch.StartNew();
@@ -177,19 +177,19 @@ public sealed class PerftRunner : IPerftRunner
             yield return perftPosition;
     }
 
-    private IAsyncEnumerable<IPerftPosition> ParseFen(CancellationToken cancellationToken)
+    private IAsyncEnumerable<PerftPosition> ParseFen(CancellationToken cancellationToken)
     {
         var options = Options as FenOptions;
         return ParseFen(options);
     }
 
 #pragma warning disable 1998
-    private static async IAsyncEnumerable<IPerftPosition> ParseFen(FenOptions options)
+    private static async IAsyncEnumerable<PerftPosition> ParseFen(FenOptions options)
 #pragma warning restore 1998
     {
         const ulong zero = ulong.MinValue;
 
-        var depths = options.Depths.Select(static d => (d, zero)).ToList();
+        var depths = options.Depths.Select(static d => new PerftPositionValue(d, zero)).ToList();
 
         var perftPositions =
             options.Fens.Select(f => PerftPositionFactory.Create(Guid.NewGuid().ToString(), f, depths));
