@@ -125,27 +125,34 @@ public sealed class Game : IGame
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Player CurrentPlayer() => Pos.SideToMove;
 
-    public ulong Perft(int depth, bool root = false)
+    public ulong Perft(int depth, bool root = true)
     {
+        var tot = ulong.MinValue;
+
         var ml = _moveLists.Get();
         ml.Generate(Pos);
-
-        if (depth == 1)
-        {
-            var res = ml.Count;
-            _moveLists.Return(ml);
-            return (ulong)res;
-        }
-
         var state = new State();
-        ulong tot = 0;
 
-        foreach (var move in ml.Select(static em => em.Move))
-        {
-            Pos.MakeMove(move, in state);
-            tot += Perft(depth - 1);
-            Pos.TakeMove(move);
-        }
+        foreach (var em in ml.Get())
+            if (root && depth <= 1)
+                tot++;
+            else
+            {
+                var m = em.Move;
+                Pos.MakeMove(m, in state);
+
+                if (depth <= 2)
+                {
+                    var ml2 = _moveLists.Get();
+                    ml2.Generate(Pos);
+                    tot += (ulong)ml2.Length;
+                    _moveLists.Return(ml2);
+                }
+                else
+                    tot += Perft(depth - 1, false);
+
+                Pos.TakeMove(m);
+            }
 
         _moveLists.Return(ml);
 

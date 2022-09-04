@@ -91,7 +91,7 @@ public sealed class Perft : IPerft
                 yield return result;
             else
             {
-                result = CurrentGame.Perft(depth, true);
+                result = CurrentGame.Perft(depth);
                 PerftTable.Store(CurrentGame.Pos.State.Key.Key, depth, result);
                 yield return result;
             }
@@ -100,7 +100,7 @@ public sealed class Perft : IPerft
 
     public Task<ulong> DoPerftAsync(int depth)
         => Task.Run(()
-            => CurrentGame.Perft(depth, true));
+            => CurrentGame.Perft(depth));
 
     public string GetBoard()
         => CurrentGame.ToString();

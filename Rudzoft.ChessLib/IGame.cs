@@ -58,5 +58,5 @@ public interface IGame : IEnumerable<Piece>
 
     Player CurrentPlayer();
 
-    ulong Perft(int depth, bool root);
+    ulong Perft(int depth, bool root = true);
 }
