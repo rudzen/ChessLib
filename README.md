@@ -2,6 +2,8 @@
 A C# chess data library with complete move generation and all needed custom types.
 
 [![Build status](https://ci.appveyor.com/api/projects/status/6dksl8dsq5s1n2uv/branch/master?svg=true)](https://ci.appveyor.com/project/rudzen/chesslib/branch/master)
+[![Build & Test](https://github.com/rudzen/ChessLib/actions/workflows/test.yml/badge.svg)](https://github.com/rudzen/ChessLib/actions/workflows/test.yml)
+![Nuget](https://img.shields.io/nuget/v/Rudzoft.ChessLib)
 
 ## Requirements
 
@@ -13,11 +15,6 @@ This library contains all the data, types and structures for which to create a p
 chess software. It does not contain any heuristics or search algorithms as these
 are meant to be implemented separately.
 
-## But why?
-
-This library was developed during a course "Advanced C# and object oriented programming E17" at DTU (Danish Technical University) as part of a chess user interface, which will be released at a later stage when it is ready.
-Since the UI needs to handle legality, mate check etc., all these features are contained within the library.
-
 ## Can I use this as a starting point for my chess software?
 
 Yes you can, it is designed with that in mind.
@@ -26,11 +23,33 @@ Yes you can, it is designed with that in mind.
 
 * Custom perft application which uses the library to calculate and compare results from custom positions
 * Transposition Table
-* Complete move generation with legality check
-* Custom compact and very efficient types for Bitboard, Square, Piece, Move, Player, File, Rank and Direction with tons of operators and helper functionality
+* Complete move generation with several types
+  * Legal
+  * Captures
+  * Quiets
+  * NonEvasions
+  * Evasions
+  * QuietChecks
+* Custom compact and very efficient types with tons of operators and helper functionality
+  * Bitboard
+  * CastleRight
+  * Depth
+  * Direction
+  * ExtMove (move + score)
+  * File
+  * HashKey
+  * Move
+  * Piece
+  * PieceSquare (for UI etc)
+  * PieceValue
+  * Player
+  * Rank
+  * Score
+  * Square
+  * Value
 * 100% Bitboard support with piece attacks for all types, including lots of helper functions
 * Lots of pre-calculated bitboard arrays to aid in the creation of an evaluation functionality
-* FEN handling with optional legality check
+* Very fast FEN handling with optional legality check
 * Magic bitboard implementation Copyright (C) 2007 Pradyumna Kannan. Converted to C#
 * FEN input and output supported
 * Chess960 support
@@ -39,20 +58,45 @@ Yes you can, it is designed with that in mind.
 * HiRes timer
 * Draw by repetition detection
 * Mate validation
-* Plenty of unit tests to see how it works
-* Notation generation for the following notation types: Fan, San, Lan, Ran, Uci
+* Notation generation
+  * Coordinate
+  * FAN
+  * ICCF
+  * LAN
+  * RAN
+  * SAN
+  * SMITH
+  * UCI
 * Benchmark project for perft
 * Custom MoveList data structure
 * Pawn blockage algorithm
+* Cuckoo repetition algorithm
+* Polyglot book support
+* Plenty of unit tests to see how it works
 
-## Is it fast?
-
-Yes. As far as C# goes it should be able to hold its own.
+### Perft
 
 Perft console test program approximate timings to depth 6 for normal start position
 
 * AMD-FX 8350 = ~12.5 seconds. (without TT) (earlier version)
-* Intel i7-8086k = ~3.5 seconds
+* Intel i7-8086k = ~3.3 seconds
+
+### Transposition Table
+
+ph
+
+### Move Generator
+
+Example
+
+```c#
+// generate all legal moves for current position
+const string fen = "rnbqkbnr/1ppQpppp/p2p4/8/8/2P5/PP1PPPPP/RNB1KBNR b KQkq - 1 6";
+
+var game = GameFactory.Create(fen);
+var moveList = game.Pos.GenerateMoves();
+// ..
+```
 
 ## What is not included?
 
@@ -63,4 +107,3 @@ Perft console test program approximate timings to depth 6 for normal start posit
 ## Planned
 
 * Basic chess engine (search + evaluation) w. UCI support
-* As nuget package
