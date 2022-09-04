@@ -199,10 +199,10 @@ public static class BitBoards
         for (var i = 0; i < SquareDistance.Length; i++)
             DistanceRingBB[i] = new BitBoard[8];
 
-        CornerA1 = MakeBitboard(Square.A1, Square.B1, Square.A2, Square.B2);
-        CornerA8 = MakeBitboard(Square.A8, Square.B8, Square.A7, Square.B7);
-        CornerH1 = MakeBitboard(Square.H1, Square.G1, Square.H2, Square.G2);
-        CornerH8 = MakeBitboard(Square.H8, Square.G8, Square.H7, Square.G7);
+        CornerA1 = Square.A1 | Square.B1 | Square.A2 | Square.B2;
+        CornerA8 = Square.A8 | Square.B8 | Square.A7 | Square.B7;
+        CornerH1 = Square.H1 | Square.G1 | Square.H2 | Square.G2;
+        CornerH8 = Square.H8 | Square.G8 | Square.H7 | Square.G7;
 
         // local helper functions to calculate distance
         static int distance(int x, int y) => Math.Abs(x - y);
@@ -210,19 +210,25 @@ public static class BitBoards
         static int distanceRank(Square x, Square y) => distance(x.Rank.AsInt(), y.Rank.AsInt());
 
         // ForwardRanksBB population loop idea from sf
-        for (var r = Ranks.Rank1; r < Ranks.RankNb; ++r)
+        foreach (var r in Rank.AllRanks)
         {
-            var rank = (int)r;
-            ForwardRanksBB[0][rank] = ~(ForwardRanksBB[1][rank + 1] = ForwardRanksBB[1][rank] | BitBoardRank(r));
+            var rank = r.AsInt();
+            ForwardRanksBB[0][rank] = ~(ForwardRanksBB[1][rank + 1] = ForwardRanksBB[1][rank] | r.BitBoardRank());
         }
 
-        Span<BitBoard> adjacentFilesBb = stackalloc BitBoard[] { FILEB, FILEA | FILEC, FILEB | FILED, FILEC | FILEE, FILED | FILEF, FILEE | FILEG, FILEF | FILEH, FILEG };
-        Span<Player> players = stackalloc Player[] { Player.White, Player.Black };
-
-        foreach (var player in players)
+        Span<BitBoard> adjacentFilesBb = stackalloc BitBoard[]
         {
-            foreach (var square in AllSquares)
+            FILEB, FILEA | FILEC, FILEB | FILED, FILEC | FILEE, FILED | FILEF, FILEE | FILEG, FILEF | FILEH, FILEG
+        };
+
+        BitBoard bb;
+
+        foreach (var player in Player.AllPlayers)
+        {
+            bb = AllSquares;
+            while (bb)
             {
+                var square = PopLsb(ref bb);
                 var s = square.AsInt();
                 var file = square.File;
                 var rank = square.Rank.AsInt();
@@ -248,19 +254,21 @@ public static class BitBoards
 
         Span<PieceTypes> validMagicPieces = stackalloc PieceTypes[] { PieceTypes.Bishop, PieceTypes.Rook };
 
+        bb = AllSquares;
         // Pseudo attacks for all pieces
-        foreach (var s1 in AllSquares)
+        while (bb)
         {
+            var s1 = PopLsb(ref bb);
             var sq = s1.AsInt();
             var b = s1.AsBb();
 
             var file = s1.File;
 
+            var bb2 = AllSquares & ~s1;
             // distance computation
-            foreach (var s2 in AllSquares)
+            while (bb2)
             {
-                if (s1 == s2)
-                    continue;
+                var s2 = PopLsb(ref bb2);
                 var dist = (byte)distanceFile(s1, s2).Max(distanceRank(s1, s2));
                 SquareDistance[sq][s2.AsInt()] = dist;
                 DistanceRingBB[sq][dist] |= s2;
@@ -292,8 +300,10 @@ public static class BitBoards
             foreach (var validMagicPiece in validMagicPieces)
             {
                 pt = validMagicPiece.AsInt();
-                foreach (var s2 in AllSquares)
+                var bb3 = AllSquares;
+                while (bb3)
                 {
+                    var s2 = PopLsb(ref bb3);
                     if ((PseudoAttacksBB[pt][sq] & s2).IsEmpty)
                         continue;
 
@@ -307,7 +317,7 @@ public static class BitBoards
             // Compute KingRings
             pt = PieceTypes.King.AsInt();
 
-            foreach (var player in players)
+            foreach (var player in Player.AllPlayers)
             {
                 KingRingBB[player.Side][sq] = PseudoAttacksBB[pt][sq];
                 if (s1.RelativeRank(player) == Ranks.Rank1)
