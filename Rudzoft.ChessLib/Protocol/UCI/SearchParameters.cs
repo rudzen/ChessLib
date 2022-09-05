@@ -127,10 +127,10 @@ public sealed class SearchParameters : ISearchParameters
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public ulong Time(Player player) => _clock.Time[player.Side];
+    public ulong Time(Player p) => _clock.Time[p.Side];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public ulong Inc(Player player) => _clock.Inc[player.Side];
+    public ulong Inc(Player p) => _clock.Inc[p.Side];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Clear()

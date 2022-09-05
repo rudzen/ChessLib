@@ -120,36 +120,36 @@ public sealed class Position : IPosition
             PieceUpdated?.Invoke(new PieceSquareEventArgs(pc, sq));
     }
 
-    public bool AttackedByKing(Square sq, Player c)
-        => !(GetAttacks(sq, PieceTypes.King) & GetKingSquare(c)).IsEmpty;
+    public bool AttackedByKing(Square sq, Player p)
+        => !(GetAttacks(sq, PieceTypes.King) & GetKingSquare(p)).IsEmpty;
 
-    public bool AttackedByKnight(Square sq, Player c)
-        => !(Board.Pieces(c, PieceTypes.Knight) & GetAttacks(sq, PieceTypes.Knight)).IsEmpty;
+    public bool AttackedByKnight(Square sq, Player p)
+        => !(Board.Pieces(p, PieceTypes.Knight) & GetAttacks(sq, PieceTypes.Knight)).IsEmpty;
 
-    public bool AttackedByPawn(Square sq, Player c) =>
-        !(Board.Pieces(c, PieceTypes.Pawn) & sq.PawnAttack(~c)).IsEmpty;
+    public bool AttackedByPawn(Square sq, Player p) =>
+        !(Board.Pieces(p, PieceTypes.Pawn) & sq.PawnAttack(~p)).IsEmpty;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool AttackedBySlider(Square sq, Player c)
+    public bool AttackedBySlider(Square sq, Player p)
     {
         var occupied = Board.Pieces();
         var rookAttacks = sq.RookAttacks(occupied);
-        if (Board.Pieces(c, PieceTypes.Rook) & rookAttacks)
+        if (Board.Pieces(p, PieceTypes.Rook) & rookAttacks)
             return true;
 
         var bishopAttacks = sq.BishopAttacks(occupied);
-        if (Board.Pieces(c, PieceTypes.Bishop) & bishopAttacks)
+        if (Board.Pieces(p, PieceTypes.Bishop) & bishopAttacks)
             return true;
 
-        return !(Board.Pieces(c, PieceTypes.Queen) & (bishopAttacks | rookAttacks)).IsEmpty;
+        return !(Board.Pieces(p, PieceTypes.Queen) & (bishopAttacks | rookAttacks)).IsEmpty;
     }
 
-    public BitBoard AttacksBy(PieceTypes pt, Player c)
+    public BitBoard AttacksBy(PieceTypes pt, Player p)
     {
-        var attackers = Pieces(pt, c);
+        var attackers = Pieces(pt, p);
 
         if (pt == PieceTypes.Pawn)
-            return attackers.PawnAttacks(c);
+            return attackers.PawnAttacks(p);
 
         var threats = BitBoard.Empty;
         while (attackers)
@@ -157,30 +157,30 @@ public sealed class Position : IPosition
         return threats;
     }
 
-    public BitBoard AttacksTo(Square sq, in BitBoard occupied)
+    public BitBoard AttacksTo(Square sq, in BitBoard occ)
     {
         Debug.Assert(sq.IsOk);
 
         return (sq.PawnAttack(Player.White) & Board.Pieces(Player.Black, PieceTypes.Pawn))
                | (sq.PawnAttack(Player.Black) & Board.Pieces(Player.White, PieceTypes.Pawn))
                | (GetAttacks(sq, PieceTypes.Knight) & Board.Pieces(PieceTypes.Knight))
-               | (GetAttacks(sq, PieceTypes.Rook, in occupied) & Board.Pieces(PieceTypes.Rook, PieceTypes.Queen))
-               | (GetAttacks(sq, PieceTypes.Bishop, in occupied) & Board.Pieces(PieceTypes.Bishop, PieceTypes.Queen))
+               | (GetAttacks(sq, PieceTypes.Rook, in occ) & Board.Pieces(PieceTypes.Rook, PieceTypes.Queen))
+               | (GetAttacks(sq, PieceTypes.Bishop, in occ) & Board.Pieces(PieceTypes.Bishop, PieceTypes.Queen))
                | (GetAttacks(sq, PieceTypes.King) & Board.Pieces(PieceTypes.King));
     }
 
     public BitBoard AttacksTo(Square sq)
         => AttacksTo(sq, Board.Pieces());
 
-    public BitBoard BlockersForKing(Player c)
-        => State.BlockersForKing[c.Side];
+    public BitBoard BlockersForKing(Player p)
+        => State.BlockersForKing[p.Side];
 
     public bool CanCastle(CastleRight cr)
         => State.CastlelingRights.Has(cr.Rights);
 
-    public bool CanCastle(Player c)
+    public bool CanCastle(Player p)
     {
-        var cr = (CastlelingRights)((int)(CastlelingRights.WhiteOo | CastlelingRights.WhiteOoo) << (2 * c.Side));
+        var cr = (CastlelingRights)((int)(CastlelingRights.WhiteOo | CastlelingRights.WhiteOoo) << (2 * p.Side));
         return State.CastlelingRights.Has(cr);
     }
 
@@ -292,7 +292,7 @@ public sealed class Position : IPosition
         return new FenData(new string(fen[..length]));
     }
 
-    public BitBoard GetAttacks(Square sq, PieceTypes pt, in BitBoard occupied)
+    public BitBoard GetAttacks(Square sq, PieceTypes pt, in BitBoard occ)
     {
         Debug.Assert(pt != PieceTypes.Pawn, "Pawns need player");
 
@@ -300,9 +300,9 @@ public sealed class Position : IPosition
         {
             PieceTypes.Knight => pt.PseudoAttacks(sq),
             PieceTypes.King => pt.PseudoAttacks(sq),
-            PieceTypes.Bishop => sq.BishopAttacks(occupied),
-            PieceTypes.Rook => sq.RookAttacks(occupied),
-            PieceTypes.Queen => sq.QueenAttacks(occupied),
+            PieceTypes.Bishop => sq.BishopAttacks(occ),
+            PieceTypes.Rook => sq.RookAttacks(occ),
+            PieceTypes.Queen => sq.QueenAttacks(occ),
             _ => BitBoard.Empty
         };
     }
@@ -319,8 +319,8 @@ public sealed class Position : IPosition
     IEnumerator IEnumerable.GetEnumerator()
         => GetEnumerator();
 
-    public Square GetKingSquare(Player c)
-        => Board.Square(PieceTypes.King, c);
+    public Square GetKingSquare(Player p)
+        => Board.Square(PieceTypes.King, p);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public HashKey GetPawnKey()
@@ -355,8 +355,8 @@ public sealed class Position : IPosition
         return result;
     }
 
-    public Square GetPieceSquare(PieceTypes pt, Player c)
-        => Board.Square(pt, c);
+    public Square GetPieceSquare(PieceTypes pt, Player p)
+        => Board.Square(pt, p);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public PieceTypes GetPieceType(Square sq) => Board.PieceAt(sq).Type();
@@ -458,8 +458,8 @@ public sealed class Position : IPosition
         };
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool IsAttacked(Square sq, Player c)
-        => AttackedBySlider(sq, c) || AttackedByKnight(sq, c) || AttackedByPawn(sq, c) || AttackedByKing(sq, c);
+    public bool IsAttacked(Square sq, Player p)
+        => AttackedBySlider(sq, p) || AttackedByKnight(sq, p) || AttackedByPawn(sq, p) || AttackedByKing(sq, p);
 
     public bool IsLegal(Move m)
     {
@@ -861,20 +861,20 @@ public sealed class Position : IPosition
     /// Determine if a pawn is isolated e.i. no own pawns on either of it's neighboring files
     /// </summary>
     /// <param name="sq"></param>
-    /// <param name="c"></param>
+    /// <param name="p"></param>
     /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool PawnIsolated(Square sq, Player c)
-        => ((sq.PawnAttackSpan(c) | sq.PawnAttackSpan(~c)) & Board.Pieces(c, PieceTypes.Pawn)).IsEmpty;
+    public bool PawnIsolated(Square sq, Player p)
+        => ((sq.PawnAttackSpan(p) | sq.PawnAttackSpan(~p)) & Board.Pieces(p, PieceTypes.Pawn)).IsEmpty;
 
-    public bool PieceOnFile(Square sq, Player c, PieceTypes pt)
-        => !(Board.Pieces(c, pt) & sq).IsEmpty;
+    public bool PieceOnFile(Square sq, Player p, PieceTypes pt)
+        => !(Board.Pieces(p, pt) & sq).IsEmpty;
 
     public BitBoard Pieces()
         => Board.Pieces();
 
-    public BitBoard Pieces(Player c)
-        => Board.Pieces(c);
+    public BitBoard Pieces(Player p)
+        => Board.Pieces(p);
 
     public BitBoard Pieces(Piece pc)
         => Board.Pieces(pc.ColorOf(), pc.Type());
@@ -885,14 +885,14 @@ public sealed class Position : IPosition
     public BitBoard Pieces(PieceTypes pt1, PieceTypes pt2)
         => Board.Pieces(pt1, pt2);
 
-    public BitBoard Pieces(PieceTypes pt, Player c)
-        => Board.Pieces(c, pt);
+    public BitBoard Pieces(PieceTypes pt, Player p)
+        => Board.Pieces(p, pt);
 
-    public BitBoard Pieces(PieceTypes pt1, PieceTypes pt2, Player c)
-        => Board.Pieces(c, pt1, pt2);
+    public BitBoard Pieces(PieceTypes pt1, PieceTypes pt2, Player p)
+        => Board.Pieces(p, pt1, pt2);
 
-    public BitBoard PinnedPieces(Player c)
-        => State.Pinners[c.Side];
+    public BitBoard PinnedPieces(Player p)
+        => State.Pinners[p.Side];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void RemovePiece(Square sq)
@@ -1023,11 +1023,11 @@ public sealed class Position : IPosition
             {
                 var pieceIndex = PieceExtensions.PieceChars.IndexOf(c);
 
-                Player player = char.IsLower(PieceExtensions.PieceChars[pieceIndex]);
+                Player p = new(char.IsLower(PieceExtensions.PieceChars[pieceIndex]));
 
                 var square = new Square(r - 1, f - 1);
 
-                var pc = ((PieceTypes)pieceIndex).MakePiece(player);
+                var pc = ((PieceTypes)pieceIndex).MakePiece(p);
                 AddPiece(pc, square);
 
                 f++;
@@ -1117,8 +1117,8 @@ public sealed class Position : IPosition
         SetState();
     }
 
-    public ReadOnlySpan<Square> Squares(PieceTypes pt, Player c)
-        => Board.Squares(pt, c);
+    public ReadOnlySpan<Square> Squares(PieceTypes pt, Player p)
+        => Board.Squares(pt, p);
 
     public void TakeMove(Move m)
     {

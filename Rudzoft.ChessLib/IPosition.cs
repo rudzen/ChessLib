@@ -90,19 +90,19 @@ public interface IPosition : IEnumerable<Piece>
 
     BitBoard CheckedSquares(PieceTypes pt);
 
-    BitBoard PinnedPieces(Player c);
+    BitBoard PinnedPieces(Player p);
 
-    BitBoard BlockersForKing(Player c);
+    BitBoard BlockersForKing(Player p);
 
     bool IsOccupied(Square sq);
 
-    bool IsAttacked(Square sq, Player c);
+    bool IsAttacked(Square sq, Player p);
 
     bool GivesCheck(Move m);
 
     BitBoard Pieces();
 
-    BitBoard Pieces(Player c);
+    BitBoard Pieces(Player p);
 
     BitBoard Pieces(Piece pc);
 
@@ -110,43 +110,43 @@ public interface IPosition : IEnumerable<Piece>
 
     BitBoard Pieces(PieceTypes pt1, PieceTypes pt2);
 
-    BitBoard Pieces(PieceTypes pt, Player c);
+    BitBoard Pieces(PieceTypes pt, Player p);
 
-    BitBoard Pieces(PieceTypes pt1, PieceTypes pt2, Player c);
+    BitBoard Pieces(PieceTypes pt1, PieceTypes pt2, Player p);
 
-    ReadOnlySpan<Square> Squares(PieceTypes pt, Player c);
+    ReadOnlySpan<Square> Squares(PieceTypes pt, Player p);
 
-    Square GetPieceSquare(PieceTypes pt, Player c);
+    Square GetPieceSquare(PieceTypes pt, Player p);
 
-    Square GetKingSquare(Player c);
+    Square GetKingSquare(Player p);
 
     Piece MovedPiece(Move m);
 
-    bool PieceOnFile(Square sq, Player c, PieceTypes pt);
+    bool PieceOnFile(Square sq, Player p, PieceTypes pt);
 
-    bool PawnIsolated(Square sq, Player c);
+    bool PawnIsolated(Square sq, Player p);
 
     bool PassedPawn(Square sq);
 
     void RemovePiece(Square sq);
 
-    BitBoard AttacksTo(Square sq, in BitBoard occupied);
+    BitBoard AttacksTo(Square sq, in BitBoard occ);
 
     BitBoard AttacksTo(Square sq);
 
-    bool AttackedBySlider(Square sq, Player c);
+    bool AttackedBySlider(Square sq, Player p);
 
-    bool AttackedByKnight(Square sq, Player c);
+    bool AttackedByKnight(Square sq, Player p);
 
-    bool AttackedByPawn(Square sq, Player c);
+    bool AttackedByPawn(Square sq, Player p);
 
-    bool AttackedByKing(Square sq, Player c);
+    bool AttackedByKing(Square sq, Player p);
 
-    BitBoard AttacksBy(PieceTypes pt, Player c);
+    BitBoard AttacksBy(PieceTypes pt, Player p);
 
     bool CanCastle(CastleRight cr);
 
-    bool CanCastle(Player c);
+    bool CanCastle(Player p);
 
     bool CastlingImpeded(CastleRight cr);
 
@@ -166,7 +166,7 @@ public interface IPosition : IEnumerable<Piece>
 
     HashKey GetPawnKey();
 
-    BitBoard GetAttacks(Square sq, PieceTypes pt, in BitBoard occupied);
+    BitBoard GetAttacks(Square sq, PieceTypes pt, in BitBoard occ);
 
     BitBoard GetAttacks(Square sq, PieceTypes pt);
 

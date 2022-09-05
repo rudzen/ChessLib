@@ -34,10 +34,10 @@ namespace Rudzoft.ChessLib.Types;
 /// </summary>
 public sealed class PieceSquareEventArgs : EventArgs, IPieceSquare
 {
-    public PieceSquareEventArgs(Piece piece, Square square)
+    public PieceSquareEventArgs(Piece pc, Square sq)
     {
-        Piece = piece;
-        Square = square;
+        Piece = pc;
+        Square = sq;
     }
 
     public Piece Piece { get; set; }
@@ -52,11 +52,11 @@ public sealed class PieceSquareEventArgs : EventArgs, IPieceSquare
 
     public bool Equals(IPieceSquare other)
         => other is not null &&
-           (ReferenceEquals(this, other) || Piece.Equals(other.Piece) && Square.Equals(other.Square));
+           (ReferenceEquals(this, other) || (Piece.Equals(other.Piece) && Square.Equals(other.Square)));
 
     public override bool Equals(object obj)
         => obj is not null &&
-           (ReferenceEquals(this, obj) || obj.GetType() == GetType() && Equals((PieceSquareEventArgs)obj));
+           (ReferenceEquals(this, obj) || (obj.GetType() == GetType() && Equals((PieceSquareEventArgs)obj)));
 
     public override int GetHashCode()
     {

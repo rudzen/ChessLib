@@ -55,5 +55,5 @@ public sealed class MovesToGoModel : EventArgs, IMovesToGoModel
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public ulong Time(Player player) => _time[player.Side];
+    public ulong Time(Player p) => _time[p.Side];
 }

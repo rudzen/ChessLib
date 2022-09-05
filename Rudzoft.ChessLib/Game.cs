@@ -119,8 +119,8 @@ public sealed class Game : IGame
         => _pos.GetEnumerator();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public BitBoard OccupiedBySide(Player c)
-        => _pos.Pieces(c);
+    public BitBoard OccupiedBySide(Player p)
+        => _pos.Pieces(p);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Player CurrentPlayer() => _pos.SideToMove;

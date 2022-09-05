@@ -255,16 +255,16 @@ public static class BitBoards
         }
 
         // mini local helpers
-        static BitBoard ComputeKnightAttack(BitBoard b)
+        static BitBoard ComputeKnightAttack(in BitBoard bb)
         {
-            var res = (b & ~(FileABB | FileBBB)) << 6;
-            res |= (b & ~FileABB) << 15;
-            res |= (b & ~FileHBB) << 17;
-            res |= (b & ~(FileGBB | FileHBB)) << 10;
-            res |= (b & ~(FileGBB | FileHBB)) >> 6;
-            res |= (b & ~FileHBB) >> 15;
-            res |= (b & ~FileABB) >> 17;
-            res |= (b & ~(FileABB | FileBBB)) >> 10;
+            var res = (bb & ~(FileABB | FileBBB)) << 6;
+            res |= (bb & ~FileABB) << 15;
+            res |= (bb & ~FileHBB) << 17;
+            res |= (bb & ~(FileGBB | FileHBB)) << 10;
+            res |= (bb & ~(FileGBB | FileHBB)) >> 6;
+            res |= (bb & ~FileHBB) >> 15;
+            res |= (bb & ~FileABB) >> 17;
+            res |= (bb & ~(FileABB | FileBBB)) >> 10;
             return res;
         }
 
@@ -294,7 +294,7 @@ public static class BitBoards
             PseudoAttacksBB[1][sq] = b.SouthWestOne() | b.SouthEastOne();
 
             var pt = PieceTypes.Knight.AsInt();
-            PseudoAttacksBB[pt][sq] = ComputeKnightAttack(b);
+            PseudoAttacksBB[pt][sq] = ComputeKnightAttack(in b);
 
             var bishopAttacks = s1.BishopAttacks(EmptyBitBoard);
             var rookAttacks = s1.RookAttacks(EmptyBitBoard);
@@ -325,7 +325,7 @@ public static class BitBoards
 
                     var sq2 = s2.AsInt();
 
-                    LineBB[sq][sq2] = GetAttacks(s1, validMagicPiece, EmptyBitBoard) & GetAttacks(s2, validMagicPiece, EmptyBitBoard) | s1 | s2;
+                    LineBB[sq][sq2] = (GetAttacks(s1, validMagicPiece, EmptyBitBoard) & GetAttacks(s2, validMagicPiece, EmptyBitBoard)) | s1 | s2;
                     BetweenBB[sq][sq2] = GetAttacks(s1, validMagicPiece, BbSquares[sq2]) & GetAttacks(s2, validMagicPiece, BbSquares[sq]);
                 }
             }
@@ -358,46 +358,46 @@ public static class BitBoards
         => RanksBB[r.AsInt()];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard FirstRank(Player side)
-        => Ranks1[side.Side];
+    public static BitBoard FirstRank(Player p)
+        => Ranks1[p.Side];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard ThirdRank(Player side)
-        => Ranks3BB[side.Side];
+    public static BitBoard ThirdRank(Player p)
+        => Ranks3BB[p.Side];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard SeventhRank(Player side)
-        => Ranks7BB[side.Side];
+    public static BitBoard SeventhRank(Player p)
+        => Ranks7BB[p.Side];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard SixthAndSeventhRank(Player side)
-        => Ranks6And7BB[side.Side];
+    public static BitBoard SixthAndSeventhRank(Player p)
+        => Ranks6And7BB[p.Side];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard SeventhAndEightsRank(Player side)
-        => Ranks7And8BB[side.Side];
+    public static BitBoard SeventhAndEightsRank(Player p)
+        => Ranks7And8BB[p.Side];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static BitBoard PseudoAttacks(this PieceTypes pt, Square sq)
         => PseudoAttacksBB[pt.AsInt()][sq.AsInt()];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard KnightAttacks(this Square square)
-        => PseudoAttacksBB[PieceTypes.Knight.AsInt()][square.AsInt()];
+    public static BitBoard KnightAttacks(this Square sq)
+        => PseudoAttacksBB[PieceTypes.Knight.AsInt()][sq.AsInt()];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard KingAttacks(this Square square)
-        => PseudoAttacksBB[PieceTypes.King.AsInt()][square.AsInt()];
+    public static BitBoard KingAttacks(this Square sq)
+        => PseudoAttacksBB[PieceTypes.King.AsInt()][sq.AsInt()];
 
     /// <summary>
     /// Attack for pawn.
     /// </summary>
-    /// <param name="this">The square</param>
-    /// <param name="side">The player side</param>
+    /// <param name="sq">The square</param>
+    /// <param name="p">The player side</param>
     /// <returns>ref to bitboard of attack</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard PawnAttack(this Square @this, Player side)
-        => PseudoAttacksBB[side.Side][@this.AsInt()];
+    public static BitBoard PawnAttack(this Square sq, Player p)
+        => PseudoAttacksBB[p.Side][sq.AsInt()];
 
     /// <summary>
     /// Returns the bitboard representation of the rank of which the square is located.
@@ -420,59 +420,59 @@ public static class BitBoards
     /// <summary>
     /// Returns the bitboard representation of the file of which the square is located.
     /// </summary>
-    /// <param name="this">The square</param>
+    /// <param name="sq">The square</param>
     /// <returns>The bitboard of square file</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard BitBoardFile(this Square @this)
-        => @this.File.BitBoardFile();
+    public static BitBoard BitBoardFile(this Square sq)
+        => sq.File.BitBoardFile();
 
     /// <summary>
     /// Returns the bitboard representation of the file.
     /// </summary>
-    /// <param name="this">The file</param>
+    /// <param name="f">The file</param>
     /// <returns>The bitboard of file</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard BitBoardFile(this File @this)
-        => FileABB << @this.AsInt();
+    public static BitBoard BitBoardFile(this File f)
+        => FileABB << f.AsInt();
 
     /// <summary>
     /// Returns all squares in front of the square in the same file as bitboard
     /// </summary>
-    /// <param name="this">The square</param>
-    /// <param name="side">The side, white is north and black is south</param>
+    /// <param name="sq">The square</param>
+    /// <param name="p">The side, white is north and black is south</param>
     /// <returns>The bitboard of all forward file squares</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard ForwardFile(this Square @this, Player side)
-        => ForwardFileBB[side.Side][@this.AsInt()];
+    public static BitBoard ForwardFile(this Square sq, Player p)
+        => ForwardFileBB[p.Side][sq.AsInt()];
 
     /// <summary>
     /// Returns all squares in pawn attack pattern in front of the square.
     /// </summary>
-    /// <param name="this">The square</param>
-    /// <param name="side">White = north, Black = south</param>
+    /// <param name="sq">The square</param>
+    /// <param name="p">White = north, Black = south</param>
     /// <returns>The bitboard representation</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard PawnAttackSpan(this Square @this, Player side)
-        => PawnAttackSpanBB[side.Side][@this.AsInt()];
+    public static BitBoard PawnAttackSpan(this Square sq, Player p)
+        => PawnAttackSpanBB[p.Side][sq.AsInt()];
 
     /// <summary>
     /// Returns all square of both file and pawn attack pattern in front of square. This is the
     /// same as ForwardFile() | PawnAttackSpan().
     /// </summary>
-    /// <param name="this">The square</param>
-    /// <param name="side">White = north, Black = south</param>
+    /// <param name="sq">The square</param>
+    /// <param name="p">White = north, Black = south</param>
     /// <returns>The bitboard representation</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard PassedPawnFrontAttackSpan(this Square @this, Player side)
-        => PassedPawnMaskBB[side.Side][@this.AsInt()];
+    public static BitBoard PassedPawnFrontAttackSpan(this Square sq, Player p)
+        => PassedPawnMaskBB[p.Side][sq.AsInt()];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard ForwardRanks(this Square @this, Player side)
-        => ForwardRanksBB[side.Side][@this.AsInt()];
+    public static BitBoard ForwardRanks(this Square sq, Player p)
+        => ForwardRanksBB[p.Side][sq.AsInt()];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard BitboardBetween(this Square firstSquare, Square secondSquare)
-        => BetweenBB[firstSquare.AsInt()][secondSquare.AsInt()];
+    public static BitBoard BitboardBetween(this Square sq1, Square sq2)
+        => BetweenBB[sq1.AsInt()][sq2.AsInt()];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Square Get(this in BitBoard bb, int pos)
@@ -491,47 +491,51 @@ public static class BitBoards
         => bb.Msb();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard Line(this Square s1, Square s2)
-        => LineBB[s1.AsInt()][s2.AsInt()];
+    public static BitBoard Line(this Square sq1, Square sq2)
+        => LineBB[sq1.AsInt()][sq2.AsInt()];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static BitBoard AdjacentFiles(File f)
         => AdjacentFilesBB[f.AsInt()];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool Aligned(this Square s1, Square s2, Square s3)
-        => !(Line(s1, s2) & s3).IsEmpty;
+    public static bool Aligned(this Square sq1, Square sq2, Square sq3)
+        => !(Line(sq1, sq2) & sq3).IsEmpty;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard KingRing(this Square sq, Player side)
-        => KingRingBB[side.Side][sq.AsInt()];
+    public static BitBoard FrontSquares(this Player p, Square sq)
+        => ForwardRanksBB[p.Side][sq.AsInt()] & sq.BitBoardFile();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static int Distance(this Square source, Square destination)
-        => SquareDistance[source.AsInt()][destination.AsInt()];
+    public static BitBoard KingRing(this Square sq, Player p)
+        => KingRingBB[p.Side][sq.AsInt()];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard DistanceRing(this Square square, int length)
-        => DistanceRingBB[square.AsInt()][length];
+    public static int Distance(this Square sq1, Square sq2)
+        => SquareDistance[sq1.AsInt()][sq2.AsInt()];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard PromotionRank(this Player us)
-        => PromotionRanks[us.Side];
+    public static BitBoard DistanceRing(this Square sq, int length)
+        => DistanceRingBB[sq.AsInt()][length];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void ToString(this in BitBoard bb, TextWriter outputWriter)
+    public static BitBoard PromotionRank(this Player p)
+        => PromotionRanks[p.Side];
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void ToString(this in BitBoard bb, TextWriter textWriter)
     {
         try
         {
-            outputWriter.WriteLine(bb);
+            textWriter.WriteLine(bb);
         }
-        catch (IOException ioException)
+        catch (IOException ioe)
         {
-            throw new IOException("Writer is not available.", ioException);
+            throw new IOException("Writer is not available.", ioe);
         }
     }
 
-    public static string PrintBitBoard(in BitBoard b, string title = "")
+    public static string PrintBitBoard(in BitBoard bb, string title = "")
     {
         var s = new StringBuilder("+---+---+---+---+---+---+---+---+---+\n", 1024);
         if (!title.IsNullOrWhiteSpace())
@@ -549,7 +553,7 @@ public static class BitBoards
             {
                 row[rowIndex++] = '|';
                 row[rowIndex++] = ' ';
-                var c = (b & new Square(r, f)).IsEmpty ? ' ' : 'X';
+                var c = (bb & new Square(r, f)).IsEmpty ? ' ' : 'X';
                 row[rowIndex++] = c;
                 row[rowIndex++] = ' ';
             }
@@ -639,42 +643,42 @@ public static class BitBoards
     /// Shorthand method for north or south fill of bitboard depending on color
     /// </summary>
     /// <param name="bb">The bitboard to fill</param>
-    /// <param name="side">The direction to fill in, white = north, black = south</param>
+    /// <param name="p">The direction to fill in, white = north, black = south</param>
     /// <returns>Filled bitboard</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard Fill(this in BitBoard bb, Player side)
-        => FillFuncs[side.Side](bb);
+    public static BitBoard Fill(this in BitBoard bb, Player p)
+        => FillFuncs[p.Side](bb);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard Shift(this in BitBoard bb, Direction direction)
+    public static BitBoard Shift(this in BitBoard bb, Direction d)
     {
-        if (ShiftFuncs.TryGetValue(direction, out var func))
+        if (ShiftFuncs.TryGetValue(d, out var func))
             return func(bb);
 
-        throw new ArgumentException("Invalid shift argument.", nameof(direction));
+        throw new ArgumentException("Invalid shift argument.", nameof(d));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard PawnEastAttack(this in BitBoard bb, Player side)
-        => Shift(in bb, side.PawnEastAttackDistance());
+    public static BitBoard PawnEastAttack(this in BitBoard bb, Player p)
+        => Shift(in bb, p.PawnEastAttackDistance());
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard PawnWestAttack(this in BitBoard bb, Player side)
-        => Shift(in bb, side.PawnWestAttackDistance());
+    public static BitBoard PawnWestAttack(this in BitBoard bb, Player p)
+        => Shift(in bb, p.PawnWestAttackDistance());
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard PawnAttacks(this in BitBoard bb, Player c)
-        => PawnEastAttack(in bb, c) | PawnWestAttack(in bb, c);
+    public static BitBoard PawnAttacks(this in BitBoard bb, Player p)
+        => PawnEastAttack(in bb, p) | PawnWestAttack(in bb, p);
 
     /// <summary>
     /// Compute all attack squares where two pawns attack the square
     /// </summary>
     /// <param name="bb">The squares to compute attacks from</param>
-    /// <param name="side">The side</param>
+    /// <param name="p">The side</param>
     /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard PawnDoubleAttacks(this in BitBoard bb, Player side)
-        => PawnEastAttack(in bb, side) & PawnWestAttack(in bb, side);
+    public static BitBoard PawnDoubleAttacks(this in BitBoard bb, Player p)
+        => PawnEastAttack(in bb, p) & PawnWestAttack(in bb, p);
 
     /// <summary>
     /// Reset the least significant bit in-place
@@ -718,12 +722,12 @@ public static class BitBoards
         => BitOperations.PopCount(bb.Value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard Rank7(this Player player)
-        => Ranks7BB[player.Side];
+    public static BitBoard Rank7(this Player p)
+        => Ranks7BB[p.Side];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard Rank3(this Player player)
-        => Ranks3BB[player.Side];
+    public static BitBoard Rank3(this Player p)
+        => Ranks3BB[p.Side];
 
     /// <summary>
     /// Generate a bitboard based on a square.
@@ -745,11 +749,11 @@ public static class BitBoards
     /// <summary>
     /// Generate a bitboard based on a variadic amount of squares.
     /// </summary>
-    /// <param name="squares">The squares to generate bitboard from</param>
+    /// <param name="sqs">The squares to generate bitboard from</param>
     /// <returns>The generated bitboard</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard MakeBitboard(params Square[] squares)
-        => squares.Aggregate(EmptyBitBoard, static (current, t) => current | t);
+    public static BitBoard MakeBitboard(params Square[] sqs)
+        => sqs.Aggregate(EmptyBitBoard, static (current, t) => current | t);
 
     /// <summary>
     /// Tests if a bitboard has more than one bit set
@@ -784,20 +788,20 @@ public static class BitBoards
     private static Func<BitBoard, BitBoard>[] MakeFillFuncs()
         => new Func<BitBoard, BitBoard>[] { NorthFill, SouthFill };
 
-    private static BitBoard GetAttacks(this in Square square, PieceTypes pieceType, in BitBoard occupied = default)
+    private static BitBoard GetAttacks(this in Square sq, PieceTypes pt, in BitBoard occ = default)
     {
-        return pieceType switch
+        return pt switch
         {
-            PieceTypes.Knight => PseudoAttacksBB[pieceType.AsInt()][square.AsInt()],
-            PieceTypes.King => PseudoAttacksBB[pieceType.AsInt()][square.AsInt()],
-            PieceTypes.Bishop => square.BishopAttacks(occupied),
-            PieceTypes.Rook => square.RookAttacks(occupied),
-            PieceTypes.Queen => square.QueenAttacks(occupied),
+            PieceTypes.Knight => PseudoAttacksBB[pt.AsInt()][sq.AsInt()],
+            PieceTypes.King => PseudoAttacksBB[pt.AsInt()][sq.AsInt()],
+            PieceTypes.Bishop => sq.BishopAttacks(occ),
+            PieceTypes.Rook => sq.RookAttacks(occ),
+            PieceTypes.Queen => sq.QueenAttacks(occ),
             _ => EmptyBitBoard
         };
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static BitBoard PseudoAttack(this in Square @this, PieceTypes pieceType)
-        => PseudoAttacksBB[pieceType.AsInt()][@this.AsInt()];
+    private static BitBoard PseudoAttack(this in Square sq, PieceTypes pt)
+        => PseudoAttacksBB[pt.AsInt()][sq.AsInt()];
 }
