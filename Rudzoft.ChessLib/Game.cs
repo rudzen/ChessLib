@@ -42,10 +42,11 @@ namespace Rudzoft.ChessLib;
 public sealed class Game : IGame
 {
     private readonly ObjectPool<IMoveList> _moveLists;
+    private readonly IPosition _pos;
 
     public Game(IPosition pos)
     {
-        Pos = pos;
+        _pos = pos;
         _moveLists = new DefaultObjectPool<IMoveList>(new MoveListPolicy());
         Uci = new Uci();
         SearchParameters = new SearchParameters();
@@ -56,13 +57,13 @@ public sealed class Game : IGame
         Table = new TranspositionTable(256);
     }
 
-    public Action<IPieceSquare> PieceUpdated => Pos.PieceUpdated;
+    public Action<IPieceSquare> PieceUpdated => _pos.PieceUpdated;
 
     public int MoveNumber => 0; //(PositionIndex - 1) / 2 + 1;
 
     public BitBoard Occupied => Pos.Pieces();
 
-    public IPosition Pos { get; }
+    public IPosition Pos => _pos;
 
     public GameEndTypes GameEndType { get; set; }
 
@@ -72,18 +73,18 @@ public sealed class Game : IGame
 
     public IUci Uci { get; }
 
-    public bool IsRepetition => Pos.IsRepetition;
+    public bool IsRepetition => _pos.IsRepetition;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void NewGame(string fen = Fen.Fen.StartPositionFen)
     {
         var fenData = new FenData(fen);
         var state = new State();
-        Pos.Set(in fenData, ChessMode.Normal, state, true);
+        _pos.Set(in fenData, ChessMode.Normal, state, true);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public FenData GetFen() => Pos.GenerateFen();
+    public FenData GetFen() => _pos.GenerateFen();
 
     public void UpdateDrawTypes()
     {
@@ -96,7 +97,7 @@ public sealed class Game : IGame
             gameEndType |= GameEndTypes.FiftyMove;
 
         var moveList = _moveLists.Get();
-        moveList.Generate(Pos);
+        moveList.Generate(in _pos);
         // ReSharper disable once LoopCanBeConvertedToQuery
         foreach (var em in moveList.Get())
             if (!Pos.IsLegal(em.Move))
@@ -109,27 +110,27 @@ public sealed class Game : IGame
     }
 
     public override string ToString()
-        => Pos.ToString();
+        => _pos.ToString();
 
     IEnumerator IEnumerable.GetEnumerator()
         => GetEnumerator();
 
     public IEnumerator<Piece> GetEnumerator()
-        => Pos.GetEnumerator();
+        => _pos.GetEnumerator();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public BitBoard OccupiedBySide(Player c)
-        => Pos.Pieces(c);
+        => _pos.Pieces(c);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Player CurrentPlayer() => Pos.SideToMove;
+    public Player CurrentPlayer() => _pos.SideToMove;
 
     public ulong Perft(int depth, bool root = true)
     {
         var tot = ulong.MinValue;
 
         var ml = _moveLists.Get();
-        ml.Generate(Pos);
+        ml.Generate(in _pos);
         var state = new State();
 
         foreach (var em in ml.Get())
@@ -138,19 +139,19 @@ public sealed class Game : IGame
             else
             {
                 var m = em.Move;
-                Pos.MakeMove(m, in state);
+                _pos.MakeMove(m, in state);
 
                 if (depth <= 2)
                 {
                     var ml2 = _moveLists.Get();
-                    ml2.Generate(Pos);
+                    ml2.Generate(in _pos);
                     tot += (ulong)ml2.Length;
                     _moveLists.Return(ml2);
                 }
                 else
                     tot += Perft(depth - 1, false);
 
-                Pos.TakeMove(m);
+                _pos.TakeMove(m);
             }
 
         _moveLists.Return(ml);

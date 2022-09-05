@@ -25,6 +25,8 @@ SOFTWARE.
 */
 
 // ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable MemberCanBeInternal
 
 using System;
 using System.Collections.Generic;
@@ -42,89 +44,107 @@ public static class BitBoards
 {
     internal const ulong One = 0x1ul;
 
-    public static readonly BitBoard WhiteArea = 0x00000000FFFFFFFF;
+    public static readonly BitBoard WhiteArea = new(0x00000000FFFFFFFFUL);
 
     public static readonly BitBoard BlackArea = ~WhiteArea;
 
-    public static readonly BitBoard LightSquares = 0x55AA55AA55AA55AA;
+    public static readonly BitBoard LightSquares = new(0x55AA55AA55AA55AAUL);
 
     public static readonly BitBoard DarkSquares = ~LightSquares;
 
-    public static readonly BitBoard FILEA = 0x0101010101010101;
+    private static readonly BitBoard FileABB = new(0x0101010101010101UL);
 
-    public static readonly BitBoard FILEB = 0x0202020202020202;
+    private static readonly BitBoard FileBBB = new(0x0202020202020202UL);
 
-    public static readonly BitBoard FILEC = 0x404040404040404;
+    private static readonly BitBoard FileCBB = new(0x404040404040404UL);
 
-    public static readonly BitBoard FILED = 0x808080808080808;
+    private static readonly BitBoard FileDBB = new(0x808080808080808UL);
 
-    public static readonly BitBoard FILEE = 0x1010101010101010;
+    private static readonly BitBoard FileEBB = new(0x1010101010101010);
 
-    public static readonly BitBoard FILEF = 0x2020202020202020;
+    private static readonly BitBoard FileFBB = new(0x2020202020202020);
 
-    public static readonly BitBoard FILEG = 0x4040404040404040;
+    private static readonly BitBoard FileGBB = new(0x4040404040404040UL);
 
-    public static readonly BitBoard FILEH = 0x8080808080808080;
+    private static readonly BitBoard FileHBB = new(0x8080808080808080UL);
 
-    public static readonly BitBoard RANK1 = 0x00000000000000ff;
+    private static readonly BitBoard[] FilesBB =
+    {
+        FileABB, FileBBB, FileCBB, FileDBB,
+        FileEBB, FileFBB, FileGBB, FileHBB
+    };
 
-    public static readonly BitBoard RANK2 = 0x000000000000ff00;
+    private static readonly BitBoard Rank1BB = new(0x00000000000000ffUL);
 
-    public static readonly BitBoard RANK3 = 0x0000000000ff0000;
+    private static readonly BitBoard Rank2BB = new(0x000000000000ff00UL);
 
-    public static readonly BitBoard RANK4 = 0x00000000ff000000;
+    private static readonly BitBoard Rank3BB = new(0x0000000000ff0000UL);
 
-    public static readonly BitBoard RANK5 = 0x000000ff00000000;
+    private static readonly BitBoard Rank4BB = new(0x00000000ff000000UL);
 
-    public static readonly BitBoard RANK6 = 0x0000ff0000000000;
+    private static readonly BitBoard Rank5BB = new(0x000000ff00000000UL);
 
-    public static readonly BitBoard RANK7 = 0x00ff000000000000;
+    private static readonly BitBoard Rank6BB = new(0x0000ff0000000000UL);
 
-    public static readonly BitBoard RANK8 = 0xff00000000000000;
+    private static readonly BitBoard Rank7BB = new(0x00ff000000000000UL);
+
+    private static readonly BitBoard Rank8BB = new(0xff00000000000000UL);
+
+    private static readonly BitBoard[] RanksBB =
+    {
+        Rank1BB, Rank2BB, Rank3BB, Rank4BB,
+        Rank5BB, Rank6BB, Rank7BB, Rank8BB
+    };
 
     public static readonly BitBoard EmptyBitBoard = new(ulong.MinValue);
 
     public static readonly BitBoard AllSquares = ~EmptyBitBoard;
 
-    public static readonly BitBoard PawnSquares = AllSquares & ~(RANK1 | RANK8);
+    public static readonly BitBoard PawnSquares = AllSquares & ~(Rank1BB | Rank8BB);
 
-    public static readonly BitBoard CornerA1;
+    public static readonly BitBoard QueenSide = new(FileABB | FileBBB | FileCBB | FileDBB);
 
-    public static readonly BitBoard CornerA8;
+    public static readonly BitBoard CenterFiles = new(FileCBB | FileDBB | FileEBB | FileFBB);
 
-    public static readonly BitBoard CornerH1;
+    public static readonly BitBoard KingSide = new(FileEBB | FileFBB | FileGBB | FileHBB);
 
-    public static readonly BitBoard CornerH8;
+    public static readonly BitBoard Center = new((FileDBB | FileEBB) & (Rank4BB | Rank5BB));
 
-    public static readonly BitBoard QueenSide = new(FILEA | FILEB | FILEC | FILED);
+    private static readonly BitBoard[] PromotionRanks = { Rank8BB, Rank1BB };
 
-    public static readonly BitBoard CenterFiles = new(FILEC | FILED | FILEE | FILEF);
-
-    public static readonly BitBoard KingSide = new(FILEE | FILEF | FILEG | FILEH);
-
-    public static readonly BitBoard Center = new((FILED | FILEE) & (RANK4 | RANK5));
-
-    public static readonly BitBoard[] PromotionRanks = { RANK8, RANK1 };
-
-    public static readonly BitBoard PromotionRanksBB = RANK1 | RANK8;
+    public static readonly BitBoard PromotionRanksBB = Rank1BB | Rank8BB;
 
     internal static readonly BitBoard[] BbSquares =
-        {
-                0x1, 0x2, 0x4, 0x8, 0x10, 0x20, 0x40, 0x80, 0x100, 0x200, 0x400, 0x800, 0x1000, 0x2000, 0x4000, 0x8000, 0x10000, 0x20000, 0x40000, 0x80000, 0x100000, 0x200000, 0x400000, 0x800000, 0x1000000, 0x2000000, 0x4000000, 0x8000000,
-                0x10000000, 0x20000000, 0x40000000, 0x80000000, 0x100000000, 0x200000000, 0x400000000, 0x800000000, 0x1000000000, 0x2000000000, 0x4000000000, 0x8000000000, 0x10000000000, 0x20000000000, 0x40000000000, 0x80000000000,
-                0x100000000000, 0x200000000000, 0x400000000000, 0x800000000000, 0x1000000000000, 0x2000000000000, 0x4000000000000, 0x8000000000000, 0x10000000000000, 0x20000000000000, 0x40000000000000, 0x80000000000000, 0x100000000000000,
-                0x200000000000000, 0x400000000000000, 0x800000000000000, 0x1000000000000000, 0x2000000000000000, 0x4000000000000000, 0x8000000000000000
-            };
+    {
+        0x1, 0x2, 0x4, 0x8, 0x10, 0x20, 0x40, 0x80, 0x100, 0x200, 0x400, 0x800, 0x1000, 0x2000, 0x4000, 0x8000, 0x10000,
+        0x20000, 0x40000, 0x80000, 0x100000, 0x200000, 0x400000, 0x800000, 0x1000000, 0x2000000, 0x4000000, 0x8000000,
+        0x10000000, 0x20000000, 0x40000000, 0x80000000, 0x100000000, 0x200000000, 0x400000000, 0x800000000,
+        0x1000000000, 0x2000000000, 0x4000000000, 0x8000000000, 0x10000000000, 0x20000000000, 0x40000000000,
+        0x80000000000,
+        0x100000000000, 0x200000000000, 0x400000000000, 0x800000000000, 0x1000000000000, 0x2000000000000,
+        0x4000000000000, 0x8000000000000, 0x10000000000000, 0x20000000000000, 0x40000000000000, 0x80000000000000,
+        0x100000000000000,
+        0x200000000000000, 0x400000000000000, 0x800000000000000, 0x1000000000000000, 0x2000000000000000,
+        0x4000000000000000, 0x8000000000000000
+    };
 
-    private static readonly BitBoard[] Rank1 = { RANK1, RANK8 };
+    public static readonly BitBoard CornerA1 = Square.A1 | Square.B1 | Square.A2 | Square.B2;
 
-    private static readonly BitBoard[] Rank3BitBoards = { RANK3, RANK6 };
+    public static readonly BitBoard CornerA8 = Square.A8 | Square.B8 | Square.A7 | Square.B7;
 
-    private static readonly BitBoard[] Rank7BitBoards = { RANK7, RANK2 };
+    public static readonly BitBoard CornerH1 = Square.H1 | Square.G1 | Square.H2 | Square.G2;
 
-    private static readonly BitBoard[] Rank6And7 = { RANK6 | RANK7, RANK2 | RANK3 };
+    public static readonly BitBoard CornerH8 = Square.H8 | Square.G8 | Square.H7 | Square.G7;
 
-    private static readonly BitBoard[] Rank7And8 = { RANK7 | RANK8, RANK1 | RANK2 };
+    private static readonly BitBoard[] Ranks1 = { Rank1BB, Rank8BB };
+
+    private static readonly BitBoard[] Ranks6And7BB = { Rank6BB | Rank7BB, Rank2BB | Rank3BB };
+
+    private static readonly BitBoard[] Ranks7And8BB = { Rank7BB | Rank8BB, Rank1BB | Rank2BB };
+
+    private static readonly BitBoard[] Ranks3BB = { Rank3BB, Rank6BB };
+
+    private static readonly BitBoard[] Ranks7BB = { Rank7BB, Rank2BB };
 
     /// <summary>
     /// PseudoAttacks are just that, full attack range for all squares for all pieces. The pawns
@@ -146,6 +166,12 @@ public static class BitBoards
     private static readonly BitBoard[][] BetweenBB;
 
     private static readonly BitBoard[][] LineBB;
+
+    private static readonly BitBoard[] AdjacentFilesBB =
+    {
+        FileBBB, FileABB | FileCBB, FileBBB | FileDBB, FileCBB | FileEBB, FileDBB | FileFBB, FileEBB | FileGBB,
+        FileFBB | FileHBB, FileGBB
+    };
 
     private static readonly int[][] SquareDistance; // chebyshev distance
 
@@ -199,11 +225,6 @@ public static class BitBoards
         for (var i = 0; i < SquareDistance.Length; i++)
             DistanceRingBB[i] = new BitBoard[8];
 
-        CornerA1 = Square.A1 | Square.B1 | Square.A2 | Square.B2;
-        CornerA8 = Square.A8 | Square.B8 | Square.A7 | Square.B7;
-        CornerH1 = Square.H1 | Square.G1 | Square.H2 | Square.G2;
-        CornerH8 = Square.H8 | Square.G8 | Square.H7 | Square.G7;
-
         // local helper functions to calculate distance
         static int distance(int x, int y) => Math.Abs(x - y);
         static int distanceFile(Square x, Square y) => distance(x.File.AsInt(), y.File.AsInt());
@@ -215,11 +236,6 @@ public static class BitBoards
             var rank = r.AsInt();
             ForwardRanksBB[0][rank] = ~(ForwardRanksBB[1][rank + 1] = ForwardRanksBB[1][rank] | r.BitBoardRank());
         }
-
-        Span<BitBoard> adjacentFilesBb = stackalloc BitBoard[]
-        {
-            FILEB, FILEA | FILEC, FILEB | FILED, FILEC | FILEE, FILED | FILEF, FILEE | FILEG, FILEF | FILEH, FILEG
-        };
 
         BitBoard bb;
 
@@ -233,7 +249,7 @@ public static class BitBoards
                 var file = square.File;
                 var rank = square.Rank.AsInt();
                 ForwardFileBB[player.Side][s] = ForwardRanksBB[player.Side][rank] & file.BitBoardFile();
-                PawnAttackSpanBB[player.Side][s] = ForwardRanksBB[player.Side][rank] & adjacentFilesBb[file.AsInt()];
+                PawnAttackSpanBB[player.Side][s] = ForwardRanksBB[player.Side][rank] & AdjacentFilesBB[file.AsInt()];
                 PassedPawnMaskBB[player.Side][s] = ForwardFileBB[player.Side][s] | PawnAttackSpanBB[player.Side][s];
             }
         }
@@ -241,14 +257,14 @@ public static class BitBoards
         // mini local helpers
         static BitBoard ComputeKnightAttack(BitBoard b)
         {
-            var res = (b & ~(FILEA | FILEB)) << 6;
-            res |= (b & ~FILEA) << 15;
-            res |= (b & ~FILEH) << 17;
-            res |= (b & ~(FILEG | FILEH)) << 10;
-            res |= (b & ~(FILEG | FILEH)) >> 6;
-            res |= (b & ~FILEH) >> 15;
-            res |= (b & ~FILEA) >> 17;
-            res |= (b & ~(FILEA | FILEB)) >> 10;
+            var res = (b & ~(FileABB | FileBBB)) << 6;
+            res |= (b & ~FileABB) << 15;
+            res |= (b & ~FileHBB) << 17;
+            res |= (b & ~(FileGBB | FileHBB)) << 10;
+            res |= (b & ~(FileGBB | FileHBB)) >> 6;
+            res |= (b & ~FileHBB) >> 15;
+            res |= (b & ~FileABB) >> 17;
+            res |= (b & ~(FileABB | FileBBB)) >> 10;
             return res;
         }
 
@@ -334,6 +350,34 @@ public static class BitBoards
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static BitBoard FileBB(this File f)
+        => FilesBB[f.AsInt()];
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static BitBoard RankBB(this Rank r)
+        => RanksBB[r.AsInt()];
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static BitBoard FirstRank(Player side)
+        => Ranks1[side.Side];
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static BitBoard ThirdRank(Player side)
+        => Ranks3BB[side.Side];
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static BitBoard SeventhRank(Player side)
+        => Ranks7BB[side.Side];
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static BitBoard SixthAndSeventhRank(Player side)
+        => Ranks6And7BB[side.Side];
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static BitBoard SeventhAndEightsRank(Player side)
+        => Ranks7And8BB[side.Side];
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static BitBoard PseudoAttacks(this PieceTypes pt, Square sq)
         => PseudoAttacksBB[pt.AsInt()][sq.AsInt()];
 
@@ -371,7 +415,7 @@ public static class BitBoards
     /// <returns>The bitboard of square rank</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static BitBoard BitBoardRank(this Rank r)
-        => RANK1 << (8 * r.AsInt());
+        => Rank1BB << (8 * r.AsInt());
 
     /// <summary>
     /// Returns the bitboard representation of the file of which the square is located.
@@ -389,7 +433,7 @@ public static class BitBoards
     /// <returns>The bitboard of file</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static BitBoard BitBoardFile(this File @this)
-        => FILEA << @this.AsInt();
+        => FileABB << @this.AsInt();
 
     /// <summary>
     /// Returns all squares in front of the square in the same file as bitboard
@@ -449,6 +493,10 @@ public static class BitBoards
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static BitBoard Line(this Square s1, Square s2)
         => LineBB[s1.AsInt()][s2.AsInt()];
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static BitBoard AdjacentFiles(File f)
+        => AdjacentFilesBB[f.AsInt()];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool Aligned(this Square s1, Square s2, Square s3)
@@ -547,27 +595,27 @@ public static class BitBoards
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static BitBoard EastOne(this in BitBoard bb)
-        => (bb & ~FILEH) << 1;
+        => (bb & ~FileHBB) << 1;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static BitBoard WestOne(this in BitBoard bb)
-        => (bb & ~FILEA) >> 1;
+        => (bb & ~FileABB) >> 1;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static BitBoard SouthEastOne(this in BitBoard bb)
-        => (bb & ~FILEH) >> 7;
+        => (bb & ~FileHBB) >> 7;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static BitBoard SouthWestOne(this in BitBoard bb)
-        => (bb & ~FILEA) >> 9;
+        => (bb & ~FileABB) >> 9;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static BitBoard NorthWestOne(this in BitBoard bb)
-        => (bb & ~FILEA) << 7;
+        => (bb & ~FileABB) << 7;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static BitBoard NorthEastOne(this in BitBoard bb)
-        => (bb & ~FILEH) << 9;
+        => (bb & ~FileHBB) << 9;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static BitBoard NorthFill(this BitBoard bb)
@@ -607,15 +655,26 @@ public static class BitBoards
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard PawnAttackBB(this in BitBoard bb, Player c)
-    {
-        var (northWest, northEast) = c == Player.White
-            ? (Direction.NorthWest, Direction.NorthEast)
-            : (Direction.SouthWest, Direction.SouthEast);
-        return bb.Shift(northWest) | bb.Shift(northEast);
-    }
+    public static BitBoard PawnEastAttack(this in BitBoard bb, Player side)
+        => Shift(in bb, side.PawnEastAttackDistance());
 
-    /* non extension methods */
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static BitBoard PawnWestAttack(this in BitBoard bb, Player side)
+        => Shift(in bb, side.PawnWestAttackDistance());
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static BitBoard PawnAttacks(this in BitBoard bb, Player c)
+        => PawnEastAttack(in bb, c) | PawnWestAttack(in bb, c);
+
+    /// <summary>
+    /// Compute all attack squares where two pawns attack the square
+    /// </summary>
+    /// <param name="bb">The squares to compute attacks from</param>
+    /// <param name="side">The side</param>
+    /// <returns></returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static BitBoard PawnDoubleAttacks(this in BitBoard bb, Player side)
+        => PawnEastAttack(in bb, side) & PawnWestAttack(in bb, side);
 
     /// <summary>
     /// Reset the least significant bit in-place
@@ -660,11 +719,11 @@ public static class BitBoards
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static BitBoard Rank7(this Player player)
-        => Rank7BitBoards[player.Side];
+        => Ranks7BB[player.Side];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static BitBoard Rank3(this Player player)
-        => Rank3BitBoards[player.Side];
+        => Ranks3BB[player.Side];
 
     /// <summary>
     /// Generate a bitboard based on a square.

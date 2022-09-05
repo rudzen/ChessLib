@@ -48,7 +48,7 @@ public sealed class PawnPushTests
     [Fact]
     public void PawnDoublePushNorth()
     {
-        var fullBoard = BitBoards.RANK2;
+        var fullBoard = Rank.RANK_2.BitBoardRank();
         var direction = Direction.NorthDouble;
 
         const int expected = 2;
@@ -65,7 +65,7 @@ public sealed class PawnPushTests
     [Fact]
     public void PawnDoublePushSouth()
     {
-        var fullBoard = BitBoards.RANK7;
+        var fullBoard = Rank.RANK_7.BitBoardRank();
         var direction = Direction.SouthDouble;
 
         const int expected = 2;
