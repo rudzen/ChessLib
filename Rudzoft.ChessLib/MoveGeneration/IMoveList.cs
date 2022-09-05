@@ -37,7 +37,7 @@ public interface IMoveList : IReadOnlyCollection<ExtMove>
 
     int Length { get; }
     Move CurrentMove { get; }
-    void Add(ExtMove item);
+    void Add(in ExtMove item);
     void Add(Move item);
 
     /// <summary>
@@ -45,9 +45,9 @@ public interface IMoveList : IReadOnlyCollection<ExtMove>
     /// </summary>
     void Clear();
 
-    bool Contains(ExtMove item);
+    bool Contains(in ExtMove item);
     bool Contains(Move item);
     bool Contains(Square from, Square to);
-    void Generate(IPosition pos, MoveGenerationType type = MoveGenerationType.Legal);
+    void Generate(in IPosition pos, MoveGenerationType type = MoveGenerationType.Legal);
     ReadOnlySpan<ExtMove> Get();
 }

@@ -149,7 +149,7 @@ public sealed class Position : IPosition
         var attackers = Pieces(pt, c);
 
         if (pt == PieceTypes.Pawn)
-            return attackers.PawnAttackBB(c);
+            return attackers.PawnAttacks(c);
 
         var threats = BitBoard.Empty;
         while (attackers)

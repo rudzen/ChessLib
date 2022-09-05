@@ -42,7 +42,7 @@ internal static class PerftTable
         public int Depth;
     }
 
-    public static void Store(ulong zobristHash, int depth, ulong childCount)
+    public static void Store(in ulong zobristHash, int depth, in ulong childCount)
     {
         var slot = (int)(zobristHash % TtSize);
         Table[slot].Hash = zobristHash;
@@ -50,7 +50,7 @@ internal static class PerftTable
         Table[slot].Depth = depth;
     }
 
-    public static bool Retrieve(ulong zobristHash, int depth, out ulong childCount)
+    public static bool Retrieve(in ulong zobristHash, int depth, out ulong childCount)
     {
         var slot = (int)(zobristHash % TtSize);
         var match = Table[slot].Depth == depth && Table[slot].Hash == zobristHash;

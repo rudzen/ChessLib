@@ -39,7 +39,8 @@ namespace Rudzoft.ChessLib;
 /// </summary>
 public sealed class Blockage : IBlockage
 {
-    private static readonly BitBoard PawnFileASquares = BitBoards.FILEA & ~(BitBoards.RANK1 | BitBoards.RANK8);
+    private static readonly BitBoard PawnFileASquares =
+        File.FILE_A.FileBB() & ~(Rank.RANK_1.RankBB() | Rank.RANK_8.RankBB());
 
     private readonly IPosition _pos;
 

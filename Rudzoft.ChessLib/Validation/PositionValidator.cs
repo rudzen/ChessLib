@@ -170,7 +170,7 @@ public sealed class PositionValidator : IPositionValidator
 
     private string ValidatePawns(string error)
     {
-        if (!(_board.Pieces(PieceTypes.Pawn) & (BitBoards.RANK1 | BitBoards.RANK8)).IsEmpty)
+        if (!(_board.Pieces(PieceTypes.Pawn) & (Rank.RANK_1.RankBB() | Rank.RANK_8.RankBB())).IsEmpty)
             error = AddError(error, "pawns exists on rank 1 or rank 8");
 
         if (_board.PieceCount(PieceTypes.Pawn, Player.White) > 8)

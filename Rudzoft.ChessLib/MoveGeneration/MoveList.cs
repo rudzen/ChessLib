@@ -61,7 +61,7 @@ public sealed class MoveList : IMoveList
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void Add(ExtMove item) => _moves[Length++] = item;
+    public void Add(in ExtMove item) => _moves[Length++] = item;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Add(Move item) => _moves[Length++].Move = item;
@@ -77,7 +77,7 @@ public sealed class MoveList : IMoveList
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool Contains(ExtMove item)
+    public bool Contains(in ExtMove item)
         => Contains(item.Move);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -104,11 +104,17 @@ public sealed class MoveList : IMoveList
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void Generate(IPosition pos, MoveGenerationType type = MoveGenerationType.Legal)
+    public void Generate(in IPosition pos, MoveGenerationType type = MoveGenerationType.Legal)
     {
         _cur = 0;
-        Length = MoveGenerator.Generate(pos, _moves, 0, pos.SideToMove, type);
+        Length = MoveGenerator.Generate(in pos, _moves.AsSpan(), 0, pos.SideToMove, type);
         _moves[Length] = ExtMove.Empty;
+    }
+
+    public static int GenerateMoveCount(in IPosition pos, MoveGenerationType type = MoveGenerationType.Legal)
+    {
+        Span<ExtMove> moves = stackalloc ExtMove[218];
+        return MoveGenerator.Generate(in pos, moves, 0, pos.SideToMove, type);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
