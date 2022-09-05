@@ -81,6 +81,14 @@ public struct Score : IEquatable<Score>
         => new(s.Mg() * v, s.Eg() * v);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Score operator /(Score s, int v)
+        => new(s.Mg() / v, s.Eg() / v);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Score operator *(Score s, bool b)
+        => b ? s : Zero;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Score operator +(Score s1, Score s2)
         => new(s1.Mg() + s2.Mg(), s1.Eg() + s2.Eg());
 
