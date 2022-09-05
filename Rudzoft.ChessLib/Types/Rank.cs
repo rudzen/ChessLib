@@ -45,7 +45,7 @@ public enum Ranks
 public static class RanksExtensions
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Rank RelativeRank(this Ranks rank, Player color) => (Ranks)(rank.AsInt() ^ (color.Side * 7));
+    public static Rank RelativeRank(this Ranks rank, Player p) => (Ranks)(rank.AsInt() ^ (p.Side * 7));
 
     public static int AsInt(this Ranks r) => (int)r;
 }
@@ -73,7 +73,7 @@ public readonly record struct Rank(Ranks Value)
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Rank(Rank rank) :this(rank.Value)
+    public Rank(Rank r) :this(r.Value)
     {
     }
 
@@ -133,12 +133,12 @@ public readonly record struct Rank(Ranks Value)
         => left.AsInt() - (int)right;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Rank operator ++(Rank rank)
-        => rank.Value + 1;
+    public static Rank operator ++(Rank r)
+        => r.Value + 1;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Rank operator --(Rank rank)
-        => rank.Value - 1;
+    public static Rank operator --(Rank r)
+        => r.Value - 1;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static BitBoard operator &(Rank left, ulong right)
@@ -217,6 +217,6 @@ public readonly record struct Rank(Ranks Value)
         => AsInt();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Rank Relative(Player color) 
-        => AsInt() ^ (color.Side * 7);
+    public Rank Relative(Player p) 
+        => AsInt() ^ (p.Side * 7);
 }

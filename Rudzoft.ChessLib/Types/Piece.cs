@@ -87,13 +87,13 @@ public static class PieceTypesExtensions
 public readonly struct Piece : IEquatable<Piece>
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private Piece(int piece) => Value = (Pieces)piece;
+    private Piece(int pc) => Value = (Pieces)pc;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private Piece(Piece piece) => Value = piece.Value;
+    private Piece(Piece pc) => Value = pc.Value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Piece(Pieces piece) => Value = piece;
+    public Piece(Pieces pc) => Value = pc;
 
     [FieldOffset(0)] public readonly Pieces Value;
 
@@ -126,10 +126,10 @@ public readonly struct Piece : IEquatable<Piece>
     public static implicit operator Piece(int value) => new(value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator Piece(Pieces value) => new(value);
+    public static implicit operator Piece(Pieces pc) => new(pc);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Piece operator ~(Piece piece) => piece.AsInt() ^ 8;
+    public static Piece operator ~(Piece pc) => pc.AsInt() ^ 8;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Piece operator +(Piece left, Player right) => new(left.Value + (byte)(right << 3));
@@ -171,10 +171,10 @@ public readonly struct Piece : IEquatable<Piece>
     public static Piece operator --(Piece left) => new(left.Value - 1);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator true(Piece piece) => piece.Value != EmptyPiece;
+    public static bool operator true(Piece pc) => pc.Value != EmptyPiece;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator false(Piece piece) => piece.Value == EmptyPiece;
+    public static bool operator false(Piece pc) => pc.Value == EmptyPiece;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Player ColorOf() => (int)Value >> 3;
@@ -183,7 +183,7 @@ public readonly struct Piece : IEquatable<Piece>
     public bool Equals(Piece other) => Value == other.Value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override bool Equals(object obj) => obj is Piece piece && Equals(piece);
+    public override bool Equals(object obj) => obj is Piece pc && Equals(pc);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override int GetHashCode() => (int)Value << 16;
@@ -212,10 +212,10 @@ public readonly struct Piece : IEquatable<Piece>
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void Deconstruct(out PieceTypes pt, out Player c)
+    public void Deconstruct(out PieceTypes pt, out Player p)
     {
         pt = Type();
-        c = ColorOf();
+        p = ColorOf();
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

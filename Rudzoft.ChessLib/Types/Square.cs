@@ -55,8 +55,8 @@ public static class SquaresExtensions
         => BitBoards.BbSquares[sq.AsInt()];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Square RelativeSquare(this Squares sq, Player c)
-        => sq.AsInt() ^ (c.Side * 56);
+    public static Square RelativeSquare(this Squares sq, Player p)
+        => sq.AsInt() ^ (p.Side * 56);
 
     public static int AsInt(this Squares sq)
         => (int)sq;
@@ -80,7 +80,7 @@ public readonly record struct Square(Squares Value) : IComparable<Square>
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Square(Square square) : this(square.Value)
+    public Square(Square sq) : this(sq.Value)
     {
     }
 
@@ -91,13 +91,13 @@ public readonly record struct Square(Squares Value) : IComparable<Square>
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Square(Ranks rank, Files file)
-        : this((int)rank, (int)file)
+    public Square(Ranks r, Files f)
+        : this((int)r, (int)f)
     {
     }
 
-    public Square(Rank rank, File file)
-        : this(rank.AsInt(), file.AsInt())
+    public Square(Rank r, File f)
+        : this(r.AsInt(), f.AsInt())
     {
     }
 
@@ -111,20 +111,20 @@ public readonly record struct Square(Squares Value) : IComparable<Square>
         => new(new Square(value[1] - '1', value[0] - 'a'));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void Deconstruct(out Rank rank, out File file)
+    public void Deconstruct(out Rank r, out File f)
     {
-        rank = Rank;
-        file = File;
+        r = Rank;
+        f = File;
     }
 
     public Rank Rank
-        => (Ranks)(AsInt() >> 3);
+        => new(AsInt() >> 3);
 
     public char RankChar
         => Rank.Char;
 
     public File File
-        => AsInt() & 7;
+        => new(AsInt() & 7);
 
     public char FileChar
         => File.Char;
@@ -222,8 +222,8 @@ public readonly record struct Square(Squares Value) : IComparable<Square>
         => new(value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator Square(Squares value)
-        => new(value);
+    public static implicit operator Square(Squares sq)
+        => new(sq);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator Square((Rank, File) value)
@@ -270,12 +270,12 @@ public readonly record struct Square(Squares Value) : IComparable<Square>
         => left.Value - (int)right;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Square operator ++(Square square)
-        => new(square.Value + 1);
+    public static Square operator ++(Square sq)
+        => new(sq.Value + 1);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Square operator --(Square square)
-        => new(square.Value - 1);
+    public static Square operator --(Square sq)
+        => new(sq.Value - 1);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static BitBoard operator &(Square left, ulong right)
@@ -362,8 +362,8 @@ public readonly record struct Square(Squares Value) : IComparable<Square>
         => BitBoards.BbSquares[AsInt()];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Rank RelativeRank(Player color)
-        => Rank.Relative(color);
+    public Rank RelativeRank(Player p)
+        => Rank.Relative(p);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool IsOppositeColor(Square other)

@@ -54,9 +54,9 @@ public interface ISearchParameters
 
     void Clear();
 
-    ulong Inc(Player player);
+    ulong Inc(Player p);
 
-    ulong Time(Player player);
+    ulong Time(Player p);
 
     string Get();
 

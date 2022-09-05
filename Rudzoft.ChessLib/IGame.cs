@@ -36,8 +36,11 @@ namespace Rudzoft.ChessLib;
 public interface IGame : IEnumerable<Piece>
 {
     Action<IPieceSquare> PieceUpdated { get; }
+
     BitBoard Occupied { get; }
+
     IPosition Pos { get; }
+
     GameEndTypes GameEndType { get; set; }
 
     SearchParameters SearchParameters { get; }
@@ -54,7 +57,7 @@ public interface IGame : IEnumerable<Piece>
 
     string ToString();
 
-    BitBoard OccupiedBySide(Player c);
+    BitBoard OccupiedBySide(Player p);
 
     Player CurrentPlayer();
 

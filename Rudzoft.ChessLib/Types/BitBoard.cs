@@ -45,8 +45,8 @@ public readonly record struct BitBoard(ulong Value) : IEnumerable<Square>
         : this(value.Value) { }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public BitBoard(Square square)
-        : this(square.AsBb()) { }
+    public BitBoard(Square sq)
+        : this(sq.AsBb()) { }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private BitBoard(int value)
@@ -76,8 +76,8 @@ public readonly record struct BitBoard(ulong Value) : IEnumerable<Square>
         => new(value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator BitBoard(Square square)
-        => new(square.AsBb());
+    public static implicit operator BitBoard(Square sq)
+        => new(sq.AsBb());
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static BitBoard Create(ulong value)
@@ -144,14 +144,14 @@ public readonly record struct BitBoard(ulong Value) : IEnumerable<Square>
         => left.AsBb() & right.Value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard operator ~(BitBoard bitBoard)
-        => ~bitBoard.Value;
+    public static BitBoard operator ~(BitBoard bb)
+        => ~bb.Value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard operator --(BitBoard bitBoard)
+    public static BitBoard operator --(BitBoard bb)
     {
-        BitBoards.ResetLsb(ref bitBoard);
-        return bitBoard;
+        BitBoards.ResetLsb(ref bb);
+        return bb;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -171,12 +171,16 @@ public readonly record struct BitBoard(ulong Value) : IEnumerable<Square>
         => left.Count <= right.Count;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator true(BitBoard bitBoard)
-        => bitBoard.Value != ulong.MinValue;
+    public static bool operator true(BitBoard bb)
+        => bb.Value != ulong.MinValue;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator false(BitBoard bitBoard)
-        => bitBoard.Value == 0;
+    public static bool operator false(BitBoard bb)
+        => bb.Value == 0;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool Contains(Square sq)
+        => !(this & sq).IsEmpty;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Square FirstOrDefault()

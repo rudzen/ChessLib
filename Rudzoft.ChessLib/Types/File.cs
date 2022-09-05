@@ -75,8 +75,8 @@ public readonly struct File : IEquatable<File>
         => Value = file;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public File(File file)
-        => Value = file.Value;
+    public File(File f)
+        => Value = f.Value;
 
     public char Char
         => (char)('a' + Value);
@@ -141,7 +141,8 @@ public readonly struct File : IEquatable<File>
         => left.AsInt() - (int)right;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static File operator ++(File file) => file.Value + 1;
+    public static File operator ++(File f)
+        => new(f.Value + 1);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static BitBoard operator &(File left, ulong right)
@@ -213,7 +214,7 @@ public readonly struct File : IEquatable<File>
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override bool Equals(object obj)
-        => obj is File file && Equals(file);
+        => obj is File f && Equals(f);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override int GetHashCode()

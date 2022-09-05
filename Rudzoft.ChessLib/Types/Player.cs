@@ -99,20 +99,20 @@ public readonly struct Player : IEquatable<Player>
         => new((byte)value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator Player(Players value)
-        => new(value);
+    public static implicit operator Player(Players p)
+        => new(p);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator Player(bool value)
         => new(value.AsByte());
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Player Create(Players player)
-        => new Player(player);
+    public static Player Create(Players p)
+        => new Player(p);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Player operator ~(Player player)
-        => new(player.Side ^ 1);
+    public static Player operator ~(Player p)
+        => new(p.Side ^ 1);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool operator ==(Player left, Player right)
@@ -136,7 +136,7 @@ public readonly struct Player : IEquatable<Player>
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override bool Equals(object obj)
-        => obj is Player player && Equals(player);
+        => obj is Player p && Equals(p);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Equals(Player other) => Side == other.Side;
@@ -173,6 +173,6 @@ public readonly struct Player : IEquatable<Player>
         => PawnEastAttackDist[Side];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public BitBoard PawnPush(BitBoard bitBoard)
-        => PawnPushModifiers[Side](bitBoard);
+    public BitBoard PawnPush(BitBoard bb)
+        => PawnPushModifiers[Side](bb);
 }
