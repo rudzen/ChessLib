@@ -71,4 +71,28 @@ public sealed class ScoreTests
             Assert.Equal(expected, actual);
         }
     }
+
+    [Theory]
+    [InlineData(10, 10, true, 10, 10)]
+    [InlineData(10, 10, false, 0, 0)]
+    public void BoolOperator(int initialMg, int initialEg, bool modifier, int expectedMg, int expectedEg)
+    {
+        var initial = new Score(initialMg, initialEg);
+        var expected = new Score(expectedMg, expectedEg);
+        var actual = initial * modifier;
+
+        Assert.Equal(expected, actual);
+    }
+
+    [Theory]
+    [InlineData(10, 10, 2, 5, 5)]
+    [InlineData(10, 10, 4, 2, 2)]
+    public void IntDivideOperator(int initialMg, int initialEg, int divideBy, int expectedMg, int expectedEg)
+    {
+        var initial = new Score(initialMg, initialEg);
+        var expected = new Score(expectedMg, expectedEg);
+        var actual = initial / divideBy;
+
+        Assert.Equal(expected, actual);
+    }
 }
