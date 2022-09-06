@@ -80,22 +80,19 @@ public static class PieceTypesExtensions
         (uint)v - (uint)min <= (uint)max - (uint)min;
 }
 
+/// <inheritdoc />
 /// <summary>
 /// Piece. Contains the piece type which indicate what type and color the piece is
 /// </summary>
-[StructLayout(LayoutKind.Explicit, Size = 1)]
-public readonly struct Piece : IEquatable<Piece>
+public readonly record struct Piece(Pieces Value)
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private Piece(int pc) => Value = (Pieces)pc;
+    private Piece(int pc)
+        : this((Pieces)pc) { }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private Piece(Piece pc) => Value = pc.Value;
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Piece(Pieces pc) => Value = pc;
-
-    [FieldOffset(0)] public readonly Pieces Value;
+    private Piece(Piece pc)
+        : this(pc.Value) { }
 
     public bool IsWhite => ColorOf().IsWhite;
 
@@ -120,76 +117,88 @@ public readonly struct Piece : IEquatable<Piece>
     };
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator Piece(char value) => new(GetPiece(value));
+    public static implicit operator Piece(char value)
+        => new(GetPiece(value));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator Piece(int value) => new(value);
+    public static implicit operator Piece(int value)
+        => new(value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator Piece(Pieces pc) => new(pc);
+    public static implicit operator Piece(Pieces pc)
+        => new(pc);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Piece operator ~(Piece pc) => pc.AsInt() ^ 8;
+    public static Piece operator ~(Piece pc)
+        => new(pc.AsInt() ^ 8);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Piece operator +(Piece left, Player right) => new(left.Value + (byte)(right << 3));
+    public static Piece operator +(Piece left, Player right)
+        => new(left.Value + (byte)(right << 3));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Piece operator >> (Piece left, int right) => (int)left.Value >> right;
+    public static Piece operator >> (Piece left, int right)
+        => new((int)left.Value >> right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Piece operator <<(Piece left, int right) => (int)left.Value << right;
+    public static Piece operator <<(Piece left, int right)
+        => new((int)left.Value << right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator ==(Piece left, Piece right) => left.Equals(right);
+    public static bool operator ==(Piece left, Pieces right)
+        => left.Value == right;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator !=(Piece left, Piece right) => !left.Equals(right);
+    public static bool operator !=(Piece left, Pieces right)
+        => left.Value != right;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator ==(Piece left, Pieces right) => left.Value == right;
+    public static bool operator <=(Piece left, Pieces right)
+        => left.Value <= right;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator !=(Piece left, Pieces right) => left.Value != right;
+    public static bool operator >=(Piece left, Pieces right)
+        => left.Value >= right;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator <=(Piece left, Pieces right) => left.Value <= right;
+    public static bool operator <(Piece left, Pieces right)
+        => left.Value < right;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator >=(Piece left, Pieces right) => left.Value >= right;
+    public static bool operator >(Piece left, Pieces right)
+        => left.Value > right;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator <(Piece left, Pieces right) => left.Value < right;
+    public static Piece operator ++(Piece left)
+        => new(left.Value + 1);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator >(Piece left, Pieces right) => left.Value > right;
+    public static Piece operator --(Piece left)
+        => new(left.Value - 1);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Piece operator ++(Piece left) => new(left.Value + 1);
+    public static bool operator true(Piece pc)
+        => pc.Value.AsInt() != EmptyPiece.AsInt();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Piece operator --(Piece left) => new(left.Value - 1);
+    public static bool operator false(Piece pc)
+        => pc.Value.AsInt() == EmptyPiece.AsInt();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator true(Piece pc) => pc.Value != EmptyPiece;
+    public Player ColorOf()
+        => new((int)Value >> 3);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator false(Piece pc) => pc.Value == EmptyPiece;
+    public bool Equals(Piece other)
+        => Value == other.Value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Player ColorOf() => (int)Value >> 3;
+    public override int GetHashCode()
+        => (int)Value << 16;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool Equals(Piece other) => Value == other.Value;
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override bool Equals(object obj) => obj is Piece pc && Equals(pc);
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override int GetHashCode() => (int)Value << 16;
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override string ToString() => this.GetPieceString();
+    public override string ToString()
+        => this.GetPieceString();
 
     private static Piece GetPiece(char character)
     {
@@ -219,40 +228,10 @@ public readonly struct Piece : IEquatable<Piece>
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public int AsInt() => (int)Value;
+    public int AsInt()
+        => (int)Value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public PieceTypes Type() => (PieceTypes)(AsInt() & 0x7);
-
-    private sealed class PieceRelationalComparer : Comparer<Piece>
-    {
-        private readonly IPieceValue _pieceValue;
-
-        public PieceRelationalComparer(IPieceValue pieceValue)
-        {
-            _pieceValue = pieceValue;
-        }
-
-        public override int Compare(Piece x, Piece y)
-        {
-            if (x.Value == y.Value)
-                return 0;
-
-            // this is dangerous (fear king leopold III ?), king has no value and is considered
-            // to be uniq
-            if (x.Type() == PieceTypes.King || y.Type() == PieceTypes.King)
-                return 1;
-
-            var xValue = _pieceValue.GetPieceValue(x, Phases.Mg);
-            var yValue = _pieceValue.GetPieceValue(y, Phases.Mg);
-
-            if (xValue < yValue)
-                return -1;
-
-            if (xValue == yValue)
-                return 0;
-
-            return xValue > yValue ? 1 : x.AsInt().CompareTo(y.AsInt());
-        }
-    }
+    public PieceTypes Type()
+        => (PieceTypes)(AsInt() & 0x7);
 }

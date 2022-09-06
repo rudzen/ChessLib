@@ -96,7 +96,7 @@ public readonly struct HashKey : IEquatable<HashKey>
         => new(left.Key ^ right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static HashKey operator ^(HashKey left, CastlelingRights right)
+    public static HashKey operator ^(HashKey left, CastleRights right)
         => new(left.Key ^ right.GetZobristCastleling().Key);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

@@ -48,7 +48,7 @@ public sealed class RanNotation : Notation
         var (from, to) = move;
 
         if (move.IsCastlelingMove())
-            return CastlelingExtensions.GetCastlelingString(to, from);
+            return CastleExtensions.GetCastleString(to, from);
 
         Span<char> re = stackalloc char[6];
         var i = 0;

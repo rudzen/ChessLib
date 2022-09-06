@@ -239,35 +239,35 @@ public readonly record struct Square(Squares Value) : ISpanFormattable, ICompara
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Square operator +(Square left, Square right)
-        => left.Value + right.AsInt();
+        => new(left.Value + right.AsInt());
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Square operator +(Square left, int right)
-        => left.Value + right;
+        => new(left.Value + right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Square operator +(Square left, Direction right)
-        => left.Value + (int)right.Value;
+        => new(left.Value + (int)right.Value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Square operator +(Square left, Directions right)
-        => left.Value + (int)right;
+        => new(left.Value + (int)right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Square operator -(Square left, Square right)
-        => left.Value - right.Value;
+        => new(left.Value - right.Value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Square operator -(Square left, int right)
-        => left.Value - right;
+        => new(left.Value - right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Square operator -(Square left, Direction right)
-        => left.Value - (int)right.Value;
+        => new(left.Value - (int)right.Value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Square operator -(Square left, Directions right)
-        => left.Value - (int)right;
+        => new(left.Value - (int)right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Square operator ++(Square sq)
@@ -279,7 +279,7 @@ public readonly record struct Square(Squares Value) : ISpanFormattable, ICompara
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static BitBoard operator &(Square left, ulong right)
-        => left.AsBb().Value & right;
+        => new(left.AsBb().Value & right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static BitBoard operator &(ulong left, Square right)
@@ -287,11 +287,11 @@ public readonly record struct Square(Squares Value) : ISpanFormattable, ICompara
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static BitBoard operator |(Square left, Square right)
-        => left.AsBb().Value | right.AsBb().Value;
+        => new(left.AsBb().Value | right.AsBb().Value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static BitBoard operator |(ulong left, Square right)
-        => left | right.AsBb().Value;
+        => new(left | right.AsBb().Value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int operator |(Square left, int right)
@@ -350,7 +350,10 @@ public readonly record struct Square(Squares Value) : ISpanFormattable, ICompara
         => string.Format(formatProvider, format, ToString());
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider provider)
+    public bool TryFormat(
+        Span<char> destination,
+        out int charsWritten,
+        ReadOnlySpan<char> format = default, IFormatProvider provider = null)
     {
         destination[0] = FileChar;
         destination[1] = RankChar;

@@ -103,7 +103,7 @@ public readonly record struct Player(byte Side) : ISpanFormattable
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Player Create(Players p)
-        => new Player(p);
+        => new(p);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Player operator ~(Player p)

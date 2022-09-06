@@ -100,7 +100,7 @@ public sealed class State : IEquatable<State>
     {
         LastMove = Move.EmptyMove;
         NonPawnMaterial = new[] { Value.ValueZero, Value.ValueZero };
-        CastlelingRights = CastleRight.NONE;
+        CastlelingRights = CastleRight.None;
         EnPassantSquare = Square.None;
         Checkers = BitBoard.Empty;
         CheckedSquares = new BitBoard[PieceTypes.PieceTypeNb.AsInt()];
@@ -143,7 +143,7 @@ public sealed class State : IEquatable<State>
         PawnStructureKey = Key = MaterialKey = HashKey.Empty;
         PliesFromNull = 0;
         Repetition = 0;
-        CastlelingRights = CastleRight.NONE;
+        CastlelingRights = CastleRight.None;
         EnPassantSquare = Square.None;
         CheckedSquares.Fill(BitBoard.Empty);
         Pinners[0] = Pinners[1] = BitBoard.Empty;

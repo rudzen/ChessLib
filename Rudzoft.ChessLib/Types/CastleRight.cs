@@ -30,71 +30,79 @@ using Rudzoft.ChessLib.Hash;
 namespace Rudzoft.ChessLib.Types;
 
 [Flags]
-public enum CastlelingRights
+public enum CastleRights
 {
     None = 0,
-    WhiteOo = 1,
-    WhiteOoo = WhiteOo << 1,
-    BlackOo = WhiteOo << 2,
-    BlackOoo = WhiteOo << 3,
+    WhiteKing = 1,
+    WhiteQueen = WhiteKing << 1,
+    BlackKing = WhiteKing << 2,
+    BlackQueen = WhiteKing << 3,
 
-    KingSide = WhiteOo | BlackOo,
-    QueenSide = WhiteOoo | BlackOoo,
-    WhiteCastleling = WhiteOo | WhiteOoo,
-    BlackCastleling = BlackOo | BlackOoo,
+    King = WhiteKing | BlackKing,
+    Queen = WhiteQueen | BlackQueen,
+    White = WhiteKing | WhiteQueen,
+    Black = BlackKing | BlackQueen,
 
-    Any = WhiteCastleling | BlackCastleling,
-    CastleRightsNb = 16
+    Any = White | Black,
+    Count = 16
 }
 
-public static class CastlelingSideExtensions
+public enum CastleSides
 {
-    public static CastlelingRights MakeCastlelingRights(this CastlelingRights cs, Player p)
-        => p.IsWhite
-            ? cs == CastlelingRights.QueenSide
-                ? CastlelingRights.WhiteOoo
-                : CastlelingRights.WhiteOo
-            : cs == CastlelingRights.QueenSide
-                ? CastlelingRights.BlackOoo
-                : CastlelingRights.BlackOo;
+    King,
+    Queen,
+    Center,
+    Count
 }
 
-public enum CastlelingPerform
+public static class CastleRightsExtensions
+{
+    public static CastleRights MakeCastleRights(this CastleRights cs, Player p)
+        => p.IsWhite
+            ? cs == CastleRights.Queen
+                ? CastleRights.WhiteQueen
+                : CastleRights.WhiteKing
+            : cs == CastleRights.Queen
+                ? CastleRights.BlackQueen
+                : CastleRights.BlackKing;
+}
+
+public enum CastlePerform
 {
     Do,
     Undo
 }
 
-public static class CastlelingExtensions
+public static class CastleExtensions
 {
-    public static string GetCastlelingString(Square toSquare, Square fromSquare) => toSquare < fromSquare ? "O-O-O" : "O-O";
+    public static string GetCastleString(Square toSquare, Square fromSquare) => toSquare < fromSquare ? "O-O-O" : "O-O";
 
-    public static bool HasFlagFast(this CastlelingRights value, CastlelingRights flag) => (value & flag) != 0;
+    public static bool HasFlagFast(this CastleRights value, CastleRights flag) => (value & flag) != 0;
 
-    public static int AsInt(this CastlelingRights value) => (int)value;
+    public static int AsInt(this CastleRights value) => (int)value;
 
-    public static CastlelingRights Without(this CastlelingRights @this, CastlelingRights remove)
+    public static CastleRights Without(this CastleRights @this, CastleRights remove)
         => @this & ~remove;
 }
 
-public readonly record struct CastleRight(CastlelingRights Rights)
+public readonly record struct CastleRight(CastleRights Rights)
 {
-    private CastleRight(int cr) : this((CastlelingRights)cr) { }
+    private CastleRight(int cr) : this((CastleRights)cr) { }
 
-    public bool IsNone => Rights == CastlelingRights.None;
+    public bool IsNone => Rights == CastleRights.None;
 
-    public static CastleRight NONE { get; } = new(CastlelingRights.None);
-    public static CastleRight WHITE_OO { get; } = new(CastlelingRights.WhiteOo);
-    public static CastleRight BLACK_OO { get; } = new(CastlelingRights.BlackOo);
-    public static CastleRight WHITE_OOO { get; } = new(CastlelingRights.WhiteOoo);
-    public static CastleRight BLACK_OOO { get; } = new(CastlelingRights.BlackOoo);
-    public static CastleRight KING_SIDE { get; } = new(CastlelingRights.KingSide);
-    public static CastleRight QUEEN_SIDE { get; } = new(CastlelingRights.QueenSide);
-    public static CastleRight WHITE_CASTLELING { get; } = new(CastlelingRights.WhiteCastleling);
-    public static CastleRight BLACK_CASTLELING  { get; }= new(CastlelingRights.BlackCastleling);
-    public static CastleRight ANY { get; } = new(CastlelingRights.Any);
+    public static CastleRight None { get; } = new(CastleRights.None);
+    public static CastleRight WhiteKing { get; } = new(CastleRights.WhiteKing);
+    public static CastleRight BlackKing { get; } = new(CastleRights.BlackKing);
+    public static CastleRight WhiteQueen { get; } = new(CastleRights.WhiteQueen);
+    public static CastleRight BlackQueen { get; } = new(CastleRights.BlackQueen);
+    public static CastleRight King { get; } = new(CastleRights.King);
+    public static CastleRight Queen { get; } = new(CastleRights.Queen);
+    public static CastleRight White { get; } = new(CastleRights.White);
+    public static CastleRight Black  { get; }= new(CastleRights.Black);
+    public static CastleRight Any { get; } = new(CastleRights.Any);
 
-    public static implicit operator CastleRight(CastlelingRights cr)
+    public static implicit operator CastleRight(CastleRights cr)
         => new(cr);
 
     public bool Equals(CastleRight other)
@@ -104,27 +112,27 @@ public readonly record struct CastleRight(CastlelingRights Rights)
         => (int)Rights;
 
     public static bool operator true(CastleRight cr)
-        => cr.Rights != CastlelingRights.None;
+        => cr.Rights != CastleRights.None;
 
     public static bool operator false(CastleRight cr)
-        => cr.Rights == CastlelingRights.None;
+        => cr.Rights == CastleRights.None;
 
     public static CastleRight operator |(CastleRight cr1, CastleRight cr2)
         => new(cr1.Rights | cr2.Rights);
 
-    public static CastleRight operator |(CastleRight cr1, CastlelingRights cr2)
+    public static CastleRight operator |(CastleRight cr1, CastleRights cr2)
         => new(cr1.Rights | cr2);
 
     public static CastleRight operator ^(CastleRight cr1, CastleRight cr2)
         => new(cr1.Rights ^ cr2.Rights);
 
-    public static CastleRight operator ^(CastleRight cr1, CastlelingRights cr2)
+    public static CastleRight operator ^(CastleRight cr1, CastleRights cr2)
         => new(cr1.Rights ^ cr2);
 
     public static CastleRight operator &(CastleRight cr1, CastleRight cr2)
         => new(cr1.Rights & cr2.Rights);
 
-    public static CastleRight operator &(CastleRight cr1, CastlelingRights cr2)
+    public static CastleRight operator &(CastleRight cr1, CastleRights cr2)
         => new(cr1.Rights & cr2);
 
     public static CastleRight operator ~(CastleRight cr)
@@ -133,9 +141,9 @@ public readonly record struct CastleRight(CastlelingRights Rights)
     public HashKey Key()
         => Rights.GetZobristCastleling();
 
-    public bool Has(CastlelingRights cr)
+    public bool Has(CastleRights cr)
         => Rights.HasFlagFast(cr);
 
-    public CastleRight Not(CastlelingRights cr)
+    public CastleRight Not(CastleRights cr)
         => new(Rights & ~cr);
 }

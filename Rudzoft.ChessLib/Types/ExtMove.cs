@@ -29,6 +29,7 @@ using System.Runtime.CompilerServices;
 
 namespace Rudzoft.ChessLib.Types;
 
+/// <inheritdoc />
 /// <summary>
 /// Extended move structure which combines Move and Score
 /// </summary>
