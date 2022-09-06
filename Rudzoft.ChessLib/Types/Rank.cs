@@ -24,6 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using System;
 using System.Runtime.CompilerServices;
 using Rudzoft.ChessLib.Extensions;
 
@@ -45,37 +46,35 @@ public enum Ranks
 public static class RanksExtensions
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Rank RelativeRank(this Ranks rank, Player p) => (Ranks)(rank.AsInt() ^ (p.Side * 7));
+    public static Rank RelativeRank(this Ranks r, Player p) => new((Ranks)(r.AsInt() ^ (p.Side * 7)));
 
     public static int AsInt(this Ranks r) => (int)r;
 }
 
-public readonly record struct Rank(Ranks Value)
+public readonly record struct Rank(Ranks Value) : ISpanFormattable, IValidationType
 {
     private static readonly string[] RankStrings = { "1", "2", "3", "4", "5", "6", "7", "8" };
 
-    public static Rank RANK_1 { get; } = new(Ranks.Rank1);
-    public static Rank RANK_2 { get; } = new(Ranks.Rank2);
-    public static Rank RANK_3 { get; } = new(Ranks.Rank3);
-    public static Rank RANK_4 { get; } = new(Ranks.Rank4);
-    public static Rank RANK_5 { get; } = new(Ranks.Rank5);
-    public static Rank RANK_6 { get; } = new(Ranks.Rank6);
-    public static Rank RANK_7 { get; } = new(Ranks.Rank7);
-    public static Rank RANK_8 { get; } = new(Ranks.Rank8);
+    public static Rank Rank1 { get; } = new(Ranks.Rank1);
+    public static Rank Rank2 { get; } = new(Ranks.Rank2);
+    public static Rank Rank3 { get; } = new(Ranks.Rank3);
+    public static Rank Rank4 { get; } = new(Ranks.Rank4);
+    public static Rank Rank5 { get; } = new(Ranks.Rank5);
+    public static Rank Rank6 { get; } = new(Ranks.Rank6);
+    public static Rank Rank7 { get; } = new(Ranks.Rank7);
+    public static Rank Rank8 { get; } = new(Ranks.Rank8);
 
-    public static Rank[] PawnRanks { get; } = { RANK_2, RANK_3, RANK_4, RANK_5, RANK_6, RANK_7 };
+    public static Rank[] PawnRanks { get; } = { Rank2, Rank3, Rank4, Rank5, Rank6, Rank7 };
 
-    public static Rank[] AllRanks { get; } = { RANK_1, RANK_2, RANK_3, RANK_4, RANK_5, RANK_6, RANK_7, RANK_8 };
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Rank(int rank) : this((Ranks)rank)
-    {
-    }
+    public static Rank[] All { get; } = { Rank1, Rank2, Rank3, Rank4, Rank5, Rank6, Rank7, Rank8 };
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Rank(Rank r) :this(r.Value)
-    {
-    }
+    public Rank(int rank)
+        : this((Ranks)rank) { }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Rank(Rank r)
+        : this(r.Value) { }
 
     public char Char => (char)('1' + Value.AsInt());
 
@@ -207,6 +206,18 @@ public readonly record struct Rank(Ranks Value)
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override string ToString()
         => RankStrings[AsInt()];
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public string ToString(string format, IFormatProvider formatProvider)
+        => string.Format(formatProvider, format, ToString());
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider provider)
+    {
+        destination[0] = Char;
+        charsWritten = 1;
+        return true;
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Equals(Rank other)

@@ -66,6 +66,7 @@ public sealed class MoveList : IMoveList
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Add(Move item) => _moves[Length++].Move = item;
 
+    /// <inheritdoc />
     /// <summary>
     /// Reset the moves
     /// </summary>

@@ -48,7 +48,7 @@ public enum Directions
     SouthFill = -NorthFill
 }
 
-public readonly struct Direction : IEquatable<Direction>
+public readonly record struct Direction(Directions Value)
 {
     public static Direction North { get; } = new(Directions.North);
 
@@ -76,61 +76,62 @@ public readonly struct Direction : IEquatable<Direction>
 
     public static Direction None { get; } = new(Directions.NoDirection);
 
-    public Directions Value { get; }
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private Direction(int d)
+        : this((Directions)d) { }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private Direction(Directions d) => Value = d;
+    public static implicit operator Direction(int value)
+        => new(value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private Direction(int d) => Value = (Directions)d;
+    public static implicit operator Direction(Directions value)
+        => new(value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator Direction(int value) => new(value);
+    public static Direction operator +(Direction left, Direction right)
+        => new(left.Value + (int)right.Value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator Direction(Directions value) => new(value);
+    public static Direction operator +(Direction left, Directions right)
+        => new(left.Value + (int)right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Direction operator +(Direction left, Direction right) => left.Value + (int)right.Value;
+    public static Direction operator +(Direction left, int right)
+        => new(left.Value + right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Direction operator +(Direction left, Directions right) => left.Value + (int)right;
+    public static Direction operator -(Direction left, Direction right)
+        => new(left.Value - (int)right.Value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Direction operator +(Direction left, int right) => left.Value + right;
+    public static Direction operator -(Direction left, Directions right)
+        => new(left.Value - (int)right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Direction operator -(Direction left, Direction right) => left.Value - (int)right.Value;
+    public static Direction operator -(Direction left, int right)
+        => new(left.Value - right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Direction operator -(Direction left, Directions right) => left.Value - (int)right;
+    public static Direction operator *(Direction left, Direction right)
+        => new((int)left.Value * (int)right.Value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Direction operator -(Direction left, int right) => left.Value - right;
+    public static Direction operator *(Direction left, Directions right)
+        => new((int)left.Value * (int)right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Direction operator *(Direction left, Direction right) => (int)left.Value * (int)right.Value;
+    public static Direction operator *(Direction left, int right)
+        => new((int)left.Value * right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Direction operator *(Direction left, Directions right) => (int)left.Value * (int)right;
+    public bool Equals(Direction other)
+        => Value == other.Value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Direction operator *(Direction left, int right) => (int)left.Value * right;
+    public override int GetHashCode()
+        => AsInt();
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator ==(Direction left, Direction right) => left.Equals(right);
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator !=(Direction left, Direction right) => !(left == right);
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool Equals(Direction other) => Value == other.Value;
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override bool Equals(object obj) => obj is Direction other && Equals(other);
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override int GetHashCode() => AsInt();
-
-    private int AsInt() => (int)Value;
+    private int AsInt()
+        => (int)Value;
 }

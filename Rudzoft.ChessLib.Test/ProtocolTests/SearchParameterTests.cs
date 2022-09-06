@@ -4,14 +4,13 @@ namespace Rudzoft.ChessLib.Test.ProtocolTests;
 
 public sealed class SearchParameterTests
 {
-
     [Fact]
     public void SearchParamInfinite()
     {
         const string expected = "go infinite";
         var sp = new SearchParameters(true);
 
-        var actual = sp.Get();
+        var actual = sp.ToString();
 
         Assert.Equal(expected, actual);
     }
@@ -35,7 +34,7 @@ public sealed class SearchParameterTests
             blackIncrementTimeMilliseconds,
             moveTime);
 
-        var actual = sp.Get();
+        var actual = sp.ToString();
 
         Assert.Equal(expected, actual);
     }

@@ -43,8 +43,9 @@ public static class Cuckoo
     static Cuckoo()
     {
         var count = 0;
-        var bb = BitBoards.AllSquares;
         foreach (var pc in Piece.AllPieces)
+        {
+            var bb = BitBoards.AllSquares;
             while (bb)
             {
                 var sq1 = BitBoards.PopLsb(ref bb);
@@ -74,6 +75,7 @@ public static class Cuckoo
                     count++;
                 }
             }
+        }
 
         Debug.Assert(count == 3668);
     }

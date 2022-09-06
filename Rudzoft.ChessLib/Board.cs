@@ -133,8 +133,8 @@ public sealed class Board : IBoard
         _pieceList[pc.AsInt()][_index[to.AsInt()]] = to;
     }
 
-    public Piece MovedPiece(Move move)
-        => PieceAt(move.FromSquare());
+    public Piece MovedPiece(Move m)
+        => PieceAt(m.FromSquare());
 
     public BitBoard Pieces()
         => _byType[PieceTypes.AllPieces.AsInt()];
@@ -145,19 +145,19 @@ public sealed class Board : IBoard
     public BitBoard Pieces(PieceTypes pt1, PieceTypes pt2)
         => _byType[pt1.AsInt()] | _byType[pt2.AsInt()];
 
-    public BitBoard Pieces(Player c)
-        => _bySide[c.Side];
+    public BitBoard Pieces(Player p)
+        => _bySide[p.Side];
 
-    public BitBoard Pieces(Player c, PieceTypes pt)
-        => _bySide[c.Side] & _byType[pt.AsInt()];
+    public BitBoard Pieces(Player p, PieceTypes pt)
+        => _bySide[p.Side] & _byType[pt.AsInt()];
 
-    public BitBoard Pieces(Player c, PieceTypes pt1, PieceTypes pt2)
-        => _bySide[c.Side] & (_byType[pt1.AsInt()] | _byType[pt2.AsInt()]);
+    public BitBoard Pieces(Player p, PieceTypes pt1, PieceTypes pt2)
+        => _bySide[p.Side] & (_byType[pt1.AsInt()] | _byType[pt2.AsInt()]);
 
-    public Square Square(PieceTypes pt, Player c)
+    public Square Square(PieceTypes pt, Player p)
     {
-        Debug.Assert(_pieceCount[pt.MakePiece(c).AsInt()] == 1);
-        return _pieceList[pt.MakePiece(c).AsInt()][0];
+        Debug.Assert(_pieceCount[pt.MakePiece(p).AsInt()] == 1);
+        return _pieceList[pt.MakePiece(p).AsInt()][0];
     }
 
     public ReadOnlySpan<Square> Squares(PieceTypes pt, Player c)
@@ -171,8 +171,8 @@ public sealed class Board : IBoard
     public int PieceCount(Piece pc)
         => _pieceCount[pc.AsInt()];
 
-    public int PieceCount(PieceTypes pt, Player c)
-        => PieceCount(pt.MakePiece(c));
+    public int PieceCount(PieceTypes pt, Player p)
+        => PieceCount(pt.MakePiece(p));
 
     public int PieceCount(PieceTypes pt)
         => _pieceCount[pt.MakePiece(Player.White).AsInt()] + _pieceCount[pt.MakePiece(Player.Black).AsInt()];

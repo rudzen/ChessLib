@@ -54,27 +54,27 @@ public sealed class KillerMoves : IKillerMoves
         return this;
     }
 
-    public int GetValue(int depth, Move move, Piece fromPiece)
-        => Equals(_killerMoves[depth, 0], move, fromPiece)
+    public int GetValue(int depth, Move m, Piece fromPc)
+        => Equals(_killerMoves[depth, 0], m, fromPc)
             ? 2
-            : Equals(_killerMoves[depth, 1], move, fromPiece).AsByte();
+            : Equals(_killerMoves[depth, 1], m, fromPc).AsByte();
 
-    public void UpdateValue(int depth, Move move, Piece fromPiece)
+    public void UpdateValue(int depth, Move m, Piece fromPc)
     {
-        if (Equals(_killerMoves[depth, 0], move, fromPiece))
+        if (Equals(_killerMoves[depth, 0], m, fromPc))
             return;
 
         // Shift killer move.
         _killerMoves[depth, 1].Piece = _killerMoves[depth, 0].Piece;
         _killerMoves[depth, 1].Square = _killerMoves[depth, 0].Square;
         // Update killer move.
-        _killerMoves[depth, 0].Piece = fromPiece;
-        _killerMoves[depth, 0].Square = move.ToSquare();
+        _killerMoves[depth, 0].Piece = fromPc;
+        _killerMoves[depth, 0].Square = m.ToSquare();
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static bool Equals(IPieceSquare killerMove, Move move, Piece fromPiece)
-        => killerMove.Piece == fromPiece && killerMove.Square == move.ToSquare();
+    private static bool Equals(IPieceSquare killerMove, Move m, Piece fromPc)
+        => killerMove.Piece == fromPc && killerMove.Square == m.ToSquare();
 
     public IPieceSquare Get(int depth, int index)
         => _killerMoves[depth, index];

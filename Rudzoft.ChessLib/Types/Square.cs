@@ -65,7 +65,7 @@ public static class SquaresExtensions
 /// <summary>
 /// Square data struct. Contains a single enum value which represents a square on the board.
 /// </summary>
-public readonly record struct Square(Squares Value) : IComparable<Square>
+public readonly record struct Square(Squares Value) : ISpanFormattable, IComparable<Square>
 {
     private static readonly string[] SquareStrings = Enum
         .GetValues(typeof(Squares))
@@ -344,6 +344,19 @@ public readonly record struct Square(Squares Value) : IComparable<Square>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override string ToString()
         => SquareStrings[AsInt()];
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public string ToString(string format, IFormatProvider formatProvider)
+        => string.Format(formatProvider, format, ToString());
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider provider)
+    {
+        destination[0] = FileChar;
+        destination[1] = RankChar;
+        charsWritten = 2;
+        return true;
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Equals(Square other)

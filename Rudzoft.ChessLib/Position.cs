@@ -59,6 +59,7 @@ public sealed class Position : IPosition
     {
         Board = board;
         PieceValue = pieceValues;
+        State = default;
         _outputObjectPool = new DefaultObjectPool<StringBuilder>(new StringBuilderPooledObjectPolicy());
         _positionValidator = new PositionValidator(this, Board);
         _castlingPath = new BitBoard[CastlelingRights.CastleRightsNb.AsInt()];
@@ -96,13 +97,13 @@ public sealed class Position : IPosition
     /// <summary>
     /// To let something outside the library be aware of changes (like a UI etc)
     /// </summary>
-    public Action<IPieceSquare> PieceUpdated { get; set; }
+    public Action<IPieceSquare>? PieceUpdated { get; set; }
 
     public IPieceValue PieceValue { get; }
 
     public int Ply { get; private set; }
 
-    public int Rule50 => State.Rule50;
+    public int Rule50 => State!.Rule50;
 
     public Player SideToMove
         => _sideToMove;
@@ -466,7 +467,7 @@ public sealed class Position : IPosition
         Debug.Assert(!m.IsNullMove());
 
         var us = _sideToMove;
-        var (from, to) = m;
+        var (from, to, type) = m;
         var ksq = GetKingSquare(us);
 
         Debug.Assert(GetPiece(GetKingSquare(us)) == PieceTypes.King.MakePiece(us));
@@ -474,14 +475,14 @@ public sealed class Position : IPosition
 
         // En passant captures are a tricky special case. Because they are rather uncommon, we
         // do it simply by testing whether the king is attacked after the move is made.
-        if (m.IsEnPassantMove())
+        if (type == MoveTypes.Enpassant)
         {
             Debug.Assert(MovedPiece(m) == PieceTypes.Pawn.MakePiece(us));
             return IsEnPassantMoveLegal(to, us, from, ksq);
         }
 
         // Check for legal castleling move
-        if (m.IsCastlelingMove())
+        if (type == MoveTypes.Castling)
             return IsCastlelingMoveLegal(m, to, from, us);
 
         // If the moving piece is a king, check whether the destination square is attacked by
@@ -575,13 +576,13 @@ public sealed class Position : IPosition
         if (pc.Type() == PieceTypes.Pawn)
         {
             // We have already handled promotion moves, so destination cannot be on the 8th/1st rank.
-            if (to.Rank == Rank.RANK_8.Relative(us))
+            if (to.Rank == Rank.Rank8.Relative(us))
                 return false;
 
             if ((from.PawnAttack(us) & Pieces(~us) & to).IsEmpty // Not a capture
                 && !(from + us.PawnPushDistance() == to && !IsOccupied(to)) // Not a single push
                 && !(from + us.PawnDoublePushDistance() == to // Not a double push
-                     && from.Rank == Rank.RANK_2.Relative(us)
+                     && from.Rank == Rank.Rank2.Relative(us)
                      && !IsOccupied(to)
                      && !IsOccupied(to - us.PawnPushDistance())))
                 return false;
@@ -631,7 +632,7 @@ public sealed class Position : IPosition
 
         var us = _sideToMove;
         var them = ~us;
-        var (from, to) = m;
+        var (from, to, type) = m;
         var pc = GetPiece(from);
         var pt = pc.Type();
         var isPawn = pt == PieceTypes.Pawn;
@@ -644,7 +645,7 @@ public sealed class Position : IPosition
             capturedPiece == Piece.EmptyPiece || capturedPiece.ColorOf() == (!m.IsCastlelingMove() ? them : us));
         Debug.Assert(capturedPiece.Type() != PieceTypes.King);
 
-        if (m.IsCastlelingMove())
+        if (type == MoveTypes.Castling)
         {
             Debug.Assert(pc == PieceTypes.King.MakePiece(us));
             Debug.Assert(capturedPiece == PieceTypes.Rook.MakePiece(us));
@@ -664,7 +665,7 @@ public sealed class Position : IPosition
 
             if (capturedPiece.Type() == PieceTypes.Pawn)
             {
-                if (m.IsEnPassantMove())
+                if (type == MoveTypes.Enpassant)
                 {
                     captureSquare -= us.PawnPushDistance();
 
@@ -685,7 +686,7 @@ public sealed class Position : IPosition
 
             // Update board and piece lists
             RemovePiece(captureSquare);
-            if (m.IsEnPassantMove())
+            if (type == MoveTypes.Enpassant)
                 Board.ClearPiece(captureSquare);
 
             k ^= capturedPiece.GetZobristPst(captureSquare);
@@ -716,7 +717,7 @@ public sealed class Position : IPosition
         }
 
         // Move the piece. The tricky Chess960 castle is handled earlier
-        if (!m.IsCastlelingMove())
+        if (type != MoveTypes.Castling)
             MovePiece(from, to);
 
         // If the moving piece is a pawn do some special extra work
@@ -729,11 +730,11 @@ public sealed class Position : IPosition
                 State.EnPassantSquare = to - us.PawnPushDistance();
                 k ^= State.EnPassantSquare.File.GetZobristEnPassant();
             }
-            else if (m.IsPromotionMove())
+            else if (type == MoveTypes.Promotion)
             {
                 var promotionPiece = m.PromotedPieceType().MakePiece(us);
 
-                Debug.Assert(to.RelativeRank(us) == Rank.RANK_8);
+                Debug.Assert(to.RelativeRank(us) == Rank.Rank8);
                 Debug.Assert(promotionPiece.Type().InBetween(PieceTypes.Knight, PieceTypes.Queen));
 
                 RemovePiece(to);
@@ -817,9 +818,9 @@ public sealed class Position : IPosition
             return;
         }
 
-        var (from, to) = m;
+        var (from, to, type) = m;
 
-        if (m.IsCastlelingMove() && ChessMode == ChessMode.Normal)
+        if (type == MoveTypes.Castling && ChessMode == ChessMode.Normal)
         {
             var file = to > from ? Files.FileG : Files.FileC;
             to = new Square(from.Rank, file);
@@ -833,7 +834,7 @@ public sealed class Position : IPosition
         s[index++] = to.FileChar;
         s[index++] = to.RankChar;
 
-        if (m.IsPromotionMove())
+        if (type == MoveTypes.Promotion)
             s[index++] = char.ToLower(m.PromotedPieceType().GetPieceChar());
 
         output.Append(new string(s[..index]));
@@ -1128,16 +1129,16 @@ public sealed class Position : IPosition
         _sideToMove = ~_sideToMove;
 
         var us = _sideToMove;
-        var (from, to) = m;
+        var (from, to, type) = m;
         var pc = GetPiece(to);
 
         Debug.Assert(!IsOccupied(from) || m.IsCastlelingMove());
         Debug.Assert(State.CapturedPiece.Type() != PieceTypes.King);
 
-        if (m.IsPromotionMove())
+        if (type == MoveTypes.Promotion)
         {
             Debug.Assert(pc.Type() == m.PromotedPieceType());
-            Debug.Assert(to.RelativeRank(us) == Rank.RANK_8);
+            Debug.Assert(to.RelativeRank(us) == Rank.Rank8);
             Debug.Assert(m.PromotedPieceType() >= PieceTypes.Knight && m.PromotedPieceType() <= PieceTypes.Queen);
 
             RemovePiece(to);
@@ -1145,7 +1146,7 @@ public sealed class Position : IPosition
             AddPiece(pc, to);
         }
 
-        if (m.IsCastlelingMove())
+        if (type == MoveTypes.Castling)
             DoCastleling(us, from, ref to, out _, out _, CastlelingPerform.Undo);
         else
         {
@@ -1159,7 +1160,7 @@ public sealed class Position : IPosition
                 var captureSquare = to;
 
                 // En-Passant capture is not located on move square
-                if (m.IsEnPassantMove())
+                if (type == MoveTypes.Enpassant)
                 {
                     captureSquare -= us.PawnPushDistance();
 
@@ -1381,7 +1382,7 @@ public sealed class Position : IPosition
                     break;
                 default:
                     if (token.InBetween('A', 'H'))
-                        rsq = new Square(Rank.RANK_1.Relative(c), new File(token - 'A'));
+                        rsq = new Square(Rank.Rank1.Relative(c), new File(token - 'A'));
                     else
                         continue;
                     break;

@@ -135,7 +135,7 @@ public sealed class FenData : EventArgs, IFenData
     }
 
     public override bool Equals(object obj)
-        => ReferenceEquals(this, obj) || obj is FenData other && Equals(other);
+        => ReferenceEquals(this, obj) || (obj is FenData other && Equals(other));
 
     public override int GetHashCode()
         => HashCode.Combine(_splitPoints, Fen);

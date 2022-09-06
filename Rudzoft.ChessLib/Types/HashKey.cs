@@ -77,31 +77,31 @@ public readonly struct HashKey : IEquatable<HashKey>
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static HashKey operator >> (HashKey left, int right)
-        => left.Key >> right;
+        => new(left.Key >> right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static HashKey operator <<(HashKey left, int right)
-        => left.Key << right;
+        => new(left.Key << right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static HashKey operator ^(HashKey left, int right)
-        => left.Key ^ (ulong)right;
+        => new(left.Key ^ (ulong)right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static HashKey operator ^(HashKey left, HashKey right)
-        => left.Key ^ right.Key;
+        => new(left.Key ^ right.Key);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static HashKey operator ^(HashKey left, ulong right)
-        => left.Key ^ right;
+        => new(left.Key ^ right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static HashKey operator ^(HashKey left, CastlelingRights right)
-        => left.Key ^ right.GetZobristCastleling();
+        => new(left.Key ^ right.GetZobristCastleling().Key);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static HashKey operator ^(HashKey left, File right)
-        => left.Key ^ right.GetZobristEnPassant();
+        => new(left.Key ^ right.GetZobristEnPassant().Key);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Equals(HashKey other)

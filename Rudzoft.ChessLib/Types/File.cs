@@ -28,6 +28,8 @@ using System;
 using System.Runtime.CompilerServices;
 using Rudzoft.ChessLib.Extensions;
 
+// ReSharper disable MemberCanBeInternal
+
 namespace Rudzoft.ChessLib.Types;
 
 public enum Files
@@ -50,33 +52,27 @@ public static class FilesExtensions
         => (int)f;
 }
 
-public readonly struct File : IEquatable<File>
+public readonly record struct File(Files Value) : IComparable<File>, ISpanFormattable, IValidationType
 {
     private static readonly string[] FileStrings = { "a", "b", "c", "d", "e", "f", "g", "h" };
 
-    public readonly Files Value;
-
-    public static File FILE_A { get; } = new(Files.FileA);
-    public static File FILE_B { get; } = new(Files.FileB);
-    public static File FILE_C { get; } = new(Files.FileC);
-    public static File FILE_D { get; } = new(Files.FileD);
-    public static File FILE_E { get; } = new(Files.FileE);
-    public static File FILE_F { get; } = new(Files.FileF);
-    public static File FILE_G { get; } = new(Files.FileG);
-    public static File FILE_H { get; } = new(Files.FileH);
-    public static File[] AllFiles { get; } = { FILE_A, FILE_B, FILE_C, FILE_D, FILE_E, FILE_F, FILE_G, FILE_H };
+    public static File FileA { get; } = new(Files.FileA);
+    public static File FileB { get; } = new(Files.FileB);
+    public static File FileC { get; } = new(Files.FileC);
+    public static File FileD { get; } = new(Files.FileD);
+    public static File FileE { get; } = new(Files.FileE);
+    public static File FileF { get; } = new(Files.FileF);
+    public static File FileG { get; } = new(Files.FileG);
+    public static File FileH { get; } = new(Files.FileH);
+    public static File[] AllFiles { get; } = { FileA, FileB, FileC, FileD, FileE, FileF, FileG, FileH };
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public File(int file)
-        => Value = (Files)file;
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public File(Files file)
-        => Value = file;
+        : this((Files)file) { }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public File(File f)
-        => Value = f.Value;
+        : this(f.Value) { }
 
     public char Char
         => (char)('a' + Value);
@@ -91,14 +87,6 @@ public readonly struct File : IEquatable<File>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator File(Files value)
         => new(value);
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator ==(File left, File right)
-        => left.Equals(right);
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator !=(File left, File right)
-        => !left.Equals(right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool operator ==(File left, Files right)
@@ -118,27 +106,27 @@ public readonly struct File : IEquatable<File>
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static File operator +(File left, File right)
-        => left.AsInt() + right.AsInt();
+        => new(left.AsInt() + right.AsInt());
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static File operator +(File left, int right)
-        => left.AsInt() + right;
+        => new(left.AsInt() + right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static File operator +(File left, Files right)
-        => left.AsInt() + (int)right;
+        => new(left.AsInt() + (int)right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static File operator -(File left, File right)
-        => left.AsInt() - right.AsInt();
+        => new(left.AsInt() - right.AsInt());
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static File operator -(File left, int right)
-        => left.AsInt() - right;
+        => new(left.AsInt() - right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static File operator -(File left, Files right)
-        => left.AsInt() - (int)right;
+        => new(left.AsInt() - (int)right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static File operator ++(File f)
@@ -190,31 +178,39 @@ public readonly struct File : IEquatable<File>
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool operator true(File f)
-        => f.IsValid();
+        => f.IsOk;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool operator false(File f)
-        => !f.IsValid();
+        => !f.IsOk;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public int AsInt()
         => (int)Value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool IsValid()
-        => (((int)Value - (int)Files.FileA) | ((int)Files.FileH - (int)Value)) >= 0;
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override string ToString()
         => FileStrings[AsInt()];
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public string ToString(string format, IFormatProvider formatProvider)
+        => Value.AsInt().ToString(format, formatProvider);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool TryFormat(
+        Span<char> destination,
+        out int charsWritten,
+        ReadOnlySpan<char> format,
+        IFormatProvider provider)
+        => Value.AsInt().TryFormat(destination, out charsWritten, format, provider);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Equals(File other)
         => Value == other.Value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override bool Equals(object obj)
-        => obj is File f && Equals(f);
+    public int CompareTo(File other)
+        => Value.AsInt().CompareTo(other.Value.AsInt());
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override int GetHashCode()

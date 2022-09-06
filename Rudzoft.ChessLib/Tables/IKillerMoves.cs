@@ -31,11 +31,11 @@ namespace Rudzoft.ChessLib.Tables;
 
 public interface IKillerMoves : IEquatable<IKillerMoves>
 {
-    int GetValue(int depth, Move move, Piece fromPiece);
+    int GetValue(int depth, Move m, Piece fromPc);
 
     IPieceSquare Get(int depth, int index);
 
-    void UpdateValue(int depth, Move move, Piece fromPiece);
+    void UpdateValue(int depth, Move m, Piece fromPc);
 
     void Shift(int depth);
 
