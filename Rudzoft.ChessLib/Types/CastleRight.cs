@@ -32,18 +32,18 @@ namespace Rudzoft.ChessLib.Types;
 [Flags]
 public enum CastleRights
 {
-    None = 0,
-    WhiteKing = 1,
-    WhiteQueen = WhiteKing << 1,
-    BlackKing = WhiteKing << 2,
-    BlackQueen = WhiteKing << 3,
+    None = 0,                           // 0000
+    WhiteKing = 1,                      // 0001
+    WhiteQueen = WhiteKing << 1,        // 0010
+    BlackKing = WhiteKing << 2,         // 0100
+    BlackQueen = WhiteKing << 3,        // 1000
 
-    King = WhiteKing | BlackKing,
-    Queen = WhiteQueen | BlackQueen,
-    White = WhiteKing | WhiteQueen,
-    Black = BlackKing | BlackQueen,
+    King = WhiteKing | BlackKing,       // 0101
+    Queen = WhiteQueen | BlackQueen,    // 1010
+    White = WhiteKing | WhiteQueen,     // 0011
+    Black = BlackKing | BlackQueen,     // 1100
+    Any = White | Black,                // 1111
 
-    Any = White | Black,
     Count = 16
 }
 
