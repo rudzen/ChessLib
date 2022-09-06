@@ -33,10 +33,10 @@ namespace Rudzoft.ChessLib.MoveGeneration;
 
 public static class MoveGenerator
 {
-    private static readonly (CastlelingRights, CastlelingRights)[] CastleSideRights =
+    private static readonly (CastleRights, CastleRights)[] CastleSideRights =
         {
-            (CastlelingRights.WhiteOo, CastlelingRights.WhiteOoo),
-            (CastlelingRights.BlackOo, CastlelingRights.BlackOoo)
+            (CastleRights.WhiteKing, CastleRights.WhiteQueen),
+            (CastleRights.BlackKing, CastleRights.BlackQueen)
         };
 
     public static int Generate(

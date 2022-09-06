@@ -346,7 +346,7 @@ internal static class BookZobrist
     internal static ulong Psq(int piece, Square sq)
         => psq[piece, sq.AsInt()];
 
-    internal static ulong Castle(CastlelingRights rights)
+    internal static ulong Castle(CastleRights rights)
         => castle[rights.AsInt()];
 
     internal static ulong EnPassant(File f)

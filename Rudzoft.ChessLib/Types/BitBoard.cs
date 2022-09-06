@@ -33,6 +33,7 @@ using System.Runtime.CompilerServices;
 // ReSharper disable MemberCanBeInternal
 namespace Rudzoft.ChessLib.Types;
 
+/// <inheritdoc />
 /// <summary>
 /// Bitboard struct, wraps an unsigned long with some nifty helper functionality and operators.
 /// Enumeration will yield each set bit as a Square struct.

@@ -62,10 +62,10 @@ public sealed class Position : IPosition
         State = default;
         _outputObjectPool = new DefaultObjectPool<StringBuilder>(new StringBuilderPooledObjectPolicy());
         _positionValidator = new PositionValidator(this, Board);
-        _castlingPath = new BitBoard[CastlelingRights.CastleRightsNb.AsInt()];
-        _castlingRookSquare = new Square[CastlelingRights.CastleRightsNb.AsInt()];
+        _castlingPath = new BitBoard[CastleRights.Count.AsInt()];
+        _castlingRookSquare = new Square[CastleRights.Count.AsInt()];
         _castlingRightsMask = new CastleRight[64];
-        _castlingRightsMask.Fill(CastleRight.NONE);
+        _castlingRightsMask.Fill(CastleRight.None);
         IsProbing = true;
         Clear();
     }
@@ -181,21 +181,21 @@ public sealed class Position : IPosition
 
     public bool CanCastle(Player p)
     {
-        var cr = (CastlelingRights)((int)(CastlelingRights.WhiteOo | CastlelingRights.WhiteOoo) << (2 * p.Side));
+        var cr = (CastleRights)((int)(CastleRights.WhiteKing | CastleRights.WhiteQueen) << (2 * p.Side));
         return State.CastlelingRights.Has(cr);
     }
 
     public bool CastlingImpeded(CastleRight cr)
     {
-        Debug.Assert(cr.Rights is CastlelingRights.WhiteOo or CastlelingRights.WhiteOoo or CastlelingRights.BlackOo
-            or CastlelingRights.BlackOoo);
+        Debug.Assert(cr.Rights is CastleRights.WhiteKing or CastleRights.WhiteQueen or CastleRights.BlackKing
+            or CastleRights.BlackQueen);
         return !(Board.Pieces() & _castlingPath[cr.Rights.AsInt()]).IsEmpty;
     }
 
     public Square CastlingRookSquare(CastleRight cr)
     {
-        Debug.Assert(cr.Rights is CastlelingRights.WhiteOo or CastlelingRights.WhiteOoo or CastlelingRights.BlackOo
-            or CastlelingRights.BlackOoo);
+        Debug.Assert(cr.Rights is CastleRights.WhiteKing or CastleRights.WhiteQueen or CastleRights.BlackKing
+            or CastleRights.BlackQueen);
         return _castlingRookSquare[cr.Rights.AsInt()];
     }
 
@@ -206,7 +206,7 @@ public sealed class Position : IPosition
     {
         Board.Clear();
         _castlingPath.Fill(BitBoard.Empty);
-        _castlingRightsMask.Fill(CastlelingRights.None);
+        _castlingRightsMask.Fill(CastleRights.None);
         _castlingRookSquare.Fill(Square.None);
         _sideToMove = Player.White;
         ChessMode = ChessMode.Normal;
@@ -251,28 +251,28 @@ public sealed class Position : IPosition
         fen[length++] = _sideToMove.Fen;
         fen[length++] = space;
 
-        if (State.CastlelingRights == CastleRight.NONE)
+        if (State.CastlelingRights == CastleRight.None)
             fen[length++] = dash;
         else
         {
-            if (CanCastle(CastleRight.WHITE_OO))
+            if (CanCastle(CastleRight.WhiteKing))
                 fen[length++] = ChessMode == ChessMode.Chess960
-                    ? CastlingRookSquare(CastleRight.WHITE_OO).FileChar
+                    ? CastlingRookSquare(CastleRight.WhiteKing).FileChar
                     : 'K';
 
-            if (CanCastle(CastleRight.WHITE_OOO))
+            if (CanCastle(CastleRight.WhiteQueen))
                 fen[length++] = ChessMode == ChessMode.Chess960
-                    ? CastlingRookSquare( CastleRight.WHITE_OOO).FileChar
+                    ? CastlingRookSquare( CastleRight.WhiteQueen).FileChar
                     : 'Q';
 
-            if (CanCastle(CastleRight.BLACK_OO))
+            if (CanCastle(CastleRight.BlackKing))
                 fen[length++] = ChessMode == ChessMode.Chess960
-                    ? CastlingRookSquare( CastleRight.BLACK_OOO).FileChar
+                    ? CastlingRookSquare( CastleRight.BlackQueen).FileChar
                     : 'k';
 
-            if (CanCastle(CastleRight.BLACK_OOO))
+            if (CanCastle(CastleRight.BlackQueen))
                 fen[length++] = ChessMode == ChessMode.Chess960
-                    ? CastlingRookSquare( CastleRight.BLACK_OOO).FileChar
+                    ? CastlingRookSquare( CastleRight.BlackQueen).FileChar
                     : 'q';
         }
 
@@ -650,7 +650,7 @@ public sealed class Position : IPosition
             Debug.Assert(pc == PieceTypes.King.MakePiece(us));
             Debug.Assert(capturedPiece == PieceTypes.Rook.MakePiece(us));
 
-            DoCastleling(us, from, ref to, out var rookFrom, out var rookTo, CastlelingPerform.Do);
+            DoCastleling(us, from, ref to, out var rookFrom, out var rookTo, CastlePerform.Do);
 
             k ^= capturedPiece.GetZobristPst(rookFrom);
             k ^= capturedPiece.GetZobristPst(rookTo);
@@ -708,8 +708,8 @@ public sealed class Position : IPosition
         }
 
         // Update castling rights if needed
-        if (State.CastlelingRights != CastlelingRights.None &&
-            (_castlingRightsMask[from.AsInt()] | _castlingRightsMask[to.AsInt()]) != CastleRight.NONE)
+        if (State.CastlelingRights != CastleRights.None &&
+            (_castlingRightsMask[from.AsInt()] | _castlingRightsMask[to.AsInt()]) != CastleRight.None)
         {
             var cr = _castlingRightsMask[from.AsInt()] | _castlingRightsMask[to.AsInt()];
             k ^= (State.CastlelingRights & cr).Key();
@@ -1147,7 +1147,7 @@ public sealed class Position : IPosition
         }
 
         if (type == MoveTypes.Castling)
-            DoCastleling(us, from, ref to, out _, out _, CastlelingPerform.Undo);
+            DoCastleling(us, from, ref to, out _, out _, CastlePerform.Undo);
         else
         {
             // Note: The parameters are reversed, since we move the piece "back"
@@ -1232,8 +1232,8 @@ public sealed class Position : IPosition
     public IPositionValidator Validate(PositionValidationTypes type = PositionValidationTypes.Basic)
         => _positionValidator.Validate(type);
 
-    private static CastlelingRights OrCastlingRight(Player c, bool isKingSide)
-        => (CastlelingRights)((int)CastlelingRights.WhiteOo << ((!isKingSide).AsByte() + 2 * c.Side));
+    private static CastleRights OrCastlingRight(Player c, bool isKingSide)
+        => (CastleRights)((int)CastleRights.WhiteKing << ((!isKingSide).AsByte() + 2 * c.Side));
 
     private void DoCastleling(
         Player us,
@@ -1241,10 +1241,10 @@ public sealed class Position : IPosition
         ref Square to,
         out Square rookFrom,
         out Square rookTo,
-        CastlelingPerform castlelingPerform)
+        CastlePerform castlelingPerform)
     {
         var kingSide = to > from;
-        var doCastleling = castlelingPerform == CastlelingPerform.Do;
+        var doCastleling = castlelingPerform == CastlePerform.Do;
 
         rookFrom = to; // Castling is encoded as "king captures friendly rook"
         rookTo = (kingSide ? Square.F1 : Square.D1).Relative(us);

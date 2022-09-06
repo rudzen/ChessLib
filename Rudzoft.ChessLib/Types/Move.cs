@@ -170,7 +170,7 @@ public record struct Move(ushort Data) : ISpanFormattable
         return MoveType() switch
         {
             MoveTypes.Normal => $"{FromSquare()}{ToSquare()}",
-            MoveTypes.Castling => CastlelingExtensions.GetCastlelingString(ToSquare(), FromSquare()),
+            MoveTypes.Castling => CastleExtensions.GetCastleString(ToSquare(), FromSquare()),
             MoveTypes.Promotion => $"{FromSquare()}{ToSquare()}{PromotedPieceType().GetPromotionChar()}",
             MoveTypes.Enpassant => $"{FromSquare()}{ToSquare()}",
             _ => "(error)"

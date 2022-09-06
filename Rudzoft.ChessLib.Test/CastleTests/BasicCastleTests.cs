@@ -34,12 +34,12 @@ namespace Rudzoft.ChessLib.Test.CastleTests;
 public sealed class BasicCastleTests
 {
     [Theory]
-    [InlineData(Fen.Fen.StartPositionFen, CastlelingRights.None, false)]
-    [InlineData("rnbqk2r/pppppppp/8/8/8/8/PPPPPPPP/RNBQK2R w KQkq - 0 1", CastlelingRights.KingSide, true)]
-    [InlineData("rnbqk2r/pppppppp/8/8/8/8/PPPPPPPP/RNBQK2R w KQkq - 0 1", CastlelingRights.QueenSide, true)]
-    [InlineData("r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 1", CastlelingRights.KingSide, true)]
-    [InlineData("r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 1", CastlelingRights.QueenSide, true)]
-    public void CanPotentiallyCastle(string fen, CastlelingRights cr, bool expected)
+    [InlineData(Fen.Fen.StartPositionFen, CastleRights.None, false)]
+    [InlineData("rnbqk2r/pppppppp/8/8/8/8/PPPPPPPP/RNBQK2R w KQkq - 0 1", CastleRights.King, true)]
+    [InlineData("rnbqk2r/pppppppp/8/8/8/8/PPPPPPPP/RNBQK2R w KQkq - 0 1", CastleRights.Queen, true)]
+    [InlineData("r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 1", CastleRights.King, true)]
+    [InlineData("r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 1", CastleRights.Queen, true)]
+    public void CanPotentiallyCastle(string fen, CastleRights cr, bool expected)
     {
         var pos = GameFactory.Create(fen).Pos;
         var fd = new FenData(fen);
@@ -50,19 +50,19 @@ public sealed class BasicCastleTests
     }
 
     [Theory]
-    [InlineData(Fen.Fen.StartPositionFen, CastlelingRights.WhiteOo, true)]
-    [InlineData(Fen.Fen.StartPositionFen, CastlelingRights.WhiteOoo, true)]
-    [InlineData(Fen.Fen.StartPositionFen, CastlelingRights.BlackOo, true)]
-    [InlineData(Fen.Fen.StartPositionFen, CastlelingRights.BlackOoo, true)]
-    [InlineData("rnbqk2r/pppppppp/8/8/8/8/PPPPPPPP/RNBQK2R w KQkq - 0 1", CastlelingRights.WhiteOo, false)]
-    [InlineData("rnbqk2r/pppppppp/8/8/8/8/PPPPPPPP/RNBQK2R w KQkq - 0 1", CastlelingRights.WhiteOoo, true)]
-    [InlineData("rnbqk2r/pppppppp/8/8/8/8/PPPPPPPP/RNBQK2R w KQkq - 0 1", CastlelingRights.BlackOo, false)]
-    [InlineData("rnbqk2r/pppppppp/8/8/8/8/PPPPPPPP/RNBQK2R w KQkq - 0 1", CastlelingRights.BlackOoo, true)]
-    [InlineData("r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 1", CastlelingRights.WhiteOo, false)]
-    [InlineData("r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 1", CastlelingRights.WhiteOoo, false)]
-    [InlineData("r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 1", CastlelingRights.BlackOo, false)]
-    [InlineData("r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 1", CastlelingRights.BlackOoo, false)]
-    public void IsCastleImpeeded(string fen, CastlelingRights cr, bool expected)
+    [InlineData(Fen.Fen.StartPositionFen, CastleRights.WhiteKing, true)]
+    [InlineData(Fen.Fen.StartPositionFen, CastleRights.WhiteQueen, true)]
+    [InlineData(Fen.Fen.StartPositionFen, CastleRights.BlackKing, true)]
+    [InlineData(Fen.Fen.StartPositionFen, CastleRights.BlackQueen, true)]
+    [InlineData("rnbqk2r/pppppppp/8/8/8/8/PPPPPPPP/RNBQK2R w KQkq - 0 1", CastleRights.WhiteKing, false)]
+    [InlineData("rnbqk2r/pppppppp/8/8/8/8/PPPPPPPP/RNBQK2R w KQkq - 0 1", CastleRights.WhiteQueen, true)]
+    [InlineData("rnbqk2r/pppppppp/8/8/8/8/PPPPPPPP/RNBQK2R w KQkq - 0 1", CastleRights.BlackKing, false)]
+    [InlineData("rnbqk2r/pppppppp/8/8/8/8/PPPPPPPP/RNBQK2R w KQkq - 0 1", CastleRights.BlackQueen, true)]
+    [InlineData("r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 1", CastleRights.WhiteKing, false)]
+    [InlineData("r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 1", CastleRights.WhiteQueen, false)]
+    [InlineData("r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 1", CastleRights.BlackKing, false)]
+    [InlineData("r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 1", CastleRights.BlackQueen, false)]
+    public void IsCastleImpeeded(string fen, CastleRights cr, bool expected)
     {
         var pos = GameFactory.Create(fen).Pos;
         var fd = new FenData(fen);

@@ -31,15 +31,15 @@ namespace Rudzoft.ChessLib.Test.CastleTests;
 public sealed class CastleRightTests
 {
     [Theory]
-    [InlineData(CastlelingRights.BlackCastleling)]
-    [InlineData(CastlelingRights.BlackOo)]
-    [InlineData(CastlelingRights.BlackOoo)]
-    [InlineData(CastlelingRights.KingSide)]
-    [InlineData(CastlelingRights.QueenSide)]
-    [InlineData(CastlelingRights.WhiteCastleling)]
-    [InlineData(CastlelingRights.WhiteOo)]
-    [InlineData(CastlelingRights.WhiteOoo)]
-    public void Simple(CastlelingRights v)
+    [InlineData(CastleRights.Black)]
+    [InlineData(CastleRights.BlackKing)]
+    [InlineData(CastleRights.BlackQueen)]
+    [InlineData(CastleRights.King)]
+    [InlineData(CastleRights.Queen)]
+    [InlineData(CastleRights.White)]
+    [InlineData(CastleRights.WhiteKing)]
+    [InlineData(CastleRights.WhiteQueen)]
+    public void Simple(CastleRights v)
     {
         CastleRight cr = v;
         Assert.True(cr.Has(v));
@@ -48,22 +48,22 @@ public sealed class CastleRightTests
     [Fact]
     public void TildeOperator()
     {
-        var cr = CastleRight.KING_SIDE;
+        var cr = CastleRight.King;
 
         var noKingSide = ~cr;
 
-        Assert.False(noKingSide.Has(CastlelingRights.BlackOo));
-        Assert.False(noKingSide.Has(CastlelingRights.WhiteOo));
+        Assert.False(noKingSide.Has(CastleRights.BlackKing));
+        Assert.False(noKingSide.Has(CastleRights.WhiteKing));
     }
 
     [Fact]
     public void Not()
     {
-        var cr = CastleRight.ANY;
-        cr = cr.Not(CastlelingRights.BlackOo);
+        var cr = CastleRight.Any;
+        cr = cr.Not(CastleRights.BlackKing);
 
-        Assert.False(cr.Has(CastlelingRights.BlackOo));
-        Assert.True(cr.Has(CastlelingRights.WhiteOo));
-        Assert.True(cr.Has(CastlelingRights.QueenSide));
+        Assert.False(cr.Has(CastleRights.BlackKing));
+        Assert.True(cr.Has(CastleRights.WhiteKing));
+        Assert.True(cr.Has(CastleRights.Queen));
     }
 }

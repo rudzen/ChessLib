@@ -109,43 +109,43 @@ public readonly record struct Rank(Ranks Value) : ISpanFormattable, IValidationT
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Rank operator +(Rank left, Rank right)
-        => left.AsInt() + right.AsInt();
+        => new(left.AsInt() + right.AsInt());
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Rank operator +(Rank left, int right)
-        => left.AsInt() + right;
+        => new(left.AsInt() + right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Rank operator +(Rank left, Ranks right)
-        => left.AsInt() + (int)right;
+        => new(left.AsInt() + (int)right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Rank operator -(Rank left, Rank right)
-        => left.AsInt() - right.AsInt();
+        => new(left.AsInt() - right.AsInt());
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Rank operator -(Rank left, int right)
-        => left.AsInt() - right;
+        => new(left.AsInt() - right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Rank operator -(Rank left, Ranks right)
-        => left.AsInt() - (int)right;
+        => new(left.AsInt() - (int)right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Rank operator ++(Rank r)
-        => r.Value + 1;
+        => new(r.Value + 1);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Rank operator --(Rank r)
-        => r.Value - 1;
+        => new(r.Value - 1);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static BitBoard operator &(Rank left, ulong right)
-        => left.BitBoardRank().Value & right;
+        => new(left.BitBoardRank().Value & right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static BitBoard operator &(ulong left, Rank right)
-        => left & right.BitBoardRank().Value;
+        => new(left & right.BitBoardRank().Value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static BitBoard operator |(Rank left, Rank right)
@@ -153,7 +153,7 @@ public readonly record struct Rank(Ranks Value) : ISpanFormattable, IValidationT
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static BitBoard operator |(ulong left, Rank right)
-        => left | right.BitBoardRank().Value;
+        => new(left | right.BitBoardRank().Value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int operator |(Rank left, int right)

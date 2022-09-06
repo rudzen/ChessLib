@@ -121,12 +121,12 @@ public sealed class PositionValidator : IPositionValidator
     private string ValidateCastleling(string error)
     {
         Span<Player> players = stackalloc Player[] { Player.White, Player.Black };
-        Span<CastlelingRights> crs = stackalloc CastlelingRights[] { CastlelingRights.None, CastlelingRights.None };
+        Span<CastleRights> crs = stackalloc CastleRights[] { CastleRights.None, CastleRights.None };
 
         foreach (var c in players)
         {
-            crs[0] = CastlelingRights.KingSide.MakeCastlelingRights(c);
-            crs[1] = CastlelingRights.QueenSide.MakeCastlelingRights(c);
+            crs[0] = CastleRights.King.MakeCastleRights(c);
+            crs[1] = CastleRights.Queen.MakeCastleRights(c);
 
             var ourRook = PieceTypes.Rook.MakePiece(c);
             foreach (var cr in crs)

@@ -119,7 +119,7 @@ public static class Zobrist
     public static HashKey GetZobristPst(this Piece piece, Square square) => ZobristPst[piece.AsInt()][square.AsInt()];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static HashKey GetZobristCastleling(this CastlelingRights index) => ZobristCastling[index.AsInt()];
+    public static HashKey GetZobristCastleling(this CastleRights index) => ZobristCastling[index.AsInt()];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static HashKey GetZobristSide() => ZobristSide;

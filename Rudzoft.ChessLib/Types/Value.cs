@@ -35,13 +35,11 @@ public readonly struct Value : IEquatable<Value>
 {
     public readonly PieceValues Raw;
 
-    public Value(Value value) : this(value.Raw)
-    {
-    }
+    public Value(Value value)
+        : this(value.Raw) { }
 
-    public Value(int value) : this((PieceValues)value)
-    {
-    }
+    public Value(int value)
+        : this((PieceValues)value) { }
 
     private Value(PieceValues value) => Raw = value;
 
@@ -60,40 +58,40 @@ public readonly struct Value : IEquatable<Value>
         => !left.Equals(right);
 
     public static Value operator +(Value left, Value right)
-        => (int)left.Raw + (int)right.Raw;
+        => new((int)left.Raw + (int)right.Raw);
 
     public static Value operator +(Value left, int right)
-        => (int)left.Raw + right;
+        => new((int)left.Raw + right);
 
     public static Value operator +(Value left, PieceValues right)
-        => (int)left.Raw + (int)right;
+        => new((int)left.Raw + (int)right);
 
     public static Value operator +(int left, Value right)
-        => left + (int)right.Raw;
+        => new(left + (int)right.Raw);
 
     public static Value operator -(Value left, Value right)
-        => left.Raw - right.Raw;
+        => new(left.Raw - right.Raw);
 
     public static Value operator -(Value left, int right)
-        => (int)left.Raw - right;
+        => new((int)left.Raw - right);
 
     public static Value operator -(PieceValues left, Value right)
-        => (int)left - right.Raw;
+        => new((int)left - right.Raw);
 
     public static Value operator -(Value left, PieceValues right)
-        => left.Raw - (int)right;
+        => new(left.Raw - (int)right);
 
     public static Value operator -(int left, Value right)
-        => left - (int)right.Raw;
+        => new(left - (int)right.Raw);
 
     public static Value operator ++(Value value)
-        => (int)value.Raw + 1;
+        => new((int)value.Raw + 1);
 
     public static Value operator --(Value value)
-        => (int)value.Raw - 1;
+        => new((int)value.Raw - 1);
 
     public static Value operator *(Value left, int right)
-        => (int)left.Raw * right;
+        => new((int)left.Raw * right);
 
     public static bool operator >(Value left, Value right)
         => left.Raw > right.Raw;
@@ -126,7 +124,7 @@ public readonly struct Value : IEquatable<Value>
         => value.Raw <= 0;
 
     public Value ForColor(Player p)
-        => p.IsWhite ? Raw : -(int)Raw;
+        => p.IsWhite ? this : new Value(-(int)Raw);
 
     public bool Equals(Value other)
         => Raw == other.Raw;
