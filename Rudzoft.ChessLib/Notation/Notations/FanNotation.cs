@@ -45,7 +45,7 @@ public sealed class FanNotation : Notation
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override string Convert(Move move)
     {
-        var (from, to) = move;
+        var (from, to, type) = move;
 
         if (move.IsCastlelingMove())
             return CastlelingExtensions.GetCastlelingString(to, from);
@@ -63,7 +63,7 @@ public sealed class FanNotation : Notation
                 re[i++] = c;
         }
 
-        if (move.IsEnPassantMove())
+        if (type == MoveTypes.Enpassant)
         {
             re[i++] = 'e';
             re[i++] = 'p';
@@ -82,7 +82,7 @@ public sealed class FanNotation : Notation
         re[i++] = to.FileChar;
         re[i++] = to.RankChar;
 
-        if (move.IsPromotionMove())
+        if (type == MoveTypes.Promotion)
         {
             re[i++] = '=';
             re[i++] = move.PromotedPieceType().MakePiece(Pos.SideToMove).GetUnicodeChar();

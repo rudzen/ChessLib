@@ -15,14 +15,14 @@ public sealed class CharConvertBenchmark
 
     public static IEnumerable<object> FileParams()
     {
-        yield return File.FILE_A;
-        yield return File.FILE_B;
-        yield return File.FILE_C;
-        yield return File.FILE_D;
-        yield return File.FILE_E;
-        yield return File.FILE_F;
-        yield return File.FILE_G;
-        yield return File.FILE_H;
+        yield return File.FileA;
+        yield return File.FileB;
+        yield return File.FileC;
+        yield return File.FileD;
+        yield return File.FileE;
+        yield return File.FileF;
+        yield return File.FileG;
+        yield return File.FileH;
     }
 
     [Benchmark]

@@ -40,7 +40,7 @@ namespace Rudzoft.ChessLib;
 public sealed class Blockage : IBlockage
 {
     private static readonly BitBoard PawnFileASquares =
-        File.FILE_A.FileBB() & ~(Rank.RANK_1.RankBB() | Rank.RANK_8.RankBB());
+        File.FileA.FileBB() & ~(Rank.Rank1.RankBB() | Rank.Rank8.RankBB());
 
     private readonly IPosition _pos;
 
@@ -132,7 +132,7 @@ public sealed class Blockage : IBlockage
                     if (theirKsq.File != f || theirKsq.RelativeRank(_us) < rr)
                         return false;
 
-                    if (f != File.FILE_A)
+                    if (f != File.FileA)
                     {
                         if (_pos.GetPiece(sq + Direction.West) != _ourPawn)
                             return false;
@@ -147,7 +147,7 @@ public sealed class Blockage : IBlockage
                             return false;
                     }
 
-                    if (f != File.FILE_H)
+                    if (f != File.FileH)
                     {
                         if (_pos.GetPiece(sq + Direction.East) != _ourPawn)
                             return false;
@@ -199,7 +199,7 @@ public sealed class Blockage : IBlockage
                     if (theirKsq.File != f || theirKsq.RelativeRank(_us) < rr)
                         return false;
 
-                    if (f != File.FILE_A)
+                    if (f != File.FileA)
                     {
                         if (_pos.GetPiece(sq + Direction.West) != _ourPawn)
                             return false;
@@ -214,7 +214,7 @@ public sealed class Blockage : IBlockage
                             return false;
                     }
 
-                    if (f != File.FILE_H)
+                    if (f != File.FileH)
                     {
                         if (_pos.GetPiece(sq + Direction.East) != _ourPawn)
                             return false;
@@ -264,7 +264,7 @@ public sealed class Blockage : IBlockage
         foreach (var psq in ourPawns)
         {
             var rr = psq.RelativeRank(_us);
-            if (rr < Rank.RANK_7
+            if (rr < Rank.Rank7
                 && (_pos.GetPiece(psq + up) == _theirPawn || !(_fixedPawn & (psq + up)).IsEmpty)
                 && (psq.PawnAttack(_us) & _theirPawns).IsEmpty)
             {
@@ -299,7 +299,7 @@ public sealed class Blockage : IBlockage
         _processed |= sq;
 
         // File H is marked as fence if it is reached.
-        if (sq.File == File.FILE_H)
+        if (sq.File == File.FileH)
         {
             _fence |= sq;
             return true;

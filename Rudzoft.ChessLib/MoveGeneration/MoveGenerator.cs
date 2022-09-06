@@ -88,7 +88,7 @@ public static class MoveGenerator
 
         var ksq = pos.GetKingSquare(us);
         var b = pos.GetAttacks(ksq, PieceTypes.King) & target;
-        index = Move.Create(moves, index, ksq, b);
+        index = Move.Create(moves, index, ksq, ref b);
 
         if (type == MoveGenerationType.Captures)
             return index;
@@ -172,7 +172,7 @@ public static class MoveGenerator
 
         // Generate evasions for king, capture and non capture moves
         var b = pos.GetAttacks(ksq, PieceTypes.King) & ~pos.Pieces(us) & ~sliderAttacks;
-        index = Move.Create(moves, index, ksq, b);
+        index = Move.Create(moves, index, ksq, ref b);
 
         if (pos.Checkers.MoreThanOne())
             return index; // Double check, only a king move can save the day
@@ -257,7 +257,7 @@ public static class MoveGenerator
             if (checks)
                 b &= pos.CheckedSquares(pt);
 
-            index = Move.Create(moves, index, from, b);
+            index = Move.Create(moves, index, from, ref b);
         }
 
         return index;
@@ -414,7 +414,7 @@ public static class MoveGenerator
         if (pos.EnPassantSquare == Square.None)
             return index;
 
-        Debug.Assert(pos.EnPassantSquare.Rank == Rank.RANK_6.Relative(us));
+        Debug.Assert(pos.EnPassantSquare.Rank == Rank.Rank6.Relative(us));
 
         // An en passant capture can be an evasion only if the checking piece is the double
         // pushed pawn and so is in the target. Otherwise this is a discovery check and we are
@@ -463,7 +463,7 @@ public static class MoveGenerator
             if (pt == PieceTypes.King)
                 b &= ~PieceTypes.Queen.PseudoAttacks(pos.GetKingSquare(~us));
 
-            index = Move.Create(moves, index, from, b);
+            index = Move.Create(moves, index, from, ref b);
         }
 
         return GenerateAll(in pos, moves, index, ~pos.Pieces(), us, MoveGenerationType.QuietChecks);

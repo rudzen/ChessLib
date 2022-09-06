@@ -35,7 +35,7 @@ namespace Rudzoft.ChessLib.Protocol.UCI;
 /// <summary>
 /// Contains the information related to search parameters for a UCI chess engine.
 /// </summary>
-public sealed class SearchParameters : ISearchParameters
+public sealed class SearchParameters : ISearchParameters, ISpanFormattable
 {
     private readonly Clock _clock;
     private ulong _movesToGo;
@@ -141,84 +141,11 @@ public sealed class SearchParameters : ISearchParameters
         Infinite = false;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public string Get()
+    public override string ToString()
     {
-        if (Infinite)
-            return "go infinite";
-
         Span<char> s = stackalloc char[128];
-        var index = 0;
-
-        s[index++] = 'g';
-        s[index++] = 'o';
-        s[index++] = ' ';
-        s[index++] = 'w';
-        s[index++] = 't';
-        s[index++] = 'i';
-        s[index++] = 'm';
-        s[index++] = 'e';
-        s[index++] = ' ';
-        index = ParseValue(index, in _clock.Time[Player.White.Side], s);
-
-        s[index++] = ' ';
-        s[index++] = 'b';
-        s[index++] = 't';
-        s[index++] = 'i';
-        s[index++] = 'm';
-        s[index++] = 'e';
-        s[index++] = ' ';
-        index = ParseValue(index, in _clock.Time[Player.Black.Side], s);
-
-        if (MoveTime > ulong.MinValue)
-        {
-            s[index++] = ' ';
-            s[index++] = 'm';
-            s[index++] = 'o';
-            s[index++] = 'v';
-            s[index++] = 'e';
-            s[index++] = 't';
-            s[index++] = 'i';
-            s[index++] = 'm';
-            s[index++] = 'e';
-            s[index++] = ' ';
-            index = s.Append(in _moveTime, index);
-        }
-
-        s[index++] = ' ';
-        s[index++] = 'w';
-        s[index++] = 'i';
-        s[index++] = 'n';
-        s[index++] = 'c';
-        s[index++] = ' ';
-        index = ParseValue(index, in _clock.Inc[Player.White.Side], s);
-
-        s[index++] = ' ';
-        s[index++] = 'b';
-        s[index++] = 'i';
-        s[index++] = 'n';
-        s[index++] = 'c';
-        s[index++] = ' ';
-
-        index = ParseValue(index, in _clock.Inc[Player.Black.Side], s);
-
-        if (_movesToGo == ulong.MinValue)
-            return new string(s[..index]);
-
-        s[index++] = ' ';
-        s[index++] = 'm';
-        s[index++] = 'o';
-        s[index++] = 'v';
-        s[index++] = 'e';
-        s[index++] = 's';
-        s[index++] = 't';
-        s[index++] = 'o';
-        s[index++] = 'g';
-        s[index++] = 'o';
-        s[index++] = ' ';
-        index = s.Append(in _movesToGo, index);
-
-        return new string(s[..index]);
+        TryFormat(s, out var written);
+        return new string(s[..written]);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -233,5 +160,102 @@ public sealed class SearchParameters : ISearchParameters
         for (var i = 0; i < numericWritten; ++i)
             target[index++] = number[i];
         return index;
+    }
+
+    public string ToString(string format, IFormatProvider formatProvider)
+        => string.Format(formatProvider, format, ToString());
+
+    public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format = default, IFormatProvider provider = null)
+    {
+        var index = 0;
+
+        destination[index++] = 'g';
+        destination[index++] = 'o';
+        destination[index++] = ' ';
+
+        if (Infinite)
+        {
+            destination[index++] = 'i';
+            destination[index++] = 'n';
+            destination[index++] = 'f';
+            destination[index++] = 'i';
+            destination[index++] = 'n';
+            destination[index++] = 'i';
+            destination[index++] = 't';
+            destination[index++] = 'e';
+            charsWritten = index;
+            return true;
+        }
+
+        destination[index++] = 'w';
+        destination[index++] = 't';
+        destination[index++] = 'i';
+        destination[index++] = 'm';
+        destination[index++] = 'e';
+        destination[index++] = ' ';
+        index = ParseValue(index, in _clock.Time[Player.White.Side], destination);
+
+        destination[index++] = ' ';
+        destination[index++] = 'b';
+        destination[index++] = 't';
+        destination[index++] = 'i';
+        destination[index++] = 'm';
+        destination[index++] = 'e';
+        destination[index++] = ' ';
+        index = ParseValue(index, in _clock.Time[Player.Black.Side], destination);
+
+        if (MoveTime > ulong.MinValue)
+        {
+            destination[index++] = ' ';
+            destination[index++] = 'm';
+            destination[index++] = 'o';
+            destination[index++] = 'v';
+            destination[index++] = 'e';
+            destination[index++] = 't';
+            destination[index++] = 'i';
+            destination[index++] = 'm';
+            destination[index++] = 'e';
+            destination[index++] = ' ';
+            index = destination.Append(in _moveTime, index);
+        }
+
+        destination[index++] = ' ';
+        destination[index++] = 'w';
+        destination[index++] = 'i';
+        destination[index++] = 'n';
+        destination[index++] = 'c';
+        destination[index++] = ' ';
+        index = ParseValue(index, in _clock.Inc[Player.White.Side], destination);
+
+        destination[index++] = ' ';
+        destination[index++] = 'b';
+        destination[index++] = 'i';
+        destination[index++] = 'n';
+        destination[index++] = 'c';
+        destination[index++] = ' ';
+
+        index = ParseValue(index, in _clock.Inc[Player.Black.Side], destination);
+
+        if (_movesToGo == ulong.MinValue)
+        {
+            charsWritten = index;
+            return true;
+        }
+
+        destination[index++] = ' ';
+        destination[index++] = 'm';
+        destination[index++] = 'o';
+        destination[index++] = 'v';
+        destination[index++] = 'e';
+        destination[index++] = 's';
+        destination[index++] = 't';
+        destination[index++] = 'o';
+        destination[index++] = 'g';
+        destination[index++] = 'o';
+        destination[index++] = ' ';
+        index = destination.Append(in _movesToGo, index);
+
+        charsWritten = index;
+        return true;
     }
 }

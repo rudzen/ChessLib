@@ -30,7 +30,7 @@ using System.Runtime.Serialization;
 namespace Rudzoft.ChessLib.Exceptions;
 
 [Serializable]
-public class TranspositionTableFailure : ArgumentException
+public sealed class TranspositionTableFailure : ArgumentException
 {
     public TranspositionTableFailure()
     {
@@ -44,7 +44,7 @@ public class TranspositionTableFailure : ArgumentException
     {
     }
 
-    protected TranspositionTableFailure(
+    public TranspositionTableFailure(
         SerializationInfo info,
         StreamingContext context) : base(info, context)
     {

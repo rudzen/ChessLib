@@ -48,7 +48,7 @@ public static class MoveTypesExtensions
 /// Move struct. Contains a single ushort for move related information. Also includes set and
 /// get functions for the relevant data stored in the bits.
 /// </summary>
-public record struct Move(ushort Data)
+public record struct Move(ushort Data) : ISpanFormattable
 {
     public Move(Square from, Square to) : this((ushort)(to | (from.AsInt() << 6)))
     {
@@ -69,6 +69,14 @@ public record struct Move(ushort Data)
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Deconstruct(out Square from, out Square to, out MoveTypes type)
+    {
+        from = FromSquare();
+        to = ToSquare();
+        type = MoveType();
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator Move(string value)
         => new(new Square(value[1] - '1', value[0] - 'a'), new Square(value[3] - '1', value[2] - 'a'));
 
@@ -85,7 +93,7 @@ public record struct Move(ushort Data)
         => new(from, to);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static int Create(Span<ExtMove> moves, int index, Square from, BitBoard to)
+    public static int Create(Span<ExtMove> moves, int index, Square from, ref BitBoard to)
     {
         while (to)
             moves[index++].Move = Create(from, BitBoards.PopLsb(ref to));
@@ -167,5 +175,49 @@ public record struct Move(ushort Data)
             MoveTypes.Enpassant => $"{FromSquare()}{ToSquare()}",
             _ => "(error)"
         };
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public string ToString(string format, IFormatProvider formatProvider)
+        => string.Format(formatProvider, format, ToString());
+
+    public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider provider)
+    {
+        var (from, to) = this;
+        switch (MoveType())
+        {
+            case MoveTypes.Normal or MoveTypes.Enpassant:
+                destination[0] = from.FileChar;
+                destination[1] = from.RankChar;
+                destination[2] = to.FileChar;
+                destination[3] = to.RankChar;
+                charsWritten = 4;
+                return true;
+            case MoveTypes.Castling:
+                destination[0] = 'O';
+                destination[1] = '-';
+                destination[2] = 'O';
+                charsWritten = 3;
+
+                if (to >= from)
+                    return true;
+
+                destination[3] = '-';
+                destination[4] = 'O';
+                charsWritten += 2;
+
+                return true;
+            case MoveTypes.Promotion:
+                destination[0] = from.FileChar;
+                destination[1] = from.RankChar;
+                destination[2] = to.FileChar;
+                destination[3] = to.RankChar;
+                destination[4] = PromotedPieceType().GetPromotionChar();
+                charsWritten = 5;
+                return true;
+        }
+
+        charsWritten = 0;
+        return false;
     }
 }

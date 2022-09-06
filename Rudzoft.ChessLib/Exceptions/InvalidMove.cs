@@ -29,7 +29,7 @@ using System.Runtime.Serialization;
 
 namespace Rudzoft.ChessLib.Exceptions;
 
-public class InvalidMove : InvalidOperationException
+public sealed class InvalidMove : InvalidOperationException
 {
     public InvalidMove()
     {
@@ -41,6 +41,6 @@ public class InvalidMove : InvalidOperationException
     public InvalidMove(string message, Exception innerException)
         : base(message, innerException) { }
 
-    protected InvalidMove(SerializationInfo info, StreamingContext context)
+    public InvalidMove(SerializationInfo info, StreamingContext context)
         : base(info, context) { }
 }

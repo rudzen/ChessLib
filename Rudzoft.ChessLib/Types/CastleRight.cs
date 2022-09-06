@@ -77,35 +77,21 @@ public static class CastlelingExtensions
         => @this & ~remove;
 }
 
-public readonly record struct CastleRight(CastlelingRights Rights) : IEquatable<CastleRight>
+public readonly record struct CastleRight(CastlelingRights Rights)
 {
-    // private CastleRight(CastlelingRights cr)
-    //     => Rights = cr;
-
-    private CastleRight(int cr) : this((CastlelingRights)cr) {}
-
-    // public CastlelingRights Rights { get; }
+    private CastleRight(int cr) : this((CastlelingRights)cr) { }
 
     public bool IsNone => Rights == CastlelingRights.None;
 
     public static CastleRight NONE { get; } = new(CastlelingRights.None);
-
     public static CastleRight WHITE_OO { get; } = new(CastlelingRights.WhiteOo);
-
     public static CastleRight BLACK_OO { get; } = new(CastlelingRights.BlackOo);
-
     public static CastleRight WHITE_OOO { get; } = new(CastlelingRights.WhiteOoo);
-
     public static CastleRight BLACK_OOO { get; } = new(CastlelingRights.BlackOoo);
-
     public static CastleRight KING_SIDE { get; } = new(CastlelingRights.KingSide);
-
     public static CastleRight QUEEN_SIDE { get; } = new(CastlelingRights.QueenSide);
-
     public static CastleRight WHITE_CASTLELING { get; } = new(CastlelingRights.WhiteCastleling);
-
     public static CastleRight BLACK_CASTLELING  { get; }= new(CastlelingRights.BlackCastleling);
-
     public static CastleRight ANY { get; } = new(CastlelingRights.Any);
 
     public static implicit operator CastleRight(CastlelingRights cr)
@@ -124,25 +110,25 @@ public readonly record struct CastleRight(CastlelingRights Rights) : IEquatable<
         => cr.Rights == CastlelingRights.None;
 
     public static CastleRight operator |(CastleRight cr1, CastleRight cr2)
-        => cr1.Rights | cr2.Rights;
+        => new(cr1.Rights | cr2.Rights);
 
     public static CastleRight operator |(CastleRight cr1, CastlelingRights cr2)
-        => cr1.Rights | cr2;
+        => new(cr1.Rights | cr2);
 
     public static CastleRight operator ^(CastleRight cr1, CastleRight cr2)
-        => cr1.Rights ^ cr2.Rights;
+        => new(cr1.Rights ^ cr2.Rights);
 
     public static CastleRight operator ^(CastleRight cr1, CastlelingRights cr2)
-        => cr1.Rights ^ cr2;
+        => new(cr1.Rights ^ cr2);
 
     public static CastleRight operator &(CastleRight cr1, CastleRight cr2)
-        => cr1.Rights & cr2.Rights;
+        => new(cr1.Rights & cr2.Rights);
 
     public static CastleRight operator &(CastleRight cr1, CastlelingRights cr2)
-        => cr1.Rights & cr2;
+        => new(cr1.Rights & cr2);
 
     public static CastleRight operator ~(CastleRight cr)
-        => ~cr.Rights;
+        => new(~cr.Rights);
 
     public HashKey Key()
         => Rights.GetZobristCastleling();
@@ -151,5 +137,5 @@ public readonly record struct CastleRight(CastlelingRights Rights) : IEquatable<
         => Rights.HasFlagFast(cr);
 
     public CastleRight Not(CastlelingRights cr)
-        => Rights & ~cr;
+        => new(Rights & ~cr);
 }

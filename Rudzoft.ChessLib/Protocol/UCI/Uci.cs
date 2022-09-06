@@ -176,10 +176,10 @@ public class Uci : IUci
         if (m.IsNullMove())
             return "(none)";
 
-        var (from, to) = m;
+        var (from, to, type) = m;
 
-        if (m.IsCastlelingMove() && chessMode != ChessMode.Chess960)
-            to = Square.Create(from.Rank, to > from ? File.FILE_G : File.FILE_C);
+        if (type == MoveTypes.Castling && chessMode != ChessMode.Chess960)
+            to = Square.Create(from.Rank, to > from ? File.FileG : File.FileC);
 
         Span<char> s = stackalloc char[5];
         var index = 0;
@@ -189,7 +189,7 @@ public class Uci : IUci
         s[index++] = to.FileChar;
         s[index++] = to.RankChar;
 
-        if (m.IsPromotionMove())
+        if (type == MoveTypes.Promotion)
             s[index++] = m.PromotedPieceType().GetPieceChar();
 
         return new string(s[..index]);

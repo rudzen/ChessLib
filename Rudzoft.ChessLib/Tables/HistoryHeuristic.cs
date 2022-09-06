@@ -46,22 +46,22 @@ public sealed class HistoryHeuristic : IHistoryHeuristic
         ClearTable(Player.Black);
     }
 
-    public void Set(Player c, Square from, Square to, int value)
-        => _table[c.Side][from.AsInt()][to.AsInt()] = value;
+    public void Set(Player p, Square from, Square to, int value)
+        => _table[p.Side][from.AsInt()][to.AsInt()] = value;
 
-    public int Retrieve(Player c, Square from, Square to)
-        => _table[c.Side][from.AsInt()][to.AsInt()];
+    public int Retrieve(Player p, Square from, Square to)
+        => _table[p.Side][from.AsInt()][to.AsInt()];
 
-    private void Initialize(Player c)
+    private void Initialize(Player p)
     {
-        _table[c.Side] = new int[64][];
-        for (var i = 0; i < _table[c.Side].Length; ++i)
-            _table[c.Side][i] = new int[64];
+        _table[p.Side] = new int[64][];
+        for (var i = 0; i < _table[p.Side].Length; ++i)
+            _table[p.Side][i] = new int[64];
     }
 
-    private void ClearTable(Player c)
+    private void ClearTable(Player p)
     {
-        for (var i = 0; i < _table[c.Side].Length; i++)
-            _table[c.Side][i].Clear();
+        for (var i = 0; i < _table[p.Side].Length; i++)
+            _table[p.Side][i].Clear();
     }
 }

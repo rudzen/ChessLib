@@ -247,7 +247,7 @@ public static class KpkBitBase
     /// <returns></returns>
     public static bool Probe(Square whiteKsq, Square pawnSq, Square blackKsq, Player stm)
     {
-        Debug.Assert(pawnSq.File <= File.FILE_D);
+        Debug.Assert(pawnSq.File <= File.FileD);
 
         return KpKbb[Index(stm, blackKsq, whiteKsq, pawnSq)];
     }

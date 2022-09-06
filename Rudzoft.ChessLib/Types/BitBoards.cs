@@ -231,7 +231,7 @@ public static class BitBoards
         static int distanceRank(Square x, Square y) => distance(x.Rank.AsInt(), y.Rank.AsInt());
 
         // ForwardRanksBB population loop idea from sf
-        foreach (var r in Rank.AllRanks)
+        foreach (var r in Rank.All)
         {
             var rank = r.AsInt();
             ForwardRanksBB[0][rank] = ~(ForwardRanksBB[1][rank + 1] = ForwardRanksBB[1][rank] | r.BitBoardRank());

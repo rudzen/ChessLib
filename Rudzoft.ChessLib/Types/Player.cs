@@ -43,7 +43,7 @@ public enum PlayerTypes
     Human = 1
 }
 
-public readonly struct Player : IEquatable<Player>
+public readonly record struct Player(byte Side) : ISpanFormattable
 {
     private static readonly Direction[] PawnPushDist = { Direction.North, Direction.South };
 
@@ -59,16 +59,11 @@ public readonly struct Player : IEquatable<Player>
 
     private static readonly Func<BitBoard, BitBoard>[] PawnPushModifiers = { BitBoards.NorthOne, BitBoards.SouthOne };
 
-    public Player(byte side)
-        : this() => Side = side;
+    public Player(Player p)
+        : this(p.Side) { }
 
-    public Player(Player side)
-        : this() => Side = side.Side;
-
-    public Player(Players side)
-        : this((byte)side) { }
-
-    public readonly byte Side;
+    public Player(Players p)
+        : this((byte)p) { }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Deconstruct(out byte side)
@@ -115,14 +110,6 @@ public readonly struct Player : IEquatable<Player>
         => new(p.Side ^ 1);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator ==(Player left, Player right)
-        => left.Side == right.Side;
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator !=(Player left, Player right)
-        => left.Side != right.Side;
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int operator <<(Player left, int right)
         => left.Side << right;
 
@@ -135,10 +122,6 @@ public readonly struct Player : IEquatable<Player>
         => (Pieces)pieceType + (byte)(side.Side << 3);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override bool Equals(object obj)
-        => obj is Player p && Equals(p);
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Equals(Player other) => Side == other.Side;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -147,6 +130,18 @@ public readonly struct Player : IEquatable<Player>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override string ToString()
         => PlayerColors[Side];
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public string ToString(string format, IFormatProvider formatProvider)
+        => string.Format(formatProvider, format, Side);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider provider)
+    {
+        destination[0] = Fen;
+        charsWritten = 1;
+        return true;
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool IsOk()

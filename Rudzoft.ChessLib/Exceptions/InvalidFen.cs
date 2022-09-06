@@ -29,7 +29,7 @@ using System.Runtime.Serialization;
 
 namespace Rudzoft.ChessLib.Exceptions;
 
-public class InvalidFen : ArgumentException
+public sealed class InvalidFen : ArgumentException
 {
     public InvalidFen()
     { }
@@ -40,6 +40,6 @@ public class InvalidFen : ArgumentException
     public InvalidFen(string message, Exception innerException)
         : base(message, innerException) { }
 
-    protected InvalidFen(SerializationInfo info, StreamingContext context)
+    public InvalidFen(SerializationInfo info, StreamingContext context)
         : base(info, context) { }
 }

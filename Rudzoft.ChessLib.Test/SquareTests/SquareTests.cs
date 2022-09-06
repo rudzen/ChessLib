@@ -61,7 +61,7 @@ public sealed class SquareTests
     {
         const Squares expected = Squares.h8;
 
-        var s = new Square(Rank.RANK_1, File.FILE_H);
+        var s = new Square(Rank.Rank1, File.FileH);
 
         var actual = s.Relative(Player.Black);
 
@@ -73,7 +73,7 @@ public sealed class SquareTests
     {
         const Squares expected = Squares.c3;
 
-        var s = new Square(Rank.RANK_3,  File.FILE_C);
+        var s = new Square(Rank.Rank3,  File.FileC);
 
         var actual = s.Relative(Player.White);
 

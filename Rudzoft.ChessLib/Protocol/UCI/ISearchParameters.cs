@@ -58,7 +58,5 @@ public interface ISearchParameters
 
     ulong Time(Player p);
 
-    string Get();
-
     bool DecreaseMovesToGo();
 }
