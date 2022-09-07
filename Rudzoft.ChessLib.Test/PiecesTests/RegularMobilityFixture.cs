@@ -38,12 +38,11 @@ public sealed class RegularMobilityFixture
     // special case with alpha band is taken care of
     public int[] KingExpected { get; } = { 5, 8, 8, 8 };
 
-    public BitBoard BoardCorners { get; }
-        = BitBoards.MakeBitboard(Square.A1) | BitBoards.MakeBitboard(Square.A8)
-                                            | BitBoards.MakeBitboard(Square.H1)
-                                            | BitBoards.MakeBitboard(Square.H8);
+    public BitBoard BoardCorners { get; } = Square.A1 | Square.A8 | Square.H1 | Square.H8;
 
     // pawn = 0 (N/A for now), knight = 1, king = 2
     public Func<Square, BitBoard>[] RegAttacks { get; } =
-        { BitBoards.KnightAttacks, BitBoards.KnightAttacks, BitBoards.KingAttacks };
+    {
+        static _ => BitBoard.Empty, BitBoards.KnightAttacks, BitBoards.KingAttacks
+    };
 }

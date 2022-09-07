@@ -47,7 +47,7 @@ public sealed class FanNotation : Notation
     {
         var (from, to, type) = move;
 
-        if (move.IsCastlelingMove())
+        if (move.IsCastleMove())
             return CastleExtensions.GetCastleString(to, from);
 
         var pc = Pos.MovedPiece(move);

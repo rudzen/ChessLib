@@ -177,13 +177,10 @@ public sealed class Position : IPosition
         => State.BlockersForKing[p.Side];
 
     public bool CanCastle(CastleRight cr)
-        => State.CastlelingRights.Has(cr.Rights);
+        => State.CastlelingRights.Has(cr);
 
     public bool CanCastle(Player p)
-    {
-        var cr = (CastleRights)((int)(CastleRights.WhiteKing | CastleRights.WhiteQueen) << (2 * p.Side));
-        return State.CastlelingRights.Has(cr);
-    }
+        => State.CastlelingRights.Has(p);
 
     public bool CastlingImpeded(CastleRight cr)
     {
@@ -262,17 +259,17 @@ public sealed class Position : IPosition
 
             if (CanCastle(CastleRight.WhiteQueen))
                 fen[length++] = ChessMode == ChessMode.Chess960
-                    ? CastlingRookSquare( CastleRight.WhiteQueen).FileChar
+                    ? CastlingRookSquare(CastleRight.WhiteQueen).FileChar
                     : 'Q';
 
             if (CanCastle(CastleRight.BlackKing))
                 fen[length++] = ChessMode == ChessMode.Chess960
-                    ? CastlingRookSquare( CastleRight.BlackQueen).FileChar
+                    ? CastlingRookSquare(CastleRight.BlackQueen).FileChar
                     : 'k';
 
             if (CanCastle(CastleRight.BlackQueen))
                 fen[length++] = ChessMode == ChessMode.Chess960
-                    ? CastlingRookSquare( CastleRight.BlackQueen).FileChar
+                    ? CastlingRookSquare(CastleRight.BlackQueen).FileChar
                     : 'q';
         }
 
@@ -418,7 +415,7 @@ public sealed class Position : IPosition
                 var ksq = GetKingSquare(them);
 
                 return !(PieceTypes.Rook.PseudoAttacks(rookTo) & ksq).IsEmpty && !(GetAttacks(rookTo, PieceTypes.Rook,
-                    Board.Pieces() ^ kingFrom ^ rookFrom | rookTo | kingTo) & ksq).IsEmpty;
+                    (Board.Pieces() ^ kingFrom ^ rookFrom) | rookTo | kingTo) & ksq).IsEmpty;
             }
             default:
                 Debug.Assert(false);
@@ -488,7 +485,7 @@ public sealed class Position : IPosition
         // If the moving piece is a king, check whether the destination square is attacked by
         // the opponent.
         if (MovedPiece(m).Type() == PieceTypes.King)
-            return m.IsCastlelingMove() || (AttacksTo(to) & Board.Pieces(~us)).IsEmpty;
+            return m.IsCastleMove() || (AttacksTo(to) & Board.Pieces(~us)).IsEmpty;
 
         // A non-king move is legal if and only if it is not pinned or it is moving along the
         // ray towards or away from the king.
@@ -642,7 +639,7 @@ public sealed class Position : IPosition
 
         Debug.Assert(pc.ColorOf() == us);
         Debug.Assert(
-            capturedPiece == Piece.EmptyPiece || capturedPiece.ColorOf() == (!m.IsCastlelingMove() ? them : us));
+            capturedPiece == Piece.EmptyPiece || capturedPiece.ColorOf() == (!m.IsCastleMove() ? them : us));
         Debug.Assert(capturedPiece.Type() != PieceTypes.King);
 
         if (type == MoveTypes.Castling)
@@ -708,7 +705,7 @@ public sealed class Position : IPosition
         }
 
         // Update castling rights if needed
-        if (State.CastlelingRights != CastleRights.None &&
+        if (State.CastlelingRights != CastleRight.None &&
             (_castlingRightsMask[from.AsInt()] | _castlingRightsMask[to.AsInt()]) != CastleRight.None)
         {
             var cr = _castlingRightsMask[from.AsInt()] | _castlingRightsMask[to.AsInt()];
@@ -1132,7 +1129,7 @@ public sealed class Position : IPosition
         var (from, to, type) = m;
         var pc = GetPiece(to);
 
-        Debug.Assert(!IsOccupied(from) || m.IsCastlelingMove());
+        Debug.Assert(!IsOccupied(from) || m.IsCastleMove());
         Debug.Assert(State.CapturedPiece.Type() != PieceTypes.King);
 
         if (type == MoveTypes.Promotion)
@@ -1241,10 +1238,10 @@ public sealed class Position : IPosition
         ref Square to,
         out Square rookFrom,
         out Square rookTo,
-        CastlePerform castlelingPerform)
+        CastlePerform castlePerform)
     {
         var kingSide = to > from;
-        var doCastleling = castlelingPerform == CastlePerform.Do;
+        var doCastleling = castlePerform == CastlePerform.Do;
 
         rookFrom = to; // Castling is encoded as "king captures friendly rook"
         rookTo = (kingSide ? Square.F1 : Square.D1).Relative(us);
@@ -1266,8 +1263,7 @@ public sealed class Position : IPosition
         if (IsProbing)
             return;
 
-        var pc = Board.PieceAt(from);
-        PieceUpdated?.Invoke(new PieceSquareEventArgs(pc, to));
+        PieceUpdated?.Invoke(new PieceSquareEventArgs(Board.PieceAt(from), to));
     }
 
     /// IPosition.SetCastlingRight() is an helper function used to set castling rights given the

@@ -75,36 +75,24 @@ public readonly record struct Square(Squares Value) : ISpanFormattable, ICompara
         .ToArray();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Square(int square) : this((Squares)square)
-    {
-    }
+    public Square(int square) : this((Squares)square) { }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Square(Square sq) : this(sq.Value)
-    {
-    }
+    public Square(Square sq) : this(sq.Value) { }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Square(int rank, int file)
-        : this((Squares)(rank << 3) + file)
-    {
-    }
+        : this((Squares)(rank << 3) + file) { }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Square(Ranks r, Files f)
-        : this((int)r, (int)f)
-    {
-    }
+        : this((int)r, (int)f) { }
 
     public Square(Rank r, File f)
-        : this(r.AsInt(), f.AsInt())
-    {
-    }
+        : this(r.AsInt(), f.AsInt()) { }
 
     public Square((Rank, File) rankFile)
-        : this(rankFile.Item1, rankFile.Item2)
-    {
-    }
+        : this(rankFile.Item1, rankFile.Item2) { }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator Square(string value)

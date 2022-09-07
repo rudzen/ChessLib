@@ -54,7 +54,7 @@ public sealed class SmithNotation : Notation
 
         if (captured != Piece.EmptyPiece)
             re[i++] = captured.GetPieceChar();
-        else if (move.IsCastlelingMove())
+        else if (move.IsCastleMove())
             re[i++] = 'c';
 
         return new string(re[..i]);

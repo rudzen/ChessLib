@@ -33,11 +33,11 @@ namespace Rudzoft.ChessLib.MoveGeneration;
 
 public static class MoveGenerator
 {
-    private static readonly (CastleRights, CastleRights)[] CastleSideRights =
-        {
-            (CastleRights.WhiteKing, CastleRights.WhiteQueen),
-            (CastleRights.BlackKing, CastleRights.BlackQueen)
-        };
+    private static readonly (CastleRight, CastleRight)[] CastleSideRights =
+    {
+        (CastleRights.WhiteKing, CastleRights.WhiteQueen),
+        (CastleRights.BlackKing, CastleRights.BlackQueen)
+    };
 
     public static int Generate(
         in IPosition pos,
@@ -76,12 +76,12 @@ public static class MoveGenerator
         Player us,
         MoveGenerationType type)
     {
-        index = GeneratePawnMoves(in pos, moves, index, target, us, type);
+        index = GeneratePawnMoves(in pos, moves, index, in target, us, type);
 
         var checks = type == MoveGenerationType.QuietChecks;
 
         for (var pt = PieceTypes.Knight; pt <= PieceTypes.Queen; ++pt)
-            index = GenerateMoves(in pos, moves, index, us, target, pt, checks);
+            index = GenerateMoves(in pos, moves, index, us, in target, pt, checks);
 
         if (checks || type == MoveGenerationType.Evasions)
             return index;
@@ -95,7 +95,7 @@ public static class MoveGenerator
 
         var (kingSide, queenSide) = CastleSideRights[us.Side];
 
-        if (!pos.CanCastle(kingSide | queenSide))
+        if (!pos.CanCastle(pos.SideToMove))
             return index;
 
         if (pos.CanCastle(kingSide) && !pos.CastlingImpeded(kingSide))
@@ -234,7 +234,7 @@ public static class MoveGenerator
         Span<ExtMove> moves,
         int index,
         Player us,
-        BitBoard target,
+        in BitBoard target,
         PieceTypes pt,
         bool checks)
     {
@@ -277,7 +277,7 @@ public static class MoveGenerator
         in IPosition pos,
         Span<ExtMove> moves,
         int index,
-        BitBoard target,
+        in BitBoard target,
         Player us,
         MoveGenerationType type)
     {
