@@ -89,7 +89,7 @@ public sealed class MoveTests
         Assert.True(move.IsQueenPromotion());
         Assert.True(move.IsPromotionMove());
         Assert.Equal(expectedMoveType, actualEMoveType);
-        Assert.False(move.IsCastlelingMove());
+        Assert.False(move.IsCastleMove());
         Assert.False(move.IsEnPassantMove());
     }
 

@@ -413,7 +413,7 @@ public static class BitBoards
     /// </summary>
     /// <param name="r">The rank</param>
     /// <returns>The bitboard of square rank</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public static BitBoard BitBoardRank(this Rank r)
         => Rank1BB << (8 * r.AsInt());
 
@@ -431,7 +431,7 @@ public static class BitBoards
     /// </summary>
     /// <param name="f">The file</param>
     /// <returns>The bitboard of file</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public static BitBoard BitBoardFile(this File f)
         => FileABB << f.AsInt();
 
@@ -498,7 +498,7 @@ public static class BitBoards
     public static BitBoard AdjacentFiles(File f)
         => AdjacentFilesBB[f.AsInt()];
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public static bool Aligned(this Square sq1, Square sq2, Square sq3)
         => !(Line(sq1, sq2) & sq3).IsEmpty;
 
@@ -574,7 +574,7 @@ public static class BitBoards
     /// <returns>The index of the found bit</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Square Lsb(this in BitBoard bb)
-        => BitOperations.TrailingZeroCount(bb.Value);
+        => new(BitOperations.TrailingZeroCount(bb.Value));
 
     /// <summary>
     /// Retrieves the least significant bit in an int word.
@@ -589,11 +589,11 @@ public static class BitBoards
     public static Square Msb(this in BitBoard bb)
         => 63 - BitOperations.LeadingZeroCount(bb.Value);
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public static BitBoard NorthOne(this BitBoard bb)
         => bb << 8;
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public static BitBoard SouthOne(this BitBoard bb)
         => bb >> 8;
 
@@ -605,19 +605,19 @@ public static class BitBoards
     public static BitBoard WestOne(this in BitBoard bb)
         => (bb & ~FileABB) >> 1;
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public static BitBoard SouthEastOne(this in BitBoard bb)
         => (bb & ~FileHBB) >> 7;
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public static BitBoard SouthWestOne(this in BitBoard bb)
         => (bb & ~FileABB) >> 9;
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public static BitBoard NorthWestOne(this in BitBoard bb)
         => (bb & ~FileABB) << 7;
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public static BitBoard NorthEastOne(this in BitBoard bb)
         => (bb & ~FileHBB) << 9;
 
@@ -649,7 +649,7 @@ public static class BitBoards
     public static BitBoard Fill(this in BitBoard bb, Player p)
         => FillFuncs[p.Side](bb);
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public static BitBoard Shift(this in BitBoard bb, Direction d)
     {
         if (ShiftFuncs.TryGetValue(d, out var func))
@@ -684,7 +684,7 @@ public static class BitBoards
     /// Reset the least significant bit in-place
     /// </summary>
     /// <param name="bb">The bitboard as reference</param>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public static void ResetLsb(ref BitBoard bb)
         => bb &= bb - 1;
 
@@ -696,7 +696,7 @@ public static class BitBoards
     public static void ResetLsb(ref int v)
         => v &= v - 1;
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public static Square PopLsb(ref BitBoard bb)
     {
         var sq = bb.Lsb();
@@ -704,7 +704,7 @@ public static class BitBoards
         return sq;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public static int PopLsb(ref int v)
     {
         var i = v.Lsb();
@@ -735,7 +735,8 @@ public static class BitBoards
     /// <param name="sq">The square to generate bitboard from</param>
     /// <returns>The generated bitboard</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard MakeBitboard(Square sq) => sq.AsBb();
+    public static BitBoard MakeBitboard(Square sq)
+        => sq.AsBb();
 
     /// <summary>
     /// Generate a bitboard based on two squares.
@@ -744,7 +745,8 @@ public static class BitBoards
     /// <param name="sq2">The second square to generate bitboard from</param>
     /// <returns>The generated bitboard</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard MakeBitboard(Square sq, Square sq2) => sq.AsBb() | sq2.AsBb();
+    public static BitBoard MakeBitboard(Square sq, Square sq2)
+        => sq.AsBb() | sq2.AsBb();
 
     /// <summary>
     /// Generate a bitboard based on a variadic amount of squares.
@@ -761,7 +763,8 @@ public static class BitBoards
     /// <param name="bb">The bitboard to set</param>
     /// <returns>true if more than one bit set, otherwise false</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool MoreThanOne(in BitBoard bb) => (bb.Value & (bb.Value - 1)) != 0;
+    public static bool MoreThanOne(in BitBoard bb)
+        => (bb.Value & (bb.Value - 1)) != 0;
 
     /// <summary>
     /// Helper method to generate shift function dictionary for all directions.

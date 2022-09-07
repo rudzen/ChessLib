@@ -25,6 +25,7 @@ SOFTWARE.
 */
 
 using System;
+using System.Runtime.CompilerServices;
 using Rudzoft.ChessLib.Hash;
 
 namespace Rudzoft.ChessLib.Types;
@@ -55,18 +56,6 @@ public enum CastleSides
     Count
 }
 
-public static class CastleRightsExtensions
-{
-    public static CastleRights MakeCastleRights(this CastleRights cs, Player p)
-        => p.IsWhite
-            ? cs == CastleRights.Queen
-                ? CastleRights.WhiteQueen
-                : CastleRights.WhiteKing
-            : cs == CastleRights.Queen
-                ? CastleRights.BlackQueen
-                : CastleRights.BlackKing;
-}
-
 public enum CastlePerform
 {
     Do,
@@ -75,14 +64,31 @@ public enum CastlePerform
 
 public static class CastleExtensions
 {
-    public static string GetCastleString(Square toSquare, Square fromSquare) => toSquare < fromSquare ? "O-O-O" : "O-O";
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string GetCastleString(Square toSquare, Square fromSquare)
+        => toSquare < fromSquare ? "O-O-O" : "O-O";
 
-    public static bool HasFlagFast(this CastleRights value, CastleRights flag) => (value & flag) != 0;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool HasFlagFast(this CastleRights value, CastleRights flag)
+        => (value & flag) != 0;
 
-    public static int AsInt(this CastleRights value) => (int)value;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static int AsInt(this CastleRights value)
+        => (int)value;
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static CastleRights Without(this CastleRights @this, CastleRights remove)
         => @this & ~remove;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static CastleRights MakeCastleRights(this CastleRights cs, Player p)
+        => p.IsWhite
+            ? cs == CastleRights.Queen
+                ? CastleRights.WhiteQueen
+                : CastleRights.WhiteKing
+            : cs == CastleRights.Queen
+                ? CastleRights.BlackQueen
+                : CastleRights.BlackKing;
 }
 
 public readonly record struct CastleRight(CastleRights Rights)
@@ -102,48 +108,75 @@ public readonly record struct CastleRight(CastleRights Rights)
     public static CastleRight Black  { get; }= new(CastleRights.Black);
     public static CastleRight Any { get; } = new(CastleRights.Any);
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator CastleRight(CastleRights cr)
         => new(cr);
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static implicit operator CastleRight(Player p)
+        => Create(p);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static CastleRight Create(Player p)
+        => new((CastleRights)((int)CastleRights.White << (p.Side << 1)));
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Equals(CastleRight other)
         => Rights == other.Rights;
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override int GetHashCode()
         => (int)Rights;
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool operator true(CastleRight cr)
         => cr.Rights != CastleRights.None;
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool operator false(CastleRight cr)
         => cr.Rights == CastleRights.None;
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static CastleRight operator |(CastleRight cr1, CastleRight cr2)
         => new(cr1.Rights | cr2.Rights);
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static CastleRight operator |(CastleRight cr1, CastleRights cr2)
         => new(cr1.Rights | cr2);
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static CastleRight operator ^(CastleRight cr1, CastleRight cr2)
         => new(cr1.Rights ^ cr2.Rights);
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static CastleRight operator ^(CastleRight cr1, CastleRights cr2)
         => new(cr1.Rights ^ cr2);
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static CastleRight operator &(CastleRight cr1, CastleRight cr2)
         => new(cr1.Rights & cr2.Rights);
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static CastleRight operator &(CastleRight cr1, CastleRights cr2)
         => new(cr1.Rights & cr2);
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static CastleRight operator ~(CastleRight cr)
         => new(~cr.Rights);
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public HashKey Key()
         => Rights.GetZobristCastleling();
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Has(CastleRights cr)
         => Rights.HasFlagFast(cr);
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool Has(CastleRight cr)
+        => Rights.HasFlagFast(cr.Rights);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public CastleRight Not(CastleRights cr)
         => new(Rights & ~cr);
 }

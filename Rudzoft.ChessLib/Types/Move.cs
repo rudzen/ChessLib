@@ -50,6 +50,8 @@ public static class MoveTypesExtensions
 /// </summary>
 public record struct Move(ushort Data) : ISpanFormattable
 {
+    private const int MaxMoveStringSize = 5;
+
     public Move(Square from, Square to) : this((ushort)(to | (from.AsInt() << 6)))
     {
     }
@@ -133,7 +135,7 @@ public record struct Move(ushort Data) : ISpanFormattable
         => MoveType() == MoveTypes.Enpassant;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool IsCastlelingMove()
+    public bool IsCastleMove()
         => MoveType() == MoveTypes.Castling;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -167,21 +169,22 @@ public record struct Move(ushort Data) : ISpanFormattable
         if (IsNullMove())
             return "(null)";
 
-        return MoveType() switch
-        {
-            MoveTypes.Normal => $"{FromSquare()}{ToSquare()}",
-            MoveTypes.Castling => CastleExtensions.GetCastleString(ToSquare(), FromSquare()),
-            MoveTypes.Promotion => $"{FromSquare()}{ToSquare()}{PromotedPieceType().GetPromotionChar()}",
-            MoveTypes.Enpassant => $"{FromSquare()}{ToSquare()}",
-            _ => "(error)"
-        };
+        Span<char> s = stackalloc char[MaxMoveStringSize];
+        return TryFormat(s, out var size)
+            ? new string(s[..size])
+            : "(error)";
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public string ToString(string format, IFormatProvider formatProvider)
+    public string ToString(string format, IFormatProvider formatProvider = null)
         => string.Format(formatProvider, format, ToString());
 
-    public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider provider)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool TryFormat(
+        Span<char> destination,
+        out int charsWritten,
+        ReadOnlySpan<char> format = default,
+        IFormatProvider provider = null)
     {
         var (from, to) = this;
         switch (MoveType())
@@ -197,14 +200,16 @@ public record struct Move(ushort Data) : ISpanFormattable
                 destination[0] = 'O';
                 destination[1] = '-';
                 destination[2] = 'O';
-                charsWritten = 3;
 
                 if (to >= from)
+                {
+                    charsWritten = 3;
                     return true;
+                }
 
                 destination[3] = '-';
                 destination[4] = 'O';
-                charsWritten += 2;
+                charsWritten = MaxMoveStringSize;
 
                 return true;
             case MoveTypes.Promotion:
@@ -213,11 +218,11 @@ public record struct Move(ushort Data) : ISpanFormattable
                 destination[2] = to.FileChar;
                 destination[3] = to.RankChar;
                 destination[4] = PromotedPieceType().GetPromotionChar();
-                charsWritten = 5;
+                charsWritten = MaxMoveStringSize;
                 return true;
+            default:
+                charsWritten = 0;
+                return false;
         }
-
-        charsWritten = 0;
-        return false;
     }
 }
