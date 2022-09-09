@@ -33,7 +33,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.ObjectPool;
 using Perft;
 using Rudzoft.ChessLib;
-using Rudzoft.ChessLib.Perft;
 using Rudzoft.ChessLib.Perft.Interfaces;
 using Rudzoft.ChessLib.Protocol.UCI;
 using Rudzoft.ChessLib.Tables;
@@ -131,7 +130,6 @@ internal static class Program
         // Bind chess classes
         container.Register<IGame, Game>(Reuse.Transient);
         container.Register<IBoard, Board>(Reuse.Singleton);
-        // container.Register<IMoveList, MoveList>(Reuse.Transient);
         container.Register<IPosition, Position>(Reuse.Transient);
         container.Register<IKillerMoves, KillerMoves>(Reuse.Transient);
         container.Register<IUci, Uci>(Reuse.Singleton);

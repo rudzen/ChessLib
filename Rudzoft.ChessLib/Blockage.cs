@@ -325,9 +325,10 @@ public sealed class Blockage : IBlockage
 
     private bool IsFenceFormed()
     {
-        // ReSharper disable once LoopCanBePartlyConvertedToQuery
-        foreach (var startSquare in PawnFileASquares)
+        var bb = PawnFileASquares;
+        while (bb)
         {
+            var startSquare = BitBoards.PopLsb(ref bb);
             if ((_marked & startSquare).IsEmpty || !FormsFence(startSquare))
                 continue;
             _fence |= startSquare;

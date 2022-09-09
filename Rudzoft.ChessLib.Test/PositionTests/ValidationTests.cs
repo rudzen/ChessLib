@@ -61,7 +61,7 @@ public sealed class ValidationTests
     {
         // position only has pawns, rooks and kings
         const string fen = "r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 1";
-        const PositionValidationTypes validationType = PositionValidationTypes.Castleling;
+        const PositionValidationTypes validationType = PositionValidationTypes.Castle;
         var game = GameFactory.Create();
         game.NewGame(fen);
 

@@ -52,11 +52,11 @@ public sealed class PieceSquareEventArgs : EventArgs, ISpanFormattable, IPieceSq
         sq = Square;
     }
 
-    public bool Equals(IPieceSquare? other)
+    public bool Equals(IPieceSquare other)
         => other is not null &&
            (ReferenceEquals(this, other) || (Piece.Equals(other.Piece) && Square.Equals(other.Square)));
 
-    public override bool Equals(object? obj)
+    public override bool Equals(object obj)
         => obj is not null &&
            (ReferenceEquals(this, obj) || (obj.GetType() == GetType() && Equals((PieceSquareEventArgs)obj)));
 
@@ -65,11 +65,11 @@ public sealed class PieceSquareEventArgs : EventArgs, ISpanFormattable, IPieceSq
         => HashCode.Combine(Piece, Square);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public string ToString(string? format, IFormatProvider? formatProvider)
+    public string ToString(string format, IFormatProvider formatProvider)
         => string.Format(formatProvider, format, Piece + Square.ToString());
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
+    public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format = default, IFormatProvider provider = null)
     {
         Span<char> s = stackalloc char[3];
         Square.TryFormat(s, out charsWritten, format, provider);

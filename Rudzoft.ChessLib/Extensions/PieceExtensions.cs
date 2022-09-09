@@ -37,7 +37,6 @@ public static class PieceExtensions
 
     private const string PromotionPieceNotation = "  nbrq";
 
-    // for polyglot support in the future
     public const string BookPieceNames = "pPnNbBrRqQkK";
 
     private static readonly string[] PieceStrings = { " ", "P", "N", "B", "R", "Q", "K", " ", " ", "p", "n", "b", "r", "q", "k" };
