@@ -5,7 +5,7 @@ using Rudzoft.ChessLib.Types;
 namespace Rudzoft.ChessLib.Benchmark;
 
 [MemoryDiagnoser]
-public sealed class IterateBenchmark
+public class IterateBenchmark
 {
     [Params(10000, 50000)]
     public int N;

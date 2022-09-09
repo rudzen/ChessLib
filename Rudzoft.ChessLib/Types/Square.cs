@@ -124,7 +124,7 @@ public readonly record struct Square(Squares Value) : ISpanFormattable, ICompara
         => !(BitBoards.PromotionRanksBB & this).IsEmpty;
 
     public bool IsDark
-        => !(BitBoards.DarkSquares & this).IsEmpty;
+        => !(Player.Black.ColorBB() & this).IsEmpty;
 
     public static Square None { get; } = new(Squares.none);
 
@@ -385,11 +385,16 @@ public readonly record struct Square(Squares Value) : ISpanFormattable, ICompara
     /// Swap A1 <-> H1
     /// </summary>
     /// <returns>Flipped square by File</returns>
-    public Square FlipFile() => AsInt() ^ Squares.h1.AsInt();
+    public Square FlipFile()
+        => AsInt() ^ Squares.h1.AsInt();
 
     /// <summary>
     /// Swap A1 <-> A8
     /// </summary>
     /// <returns>Flipped square by Fank</returns>
-    public Square FlipRank() => AsInt() ^ Squares.a8.AsInt();
+    public Square FlipRank()
+        => AsInt() ^ Squares.a8.AsInt();
+
+    public Player Color()
+        => ((AsInt() + Rank.AsInt()) ^ 1) & 1;
 }

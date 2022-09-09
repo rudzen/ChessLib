@@ -48,13 +48,13 @@ public sealed class Game : IGame
     {
         _pos = pos;
         _moveLists = new DefaultObjectPool<IMoveList>(new MoveListPolicy());
-        Uci = new Uci();
         SearchParameters = new SearchParameters();
     }
 
     static Game()
     {
         Table = new TranspositionTable(256);
+        Uci = new Uci();
     }
 
     public Action<IPieceSquare> PieceUpdated => _pos.PieceUpdated;
@@ -71,7 +71,7 @@ public sealed class Game : IGame
 
     public SearchParameters SearchParameters { get; }
 
-    public IUci Uci { get; }
+    public static IUci Uci { get; }
 
     public bool IsRepetition => _pos.IsRepetition;
 

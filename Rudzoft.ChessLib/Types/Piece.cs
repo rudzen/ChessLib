@@ -98,7 +98,20 @@ public readonly record struct Piece(Pieces Value)
 
     public bool IsBlack => ColorOf().IsBlack;
 
-    public static readonly Piece EmptyPiece = Pieces.NoPiece;
+    public static Piece EmptyPiece { get; } = new(Pieces.NoPiece);
+    public static Piece WhitePawn { get; } = new(Pieces.WhitePawn);
+    public static Piece WhiteKnight { get; } = new(Pieces.WhiteKnight);
+    public static Piece WhiteBishop { get; } = new(Pieces.WhiteBishop);
+    public static Piece WhiteRook { get; } = new(Pieces.WhiteRook);
+    public static Piece WhiteQueen { get; } = new(Pieces.WhiteQueen);
+    public static Piece WhiteKing { get; } = new(Pieces.WhiteKing);
+    public static Piece BlackPawn { get; } = new(Pieces.BlackPawn);
+    public static Piece BlackKnight { get; } = new(Pieces.BlackKnight);
+    public static Piece BlackBishop { get; } = new(Pieces.BlackBishop);
+    public static Piece BlackRook { get; } = new(Pieces.BlackRook);
+    public static Piece BlackQueen { get; } = new(Pieces.BlackQueen);
+    public static Piece BlackKing { get; } = new(Pieces.BlackKing);
+
 
     public static Piece[] AllPieces { get; } =
     {

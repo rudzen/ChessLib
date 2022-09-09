@@ -6,7 +6,7 @@ using Rudzoft.ChessLib.Types;
 namespace Rudzoft.ChessLib.Benchmark;
 
 [MemoryDiagnoser]
-public sealed class BitOpBench
+public class BitOpBench
 {
     private static readonly int[] Lsb64Table =
     {
@@ -97,7 +97,7 @@ public sealed class BitOpBench
         yield return BitBoards.Center;
         yield return BitBoards.BlackArea;
         yield return BitBoards.CenterFiles;
-        yield return BitBoards.DarkSquares;
+        yield return Player.Black.ColorBB();
         yield return BitBoards.CornerA1;
         yield return BitBoards.CornerA8;
         yield return BitBoards.CornerH1;

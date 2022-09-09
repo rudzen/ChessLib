@@ -36,7 +36,7 @@ public sealed class BitboardTests
     {
         // a few squares
         var b1 = BitBoards.MakeBitboard(Square.A1, Square.B1, Square.A2, Square.B2);
-        var b2 = Square.A1.AsBb() | Square.B1.AsBb() | Square.A2.AsBb() | Square.B2.AsBb();
+        var b2 = Square.A1 | Square.B1 | Square.A2 | Square.B2;
         Assert.Equal(b1, b2);
 
         // a single square (not needed, but still has to work in case of list of squares etc)
@@ -48,7 +48,8 @@ public sealed class BitboardTests
     [Fact]
     public void BitBoardOrAll()
     {
-        Span<Square> baseSquares = stackalloc Square[8] { Square.A1, Square.A2, Square.A3, Square.A4, Square.A5, Square.A6, Square.A7, Square.A8 };
+        Span<Square> baseSquares = stackalloc Square[8]
+            { Square.A1, Square.A2, Square.A3, Square.A4, Square.A5, Square.A6, Square.A7, Square.A8 };
         var bb = BitBoard.Empty.OrAll(baseSquares);
         while (bb)
         {
@@ -56,5 +57,86 @@ public sealed class BitboardTests
             var valid = baseSquares.BinarySearch(s) > -1;
             Assert.True(valid);
         }
+    }
+
+    [Fact]
+    public void WhiteAreaCount()
+    {
+        const int expected = 32;
+        var actual = BitBoards.WhiteArea.Count;
+        Assert.Equal(expected, actual);
+    }
+
+    [Fact]
+    public void BlackAreaCount()
+    {
+        const int expected = 32;
+        var actual = BitBoards.BlackArea.Count;
+        Assert.Equal(expected, actual);
+    }
+
+    [Fact]
+    public void LightSquaresCount()
+    {
+        const int expected = 32;
+        var actual = Player.White.ColorBB().Count;
+        Assert.Equal(expected, actual);
+    }
+
+    [Fact]
+    public void DarkSquaresCount()
+    {
+        const int expected = 32;
+        var actual = Player.Black.ColorBB().Count;
+        Assert.Equal(expected, actual);
+    }
+
+    [Theory]
+    [InlineData(Files.FileA, 8)]
+    [InlineData(Files.FileB, 8)]
+    [InlineData(Files.FileC, 8)]
+    [InlineData(Files.FileD, 8)]
+    [InlineData(Files.FileE, 8)]
+    [InlineData(Files.FileF, 8)]
+    [InlineData(Files.FileG, 8)]
+    [InlineData(Files.FileH, 8)]
+    public void FileSquaresCount(Files files, int expected)
+    {
+        var f = new File(files);
+        var actual = f.BitBoardFile().Count;
+        Assert.Equal(expected, actual);
+    }
+
+    [Theory]
+    [InlineData(Ranks.Rank1, 8)]
+    [InlineData(Ranks.Rank2, 8)]
+    [InlineData(Ranks.Rank3, 8)]
+    [InlineData(Ranks.Rank4, 8)]
+    [InlineData(Ranks.Rank5, 8)]
+    [InlineData(Ranks.Rank6, 8)]
+    [InlineData(Ranks.Rank7, 8)]
+    [InlineData(Ranks.Rank8, 8)]
+    public void RankSquaresCount(Ranks ranks, int expected)
+    {
+        var r = new Rank(ranks);
+        var actual = r.BitBoardRank().Count;
+        Assert.Equal(expected, actual);
+    }
+
+    [Fact]
+    public void EmptyCount()
+    {
+        const int expected = 0;
+        var actual = BitBoards.EmptyBitBoard.Count;
+        Assert.Equal(expected, actual);
+        Assert.True(BitBoards.EmptyBitBoard.IsEmpty);
+    }
+
+    [Fact]
+    public void FullCount()
+    {
+        var expected = Square.Count;
+        var actual = BitBoards.AllSquares.Count;
+        Assert.Equal(expected, actual);
     }
 }

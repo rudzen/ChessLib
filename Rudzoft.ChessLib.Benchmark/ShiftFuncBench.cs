@@ -6,7 +6,8 @@ using Rudzoft.ChessLib.Types;
 namespace Rudzoft.ChessLib.Benchmark;
 
 [MemoryDiagnoser]
-public sealed class ShiftFuncBench
+// ReSharper disable once ClassCanBeSealed.Global
+public class ShiftFuncBench
 {
 
     private static readonly IDictionary<Direction, Func<BitBoard, BitBoard>> ShiftFuncs = MakeShiftFuncs();

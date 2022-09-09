@@ -96,15 +96,7 @@ public static class Zobrist
         for (var i = 0; i < ZobristPst.Length; i++)
             ZobristPst[i] = new HashKey[64];
 
-        Span<Piece> pieces = stackalloc Piece[]
-        {
-            Pieces.WhitePawn, Pieces.WhiteKnight, Pieces.WhiteBishop,
-            Pieces.WhiteRook, Pieces.WhiteQueen,  Pieces.WhiteKing,
-            Pieces.BlackPawn, Pieces.BlackKnight, Pieces.BlackBishop,
-            Pieces.BlackRook, Pieces.BlackQueen,  Pieces.BlackKing
-        };
-
-        foreach (var pc in pieces)
+        foreach (var pc in Piece.AllPieces)
         foreach (var sq in BitBoards.AllSquares)
             ZobristPst[pc.AsInt()][sq.AsInt()] = rnd.Rand();
     }

@@ -889,6 +889,23 @@ public sealed class Position : IPosition
     public BitBoard Pieces(PieceTypes pt1, PieceTypes pt2, Player p)
         => Board.Pieces(p, pt1, pt2);
 
+    public BitBoard PawnsOnColor(Player p, Square sq)
+        => Pieces(PieceTypes.Pawn, p) & sq.Color().ColorBB();
+
+    public bool SemiOpenFileOn(Player p, Square sq)
+        => (Board.Pieces(p, PieceTypes.Pawn) & sq.File.BitBoardFile()).IsEmpty;
+
+    public bool BishopPaired(Player p) =>
+        Board.PieceCount(PieceTypes.Bishop, p) >= 2
+        && !(Board.Pieces(p, PieceTypes.Bishop) & Player.White.ColorBB()).IsEmpty
+        && !(Board.Pieces(p, PieceTypes.Bishop) & Player.Black.ColorBB()).IsEmpty;
+
+    public bool BishopOpposed() =>
+        Board.PieceCount(Piece.WhiteBishop) == 1
+        && Board.PieceCount(Piece.BlackBishop) == 1
+        && Board.Square(PieceTypes.Bishop, Player.White)
+            .IsOppositeColor(Board.Square(PieceTypes.Bishop, Player.Black));
+
     public BitBoard PinnedPieces(Player p)
         => State.Pinners[p.Side];
 

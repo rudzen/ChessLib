@@ -28,7 +28,7 @@ namespace Rudzoft.ChessLib.Factories;
 
 public static class BlockageFactory
 {
-    public static IBlockage Create(IPosition pos) => new Blockage(pos);
+    public static IBlockage Create(in IPosition pos) => new Blockage(in pos);
 
-    public static bool IsBlocked(IPosition pos) => Create(pos).IsBlocked();
+    public static bool IsBlocked(in IPosition pos) => Create(in pos).IsBlocked();
 }

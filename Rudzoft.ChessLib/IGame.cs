@@ -45,8 +45,6 @@ public interface IGame : IEnumerable<Piece>
 
     SearchParameters SearchParameters { get; }
 
-    IUci Uci { get; }
-
     bool IsRepetition { get; }
 
     void NewGame(string fen = Fen.Fen.StartPositionFen);

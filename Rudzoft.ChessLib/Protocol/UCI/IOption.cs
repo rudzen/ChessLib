@@ -40,6 +40,8 @@ public interface IOption
     int GetInt();
     string GetText();
 
+    bool GetBool();
+
     /// <summary>
     /// Updates currentValue and triggers OnChange() action.
     /// It's up to the GUI to check for option's limits, but we could receive the new value from

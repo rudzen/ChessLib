@@ -48,9 +48,9 @@ public static class BitBoards
 
     public static readonly BitBoard BlackArea = ~WhiteArea;
 
-    public static readonly BitBoard LightSquares = new(0x55AA55AA55AA55AAUL);
+    private static readonly BitBoard LightSquares = new(0x55AA55AA55AA55AAUL);
 
-    public static readonly BitBoard DarkSquares = ~LightSquares;
+    private static readonly BitBoard[] ColorsBB = { LightSquares, ~LightSquares };
 
     private static readonly BitBoard FileABB = new(0x0101010101010101UL);
 
@@ -109,6 +109,9 @@ public static class BitBoards
     public static readonly BitBoard KingSide = new(FileEBB | FileFBB | FileGBB | FileHBB);
 
     public static readonly BitBoard Center = new((FileDBB | FileEBB) & (Rank4BB | Rank5BB));
+
+    // A1..H8 | H1..A8
+    public static readonly BitBoard DiagonalBB = new(0x8142241818244281UL);
 
     private static readonly BitBoard[] PromotionRanks = { Rank8BB, Rank1BB };
 
@@ -331,21 +334,25 @@ public static class BitBoards
             }
 
             // Compute KingRings
-            pt = PieceTypes.King.AsInt();
+            InitializeKingRing(s1, sq, file);
+        }
+    }
 
-            foreach (var player in Player.AllPlayers)
-            {
-                KingRingBB[player.Side][sq] = PseudoAttacksBB[pt][sq];
-                if (s1.RelativeRank(player) == Ranks.Rank1)
-                    KingRingBB[player.Side][sq] |= KingRingBB[player.Side][sq].Shift(PawnPushDirections[player.Side]);
+    private static void InitializeKingRing(Square s1, int sq, File file)
+    {
+        const int pt = (int)PieceTypes.King;
+        foreach (var player in Player.AllPlayers)
+        {
+            KingRingBB[player.Side][sq] = PseudoAttacksBB[pt][sq];
+            if (s1.RelativeRank(player) == Ranks.Rank1)
+                KingRingBB[player.Side][sq] |= KingRingBB[player.Side][sq].Shift(PawnPushDirections[player.Side]);
 
-                if (file == Files.FileH)
-                    KingRingBB[player.Side][sq] |= KingRingBB[player.Side][sq].WestOne();
-                else if (file == Files.FileA)
-                    KingRingBB[player.Side][sq] |= KingRingBB[player.Side][sq].EastOne();
+            if (file == Files.FileH)
+                KingRingBB[player.Side][sq] |= KingRingBB[player.Side][sq].WestOne();
+            else if (file == Files.FileA)
+                KingRingBB[player.Side][sq] |= KingRingBB[player.Side][sq].EastOne();
 
-                Debug.Assert(!KingRingBB[player.Side][sq].IsEmpty);
-            }
+            Debug.Assert(!KingRingBB[player.Side][sq].IsEmpty);
         }
     }
 
@@ -356,6 +363,10 @@ public static class BitBoards
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static BitBoard RankBB(this Rank r)
         => RanksBB[r.AsInt()];
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static BitBoard ColorBB(this Player p)
+        => ColorsBB[p.Side];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static BitBoard FirstRank(Player p)

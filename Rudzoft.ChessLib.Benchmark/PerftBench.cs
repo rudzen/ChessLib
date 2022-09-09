@@ -34,7 +34,7 @@ using Rudzoft.ChessLib.Perft.Interfaces;
 namespace Rudzoft.ChessLib.Benchmark;
 
 [MemoryDiagnoser]
-public sealed class PerftBench
+public class PerftBench
 {
     private IPerft _perft;
 

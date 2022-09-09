@@ -44,22 +44,25 @@ public static class PieceExtensions
 
     private static readonly string[] PieceNames = { "None", "Pawn", "Knight", "Bishop", "Rook", "Queen", "King" };
 
-    /*
-* white chess king 	♔ 	U+2654 	&#9812;
-* white chess queen 	♕ 	U+2655 	&#9813;
-* white chess rook 	♖ 	U+2656 	&#9814;
-* white chess bishop 	♗ 	U+2657 	&#9815;
-* white chess knight 	♘ 	U+2658 	&#9816;
-* white chess pawn 	♙ 	U+2659 	&#9817;
-* black chess king 	♚ 	U+265A 	&#9818;
-* black chess queen 	♛ 	U+265B 	&#9819;
-* black chess rook 	♜ 	U+265C 	&#9820;
-* black chess bishop 	♝ 	U+265D 	&#9821;
-* black chess knight 	♞ 	U+265E 	&#9822;
-* black chess pawn 	♟ 	U+265F 	&#9823;
-     */
-
-    private static readonly char[] PieceUnicodeChar = { ' ', '\u2659', '\u2658', '\u2657', '\u2656', '\u2655', '\u2654', ' ', ' ', '\u265F', '\u265E', '\u265D', '\u265C', '\u265B', '\u265A', ' ' };
+    private static readonly char[] PieceUnicodeChar =
+    {
+        ' ',
+        '\u2659',   //  ♙   U+2659  &#9817;
+        '\u2658',   //  ♘   U+2658  &#9816;
+        '\u2657',   //  ♗   U+2657  &#9815;
+        '\u2656',   //  ♖   U+2656  &#9814;
+        '\u2655',   //  ♕   U+2655  &#9813;
+        '\u2654',   //  ♔   U+2654  &#9812;
+        ' ',
+        ' ',
+        '\u265F',   //  ♟   U+265F  &#9823;
+        '\u265E',   //  ♞   U+265E  &#9822;
+        '\u265D',   //  ♝   U+265D  &#9821;
+        '\u265C',   //  ♜   U+265C  &#9820;
+        '\u265B',   //  ♛   U+265B  &#9819;
+        '\u265A',   //  ♚   U+265A  &#9818;
+        ' '
+    };
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static char GetPieceChar(this Piece p) => PieceChars[p.AsInt()];
