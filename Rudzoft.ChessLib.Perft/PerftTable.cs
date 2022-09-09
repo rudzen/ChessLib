@@ -24,6 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using Rudzoft.ChessLib.Types;
 using System;
 
 namespace Rudzoft.ChessLib.Perft;
@@ -37,23 +38,23 @@ internal static class PerftTable
 
     private struct PerftHashEntry
     {
-        public ulong Hash;
+        public HashKey Hash;
         public ulong Count;
         public int Depth;
     }
 
-    public static void Store(in ulong zobristHash, int depth, in ulong childCount)
+    public static void Store(in HashKey key, int depth, in ulong childCount)
     {
-        var slot = (int)(zobristHash % TtSize);
-        Table[slot].Hash = zobristHash;
+        var slot = (int)(key.Key % TtSize);
+        Table[slot].Hash = key;
         Table[slot].Count = childCount;
         Table[slot].Depth = depth;
     }
 
-    public static bool Retrieve(in ulong zobristHash, int depth, out ulong childCount)
+    public static bool Retrieve(in HashKey key, int depth, out ulong childCount)
     {
-        var slot = (int)(zobristHash % TtSize);
-        var match = Table[slot].Depth == depth && Table[slot].Hash == zobristHash;
+        var slot = (int)(key.Key % TtSize);
+        var match = Table[slot].Depth == depth && Table[slot].Hash == key;
 
         childCount = match ? Table[slot].Count : 0;
         return match;

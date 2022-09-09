@@ -97,7 +97,7 @@ public sealed class Position : IPosition
     /// <summary>
     /// To let something outside the library be aware of changes (like a UI etc)
     /// </summary>
-    public Action<IPieceSquare>? PieceUpdated { get; set; }
+    public Action<IPieceSquare> PieceUpdated { get; set; }
 
     public IPieceValue PieceValue { get; }
 

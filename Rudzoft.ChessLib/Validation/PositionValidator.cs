@@ -37,14 +37,14 @@ public enum PositionValidationTypes
 {
     None = 0,
     Basic = 1,
-    Castleling = 1 << 1,
+    Castle = 1 << 1,
     Kings = 1 << 2,
     Pawns = 1 << 3,
     PieceConsistency = 1 << 4,
     PieceCount = 1 << 5,
     PieceTypes = 1 << 6,
     State = 1 << 7,
-    All = Basic | Castleling | Kings | Pawns | PieceConsistency | PieceCount | PieceTypes | State
+    All = Basic | Castle | Kings | Pawns | PieceConsistency | PieceCount | PieceTypes | State
 }
 
 public static class PositionValidationTypesExtensions
@@ -74,7 +74,7 @@ public sealed class PositionValidator : IPositionValidator
         if (types.HasFlagFast(PositionValidationTypes.Basic))
             error = ValidateBasic();
 
-        if (types.HasFlagFast(PositionValidationTypes.Castleling))
+        if (types.HasFlagFast(PositionValidationTypes.Castle))
             error = ValidateCastleling(error);
 
         if (types.HasFlagFast(PositionValidationTypes.Kings))
@@ -106,10 +106,10 @@ public sealed class PositionValidator : IPositionValidator
         if (_pos.SideToMove != Player.White && _pos.SideToMove != Player.Black)
             error = AddError(error, $"{nameof(_pos.SideToMove)} is not a valid");
 
-        if (_board.PieceAt(_pos.GetKingSquare(Player.White)) != Pieces.WhiteKing)
+        if (_board.PieceAt(_pos.GetKingSquare(Player.White)) != Piece.WhiteKing)
             error = AddError(error, "white king position is not a white king");
 
-        if (_board.PieceAt(_pos.GetKingSquare(Player.Black)) != Pieces.BlackKing)
+        if (_board.PieceAt(_pos.GetKingSquare(Player.Black)) != Piece.BlackKing)
             error = AddError(error, "black king position is not a black king");
 
         if (_pos.EnPassantSquare != Square.None && _pos.EnPassantSquare.RelativeRank(_pos.SideToMove) != Ranks.Rank6)
@@ -142,7 +142,7 @@ public sealed class PositionValidator : IPositionValidator
                 if (_pos.GetCastlelingRightsMask(rookSq) != cr)
                     error = AddError(error, $"castleling rights mask at {rookSq} does not match for player {c}");
 
-                if ((_pos.GetCastlelingRightsMask(_pos.GetKingSquare(c).AsInt()) & cr) != cr)
+                if ((_pos.GetCastlelingRightsMask(_pos.GetKingSquare(c)) & cr) != cr)
                     error = AddError(error,
                         $"castleling rights mask at {_pos.GetKingSquare(c)} does not match for player {c}");
             }

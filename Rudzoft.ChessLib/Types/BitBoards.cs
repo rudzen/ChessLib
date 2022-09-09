@@ -548,34 +548,48 @@ public static class BitBoards
 
     public static string PrintBitBoard(in BitBoard bb, string title = "")
     {
-        var s = new StringBuilder("+---+---+---+---+---+---+---+---+---+\n", 1024);
-        if (!title.IsNullOrWhiteSpace())
-            s.AppendLine($"| {title}");
+        const string line = "+---+---+---+---+---+---+---+---+---+";
+        const string buttom = "|   | A | B | C | D | E | F | G | H |";
+        Span<char> span = stackalloc char[768];
+        var idx = 0;
+        foreach (var c in line)
+            span[idx++] = c;
+        span[idx++] = '\n';
+        foreach (var c in title)
+            span[idx++] = c;
 
-        Span<char> row = stackalloc char[36];
         for (var r = Ranks.Rank8; r >= Ranks.Rank1; --r)
         {
-            row.Clear();
-            var rowIndex = 0;
-            row[rowIndex++] = '|';
-            row[rowIndex++] = ' ';
-            row[rowIndex++] = (char)('0' + (int)r + 1);
+            span[idx++] = '|';
+            span[idx++] = ' ';
+            span[idx++] = (char)('0' + (int)r + 1);
+            span[idx++] = ' ';
             for (var f = Files.FileA; f <= Files.FileH; ++f)
             {
-                row[rowIndex++] = '|';
-                row[rowIndex++] = ' ';
-                var c = (bb & new Square(r, f)).IsEmpty ? ' ' : 'X';
-                row[rowIndex++] = c;
-                row[rowIndex++] = ' ';
+                span[idx++] = '|';
+                span[idx++] = ' ';
+                span[idx++] = (bb & new Square(r, f)).IsEmpty ? ' ' : 'X';;
+                span[idx++] = ' ';
             }
 
-            s.Append(new string(row));
-            s.AppendLine("|\n+---+---+---+---+---+---+---+---+---+");
+            span[idx++] = '|';
+            span[idx++] = '\n';
+            foreach (var c in line)
+                span[idx++] = c;
+            span[idx++] = '\n';
         }
 
-        s.AppendLine("|   | A | B | C | D | E | F | G | H |");
-        s.AppendLine("+---+---+---+---+---+---+---+---+---+");
-        return s.ToString();
+        foreach (var c in buttom)
+            span[idx++] = c;
+
+        span[idx++] = '\n';
+
+        foreach (var c in line)
+            span[idx++] = c;
+
+        span[idx] = '\n';
+
+        return new string(span[..idx]);
     }
 
     /// <summary>

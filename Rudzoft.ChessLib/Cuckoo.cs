@@ -24,6 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using System;
 using System.Diagnostics;
 using Rudzoft.ChessLib.Hash;
 using Rudzoft.ChessLib.Types;
@@ -40,6 +41,7 @@ public static class Cuckoo
     private static readonly HashKey[] CuckooKeys = new HashKey[8192];
     private static readonly Move[] CuckooMoves = new Move[8192];
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Minor Code Smell", "S3963:\"static\" fields should be initialized inline", Justification = "Multiple arrays in one go")]
     static Cuckoo()
     {
         var count = 0;
