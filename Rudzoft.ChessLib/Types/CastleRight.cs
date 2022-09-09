@@ -56,6 +56,12 @@ public enum CastleSides
     Count
 }
 
+public static class CastleSidesExtensions
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static int AsInt(this CastleSides cs) => (int)cs;
+}
+
 public enum CastlePerform
 {
     Do,

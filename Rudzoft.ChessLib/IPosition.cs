@@ -114,6 +114,14 @@ public interface IPosition : IEnumerable<Piece>
 
     BitBoard Pieces(PieceTypes pt1, PieceTypes pt2, Player p);
 
+    BitBoard PawnsOnColor(Player p, Square sq);
+
+    bool SemiOpenFileOn(Player p, Square sq);
+
+    bool BishopPaired(Player p);
+
+    bool BishopOpposed();
+
     ReadOnlySpan<Square> Squares(PieceTypes pt, Player p);
 
     Square GetPieceSquare(PieceTypes pt, Player p);

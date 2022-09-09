@@ -215,4 +215,13 @@ public readonly record struct File(Files Value) : IComparable<File>, ISpanFormat
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override int GetHashCode()
         => AsInt();
+
+    /// <summary>
+    /// Fold file [ABCDEFGH] to file [ABCDDCBA]
+    /// </summary>
+    /// <param name="f"></param>
+    /// <returns></returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public int EdgeDistance()
+        => Math.Min(AsInt() - FileH.AsInt(), FileH.AsInt() - AsInt());
 }

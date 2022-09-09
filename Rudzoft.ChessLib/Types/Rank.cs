@@ -229,5 +229,14 @@ public readonly record struct Rank(Ranks Value) : ISpanFormattable, IValidationT
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Rank Relative(Player p) 
-        => AsInt() ^ (p.Side * 7);
+        => new(AsInt() ^ (p.Side * 7));
+
+    /// <summary>
+    /// Fold rank [12345678] to rank [12344321]
+    /// </summary>
+    /// <param name="r"></param>
+    /// <returns></returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public int EdgeDistance()
+        => Math.Min(AsInt() - Rank1.AsInt(), Rank8.AsInt() - AsInt());
 }

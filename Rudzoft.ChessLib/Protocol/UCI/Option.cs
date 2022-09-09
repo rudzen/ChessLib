@@ -80,6 +80,13 @@ public sealed class Option : IOption
         DefaultValue = _currentValue = v.ToString();
     }
 
+    public static implicit operator bool(Option o)
+    {
+        if (o.Type == UciOptionType.Check)
+            return bool.Parse(o._currentValue);
+        return false;
+    }
+
     public string Name { get; set; }
 
     public UciOptionType Type { get; set; }
@@ -109,6 +116,12 @@ public sealed class Option : IOption
         Debug.Assert(Type != UciOptionType.Check);
         Debug.Assert(Type != UciOptionType.Spin);
         return _currentValue;
+    }
+
+    public bool GetBool()
+    {
+        var b = bool.TryParse(_currentValue, out var r);
+        return b ? r : b;
     }
 
     /// <summary>

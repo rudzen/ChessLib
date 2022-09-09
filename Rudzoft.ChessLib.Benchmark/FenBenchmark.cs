@@ -6,7 +6,7 @@ using Rudzoft.ChessLib.Types;
 namespace Rudzoft.ChessLib.Benchmark;
 
 [MemoryDiagnoser]
-public sealed class FenBenchmark
+public class FenBenchmark
 {
     private const string F = "rnkq1bnr/p3ppp1/1ppp3p/3B4/6b1/2PQ3P/PP1PPP2/RNB1K1NR w KQ 4 10";
 

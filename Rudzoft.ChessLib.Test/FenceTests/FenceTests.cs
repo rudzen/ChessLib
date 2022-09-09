@@ -42,7 +42,7 @@ public sealed class FenceTests
         var g = GameFactory.Create(fen);
         var pos = g.Pos;
 
-        var actual = BlockageFactory.IsBlocked(pos);
+        var actual = BlockageFactory.IsBlocked(in pos);
 
         Assert.Equal(expected, actual);
     }
