@@ -139,10 +139,10 @@ public sealed class PositionValidator : IPositionValidator
                 if (_board.PieceAt(rookSq) != ourRook)
                     error = AddError(error, $"rook does not appear on its position for {c}");
 
-                if (_pos.GetCastlelingRightsMask(rookSq) != cr)
+                if (_pos.GetCastleRightsMask(rookSq) != cr)
                     error = AddError(error, $"castleling rights mask at {rookSq} does not match for player {c}");
 
-                if ((_pos.GetCastlelingRightsMask(_pos.GetKingSquare(c)) & cr) != cr)
+                if ((_pos.GetCastleRightsMask(_pos.GetKingSquare(c)) & cr) != cr)
                     error = AddError(error,
                         $"castleling rights mask at {_pos.GetKingSquare(c)} does not match for player {c}");
             }

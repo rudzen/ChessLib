@@ -135,7 +135,7 @@ public sealed class BitboardTests
     [Fact]
     public void FullCount()
     {
-        var expected = Square.Count;
+        const int expected = Square.Count;
         var actual = BitBoards.AllSquares.Count;
         Assert.Equal(expected, actual);
     }

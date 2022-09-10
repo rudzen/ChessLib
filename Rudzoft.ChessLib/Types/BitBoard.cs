@@ -27,6 +27,7 @@ SOFTWARE.
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
@@ -90,47 +91,47 @@ public readonly record struct BitBoard(ulong Value) : IEnumerable<Square>
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static BitBoard operator *(BitBoard left, ulong right)
-        => left.Value * right;
+        => new(left.Value * right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static BitBoard operator *(ulong left, BitBoard right)
-        => left * right.Value;
+        => new(left * right.Value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static BitBoard operator -(BitBoard left, int right)
-        => left.Value - (ulong)right;
+        => new(left.Value - (ulong)right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static BitBoard operator >>(BitBoard left, int right)
-        => left.Value >> right;
+        => new(left.Value >> right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static BitBoard operator <<(BitBoard left, int right)
-        => left.Value << right;
+        => new(left.Value << right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static BitBoard operator |(BitBoard left, Square right)
-        => left.Value | right.AsBb();
+        => new(left.Value | right.AsBb());
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static BitBoard operator |(BitBoard left, BitBoard right)
-        => left.Value | right.Value;
+        => new(left.Value | right.Value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static BitBoard operator ^(BitBoard left, BitBoard right)
-        => left.Value ^ right.Value;
+        => new(left.Value ^ right.Value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static BitBoard operator &(BitBoard left, BitBoard right)
-        => left.Value & right.Value;
+        => new(left.Value & right.Value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static BitBoard operator &(ulong left, BitBoard right)
-        => left & right.Value;
+        => new(left & right.Value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static BitBoard operator &(BitBoard left, ulong right)
-        => left.Value & right;
+        => new(left.Value & right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static BitBoard operator &(BitBoard left, Square right)
@@ -146,7 +147,7 @@ public readonly record struct BitBoard(ulong Value) : IEnumerable<Square>
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static BitBoard operator ~(BitBoard bb)
-        => ~bb.Value;
+        => new(~bb.Value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static BitBoard operator --(BitBoard bb)
@@ -189,7 +190,7 @@ public readonly record struct BitBoard(ulong Value) : IEnumerable<Square>
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public BitBoard Xor(int pos)
-        => Value ^ (uint)pos;
+        => new(Value ^ (uint)pos);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public BitBoard And(BitBoard other)
@@ -197,15 +198,15 @@ public readonly record struct BitBoard(ulong Value) : IEnumerable<Square>
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public BitBoard Or(BitBoard other)
-        => Value | other;
+        => this | other;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public BitBoard OrAll(params BitBoard[] bbs)
-        => bbs.Aggregate(Value, static (current, b) => current | b.Value);
+        => new(bbs.Aggregate(Value, static (current, b) => current | b.Value));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public BitBoard OrAll(IEnumerable<BitBoard> bbs)
-        => bbs.Aggregate(Value, static (current, bb) => current | bb.Value);
+        => new(bbs.Aggregate(Value, static (current, bb) => current | bb.Value));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public BitBoard OrAll(ReadOnlySpan<Square> sqs)
@@ -239,6 +240,19 @@ public readonly record struct BitBoard(ulong Value) : IEnumerable<Square>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override string ToString()
         => BitBoards.PrintBitBoard(this, Value.ToString());
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void ToString(TextWriter textWriter)
+    {
+        try
+        {
+            textWriter.WriteLine(ToString());
+        }
+        catch (IOException ioe)
+        {
+            throw new IOException("Writer is closed", ioe);
+        }
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Equals(BitBoard other)

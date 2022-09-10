@@ -200,7 +200,7 @@ public readonly record struct Square(Squares Value) : ISpanFormattable, ICompara
     public static Square G8 { get; } = new(Squares.g8);
     public static Square H8 { get; } = new(Squares.h8);
 
-    public static int Count { get; } = 64;
+    public const int Count = 64;
 
     public static Square Create(Rank r, File f)
         => new(r, f);

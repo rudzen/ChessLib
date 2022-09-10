@@ -54,9 +54,9 @@ public sealed class HistoryHeuristic : IHistoryHeuristic
 
     private void Initialize(Player p)
     {
-        _table[p.Side] = new int[64][];
+        _table[p.Side] = new int[Square.Count][];
         for (var i = 0; i < _table[p.Side].Length; ++i)
-            _table[p.Side][i] = new int[64];
+            _table[p.Side][i] = new int[Square.Count];
     }
 
     private void ClearTable(Player p)

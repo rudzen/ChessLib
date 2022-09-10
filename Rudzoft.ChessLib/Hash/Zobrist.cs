@@ -94,7 +94,7 @@ public static class Zobrist
     private static void InitializePst(in IRKiss rnd)
     {
         for (var i = 0; i < ZobristPst.Length; i++)
-            ZobristPst[i] = new HashKey[64];
+            ZobristPst[i] = new HashKey[Square.Count];
 
         foreach (var pc in Piece.AllPieces)
         foreach (var sq in BitBoards.AllSquares)

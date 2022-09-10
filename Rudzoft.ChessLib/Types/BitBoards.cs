@@ -31,11 +31,9 @@ SOFTWARE.
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Runtime.CompilerServices;
-using System.Text;
 using Rudzoft.ChessLib.Extensions;
 
 namespace Rudzoft.ChessLib.Types;
@@ -190,41 +188,41 @@ public static class BitBoards
     {
         PseudoAttacksBB = new BitBoard[PieceTypes.PieceTypeNb.AsInt()][];
         for (var i = 0; i < PseudoAttacksBB.Length; i++)
-            PseudoAttacksBB[i] = new BitBoard[64];
+            PseudoAttacksBB[i] = new BitBoard[Square.Count];
 
-        PawnAttackSpanBB = new BitBoard[2][];
-        PawnAttackSpanBB[0] = new BitBoard[64];
-        PawnAttackSpanBB[1] = new BitBoard[64];
+        PawnAttackSpanBB = new BitBoard[Player.Count][];
+        PawnAttackSpanBB[0] = new BitBoard[Square.Count];
+        PawnAttackSpanBB[1] = new BitBoard[Square.Count];
 
-        PassedPawnMaskBB = new BitBoard[2][];
-        PassedPawnMaskBB[0] = new BitBoard[64];
-        PassedPawnMaskBB[1] = new BitBoard[64];
+        PassedPawnMaskBB = new BitBoard[Player.Count][];
+        PassedPawnMaskBB[0] = new BitBoard[Square.Count];
+        PassedPawnMaskBB[1] = new BitBoard[Square.Count];
 
-        ForwardRanksBB = new BitBoard[2][];
-        ForwardRanksBB[0] = new BitBoard[64];
-        ForwardRanksBB[1] = new BitBoard[64];
+        ForwardRanksBB = new BitBoard[Player.Count][];
+        ForwardRanksBB[0] = new BitBoard[Square.Count];
+        ForwardRanksBB[1] = new BitBoard[Square.Count];
 
-        ForwardFileBB = new BitBoard[2][];
-        ForwardFileBB[0] = new BitBoard[64];
-        ForwardFileBB[1] = new BitBoard[64];
+        ForwardFileBB = new BitBoard[Player.Count][];
+        ForwardFileBB[0] = new BitBoard[Square.Count];
+        ForwardFileBB[1] = new BitBoard[Square.Count];
 
-        KingRingBB = new BitBoard[2][];
-        KingRingBB[0] = new BitBoard[64];
-        KingRingBB[1] = new BitBoard[64];
+        KingRingBB = new BitBoard[Player.Count][];
+        KingRingBB[0] = new BitBoard[Square.Count];
+        KingRingBB[1] = new BitBoard[Square.Count];
 
-        BetweenBB = new BitBoard[64][];
+        BetweenBB = new BitBoard[Square.Count][];
         for (var i = 0; i < BetweenBB.Length; i++)
-            BetweenBB[i] = new BitBoard[64];
+            BetweenBB[i] = new BitBoard[Square.Count];
 
-        LineBB = new BitBoard[64][];
+        LineBB = new BitBoard[Square.Count][];
         for (var i = 0; i < LineBB.Length; i++)
-            LineBB[i] = new BitBoard[64];
+            LineBB[i] = new BitBoard[Square.Count];
 
-        SquareDistance = new int[64][];
+        SquareDistance = new int[Square.Count][];
         for (var i = 0; i < SquareDistance.Length; i++)
-            SquareDistance[i] = new int[64];
+            SquareDistance[i] = new int[Square.Count];
 
-        DistanceRingBB = new BitBoard[64][];
+        DistanceRingBB = new BitBoard[Square.Count][];
         for (var i = 0; i < SquareDistance.Length; i++)
             DistanceRingBB[i] = new BitBoard[8];
 
@@ -533,19 +531,6 @@ public static class BitBoards
     public static BitBoard PromotionRank(this Player p)
         => PromotionRanks[p.Side];
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void ToString(this in BitBoard bb, TextWriter textWriter)
-    {
-        try
-        {
-            textWriter.WriteLine(bb);
-        }
-        catch (IOException ioe)
-        {
-            throw new IOException("Writer is not available.", ioe);
-        }
-    }
-
     public static string PrintBitBoard(in BitBoard bb, string title = "")
     {
         const string line = "+---+---+---+---+---+---+---+---+---+";
@@ -555,7 +540,7 @@ public static class BitBoards
         foreach (var c in line)
             span[idx++] = c;
         span[idx++] = '\n';
-        foreach (var c in title)
+        foreach (var c in title.Length > 64 ? title.AsSpan()[..64] : title.AsSpan())
             span[idx++] = c;
 
         for (var r = Ranks.Rank8; r >= Ranks.Rank1; --r)
@@ -612,7 +597,7 @@ public static class BitBoards
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Square Msb(this in BitBoard bb)
-        => 63 - BitOperations.LeadingZeroCount(bb.Value);
+        => new(63 - BitOperations.LeadingZeroCount(bb.Value));
 
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public static BitBoard NorthOne(this BitBoard bb)
@@ -795,8 +780,8 @@ public static class BitBoards
     /// Helper method to generate shift function dictionary for all directions.
     /// </summary>
     /// <returns>The generated shift dictionary</returns>
-    private static IDictionary<Direction, Func<BitBoard, BitBoard>> MakeShiftFuncs() =>
-        new Dictionary<Direction, Func<BitBoard, BitBoard>>(13)
+    private static IDictionary<Direction, Func<BitBoard, BitBoard>> MakeShiftFuncs()
+        => new Dictionary<Direction, Func<BitBoard, BitBoard>>(13)
         {
             { Direction.None, static board => board },
             { Direction.North, static board => board.NorthOne() },

@@ -45,7 +45,7 @@ public static class MagicBB
 
     private const int MagicRookDbLength = 4096;
 
-    private static readonly BitBoard[][] MagicBishopDb = new BitBoard[64][];
+    private static readonly BitBoard[][] MagicBishopDb = new BitBoard[Square.Count][];
 
     private static readonly ulong[] BishopMagics =
     {
@@ -87,7 +87,7 @@ public static class MagicBB
         0x0028440200000000UL, 0x0050080402000000UL, 0x0020100804020000UL, 0x0040201008040200UL
     };
 
-    private static readonly BitBoard[][] MagicRookDb = new BitBoard[64][];
+    private static readonly BitBoard[][] MagicRookDb = new BitBoard[Square.Count][];
 
     private static readonly ulong[] RookMagics =
     {
@@ -150,7 +150,7 @@ public static class MagicBB
         };
 #pragma warning restore format // @formatter:on
 
-        Span<int> squares = stackalloc int[64];
+        Span<int> squares = stackalloc int[Square.Count];
 
         for (var i = 0; i < squares.Length; ++i)
         {

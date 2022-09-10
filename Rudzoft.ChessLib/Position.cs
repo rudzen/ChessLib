@@ -64,7 +64,7 @@ public sealed class Position : IPosition
         _positionValidator = new PositionValidator(this, Board);
         _castlingPath = new BitBoard[CastleRights.Count.AsInt()];
         _castlingRookSquare = new Square[CastleRights.Count.AsInt()];
-        _castlingRightsMask = new CastleRight[64];
+        _castlingRightsMask = new CastleRight[Square.Count];
         _castlingRightsMask.Fill(CastleRight.None);
         IsProbing = true;
         Clear();
@@ -158,6 +158,26 @@ public sealed class Position : IPosition
         return threats;
     }
 
+    public bool IsCapture(Move m)
+    {
+        var mt = m.MoveType();
+        return mt == MoveTypes.Enpassant ||
+               (mt != MoveTypes.Castling && Board.Pieces(~SideToMove).Contains(m.ToSquare()));
+    }
+
+    public bool IsCaptureOrPromotion(Move m)
+    {
+        var mt = m.MoveType();
+        return mt switch
+        {
+            MoveTypes.Normal => Board.Pieces(~SideToMove).Contains(m.ToSquare()),
+            _ => mt != MoveTypes.Castling
+        };
+    }
+
+    public bool IsPawnPassedAt(Player p, Square sq)
+        => (Board.Pieces(~p, PieceTypes.Pawn) & sq.PassedPawnFrontAttackSpan(p)).IsEmpty;
+
     public BitBoard AttacksTo(Square sq, in BitBoard occ)
     {
         Debug.Assert(sq.IsOk);
@@ -203,7 +223,7 @@ public sealed class Position : IPosition
     {
         Board.Clear();
         _castlingPath.Fill(BitBoard.Empty);
-        _castlingRightsMask.Fill(CastleRights.None);
+        _castlingRightsMask.Fill(CastleRight.None);
         _castlingRookSquare.Fill(Square.None);
         _sideToMove = Player.White;
         ChessMode = ChessMode.Normal;
@@ -229,8 +249,8 @@ public sealed class Position : IPosition
         {
             for (var file = Files.FileA; file <= Files.FileH; file++)
             {
-                int empty;
-                for (empty = 0; file <= Files.FileH && Board.IsEmpty(new Square(rank, file)); ++file)
+                var empty = 0;
+                for (; file <= Files.FileH && Board.IsEmpty(new Square(rank, file)); ++file)
                     ++empty;
 
                 if (empty != 0)
@@ -308,7 +328,7 @@ public sealed class Position : IPosition
     public BitBoard GetAttacks(Square sq, PieceTypes pt)
         => GetAttacks(sq, pt, Pieces());
 
-    public CastleRight GetCastlelingRightsMask(Square sq)
+    public CastleRight GetCastleRightsMask(Square sq)
         => _castlingRightsMask[sq.AsInt()];
 
     public IEnumerator<Piece> GetEnumerator()
