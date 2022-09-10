@@ -94,6 +94,8 @@ public readonly record struct Piece(Pieces Value)
     private Piece(Piece pc)
         : this(pc.Value) { }
 
+    public const int Count = (int)Pieces.PieceNb + 1;
+
     public bool IsWhite => ColorOf().IsWhite;
 
     public bool IsBlack => ColorOf().IsBlack;

@@ -54,19 +54,19 @@ public sealed class Board : IBoard
 
     public Board()
     {
-        _pieces = new Piece[64];
+        _pieces = new Piece[Types.Square.Count];
         _bySide = new BitBoard[Player.Count];
         _byType = new BitBoard[PieceTypes.PieceTypeNb.AsInt()];
-        _pieceCount = new int[16];
-        _pieceList = new Square[64][];
+        _pieceCount = new int[Piece.Count];
+        _pieceList = new Square[Types.Square.Count][];
         for (var i = 0; i < _pieceList.Length; i++)
         {
-            var arr = new Square[16];
+            var arr = new Square[Piece.Count];
             arr.Fill(Types.Square.None);
             _pieceList[i] = arr;
         }
 
-        _index = new int[64];
+        _index = new int[Types.Square.Count];
     }
 
     public void Clear()

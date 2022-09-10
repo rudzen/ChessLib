@@ -152,6 +152,12 @@ public interface IPosition : IEnumerable<Piece>
 
     BitBoard AttacksBy(PieceTypes pt, Player p);
 
+    bool IsCapture(Move m);
+
+    bool IsCaptureOrPromotion(Move m);
+
+    bool IsPawnPassedAt(Player p, Square sq);
+
     bool CanCastle(CastleRight cr);
 
     bool CanCastle(Player p);
@@ -160,7 +166,7 @@ public interface IPosition : IEnumerable<Piece>
 
     Square CastlingRookSquare(CastleRight cr);
 
-    CastleRight GetCastlelingRightsMask(Square sq);
+    CastleRight GetCastleRightsMask(Square sq);
 
     bool IsPseudoLegal(Move m);
 
