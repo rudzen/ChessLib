@@ -69,6 +69,13 @@ public struct Score : IEquatable<Score>
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Score(Value mg, Value eg)
+    {
+        _data.mg = (int)mg.Raw;
+        _data.eg = (int)eg.Raw;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Score(Score s)
         => _data = s._data;
 

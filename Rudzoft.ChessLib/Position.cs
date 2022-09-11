@@ -193,8 +193,43 @@ public sealed class Position : IPosition
     public BitBoard AttacksTo(Square sq)
         => AttacksTo(sq, Board.Pieces());
 
-    public BitBoard BlockersForKing(Player p)
+    public BitBoard KingBlockers(Player p)
         => State.BlockersForKing[p.Side];
+
+    public bool IsKingBlocker(Player p, Square sq)
+        => KingBlockers(p).Contains(sq);
+
+    public BitBoard SliderBlockerOn(Square sq, BitBoard attackers, ref BitBoard pinners, ref BitBoard hidders)
+    {
+        var blockers = BitBoards.EmptyBitBoard;
+        var defenders = Board.Pieces(GetPiece(sq).ColorOf());
+
+        // Snipers are X-ray slider attackers at 's'
+        // No need to remove direct attackers at 's' as in check no evaluation
+
+        var snipers = attackers & ((Pieces(PieceTypes.Bishop, PieceTypes.Queen) & GetAttacks(sq, PieceTypes.Bishop))
+                                   | (Pieces(PieceTypes.Rook, PieceTypes.Queen) & GetAttacks(sq, PieceTypes.Rook)));
+
+        var mocc = Pieces() ^ snipers;
+
+        while (snipers)
+        {
+            var sniperSq = BitBoards.PopLsb(ref snipers);
+            var b = sq.BitboardBetween(sniperSq) & mocc;
+
+            if (b.IsEmpty || b.MoreThanOne())
+                continue;
+
+            blockers |= b;
+
+            if (!(b & defenders).IsEmpty)
+                pinners |= sniperSq;
+            else
+                hidders |= sniperSq;
+        }
+
+        return blockers;
+    }
 
     public bool CanCastle(CastleRight cr)
         => State.CastlelingRights.Has(cr);
@@ -509,7 +544,7 @@ public sealed class Position : IPosition
 
         // A non-king move is legal if and only if it is not pinned or it is moving along the
         // ray towards or away from the king.
-        return (BlockersForKing(us) & from).IsEmpty || from.Aligned(to, ksq);
+        return (KingBlockers(us) & from).IsEmpty || from.Aligned(to, ksq);
     }
 
     private bool IsCastlelingMoveLegal(Move m, Square to, Square from, Player us)
@@ -1071,7 +1106,7 @@ public sealed class Position : IPosition
 
     private void SetupPlayer(ReadOnlySpan<char> fenChunk)
     {
-        _sideToMove = (fenChunk[0] != 'w').ToInt();
+        _sideToMove = (fenChunk[0] != 'w').AsByte();
     }
 
     private void SetupEnPassant(ReadOnlySpan<char> fenChunk)

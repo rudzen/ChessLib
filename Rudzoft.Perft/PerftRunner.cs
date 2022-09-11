@@ -120,7 +120,7 @@ public sealed class PerftRunner : IPerftRunner
             Game.Table.SetSize(TranspositionTableOptions.Size);
 
         var errors = 0;
-        var runnerIndex = (Options is FenOptions).ToInt();
+        var runnerIndex = (Options is FenOptions).AsByte();
         _usingEpd = runnerIndex == 0;
         var positions = _runners[runnerIndex].Invoke(cancellationToken);
 

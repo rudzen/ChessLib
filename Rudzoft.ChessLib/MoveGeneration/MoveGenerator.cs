@@ -198,7 +198,7 @@ public static class MoveGenerator
         int index,
         Player us)
     {
-        var pinned = pos.BlockersForKing(us) & pos.Pieces(us);
+        var pinned = pos.KingBlockers(us) & pos.Pieces(us);
         var ksq = pos.GetKingSquare(us);
 
         var end = pos.InCheck
@@ -248,7 +248,7 @@ public static class MoveGenerator
         foreach (var from in squares)
         {
             if (checks
-                && (!(pos.BlockersForKing(~us) & from).IsEmpty ||
+                && (!(pos.KingBlockers(~us) & from).IsEmpty ||
                     (pt.PseudoAttacks(from) & target & pos.CheckedSquares(pt)).IsEmpty))
                 continue;
 
@@ -326,7 +326,7 @@ public static class MoveGenerator
                     pawnOne &= ksq.PawnAttack(them);
                     pawnTwo &= ksq.PawnAttack(them);
 
-                    var dcCandidates = pawnsNotOn7 & pos.BlockersForKing(them);
+                    var dcCandidates = pawnsNotOn7 & pos.KingBlockers(them);
 
                     // Add pawn pushes which give discovered check. This is possible only if
                     // the pawn is not on the same file as the enemy king, because we don't
@@ -446,7 +446,7 @@ public static class MoveGenerator
         Player us)
     {
         Debug.Assert(!pos.InCheck);
-        var dc = pos.BlockersForKing(~us) & pos.Pieces(us);
+        var dc = pos.KingBlockers(~us) & pos.Pieces(us);
 
         while (dc)
         {
