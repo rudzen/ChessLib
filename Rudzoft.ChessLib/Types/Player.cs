@@ -69,8 +69,6 @@ public readonly record struct Player(byte Side) : ISpanFormattable
     public void Deconstruct(out byte side)
         => side = Side;
 
-    // public readonly byte Side;
-
     public bool IsWhite => Side == byte.MinValue;
 
     public bool IsBlack => Side != byte.MinValue;
@@ -88,6 +86,10 @@ public readonly record struct Player(byte Side) : ISpanFormattable
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator Player(int value)
         => new((byte)value);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static implicit operator Player(byte value)
+        => new(value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator Player(uint value)

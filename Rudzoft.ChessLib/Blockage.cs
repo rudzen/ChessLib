@@ -181,7 +181,7 @@ public sealed class Blockage : IBlockage
                     if (_theirPawns & pawnAttacks)
                         return false;
 
-                    if (_pos.GetPiece(sq) == _ourPawn)
+                    if (_ourPawns & sq)
                         break;
 
                     sq += up;

@@ -107,7 +107,7 @@ public sealed class Option : IOption
         return Type switch
         {
             UciOptionType.Spin => Convert.ToInt32(_currentValue),
-            _ => bool.Parse(_currentValue).ToInt()
+            _ => bool.Parse(_currentValue).AsByte()
         };
     }
 

@@ -160,11 +160,8 @@ public static class MagicBB
                 var occ = InitMagicMovesOccupancy(squares[..numSquares], in temp);
                 MagicBishopDb[i][(occ * BishopMagics[i]) >> 55] = InitmagicmovesBmoves(i, in occ);
             }
-        }
 
-        for (var i = 0; i < squares.Length; ++i)
-        {
-            var numSquares = InitSquares(squares, RookMask[i], initMagicMovesDb);
+            numSquares = InitSquares(squares, RookMask[i], initMagicMovesDb);
             for (var temp = ulong.MinValue; temp < One << numSquares; ++temp)
             {
                 var occ = InitMagicMovesOccupancy(squares[..numSquares], in temp);
@@ -175,11 +172,13 @@ public static class MagicBB
 
     private static int InitSquares(Span<int> squares, ulong mask, ReadOnlySpan<int> bbInits)
     {
+        const ulong bitFactor = 0x07EDD5E59A4E28C2UL;
+        const int shift = 58;
         var numSquares = 0;
         while (mask != ulong.MinValue)
         {
             var bit = (ulong)((long)mask & -(long)mask);
-            squares[numSquares++] = bbInits[(int)((bit * 0x07EDD5E59A4E28C2UL) >> 58)];
+            squares[numSquares++] = bbInits[(int)((bit * bitFactor) >> shift)];
             mask ^= bit;
         }
 

@@ -92,7 +92,11 @@ public interface IPosition : IEnumerable<Piece>
 
     BitBoard PinnedPieces(Player p);
 
-    BitBoard BlockersForKing(Player p);
+    BitBoard KingBlockers(Player p);
+
+    bool IsKingBlocker(Player p, Square sq);
+
+    BitBoard SliderBlockerOn(Square sq, BitBoard attackers, ref BitBoard pinners, ref BitBoard hidders);
 
     bool IsOccupied(Square sq);
 

@@ -76,7 +76,7 @@ public sealed class PositionTests
         var game = GameFactory.Create(fen);
         var pos = game.Pos;
 
-        var b = pos.BlockersForKing(Player.Black);
+        var b = pos.KingBlockers(Player.Black);
 
         // b must contain one square at this point
         var pinnedCount = b.Count;
