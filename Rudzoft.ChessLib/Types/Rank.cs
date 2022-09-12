@@ -27,6 +27,7 @@ SOFTWARE.
 using System;
 using System.Runtime.CompilerServices;
 using Rudzoft.ChessLib.Extensions;
+// ReSharper disable UnusedMember.Global
 
 namespace Rudzoft.ChessLib.Types;
 
@@ -234,8 +235,7 @@ public readonly record struct Rank(Ranks Value) : ISpanFormattable, IValidationT
     /// <summary>
     /// Fold rank [12345678] to rank [12344321]
     /// </summary>
-    /// <param name="r"></param>
-    /// <returns></returns>
+    /// <returns>The distance to the edge rank</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public int EdgeDistance()
         => Math.Min(AsInt() - Rank1.AsInt(), Rank8.AsInt() - AsInt());
