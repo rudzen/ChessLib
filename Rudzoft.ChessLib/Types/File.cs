@@ -28,6 +28,7 @@ using System;
 using System.Runtime.CompilerServices;
 using Rudzoft.ChessLib.Extensions;
 
+// ReSharper disable UnusedMember.Global
 // ReSharper disable MemberCanBeInternal
 
 namespace Rudzoft.ChessLib.Types;
@@ -219,9 +220,8 @@ public readonly record struct File(Files Value) : IComparable<File>, ISpanFormat
     /// <summary>
     /// Fold file [ABCDEFGH] to file [ABCDDCBA]
     /// </summary>
-    /// <param name="f"></param>
-    /// <returns></returns>
+    /// <returns>The distance to the edge file</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public int EdgeDistance()
-        => Math.Min(AsInt() - FileH.AsInt(), FileH.AsInt() - AsInt());
+        => Math.Min(AsInt() - FileA.AsInt(), FileH.AsInt() - AsInt());
 }
