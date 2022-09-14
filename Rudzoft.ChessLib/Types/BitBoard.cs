@@ -181,6 +181,14 @@ public readonly record struct BitBoard(ulong Value) : IEnumerable<Square>
         => bb.Value == 0;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool operator !(BitBoard bb)
+        => bb.Value == 0;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static implicit operator bool(BitBoard b)
+        => b.Value != 0;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Contains(Square sq)
         => !(this & sq).IsEmpty;
 

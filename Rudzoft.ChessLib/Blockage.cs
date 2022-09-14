@@ -70,7 +70,7 @@ public sealed class Blockage : IBlockage
     public Blockage(in IPosition pos)
     {
         _pos = pos;
-        _fenceRank = new Rank[(int)Files.FileNb];
+        _fenceRank = new Rank[File.Count];
         _us = pos.SideToMove;
         _them = ~_us;
         _ourPawns = pos.Pieces(PieceTypes.Pawn, _us);

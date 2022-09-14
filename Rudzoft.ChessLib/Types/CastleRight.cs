@@ -114,6 +114,8 @@ public readonly record struct CastleRight(CastleRights Rights)
     public static CastleRight Black  { get; }= new(CastleRights.Black);
     public static CastleRight Any { get; } = new(CastleRights.Any);
 
+    public const int Count = (int)CastleRights.Count;
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator CastleRight(CastleRights cr)
         => new(cr);
@@ -185,4 +187,8 @@ public readonly record struct CastleRight(CastleRights Rights)
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public CastleRight Not(CastleRights cr)
         => new(Rights & ~cr);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public int AsInt()
+        => Rights.AsInt();
 }

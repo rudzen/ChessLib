@@ -49,7 +49,7 @@ public sealed class BaseTypesSizeTests
     [Fact]
     public unsafe void SquareSize()
     {
-        const int expected = 4;
+        const int expected = 1;
         var actual = sizeof(Square);
         Assert.Equal(expected, actual);
     }

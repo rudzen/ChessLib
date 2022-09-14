@@ -599,6 +599,10 @@ public static class BitBoards
     public static Square Msb(this in BitBoard bb)
         => new(63 - BitOperations.LeadingZeroCount(bb.Value));
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Square FrontMostSquare(in BitBoard bb, Player p)
+        => p.IsWhite ? Lsb(in bb) : Msb(in bb);
+
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public static BitBoard NorthOne(this BitBoard bb)
         => bb << 8;

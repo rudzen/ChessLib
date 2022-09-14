@@ -48,7 +48,8 @@ namespace Rudzoft.ChessLib;
 /// </summary>
 public sealed class Position : IPosition
 {
-    private readonly BitBoard[] _castlingPath;
+    private readonly BitBoard[] _castleKingPath;
+    private readonly BitBoard[] _castleRookPath;
     private readonly CastleRight[] _castlingRightsMask;
     private readonly Square[] _castlingRookSquare;
     private readonly ObjectPool<StringBuilder> _outputObjectPool;
@@ -62,8 +63,9 @@ public sealed class Position : IPosition
         State = default;
         _outputObjectPool = new DefaultObjectPool<StringBuilder>(new StringBuilderPooledObjectPolicy());
         _positionValidator = new PositionValidator(this, Board);
-        _castlingPath = new BitBoard[CastleRights.Count.AsInt()];
-        _castlingRookSquare = new Square[CastleRights.Count.AsInt()];
+        _castleKingPath = new BitBoard[CastleRight.Count];
+        _castleRookPath = new BitBoard[CastleRight.Count];
+        _castlingRookSquare = new Square[CastleRight.Count];
         _castlingRightsMask = new CastleRight[Square.Count];
         _castlingRightsMask.Fill(CastleRight.None);
         IsProbing = true;
@@ -84,7 +86,7 @@ public sealed class Position : IPosition
         => GenerateFen().ToString();
 
     public bool InCheck
-        => !State.Checkers.IsEmpty;
+        => State.Checkers;
 
     public bool IsMate
         => this.GenerateMoves().Length == 0;
@@ -237,11 +239,14 @@ public sealed class Position : IPosition
     public bool CanCastle(Player p)
         => State.CastlelingRights.Has(p);
 
+    public ref BitBoard CastleKingPath(CastleRight cr)
+        => ref _castleKingPath[cr.AsInt()];
+
     public bool CastlingImpeded(CastleRight cr)
     {
         Debug.Assert(cr.Rights is CastleRights.WhiteKing or CastleRights.WhiteQueen or CastleRights.BlackKing
             or CastleRights.BlackQueen);
-        return !(Board.Pieces() & _castlingPath[cr.Rights.AsInt()]).IsEmpty;
+        return !(Board.Pieces() & _castleRookPath[cr.Rights.AsInt()]).IsEmpty;
     }
 
     public Square CastlingRookSquare(CastleRight cr)
@@ -257,7 +262,8 @@ public sealed class Position : IPosition
     public void Clear()
     {
         Board.Clear();
-        _castlingPath.Fill(BitBoard.Empty);
+        _castleKingPath.Fill(BitBoard.Empty);
+        _castleRookPath.Fill(BitBoard.Empty);
         _castlingRightsMask.Fill(CastleRight.None);
         _castlingRookSquare.Fill(Square.None);
         _sideToMove = Player.White;
@@ -1354,9 +1360,9 @@ public sealed class Position : IPosition
         var kingTo = (isKingSide ? Square.G1 : Square.C1).Relative(stm);
         var rookTo = (isKingSide ? Square.F1 : Square.D1).Relative(stm);
 
-        _castlingPath[cr.AsInt()] =
-            (rookFrom.BitboardBetween(rookTo) | kingFrom.BitboardBetween(kingTo) | rookTo | kingTo)
-            & ~(kingFrom | rookFrom);
+        var kingPath = kingFrom.BitboardBetween(kingTo) | kingTo;
+        _castleKingPath[cr.AsInt()] = kingPath;
+        _castleRookPath[cr.AsInt()] = (kingPath | (rookFrom.BitboardBetween(rookTo) | rookTo)) & ~(kingFrom | rookFrom);;
     }
 
     private void SetCheckInfo(in State state)

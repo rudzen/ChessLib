@@ -25,55 +25,39 @@ SOFTWARE.
 */
 
 using System;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace Rudzoft.ChessLib.Types;
 
+/// <inheritdoc />
 /// <summary>
 /// Score type with support for Eg/Mg values
 /// </summary>
 public struct Score : IEquatable<Score>
 {
-    [StructLayout(LayoutKind.Explicit)]
-    private struct ScoreUnion : IEquatable<ScoreUnion>
-    {
-        [FieldOffset(0)] public int mg;
+    private Vector2 _data;
 
-        [FieldOffset(16)] public int eg;
-
-        public bool Equals(ScoreUnion other)
-            => mg == other.mg && eg == other.eg;
-
-        public override bool Equals(object obj)
-            => obj is ScoreUnion other && Equals(other);
-
-        public override int GetHashCode()
-            => HashCode.Combine(mg, eg);
-    }
-
-    private ScoreUnion _data;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private Score(Vector2 value)
+        => _data = value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private Score(int value)
-    {
-        _data.mg = value;
-        _data.eg = 0;
-    }
+        => _data = new Vector2(value, 0);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Score(float mg, float eg)
+        => _data = new Vector2(mg, eg);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Score(int mg, int eg)
-    {
-        _data.mg = mg;
-        _data.eg = eg;
-    }
+        => _data = new Vector2(mg, eg);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Score(Value mg, Value eg)
-    {
-        _data.mg = (int)mg.Raw;
-        _data.eg = (int)eg.Raw;
-    }
+        => _data = new Vector2((int)mg.Raw, (int)eg.Raw);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Score(Score s)
@@ -84,12 +68,16 @@ public struct Score : IEquatable<Score>
         => new(v);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static implicit operator Score(Vector2 v)
+        => new(v);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Score operator *(Score s, int v)
-        => new(s.Mg() * v, s.Eg() * v);
+        => new(Vector2.Multiply(s._data, v));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Score operator /(Score s, int v)
-        => new(s.Mg() / v, s.Eg() / v);
+        => new(Vector2.Divide(s._data, v));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Score operator *(Score s, bool b)
@@ -97,42 +85,42 @@ public struct Score : IEquatable<Score>
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Score operator +(Score s1, Score s2)
-        => new(s1.Mg() + s2.Mg(), s1.Eg() + s2.Eg());
+        => new(Vector2.Add(s1._data, s2._data));
 
     public static Score operator -(Score s1, Score s2)
-        => new(s1.Mg() - s2.Mg(), s1.Eg() - s2.Eg());
+        => new(Vector2.Subtract(s1._data, s2._data));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Score operator +(Score s, int v)
-        => new(s.Mg() + v, s.Eg() + v);
+        => new(Vector2.Add(s._data, new Vector2(v, v)));
 
     public static readonly Score Zero = new();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public readonly void Deconstruct(out int mg, out int eg)
+    public readonly void Deconstruct(out float mg, out float eg)
     {
-        mg = Mg();
-        eg = Eg();
+        mg = _data.X;
+        eg = _data.Y;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void SetMg(int v)
-        => _data.mg = v;
+        => _data.X = v;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void SetEg(int v)
-        => _data.eg = v;
+        => _data.Y = v;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public readonly int Eg()
-        => _data.eg;
+    public readonly float Eg()
+        => _data.Y;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public readonly int Mg()
-        => _data.mg;
+    public readonly float Mg()
+        => _data.X;
 
     public readonly override string ToString()
-        => $"Mg:{_data.mg}, Eg:{_data.eg}";
+        => $"Mg:{_data.X}, Eg:{_data.Y}";
 
     public bool Equals(Score other)
         => _data.Equals(other._data);
@@ -144,12 +132,8 @@ public struct Score : IEquatable<Score>
         => _data.GetHashCode();
 
     public static bool operator ==(Score left, Score right)
-    {
-        return left.Equals(right);
-    }
+        => left._data.Equals(right._data);
 
     public static bool operator !=(Score left, Score right)
-    {
-        return !(left == right);
-    }
+        => !(left == right);
 }

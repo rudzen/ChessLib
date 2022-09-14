@@ -60,10 +60,6 @@ public static class MathExtensions
         => v < min ? min : v > max ? max : v;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static File Clamp(this File v, File min, File max)
-        => new(Clamp(v.AsInt(), min.AsInt(), max.AsInt()));
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int Abs(this int @this)
         => Math.Abs(@this);
 

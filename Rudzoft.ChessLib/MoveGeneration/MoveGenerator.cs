@@ -205,7 +205,7 @@ public static class MoveGenerator
             ? GenerateEvasions(in pos, moves, index, us)
             : Generate(in pos, moves, index, us, MoveGenerationType.NonEvasions);
 
-        // In case there exists pinned pieces, the move is a king move (including castleling) or
+        // In case there exists pinned pieces, the move is a king move (including castles) or
         // it's an en-passant move the move is checked, otherwise we assume the move is legal.
         var pinnedIsEmpty = pinned.IsEmpty;
         while (index != end)
@@ -242,20 +242,16 @@ public static class MoveGenerator
 
         var squares = pos.Squares(pt, us);
 
-        if (squares.IsEmpty)
-            return index;
-
         foreach (var from in squares)
         {
             if (checks
                 && (!(pos.KingBlockers(~us) & from).IsEmpty ||
-                    (pt.PseudoAttacks(from) & target & pos.CheckedSquares(pt)).IsEmpty))
+                    !(pt.PseudoAttacks(from) & target & pos.CheckedSquares(pt))))
                 continue;
 
-            var b = pos.GetAttacks(from, pt) & target;
-
-            if (checks)
-                b &= pos.CheckedSquares(pt);
+            var b = checks
+                ? pos.GetAttacks(from, pt) & target & pos.CheckedSquares(pt)
+                : pos.GetAttacks(from, pt) & target;
 
             index = Move.Create(moves, index, from, ref b);
         }
@@ -332,7 +328,7 @@ public static class MoveGenerator
                     // the pawn is not on the same file as the enemy king, because we don't
                     // generate captures. Note that a possible discovery check promotion has
                     // been already generated among captures.
-                    if (!dcCandidates.IsEmpty)
+                    if (dcCandidates)
                     {
                         var dc1 = dcCandidates.Shift(up) & emptySquares & ~ksq;
                         var dc2 = (dc1 & us.Rank3()).Shift(up) & emptySquares;
@@ -358,9 +354,7 @@ public static class MoveGenerator
         }
 
         var pawnsOn7 = pawns & rank7Bb;
-        var (right, left) = us.IsWhite
-            ? (Direction.NorthEast, Direction.NorthWest)
-            : (Direction.SouthWest, Direction.SouthEast);
+        var (right, left) = (us.PawnEastAttackDistance(), us.PawnWestAttackDistance());
 
         // Promotions and under-promotions
         if (pawnsOn7)
@@ -495,7 +489,7 @@ public static class MoveGenerator
             case MoveGenerationType.Evasions:
             case MoveGenerationType.NonEvasions:
                 moves[index++].Move = Move.Create(from, to, MoveTypes.Promotion, PieceTypes.Queen);
-                if (!(PieceTypes.Knight.PseudoAttacks(to) & ksq).IsEmpty)
+                if (PieceTypes.Knight.PseudoAttacks(to) & ksq)
                     moves[index++].Move = Move.Create(from, to, MoveTypes.Promotion);
                 break;
         }
@@ -508,7 +502,7 @@ public static class MoveGenerator
         moves[index++].Move = Move.Create(from, to, MoveTypes.Promotion, PieceTypes.Rook);
         moves[index++].Move = Move.Create(from, to, MoveTypes.Promotion, PieceTypes.Bishop);
 
-        if ((PieceTypes.Knight.PseudoAttacks(to) & ksq).IsEmpty)
+        if (!(PieceTypes.Knight.PseudoAttacks(to) & ksq))
             moves[index++].Move = Move.Create(from, to, MoveTypes.Promotion);
 
         return index;
