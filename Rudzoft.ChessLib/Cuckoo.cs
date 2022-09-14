@@ -53,7 +53,7 @@ public static class Cuckoo
                 var sq1 = BitBoards.PopLsb(ref bb);
                 for (var sq2 = sq1 + 1; sq2 <= Square.H8; ++sq2)
                 {
-                    if ((pc.Type().PseudoAttacks(sq1) & sq2).IsEmpty)
+                    if (!pc.Type().PseudoAttacks(sq1).Contains(sq2))
                         continue;
 
                     var move = Move.Create(sq1, sq2);

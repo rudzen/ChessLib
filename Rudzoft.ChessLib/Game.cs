@@ -91,8 +91,6 @@ public sealed class Game : IGame
         var gameEndType = GameEndTypes.None;
         if (IsRepetition)
             gameEndType |= GameEndTypes.Repetition;
-        // if (State.Material[Player.White.Side] <= 300 && State.Material[Player.Black.Side] <=
-        // 300)//&& Pos.BoardPieces[0].Empty && Pos.BoardPieces[8].Empty) gameEndType |= GameEndTypes.MaterialDrawn;
         if (Pos.Rule50 >= 100)
             gameEndType |= GameEndTypes.FiftyMove;
 

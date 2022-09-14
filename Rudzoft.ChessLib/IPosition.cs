@@ -166,6 +166,8 @@ public interface IPosition : IEnumerable<Piece>
 
     bool CanCastle(Player p);
 
+    public ref BitBoard CastleKingPath(CastleRight cr);
+
     bool CastlingImpeded(CastleRight cr);
 
     Square CastlingRookSquare(CastleRight cr);

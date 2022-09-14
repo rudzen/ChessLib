@@ -81,6 +81,8 @@ public readonly record struct File(Files Value) : IComparable<File>, ISpanFormat
     public bool IsOk
         => Value.AsInt().InBetween(Files.FileA.AsInt(), Files.FileH.AsInt());
 
+    public const int Count = (int)Files.FileNb;
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator File(int value)
         => new(value);
@@ -224,4 +226,8 @@ public readonly record struct File(Files Value) : IComparable<File>, ISpanFormat
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public int EdgeDistance()
         => Math.Min(AsInt() - FileA.AsInt(), FileH.AsInt() - AsInt());
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public File Clamp(File min, File max)
+        => new(Value.AsInt().Clamp(min.AsInt(), max.AsInt()));
 }

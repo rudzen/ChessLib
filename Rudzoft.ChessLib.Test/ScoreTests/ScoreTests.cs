@@ -24,7 +24,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System.Collections.Generic;
 using System.Linq;
 using Rudzoft.ChessLib.Types;
 
@@ -32,44 +31,43 @@ namespace Rudzoft.ChessLib.Test.ScoreTests;
 
 public sealed class ScoreTests
 {
-    private static readonly KeyValuePair<int, int>[] TestValues;
+    private static readonly Score[] TestValues;
 
     static ScoreTests()
     {
-        TestValues = new KeyValuePair<int, int>[20];
-        TestValues[0] = new KeyValuePair<int, int>(35, 23);
-        TestValues[1] = new KeyValuePair<int, int>(-35, 23);
-        TestValues[2] = new KeyValuePair<int, int>(35, -23);
-        TestValues[3] = new KeyValuePair<int, int>(-35, -23);
-        TestValues[4] = new KeyValuePair<int, int>(350, 230);
-        TestValues[5] = new KeyValuePair<int, int>(3542, 234);
-        TestValues[6] = new KeyValuePair<int, int>(35, -223);
-        TestValues[7] = new KeyValuePair<int, int>(0, 0);
-        TestValues[8] = new KeyValuePair<int, int>(56, 23);
-        TestValues[9] = new KeyValuePair<int, int>(15423, -23);
-        TestValues[10] = new KeyValuePair<int, int>(2, 1);
-        TestValues[11] = new KeyValuePair<int, int>(425, 23);
-        TestValues[12] = new KeyValuePair<int, int>(35, 4223);
-        TestValues[13] = new KeyValuePair<int, int>(-35231, -24223);
-        TestValues[14] = new KeyValuePair<int, int>(-1, 1);
-        TestValues[15] = new KeyValuePair<int, int>(1, -1);
-        TestValues[16] = new KeyValuePair<int, int>(2, 23);
-        TestValues[17] = new KeyValuePair<int, int>(55, 23);
-        TestValues[18] = new KeyValuePair<int, int>(0, 23);
-        TestValues[19] = new KeyValuePair<int, int>(650, -2323);
+        TestValues = new Score[20];
+        TestValues[0] = new Score(35, 23);
+        TestValues[1] = new Score(-35, 23);
+        TestValues[2] = new Score(35, -23);
+        TestValues[3] = new Score(-35, -23);
+        TestValues[4] = new Score(350, 230);
+        TestValues[5] = new Score(3542, 234);
+        TestValues[6] = new Score(35, -223);
+        TestValues[7] = new Score(0, 0);
+        TestValues[8] = new Score(56, 23);
+        TestValues[9] = new Score(15423, -23);
+        TestValues[10] = new Score(2, 1);
+        TestValues[11] = new Score(425, 23);
+        TestValues[12] = new Score(35, 4223);
+        TestValues[13] = new Score(-35231, -24223);
+        TestValues[14] = new Score(-1, 1);
+        TestValues[15] = new Score(1, -1);
+        TestValues[16] = new Score(2, 23);
+        TestValues[17] = new Score(55, 23);
+        TestValues[18] = new Score(0, 23);
+        TestValues[19] = new Score(650, -2323);
     }
 
     [Fact]
     public void ScoreMg()
     {
-        var scores = TestValues.Select(static x => new Score(x.Key, x.Value));
-        var i = 0;
-        foreach (var score in scores)
-        {
-            var expected = TestValues[i++];
-            var actual = new KeyValuePair<int, int>(score.Mg(), score.Eg());
-            Assert.Equal(expected, actual);
-        }
+        const int expectedMg = -14656;
+        const int expectedEg = -21989;
+        var result = TestValues
+            .Aggregate(Score.Zero, static (current, expected) => current + expected);
+
+        Assert.Equal( expectedMg, result.Mg());
+        Assert.Equal( expectedEg, result.Eg());
     }
 
     [Theory]
@@ -85,9 +83,9 @@ public sealed class ScoreTests
     }
 
     [Theory]
-    [InlineData(10, 10, 2, 5, 5)]
-    [InlineData(10, 10, 4, 2, 2)]
-    public void IntDivideOperator(int initialMg, int initialEg, int divideBy, int expectedMg, int expectedEg)
+    [InlineData(10, 10, 2, 5.0f, 5.0f)]
+    [InlineData(10, 10, 4, 2.5f, 2.5f)]
+    public void IntDivideOperator(int initialMg, int initialEg, int divideBy, float expectedMg, float expectedEg)
     {
         var initial = new Score(initialMg, initialEg);
         var expected = new Score(expectedMg, expectedEg);

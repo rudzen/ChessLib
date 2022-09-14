@@ -82,7 +82,7 @@ public readonly record struct Rank(Ranks Value) : ISpanFormattable, IValidationT
     public bool IsOk
         => Value.AsInt().InBetween(Ranks.Rank1.AsInt(), Ranks.Rank8.AsInt());
 
-    public static int Count => (int)Ranks.RankNb;
+    public const int Count = (int)Ranks.RankNb;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator Rank(int value)
@@ -239,4 +239,8 @@ public readonly record struct Rank(Ranks Value) : ISpanFormattable, IValidationT
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public int EdgeDistance()
         => Math.Min(AsInt() - Rank1.AsInt(), Rank8.AsInt() - AsInt());
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Rank Clamp(Rank min, Rank max)
+        => new(Value.AsInt().Clamp(min.AsInt(), max.AsInt()));
 }

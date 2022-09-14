@@ -31,7 +31,7 @@ using Rudzoft.ChessLib.Extensions;
 
 namespace Rudzoft.ChessLib.Types;
 
-public enum Squares
+public enum Squares : byte
 {
     // ReSharper disable InconsistentNaming
     // ReSharper disable UnusedMember.Global
@@ -75,6 +75,9 @@ public readonly record struct Square(Squares Value) : ISpanFormattable, ICompara
         .ToArray();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Square(byte square) : this((Squares)square) { }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Square(int square) : this((Squares)square) { }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -82,7 +85,7 @@ public readonly record struct Square(Squares Value) : ISpanFormattable, ICompara
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Square(int rank, int file)
-        : this((Squares)(rank << 3) + file) { }
+        : this((Squares)(rank << 3) + (byte)file) { }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Square(Ranks r, Files f)
@@ -227,19 +230,19 @@ public readonly record struct Square(Squares Value) : ISpanFormattable, ICompara
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Square operator +(Square left, Square right)
-        => new(left.Value + right.AsInt());
+        => new(left.Value + (byte)right.AsInt());
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Square operator +(Square left, int right)
-        => new(left.Value + right);
+        => new(left.Value + (byte)right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Square operator +(Square left, Direction right)
-        => new(left.Value + (int)right.Value);
+        => new(left.Value + (byte)right.Value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Square operator +(Square left, Directions right)
-        => new(left.Value + (int)right);
+        => new(left.Value + (byte)right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Square operator -(Square left, Square right)
@@ -247,15 +250,15 @@ public readonly record struct Square(Squares Value) : ISpanFormattable, ICompara
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Square operator -(Square left, int right)
-        => new(left.Value - right);
+        => new(left.Value - (byte)right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Square operator -(Square left, Direction right)
-        => new(left.Value - (int)right.Value);
+        => new(left.Value - (byte)right.Value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Square operator -(Square left, Directions right)
-        => new(left.Value - (int)right);
+        => new(left.Value - (byte)right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Square operator ++(Square sq)
