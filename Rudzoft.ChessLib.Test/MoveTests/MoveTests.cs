@@ -26,6 +26,7 @@ SOFTWARE.
 
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using System.Text;
 using Rudzoft.ChessLib.Factories;
 using Rudzoft.ChessLib.Types;
@@ -69,8 +70,7 @@ public sealed class MoveTests
         // full move spectrum
         var move = Move.Create(expectedFrom, expectedTo, MoveTypes.Promotion, expectedPromotionPiece);
 
-        var actualFrom = move.FromSquare();
-        var actualTo = move.ToSquare();
+        var (actualFrom, actualTo) = move;
         var actualPromotionPiece = move.PromotedPieceType();
         var actualEMoveType = move.MoveType();
 
@@ -107,17 +107,19 @@ public sealed class MoveTests
 
         // build move list and expected result
         for (Square s1 = Squares.a1; s1 <= Squares.h8; s1++)
-        for (Square s2 = Squares.a2; s2 <= Squares.h8; s2++)
         {
-            if (s1 == s2)
-                continue;
+            for (Square s2 = Squares.a2; s2 <= Squares.h8; s2++)
+            {
+                if (s1 == s2)
+                    continue;
 
-            moves.Add(Move.Create(s1, s2));
-            tmp.Clear();
-            tmp.Append(' ');
-            tmp.Append(s1.ToString());
-            tmp.Append(s2.ToString());
-            movesString.Add(new MoveStrings(tmp.ToString()));
+                moves.Add(Move.Create(s1, s2));
+                tmp.Clear();
+                tmp.Append(' ');
+                tmp.Append(s1.ToString());
+                tmp.Append(s2.ToString());
+                movesString.Add(new MoveStrings(tmp.ToString()));
+            }
         }
 
         var result = new StringBuilder(128);
@@ -163,7 +165,7 @@ public sealed class MoveTests
         }
 
         // generate a bitch string for them all.
-        foreach (var move in moves)
+        foreach (var move in CollectionsMarshal.AsSpan(moves))
         {
             result.Append(' ');
             game.Pos.MoveToString(move, result);

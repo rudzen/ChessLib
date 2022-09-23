@@ -32,7 +32,7 @@ namespace Rudzoft.ChessLib.Extensions;
 public static class ArrayExtensions
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void Fill<T>(this T[] arr, T value)
+    public static void Fill<T>(this T[] arr, in T value)
     {
         if (arr == null)
             throw new ArgumentNullException(nameof(arr));

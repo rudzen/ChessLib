@@ -26,6 +26,7 @@ SOFTWARE.
 
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using System.Text;
 using Microsoft.Extensions.ObjectPool;
 using Rudzoft.ChessLib.Enums;
@@ -206,7 +207,7 @@ public class Uci : IUci
         list.Sort(OptionComparer);
         var sb = _pvPool.Get();
 
-        foreach (var opt in list)
+        foreach (var opt in CollectionsMarshal.AsSpan(list))
         {
             sb.AppendLine();
             sb.Append("option name ").Append(opt.Name).Append(" type ").Append(OptionTypeStrings[(int)opt.Type]);

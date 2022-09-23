@@ -15,6 +15,8 @@ This library contains all the data, types and structures for which to create a p
 chess software. It does not contain any heuristics or search algorithms as these
 are meant to be implemented separately.
 
+It also contains KPK bit compact data to determine endgame draw.
+
 ## Can I use this as a starting point for my chess software?
 
 Yes you can, it is designed with that in mind.
@@ -47,8 +49,7 @@ Yes you can, it is designed with that in mind.
   * Score
   * Square
   * Value
-* 100% Bitboard support with piece attacks for all types, including lots of helper functions
-* Lots of pre-calculated bitboard arrays to aid in the creation of an evaluation functionality
+* Bitboard use with piece attacks for all types, including lots of helper functions
 * Very fast FEN handling with optional legality check
 * Magic bitboard implementation Copyright (C) 2007 Pradyumna Kannan. Converted to C#
 * FEN input and output supported
@@ -100,7 +101,7 @@ var moveList = game.Pos.GenerateMoves();
 
 ## What is not included?
 
-* Evaluation
+* Evaluation (except KPK)
 * Search
 * Communication using e.i. UCI (base parameter struct supplied though)
 

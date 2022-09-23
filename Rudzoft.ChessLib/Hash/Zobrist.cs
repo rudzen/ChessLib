@@ -26,6 +26,7 @@ SOFTWARE.
 
 using System;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Hash;
@@ -97,8 +98,14 @@ public static class Zobrist
             ZobristPst[i] = new HashKey[Square.Count];
 
         foreach (var pc in Piece.AllPieces)
-        foreach (var sq in BitBoards.AllSquares)
-            ZobristPst[pc.AsInt()][sq.AsInt()] = rnd.Rand();
+        {
+            var bb = BitBoards.AllSquares;
+            while (bb)
+            {
+                var sq = BitBoards.PopLsb(ref bb).AsInt();
+                ZobristPst[pc.AsInt()][sq] = rnd.Rand();
+            }
+        }
     }
 
     private static void InitializeRandomArray(Span<HashKey> array, IRKiss rnd)

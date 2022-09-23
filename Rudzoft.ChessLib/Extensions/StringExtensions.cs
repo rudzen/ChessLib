@@ -100,4 +100,12 @@ public static class StringExtensions
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsNullOrWhiteSpace(this string @this) => string.IsNullOrWhiteSpace(@this);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static char FlipCase(this char c)
+    {
+#pragma warning disable S3358 // Ternary operators should not be nested
+        return char.IsLetter(c) ? char.IsLower(c) ? char.ToUpper(c) : char.ToLower(c) : c;
+#pragma warning restore S3358 // Ternary operators should not be nested
+    }
 }

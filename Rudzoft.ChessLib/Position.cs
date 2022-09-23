@@ -708,7 +708,7 @@ public sealed class Position : IPosition
             Debug.Assert(pc == PieceTypes.King.MakePiece(us));
             Debug.Assert(capturedPiece == PieceTypes.Rook.MakePiece(us));
 
-            DoCastleling(us, from, ref to, out var rookFrom, out var rookTo, CastlePerform.Do);
+            var (rookFrom, rookTo) = DoCastleling(us, from, ref to, CastlePerform.Do);
 
             k ^= capturedPiece.GetZobristPst(rookFrom);
             k ^= capturedPiece.GetZobristPst(rookTo);
@@ -1110,10 +1110,9 @@ public sealed class Position : IPosition
             }
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void SetupPlayer(ReadOnlySpan<char> fenChunk)
-    {
-        _sideToMove = (fenChunk[0] != 'w').AsByte();
-    }
+        => _sideToMove = (fenChunk[0] != 'w').AsByte();
 
     private void SetupEnPassant(ReadOnlySpan<char> fenChunk)
     {
@@ -1193,6 +1192,7 @@ public sealed class Position : IPosition
         SetState();
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public ReadOnlySpan<Square> Squares(PieceTypes pt, Player p)
         => Board.Squares(pt, p);
 
@@ -1222,7 +1222,7 @@ public sealed class Position : IPosition
         }
 
         if (type == MoveTypes.Castling)
-            DoCastleling(us, from, ref to, out _, out _, CastlePerform.Undo);
+            var (_, _) = DoCastleling(us, from, ref to, CastlePerform.Undo);
         else
         {
             // Note: The parameters are reversed, since we move the piece "back"
@@ -1259,6 +1259,7 @@ public sealed class Position : IPosition
         //Debug.Assert(_positionValidator.Validate().IsOk);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void TakeNullMove()
     {
         Debug.Assert(!InCheck);
@@ -1279,7 +1280,7 @@ public sealed class Position : IPosition
             row.Clear();
             var rowIndex = 0;
 
-            row[rowIndex++] = (char)('0' + rank.AsInt() + 1);
+            row[rowIndex++] = (char)('1' + rank.AsInt());
             row[rowIndex++] = space;
 
             for (var file = Files.FileA; file <= Files.FileH; file++)
@@ -1307,33 +1308,44 @@ public sealed class Position : IPosition
     public IPositionValidator Validate(PositionValidationTypes type = PositionValidationTypes.Basic)
         => _positionValidator.Validate(type);
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static CastleRights OrCastlingRight(Player c, bool isKingSide)
         => (CastleRights)((int)CastleRights.WhiteKing << ((!isKingSide).AsByte() + 2 * c.Side));
 
-    private void DoCastleling(
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    private (Square, Square) DoCastleling(
         Player us,
         Square from,
         ref Square to,
-        out Square rookFrom,
-        out Square rookTo,
         CastlePerform castlePerform)
     {
         var kingSide = to > from;
         var doCastleling = castlePerform == CastlePerform.Do;
 
-        rookFrom = to; // Castling is encoded as "king captures friendly rook"
-        rookTo = (kingSide ? Square.F1 : Square.D1).Relative(us);
+        // Castling is encoded as "king captures friendly rook"
+        var rookFromTo = (rookFrom: to, rookTo: (kingSide ? Square.F1 : Square.D1).Relative(us));
+
         to = (kingSide ? Square.G1 : Square.C1).Relative(us);
 
+        // If we are performing castle move, just swap the squares
+        if (doCastleling)
+        {
+            (to, from) = (from, to);
+            (rookFromTo.rookFrom, rookFromTo.rookTo) = (rookFromTo.rookTo, rookFromTo.rookFrom);
+        }
+
         // Remove both pieces first since squares could overlap in Chess960
-        RemovePiece(doCastleling ? from : to);
-        RemovePiece(doCastleling ? rookFrom : rookTo);
-        Board.ClearPiece(doCastleling ? from : to);
-        Board.ClearPiece(doCastleling ? rookFrom : rookTo);
-        AddPiece(PieceTypes.King.MakePiece(us), doCastleling ? to : from);
-        AddPiece(PieceTypes.Rook.MakePiece(us), doCastleling ? rookTo : rookFrom);
+        RemovePiece(to);
+        RemovePiece(rookFromTo.rookTo);
+        Board.ClearPiece(to);
+        Board.ClearPiece(rookFromTo.rookTo);
+        AddPiece(PieceTypes.King.MakePiece(us), from);
+        AddPiece(PieceTypes.Rook.MakePiece(us), rookFromTo.rookFrom);
+
+        return rookFromTo;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void MovePiece(Square from, Square to)
     {
         Board.MovePiece(from, to);
@@ -1344,8 +1356,12 @@ public sealed class Position : IPosition
         PieceUpdated?.Invoke(new PieceSquareEventArgs(Board.PieceAt(from), to));
     }
 
+    ///<summary>
     /// IPosition.SetCastlingRight() is an helper function used to set castling rights given the
     /// corresponding color and the rook starting square.
+    /// </summary>
+    /// <param name="stm"></param>
+    /// <param name="rookFrom"></param>
     private void SetCastlingRight(Player stm, Square rookFrom)
     {
         var kingFrom = GetKingSquare(stm);
@@ -1362,7 +1378,7 @@ public sealed class Position : IPosition
 
         var kingPath = kingFrom.BitboardBetween(kingTo) | kingTo;
         _castleKingPath[cr.AsInt()] = kingPath;
-        _castleRookPath[cr.AsInt()] = (kingPath | (rookFrom.BitboardBetween(rookTo) | rookTo)) & ~(kingFrom | rookFrom);;
+        _castleRookPath[cr.AsInt()] = (kingPath | (rookFrom.BitboardBetween(rookTo) | rookTo)) & ~(kingFrom | rookFrom);
     }
 
     private void SetCheckInfo(in State state)
@@ -1427,42 +1443,31 @@ public sealed class Position : IPosition
 
     private void SetupCastleling(ReadOnlySpan<char> castleling)
     {
+        Square RookSquare(Square startSq, Piece rook)
+        {
+            Square targetSq;
+            for (targetSq = startSq; Board.PieceAt(targetSq) != rook; --targetSq)
+            {
+            }
+
+            return targetSq;
+        }
+
         foreach (var ca in castleling)
         {
             Player c = char.IsLower(ca);
             var rook = PieceTypes.Rook.MakePiece(c);
             var token = char.ToUpper(ca);
 
-            Square rsq;
-
-            Square RookSquare(Square startSq)
+            var rsq = token switch
             {
-                for (rsq = startSq; GetPiece(rsq) != rook; --rsq)
-                {
-                }
+                'K' => RookSquare(Square.H1.Relative(c), rook),
+                'Q' => RookSquare(Square.A1.Relative(c), rook),
+                _ => token.InBetween('A', 'H') ? new Square(Rank.Rank1.Relative(c), new File(token - 'A')) : Square.None
+            };
 
-                return rsq;
-            }
-
-            switch (token)
-            {
-                case 'K':
-                    rsq = RookSquare(Square.H1.Relative(c));
-
-                    break;
-                case 'Q':
-                    rsq = RookSquare(Square.A1.Relative(c));
-
-                    break;
-                default:
-                    if (token.InBetween('A', 'H'))
-                        rsq = new Square(Rank.Rank1.Relative(c), new File(token - 'A'));
-                    else
-                        continue;
-                    break;
-            }
-
-            SetCastlingRight(c, rsq);
+            if (rsq != Square.None)
+                SetCastlingRight(c, rsq);
         }
     }
 

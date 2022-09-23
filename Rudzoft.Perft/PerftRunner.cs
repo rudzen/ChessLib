@@ -29,6 +29,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Threading;
@@ -126,6 +127,8 @@ public sealed class PerftRunner : IPerftRunner
 
         _perft.Positions = new List<PerftPosition>();
 
+        GCSettings.LatencyMode = GCLatencyMode.SustainedLowLatency;
+
         await foreach (var position in positions.WithCancellation(cancellationToken).ConfigureAwait(false))
         {
             _perft.AddPosition(position);
@@ -144,6 +147,8 @@ public sealed class PerftRunner : IPerftRunner
                 break;
             }
         }
+
+        GCSettings.LatencyMode = GCLatencyMode.Interactive;
 
         return errors;
     }
@@ -204,18 +209,19 @@ public sealed class PerftRunner : IPerftRunner
         result.Clear();
 
         var pp = _perft.Positions.Last();
-
-        var baseFileName = SaveResults ? Path.Combine(CurrentDirectory.Value, $"{FixFileName(pp.Fen)}[") : string.Empty;
+        var baseFileName = SaveResults
+            ? Path.Combine(CurrentDirectory.Value, $"{FixFileName(pp.Fen)}[")
+            : string.Empty;
 
         var errors = 0;
-
-        var sw = new Stopwatch();
 
         result.Fen = pp.Fen;
         _perft.SetGamePosition(pp);
         _perft.BoardPrintCallback(_perft.GetBoard());
         _log.Information("Fen         : {0}", pp.Fen);
         _log.Information(Line);
+
+        var sw = new Stopwatch();
 
         foreach (var (depth, expected) in pp.Value)
         {

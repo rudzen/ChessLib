@@ -35,8 +35,8 @@ public static class MoveGenerator
 {
     private static readonly (CastleRight, CastleRight)[] CastleSideRights =
     {
-        (CastleRights.WhiteKing, CastleRights.WhiteQueen),
-        (CastleRights.BlackKing, CastleRights.BlackQueen)
+        (CastleRight.WhiteKing, CastleRight.WhiteQueen),
+        (CastleRight.BlackKing, CastleRight.BlackQueen)
     };
 
     public static int Generate(
@@ -72,7 +72,7 @@ public static class MoveGenerator
         in IPosition pos,
         Span<ExtMove> moves,
         int index,
-        BitBoard target,
+        in BitBoard target,
         Player us,
         MoveGenerationType type)
     {
@@ -90,13 +90,10 @@ public static class MoveGenerator
         var b = pos.GetAttacks(ksq, PieceTypes.King) & target;
         index = Move.Create(moves, index, ksq, ref b);
 
-        if (type == MoveGenerationType.Captures)
+        if (type == MoveGenerationType.Captures || !pos.CanCastle(pos.SideToMove))
             return index;
 
         var (kingSide, queenSide) = CastleSideRights[us.Side];
-
-        if (!pos.CanCastle(pos.SideToMove))
-            return index;
 
         if (pos.CanCastle(kingSide) && !pos.CastlingImpeded(kingSide))
             moves[index++].Move = Move.Create(ksq, pos.CastlingRookSquare(kingSide), MoveTypes.Castling);
@@ -134,7 +131,7 @@ public static class MoveGenerator
             _ => BitBoard.Empty
         };
 
-        return GenerateAll(in pos, moves, index, target, us, type);
+        return GenerateAll(in pos, moves, index, in target, us, type);
     }
 
     /// <summary>
@@ -181,7 +178,7 @@ public static class MoveGenerator
         checkSquare = pos.Checkers.Lsb();
         var target = checkSquare.BitboardBetween(ksq) | checkSquare;
 
-        return GenerateAll(in pos, moves, index, target, us, MoveGenerationType.Evasions);
+        return GenerateAll(in pos, moves, index, in target, us, MoveGenerationType.Evasions);
     }
 
     /// <summary>
@@ -198,12 +195,12 @@ public static class MoveGenerator
         int index,
         Player us)
     {
-        var pinned = pos.KingBlockers(us) & pos.Pieces(us);
-        var ksq = pos.GetKingSquare(us);
-
         var end = pos.InCheck
             ? GenerateEvasions(in pos, moves, index, us)
             : Generate(in pos, moves, index, us, MoveGenerationType.NonEvasions);
+
+        var pinned = pos.KingBlockers(us) & pos.Pieces(us);
+        var ksq = pos.GetKingSquare(us);
 
         // In case there exists pinned pieces, the move is a king move (including castles) or
         // it's an en-passant move the move is checked, otherwise we assume the move is legal.
@@ -441,6 +438,7 @@ public static class MoveGenerator
     {
         Debug.Assert(!pos.InCheck);
         var dc = pos.KingBlockers(~us) & pos.Pieces(us);
+        var emptySquares = ~pos.Pieces();
 
         while (dc)
         {
@@ -452,7 +450,7 @@ public static class MoveGenerator
             if (pt == PieceTypes.Pawn)
                 continue;
 
-            var b = pos.GetAttacks(from, pt) & ~pos.Pieces();
+            var b = pos.GetAttacks(from, pt) & emptySquares;
 
             if (pt == PieceTypes.King)
                 b &= ~PieceTypes.Queen.PseudoAttacks(pos.GetKingSquare(~us));
@@ -460,7 +458,7 @@ public static class MoveGenerator
             index = Move.Create(moves, index, from, ref b);
         }
 
-        return GenerateAll(in pos, moves, index, ~pos.Pieces(), us, MoveGenerationType.QuietChecks);
+        return GenerateAll(in pos, moves, index, in emptySquares, us, MoveGenerationType.QuietChecks);
     }
 
     /// <summary>
