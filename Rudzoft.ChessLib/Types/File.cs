@@ -24,9 +24,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using Rudzoft.ChessLib.Extensions;
 using System;
 using System.Runtime.CompilerServices;
-using Rudzoft.ChessLib.Extensions;
 
 // ReSharper disable UnusedMember.Global
 // ReSharper disable MemberCanBeInternal
@@ -65,7 +65,7 @@ public readonly record struct File(Files Value) : IComparable<File>, ISpanFormat
     public static File FileF { get; } = new(Files.FileF);
     public static File FileG { get; } = new(Files.FileG);
     public static File FileH { get; } = new(Files.FileH);
-    public static File[] AllFiles { get; } = { FileA, FileB, FileC, FileD, FileE, FileF, FileG, FileH };
+    public static File[] AllFiles { get; } = new[] { FileA, FileB, FileC, FileD, FileE, FileF, FileG, FileH };
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public File(int file)
@@ -160,7 +160,7 @@ public readonly record struct File(Files Value) : IComparable<File>, ISpanFormat
         => ~left.BitBoardFile();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static int operator >> (File left, int right)
+    public static int operator >>(File left, int right)
         => left.AsInt() >> right;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

@@ -113,9 +113,8 @@ public sealed class FenData : EventArgs, IFenData
     public ReadOnlySpan<char> Chunk()
     {
         // ReSharper disable once InlineOutVariableDeclaration
-        (int start, int end) result;
         Index++;
-        return _splitPoints.TryDequeue(out result)
+        return _splitPoints.TryDequeue(out (int start, int end) result)
             ? Fen.Span[result.start..result.end]
             : ReadOnlySpan<char>.Empty;
     }

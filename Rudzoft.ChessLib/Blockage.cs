@@ -26,6 +26,7 @@ SOFTWARE.
 
 using System;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using Rudzoft.ChessLib.Types;
 
 [assembly: InternalsVisibleTo("Chess.Test")]
@@ -108,7 +109,7 @@ public sealed class Blockage : IBlockage
             return false;
 
         var theirKsq = _pos.GetKingSquare(_them);
-        _dynamicPawns |= ComputeDynamicFencedPawns(_them);
+        _dynamicPawns |= ComputeDynamicFencedPawns();
 
         while (_dynamicPawns)
         {
@@ -259,10 +260,11 @@ public sealed class Blockage : IBlockage
     /// <param name="up">The up direction for the current player</param>
     private void MarkOurPawns(Direction up)
     {
-        var ourPawns = _pos.Pieces(PieceTypes.Pawn, _us);
+        var ourPawns = _ourPawns;
 
-        foreach (var psq in ourPawns)
+        while (ourPawns)
         {
+            var psq = BitBoards.PopLsb(ref ourPawns);
             var rr = psq.RelativeRank(_us);
             if (rr < Rank.Rank7
                 && (_pos.GetPiece(psq + up) == _theirPawn || !(_fixedPawn & (psq + up)).IsEmpty)
@@ -338,19 +340,17 @@ public sealed class Blockage : IBlockage
         return false;
     }
 
-    private BitBoard ComputeDynamicFencedPawns(Player them)
+    private BitBoard ComputeDynamicFencedPawns()
     {
         // reverse order of Down
-        var down = them.IsBlack
-            ? Direction.South
-            : Direction.North;
+        var down = _us.PawnPushDistance();
 
         var result = BitBoard.Empty;
 
         foreach (var f in File.AllFiles)
         {
-            var sq = NextFenceRankSquare(f, them);
-            var b = sq.ForwardFile(them) & _theirPawns;
+            var sq = NextFenceRankSquare(f, _them);
+            var b = sq.ForwardFile(_them) & _theirPawns;
             while (b)
             {
                 sq = BitBoards.PopLsb(ref b) + down;

@@ -28,6 +28,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
+using Rudzoft.ChessLib.Extensions;
 using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Evaluation;
@@ -46,27 +48,33 @@ public static class KpkBitBase
 
     static KpkBitBase()
     {
-        IList<KpkPosition> db = new List<KpkPosition>(MaxIndex);
+        List<KpkPosition> db = new(MaxIndex);
+        int idx;
 
         // Initialize db with known win / draw positions
-        for (var idx = 0; idx < MaxIndex; ++idx)
+        for (idx = 0; idx < MaxIndex; ++idx)
             db.Add(KpkPosition.Create(idx));
 
         // Iterate through the positions until none of the unknown positions can be
         // changed to either wins or draws (15 cycles needed).
         var repeat = 1;
 
+        var dbs = CollectionsMarshal.AsSpan(db);
         while (repeat != 0)
         {
             repeat = 1;
-            for (var idx = 0; idx < MaxIndex; ++idx)
-                repeat = db[idx].Result == Result.Unknown && db[idx].Classify(db) != Result.Unknown ? 1 : 0;
+            foreach (var kpkPosition in dbs)
+                repeat = (kpkPosition.Result == Result.Unknown && kpkPosition.Classify(db) != Result.Unknown).AsByte();
         }
 
         // Fill the bitbase with the decisive results
-        for (var idx = 0; idx < MaxIndex; ++idx)
-            if (db[idx].Result == Result.Win)
+        idx = 0;
+        foreach (var kpkPosition in dbs)
+        {
+            if (kpkPosition.Result == Result.Win)
                 KpKbb.Set(idx, true);
+            idx++;
+        }
     }
 
     /// <summary>
@@ -244,7 +252,7 @@ public static class KpkBitBase
     /// <param name="pawnSq">"Strong" side pawn square</param>
     /// <param name="blackKsq">"Weak" side king square</param>
     /// <param name="stm">strong side. fx strongSide == pos.SideToMove ? Player.White : Player.Black</param>
-    /// <returns></returns>
+    /// <returns>true if strong side "won"</returns>
     public static bool Probe(Square whiteKsq, Square pawnSq, Square blackKsq, Player stm)
     {
         Debug.Assert(pawnSq.File <= File.FileD);

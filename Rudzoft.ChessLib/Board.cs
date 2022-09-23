@@ -28,7 +28,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using Rudzoft.ChessLib.Extensions;
 using Rudzoft.ChessLib.Types;
 
@@ -36,8 +35,6 @@ namespace Rudzoft.ChessLib;
 
 public sealed class Board : IBoard
 {
-    #region base piece information
-
     private readonly Piece[] _pieces;
 
     private readonly BitBoard[] _bySide;
@@ -49,8 +46,6 @@ public sealed class Board : IBoard
     private readonly Square[][] _pieceList;
 
     private readonly int[] _index;
-
-    #endregion base piece information
 
     public Board()
     {
@@ -71,13 +66,13 @@ public sealed class Board : IBoard
 
     public void Clear()
     {
-        _pieces.Clear();
-        _bySide.Clear();
-        _byType.Clear();
-        _pieceCount.Clear();
+        Array.Fill(_pieces, Piece.EmptyPiece);
+        _bySide[0] = _bySide[1] = BitBoard.Empty;
+        _byType.Fill(in BitBoard.Empty);
+        Array.Fill(_pieceCount, 0);
         foreach (var s in _pieceList)
-            s.Fill(Types.Square.None);
-        _index.Clear();
+            Array.Fill(s, Types.Square.None);
+        Array.Fill(_index, 0);
     }
 
     public Piece PieceAt(Square sq)
@@ -181,7 +176,14 @@ public sealed class Board : IBoard
         => PieceCount(PieceTypes.AllPieces);
 
     public IEnumerator<Piece> GetEnumerator()
-        => _pieces.Where(static piece => piece != Piece.EmptyPiece).GetEnumerator();
+    {
+        for (var i = 0; i < _pieces.Length; ++i)
+        {
+            var pc = _pieces[i];
+            if (pc != Piece.EmptyPiece)
+                yield return pc;
+        }
+    }
 
     IEnumerator IEnumerable.GetEnumerator()
         => GetEnumerator();

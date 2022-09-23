@@ -25,6 +25,7 @@ SOFTWARE.
 */
 
 using Rudzoft.ChessLib.Factories;
+using Rudzoft.ChessLib.Fen;
 using Rudzoft.ChessLib.MoveGeneration;
 using Rudzoft.ChessLib.Types;
 
@@ -45,11 +46,8 @@ public sealed class FoolsCheckMateTests
         };
 
         // construct game and start a new game
-        var board = new Board();
-        var pieceValue = new PieceValue();
-        var position = new Position(board, pieceValue);
-        var game = GameFactory.Create(position);
-        game.NewGame();
+        var game = GameFactory.Create(Fen.Fen.StartPositionFen);
+        var position = game.Pos;
         var state = new State();
 
         // make the moves necessary to create a mate

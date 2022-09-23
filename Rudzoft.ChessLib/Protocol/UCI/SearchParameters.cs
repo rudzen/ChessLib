@@ -78,7 +78,7 @@ public sealed class SearchParameters : ISearchParameters, ISpanFormattable
         MoveTime = moveTime;
     }
 
-    public IList<Move> SearchMoves { get; set; }
+    public List<Move> SearchMoves { get; set; }
 
     public bool Infinite { get; set; }
 
