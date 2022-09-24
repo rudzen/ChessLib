@@ -28,7 +28,7 @@ using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Polyglot;
 
-internal static class BookZobrist
+internal static class PolyglotBookZobrist
 {
     private static readonly ulong[,] psq =
     {
@@ -346,7 +346,7 @@ internal static class BookZobrist
     internal static ulong Psq(int piece, Square sq)
         => psq[piece, sq.AsInt()];
 
-    internal static ulong Castle(CastleRights rights)
+    internal static ulong Castle(CastleRight rights)
         => castle[rights.AsInt()];
 
     internal static ulong EnPassant(File f)

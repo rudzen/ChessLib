@@ -27,6 +27,7 @@ SOFTWARE.
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.IO.MemoryMappedFiles;
 using System.Linq;
 using Rudzoft.ChessLib.Extensions;
 using Rudzoft.ChessLib.MoveGeneration;
@@ -34,17 +35,17 @@ using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Polyglot;
 
-public sealed class Book : IDisposable
+public sealed class PolyglotBook : IDisposable
 {
     // PolyGlot pieces are: BP = 0, WP = 1, BN = 2, ... BK = 10, WK = 11
     private static readonly int[] PieceMapping = { -1, 1, 3, 5, 7, 9, 11, -1, -1, 0, 2, 4, 6, 8, 10 };
 
-    private static readonly CastleRights[] CastleRights =
+    private static readonly CastleRight[] CastleRights =
     {
-        Types.CastleRights.WhiteKing,
-        Types.CastleRights.WhiteQueen,
-        Types.CastleRights.BlackKing,
-        Types.CastleRights.BlackQueen
+        CastleRight.WhiteKing,
+        CastleRight.WhiteQueen,
+        CastleRight.BlackKing,
+        CastleRight.BlackQueen
     };
 
     private readonly IPosition _pos;
@@ -54,26 +55,10 @@ public sealed class Book : IDisposable
     private readonly int _entrySize;
     private readonly Random _rnd;
 
-    private struct Entry
-    {
-        public readonly ulong Key;
-        public readonly ushort Move;
-        public readonly ushort Count;
-        public uint Learn;
-
-        public Entry(ulong key, ushort move, ushort count, uint learn)
-        {
-            Key = key;
-            Move = move;
-            Count = count;
-            Learn = learn;
-        }
-    }
-
-    public unsafe Book(IPosition pos)
+    public unsafe PolyglotBook(IPosition pos)
     {
         _pos = pos;
-        _entrySize = sizeof(Entry);
+        _entrySize = sizeof(PolyglotBookEntry);
         _rnd = new Random(DateTime.Now.Millisecond);
     }
 
@@ -92,7 +77,7 @@ public sealed class Book : IDisposable
         }
     }
 
-    public Move Probe(bool pickBest = true)
+    public Move Probe(IPosition pos, bool pickBest = true)
     {
         if (_fileName.IsNullOrEmpty() || _fileStream == null)
             return Move.EmptyMove;
@@ -127,7 +112,7 @@ public sealed class Book : IDisposable
 
         return polyMove == 0
             ? Move.EmptyMove
-            : ConvertMove(polyMove);
+            : ConvertMove(pos, polyMove);
     }
 
     public void Dispose()
@@ -136,7 +121,7 @@ public sealed class Book : IDisposable
         _binaryReader?.Dispose();
     }
 
-    private Move ConvertMove(ushort polyMove)
+    private Move ConvertMove(IPosition pos, ushort polyMove)
     {
         // A PolyGlot book move is encoded as follows:
         //
@@ -173,12 +158,23 @@ public sealed class Book : IDisposable
                     return type == MoveTypes.Promotion;
                 else
                     return type != MoveTypes.Promotion;
-            });
+            })
+            .Where(m => !IsInCheck(pos, m));
 
         return emMoves.FirstOrDefault(Move.EmptyMove);
     }
 
-    private Entry ReadEntry() => new(
+    private static bool IsInCheck(IPosition pos, Move m)
+    {
+        pos.GivesCheck(m);
+        var state = new State();
+        pos.MakeMove(m, in state);
+        var inCheck = pos.InCheck;
+        pos.TakeMove(m);
+        return inCheck;
+    }
+
+    private PolyglotBookEntry ReadEntry() => new(
         _binaryReader.ReadUInt64(),
         _binaryReader.ReadUInt16(),
         _binaryReader.ReadUInt16(),
@@ -195,18 +191,17 @@ public sealed class Book : IDisposable
             var s = BitBoards.PopLsb(ref b);
             var pc = _pos.GetPiece(s);
             var p = PieceMapping[pc.AsInt()];
-            k ^= BookZobrist.Psq(p, s);
+            k ^= PolyglotBookZobrist.Psq(p, s);
         }
 
-        k ^= CastleRights
-            .Where(cr => _pos.State.CastlelingRights.Has(cr))
-            .Aggregate(ulong.MinValue, static (current, validCastlelingFlag) => current ^ BookZobrist.Castle(validCastlelingFlag));
+        foreach (var cr in CastleRights.Where(cr => _pos.State.CastlelingRights.Has(cr)))
+            k ^= PolyglotBookZobrist.Castle(cr);
 
         if (_pos.State.EnPassantSquare != Square.None)
-            k ^= BookZobrist.EnPassant(_pos.State.EnPassantSquare.File);
+            k ^= PolyglotBookZobrist.EnPassant(_pos.State.EnPassantSquare.File);
 
         if (_pos.SideToMove.IsWhite)
-            k ^= BookZobrist.Turn();
+            k ^= PolyglotBookZobrist.Turn();
 
         return k;
     }
