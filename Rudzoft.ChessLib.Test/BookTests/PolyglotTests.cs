@@ -49,9 +49,9 @@ public sealed class PolyglotTests : IClassFixture<BookFixture>
         const string fen = Fen.Fen.StartPositionFen;
 
         var game = GameFactory.Create(fen);
-        var book = new Book(game.Pos);
+        var book = new PolyglotBook(game.Pos);
 
-        var bookMove = book.Probe();
+        var bookMove = book.Probe(game.Pos);
 
         var m = Move.EmptyMove;
 
@@ -65,7 +65,7 @@ public sealed class PolyglotTests : IClassFixture<BookFixture>
 
         var game = GameFactory.Create(fen);
         var path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), _fixture.BookFile);
-        var book = new Book(game.Pos)
+        var book = new PolyglotBook(game.Pos)
         {
             FileName = path
         };
@@ -73,7 +73,7 @@ public sealed class PolyglotTests : IClassFixture<BookFixture>
         Assert.NotNull(book.FileName);
 
         var expected = Move.Create(Square.D2, Square.D4);
-        var actual = book.Probe();
+        var actual = book.Probe(game.Pos);
 
         Assert.False(actual.IsNullMove());
         Assert.Equal(expected, actual);
@@ -86,7 +86,7 @@ public sealed class PolyglotTests : IClassFixture<BookFixture>
         const string fen = Fen.Fen.StartPositionFen;
 
         var game = GameFactory.Create(fen);
-        var book = new Book(game.Pos);
+        var book = new PolyglotBook(game.Pos);
 
         var actual = book.ComputePolyglotKey().Key;
 
@@ -109,7 +109,7 @@ public sealed class PolyglotTests : IClassFixture<BookFixture>
 
         var uci = new Uci();
         var game = GameFactory.Create(fen);
-        var book = new Book(game.Pos);
+        var book = new PolyglotBook(game.Pos);
         var state = new State();
 
         foreach (var m in uciMoves.Select(uciMove => uci.MoveFromUci(game.Pos, uciMove)))
