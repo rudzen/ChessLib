@@ -33,6 +33,7 @@ using Rudzoft.ChessLib.Enums;
 using Rudzoft.ChessLib.Extensions;
 using Rudzoft.ChessLib.MoveGeneration;
 using Rudzoft.ChessLib.Types;
+using System.Linq;
 
 namespace Rudzoft.ChessLib.Protocol.UCI;
 
@@ -85,13 +86,12 @@ public class Uci : IUci
 
     public void AddOption(string name, IOption option) => O[name] = option;
 
-    public ulong Nps(ulong nodes, TimeSpan time)
+    public ulong Nps(in ulong nodes, in TimeSpan time)
         => (ulong)(nodes * 1000.0 / time.Milliseconds);
 
     public Move MoveFromUci(IPosition pos, ReadOnlySpan<char> uciMove)
     {
         var moveList = pos.GenerateMoves();
-
         foreach (var move in moveList.Get())
             if (uciMove.Equals(move.Move.ToString(), StringComparison.InvariantCultureIgnoreCase))
                 return move.Move;
@@ -101,16 +101,16 @@ public class Uci : IUci
 
     public IEnumerable<Move> MovesFromUci(IPosition pos, Stack<State> states, IEnumerable<string> moves)
     {
-        foreach (var move in moves)
-        {
-            var m = MoveFromUci(pos, move);
-            if (m.IsNullMove())
-                yield break;
+        var uciMoves = moves
+            .Select(x => MoveFromUci(pos, x))
+            .Where(x => !x.IsNullMove());
 
+        foreach (var move in uciMoves)
+        {
             var state = new State();
             states.Push(state);
-            pos.MakeMove(m, in state);
-            yield return m;
+            pos.MakeMove(move, in state);
+            yield return move;
         }
     }
 
@@ -126,7 +126,7 @@ public class Uci : IUci
             ? $"bestmove {move} ponder {ponderMove}"
             : $"bestmove {move}";
 
-    public string CurrentMoveNum(int moveNumber, Move move, ulong visitedNodes, TimeSpan time)
+    public string CurrentMoveNum(int moveNumber, Move move, in ulong visitedNodes, in TimeSpan time)
         => $"info currmovenumber {moveNumber} currmove {move} nodes {visitedNodes} time {time.Milliseconds}";
 
     public string Score(int value, int mateInMaxPly, int valueMate)
@@ -147,9 +147,9 @@ public class Uci : IUci
         int selectiveDepth,
         int alpha,
         int beta,
-        TimeSpan time,
+        in TimeSpan time,
         IEnumerable<Move> pvLine,
-        ulong nodes)
+        in ulong nodes)
     {
         var sb = _pvPool.Get();
 
@@ -160,7 +160,7 @@ public class Uci : IUci
         else if (score <= alpha)
             sb.Append("upperbound ");
 
-        sb.Append($"nodes {nodes} nps {Nps(nodes, time)} tbhits {Game.Table.Hits} time {time.Milliseconds} ");
+        sb.Append($"nodes {nodes} nps {Nps(in nodes, in time)} tbhits {Game.Table.Hits} time {time.Milliseconds} ");
         sb.AppendJoin(' ', pvLine);
 
         var result = sb.ToString();
@@ -168,9 +168,9 @@ public class Uci : IUci
         return result;
     }
 
-    public string Fullness(ulong tbHits, ulong nodes, TimeSpan time)
+    public string Fullness(in ulong tbHits, in ulong nodes, in TimeSpan time)
         =>
-            $"info hashfull {Game.Table.Fullness()} tbhits {tbHits} nodes {nodes} time {time.Milliseconds} nps {Nps(nodes, time)}";
+            $"info hashfull {Game.Table.Fullness()} tbhits {tbHits} nodes {nodes} time {time.Milliseconds} nps {Nps(in nodes, in time)}";
 
     public string MoveToString(Move m, ChessMode chessMode = ChessMode.Normal)
     {

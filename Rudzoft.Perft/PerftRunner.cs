@@ -271,7 +271,7 @@ public sealed class PerftRunner : IPerftRunner
         results.Depth = depth;
         // add 1 to avoid potential dbz
         results.Elapsed = TimeSpan.FromMilliseconds(elapsedMs + 1);
-        results.Nps = _uci.Nps(result, results.Elapsed);
+        results.Nps = _uci.Nps(in result, results.Elapsed);
         results.CorrectResult = expected;
         results.Passed = expected == result;
         results.TableHits = Game.Table.Hits;

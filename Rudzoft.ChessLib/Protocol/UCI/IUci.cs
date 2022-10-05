@@ -45,7 +45,7 @@ public interface IUci
 
     void AddOption(string name, IOption option);
 
-    ulong Nps(ulong nodes, TimeSpan time);
+    ulong Nps(in ulong nodes, in TimeSpan time);
 
     Move MoveFromUci(IPosition pos, ReadOnlySpan<char> uciMove);
 
@@ -59,7 +59,7 @@ public interface IUci
 
     string BestMove(Move move, Move ponderMove);
 
-    string CurrentMoveNum(int moveNumber, Move move, ulong visitedNodes, TimeSpan time);
+    string CurrentMoveNum(int moveNumber, Move move, in ulong visitedNodes, in TimeSpan time);
 
     string Score(int value, int mateInMaxPly, int valueMate);
 
@@ -67,9 +67,9 @@ public interface IUci
 
     string Depth(int depth);
 
-    string Pv(int count, int score, int depth, int selectiveDepth, int alpha, int beta, TimeSpan time, IEnumerable<Move> pvLine, ulong nodes);
+    string Pv(int count, int score, int depth, int selectiveDepth, int alpha, int beta, in TimeSpan time, IEnumerable<Move> pvLine, in ulong nodes);
 
-    string Fullness(ulong tbHits, ulong nodes, TimeSpan time);
+    string Fullness(in ulong tbHits, in ulong nodes, in TimeSpan time);
 
     string ToString();
 }
