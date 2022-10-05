@@ -44,7 +44,7 @@ public sealed class UciTests
 
         var uci = new Uci();
 
-        var actual = uci.Nps(nodes, ts);
+        var actual = uci.Nps(in nodes, in ts);
 
         Assert.Equal(expected, actual);
     }
