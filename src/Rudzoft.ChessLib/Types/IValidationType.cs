@@ -24,43 +24,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System;
-using Rudzoft.ChessLib.Factories;
-using Rudzoft.ChessLib.Protocol.UCI;
-using Rudzoft.ChessLib.Types;
+namespace Rudzoft.ChessLib.Types;
 
-namespace Rudzoft.ChessLib.Test.ProtocolTests;
-
-public sealed class UciTests
+public interface IValidationType
 {
-    [Fact]
-    public void NpsSimple()
-    {
-        const ulong expected = ulong.MinValue;
-
-        const ulong nodes = 1000UL;
-
-        var ts = TimeSpan.FromSeconds(1);
-
-        var uci = new Uci();
-
-        var actual = uci.Nps(in nodes, in ts);
-
-        Assert.Equal(expected, actual);
-    }
-
-    [Fact]
-    public void MoveFromUciBasic()
-    {
-        const string uciMove = "a2a3";
-        var expected = Move.Create(Square.A2, Square.A3);
-        var uci = new Uci();
-
-        var game = GameFactory.Create();
-        game.NewGame();
-
-        var actual = uci.MoveFromUci(game.Pos, uciMove);
-
-        Assert.Equal(expected, actual);
-    }
+    bool IsOk { get; }
 }

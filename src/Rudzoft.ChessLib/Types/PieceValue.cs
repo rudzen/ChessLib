@@ -37,6 +37,7 @@ public enum PieceValues
     ValueKnownWin = 10000,
     ValueMate = 32000,
     ValueInfinite = 32001,
+    ValueMinusInfinite = -32001,
     ValueNone = 32002,
 
     ValueMateInMaxPly = ValueMate - 2 * PieceValue.MAX_PLY,
