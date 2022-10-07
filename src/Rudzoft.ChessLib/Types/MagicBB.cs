@@ -30,9 +30,8 @@
 */
 
 using System;
-using Rudzoft.ChessLib.Types;
 
-namespace Rudzoft.ChessLib;
+namespace Rudzoft.ChessLib.Types;
 
 // ReSharper disable once InconsistentNaming
 public static class MagicBB
@@ -158,14 +157,14 @@ public static class MagicBB
             for (var temp = ulong.MinValue; temp < One << numSquares; ++temp)
             {
                 var occ = InitMagicMovesOccupancy(squares[..numSquares], in temp);
-                MagicBishopDb[i][(occ * BishopMagics[i]) >> 55] = InitmagicmovesBmoves(i, in occ);
+                MagicBishopDb[i][occ * BishopMagics[i] >> 55] = InitmagicmovesBmoves(i, in occ);
             }
 
             numSquares = InitSquares(squares, RookMask[i], initMagicMovesDb);
             for (var temp = ulong.MinValue; temp < One << numSquares; ++temp)
             {
                 var occ = InitMagicMovesOccupancy(squares[..numSquares], in temp);
-                MagicRookDb[i][(occ * RookMagics[i]) >> 52] = InitmagicmovesRmoves(i, in occ);
+                MagicRookDb[i][occ * RookMagics[i] >> 52] = InitmagicmovesRmoves(i, in occ);
             }
         }
     }
@@ -178,7 +177,7 @@ public static class MagicBB
         while (mask != ulong.MinValue)
         {
             var bit = (ulong)((long)mask & -(long)mask);
-            squares[numSquares++] = bbInits[(int)((bit * bitFactor) >> shift)];
+            squares[numSquares++] = bbInits[(int)(bit * bitFactor >> shift)];
             mask ^= bit;
         }
 
@@ -189,25 +188,25 @@ public static class MagicBB
     {
         var ret = ulong.MinValue;
         for (var i = 0; i < squares.Length; ++i)
-            if ((lineOccupancy & (One << i)) != ulong.MinValue)
+            if ((lineOccupancy & One << i) != ulong.MinValue)
                 ret |= One << squares[i];
 
         return ret;
     }
 
     public static BitBoard BishopAttacks(this Square square, BitBoard occupied)
-        => MagicBishopDb[square.AsInt()][((occupied.Value & BishopMask[square.AsInt()]) * BishopMagics[square.AsInt()]) >> 55];
+        => MagicBishopDb[square.AsInt()][(occupied.Value & BishopMask[square.AsInt()]) * BishopMagics[square.AsInt()] >> 55];
 
     public static BitBoard RookAttacks(this Square square, BitBoard occupied)
-        => MagicRookDb[square.AsInt()][((occupied.Value & RookMask[square.AsInt()]) * RookMagics[square.AsInt()]) >> 52];
+        => MagicRookDb[square.AsInt()][(occupied.Value & RookMask[square.AsInt()]) * RookMagics[square.AsInt()] >> 52];
 
     public static BitBoard QueenAttacks(this Square square, BitBoard occupied)
-        => BishopAttacks(square, occupied) | RookAttacks(square, occupied);
+        => square.BishopAttacks(occupied) | square.RookAttacks(occupied);
 
     private static ulong InitmagicmovesRmoves(int square, in ulong occ)
     {
         var ret = ulong.MinValue;
-        var rowBits = Ff << (8 * (square / 8));
+        var rowBits = Ff << 8 * (square / 8);
 
         var bit = One << square;
         do
@@ -253,7 +252,7 @@ public static class MagicBB
     private static ulong InitmagicmovesBmoves(int square, in ulong occ)
     {
         var ret = ulong.MinValue;
-        var rowBits = Ff << (8 * (square / 8));
+        var rowBits = Ff << 8 * (square / 8);
 
         var bit = One << square;
         var bit2 = bit;
