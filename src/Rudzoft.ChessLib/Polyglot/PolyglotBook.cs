@@ -27,7 +27,6 @@ SOFTWARE.
 using System;
 using System.Diagnostics;
 using System.IO;
-using System.IO.MemoryMappedFiles;
 using System.Linq;
 using Rudzoft.ChessLib.Extensions;
 using Rudzoft.ChessLib.MoveGeneration;

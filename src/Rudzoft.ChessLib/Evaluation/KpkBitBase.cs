@@ -105,7 +105,7 @@ public static class KpkBitBase
     [Flags]
     private enum Result
     {
-        Invalid = 0,
+        None = 0,
         Unknown = 1 << 0,
         Draw = 1 << 1,
         Win = 1 << 2
@@ -137,7 +137,7 @@ public static class KpkBitBase
                 || ksq[Player.White.Side] == psq
                 || ksq[Player.Black.Side] == psq
                 || (stm.IsWhite && !(psq.PawnAttack(Player.White) & ksq[Player.Black.Side]).IsEmpty))
-                result = Result.Invalid;
+                result = Result.None;
 
             // Win if the pawn can be promoted without getting captured
             else if (stm.IsWhite
@@ -191,7 +191,7 @@ public static class KpkBitBase
                 ? (Result.Win, Result.Draw)
                 : (Result.Draw, Result.Win);
 
-            var r = Result.Invalid;
+            var r = Result.None;
             var b = PieceTypes.King.PseudoAttacks(KingSquares[Stm.Side]);
 
             while (b)
@@ -219,9 +219,10 @@ public static class KpkBitBase
                             PawnSquare + Directions.NorthDouble)].Result;
             }
 
-            return Result = (r & good) != 0
-                ? good
-                : (r & Result.Unknown) != 0
+            if ((r & good) != 0)
+                return good;
+
+            return (r & Result.Unknown) != 0
                     ? Result.Unknown
                     : bad;
         }

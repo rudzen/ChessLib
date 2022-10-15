@@ -76,14 +76,14 @@ public class EpdParser : IEpdParser
                 continue;
             }
 
-            if (!idSet & s[0] == 'i' && s[1] == 'd')
+            if (!idSet && s[0] == 'i' && s[1] == 'd')
             {
                 id = s.Split(' ', StringSplitOptions.RemoveEmptyEntries)[1];
                 idSet = true;
                 continue;
             }
 
-            if (s[0] == 'e' & s[1] == 'p' & s[2] == 'd')
+            if (s[0] == 'e' && s[1] == 'p' && s[2] == 'd')
             {
                 var firstSpace = s.IndexOf(space);
                 epd = s[firstSpace..].TrimStart();

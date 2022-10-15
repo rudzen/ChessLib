@@ -24,7 +24,7 @@ public sealed class MoveGeneratorService : IMoveGeneratorService
 
     public IEnumerable<string> GenerateMoves(MoveQuery parameters)
     {
-        _logger.LogInformation("Generating moves. fen={0},type={1}", parameters.Fen, parameters.Type);
+        _logger.LogInformation("Generating moves. fen={Fen},type={Type}", parameters.Fen, parameters.Type);
 
         var fd = new FenData(parameters.Fen);
         _position.Set(in fd, ChessMode.Normal, _state);

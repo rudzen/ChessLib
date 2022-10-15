@@ -24,6 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using Cysharp.Text;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -146,12 +147,17 @@ public sealed class StateStack : IEnumerable<State>
 
     public override string ToString()
     {
-        var sb = new StringBuilder(64 * Count);
+        using var sb = ZString.CreateStringBuilder();
         for (var i = Size; i > 0; i--)
         {
             var o = _stack[i];
-            var t = o == null ? "   |" : $" {o} |";
-            sb.Append(t);
+            sb.Append(' ');
+            if (o != null)
+                sb.Append(o.ToString());
+            else
+                sb.Append(' ');
+            sb.Append(' ');
+            sb.Append('|');
         }
 
         return sb.ToString();
