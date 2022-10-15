@@ -96,14 +96,14 @@ public sealed class MoveTests
     [Fact]
     public void MoveToString()
     {
-        var moves = new List<Move>(128);
-        var movesString = new List<MoveStrings>(128);
+        var moves = new List<Move>(3528);
+        var movesString = new List<MoveStrings>(3528);
 
         var game = GameFactory.Create();
 
         game.NewGame();
 
-        var tmp = new StringBuilder(128);
+        var tmp = new StringBuilder(8);
 
         // build move list and expected result
         for (Square s1 = Squares.a1; s1 <= Squares.h8; s1++)
@@ -124,12 +124,14 @@ public sealed class MoveTests
 
         var result = new StringBuilder(128);
 
-        for (var i = 0; i < moves.Count; i++)
+        var i = 0;
+        foreach (var move in CollectionsMarshal.AsSpan(moves))
         {
             result.Clear();
             result.Append(' ');
-            game.Pos.MoveToString(moves[i], in result);
-            Assert.Equal(result.ToString(), movesString[i].ToString());
+            game.Pos.MoveToString(move, in result);
+            Assert.Equal(result.ToString(), movesString[i++].ToString());
+
         }
     }
 

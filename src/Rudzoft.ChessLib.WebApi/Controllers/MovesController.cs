@@ -21,7 +21,7 @@ public class MovesController : ControllerBase
     public IActionResult Get([FromQuery] MoveQuery parameters)
     {
         var m = _moveGeneratorService.GenerateMoves(parameters).ToList();
-        _logger.LogInformation("Moves fetched. size={0}", m.Count);
+        _logger.LogInformation("Moves fetched. size={Count}", m.Count);
         return Ok(new Moves(m, m.Count));
     }
 }
