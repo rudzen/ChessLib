@@ -310,8 +310,10 @@ public sealed class Blockage : IBlockage
         Span<Direction> directions = stackalloc Direction[]
             { _us.PawnPushDistance(), Directions.East, _them.PawnPushDistance() };
 
-        foreach (var direction in directions)
+        ref var directionSpace = ref MemoryMarshal.GetReference(directions);
+        for (var i = 0; i < directions.Length; ++i)
         {
+            var direction = Unsafe.Add(ref directionSpace, i);
             var s = sq + direction;
             if ((_marked & s).IsEmpty || !(_processed & s).IsEmpty || !FormsFence(s))
                 continue;
@@ -347,8 +349,10 @@ public sealed class Blockage : IBlockage
 
         var result = BitBoard.Empty;
 
-        foreach (var f in File.AllFiles)
+        ref var fileSpace = ref MemoryMarshal.GetArrayDataReference(File.AllFiles);
+        for (var i = 0; i < File.AllFiles.Length; ++i)
         {
+            var f = Unsafe.Add(ref fileSpace, i);
             var sq = NextFenceRankSquare(f, _them);
             var b = sq.ForwardFile(_them) & _theirPawns;
             while (b)

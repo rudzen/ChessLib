@@ -163,6 +163,7 @@ public record struct Move(ushort Data) : ISpanFormattable
     public override int GetHashCode()
         => Data;
 
+    [SkipLocalsInit]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override string ToString()
     {

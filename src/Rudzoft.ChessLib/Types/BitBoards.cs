@@ -34,6 +34,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using Rudzoft.ChessLib.Extensions;
 
 namespace Rudzoft.ChessLib.Types;
@@ -232,16 +233,20 @@ public static class BitBoards
         static int distanceRank(Square x, Square y) => distance(x.Rank.AsInt(), y.Rank.AsInt());
 
         // ForwardRanksBB population loop idea from sf
-        foreach (var r in Rank.All)
+        ref var rankSpace = ref MemoryMarshal.GetArrayDataReference(Rank.All);
+        for (var i = 0; i < Rank.All.Length; i++)
         {
+            var r = Unsafe.Add(ref rankSpace, i);
             var rank = r.AsInt();
             ForwardRanksBB[0][rank] = ~(ForwardRanksBB[1][rank + 1] = ForwardRanksBB[1][rank] | r.BitBoardRank());
         }
 
         BitBoard bb;
 
-        foreach (var player in Player.AllPlayers)
+        ref var playerSpace = ref MemoryMarshal.GetArrayDataReference(Player.AllPlayers);
+        for (var i = 0; i < Player.AllPlayers.Length; ++i)
         {
+            var player = Unsafe.Add(ref playerSpace, i);
             bb = AllSquares;
             while (bb)
             {
@@ -314,8 +319,10 @@ public static class BitBoards
                                     | b.NorthEastOne() | b.NorthWestOne() | b.SouthEastOne() | b.SouthWestOne();
 
             // Compute lines and betweens
-            foreach (var validMagicPiece in validMagicPieces)
+            ref var magicPiecesSpace = ref MemoryMarshal.GetReference(validMagicPieces);
+            for (var i = 0; i < validMagicPieces.Length; i++)
             {
+                var validMagicPiece = Unsafe.Add(ref magicPiecesSpace, i);
                 pt = validMagicPiece.AsInt();
                 var bb3 = AllSquares;
                 while (bb3)
@@ -339,8 +346,11 @@ public static class BitBoards
     private static void InitializeKingRing(Square s1, int sq, File file)
     {
         const int pt = (int)PieceTypes.King;
-        foreach (var player in Player.AllPlayers)
+
+        ref var playerSpace = ref MemoryMarshal.GetArrayDataReference(Player.AllPlayers);
+        for (var i = 0; i < Player.AllPlayers.Length; ++i)
         {
+            var player = Unsafe.Add(ref playerSpace, i);
             KingRingBB[player.Side][sq] = PseudoAttacksBB[pt][sq];
             if (s1.RelativeRank(player) == Ranks.Rank1)
                 KingRingBB[player.Side][sq] |= KingRingBB[player.Side][sq].Shift(PawnPushDirections[player.Side]);
@@ -531,6 +541,7 @@ public static class BitBoards
     public static BitBoard PromotionRank(this Player p)
         => PromotionRanks[p.Side];
 
+    [SkipLocalsInit]
     public static string PrintBitBoard(in BitBoard bb, string title = "")
     {
         const string line = "+---+---+---+---+---+---+---+---+---+";

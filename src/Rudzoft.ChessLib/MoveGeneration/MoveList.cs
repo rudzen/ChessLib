@@ -112,6 +112,7 @@ public sealed class MoveList : IMoveList
         _moves[Length] = ExtMove.Empty;
     }
 
+    [SkipLocalsInit]
     public static int GenerateMoveCount(in IPosition pos, MoveGenerationType type = MoveGenerationType.Legal)
     {
         Span<ExtMove> moves = stackalloc ExtMove[218];

@@ -30,6 +30,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 // ReSharper disable MemberCanBeInternal
 namespace Rudzoft.ChessLib.Types;
@@ -220,8 +221,9 @@ public readonly record struct BitBoard(ulong Value) : IEnumerable<Square>
     public BitBoard OrAll(ReadOnlySpan<Square> sqs)
     {
         var b = this;
-        foreach (var sq in sqs)
-            b |= sq;
+        ref var squaresSpace = ref MemoryMarshal.GetReference(sqs);
+        for (var i = 0; i < sqs.Length; ++i)
+            b |= Unsafe.Add(ref squaresSpace, i);
 
         return b;
     }

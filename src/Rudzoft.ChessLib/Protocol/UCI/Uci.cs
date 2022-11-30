@@ -34,6 +34,7 @@ using Rudzoft.ChessLib.Extensions;
 using Rudzoft.ChessLib.MoveGeneration;
 using Rudzoft.ChessLib.Types;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace Rudzoft.ChessLib.Protocol.UCI;
 
@@ -92,9 +93,16 @@ public class Uci : IUci
     public Move MoveFromUci(IPosition pos, ReadOnlySpan<char> uciMove)
     {
         var moveList = pos.GenerateMoves();
-        foreach (var move in moveList.Get())
+
+        var moves = moveList.Get();
+        ref var movesSpace = ref MemoryMarshal.GetReference(moves);
+
+        for (var i = 0; i < moves.Length; ++i)
+        {
+            var move = Unsafe.Add(ref movesSpace, i);
             if (uciMove.Equals(move.Move.ToString(), StringComparison.InvariantCultureIgnoreCase))
                 return move.Move;
+        }
 
         return Move.EmptyMove;
     }
@@ -172,6 +180,7 @@ public class Uci : IUci
         =>
             $"info hashfull {Game.Table.Fullness()} tbhits {tbHits} nodes {nodes} time {time.Milliseconds} nps {Nps(in nodes, in time)}";
 
+    [SkipLocalsInit]
     public string MoveToString(Move m, ChessMode chessMode = ChessMode.Normal)
     {
         if (m.IsNullMove())
@@ -207,8 +216,12 @@ public class Uci : IUci
         list.Sort(OptionComparer);
         var sb = _pvPool.Get();
 
-        foreach (var opt in CollectionsMarshal.AsSpan(list))
+        var listSpan = CollectionsMarshal.AsSpan(list);
+        ref var listSpace = ref MemoryMarshal.GetReference(listSpan);
+
+        for (var i = 0; i < list.Count; ++i)
         {
+            var opt = Unsafe.Add(ref listSpace, i);
             sb.AppendLine();
             sb.Append("option name ").Append(opt.Name).Append(" type ").Append(OptionTypeStrings[(int)opt.Type]);
             if (opt.Type != UciOptionType.Button)

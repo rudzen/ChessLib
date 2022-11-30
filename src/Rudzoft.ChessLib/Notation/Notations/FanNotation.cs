@@ -42,6 +42,7 @@ public sealed class FanNotation : Notation
     /// </summary>
     /// <param name="move">The move to convert</param>
     /// <returns>FAN move string</returns>
+    [SkipLocalsInit]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override string Convert(Move move)
     {

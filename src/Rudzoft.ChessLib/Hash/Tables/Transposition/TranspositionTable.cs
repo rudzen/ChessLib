@@ -27,6 +27,7 @@ SOFTWARE.
 using System;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using Rudzoft.ChessLib.Exceptions;
 using Rudzoft.ChessLib.Types;
 
@@ -133,13 +134,15 @@ public sealed class TranspositionTable : ITranspositionTable
         // probing retrieves an element.
 
         var set = false;
+        ref var clusterSpace = ref MemoryMarshal.GetArrayDataReference(ttc.Cluster);
         for (var i = 0; i < ttc.Cluster.Length; ++i)
         {
-            if (ttc.Cluster[i].Key32 != uint.MinValue && ttc.Cluster[i].Key32 != key.UpperKey)
+            var entry = Unsafe.Add(ref clusterSpace, i);
+            if (entry.Key32 != uint.MinValue && entry.Key32 != key.UpperKey)
                 continue;
 
-            ttc.Cluster[i].Generation = g;
-            e = ttc.Cluster[i];
+            entry.Generation = g;
+            e = entry;
             set = true;
             Hits++;
             break;
@@ -156,9 +159,11 @@ public sealed class TranspositionTable : ITranspositionTable
         var ttc = FindCluster(in key);
         var entryIndex = 0;
 
+        ref var clusterSpace = ref MemoryMarshal.GetArrayDataReference(ttc.Cluster);
         for (var i = 0; i < ttc.Cluster.Length; ++i)
         {
-            if (ttc.Cluster[i].Key32 != uint.MinValue && ttc.Cluster[i].Key32 != key.UpperKey)
+            var entry = Unsafe.Add(ref clusterSpace, i);
+            if (entry.Key32 != uint.MinValue && entry.Key32 != key.UpperKey)
                 continue;
 
             entryIndex = i;
@@ -194,9 +199,11 @@ public sealed class TranspositionTable : ITranspositionTable
         var clusterIndex = 0;
         var found = false;
 
+        ref var clusterSpace = ref MemoryMarshal.GetArrayDataReference(ttc.Cluster);
         for (var i = 0; i < ttc.Cluster.Length; ++i)
         {
-            if (ttc.Cluster[i].Key32 != uint.MinValue && ttc.Cluster[i].Key32 != key.UpperKey)
+            var entry = Unsafe.Add(ref clusterSpace, i);
+            if (entry.Key32 != uint.MinValue && entry.Key32 != key.UpperKey)
                 continue;
 
             clusterIndex = i;
@@ -209,19 +216,16 @@ public sealed class TranspositionTable : ITranspositionTable
             var index = 0;
             var candidate = ttc.Cluster[index];
             var g = _generation;
-            var i = 0;
-            foreach (var ttEntry in ttc.Cluster)
-            {
-                var (cc1, cc2, cc3, cc4) =
-                    (candidate.Generation == g,
-                        ttEntry.Generation == g,
-                        ttEntry.Type == Bound.Exact,
-                        ttEntry.Depth <= candidate.Depth);
 
+            ref var entrySpace = ref MemoryMarshal.GetArrayDataReference(ttc.Cluster);
+            for (var i = 0; i < ttc.Cluster.Length; ++i)
+            {
+                var entry = Unsafe.Add(ref entrySpace, i);
+                var (cc1, cc2, cc3, cc4) = (candidate.Generation == g, entry.Generation == g, entry.Type == Bound.Exact, entry.Depth <= candidate.Depth);
                 if ((cc1 && cc4) || (!(cc2 || cc3) && (cc4 || cc1)))
                 {
                     index = i;
-                    candidate = ttEntry;
+                    candidate = entry;
                 }
 
                 i++;
@@ -245,6 +249,7 @@ public sealed class TranspositionTable : ITranspositionTable
             return 0;
         var gen = _generation;
         var sum = 0;
+
         for (var i = 0; i < _fullnessElements; ++i)
             sum += _table[i].Cluster.Count(x => x.Generation == gen);
 
@@ -257,8 +262,9 @@ public sealed class TranspositionTable : ITranspositionTable
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Clear()
     {
-        foreach (var t in _table)
-            t.Reset();
+        ref var tableSpace = ref MemoryMarshal.GetArrayDataReference(_table);
+        for (var i = 0; i < _table.Length; ++i)
+            Unsafe.Add(ref tableSpace, i).Reset();
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

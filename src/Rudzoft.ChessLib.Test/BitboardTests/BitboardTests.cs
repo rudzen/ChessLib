@@ -25,6 +25,7 @@ SOFTWARE.
 */
 
 using System;
+using System.Runtime.CompilerServices;
 using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Test.BitboardTests;
@@ -46,6 +47,7 @@ public sealed class BitboardTests
     }
 
     [Fact]
+    [SkipLocalsInit]
     public void BitBoardOrAll()
     {
         Span<Square> baseSquares = stackalloc Square[8]

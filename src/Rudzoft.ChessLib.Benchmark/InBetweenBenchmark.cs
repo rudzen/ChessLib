@@ -1,5 +1,4 @@
 using System.Runtime.CompilerServices;
-using BenchmarkDotNet.Attributes;
 
 namespace Rudzoft.ChessLib.Benchmark;
 
@@ -30,6 +29,16 @@ public class InBetweenBenchmark
 
     [Benchmark(Baseline = true, Description = "Unsigned Compare [int]")]
     public void UnsignedCompareInt()
+    {
+        var half = N / 2;
+        for (var i = 0; i < N; ++i)
+        {
+            var inBetween = InBetween(i, 0, half);
+        }
+    }
+
+    [Benchmark(Description = ".NET 7 IsAsciiDigit")]
+    public void IsAsciiDigit()
     {
         var half = N / 2;
         for (var i = 0; i < N; ++i)

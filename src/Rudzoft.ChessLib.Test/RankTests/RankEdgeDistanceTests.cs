@@ -41,8 +41,8 @@ public sealed class RankEdgeDistanceTests
     [InlineData(Ranks.Rank8, 0)]
     public void RankEdgeDistanceFolding(Ranks rs, int expected)
     {
-        var f = new Rank(rs);
-        var actual = f.EdgeDistance();
+        var r = new Rank(rs);
+        var actual = r.EdgeDistance();
         Assert.Equal(expected, actual);
     }
 }

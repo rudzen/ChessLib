@@ -33,12 +33,12 @@ public static class GameFactory
 {
     public static IGame Create(IPosition position) => new Game(position);
 
-    public static IGame Create(string fen)
+    public static IGame Create(string fen, bool validate = false)
     {
         var g = Create();
         var fenData = new FenData(fen);
         var state = new State();
-        g.Pos.Set(in fenData, Enums.ChessMode.Normal, state);
+        g.Pos.Set(in fenData, Enums.ChessMode.Normal, state, validate);
         return g;
     }
 

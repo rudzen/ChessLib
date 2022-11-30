@@ -29,6 +29,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Text;
 using Microsoft.Extensions.ObjectPool;
 using Rudzoft.ChessLib.Enums;
@@ -276,6 +277,7 @@ public sealed class Position : IPosition
     /// Parses the board layout to a FEN representation.. Beware, goblins are a foot.
     /// </summary>
     /// <returns>The FenData which contains the fen string that was generated.</returns>
+    [SkipLocalsInit]
     public FenData GenerateFen()
     {
         const char space = ' ';
@@ -867,6 +869,7 @@ public sealed class Position : IPosition
     /// </summary>
     /// <param name="m">The move to convert</param>
     /// <param name="output">The string builder used to generate the string with</param>
+    [SkipLocalsInit]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void MoveToString(Move m, in StringBuilder output)
     {
@@ -1087,7 +1090,10 @@ public sealed class Position : IPosition
         var f = 1; // file (column)
         var r = 8; // rank (row)
 
-        foreach (var c in fenChunk)
+        ref var fenChunkSpace = ref MemoryMarshal.GetReference(fenChunk);
+        for (var i = 0; i < fenChunk.Length; i++)
+        {
+            var c = Unsafe.Add(ref fenChunkSpace, i);
             if (char.IsNumber(c))
                 f += c - '0';
             else if (c == '/')
@@ -1108,6 +1114,7 @@ public sealed class Position : IPosition
 
                 f++;
             }
+        }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1118,7 +1125,7 @@ public sealed class Position : IPosition
     {
         var enPassant = fenChunk.Length == 2
                         && fenChunk[0] != '-'
-                        && fenChunk[0].InBetween('a', 'h')
+                        && char.IsBetween(fenChunk[0], 'a', 'h')
                         && fenChunk[1] == (_sideToMove.IsWhite ? '6' : '3');
 
         if (enPassant)
@@ -1267,6 +1274,7 @@ public sealed class Position : IPosition
         _sideToMove = ~_sideToMove;
     }
 
+    [SkipLocalsInit]
     public override string ToString()
     {
         const string separator = "\n  +---+---+---+---+---+---+---+---+\n";
@@ -1432,9 +1440,13 @@ public sealed class Position : IPosition
         key ^= State.CastlelingRights.Key();
 
         var materialKey = HashKey.Empty;
-        foreach (var pc in Piece.AllPieces)
+        ref var piecesSpace = ref MemoryMarshal.GetArrayDataReference(Piece.AllPieces);
+        for (int i = 0; i < Piece.AllPieces.Length; i++)
+        {
+            var pc = Unsafe.Add(ref piecesSpace, i);
             for (var cnt = 0; cnt < Board.PieceCount(pc); ++cnt)
                 materialKey ^= pc.GetZobristPst(cnt);
+        }
 
         State.Key = key;
         State.PawnStructureKey = pawnKey;
@@ -1453,8 +1465,11 @@ public sealed class Position : IPosition
             return targetSq;
         }
 
-        foreach (var ca in castleling)
+        ref var castleSpace = ref MemoryMarshal.GetReference(castleling);
+
+        for (var i = 0; i < castleling.Length; ++i)
         {
+            var ca = Unsafe.Add(ref castleSpace, i);
             Player c = char.IsLower(ca);
             var rook = PieceTypes.Rook.MakePiece(c);
             var token = char.ToUpper(ca);
@@ -1463,11 +1478,12 @@ public sealed class Position : IPosition
             {
                 'K' => RookSquare(Square.H1.Relative(c), rook),
                 'Q' => RookSquare(Square.A1.Relative(c), rook),
-                _ => token.InBetween('A', 'H') ? new Square(Rank.Rank1.Relative(c), new File(token - 'A')) : Square.None
+                _ => char.IsBetween(token, 'A', 'H') ? new Square(Rank.Rank1.Relative(c), new File(token - 'A')) : Square.None
             };
 
             if (rsq != Square.None)
                 SetCastlingRight(c, rsq);
+
         }
     }
 

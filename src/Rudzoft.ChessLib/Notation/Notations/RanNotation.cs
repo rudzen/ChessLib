@@ -42,6 +42,7 @@ public sealed class RanNotation : Notation
     /// </summary>
     /// <param name="move">The move to convert</param>
     /// <returns>RAN move string</returns>
+    [SkipLocalsInit]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override string Convert(Move move)
     {

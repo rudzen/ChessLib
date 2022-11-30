@@ -43,6 +43,7 @@ public sealed class SanNotation : Notation
     /// </summary>
     /// <param name="move">The move to convert</param>
     /// <returns>SAN move string</returns>
+    [SkipLocalsInit]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override string Convert(Move move)
     {

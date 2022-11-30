@@ -26,6 +26,8 @@ SOFTWARE.
 
 using System;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using Rudzoft.ChessLib.Hash;
 using Rudzoft.ChessLib.Types;
 
@@ -45,8 +47,9 @@ public static class Cuckoo
     static Cuckoo()
     {
         var count = 0;
-        foreach (var pc in Piece.AllPieces)
-        {
+        ref var piecesSpace = ref MemoryMarshal.GetArrayDataReference(Piece.AllPieces);
+        for (var i = 0; i < Piece.AllPieces.Length; i++) {
+            var pc = Unsafe.Add(ref piecesSpace, i);
             var bb = BitBoards.AllSquares;
             while (bb)
             {
@@ -58,18 +61,18 @@ public static class Cuckoo
 
                     var move = Move.Create(sq1, sq2);
                     var key = pc.GetZobristPst(sq1) ^ pc.GetZobristPst(sq2) ^ Zobrist.GetZobristSide();
-                    var i = CuckooHashOne(in key);
+                    var j = CuckooHashOne(in key);
                     do
                     {
-                        (CuckooKeys[i], key) = (key, CuckooKeys[i]);
-                        (CuckooMoves[i], move) = (move, CuckooMoves[i]);
+                        (CuckooKeys[j], key) = (key, CuckooKeys[j]);
+                        (CuckooMoves[j], move) = (move, CuckooMoves[j]);
 
                         // check for empty slot
                         if (move.IsNullMove())
                             break;
 
                         // Push victim to alternative slot
-                        i = i == CuckooHashOne(in key)
+                        j = j == CuckooHashOne(in key)
                             ? CuckooHashTwo(in key)
                             : CuckooHashOne(in key);
                     } while (true);

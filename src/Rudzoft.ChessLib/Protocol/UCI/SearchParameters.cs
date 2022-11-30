@@ -141,6 +141,7 @@ public sealed class SearchParameters : ISearchParameters, ISpanFormattable
         Infinite = false;
     }
 
+    [SkipLocalsInit]
     public override string ToString()
     {
         Span<char> s = stackalloc char[128];
@@ -153,6 +154,7 @@ public sealed class SearchParameters : ISearchParameters, ISpanFormattable
 
     public void AddSearchMove(Move move) => SearchMoves.Add(move);
 
+    [SkipLocalsInit]
     private static int ParseValue(int index, in ulong value, Span<char> target)
     {
         Span<char> number = stackalloc char[32];

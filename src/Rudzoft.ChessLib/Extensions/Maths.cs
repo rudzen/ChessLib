@@ -53,7 +53,7 @@ public static class Maths
             pos++;
         }
 
-        while (pos <= max && str[pos].InBetween('0', '9'))
+        while (pos <= max && char.IsAsciiDigit(str[pos]))
         {
             x = x * 10 + (str[pos] - '0');
             pos++;
@@ -74,7 +74,7 @@ public static class Maths
         var x = ulong.MinValue;
         var pos = 0;
         var max = str.Length - 1;
-        while (pos <= max && str[pos].InBetween('0', '9'))
+        while (pos <= max && char.IsAsciiDigit(str[pos]))
         {
             x = x * 10 + (ulong)(str[pos] - '0');
             pos++;
@@ -96,7 +96,7 @@ public static class Maths
         var x = 0;
         var pos = 0;
         var max = str.Length - 1;
-        while (pos <= max && str[pos].InBetween('0', '9'))
+        while (pos <= max && char.IsAsciiDigit(str[pos]))
         {
             x = x * 10 + (str[pos] - '0');
             pos++;

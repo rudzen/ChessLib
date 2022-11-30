@@ -30,6 +30,7 @@
 */
 
 using System;
+using System.Runtime.CompilerServices;
 
 namespace Rudzoft.ChessLib.Types;
 
@@ -128,6 +129,7 @@ public static class MagicBB
         0x6E10101010101000UL, 0x5E20202020202000UL, 0x3E40404040404000UL, 0x7E80808080808000UL
     };
 
+    [SkipLocalsInit]
     static MagicBB()
     {
         for (var i = 0; i < MagicBishopDb.Length; i++)

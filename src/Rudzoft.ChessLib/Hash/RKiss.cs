@@ -27,6 +27,7 @@
 
  */
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -55,7 +56,12 @@ public sealed class RKiss : IRKiss
     /// Special generator used to fast init magic numbers.
     /// Output values only have 1/8th of their bits set on average.
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public ulong Sparse() => Rand64() & Rand64() & Rand64();
+    public ulong Sparse()
+    {
+        var h = Rand64();
+        h &= Rand64();
+        return h & Rand64();
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private ulong Rand64()

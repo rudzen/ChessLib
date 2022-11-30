@@ -28,6 +28,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Rudzoft.ChessLib.Extensions;
 using Rudzoft.ChessLib.Types;
@@ -48,32 +50,38 @@ public static class KpkBitBase
 
     static KpkBitBase()
     {
-        List<KpkPosition> db = new(MaxIndex);
-        int idx;
-
         // Initialize db with known win / draw positions
-        for (idx = 0; idx < MaxIndex; ++idx)
-            db.Add(KpkPosition.Create(idx));
+        var db = Enumerable
+            .Range(0, MaxIndex)
+            .Select(KpkPosition.Create)
+            .ToArray()
+            .AsSpan();
 
         // Iterate through the positions until none of the unknown positions can be
         // changed to either wins or draws (15 cycles needed).
         var repeat = 1;
 
-        var dbs = CollectionsMarshal.AsSpan(db);
         while (repeat != 0)
         {
             repeat = 1;
-            foreach (var kpkPosition in dbs)
+            ref var dbSpace = ref MemoryMarshal.GetReference(db);
+            for (var i = 0; i < db.Length; ++i)
+            {
+                var kpkPosition = Unsafe.Add(ref dbSpace, i);
                 repeat = (kpkPosition.Result == Result.Unknown && kpkPosition.Classify(db) != Result.Unknown).AsByte();
+            }
         }
 
         // Fill the bitbase with the decisive results
-        idx = 0;
-        foreach (var kpkPosition in dbs)
+        var idx = 0;
+        ref var setDbSpace = ref MemoryMarshal.GetReference(db);
+        for (var i = 0; i < db.Length; ++i)
         {
+            var kpkPosition = Unsafe.Add(ref setDbSpace, i);
             if (kpkPosition.Result == Result.Win)
                 KpKbb.Set(idx, true);
             idx++;
+
         }
     }
 
@@ -185,7 +193,7 @@ public static class KpkBitBase
         /// </summary>
         /// <param name="db">Current KpkPositions as list</param>
         /// <returns>Result after classification</returns>
-        public Result Classify(IList<KpkPosition> db)
+        public Result Classify(ReadOnlySpan<KpkPosition> db)
         {
             var (good, bad) = Stm.IsWhite
                 ? (Result.Win, Result.Draw)

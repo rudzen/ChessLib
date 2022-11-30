@@ -97,8 +97,10 @@ public static class Zobrist
         for (var i = 0; i < ZobristPst.Length; i++)
             ZobristPst[i] = new HashKey[Square.Count];
 
-        foreach (var pc in Piece.AllPieces)
+        ref var piecesSpace = ref MemoryMarshal.GetArrayDataReference(Piece.AllPieces);
+        for (var i = 0; i < Piece.AllPieces.Length; ++i)
         {
+            var pc = Unsafe.Add(ref piecesSpace, i);
             var bb = BitBoards.AllSquares;
             while (bb)
             {

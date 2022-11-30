@@ -26,6 +26,7 @@ SOFTWARE.
 
 using System;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using Rudzoft.ChessLib.Exceptions;
 using Rudzoft.ChessLib.Extensions;
@@ -41,6 +42,8 @@ public static class Fen
 
     private const string FenRankRegexSnippet = @"[1-8KkQqRrBbNnPp]{1,8}";
 
+    private const string ValidChars = @"012345678pPnNbBrRqQkK/ w-abcdefgh";
+
     private const char Space = ' ';
 
     private const int SpaceCount = 3;
@@ -51,7 +54,7 @@ public static class Fen
 
     private static readonly Lazy<Regex> ValidFenRegex = new(static () => new Regex(
        string.Format(@"^ \s* {0}/{0}/{0}/{0}/{0}/{0}/{0}/{0} \s+ (?:w|b) \s+ (?:[KkQq]+|\-) \s+ (?:[a-h][1-8]|\-) \s+ \d+ \s+ \d+ \s* $", FenRankRegexSnippet),
-       RegexOptions.Compiled | RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline));
+       RegexOptions.Compiled | RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.NonBacktracking));
 
     /// <summary>
     /// Performs basic validation of FEN string.
@@ -65,7 +68,12 @@ public static class Fen
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void Validate(string fen)
     {
-        var f = fen.Trim().AsSpan();
+        var f = fen.AsSpan().Trim();
+
+        var invalidCharIndex = f.IndexOfAnyExcept(ValidChars.AsSpan());
+
+        if (invalidCharIndex > -1)
+            throw new InvalidFen($"Invalid char detected in fen. fen={f}, pos={invalidCharIndex}");
 
         if (f.Length >= MaxFenLen)
             throw new InvalidFen($"Invalid length for fen {fen}.");
@@ -81,6 +89,7 @@ public static class Fen
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsDelimiter(char c) => c == Space;
 
+    [SkipLocalsInit]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static bool CountPieceValidity(ReadOnlySpan<char> s)
     {
@@ -95,8 +104,11 @@ public static class Fen
         // piece count storage, using index 0 = '/' count
         Span<int> pieceCount = stackalloc int[Pieces.PieceNb.AsInt()];
 
-        foreach (var t in mainSection)
+        ref var mainSectionSpace = ref MemoryMarshal.GetReference(mainSection);
+
+        for (var i = 0; i < mainSection.Length; ++i)
         {
+            var t = Unsafe.Add(ref mainSectionSpace, i);
             if (t == '/')
             {
                 if (++pieceCount[0] > SeparatorCount)
@@ -106,7 +118,7 @@ public static class Fen
 
             if (char.IsNumber(t))
             {
-                if (!t.InBetween('1', '8'))
+                if (!char.IsBetween(t, '1', '8'))
                     throw new InvalidFen($"Invalid fen (not a valid square jump) {s.ToString()}");
                 continue;
             }
@@ -131,8 +143,10 @@ public static class Fen
         static bool GetSpanSum(ReadOnlySpan<int> span, int limit)
         {
             var sum = 0;
-            foreach (var v in span)
-                sum += v;
+
+            ref var spanSpace = ref MemoryMarshal.GetReference(span);
+            for (var i = 0; i < span.Length; ++i)
+                sum += Unsafe.Add(ref spanSpace, i);
 
             return sum <= limit;
         }
@@ -186,7 +200,10 @@ public static class Fen
     {
         var result = (spaceCount: 0, separatorCount: 0);
 
-        foreach (var c in str)
+        ref var strSpace = ref MemoryMarshal.GetReference(str);
+        for (var i = 0; i < str.Length; ++i)
+        {
+            var c = Unsafe.Add(ref strSpace, i);
             switch (c)
             {
                 case Separator:
@@ -197,6 +214,7 @@ public static class Fen
                     result.spaceCount++;
                     break;
             }
+        }
 
         return result;
     }

@@ -28,6 +28,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using Microsoft.Extensions.ObjectPool;
 using Rudzoft.ChessLib.Enums;
 using Rudzoft.ChessLib.Fen;
@@ -96,13 +97,18 @@ public sealed class Game : IGame
 
         var moveList = _moveLists.Get();
         moveList.Generate(in _pos);
-        // ReSharper disable once LoopCanBeConvertedToQuery
-        foreach (var em in moveList.Get())
+
+        var moves = moveList.Get();
+        ref var movesSpace = ref MemoryMarshal.GetReference(moves);
+        for (var i = 0; i < moves.Length; ++i)
+        {
+            var em = Unsafe.Add(ref movesSpace, i);
             if (!Pos.IsLegal(em.Move))
             {
                 gameEndType |= GameEndTypes.Pat;
                 break;
             }
+        }
 
         GameEndType = gameEndType;
     }
@@ -131,7 +137,11 @@ public sealed class Game : IGame
         ml.Generate(in _pos);
         var state = new State();
 
-        foreach (var em in ml.Get())
+        var moves = ml.Get();
+        ref var movesSpace = ref MemoryMarshal.GetReference(moves);
+        for (var i = 0; i < moves.Length; ++i)
+        {
+            var em = Unsafe.Add(ref movesSpace, i);
             if (root && depth <= 1)
                 tot++;
             else
@@ -151,6 +161,7 @@ public sealed class Game : IGame
 
                 _pos.TakeMove(m);
             }
+        }
 
         _moveLists.Return(ml);
 

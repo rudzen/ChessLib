@@ -27,6 +27,7 @@ SOFTWARE.
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace Rudzoft.ChessLib.Fen;
@@ -40,18 +41,24 @@ public sealed class FenData : EventArgs, IFenData
 {
     private readonly Queue<(int, int)> _splitPoints;
 
-    public FenData(ReadOnlyMemory<char> fen)
+    private FenData()
     {
         _splitPoints = new Queue<(int, int)>(6);
+    }
+
+    public FenData(ReadOnlyMemory<char> fen) : this()
+    {
         Fen = fen;
         var start = 0;
 
         var s = fen.Span;
 
         // determine split points
+        ref var splitPointsSpace = ref MemoryMarshal.GetReference(s);
         for (var i = 0; i < s.Length; i++)
         {
-            if (s[i] != ' ')
+            var splitPoint = Unsafe.Add(ref splitPointsSpace, i);
+            if (splitPoint != ' ')
                 continue;
 
             _splitPoints.Enqueue((start, i));
@@ -62,14 +69,14 @@ public sealed class FenData : EventArgs, IFenData
         _splitPoints.Enqueue((start, s.Length));
     }
 
-    public FenData(ReadOnlySpan<string> fen)
+    public FenData(ReadOnlySpan<string> fen) : this()
     {
-        _splitPoints = new Queue<(int, int)>(6);
         var sb = new StringBuilder(128);
 
+        ref var fenSpace = ref MemoryMarshal.GetReference(fen);
         for (var i = 0; i < fen.Length; ++i)
         {
-            sb.Append(fen[i]);
+            sb.Append(Unsafe.Add(ref fenSpace, i));
             if (i < fen.Length - 1)
                 sb.Append(' ');
         }
@@ -80,9 +87,11 @@ public sealed class FenData : EventArgs, IFenData
         var s = Fen.Span;
 
         // determine split points
+        ref var splitPointsSpace = ref MemoryMarshal.GetReference(s);
         for (var i = 0; i < s.Length; i++)
         {
-            if (s[i] != ' ')
+            var splitPoint = Unsafe.Add(ref splitPointsSpace, i);
+            if (splitPoint != ' ')
                 continue;
 
             _splitPoints.Enqueue((start, i));

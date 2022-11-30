@@ -128,7 +128,9 @@ public struct Score : IEquatable<Score>
     public override bool Equals(object obj)
         => obj is Score other && Equals(other);
 
+#pragma warning disable S2328 // "GetHashCode" should not reference mutable fields
     public override int GetHashCode()
+#pragma warning restore S2328 // "GetHashCode" should not reference mutable fields
         => _data.GetHashCode();
 
     public static bool operator ==(Score left, Score right)

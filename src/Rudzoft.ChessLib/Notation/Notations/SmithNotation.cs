@@ -37,6 +37,7 @@ public sealed class SmithNotation : Notation
     {
     }
 
+    [SkipLocalsInit]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override string Convert(Move move)
     {

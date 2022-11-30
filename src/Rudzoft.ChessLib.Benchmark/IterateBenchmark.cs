@@ -1,5 +1,4 @@
 ﻿using System;
-using BenchmarkDotNet.Attributes;
 using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Benchmark;

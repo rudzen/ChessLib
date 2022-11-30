@@ -26,6 +26,8 @@ SOFTWARE.
 
 using System;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using Rudzoft.ChessLib.Enums;
 using Rudzoft.ChessLib.Types;
 
@@ -239,8 +241,10 @@ public static class MoveGenerator
 
         var squares = pos.Squares(pt, us);
 
-        foreach (var from in squares)
+        ref var squaresSpace = ref MemoryMarshal.GetReference(squares);
+        for (var i = 0; i < squares.Length; ++i)
         {
+            var from = Unsafe.Add(ref squaresSpace, i);
             if (checks
                 && (!(pos.KingBlockers(~us) & from).IsEmpty ||
                     !(pt.PseudoAttacks(from) & target & pos.CheckedSquares(pt))))
