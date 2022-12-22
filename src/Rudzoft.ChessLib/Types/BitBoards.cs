@@ -564,7 +564,7 @@ public static class BitBoards
             {
                 span[idx++] = '|';
                 span[idx++] = ' ';
-                span[idx++] = (bb & new Square(r, f)).IsEmpty ? ' ' : 'X';;
+                span[idx++] = (bb & new Square(r, f)).IsEmpty ? ' ' : 'X';
                 span[idx++] = ' ';
             }
 
@@ -814,7 +814,7 @@ public static class BitBoards
         };
 
     private static Func<BitBoard, BitBoard>[] MakeFillFuncs()
-        => new Func<BitBoard, BitBoard>[] { NorthFill, SouthFill };
+        => new[] { NorthFill, SouthFill };
 
     private static BitBoard GetAttacks(this in Square sq, PieceTypes pt, in BitBoard occ = default)
     {

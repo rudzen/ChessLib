@@ -26,7 +26,6 @@ SOFTWARE.
 
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -72,6 +71,7 @@ public static class KpkBitBase
             }
         }
 
+
         // Fill the bitbase with the decisive results
         var idx = 0;
         ref var setDbSpace = ref MemoryMarshal.GetReference(db);
@@ -81,12 +81,11 @@ public static class KpkBitBase
             if (kpkPosition.Result == Result.Win)
                 KpKbb.Set(idx, true);
             idx++;
-
         }
     }
 
     /// <summary>
-    /// A KPK bitbase index is an integer in [0, IndexMax] range
+    /// A KPK bitbase index is an integer in [0,IndexMax] range
     ///
     /// Information is mapped in a way that minimizes the number of iterations:
     ///
@@ -175,7 +174,7 @@ public static class KpkBitBase
                 psq);
         }
 
-        public Result Result { get; private set; }
+        public Result Result { get; }
         private Player Stm { get; }
         private Square[] KingSquares { get; }
         private Square PawnSquare { get; }

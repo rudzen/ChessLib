@@ -26,6 +26,4 @@ SOFTWARE.
 
 namespace Rudzoft.ChessLib.Protocol.UCI;
 
-public record struct Clock(ulong[] Inc, ulong[] Time)
-{
-}
+public record struct Clock(ulong[] Inc, ulong[] Time);

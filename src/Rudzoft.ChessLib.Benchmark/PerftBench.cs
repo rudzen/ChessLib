@@ -27,13 +27,13 @@ SOFTWARE.
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using BenchmarkDotNet.Attributes;
 using Rudzoft.ChessLib.Perft;
 using Rudzoft.ChessLib.Perft.Interfaces;
 
 namespace Rudzoft.ChessLib.Benchmark;
 
 [MemoryDiagnoser]
+// ReSharper disable once ClassCanBeSealed.Global
 public class PerftBench
 {
     private IPerft _perft;
@@ -71,10 +71,8 @@ public class PerftBench
     {
         var total = ulong.MinValue;
         for (var i = 0; i < N; i++)
-        {
             await foreach (var res in _perft.DoPerft(N).ConfigureAwait(false))
                 total += res;
-        }
         return total;
     }
 
@@ -83,9 +81,7 @@ public class PerftBench
     {
         var total = ulong.MinValue;
         for (var i = 0; i < N; ++i)
-        {
             total += await _perft.DoPerftAsync(N);
-        }
 
         return total;
     }

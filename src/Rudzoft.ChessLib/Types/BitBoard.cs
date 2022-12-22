@@ -29,6 +29,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -41,7 +42,7 @@ namespace Rudzoft.ChessLib.Types;
 /// Enumeration will yield each set bit as a Square struct.
 /// <para>For more information - please see https://github.com/rudzen/ChessLib/wiki/BitBoard</para>
 /// </summary>
-public readonly record struct BitBoard(ulong Value) : IEnumerable<Square>
+public readonly record struct BitBoard(ulong Value) : IEnumerable<Square>, IMinMaxValue<BitBoard>
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public BitBoard(BitBoard value)
@@ -60,6 +61,10 @@ public readonly record struct BitBoard(ulong Value) : IEnumerable<Square>
     public bool IsEmpty => Value == 0;
 
     public static readonly BitBoard Empty = BitBoards.EmptyBitBoard;
+
+    public static BitBoard MaxValue { get; } = BitBoards.EmptyBitBoard;
+
+    public static BitBoard MinValue { get; } = BitBoards.AllSquares;
 
     public string String => Convert.ToString((long)Value, 2).PadLeft(64, '0');
 
@@ -230,7 +235,10 @@ public readonly record struct BitBoard(ulong Value) : IEnumerable<Square>
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool MoreThanOne()
-        => (Value & (Value - 1)) > 0;
+    {
+        var v = Value;
+        return (v & (v - 1)) > 0;
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public IEnumerator<Square> GetEnumerator()
@@ -249,7 +257,7 @@ public readonly record struct BitBoard(ulong Value) : IEnumerable<Square>
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override string ToString()
-        => BitBoards.PrintBitBoard(this, Value.ToString());
+        => BitBoards.PrintBitBoard(in this, Value.ToString());
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void ToString(TextWriter textWriter)

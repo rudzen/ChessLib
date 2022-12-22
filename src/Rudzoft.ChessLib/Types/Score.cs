@@ -27,7 +27,6 @@ SOFTWARE.
 using System;
 using System.Numerics;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 
 namespace Rudzoft.ChessLib.Types;
 
@@ -129,7 +128,7 @@ public struct Score : IEquatable<Score>
         => obj is Score other && Equals(other);
 
 #pragma warning disable S2328 // "GetHashCode" should not reference mutable fields
-    public override int GetHashCode()
+    public readonly override int GetHashCode()
 #pragma warning restore S2328 // "GetHashCode" should not reference mutable fields
         => _data.GetHashCode();
 

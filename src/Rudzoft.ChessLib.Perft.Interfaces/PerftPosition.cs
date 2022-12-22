@@ -30,4 +30,4 @@ namespace Rudzoft.ChessLib.Perft.Interfaces;
 
 public record struct PerftPositionValue(int Depth, ulong MoveCount);
 
-public record PerftPosition(string Id, string Fen, IList<PerftPositionValue> Value);
+public sealed record PerftPosition(string Id, string Fen, IList<PerftPositionValue> Value);

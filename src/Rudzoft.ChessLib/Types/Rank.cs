@@ -229,7 +229,7 @@ public readonly record struct Rank(Ranks Value) : ISpanFormattable, IValidationT
         => AsInt();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Rank Relative(Player p) 
+    public Rank Relative(Player p)
         => new(AsInt() ^ (p.Side * 7));
 
     /// <summary>

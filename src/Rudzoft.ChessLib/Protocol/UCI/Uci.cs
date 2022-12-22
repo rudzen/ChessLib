@@ -111,7 +111,7 @@ public class Uci : IUci
     {
         var uciMoves = moves
             .Select(x => MoveFromUci(pos, x))
-            .Where(x => !x.IsNullMove());
+            .Where(static x => !x.IsNullMove());
 
         foreach (var move in uciMoves)
         {

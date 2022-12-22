@@ -385,16 +385,16 @@ public readonly record struct Square(Squares Value) : ISpanFormattable, ICompara
     }
 
     /// <summary>
-    /// Swap A1 <-> H1
+    /// Swap A1 &lt;-&gt; H1
     /// </summary>
     /// <returns>Flipped square by File</returns>
     public Square FlipFile()
         => AsInt() ^ Squares.h1.AsInt();
 
     /// <summary>
-    /// Swap A1 <-> A8
+    /// Swap A1 &lt;-&gt; A8
     /// </summary>
-    /// <returns>Flipped square by Fank</returns>
+    /// <returns>Flipped square by Rank</returns>
     public Square FlipRank()
         => AsInt() ^ Squares.a8.AsInt();
 
