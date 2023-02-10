@@ -49,6 +49,9 @@ public abstract class Notation : INotation
         };
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    protected bool GivesCheck(Move move) => Pos.GivesCheck(move);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private MoveAmbiguities Ambiguity(Square from, BitBoard similarTypeAttacks)
     {
         var ambiguity = MoveAmbiguities.None;

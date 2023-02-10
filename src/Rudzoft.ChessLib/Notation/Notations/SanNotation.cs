@@ -27,6 +27,7 @@ SOFTWARE.
 using System;
 using System.Runtime.CompilerServices;
 using Rudzoft.ChessLib.Extensions;
+using Rudzoft.ChessLib.MoveGeneration;
 using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Notation.Notations;
@@ -88,7 +89,11 @@ public sealed class SanNotation : Notation
         }
 
         if (Pos.InCheck)
-            re[i++] = GetCheckChar();
+        {
+            if (Pos.GenerateMoves().Get().IsEmpty)
+                re[i++] = '#';
+        } else if (GivesCheck(move))
+            re[i++] = '+';
 
         return new string(re[..i]);
     }
