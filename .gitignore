@@ -353,3 +353,4 @@ MigrationBackup/
 
 Perft/Logs/
 .idea
+.sonarqube
