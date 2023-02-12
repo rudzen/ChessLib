@@ -103,6 +103,7 @@ public static class Fen
 
         // piece count storage, using index 0 = '/' count
         Span<int> pieceCount = stackalloc int[Pieces.PieceNb.AsInt()];
+        pieceCount.Clear();
 
         ref var mainSectionSpace = ref MemoryMarshal.GetReference(mainSection);
 
@@ -136,7 +137,7 @@ public static class Fen
             var limit = limits[pt.AsInt()];
 
             if (pieceCount[pc.AsInt()] > limit)
-                throw new InvalidFen($"Invalid fen (piece limit exceeded for {pc}) {s.ToString()}");
+                throw new InvalidFen($"Invalid fen (piece limit exceeded for {pc}. index={i},limit={limit},count={pieceCount[pc.AsInt()]}) {s.ToString()}");
         }
 
         // check for summed up values
