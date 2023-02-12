@@ -54,7 +54,7 @@ public interface ITranspositionTable
     /// </summary>
     /// <param name="key">The position key</param>
     /// <returns>The cluster of the keys position in the table</returns>
-    ref TTCluster FindCluster(in HashKey key);
+    ref Cluster FindCluster(in HashKey key);
 
     void Refresh(ref TranspositionTableEntry tte);
 

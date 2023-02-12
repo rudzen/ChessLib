@@ -1223,12 +1223,8 @@ public sealed class Position : IPosition
         Debug.Assert(code.Length.InBetween(0, 8));
         Debug.Assert(code[0] == 'K');
 
-        var kingPos = code[1..].IndexOf('K');
-        var sides = new[]
-        {
-            code[1..kingPos].ToString(),
-            code[kingPos].ToString()
-        };
+        var kingPos = code.LastIndexOf('K');
+        var sides = new [] { code[kingPos..].ToString(), code[..kingPos].ToString() };
         
         sides[p.Side] = sides[p.Side].ToLower();
 

@@ -88,4 +88,25 @@ public sealed class PositionTests
 
         Assert.Equal(expectedSquare, actual);
     }
+    
+    [Theory]
+    [InlineData("KPK", "k7/8/8/8/8/8/8/KP6 w - - 0 10")]
+    [InlineData("KNNK", "k7/8/8/8/8/8/8/KNN5 w - - 0 10")]
+    [InlineData("KBNK", "k7/8/8/8/8/8/8/KBN5 w - - 0 10")]
+    public void SetByCodeCreatesSameMaterialKey(string code, string fen)
+    {
+        var g = GameFactory.Create(fen);
+        var pos = g.Pos;
+        var materialKey = pos.State.MaterialKey;
+
+        var state = new State();
+        var posCode = pos.Set(code, Player.White, state);
+        var codeMaterialKey = posCode.State.MaterialKey;
+        
+        Assert.Equal(materialKey, codeMaterialKey);
+
+        var codeFen = pos.GenerateFen().ToString();
+
+        Assert.Equal(fen, codeFen);
+    }
 }

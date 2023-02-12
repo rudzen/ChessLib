@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2023 Rudy Alex Kohn
+Copyright (c) 2017-2020 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,14 +24,44 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using Rudzoft.ChessLib.Types;
+
 namespace Rudzoft.ChessLib.Hash.Tables.Transposition;
 
-// public interface ITTCluster
-// {
-//     // TranspositionTableEntry[] Cluster { get; }
-//     ref TranspositionTableEntry this[int key] { get; }
-//
-//     public void Add(int key, in TranspositionTableEntry entry);
-//     
-//     public void Reset();
-// }
+/// <summary>
+/// Stores an array of <see cref="TranspositionTableEntry"/>. In essence it acts like a entry
+/// bucket of 4 elements for each position stored in the <see cref="TranspositionTable"/>
+/// </summary>
+public readonly struct Cluster
+{
+    public static readonly TranspositionTableEntry DefaultEntry = new(
+        0,
+        Move.EmptyMove,
+        0,
+        1,
+        int.MaxValue,
+        int.MaxValue,
+        Bound.Void);
+
+    private readonly TranspositionTableEntry[] _cluster = new TranspositionTableEntry[4];
+    
+    public Cluster()
+    {
+        Reset();
+    }
+
+    public ref TranspositionTableEntry this[int key] => ref _cluster[key];
+
+    public void Add(int key, in TranspositionTableEntry entry)
+    {
+        _cluster[key] = entry;
+    }
+
+    public void Reset()
+    {
+        _cluster[0] = DefaultEntry;
+        _cluster[1] = DefaultEntry;
+        _cluster[2] = DefaultEntry;
+        _cluster[3] = DefaultEntry;
+    }
+}

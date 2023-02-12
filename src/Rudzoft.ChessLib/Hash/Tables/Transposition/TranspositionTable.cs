@@ -36,7 +36,7 @@ public sealed class TranspositionTable : ITranspositionTable
 {
     private static readonly int ClusterSize;
 
-    private TTCluster[] _table;
+    private Cluster[] _table;
     private ulong _elements;
     private int _fullnessElements;
     private sbyte _generation;
@@ -51,7 +51,7 @@ public sealed class TranspositionTable : ITranspositionTable
 
     public TranspositionTable(int mbSize)
     {
-        _table = Array.Empty<TTCluster>();
+        _table = Array.Empty<Cluster>();
         SetSize(mbSize);
     }
 
@@ -84,7 +84,7 @@ public sealed class TranspositionTable : ITranspositionTable
         var currentSize = _table.Length;
         if (_table.Length == 0)
         {
-            _table = new TTCluster[size];
+            _table = new Cluster[size];
             PopulateTable(0, size);
         }
         else if (currentSize != size)
@@ -110,7 +110,7 @@ public sealed class TranspositionTable : ITranspositionTable
     /// <param name="key">The position key</param>
     /// <returns>The cluster of the keys position in the table</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public ref TTCluster FindCluster(in HashKey key)
+    public ref Cluster FindCluster(in HashKey key)
     {
         var idx = (int)(key.LowerKey & (_elements - 1));
         return ref _table[idx];
@@ -273,6 +273,6 @@ public sealed class TranspositionTable : ITranspositionTable
     private void PopulateTable(int from, int to)
     {
         for (var i = from; i < to; ++i)
-            _table[i] = new TTCluster();
+            _table[i] = new Cluster();
     }
 }

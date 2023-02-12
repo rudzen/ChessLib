@@ -135,7 +135,7 @@ public readonly record struct Player(byte Side) : ISpanFormattable
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public string ToString(string format, IFormatProvider formatProvider)
-        => string.Format(formatProvider, format, Side);
+        => ToString();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider provider)
