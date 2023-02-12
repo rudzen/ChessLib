@@ -32,22 +32,26 @@ namespace Rudzoft.ChessLib.Tables;
 
 public sealed class KillerMoves : IKillerMoves
 {
-    private IPieceSquare[,] _killerMoves;
+    private static readonly PieceSquare EmptyPieceSquare = new(Piece.EmptyPiece, Square.None);
+    
+    private readonly PieceSquare[,] _killerMoves;
     private readonly int _maxDepth;
 
     public static IKillerMoves Create(int maxDepth)
         => new KillerMoves(maxDepth).Initialize();
 
-    public KillerMoves(int maxDepth)
-        => _maxDepth = maxDepth + 1;
+    private KillerMoves(int maxDepth)
+    {
+        _maxDepth = maxDepth + 1;
+        _killerMoves = new PieceSquare[_maxDepth, 2];
+    }
 
     private IKillerMoves Initialize()
     {
-        _killerMoves = new IPieceSquare[_maxDepth, 2];
         for (var depth = 0; depth < _maxDepth; depth++)
         {
-            _killerMoves[depth, 0] = new PieceSquareEventArgs(Piece.EmptyPiece, Square.None);
-            _killerMoves[depth, 1] = new PieceSquareEventArgs(Piece.EmptyPiece, Square.None);
+            _killerMoves[depth, 0] = EmptyPieceSquare;
+            _killerMoves[depth, 1] = EmptyPieceSquare;
         }
 
         Reset();
@@ -55,29 +59,28 @@ public sealed class KillerMoves : IKillerMoves
     }
 
     public int GetValue(int depth, Move m, Piece fromPc)
-        => Equals(_killerMoves[depth, 0], m, fromPc)
+        => Equals(in _killerMoves[depth, 0], m, fromPc)
             ? 2
-            : Equals(_killerMoves[depth, 1], m, fromPc).AsByte();
+            : Equals(in _killerMoves[depth, 1], m, fromPc).AsByte();
 
     public void UpdateValue(int depth, Move m, Piece fromPc)
     {
-        if (Equals(_killerMoves[depth, 0], m, fromPc))
+        if (Equals(in _killerMoves[depth, 0], m, fromPc))
             return;
 
         // Shift killer move.
-        _killerMoves[depth, 1].Piece = _killerMoves[depth, 0].Piece;
-        _killerMoves[depth, 1].Square = _killerMoves[depth, 0].Square;
+        _killerMoves[depth, 1] = _killerMoves[depth, 0];
         // Update killer move.
         _killerMoves[depth, 0].Piece = fromPc;
         _killerMoves[depth, 0].Square = m.ToSquare();
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static bool Equals(IPieceSquare killerMove, Move m, Piece fromPc)
+    private static bool Equals(in PieceSquare killerMove, Move m, Piece fromPc)
         => killerMove.Piece == fromPc && killerMove.Square == m.ToSquare();
 
-    public IPieceSquare Get(int depth, int index)
-        => _killerMoves[depth, index];
+    public ref PieceSquare Get(int depth, int index)
+        => ref _killerMoves[depth, index];
 
     public void Shift(int depth)
     {
@@ -85,31 +88,24 @@ public sealed class KillerMoves : IKillerMoves
         var lastDepth = _killerMoves.Length - depth - 1;
         for (var i = 0; i <= lastDepth; i++)
         {
-            _killerMoves[i, 0].Piece = _killerMoves[i + depth, 0].Piece;
-            _killerMoves[i, 0].Square = _killerMoves[i + depth, 0].Square;
-            _killerMoves[i, 1].Piece = _killerMoves[i + depth, 1].Piece;
-            _killerMoves[i, 1].Square = _killerMoves[i + depth, 1].Square;
+            _killerMoves[i, 0] = _killerMoves[i + depth, 0];
+            _killerMoves[i, 1] = _killerMoves[i + depth, 1];
         }
 
         // Reset killer moves far from root position.
         for (var i = lastDepth + 1; i < _killerMoves.Length; i++)
         {
-            _killerMoves[i, 0].Piece = Piece.EmptyPiece;
-            _killerMoves[i, 0].Square = Square.None;
-            _killerMoves[i, 1].Piece = Piece.EmptyPiece;
-            _killerMoves[i, 1].Square = Square.None;
+            _killerMoves[i, 0] = EmptyPieceSquare;
+            _killerMoves[i, 1] = EmptyPieceSquare;
         }
     }
 
     public void Reset()
     {
-        //Array.Clear(_killerMoves, 0, _killerMoves.Length);
         for (var i = 0; i < _maxDepth; i++)
         {
-            _killerMoves[i, 0].Piece = Piece.EmptyPiece;
-            _killerMoves[i, 0].Square = Square.None;
-            _killerMoves[i, 1].Piece = Piece.EmptyPiece;
-            _killerMoves[i, 1].Square = Square.None;
+            _killerMoves[i, 0] = EmptyPieceSquare;
+            _killerMoves[i, 1] = EmptyPieceSquare;
         }
     }
 
@@ -134,5 +130,5 @@ public sealed class KillerMoves : IKillerMoves
         => ReferenceEquals(this, obj) || obj is KillerMoves other && Equals(other);
 
     public override int GetHashCode()
-        => _killerMoves != null ? _killerMoves.GetHashCode() : 0;
+        => _killerMoves.GetHashCode();
 }

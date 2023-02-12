@@ -32,7 +32,7 @@ namespace Rudzoft.ChessLib.Hash.Tables.Transposition;
 /// Stores an array of <see cref="TranspositionTableEntry"/>. In essence it acts like a entry
 /// bucket of 4 elements for each position stored in the <see cref="TranspositionTable"/>
 /// </summary>
-public sealed class TTCluster : ITTCluster
+public readonly struct TTCluster //: ITTCluster
 {
     public static readonly TranspositionTableEntry DefaultEntry = new(
         0,
@@ -43,19 +43,25 @@ public sealed class TTCluster : ITTCluster
         int.MaxValue,
         Bound.Void);
 
+    private readonly TranspositionTableEntry[] _cluster = new TranspositionTableEntry[4];
+    
     public TTCluster()
     {
         Reset();
     }
 
-    public TranspositionTableEntry[] Cluster { get; private set; }
+    public ref TranspositionTableEntry this[int key] => ref _cluster[key];
 
-    public TranspositionTableEntry this[int key]
+    public void Add(int key, in TranspositionTableEntry entry)
     {
-        get => Cluster[key];
-        set => Cluster[key] = value;
+        _cluster[key] = entry;
     }
 
     public void Reset()
-        => Cluster = new[] { DefaultEntry, DefaultEntry, DefaultEntry, DefaultEntry };
+    {
+        _cluster[0] = DefaultEntry;
+        _cluster[1] = DefaultEntry;
+        _cluster[2] = DefaultEntry;
+        _cluster[3] = DefaultEntry;
+    }
 }

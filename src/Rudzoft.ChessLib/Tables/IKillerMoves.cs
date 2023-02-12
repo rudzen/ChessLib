@@ -33,7 +33,7 @@ public interface IKillerMoves : IEquatable<IKillerMoves>
 {
     int GetValue(int depth, Move m, Piece fromPc);
 
-    IPieceSquare Get(int depth, int index);
+    ref PieceSquare Get(int depth, int index);
 
     void UpdateValue(int depth, Move m, Piece fromPc);
 

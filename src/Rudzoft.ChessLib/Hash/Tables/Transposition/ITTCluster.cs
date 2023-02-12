@@ -26,10 +26,12 @@ SOFTWARE.
 
 namespace Rudzoft.ChessLib.Hash.Tables.Transposition;
 
-public interface ITTCluster
-{
-    TranspositionTableEntry[] Cluster { get; }
-    TranspositionTableEntry this[int key] { get; set; }
-
-    public void Reset();
-}
+// public interface ITTCluster
+// {
+//     // TranspositionTableEntry[] Cluster { get; }
+//     ref TranspositionTableEntry this[int key] { get; }
+//
+//     public void Add(int key, in TranspositionTableEntry entry);
+//     
+//     public void Reset();
+// }

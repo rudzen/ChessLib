@@ -50,16 +50,19 @@ public enum CastleRights
 
 public enum CastleSides
 {
-    King,
-    Queen,
-    Center,
-    Count
+    King = 0,
+    Queen = 1,
+    Center = 2,
+    Count = 3
 }
 
 public static class CastleSidesExtensions
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int AsInt(this CastleSides cs) => (int)cs;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static BitBoard SlotFile(this CastleSides cs) => BitBoards.SlotFile(cs);
 }
 
 public enum CastlePerform

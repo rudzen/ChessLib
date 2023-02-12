@@ -25,7 +25,6 @@ SOFTWARE.
 */
 
 using System;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Rudzoft.ChessLib.Exceptions;
@@ -37,7 +36,7 @@ public sealed class TranspositionTable : ITranspositionTable
 {
     private static readonly int ClusterSize;
 
-    private ITTCluster[] _table;
+    private TTCluster[] _table;
     private ulong _elements;
     private int _fullnessElements;
     private sbyte _generation;
@@ -52,7 +51,7 @@ public sealed class TranspositionTable : ITranspositionTable
 
     public TranspositionTable(int mbSize)
     {
-        _table = Array.Empty<ITTCluster>();
+        _table = Array.Empty<TTCluster>();
         SetSize(mbSize);
     }
 
@@ -85,7 +84,7 @@ public sealed class TranspositionTable : ITranspositionTable
         var currentSize = _table.Length;
         if (_table.Length == 0)
         {
-            _table = new ITTCluster[size];
+            _table = new TTCluster[size];
             PopulateTable(0, size);
         }
         else if (currentSize != size)
@@ -111,14 +110,14 @@ public sealed class TranspositionTable : ITranspositionTable
     /// <param name="key">The position key</param>
     /// <returns>The cluster of the keys position in the table</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public ITTCluster FindCluster(in HashKey key)
+    public ref TTCluster FindCluster(in HashKey key)
     {
         var idx = (int)(key.LowerKey & (_elements - 1));
-        return _table[idx];
+        return ref _table[idx];
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void Refresh(TranspositionTableEntry tte) => tte.Generation = _generation;
+    public void Refresh(ref TranspositionTableEntry tte) => tte.Generation = _generation;
 
     /// <summary>
     /// Probes the transposition table for a entry that matches the position key.
@@ -127,17 +126,17 @@ public sealed class TranspositionTable : ITranspositionTable
     /// <returns>(true, entry) if one was found, (false, empty) if not found</returns>
     public bool Probe(in HashKey key, ref TranspositionTableEntry e)
     {
-        var ttc = FindCluster(in key);
+        ref var ttc = ref FindCluster(in key);
         var g = _generation;
 
         // Probing the Table will automatically update the generation of the entry in case the
         // probing retrieves an element.
 
         var set = false;
-        ref var clusterSpace = ref MemoryMarshal.GetArrayDataReference(ttc.Cluster);
-        for (var i = 0; i < ttc.Cluster.Length; ++i)
+
+        for (var i = 0; i < ClusterSize; ++i)
         {
-            var entry = Unsafe.Add(ref clusterSpace, i);
+            ref var entry = ref ttc[i];
             if (entry.Key32 != uint.MinValue && entry.Key32 != key.UpperKey)
                 continue;
 
@@ -147,7 +146,7 @@ public sealed class TranspositionTable : ITranspositionTable
             Hits++;
             break;
         }
-
+        
         if (!set)
             e = default;
 
@@ -156,20 +155,19 @@ public sealed class TranspositionTable : ITranspositionTable
 
     public void Save(in HashKey key, in TranspositionTableEntry e)
     {
-        var ttc = FindCluster(in key);
+        ref var ttc = ref FindCluster(in key);
         var entryIndex = 0;
 
-        ref var clusterSpace = ref MemoryMarshal.GetArrayDataReference(ttc.Cluster);
-        for (var i = 0; i < ttc.Cluster.Length; ++i)
+        for (var i = 0; i < ClusterSize; ++i)
         {
-            var entry = Unsafe.Add(ref clusterSpace, i);
+            ref var entry = ref ttc[i];
             if (entry.Key32 != uint.MinValue && entry.Key32 != key.UpperKey)
                 continue;
 
             entryIndex = i;
             break;
         }
-
+        
         ttc[entryIndex] = e;
     }
 
@@ -179,7 +177,7 @@ public sealed class TranspositionTable : ITranspositionTable
     /// <param name="key">The position key</param>
     /// <returns>The cluster entry</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public TranspositionTableEntry ProbeFirst(in HashKey key) => FindCluster(key)[0];
+    public ref TranspositionTableEntry ProbeFirst(in HashKey key) => ref FindCluster(key)[0];
 
     /// <summary>
     /// Stores a move in the transposition table. It will automatically detect the best cluster
@@ -194,15 +192,14 @@ public sealed class TranspositionTable : ITranspositionTable
     /// <param name="statValue">The static value of the move</param>
     public void Store(in HashKey key, int value, Bound type, sbyte depth, Move move, int statValue)
     {
-        var ttc = FindCluster(in key);
+        ref var ttc = ref FindCluster(in key);
 
         var clusterIndex = 0;
         var found = false;
 
-        ref var clusterSpace = ref MemoryMarshal.GetArrayDataReference(ttc.Cluster);
-        for (var i = 0; i < ttc.Cluster.Length; ++i)
+        for (var i = 0; i < ClusterSize; ++i)
         {
-            var entry = Unsafe.Add(ref clusterSpace, i);
+            ref var entry = ref ttc[i];
             if (entry.Key32 != uint.MinValue && entry.Key32 != key.UpperKey)
                 continue;
 
@@ -214,21 +211,18 @@ public sealed class TranspositionTable : ITranspositionTable
         if (!found)
         {
             var index = 0;
-            var candidate = ttc.Cluster[index];
+            ref var candidate = ref ttc[index];
             var g = _generation;
 
-            ref var entrySpace = ref MemoryMarshal.GetArrayDataReference(ttc.Cluster);
-            for (var i = 0; i < ttc.Cluster.Length; ++i)
+            for (var i = 0; i < ClusterSize; ++i)
             {
-                var entry = Unsafe.Add(ref entrySpace, i);
+                ref var entry = ref ttc[i];
                 var (cc1, cc2, cc3, cc4) = (candidate.Generation == g, entry.Generation == g, entry.Type == Bound.Exact, entry.Depth <= candidate.Depth);
                 if ((cc1 && cc4) || (!(cc2 || cc3) && (cc4 || cc1)))
                 {
                     index = i;
                     candidate = entry;
                 }
-
-                i++;
             }
 
             clusterIndex = index;
@@ -236,7 +230,8 @@ public sealed class TranspositionTable : ITranspositionTable
 
         var e = new TranspositionTableEntry(key.UpperKey, move, depth, _generation, value, statValue, type);
 
-        ttc.Cluster[clusterIndex].Save(e);
+        ref var target = ref ttc[clusterIndex];
+        target.Save(in e);
     }
 
     /// <summary>
@@ -251,7 +246,14 @@ public sealed class TranspositionTable : ITranspositionTable
         var sum = 0;
 
         for (var i = 0; i < _fullnessElements; ++i)
-            sum += _table[i].Cluster.Count(x => x.Generation == gen);
+        {
+            for (var j = 0; j < ClusterSize; ++j)
+            {
+                ref var entry = ref _table[i][j];
+                if (entry.Generation == gen)
+                    sum++;
+            }
+        }
 
         return sum * 250 / _fullnessElements;
     }
@@ -271,10 +273,6 @@ public sealed class TranspositionTable : ITranspositionTable
     private void PopulateTable(int from, int to)
     {
         for (var i = from; i < to; ++i)
-        {
-            var ttc = new TTCluster();
-            Array.Fill(ttc.Cluster, TTCluster.DefaultEntry);
-            _table[i] = ttc;
-        }
+            _table[i] = new TTCluster();
     }
 }

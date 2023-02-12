@@ -54,9 +54,9 @@ public interface ITranspositionTable
     /// </summary>
     /// <param name="key">The position key</param>
     /// <returns>The cluster of the keys position in the table</returns>
-    ITTCluster FindCluster(in HashKey key);
+    ref TTCluster FindCluster(in HashKey key);
 
-    void Refresh(TranspositionTableEntry tte);
+    void Refresh(ref TranspositionTableEntry tte);
 
     /// <summary>
     /// Probes the transposition table for a entry that matches the position key.
@@ -71,7 +71,7 @@ public interface ITranspositionTable
     /// </summary>
     /// <param name="key">The position key</param>
     /// <returns>The cluster entry</returns>
-    TranspositionTableEntry ProbeFirst(in HashKey key);
+    ref TranspositionTableEntry ProbeFirst(in HashKey key);
 
     /// <summary>
     /// Stores a move in the transposition table. It will automatically detect the best cluster

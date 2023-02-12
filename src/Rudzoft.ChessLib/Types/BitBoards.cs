@@ -179,6 +179,8 @@ public static class BitBoards
 
     private static readonly BitBoard[][] DistanceRingBB;
 
+    private static readonly BitBoard[] SlotFileBB;
+
     private static readonly Direction[] PawnPushDirections = { Direction.North, Direction.South };
 
     private static readonly IDictionary<Direction, Func<BitBoard, BitBoard>> ShiftFuncs = MakeShiftFuncs();
@@ -341,6 +343,13 @@ public static class BitBoards
             // Compute KingRings
             InitializeKingRing(s1, sq, file);
         }
+        
+        SlotFileBB = new[]
+        {
+            File.FileE.FileBB() | File.FileF.FileBB() | File.FileG.FileBB() | File.FileH.FileBB(), // King
+            File.FileA.FileBB() | File.FileB.FileBB() | File.FileC.FileBB() | File.FileD.FileBB(), // Queen
+            File.FileC.FileBB() | File.FileD.FileBB() | File.FileE.FileBB() | File.FileF.FileBB()  // Center
+        };
     }
 
     private static void InitializeKingRing(Square s1, int sq, File file)
@@ -512,6 +521,10 @@ public static class BitBoards
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static BitBoard Line(this Square sq1, Square sq2)
         => LineBB[sq1.AsInt()][sq2.AsInt()];
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static BitBoard SlotFile(CastleSides cs)
+        => SlotFileBB[cs.AsInt()];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static BitBoard AdjacentFiles(File f)

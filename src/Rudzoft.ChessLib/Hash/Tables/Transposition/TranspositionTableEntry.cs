@@ -52,7 +52,7 @@ public struct TranspositionTableEntry
         Type = b;
     }
 
-    public TranspositionTableEntry(TranspositionTableEntry tte)
+    public TranspositionTableEntry(in TranspositionTableEntry tte)
     {
         this = tte;
     }
@@ -63,7 +63,7 @@ public struct TranspositionTableEntry
     public static bool operator !=(TranspositionTableEntry left, TranspositionTableEntry right)
         => !(left == right);
 
-    public void Save(TranspositionTableEntry tte)
+    public void Save(in TranspositionTableEntry tte)
     {
         Key32 = tte.Key32;
         if (!tte.Move.IsNullMove())
