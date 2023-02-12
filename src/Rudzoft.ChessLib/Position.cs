@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2022 Rudy Alex Kohn
+Copyright (c) 2017-2023 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -1217,6 +1217,27 @@ public sealed class Position : IPosition
         return this;
     }
 
+    public IPosition Set(ReadOnlySpan<char> code, Player p, State state)
+    {
+        Debug.Assert(code[0] == 'K' && code[1..].IndexOf('K') != -1);
+        Debug.Assert(code.Length.InBetween(0, 8));
+        Debug.Assert(code[0] == 'K');
+
+        var kingPos = code[1..].IndexOf('K');
+        var sides = new[]
+        {
+            code[1..kingPos].ToString(),
+            code[kingPos].ToString()
+        };
+        
+        sides[p.Side] = sides[p.Side].ToLower();
+
+        var fenStr = $"{sides[0]}{8 - sides[0].Length}/8/8/8/8/8/8/{sides[1]}{8 - sides[1].Length} w - - 0 10";
+        var fen = new FenData(fenStr);
+
+        return Set(in fen, ChessMode.Normal, state);
+    }
+    
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public ReadOnlySpan<Square> Squares(PieceTypes pt, Player p)
         => Board.Squares(pt, p);

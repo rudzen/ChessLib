@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2022 Rudy Alex Kohn
+Copyright (c) 2017-2023 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -190,6 +190,8 @@ public interface IPosition : IEnumerable<Piece>
 
     IPosition Set(in FenData fenData, ChessMode chessMode, State state, bool validate = false, int searcher = 0);
 
+    IPosition Set(ReadOnlySpan<char> code, Player p, State state);
+    
     HashKey GetPiecesKey();
 
     HashKey GetPawnKey();
