@@ -25,6 +25,7 @@ SOFTWARE.
 */
 
 using System;
+using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
 using Rudzoft.ChessLib.Enums;
 
@@ -58,6 +59,12 @@ public enum PieceValues
     EndgameLimit = 3915
 }
 
+public static class PieceValuesExtensions
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static int AsInt(this PieceValues @this) => (int)@this;
+}
+
 public sealed class PieceValue : IPieceValue
 {
     public const int MAX_PLY = 246;
@@ -80,7 +87,7 @@ public sealed class PieceValue : IPieceValue
         SetDefaults();
     }
 
-    public PieceValues[][] _values { get; set; }
+    public PieceValues[][] Values { get; set; }
 
     public Value MaxValueWithoutPawns { get; private set; }
 
@@ -138,9 +145,9 @@ public sealed class PieceValue : IPieceValue
 
     public void SetDefaults()
     {
-        _values = new PieceValues[2][];
-        for (var index = 0; index < _values.Length; index++)
-            _values[index] = new PieceValues[6];
+        Values = new PieceValues[2][];
+        for (var index = 0; index < Values.Length; index++)
+            Values[index] = new PieceValues[6];
 
         Span<Phases> phases = stackalloc Phases[] { Phases.Mg, Phases.Eg };
 
@@ -154,7 +161,7 @@ public sealed class PieceValue : IPieceValue
 
         foreach (var pt in pieceTypes)
         {
-            var value = new Value(_values[0][pt.AsInt()]);
+            var value = new Value(Values[0][pt.AsInt()]);
             switch (pt)
             {
                 case PieceTypes.Pawn:
@@ -188,11 +195,11 @@ public sealed class PieceValue : IPieceValue
     }
 
     public void SetPieceValues(PieceValues[] values, Phases phase)
-        => Array.Copy(values, _values[phase.AsInt()], values.Length);
+        => Array.Copy(values, Values[phase.AsInt()], values.Length);
 
     public PieceValues GetPieceValue(Piece pc, Phases phase)
-        => _values[(int)phase][pc.Type().AsInt()];
+        => Values[(int)phase][pc.Type().AsInt()];
 
     public PieceValues GetPieceValue(PieceTypes pt, Phases phase)
-        => _values[phase.AsInt()][pt.AsInt()];
+        => Values[phase.AsInt()][pt.AsInt()];
 }

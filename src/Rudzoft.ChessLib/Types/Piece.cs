@@ -24,11 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System;
-using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using Rudzoft.ChessLib.Enums;
 using Rudzoft.ChessLib.Extensions;
 
 namespace Rudzoft.ChessLib.Types;
@@ -61,7 +57,7 @@ public enum PieceTypes
     Queen = 5,
     King = 6,
     PieceTypeNb = 7,
-    AllPieces = 0
+    AllPieces = NoPieceType
 }
 
 public static class PieceTypesExtensions

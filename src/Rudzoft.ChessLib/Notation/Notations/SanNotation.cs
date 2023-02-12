@@ -87,13 +87,10 @@ public sealed class SanNotation : Notation
         {
             re[i++] = '=';
             re[i++] = move.PromotedPieceType().MakePiece(Pos.SideToMove).GetPgnChar();
-        }
+        } else if (Pos.InCheck && Pos.GenerateMoves().Get().IsEmpty)
+            re[i++] = '#';
 
-        if (Pos.InCheck)
-        {
-            if (Pos.GenerateMoves().Get().IsEmpty)
-                re[i++] = '#';
-        } else if (GivesCheck(move))
+        if (GivesCheck(move))
             re[i++] = '+';
 
         return new string(re[..i]);

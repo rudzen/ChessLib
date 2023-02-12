@@ -103,11 +103,10 @@ public sealed class Game : IGame
         for (var i = 0; i < moves.Length; ++i)
         {
             var em = Unsafe.Add(ref movesSpace, i);
-            if (!Pos.IsLegal(em.Move))
-            {
-                gameEndType |= GameEndTypes.Pat;
-                break;
-            }
+            if (Pos.IsLegal(em.Move))
+                continue;
+            gameEndType |= GameEndTypes.Pat;
+            break;
         }
 
         GameEndType = gameEndType;

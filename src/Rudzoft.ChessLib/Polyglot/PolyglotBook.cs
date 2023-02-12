@@ -127,9 +127,6 @@ public sealed class PolyglotBook : IDisposable
         // bit 0- 5: destination square (from 0 to 63)
         // bit 6-11: origin square (from 0 to 63)
         // bit 12-14: promotion piece (from KNIGHT == 1 to QUEEN == 4)
-        //
-        // In case book move is a non-normal move, the move have to be converted. Castleling moves
-        // are especially converted to reflect castleling move format.
 
         Move move = polyMove;
 
@@ -153,10 +150,9 @@ public sealed class PolyglotBook : IDisposable
             .Where(m =>
             {
                 var type = move.MoveType();
-                if (m.IsPromotionMove())
-                    return type == MoveTypes.Promotion;
-                else
-                    return type != MoveTypes.Promotion;
+                return m.IsPromotionMove()
+                    ? type == MoveTypes.Promotion
+                    : type != MoveTypes.Promotion;
             })
             .Where(m => !IsInCheck(pos, m));
 

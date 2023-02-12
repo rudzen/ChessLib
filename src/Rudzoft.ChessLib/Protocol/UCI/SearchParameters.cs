@@ -37,14 +37,14 @@ namespace Rudzoft.ChessLib.Protocol.UCI;
 /// </summary>
 public sealed class SearchParameters : ISearchParameters, ISpanFormattable
 {
-    private readonly Clock _clock;
+    private readonly Clock[] _clock;
     private ulong _movesToGo;
     private ulong _moveTime;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public SearchParameters()
     {
-        _clock = new Clock(new ulong[Player.Count], new ulong[Player.Count]);
+        _clock = new Clock[Player.Count];
         SearchMoves = new List<Move>();
     }
 
@@ -104,39 +104,52 @@ public sealed class SearchParameters : ISearchParameters, ISpanFormattable
 
     public ulong WhiteTimeMilliseconds
     {
-        get => _clock.Time[Player.White.Side];
-        set => _clock.Time[Player.White.Side] = value;
+        get => _clock[Player.White.Side].Time;
+        set => _clock[Player.White.Side].Time = value;
     }
 
     public ulong BlackTimeMilliseconds
     {
-        get => _clock.Time[Player.Black.Side];
-        set => _clock.Time[Player.Black.Side] = value;
+        get => _clock[Player.Black.Side].Time;
+        set => _clock[Player.Black.Side].Time = value;
     }
 
     public ulong WhiteIncrementTimeMilliseconds
     {
-        get => _clock.Inc[Player.White.Side];
-        set => _clock.Inc[Player.White.Side] = value;
+        get => _clock[Player.White.Side].Inc;
+        set => _clock[Player.White.Side].Inc = value;
     }
 
     public ulong BlackIncrementTimeMilliseconds
     {
-        get => _clock.Inc[Player.Black.Side];
-        set => _clock.Inc[Player.Black.Side] = value;
+        get => _clock[Player.Black.Side].Inc;
+        set => _clock[Player.Black.Side].Inc = value;
     }
 
+    public ref Clock Clock(Player p)
+    {
+        return ref _clock[p.Side];
+    }
+
+    public bool UseTimeManagement()
+    {
+        return _clock[Player.White.Side].Time != 0 && _clock[Player.Black.Side].Time != 0;
+    }
+    
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public ulong Time(Player p) => _clock.Time[p.Side];
+    public ulong Time(Player p) => _clock[p.Side].Time;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public ulong Inc(Player p) => _clock.Inc[p.Side];
+    public ulong Inc(Player p) => _clock[p.Side].Inc;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Clear()
     {
-        Array.Clear(_clock.Time);
-        Array.Clear(_clock.Inc);
+        _clock[Player.White.Side].Time = ulong.MinValue;
+        _clock[Player.White.Side].Time = ulong.MinValue;
+        _clock[Player.Black.Side].Inc = ulong.MinValue;
+        _clock[Player.Black.Side].Inc = ulong.MinValue;
+        
         MoveTime = 0;
         Infinite = false;
     }
@@ -195,7 +208,7 @@ public sealed class SearchParameters : ISearchParameters, ISpanFormattable
         destination[index++] = 'm';
         destination[index++] = 'e';
         destination[index++] = ' ';
-        index = ParseValue(index, in _clock.Time[Player.White.Side], destination);
+        index = ParseValue(index, _clock[Player.White.Side].Time, destination);
 
         destination[index++] = ' ';
         destination[index++] = 'b';
@@ -204,7 +217,7 @@ public sealed class SearchParameters : ISearchParameters, ISpanFormattable
         destination[index++] = 'm';
         destination[index++] = 'e';
         destination[index++] = ' ';
-        index = ParseValue(index, in _clock.Time[Player.Black.Side], destination);
+        index = ParseValue(index, _clock[Player.Black.Side].Time, destination);
 
         if (MoveTime > ulong.MinValue)
         {
@@ -227,7 +240,7 @@ public sealed class SearchParameters : ISearchParameters, ISpanFormattable
         destination[index++] = 'n';
         destination[index++] = 'c';
         destination[index++] = ' ';
-        index = ParseValue(index, in _clock.Inc[Player.White.Side], destination);
+        index = ParseValue(index, _clock[Player.White.Side].Inc, destination);
 
         destination[index++] = ' ';
         destination[index++] = 'b';
@@ -236,7 +249,7 @@ public sealed class SearchParameters : ISearchParameters, ISpanFormattable
         destination[index++] = 'c';
         destination[index++] = ' ';
 
-        index = ParseValue(index, in _clock.Inc[Player.Black.Side], destination);
+        index = ParseValue(index, _clock[Player.Black.Side].Inc, destination);
 
         if (_movesToGo == ulong.MinValue)
         {

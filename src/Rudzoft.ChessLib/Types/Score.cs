@@ -63,6 +63,12 @@ public struct Score : IEquatable<Score>
         => _data = s._data;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Score Create(int mg, int eg) => new(mg, eg);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Score Create(in Vector2 v) => new(v);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator Score(int v)
         => new(v);
 

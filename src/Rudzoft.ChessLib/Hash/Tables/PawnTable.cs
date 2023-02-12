@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2022 Rudy Alex Kohn
+Copyright (c) 2017-2023 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -28,9 +28,8 @@ using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Hash.Tables;
 
-public struct PawnTableEntry
+public class PawnTableEntry : ITableEntry
 {
-    public ulong Key;
     public Score Score;
     public BitBoard[] PassedPawns;
 
@@ -40,8 +39,16 @@ public struct PawnTableEntry
         Score = Score.Zero;
         PassedPawns = new BitBoard[Player.Count];
     }
-}
 
-public sealed class PawnTable : HashTable<PawnTableEntry>
-{
+    public HashKey Key { get; set; }
+    
+    public Score Evaluate(IPosition pos)
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public Score Evaluate(IPosition pos, in BitBoard attacks, Player own)
+    {
+        throw new System.NotImplementedException();
+    }
 }

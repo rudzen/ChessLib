@@ -32,6 +32,8 @@ namespace Rudzoft.ChessLib.Protocol.UCI;
 
 public sealed class Option : IOption
 {
+    private static readonly string[] BoolStrings = { "false", "true" };
+    
     private string _currentValue;
 
     public Option()
@@ -56,7 +58,7 @@ public sealed class Option : IOption
         Min = Max = 0;
         Idx = indices;
         OnChange = func;
-        DefaultValue = _currentValue = v.ToString();
+        DefaultValue = _currentValue = BoolStrings[v.AsByte()];
     }
 
     public Option(string name, int indices, string v, Action<IOption> func = null)
@@ -82,9 +84,7 @@ public sealed class Option : IOption
 
     public static implicit operator bool(Option o)
     {
-        if (o.Type == UciOptionType.Check)
-            return bool.Parse(o._currentValue);
-        return false;
+        return o.Type == UciOptionType.Check && o.GetBool();
     }
 
     public string Name { get; set; }
@@ -121,7 +121,7 @@ public sealed class Option : IOption
     public bool GetBool()
     {
         var b = bool.TryParse(_currentValue, out var r);
-        return b ? r : b;
+        return b && r;
     }
 
     /// <summary>

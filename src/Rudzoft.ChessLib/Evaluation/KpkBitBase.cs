@@ -96,17 +96,17 @@ public static class KpkBitBase
     /// bit 15-17: white pawn RANK_7 - rank (from RANK_7 - RANK_7 to RANK_7 - RANK_2)
     /// </summary>
     /// <param name="stm"></param>
-    /// <param name="blackKsq"></param>
-    /// <param name="whiteKsq"></param>
-    /// <param name="pawnSq"></param>
+    /// <param name="weakKingSq"></param>
+    /// <param name="strongKsq"></param>
+    /// <param name="strongPawnSq"></param>
     /// <returns></returns>
-    private static int Index(Player stm, Square blackKsq, Square whiteKsq, Square pawnSq)
+    private static int Index(Player stm, Square weakKingSq, Square strongKsq, Square strongPawnSq)
     {
-        return whiteKsq.AsInt()
-               | (blackKsq.AsInt() << 6)
+        return strongKsq.AsInt()
+               | (weakKingSq.AsInt() << 6)
                | (stm << 12)
-               | (pawnSq.File.AsInt() << 13)
-               | ((Ranks.Rank7.AsInt() - pawnSq.Rank.AsInt()) << 15);
+               | (strongPawnSq.File.AsInt() << 13)
+               | ((Ranks.Rank7.AsInt() - strongPawnSq.Rank.AsInt()) << 15);
     }
 
     [Flags]
@@ -256,18 +256,29 @@ public static class KpkBitBase
     /// <summary>
     /// Probe with normalized squares and strong player
     /// </summary>
-    /// <param name="whiteKsq">"Strong" side king square</param>
-    /// <param name="pawnSq">"Strong" side pawn square</param>
-    /// <param name="blackKsq">"Weak" side king square</param>
+    /// <param name="strongKsq">"Strong" side king square</param>
+    /// <param name="strongPawnSq">"Strong" side pawn square</param>
+    /// <param name="weakKsq">"Weak" side king square</param>
     /// <param name="stm">strong side. fx strongSide == pos.SideToMove ? Player.White : Player.Black</param>
     /// <returns>true if strong side "won"</returns>
-    public static bool Probe(Square whiteKsq, Square pawnSq, Square blackKsq, Player stm)
+    public static bool Probe(Square strongKsq, Square strongPawnSq, Square weakKsq, Player stm)
     {
-        Debug.Assert(pawnSq.File <= File.FileD);
-
-        return KpKbb[Index(stm, blackKsq, whiteKsq, pawnSq)];
+        Debug.Assert(strongPawnSq.File <= File.FileD);
+        return KpKbb[Index(stm, weakKsq, strongKsq, strongPawnSq)];
     }
 
+    /// <summary>
+    /// </summary>
+    /// <param name="stngActive"></param>
+    /// <param name="skSq">White King</param>
+    /// <param name="wkSq">Black King</param>
+    /// <param name="spSq">White Pawn</param>
+    /// <returns></returns>
+    public static bool Probe(bool stngActive, Square skSq, Square wkSq, Square spSq)
+    {
+        return KpKbb[Index(stngActive, skSq, wkSq, spSq)];
+    }
+    
     public static bool IsDraw(IPosition pos)
     {
         return !Probe(

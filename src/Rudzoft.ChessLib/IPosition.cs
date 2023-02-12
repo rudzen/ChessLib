@@ -117,6 +117,14 @@ public interface IPosition : IEnumerable<Piece>
     BitBoard Pieces(PieceTypes pt, Player p);
 
     BitBoard Pieces(PieceTypes pt1, PieceTypes pt2, Player p);
+    
+    int PieceCount();
+
+    int PieceCount(Piece pc);
+
+    int PieceCount(PieceTypes pt);
+
+    int PieceCount(PieceTypes pt, Player p);
 
     BitBoard PawnsOnColor(Player p, Square sq);
 
@@ -180,7 +188,7 @@ public interface IPosition : IEnumerable<Piece>
 
     FenData GenerateFen();
 
-    void Set(in FenData fenData, ChessMode chessMode, State state, bool validate = false, int searcher = 0);
+    IPosition Set(in FenData fenData, ChessMode chessMode, State state, bool validate = false, int searcher = 0);
 
     HashKey GetPiecesKey();
 
@@ -200,5 +208,9 @@ public interface IPosition : IEnumerable<Piece>
 
     bool SeeGe(Move m, Value threshold);
 
+    Value NonPawnMaterial(Player p);
+    
+    Value NonPawnMaterial();
+    
     IPositionValidator Validate(PositionValidationTypes type = PositionValidationTypes.Basic);
 }

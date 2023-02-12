@@ -28,6 +28,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using Rudzoft.ChessLib.Extensions;
 using Rudzoft.ChessLib.Types;
 
@@ -176,14 +177,7 @@ public sealed class Board : IBoard
         => PieceCount(PieceTypes.AllPieces);
 
     public IEnumerator<Piece> GetEnumerator()
-    {
-        for (var i = 0; i < _pieces.Length; ++i)
-        {
-            var pc = _pieces[i];
-            if (pc != Piece.EmptyPiece)
-                yield return pc;
-        }
-    }
+        => _pieces.Where(static pc => pc != Piece.EmptyPiece).GetEnumerator();
 
     IEnumerator IEnumerable.GetEnumerator()
         => GetEnumerator();

@@ -953,6 +953,18 @@ public sealed class Position : IPosition
     public BitBoard Pieces(PieceTypes pt1, PieceTypes pt2, Player p)
         => Board.Pieces(p, pt1, pt2);
 
+    public int PieceCount()
+        => Board.PieceCount();
+
+    public int PieceCount(Piece pc)
+        => Board.PieceCount(pc.Type(), pc.ColorOf());
+
+    public int PieceCount(PieceTypes pt)
+        => Board.PieceCount(pt);
+
+    public int PieceCount(PieceTypes pt, Player p)
+        => Board.PieceCount(pt, p);
+
     public BitBoard PawnsOnColor(Player p, Square sq)
         => Pieces(PieceTypes.Pawn, p) & sq.Color().ColorBB();
 
@@ -1085,6 +1097,10 @@ public sealed class Position : IPosition
         return res > 0;
     }
 
+    public Value NonPawnMaterial(Player p) => State.NonPawnMaterial[p.Side];
+
+    public Value NonPawnMaterial() => State.NonPawnMaterial[0] - State.NonPawnMaterial[1];
+
     private void SetupPieces(ReadOnlySpan<char> fenChunk)
     {
         var f = 1; // file (column)
@@ -1177,7 +1193,7 @@ public sealed class Position : IPosition
     /// <param name="state">State reference to use. Allows to keep track of states if pre-created (i.e. in a stack) before engine search start</param>
     /// <param name="validate">If true, the fen should be validated, otherwise not</param>
     /// <param name="searcher">Searcher index, to help point to a specific search index in thread-based search array</param>
-    public void Set(in FenData fenData, ChessMode chessMode, State state, bool validate = false, int searcher = 0)
+    public IPosition Set(in FenData fenData, ChessMode chessMode, State state, bool validate = false, int searcher = 0)
     {
         if (validate)
             Fen.Fen.Validate(fenData.Fen.ToString());
@@ -1197,6 +1213,8 @@ public sealed class Position : IPosition
         ChessMode = chessMode;
 
         SetState();
+
+        return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1229,7 +1247,7 @@ public sealed class Position : IPosition
         }
 
         if (type == MoveTypes.Castling)
-            var (_, _) = DoCastleling(us, from, ref to, CastlePerform.Undo);
+            DoCastleling(us, from, ref to, CastlePerform.Undo);
         else
         {
             // Note: The parameters are reversed, since we move the piece "back"
