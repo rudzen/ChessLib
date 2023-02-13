@@ -3,7 +3,7 @@ Perft, a chess perft testing application
 
 MIT License
 
-Copyright (c) 2019-2022 Rudy Alex Kohn
+Copyright (c) 2019-2023 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,22 +24,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System;
+using System.Collections.Generic;
 
-namespace Rudzoft.Perft;
+namespace Rudzoft.Perft.Options;
 
-public interface IPerftResult
+public interface IOptionsFactory
 {
-    string Id { get; set; }
-    string Fen { get; set; }
-    int Depth { get; set; }
-    ulong Result { get; set; }
-    ulong CorrectResult { get; set; }
-    TimeSpan Elapsed { get; set; }
-    ulong Nps { get; set; }
-    ulong TableHits { get; set; }
-    bool Passed { get; set; }
-    int Errors { get; set; }
-
-    void Clear();
+    IEnumerable<PerftOption> Parse();
 }

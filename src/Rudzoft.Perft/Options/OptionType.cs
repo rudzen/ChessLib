@@ -3,7 +3,7 @@ Perft, a chess perft testing application
 
 MIT License
 
-Copyright (c) 2019-2022 Rudy Alex Kohn
+Copyright (c) 2019-2023 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,8 +24,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System;
-
 namespace Rudzoft.Perft.Options;
 
 [Flags]
@@ -35,4 +33,12 @@ public enum OptionType
     EdpOptions = 1,
     FenOptions = 2,
     TTOptions = 4
+}
+
+public static class OptionTypeExtensions
+{
+    public static bool HasFlagFast(this OptionType value, OptionType flag)
+    {
+        return (value & flag) != 0;
+    }
 }

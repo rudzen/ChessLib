@@ -37,3 +37,8 @@ public sealed class RootMove : List<Move>
     public static bool operator >(RootMove left, RootMove right)
         => left.NewValue < right.NewValue || left.NewValue == right.NewValue && left.OldValue < right.OldValue;
 }
+
+public sealed class RootMoves : List<RootMove>
+{
+    
+}

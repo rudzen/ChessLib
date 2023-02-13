@@ -24,16 +24,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using CommandLine;
+namespace Rudzoft.Perft.Host;
 
-namespace Rudzoft.Perft.Options;
-
-[Verb("tt", HelpText = "Configuration for transposition table")]
-public class TTOptions : IPerftOptions
-{
-    [Option('u', "use", Required = false, Default = true, HelpText = "Dis/En-able use of transposition table")]
-    public bool Use { get; set; }
-
-    [Option('s', "size", Required = false, Default = 32, HelpText = "Set the size of the transposition table in mb")]
-    public int Size { get; set; }
-}
+public record CommandLineArgs(string[] Args);

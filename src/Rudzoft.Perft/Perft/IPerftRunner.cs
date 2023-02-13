@@ -24,16 +24,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using CommandLine;
+using System.Threading;
+using System.Threading.Tasks;
+using Rudzoft.Perft.Options;
 
-namespace Rudzoft.Perft.Options;
+namespace Rudzoft.Perft.Perft;
 
-[Verb("tt", HelpText = "Configuration for transposition table")]
-public class TTOptions : IPerftOptions
+public interface IPerftRunner
 {
-    [Option('u', "use", Required = false, Default = true, HelpText = "Dis/En-able use of transposition table")]
-    public bool Use { get; set; }
+    bool SaveResults { get; set; }
+    IPerftOptions Options { get; set; }
+    IPerftOptions TranspositionTableOptions { get; set; }
 
-    [Option('s', "size", Required = false, Default = 32, HelpText = "Set the size of the transposition table in mb")]
-    public int Size { get; set; }
+    Task<int> Run(CancellationToken cancellationToken = default);
 }

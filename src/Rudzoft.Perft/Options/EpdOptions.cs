@@ -3,7 +3,7 @@ Perft, a chess perft testing application
 
 MIT License
 
-Copyright (c) 2019-2022 Rudy Alex Kohn
+Copyright (c) 2019-2023 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -30,7 +30,7 @@ using CommandLine;
 namespace Rudzoft.Perft.Options;
 
 [Verb("epd", HelpText = "Add parsing of an epd file containing perft information")]
-public sealed class EpdOptions : IOptions
+public sealed class EpdOptions : IPerftOptions
 {
     [Option('f', "files", Required = true, HelpText = "List of epd files to parse.")]
     public IEnumerable<string> Epds { get; set; }

@@ -3,7 +3,7 @@ Perft, a chess perft testing application
 
 MIT License
 
-Copyright (c) 2019-2022 Rudy Alex Kohn
+Copyright (c) 2019-2023 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -26,6 +26,8 @@ SOFTWARE.
 
 namespace Rudzoft.Perft.Options;
 
-public interface IOptions
+public record PerftOption(OptionType Type, IPerftOptions PerftOptions);
+
+public interface IPerftOptions
 {
 }

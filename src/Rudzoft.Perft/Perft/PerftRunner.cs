@@ -3,7 +3,7 @@ Perft, a chess perft testing application
 
 MIT License
 
-Copyright (c) 2019-2022 Rudy Alex Kohn
+Copyright (c) 2019-2023 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -34,10 +33,8 @@ using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using DryIoc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.ObjectPool;
-using Perft;
 using Rudzoft.ChessLib;
 using Rudzoft.ChessLib.Extensions;
 using Rudzoft.ChessLib.Perft;
@@ -48,7 +45,7 @@ using Rudzoft.Perft.Parsers;
 using Rudzoft.Perft.TimeStamp;
 using Serilog;
 
-namespace Rudzoft.Perft;
+namespace Rudzoft.Perft.Perft;
 
 public sealed class PerftRunner : IPerftRunner
 {
@@ -97,7 +94,6 @@ public sealed class PerftRunner : IPerftRunner
 
         _runners = new Func<CancellationToken, IAsyncEnumerable<PerftPosition>>[] { ParseEpd, ParseFen };
 
-        TranspositionTableOptions = Framework.IoC.Resolve<IOptions>(OptionType.TTOptions) as TTOptions;
         configuration.Bind("TranspositionTable", TranspositionTableOptions);
 
         _cpu = new CPU();
@@ -105,9 +101,9 @@ public sealed class PerftRunner : IPerftRunner
 
     public bool SaveResults { get; set; }
 
-    public IOptions Options { get; set; }
+    public IPerftOptions Options { get; set; }
 
-    public TTOptions TranspositionTableOptions { get; set; }
+    public IPerftOptions TranspositionTableOptions { get; set; }
 
     public Task<int> Run(CancellationToken cancellationToken = default) => InternalRun(cancellationToken);
 
@@ -117,8 +113,8 @@ public sealed class PerftRunner : IPerftRunner
 
         InternalRunArgumentCheck(Options);
 
-        if (TranspositionTableOptions.Use)
-            Game.Table.SetSize(TranspositionTableOptions.Size);
+        if (TranspositionTableOptions is TTOptions { Use: true } ttOptions)
+            Game.Table.SetSize(ttOptions.Size);
 
         var errors = 0;
         var runnerIndex = (Options is FenOptions).AsByte();
@@ -135,7 +131,7 @@ public sealed class PerftRunner : IPerftRunner
             try
             {
                 var result = await ComputePerft(cancellationToken).ConfigureAwait(false);
-                errors = result.Errors;
+                Interlocked.Add(ref errors, result.Errors);
                 if (errors != 0)
                     _log.Error("Parsing failed for Id={0}", position.Id);
                 _resultPool.Return(result);
@@ -143,7 +139,7 @@ public sealed class PerftRunner : IPerftRunner
             catch (AggregateException e)
             {
                 _log.Error(e.GetBaseException(), "Cancel requested.");
-                errors = 1;
+                Interlocked.Increment(ref errors);
                 break;
             }
         }
@@ -153,7 +149,7 @@ public sealed class PerftRunner : IPerftRunner
         return errors;
     }
 
-    private static void InternalRunArgumentCheck(IOptions options)
+    private static void InternalRunArgumentCheck(IPerftOptions options)
     {
         if (options == null)
             throw new ArgumentNullException(nameof(options), "Cannot be null");
@@ -237,7 +233,7 @@ public sealed class PerftRunner : IPerftRunner
 
             ComputeResults(perftResult, depth, expected, elapsedMs, result);
 
-            errors += await LogResults(result).ConfigureAwait(false);
+            errors += LogResults(result);
 
             if (baseFileName.IsNullOrEmpty())
                 continue;
@@ -284,41 +280,38 @@ public sealed class PerftRunner : IPerftRunner
         _log.Information("Initializing..");
     }
 
-    private Task<int> LogResults(IPerftResult result)
+    private int LogResults(IPerftResult result)
     {
-        return Task.Run(() =>
+        _log.Information("Time passed : {0}", result.Elapsed);
+        _log.Information("Nps         : {0}", result.Nps);
+        if (_usingEpd)
         {
-            _log.Information("Time passed : {0}", result.Elapsed);
-            _log.Information("Nps         : {0}", result.Nps);
-            if (_usingEpd)
+            _log.Information("Result      : {0} - should be {1}", result.Result, result.CorrectResult);
+            if (result.Result != result.CorrectResult)
             {
-                _log.Information("Result      : {0} - should be {1}", result.Result, result.CorrectResult);
-                if (result.Result != result.CorrectResult)
-                {
-                    var difference = (long)(result.CorrectResult - result.Result);
-                    _log.Information("Difference  : {0}", Math.Abs(difference));
-                }
+                var difference = (long)(result.CorrectResult - result.Result);
+                _log.Information("Difference  : {0}", Math.Abs(difference));
             }
-            else
-                _log.Information("Result      : {0}", result.Result);
+        }
+        else
+            _log.Information("Result      : {0}", result.Result);
 
-            _log.Information("TT hits     : {0}", Game.Table.Hits);
+        _log.Information("TT hits     : {0}", Game.Table.Hits);
 
-            var error = 0;
+        var error = 0;
 
-            if (!_usingEpd)
-                return error;
-
-            if (result.CorrectResult == result.Result)
-                _log.Information("Move count matches!");
-            else
-            {
-                _log.Error("Failed for position: {0}", _perft.CurrentGame.Pos.GenerateFen());
-                error = 1;
-            }
-
+        if (!_usingEpd)
             return error;
-        });
+
+        if (result.CorrectResult == result.Result)
+            _log.Information("Move count matches!");
+        else
+        {
+            _log.Error("Failed for position: {0}", _perft.CurrentGame.Pos.GenerateFen());
+            error = 1;
+        }
+
+        return error;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
