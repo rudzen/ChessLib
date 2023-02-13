@@ -43,7 +43,7 @@ public static class MoveGenerator
 
     public static int Generate(
         in IPosition pos,
-        Span<ExtMove> moves,
+        Span<ValMove> moves,
         int index,
         Player us,
         MoveGenerationType type)
@@ -72,7 +72,7 @@ public static class MoveGenerator
 
     private static int GenerateAll(
         in IPosition pos,
-        Span<ExtMove> moves,
+        Span<ValMove> moves,
         int index,
         in BitBoard target,
         Player us,
@@ -117,7 +117,7 @@ public static class MoveGenerator
     /// <returns></returns>
     private static int GenerateCapturesQuietsNonEvasions(
         in IPosition pos,
-        Span<ExtMove> moves,
+        Span<ValMove> moves,
         int index,
         Player us,
         MoveGenerationType type)
@@ -147,7 +147,7 @@ public static class MoveGenerator
     /// <returns></returns>
     private static int GenerateEvasions(
         in IPosition pos,
-        Span<ExtMove> moves,
+        Span<ValMove> moves,
         int index,
         Player us)
     {
@@ -193,7 +193,7 @@ public static class MoveGenerator
     /// <returns></returns>
     private static int GenerateLegal(
         in IPosition pos,
-        Span<ExtMove> moves,
+        Span<ValMove> moves,
         int index,
         Player us)
     {
@@ -230,7 +230,7 @@ public static class MoveGenerator
     /// <returns>The new move index</returns>
     private static int GenerateMoves(
         in IPosition pos,
-        Span<ExtMove> moves,
+        Span<ValMove> moves,
         int index,
         Player us,
         in BitBoard target,
@@ -272,7 +272,7 @@ public static class MoveGenerator
     /// <returns>The new move index</returns>
     private static int GeneratePawnMoves(
         in IPosition pos,
-        Span<ExtMove> moves,
+        Span<ValMove> moves,
         int index,
         in BitBoard target,
         Player us,
@@ -436,7 +436,7 @@ public static class MoveGenerator
     /// <returns></returns>
     private static int GenerateQuietChecks(
         in IPosition pos,
-        Span<ExtMove> moves,
+        Span<ValMove> moves,
         int index,
         Player us)
     {
@@ -476,7 +476,7 @@ public static class MoveGenerator
     /// <param name="type"></param>
     /// <returns></returns>
     private static int MakePromotions(
-        Span<ExtMove> moves,
+        Span<ValMove> moves,
         int index,
         Square to,
         Square ksq,

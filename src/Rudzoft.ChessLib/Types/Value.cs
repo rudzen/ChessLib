@@ -33,26 +33,26 @@ namespace Rudzoft.ChessLib.Types;
 /// </summary>
 public readonly struct Value : IEquatable<Value>
 {
-    public readonly PieceValues Raw;
+    public readonly DefaultPieceValues Raw;
 
     public Value(Value value)
         : this(value.Raw) { }
 
     public Value(int value)
-        : this((PieceValues)value) { }
+        : this((DefaultPieceValues)value) { }
 
-    private Value(PieceValues value) => Raw = value;
+    private Value(DefaultPieceValues value) => Raw = value;
 
-    public static Value ValueZero { get; } = new(PieceValues.ValueZero);
+    public static Value ValueZero { get; } = new(DefaultPieceValues.ValueZero);
 
-    public static Value Infinite { get; } = new(PieceValues.ValueInfinite);
+    public static Value Infinite { get; } = new(DefaultPieceValues.ValueInfinite);
 
-    public static Value MinusInfinite { get; } = new(PieceValues.ValueMinusInfinite);
+    public static Value MinusInfinite { get; } = new(DefaultPieceValues.ValueMinusInfinite);
 
     public static implicit operator Value(int value)
         => new(value);
 
-    public static implicit operator Value(PieceValues value)
+    public static implicit operator Value(DefaultPieceValues value)
         => new(value);
 
     public static bool operator ==(Value left, Value right)
@@ -67,7 +67,7 @@ public readonly struct Value : IEquatable<Value>
     public static Value operator +(Value left, int right)
         => new((int)left.Raw + right);
 
-    public static Value operator +(Value left, PieceValues right)
+    public static Value operator +(Value left, DefaultPieceValues right)
         => new((int)left.Raw + (int)right);
 
     public static Value operator +(int left, Value right)
@@ -79,10 +79,10 @@ public readonly struct Value : IEquatable<Value>
     public static Value operator -(Value left, int right)
         => new((int)left.Raw - right);
 
-    public static Value operator -(PieceValues left, Value right)
+    public static Value operator -(DefaultPieceValues left, Value right)
         => new((int)left - right.Raw);
 
-    public static Value operator -(Value left, PieceValues right)
+    public static Value operator -(Value left, DefaultPieceValues right)
         => new(left.Raw - (int)right);
 
     public static Value operator -(int left, Value right)
@@ -97,6 +97,9 @@ public readonly struct Value : IEquatable<Value>
     public static Value operator *(Value left, int right)
         => new((int)left.Raw * right);
 
+    public static Value operator *(int left, Value right)
+        => new(left * right.Raw.AsInt());
+
     public static bool operator >(Value left, Value right)
         => left.Raw > right.Raw;
 
@@ -109,16 +112,16 @@ public readonly struct Value : IEquatable<Value>
     public static bool operator >=(Value left, Value right)
         => left.Raw >= right.Raw;
 
-    public static bool operator >(Value left, PieceValues right)
+    public static bool operator >(Value left, DefaultPieceValues right)
         => left.Raw > right;
 
-    public static bool operator <(Value left, PieceValues right)
+    public static bool operator <(Value left, DefaultPieceValues right)
         => left.Raw < right;
 
-    public static bool operator <=(Value left, PieceValues right)
+    public static bool operator <=(Value left, DefaultPieceValues right)
         => left.Raw <= right;
 
-    public static bool operator >=(Value left, PieceValues right)
+    public static bool operator >=(Value left, DefaultPieceValues right)
         => left.Raw >= right;
 
     public static bool operator true(Value value)

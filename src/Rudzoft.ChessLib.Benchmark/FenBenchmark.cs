@@ -19,7 +19,7 @@ public class FenBenchmark
     public void Setup()
     {
         var board = new Board();
-        var pieceValue = new PieceValue();
+        var pieceValue = new Values();
         var pos = new Position(board, pieceValue);
         _game = new Game(pos);
         var fp = new FenData(F);

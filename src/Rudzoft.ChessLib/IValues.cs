@@ -29,7 +29,7 @@ using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib;
 
-public interface IPieceValue
+public interface IValues
 {
     Value MaxValueWithoutPawns { get; }
     Value MaxValue { get; }
@@ -72,7 +72,7 @@ public interface IPieceValue
 
     void SetDefaults();
 
-    void SetPieceValues(PieceValues[] values, Phases phase);
+    void SetPieceValues(DefaultPieceValues[] values, Phases phase);
 
-    PieceValues GetPieceValue(Piece pc, Phases phase);
+    DefaultPieceValues GetPieceValue(Piece pc, Phases phase);
 }

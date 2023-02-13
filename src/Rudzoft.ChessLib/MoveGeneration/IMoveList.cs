@@ -31,13 +31,13 @@ using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.MoveGeneration;
 
-public interface IMoveList : IReadOnlyCollection<ExtMove>
+public interface IMoveList : IReadOnlyCollection<ValMove>
 {
-    ExtMove this[int index] { get; set; }
+    ValMove this[int index] { get; set; }
 
     int Length { get; }
     Move CurrentMove { get; }
-    void Add(in ExtMove item);
+    void Add(in ValMove item);
     void Add(Move item);
 
     /// <summary>
@@ -45,9 +45,9 @@ public interface IMoveList : IReadOnlyCollection<ExtMove>
     /// </summary>
     void Clear();
 
-    bool Contains(in ExtMove item);
+    bool Contains(in ValMove item);
     bool Contains(Move item);
     bool Contains(Square from, Square to);
     void Generate(in IPosition pos, MoveGenerationType type = MoveGenerationType.Legal);
-    ReadOnlySpan<ExtMove> Get();
+    ReadOnlySpan<ValMove> Get();
 }

@@ -34,7 +34,7 @@ public sealed class PositionTests
     [Fact]
     public void AddPieceTest()
     {
-        var pieceValue = new PieceValue();
+        var pieceValue = new Values();
         var board = new Board();
         var position = new Position(board, pieceValue);
 

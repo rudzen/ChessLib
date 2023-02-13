@@ -36,12 +36,12 @@ namespace Rudzoft.ChessLib.MoveGeneration;
 
 public sealed class MoveList : IMoveList
 {
-    private readonly ExtMove[] _moves;
+    private readonly ValMove[] _moves;
     private int _cur;
 
-    public MoveList() => _moves = new ExtMove[218];
+    public MoveList() => _moves = new ValMove[218];
 
-    int IReadOnlyCollection<ExtMove>.Count => Length;
+    int IReadOnlyCollection<ValMove>.Count => Length;
 
     public int Length { get; private set; }
 
@@ -54,14 +54,14 @@ public sealed class MoveList : IMoveList
         return moveList;
     }
 
-    public ExtMove this[int index]
+    public ValMove this[int index]
     {
         get => _moves[index];
         set => _moves[index] = value;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void Add(in ExtMove item) => _moves[Length++] = item;
+    public void Add(in ValMove item) => _moves[Length++] = item;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Add(Move item) => _moves[Length++].Move = item;
@@ -74,11 +74,11 @@ public sealed class MoveList : IMoveList
     public void Clear()
     {
         _cur = Length = 0;
-        _moves[0] = ExtMove.Empty;
+        _moves[0] = ValMove.Empty;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool Contains(in ExtMove item)
+    public bool Contains(in ValMove item)
         => Contains(item.Move);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -109,24 +109,24 @@ public sealed class MoveList : IMoveList
     {
         _cur = 0;
         Length = MoveGenerator.Generate(in pos, _moves.AsSpan(), 0, pos.SideToMove, type);
-        _moves[Length] = ExtMove.Empty;
+        _moves[Length] = ValMove.Empty;
     }
 
     [SkipLocalsInit]
     public static int GenerateMoveCount(in IPosition pos, MoveGenerationType type = MoveGenerationType.Legal)
     {
-        Span<ExtMove> moves = stackalloc ExtMove[218];
+        Span<ValMove> moves = stackalloc ValMove[218];
         return MoveGenerator.Generate(in pos, moves, 0, pos.SideToMove, type);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public ReadOnlySpan<ExtMove> Get() =>
+    public ReadOnlySpan<ValMove> Get() =>
         Length == 0
-            ? ReadOnlySpan<ExtMove>.Empty
+            ? ReadOnlySpan<ValMove>.Empty
             : _moves.AsSpan()[..Length];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public IEnumerator<ExtMove> GetEnumerator()
+    public IEnumerator<ValMove> GetEnumerator()
         => _moves.Take(Length).GetEnumerator();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

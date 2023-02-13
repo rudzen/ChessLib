@@ -41,7 +41,7 @@ public sealed class IccfTests
         const string expectedPrimary = "4263";
 
         var board = new Board();
-        var pieceValue = new PieceValue();
+        var pieceValue = new Values();
         var pos = new Position(board, pieceValue);
         var g = GameFactory.Create(pos);
         g.NewGame(fen);
@@ -65,7 +65,7 @@ public sealed class IccfTests
         const MoveNotations notation = MoveNotations.ICCF;
 
         var board = new Board();
-        var pieceValue = new PieceValue();
+        var pieceValue = new Values();
         var pos = new Position(board, pieceValue);
         var g = GameFactory.Create(pos);
         g.NewGame(fen);

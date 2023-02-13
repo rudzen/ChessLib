@@ -48,7 +48,7 @@ public static class MoveTypesExtensions
 /// Move struct. Contains a single ushort for move related information. Also includes set and
 /// get functions for the relevant data stored in the bits.
 /// </summary>
-public record struct Move(ushort Data) : ISpanFormattable
+public readonly record struct Move(ushort Data) : ISpanFormattable
 {
     private const int MaxMoveStringSize = 5;
 
@@ -83,8 +83,8 @@ public record struct Move(ushort Data) : ISpanFormattable
         => new(new Square(value[1] - '1', value[0] - 'a'), new Square(value[3] - '1', value[2] - 'a'));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator Move(ExtMove extMove)
-        => extMove.Move;
+    public static implicit operator Move(ValMove valMove)
+        => valMove.Move;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator Move(ushort value)
@@ -95,7 +95,7 @@ public record struct Move(ushort Data) : ISpanFormattable
         => new(from, to);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static int Create(Span<ExtMove> moves, int index, Square from, ref BitBoard to)
+    public static int Create(Span<ValMove> moves, int index, Square from, ref BitBoard to)
     {
         while (to)
             moves[index++].Move = Create(from, BitBoards.PopLsb(ref to));

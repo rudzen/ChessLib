@@ -39,7 +39,7 @@ public sealed class MoveGen_49
         const string fen = "r3kb1r/p3pppp/p1n2n2/2pp1Q2/3P1B2/2P1PN2/Pq3PPP/RN2K2R w KQkq - 0 9";
 
         var board = new Board();
-        var pieceValue = new PieceValue();
+        var pieceValue = new Values();
         var pos = new Position(board, pieceValue);
         var fd = new FenData(fen);
         var state = new State();

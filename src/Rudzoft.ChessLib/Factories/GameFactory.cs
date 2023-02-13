@@ -43,5 +43,5 @@ public static class GameFactory
     }
 
     public static IGame Create()
-        => new Game(new Position(new Board(), new PieceValue()));
+        => new Game(new Position(new Board(), new Values()));
 }

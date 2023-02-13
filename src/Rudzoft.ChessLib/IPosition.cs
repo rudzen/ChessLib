@@ -50,7 +50,7 @@ public interface IPosition : IEnumerable<Piece>
 
     IBoard Board { get; }
 
-    IPieceValue PieceValue { get; }
+    IValues Values { get; }
 
     BitBoard Checkers { get; }
 

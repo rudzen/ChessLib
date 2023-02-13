@@ -30,45 +30,45 @@ using System.Runtime.CompilerServices;
 namespace Rudzoft.ChessLib.Types;
 
 /// <summary>
-/// Extended move structure which combines Move and Score
+/// Value based move structure which combines move and a simple move ordering score
 /// </summary>
-public struct ExtMove : IEquatable<ExtMove>, IComparable<ExtMove>
+public struct ValMove : IEquatable<ValMove>, IComparable<ValMove>
 {
-    public static readonly ExtMove Empty = new();
+    public static readonly ValMove Empty = new();
 
     public Move Move { get; set; }
 
     public int Score { get; set; }
 
-    private ExtMove(Move m, int s)
+    private ValMove(Move m, int s)
     {
         Move = m;
         Score = s;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator ExtMove(Move m)
+    public static implicit operator ValMove(Move m)
         => new(m, 0);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator ExtMove(int s)
+    public static implicit operator ValMove(int s)
         => new(Move.EmptyMove, s);
 
-    public static bool operator !=(ExtMove left, ExtMove right)
-        => !(left == right);
+    public static bool operator !=(ValMove left, ValMove right)
+        => !(left.Move == right.Move);
 
-    public static bool operator ==(ExtMove left, ExtMove right)
-        => left.Equals(right);
-
-    public bool Equals(ExtMove other)
-        => Move.Equals(other.Move);
-
-    public readonly int CompareTo(ExtMove other)
-        => other.Score.CompareTo(Score);
+    public static bool operator ==(ValMove left, ValMove right)
+        => left.Move == right.Move;
 
     public override bool Equals(object obj)
-        => obj is ExtMove other && Equals(other);
+        => obj is ValMove other && Equals(other);
 
+    public bool Equals(ValMove other)
+        => Move.Equals(other.Move);
+
+    public readonly int CompareTo(ValMove other)
+        => other.Score.CompareTo(Score);
+    
     public readonly override int GetHashCode()
         => Move.GetHashCode();
 

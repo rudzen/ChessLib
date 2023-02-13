@@ -108,4 +108,8 @@ public static class MathExtensions
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static long MidPoint(this long @this, long that)
         => (@this + that) >> 1;
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Value Min(this Value @this, Value other)
+        => @this < other ? @this : other;
 }

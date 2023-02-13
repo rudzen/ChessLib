@@ -63,7 +63,7 @@ public sealed class PieceAttacksRookTests : PieceAttacks
 
         // just to get the attacks
         var board = new Board();
-        var pieceValue = new PieceValue();
+        var pieceValue = new Values();
         var pos = new Position(board, pieceValue);
 
         while (border)

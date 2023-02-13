@@ -31,7 +31,7 @@ using Rudzoft.ChessLib.Enums;
 
 namespace Rudzoft.ChessLib.Types;
 
-public enum PieceValues
+public enum DefaultPieceValues
 {
     ValueZero = 0,
     ValueDraw = 0,
@@ -41,8 +41,8 @@ public enum PieceValues
     ValueMinusInfinite = -32001,
     ValueNone = 32002,
 
-    ValueMateInMaxPly = ValueMate - 2 * PieceValue.MAX_PLY,
-    ValueMatedInMaxPly = -ValueMate + 2 * PieceValue.MAX_PLY,
+    ValueMateInMaxPly = ValueMate - 2 * Values.MAX_PLY,
+    ValueMatedInMaxPly = -ValueMate + 2 * Values.MAX_PLY,
 
     PawnValueMg = 128,
     PawnValueEg = 213,
@@ -62,32 +62,32 @@ public enum PieceValues
 public static class PieceValuesExtensions
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static int AsInt(this PieceValues @this) => (int)@this;
+    public static int AsInt(this DefaultPieceValues @this) => (int)@this;
 }
 
-public sealed class PieceValue : IPieceValue
+public sealed class Values : IValues
 {
     public const int MAX_PLY = 246;
 
-    private readonly PieceValues[][] _defaults;
+    private readonly DefaultPieceValues[][] _defaults;
 
     private Value _valueMateInMaxPly;
     private Value _valueMatedInMaxPly;
     private Value _valueMate;
 
-    public PieceValue()
+    public Values()
     {
-        _defaults = new PieceValues[2][];
+        _defaults = new DefaultPieceValues[2][];
         for (var index = 0; index < _defaults.Length; index++)
-            _defaults[index] = new PieceValues[6];
+            _defaults[index] = new DefaultPieceValues[6];
 
-        _defaults[0] = new[] { PieceValues.ValueZero, PieceValues.PawnValueMg, PieceValues.KnightValueMg, PieceValues.BishopValueMg, PieceValues.RookValueMg, PieceValues.QueenValueMg };
-        _defaults[1] = new[] { PieceValues.ValueZero, PieceValues.PawnValueEg, PieceValues.KnightValueEg, PieceValues.BishopValueEg, PieceValues.RookValueEg, PieceValues.QueenValueEg };
+        _defaults[0] = new[] { DefaultPieceValues.ValueZero, DefaultPieceValues.PawnValueMg, DefaultPieceValues.KnightValueMg, DefaultPieceValues.BishopValueMg, DefaultPieceValues.RookValueMg, DefaultPieceValues.QueenValueMg };
+        _defaults[1] = new[] { DefaultPieceValues.ValueZero, DefaultPieceValues.PawnValueEg, DefaultPieceValues.KnightValueEg, DefaultPieceValues.BishopValueEg, DefaultPieceValues.RookValueEg, DefaultPieceValues.QueenValueEg };
 
         SetDefaults();
     }
 
-    public PieceValues[][] Values { get; set; }
+    public DefaultPieceValues[][] PieceValues { get; set; }
 
     public Value MaxValueWithoutPawns { get; private set; }
 
@@ -145,9 +145,9 @@ public sealed class PieceValue : IPieceValue
 
     public void SetDefaults()
     {
-        Values = new PieceValues[2][];
-        for (var index = 0; index < Values.Length; index++)
-            Values[index] = new PieceValues[6];
+        PieceValues = new DefaultPieceValues[2][];
+        for (var index = 0; index < PieceValues.Length; index++)
+            PieceValues[index] = new DefaultPieceValues[6];
 
         Span<Phases> phases = stackalloc Phases[] { Phases.Mg, Phases.Eg };
 
@@ -161,7 +161,7 @@ public sealed class PieceValue : IPieceValue
 
         foreach (var pt in pieceTypes)
         {
-            var value = new Value(Values[0][pt.AsInt()]);
+            var value = new Value(PieceValues[0][pt.AsInt()]);
             switch (pt)
             {
                 case PieceTypes.Pawn:
@@ -194,12 +194,12 @@ public sealed class PieceValue : IPieceValue
         QueenValueEg = GetPieceValue(PieceTypes.Queen, Phases.Eg);
     }
 
-    public void SetPieceValues(PieceValues[] values, Phases phase)
-        => Array.Copy(values, Values[phase.AsInt()], values.Length);
+    public void SetPieceValues(DefaultPieceValues[] values, Phases phase)
+        => Array.Copy(values, PieceValues[phase.AsInt()], values.Length);
 
-    public PieceValues GetPieceValue(Piece pc, Phases phase)
-        => Values[(int)phase][pc.Type().AsInt()];
+    public DefaultPieceValues GetPieceValue(Piece pc, Phases phase)
+        => PieceValues[(int)phase][pc.Type().AsInt()];
 
-    public PieceValues GetPieceValue(PieceTypes pt, Phases phase)
-        => Values[phase.AsInt()][pt.AsInt()];
+    public DefaultPieceValues GetPieceValue(PieceTypes pt, Phases phase)
+        => PieceValues[phase.AsInt()][pt.AsInt()];
 }

@@ -14,7 +14,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddTransient<IMoveGeneratorService, MoveGeneratorService>();
 builder.Services.AddTransient<IPosition, Position>();
 builder.Services.AddTransient<IBoard, Board>();
-builder.Services.AddSingleton<IPieceValue, PieceValue>();
+builder.Services.AddSingleton<IValues, Values>();
 builder.Services.AddTransient<IGame, Game>();
 
 var app = builder.Build();

@@ -57,10 +57,10 @@ public sealed class Position : IPosition
     private readonly IPositionValidator _positionValidator;
     private Player _sideToMove;
 
-    public Position(IBoard board, IPieceValue pieceValues)
+    public Position(IBoard board, IValues valueses)
     {
         Board = board;
-        PieceValue = pieceValues;
+        Values = valueses;
         State = default;
         _outputObjectPool = new DefaultObjectPool<StringBuilder>(new StringBuilderPooledObjectPolicy());
         _positionValidator = new PositionValidator(this, Board);
@@ -102,7 +102,7 @@ public sealed class Position : IPosition
     /// </summary>
     public Action<IPieceSquare> PieceUpdated { get; set; }
 
-    public IPieceValue PieceValue { get; }
+    public IValues Values { get; }
 
     public int Ply { get; private set; }
 
@@ -740,7 +740,7 @@ public sealed class Position : IPosition
             }
             else
             {
-                State.NonPawnMaterial[them.Side] -= PieceValue.GetPieceValue(capturedPiece, Phases.Mg);
+                State.NonPawnMaterial[them.Side] -= Values.GetPieceValue(capturedPiece, Phases.Mg);
                 // TODO : Update material here
             }
 
@@ -804,7 +804,7 @@ public sealed class Position : IPosition
                 k ^= pc.GetZobristPst(to) ^ promotionPiece.GetZobristPst(to);
                 State.PawnStructureKey ^= pc.GetZobristPst(to);
 
-                State.NonPawnMaterial[us.Side] += PieceValue.GetPieceValue(promotionPiece, Phases.Mg);
+                State.NonPawnMaterial[us.Side] += Values.GetPieceValue(promotionPiece, Phases.Mg);
             }
 
             // Update pawn hash key
@@ -1003,11 +1003,11 @@ public sealed class Position : IPosition
 
         var (from, to) = m;
 
-        var swap = PieceValue.GetPieceValue(GetPiece(to), Phases.Mg) - threshold;
+        var swap = Values.GetPieceValue(GetPiece(to), Phases.Mg) - threshold;
         if (swap < Value.ValueZero)
             return false;
 
-        swap = PieceValue.GetPieceValue(GetPiece(from), Phases.Mg) - swap;
+        swap = Values.GetPieceValue(GetPiece(from), Phases.Mg) - swap;
         if (swap <= Value.ValueZero)
             return true;
 
@@ -1041,7 +1041,7 @@ public sealed class Position : IPosition
             var bb = stmAttackers & Board.Pieces(PieceTypes.Pawn);
             if (!bb.IsEmpty)
             {
-                if ((swap = PieceValue.PawnValueMg - swap) < res)
+                if ((swap = Values.PawnValueMg - swap) < res)
                     break;
 
                 occupied ^= bb.Lsb();
@@ -1050,14 +1050,14 @@ public sealed class Position : IPosition
             }
             else if (!(bb = stmAttackers & Board.Pieces(PieceTypes.Knight)).IsEmpty)
             {
-                if ((swap = PieceValue.KnightValueMg - swap) < res)
+                if ((swap = Values.KnightValueMg - swap) < res)
                     break;
 
                 occupied ^= bb.Lsb();
             }
             else if (!(bb = stmAttackers & Board.Pieces(PieceTypes.Bishop)).IsEmpty)
             {
-                if ((swap = PieceValue.BishopValueMg - swap) < res)
+                if ((swap = Values.BishopValueMg - swap) < res)
                     break;
 
                 occupied ^= bb.Lsb();
@@ -1066,7 +1066,7 @@ public sealed class Position : IPosition
             }
             else if (!(bb = stmAttackers & Board.Pieces(PieceTypes.Rook)).IsEmpty)
             {
-                if ((swap = PieceValue.RookValueMg - swap) < res)
+                if ((swap = Values.RookValueMg - swap) < res)
                     break;
 
                 occupied ^= bb.Lsb();
@@ -1075,7 +1075,7 @@ public sealed class Position : IPosition
             }
             else if (!(bb = stmAttackers & Board.Pieces(PieceTypes.Queen)).IsEmpty)
             {
-                if ((swap = PieceValue.QueenValueMg - swap) < res)
+                if ((swap = Values.QueenValueMg - swap) < res)
                     break;
 
                 occupied ^= bb.Lsb();
@@ -1463,7 +1463,7 @@ public sealed class Position : IPosition
             if (pt == PieceTypes.Pawn)
                 pawnKey ^= pc.GetZobristPst(sq);
             else if (pt != PieceTypes.King)
-                State.NonPawnMaterial[pc.ColorOf().Side] += PieceValue.GetPieceValue(pc, Phases.Mg);
+                State.NonPawnMaterial[pc.ColorOf().Side] += Values.GetPieceValue(pc, Phases.Mg);
         }
 
         if (State.EnPassantSquare != Square.None)
