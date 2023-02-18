@@ -34,7 +34,7 @@ namespace Rudzoft.ChessLib.Types;
 public enum DefaultPieceValues
 {
     ValueZero = 0,
-    ValueDraw = 0,
+    ValueDraw = ValueZero,
     ValueKnownWin = 10000,
     ValueMate = 32000,
     ValueInfinite = 32001,

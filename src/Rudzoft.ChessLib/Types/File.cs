@@ -65,7 +65,7 @@ public readonly record struct File(Files Value) : IComparable<File>, ISpanFormat
     public static File FileF { get; } = new(Files.FileF);
     public static File FileG { get; } = new(Files.FileG);
     public static File FileH { get; } = new(Files.FileH);
-    public static File[] AllFiles { get; } = new[] { FileA, FileB, FileC, FileD, FileE, FileF, FileG, FileH };
+    public static File[] AllFiles { get; } = { FileA, FileB, FileC, FileD, FileE, FileF, FileG, FileH };
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public File(int file)

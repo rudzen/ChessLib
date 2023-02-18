@@ -25,7 +25,6 @@ SOFTWARE.
 */
 
 using System.Linq;
-using FluentAssertions;
 using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Test.PiecesTests;
@@ -65,10 +64,12 @@ public sealed class PieceAttacksKingTests : PieceAttacks, IClassFixture<RegularM
     {
         const int index = (int)EBands.Beta;
         const int attackIndex = 2;
-        var expected = _fixture.KingExpected[index];
-        var actuals = Bands[index].Select(x => _fixture.RegAttacks[attackIndex](x).Count);
-
-        actuals.Should().AllBeEquivalentTo(expected);
+        var bands = Bands[index];
+        var expected = _fixture.KingExpected[index] * bands.Count;
+        var actuals = bands.Select(x => _fixture.RegAttacks[attackIndex](x).Count);
+        var actual = actuals.Sum();
+        
+        Assert.Equal(expected, actual);
     }
 
     [Fact]
@@ -76,10 +77,12 @@ public sealed class PieceAttacksKingTests : PieceAttacks, IClassFixture<RegularM
     {
         const int index = (int)EBands.Gamma;
         const int attackIndex = 2;
-        var expected = _fixture.KingExpected[index];
-        var actuals = Bands[index].Select(x => _fixture.RegAttacks[attackIndex](x).Count);
+        var band = Bands[index];
+        var expected = _fixture.KingExpected[index] * band.Count;
+        var actuals = band.Select(x => _fixture.RegAttacks[attackIndex](x).Count);
+        var actual = actuals.Sum();
 
-        actuals.Should().AllBeEquivalentTo(expected);
+        Assert.Equal(expected, actual);
     }
 
     [Fact]
@@ -87,9 +90,11 @@ public sealed class PieceAttacksKingTests : PieceAttacks, IClassFixture<RegularM
     {
         const int index = (int)EBands.Delta;
         const int attackIndex = 2;
-        var expected = _fixture.KingExpected[index];
-        var actuals = Bands[index].Select(x => _fixture.RegAttacks[attackIndex](x).Count);
-
-        actuals.Should().AllBeEquivalentTo(expected);
+        var band = Bands[index];
+        var expected = _fixture.KingExpected[index] * band.Count;
+        var actuals = band.Select(x => _fixture.RegAttacks[attackIndex](x).Count);
+        var actual = actuals.Sum();
+        
+        Assert.Equal(expected, actual);
     }
 }

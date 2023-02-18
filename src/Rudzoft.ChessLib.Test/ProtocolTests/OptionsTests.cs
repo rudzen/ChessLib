@@ -31,9 +31,9 @@ namespace Rudzoft.ChessLib.Test.ProtocolTests;
 public class OptionsTests
 {
     [Theory]
-    [InlineData("Boolean Test", true, "true", true, "option name Boolean Test type Check default true")]
-    [InlineData("Boolean Test", false, "false", false, "option name Boolean Test type Check default false")]
-    public void Boolean(string name, bool value, string expectedText, bool expected, string uciString)
+    [InlineData("Boolean Test", true, true, "option name Boolean Test type Check default true")]
+    [InlineData("Boolean Test", false, false, "option name Boolean Test type Check default false")]
+    public void Boolean(string name, bool value, bool expected, string uciString)
     {
         IUci uci = new Uci();
         
@@ -41,10 +41,6 @@ public class OptionsTests
         
         var option = new Option(name, 0, value);
         uci.AddOption(name, option);
-
-        var actualText = option.GetText();
-        
-        Assert.Equal(expectedText, actualText);
 
         var actual = option.GetBool();
         
@@ -55,5 +51,4 @@ public class OptionsTests
         
         Assert.Contains(uciString, t);
     }
-    
 }

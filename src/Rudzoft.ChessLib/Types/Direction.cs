@@ -47,8 +47,6 @@ public enum Directions
     SouthFill = -NorthFill
 }
 
-public record struct BiDirection(Direction One, Direction Two);
-
 public readonly record struct Direction(Directions Value)
 {
     public static Direction North { get; } = new(Directions.North);

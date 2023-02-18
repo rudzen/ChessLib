@@ -52,7 +52,7 @@ public class PerftServiceProviderFactory : IServiceProviderFactory<Container>
         var configBuilder = ConfigurationBuilder();
         var configuration = ConfigurationFactory.CreateConfiguration(configBuilder);
         
-        var container = new Container(Rules.MicrosoftDependencyInjectionRules.WithConcreteTypeDynamicRegistrations(reuse: Reuse.Transient));
+        var container = new Container(Rules.MicrosoftDependencyInjectionRules);
         
         // Construct a configuration binding
         container.RegisterInstance(configuration);

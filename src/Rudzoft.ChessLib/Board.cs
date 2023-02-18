@@ -69,7 +69,7 @@ public sealed class Board : IBoard
     {
         Array.Fill(_pieces, Piece.EmptyPiece);
         _bySide[0] = _bySide[1] = BitBoard.Empty;
-        _byType.Fill(in BitBoard.Empty);
+        _byType.Fill(in _bySide[0]);
         Array.Fill(_pieceCount, 0);
         foreach (var s in _pieceList)
             Array.Fill(s, Types.Square.None);

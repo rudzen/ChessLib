@@ -40,7 +40,7 @@ public enum Depths
     QsRecap = -5,
     None = -6,
     Offset = None - 1,
-    MaxPly = 256 + Offset - 4, // Used only for TT entry occupancy check
+    MaxPly = 256 + Offset - 4 // Used only for TT entry occupancy check
 }
 
 public static class DepthsExtensions

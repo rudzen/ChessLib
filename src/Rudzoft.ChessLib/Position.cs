@@ -1476,7 +1476,7 @@ public sealed class Position : IPosition
 
         var materialKey = HashKey.Empty;
         ref var piecesSpace = ref MemoryMarshal.GetArrayDataReference(Piece.AllPieces);
-        for (int i = 0; i < Piece.AllPieces.Length; i++)
+        for (var i = 0; i < Piece.AllPieces.Length; i++)
         {
             var pc = Unsafe.Add(ref piecesSpace, i);
             for (var cnt = 0; cnt < Board.PieceCount(pc); ++cnt)

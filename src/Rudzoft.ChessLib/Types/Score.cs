@@ -143,4 +143,9 @@ public struct Score : IEquatable<Score>
 
     public static bool operator !=(Score left, Score right)
         => !(left == right);
+
+    public Score Negate()
+    {
+        return -_data;
+    }
 }

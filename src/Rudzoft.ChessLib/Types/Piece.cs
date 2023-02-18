@@ -110,7 +110,6 @@ public readonly record struct Piece(Pieces Value)
     public static Piece BlackQueen { get; } = new(Pieces.BlackQueen);
     public static Piece BlackKing { get; } = new(Pieces.BlackKing);
 
-
     public static Piece[] AllPieces { get; } =
     {
         Pieces.WhitePawn,
