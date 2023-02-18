@@ -34,7 +34,7 @@ public sealed class KillerMoves : IKillerMoves
 {
     private static readonly PieceSquare EmptyPieceSquare = new(Piece.EmptyPiece, Square.None);
     
-    private readonly PieceSquare[,] _killerMoves;
+    private readonly PieceSquare[][] _killerMoves;
     private readonly int _maxDepth;
 
     public static IKillerMoves Create(int maxDepth)
@@ -43,15 +43,17 @@ public sealed class KillerMoves : IKillerMoves
     private KillerMoves(int maxDepth)
     {
         _maxDepth = maxDepth + 1;
-        _killerMoves = new PieceSquare[_maxDepth, 2];
+        _killerMoves = new PieceSquare[_maxDepth][];
+        for (var i = 0; i < _killerMoves.Length; ++i)
+            _killerMoves[i] = new[] { EmptyPieceSquare, EmptyPieceSquare };
     }
 
     private IKillerMoves Initialize()
     {
         for (var depth = 0; depth < _maxDepth; depth++)
         {
-            _killerMoves[depth, 0] = EmptyPieceSquare;
-            _killerMoves[depth, 1] = EmptyPieceSquare;
+            _killerMoves[depth][0] = EmptyPieceSquare;
+            _killerMoves[depth][1] = EmptyPieceSquare;
         }
 
         Reset();
@@ -59,20 +61,19 @@ public sealed class KillerMoves : IKillerMoves
     }
 
     public int GetValue(int depth, Move m, Piece fromPc)
-        => Equals(in _killerMoves[depth, 0], m, fromPc)
+        => Equals(in _killerMoves[depth][0], m, fromPc)
             ? 2
-            : Equals(in _killerMoves[depth, 1], m, fromPc).AsByte();
+            : Equals(in _killerMoves[depth][1], m, fromPc).AsByte();
 
     public void UpdateValue(int depth, Move m, Piece fromPc)
     {
-        if (Equals(in _killerMoves[depth, 0], m, fromPc))
+        if (Equals(in _killerMoves[depth][0], m, fromPc))
             return;
 
         // Shift killer move.
-        _killerMoves[depth, 1] = _killerMoves[depth, 0];
+        _killerMoves[depth][1] = _killerMoves[depth][0];
         // Update killer move.
-        _killerMoves[depth, 0].Piece = fromPc;
-        _killerMoves[depth, 0].Square = m.ToSquare();
+        _killerMoves[depth][0] = new PieceSquare(fromPc, m.ToSquare());
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -80,7 +81,7 @@ public sealed class KillerMoves : IKillerMoves
         => killerMove.Piece == fromPc && killerMove.Square == m.ToSquare();
 
     public ref PieceSquare Get(int depth, int index)
-        => ref _killerMoves[depth, index];
+        => ref _killerMoves[depth][index];
 
     public void Shift(int depth)
     {
@@ -88,15 +89,15 @@ public sealed class KillerMoves : IKillerMoves
         var lastDepth = _killerMoves.Length - depth - 1;
         for (var i = 0; i <= lastDepth; i++)
         {
-            _killerMoves[i, 0] = _killerMoves[i + depth, 0];
-            _killerMoves[i, 1] = _killerMoves[i + depth, 1];
+            _killerMoves[i][0] = _killerMoves[i + depth][0];
+            _killerMoves[i][1] = _killerMoves[i + depth][1];
         }
 
         // Reset killer moves far from root position.
         for (var i = lastDepth + 1; i < _killerMoves.Length; i++)
         {
-            _killerMoves[i, 0] = EmptyPieceSquare;
-            _killerMoves[i, 1] = EmptyPieceSquare;
+            _killerMoves[i][0] = EmptyPieceSquare;
+            _killerMoves[i][1] = EmptyPieceSquare;
         }
     }
 
@@ -104,8 +105,8 @@ public sealed class KillerMoves : IKillerMoves
     {
         for (var i = 0; i < _maxDepth; i++)
         {
-            _killerMoves[i, 0] = EmptyPieceSquare;
-            _killerMoves[i, 1] = EmptyPieceSquare;
+            _killerMoves[i][0] = EmptyPieceSquare;
+            _killerMoves[i][1] = EmptyPieceSquare;
         }
     }
 
@@ -113,13 +114,14 @@ public sealed class KillerMoves : IKillerMoves
     {
         if (other is null) return false;
         if (ReferenceEquals(this, other)) return true;
-        for (var j = 0; j < _maxDepth; ++j)
+        for (var i = 0; i < _maxDepth; ++i)
         {
-            var otherKm = other.Get(j, 0);
-            if (otherKm.Piece != _killerMoves[j, 0].Piece || otherKm.Square != _killerMoves[j, 0].Square)
+            ref var otherKm = ref other.Get(i, 0);
+            if (_killerMoves[i][0] != otherKm)
                 return false;
-            otherKm = other.Get(j, 1);
-            if (otherKm.Piece != _killerMoves[j, 1].Piece || otherKm.Square != _killerMoves[j, 1].Square)
+
+            otherKm = ref other.Get(i, 1);
+            if (_killerMoves[i][1] != otherKm)
                 return false;
         }
 
