@@ -81,7 +81,7 @@ public sealed class HiResTimer : IHiResTimer, IEquatable<HiResTimer>
 
         set
         {
-            if (value < 0f || float.IsNaN(value))
+            if (value is < 0f or float.NaN)
                 throw new ArgumentOutOfRangeException(nameof(value));
             lock (_intervalLock)
                 _interval = value;
@@ -155,18 +155,16 @@ public sealed class HiResTimer : IHiResTimer, IEquatable<HiResTimer>
         return obj.GetType() == GetType() && Equals((HiResTimer)obj);
     }
 
-    public bool Equals(HiResTimer other) => Id == other.Id;
+    public bool Equals(HiResTimer other) => Id == other?.Id;
 
-    private static double ElapsedHiRes(Stopwatch stopwatch) => stopwatch.ElapsedTicks * TickLength;
+    private static double ElapsedHiRes(in long timeStamp) => Stopwatch.GetElapsedTime(timeStamp).Ticks * TickLength;
 
     private void ExecuteTimer(CancellationToken cancellationToken)
     {
         Debug.Print($"Timer ExecuteTimer on thread {Environment.CurrentManagedThreadId}");
 
         var nextTrigger = 0f;
-
-        var stopwatch = new Stopwatch();
-        stopwatch.Start();
+        var timeStamp = Stopwatch.GetTimestamp();
 
         while (!cancellationToken.IsCancellationRequested)
         {
@@ -175,7 +173,7 @@ public sealed class HiResTimer : IHiResTimer, IEquatable<HiResTimer>
 
             do
             {
-                elapsed = ElapsedHiRes(stopwatch);
+                elapsed = ElapsedHiRes(in timeStamp);
                 var diff = nextTrigger - elapsed;
                 if (diff <= 0f)
                     break;
@@ -210,12 +208,10 @@ public sealed class HiResTimer : IHiResTimer, IEquatable<HiResTimer>
                 return;
 
             // restarting the timer in every hour to prevent precision problems
-            if (stopwatch.Elapsed.TotalHours < 1d)
+            if (Stopwatch.GetElapsedTime(timeStamp).TotalHours < 1d)
                 continue;
-            stopwatch.Restart();
+            timeStamp = Stopwatch.GetTimestamp();
             nextTrigger = 0f;
         }
-
-        stopwatch.Stop();
     }
 }
