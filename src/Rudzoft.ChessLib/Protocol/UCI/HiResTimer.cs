@@ -200,8 +200,11 @@ public sealed class HiResTimer : IHiResTimer, IEquatable<HiResTimer>
                     return;
             } while (true);
 
-            var delay = elapsed - nextTrigger;
-            Elapsed?.Invoke(new HiResTimerArgs(delay, Id));
+            if (Elapsed != null)
+            {
+                var delay = elapsed - nextTrigger;
+                Elapsed(new HiResTimerArgs(delay, Id));
+            }
 
             if (cancellationToken.IsCancellationRequested)
                 return;
