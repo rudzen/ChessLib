@@ -30,6 +30,7 @@ using Rudzoft.ChessLib.Fen;
 using Rudzoft.ChessLib.MoveGeneration;
 using Rudzoft.ChessLib.ObjectPoolPolicies;
 using Rudzoft.ChessLib.Types;
+using Rudzoft.ChessLib.Validation;
 
 namespace Rudzoft.ChessLib.Test.MoveTests;
 
@@ -43,8 +44,9 @@ public sealed class MoveGen_49
         var board = new Board();
         var pieceValue = new Values();
         var moveListObjectPool = new DefaultObjectPool<IMoveList>(new MoveListPolicy());
+        var validator = new PositionValidator();
 
-        var pos = new Position(board, pieceValue, moveListObjectPool);
+        var pos = new Position(board, pieceValue, validator, moveListObjectPool);
         var fd = new FenData(fen);
         var state = new State();
 

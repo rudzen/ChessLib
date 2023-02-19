@@ -55,70 +55,61 @@ public static class PositionValidationTypesExtensions
 
 public sealed class PositionValidator : IPositionValidator
 {
-    private readonly IBoard _board;
-    private readonly IPosition _pos;
-
-    public PositionValidator(in IPosition pos, in IBoard board)
-    {
-        _pos = pos;
-        _board = board;
-    }
-
     public string? ErrorMsg { get; private set; }
     public bool IsOk { get; private set; }
 
-    public IPositionValidator Validate(PositionValidationTypes type = PositionValidationTypes.All)
+    public IPositionValidator Validate(in IPosition pos, PositionValidationTypes type = PositionValidationTypes.All)
     {
         var error = string.Empty;
 
         if (type.HasFlagFast(PositionValidationTypes.Basic))
-            error = ValidateBasic();
+            error = ValidateBasic(in pos);
 
         if (type.HasFlagFast(PositionValidationTypes.Castle))
-            error = ValidateCastleling(error);
+            error = ValidateCastleling(in pos, error);
 
         if (type.HasFlagFast(PositionValidationTypes.Kings))
-            error = ValidateKings(error);
+            error = ValidateKings(in pos, error);
 
         if (type.HasFlagFast(PositionValidationTypes.Pawns))
-            error = ValidatePawns(error);
+            error = ValidatePawns(in pos, error);
 
         if (type.HasFlagFast(PositionValidationTypes.PieceConsistency))
-            error = ValidatePieceConsistency(error);
+            error = ValidatePieceConsistency(in pos, error);
 
         if (type.HasFlagFast(PositionValidationTypes.PieceCount))
-            error = ValidatePieceCount(error);
+            error = ValidatePieceCount(pos, error);
 
         if (type.HasFlagFast(PositionValidationTypes.PieceTypes))
-            error = ValidatePieceTypes(error);
+            error = ValidatePieceTypes(in pos, error);
 
         if (type.HasFlagFast(PositionValidationTypes.State))
-            error = ValidateState(error);
+            error = ValidateState(in pos, error);
 
         IsOk = error.IsNullOrEmpty();
         ErrorMsg = error;
         return this;
     }
 
-    private string ValidateBasic()
+    private static string ValidateBasic(in IPosition pos)
     {
         var error = string.Empty;
-        if (_pos.SideToMove != Player.White && _pos.SideToMove != Player.Black)
-            error = AddError(error, $"{nameof(_pos.SideToMove)} is not a valid");
+        if (pos.SideToMove != Player.White && pos.SideToMove != Player.Black)
+            error = AddError(error, $"{nameof(pos.SideToMove)} is not a valid");
 
-        if (_board.PieceAt(_pos.GetKingSquare(Player.White)) != Piece.WhiteKing)
+        if (pos.GetPiece(pos.GetKingSquare(Player.White)) != Piece.WhiteKing)
             error = AddError(error, "white king position is not a white king");
 
-        if (_board.PieceAt(_pos.GetKingSquare(Player.Black)) != Piece.BlackKing)
+        if (pos.GetPiece(pos.GetKingSquare(Player.Black)) != Piece.BlackKing)
             error = AddError(error, "black king position is not a black king");
 
-        if (_pos.EnPassantSquare != Square.None && _pos.EnPassantSquare.RelativeRank(_pos.SideToMove) != Ranks.Rank6)
-            error = AddError(error, $"{nameof(_pos.EnPassantSquare)} square is not on rank 6");
+        if (pos.EnPassantSquare != Square.None && pos.EnPassantSquare.RelativeRank(pos.SideToMove) != Ranks.Rank6)
+            error = AddError(error, $"{nameof(pos.EnPassantSquare)} square is not on rank 6");
 
         return error;
     }
 
-    private string ValidateCastleling(string error)
+    private string ValidateCastleling(in IPosition pos, string error)
     {
         Span<Player> players = stackalloc Player[] { Player.White, Player.Black };
         Span<CastleRight> crs = stackalloc CastleRight[] { CastleRight.None, CastleRight.None };
@@ -131,83 +122,83 @@ public sealed class PositionValidator : IPositionValidator
             var ourRook = PieceTypes.Rook.MakePiece(c);
             foreach (var cr in crs)
             {
-                if (!_pos.CanCastle(cr))
+                if (!pos.CanCastle(cr))
                     continue;
 
-                var rookSq = _pos.CastlingRookSquare(cr);
+                var rookSq = pos.CastlingRookSquare(cr);
 
-                if (_board.PieceAt(rookSq) != ourRook)
+                if (pos.GetPiece(rookSq) != ourRook)
                     error = AddError(error, $"rook does not appear on its position for {c}");
 
-                if (_pos.GetCastleRightsMask(rookSq) != cr)
+                if (pos.GetCastleRightsMask(rookSq) != cr)
                     error = AddError(error, $"castleling rights mask at {rookSq} does not match for player {c}");
 
-                if ((_pos.GetCastleRightsMask(_pos.GetKingSquare(c)) & cr) != cr)
+                if ((pos.GetCastleRightsMask(pos.GetKingSquare(c)) & cr) != cr)
                     error = AddError(error,
-                        $"castleling rights mask at {_pos.GetKingSquare(c)} does not match for player {c}");
+                        $"castleling rights mask at {pos.GetKingSquare(c)} does not match for player {c}");
             }
         }
 
         return error;
     }
 
-    private string ValidateKings(string error)
+    private static string ValidateKings(in IPosition pos, string error)
     {
         Span<Player> players = stackalloc Player[] { Player.White, Player.Black };
 
         foreach (var player in players)
         {
-            var count = _board.PieceCount(PieceTypes.King, player);
+            var count = pos.PieceCount(PieceTypes.King, player);
             if (count != 1)
                 error = AddError(error, $"king count for player {player} was {count}");
         }
 
-        if (!(_pos.AttacksTo(_pos.GetKingSquare(~_pos.SideToMove)) & _board.Pieces(_pos.SideToMove)).IsEmpty)
+        if (!(pos.AttacksTo(pos.GetKingSquare(~pos.SideToMove)) & pos.Pieces(pos.SideToMove)).IsEmpty)
             error = AddError(error, "kings appear to attack each other");
 
         return error;
     }
 
-    private string ValidatePawns(string error)
+    private static string ValidatePawns(in IPosition pos, string error)
     {
-        if (!(_board.Pieces(PieceTypes.Pawn) & (Rank.Rank1.RankBB() | Rank.Rank8.RankBB())).IsEmpty)
+        if (!(pos.Pieces(PieceTypes.Pawn) & (Rank.Rank1.RankBB() | Rank.Rank8.RankBB())).IsEmpty)
             error = AddError(error, "pawns exists on rank 1 or rank 8");
 
-        if (_board.PieceCount(PieceTypes.Pawn, Player.White) > 8)
+        if (pos.PieceCount(PieceTypes.Pawn, Player.White) > 8)
             error = AddError(error, "white side has more than 8 pawns");
 
-        if (_board.PieceCount(PieceTypes.Pawn, Player.Black) > 8)
+        if (pos.PieceCount(PieceTypes.Pawn, Player.Black) > 8)
             error = AddError(error, "black side has more than 8 pawns");
 
         return error;
     }
 
-    private string ValidatePieceConsistency(string error)
+    private static string ValidatePieceConsistency(in IPosition pos, string error)
     {
-        if (!(_board.Pieces(Player.White) & _board.Pieces(Player.Black)).IsEmpty)
+        if (!(pos.Pieces(Player.White) & pos.Pieces(Player.Black)).IsEmpty)
             error = AddError(error, "white and black pieces overlap");
 
-        if ((_board.Pieces(Player.White) | _board.Pieces(Player.Black)) != _board.Pieces())
+        if ((pos.Pieces(Player.White) | pos.Pieces(Player.Black)) != pos.Pieces())
             error = AddError(error, "white and black pieces do not match all pieces");
 
-        if (_board.Pieces(Player.White).Count > 16)
+        if (pos.Pieces(Player.White).Count > 16)
             error = AddError(error, "white side has more than 16 pieces");
 
-        if (_board.Pieces(Player.Black).Count > 16)
+        if (pos.Pieces(Player.Black).Count > 16)
             error = AddError(error, "black side has more than 16 pieces");
 
         return error;
     }
 
-    private string ValidatePieceCount(string error) =>
+    private static string ValidatePieceCount(IPosition pos, string error) =>
         Piece.AllPieces
             .Select(static pc => new { pc, pt = pc.Type() })
             .Select(static t => new { t, c = t.pc.ColorOf() })
-            .Where(t => _board.PieceCount(t.t.pt, t.c) != _board.Pieces(t.c, t.t.pt).Count)
+            .Where(t => pos.PieceCount(t.t.pt, t.c) != pos.Pieces(t.t.pt, t.c).Count)
             .Select(static t => t.t.pc)
             .Aggregate(error, static (current, pc) => AddError(current, $"piece count does not match for piece {pc}"));
 
-    private string ValidatePieceTypes(string error)
+    private static string ValidatePieceTypes(in IPosition pos, string error)
     {
         Span<PieceTypes> pts = stackalloc PieceTypes[]
         {
@@ -220,31 +211,27 @@ public sealed class PositionValidator : IPositionValidator
         };
 
         foreach (var p1 in pts)
-        foreach (var p2 in pts)
         {
-            if (p1 == p2 || (_board.Pieces(p1) & _board.Pieces(p2)).IsEmpty)
-                continue;
+            foreach (var p2 in pts)
+            {
+                if (p1 == p2 || (pos.Pieces(p1) & pos.Pieces(p2)).IsEmpty)
+                    continue;
 
-            error = AddError(error, $"piece types {p1} and {p2} doesn't align");
+                error = AddError(error, $"piece types {p1} and {p2} doesn't align");
+            }
         }
 
         return error;
     }
 
-    private string ValidateState(string error)
+    private string ValidateState(in IPosition pos, string error)
     {
-        var state = _pos.State;
+        var state = pos.State;
 
-        if (state == null)
-        {
-            error = AddError(error, "state is null");
-            return error;
-        }
-
-        if (state.Key.Key == 0 && !_board.Pieces().IsEmpty)
+        if (state.Key.Key == 0 && !pos.Pieces().IsEmpty)
             error = AddError(error, "state key is invalid");
 
-        if (_board.Pieces(_pos.SideToMove, PieceTypes.Pawn).IsEmpty &&
+        if (pos.Pieces(PieceTypes.Pawn, pos.SideToMove).IsEmpty &&
             state.PawnStructureKey.Key != Zobrist.ZobristNoPawn)
             error = AddError(error, "empty pawn key is invalid");
 

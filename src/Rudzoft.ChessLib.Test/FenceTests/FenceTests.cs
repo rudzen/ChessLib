@@ -31,6 +31,7 @@ using Rudzoft.ChessLib.Enums;
 using Rudzoft.ChessLib.Fen;
 using Rudzoft.ChessLib.ObjectPoolPolicies;
 using Rudzoft.ChessLib.Types;
+using Rudzoft.ChessLib.Validation;
 
 namespace Rudzoft.ChessLib.Test.FenceTests;
 
@@ -43,6 +44,7 @@ public sealed class FenceTests
         _serviceProvider = new ServiceCollection()
             .AddTransient<IBoard, Board>()
             .AddSingleton<IValues, Values>()
+            .AddSingleton<IPositionValidator, PositionValidator>()
             .AddTransient<IPosition, Position>()
             .AddSingleton<IBlockage, Blockage>()
             .AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>()

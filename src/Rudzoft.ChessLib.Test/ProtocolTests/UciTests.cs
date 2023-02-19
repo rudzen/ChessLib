@@ -34,6 +34,7 @@ using Rudzoft.ChessLib.Hash.Tables.Transposition;
 using Rudzoft.ChessLib.ObjectPoolPolicies;
 using Rudzoft.ChessLib.Protocol.UCI;
 using Rudzoft.ChessLib.Types;
+using Rudzoft.ChessLib.Validation;
 
 namespace Rudzoft.ChessLib.Test.ProtocolTests;
 
@@ -49,6 +50,7 @@ public sealed class UciTests
         _serviceProvider = new ServiceCollection()
             .AddSingleton(options)
             .AddSingleton<IValues, Values>()
+            .AddSingleton<IPositionValidator, PositionValidator>()
             .AddTransient<IBoard, Board>()
             .AddTransient<IPosition, Position>()
             .AddSingleton(static _ =>

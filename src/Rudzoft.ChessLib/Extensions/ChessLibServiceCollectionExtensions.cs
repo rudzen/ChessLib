@@ -37,6 +37,7 @@ using Rudzoft.ChessLib.Polyglot;
 using Rudzoft.ChessLib.Protocol.UCI;
 using Rudzoft.ChessLib.Tables;
 using Rudzoft.ChessLib.Types;
+using Rudzoft.ChessLib.Validation;
 
 namespace Rudzoft.ChessLib.Extensions;
 
@@ -87,6 +88,7 @@ public static class ChessLibServiceCollectionExtensions
             .AddSingleton<ISearchParameters, SearchParameters>()
             .AddSingleton<IValues, Values>()
             .AddTransient<IBoard, Board>()
+            .AddSingleton<IPositionValidator, PositionValidator>()
             .AddTransient<IPosition, Position>()
             .AddTransient<IGame, Game>()
             .AddSingleton<IPolyglotBookFactory, PolyglotBookFactory>();

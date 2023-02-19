@@ -38,6 +38,7 @@ using Rudzoft.ChessLib.ObjectPoolPolicies;
 using Rudzoft.ChessLib.Polyglot;
 using Rudzoft.ChessLib.Protocol.UCI;
 using Rudzoft.ChessLib.Types;
+using Rudzoft.ChessLib.Validation;
 
 namespace Rudzoft.ChessLib.Test.BookTests;
 
@@ -56,6 +57,7 @@ public sealed class PolyglotTests : IClassFixture<BookFixture>
             .AddSingleton(polyOptions)
             .AddTransient<IBoard, Board>()
             .AddSingleton<IValues, Values>()
+            .AddSingleton<IPositionValidator, PositionValidator>()
             .AddTransient<IPosition, Position>()
             .AddSingleton<IPolyglotBookFactory, PolyglotBookFactory>()
             .AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>()

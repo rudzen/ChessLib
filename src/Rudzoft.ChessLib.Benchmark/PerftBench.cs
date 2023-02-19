@@ -36,6 +36,7 @@ using Rudzoft.ChessLib.Perft;
 using Rudzoft.ChessLib.Perft.Interfaces;
 using Rudzoft.ChessLib.Protocol.UCI;
 using Rudzoft.ChessLib.Types;
+using Rudzoft.ChessLib.Validation;
 
 namespace Rudzoft.ChessLib.Benchmark;
 
@@ -78,7 +79,9 @@ public class PerftBench
         
         var board = new Board();
         var values = new Values();
-        var pos = new Position(board, values, moveListObjectPool);
+        var validator = new PositionValidator();
+
+        var pos = new Position(board, values, validator, moveListObjectPool);
         
         var game = new Game(tt, uci, sp, pos, moveListObjectPool);
         _perft = new Perft.Perft(game, new []{ pp });

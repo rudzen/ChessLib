@@ -30,5 +30,5 @@ public interface IPositionValidator
 {
     string? ErrorMsg { get; }
     bool IsOk { get; }
-    IPositionValidator Validate(PositionValidationTypes type = PositionValidationTypes.All);
+    IPositionValidator Validate(in IPosition pos, PositionValidationTypes type = PositionValidationTypes.All);
 }

@@ -33,6 +33,7 @@ using Rudzoft.ChessLib.Notation;
 using Rudzoft.ChessLib.Notation.Notations;
 using Rudzoft.ChessLib.ObjectPoolPolicies;
 using Rudzoft.ChessLib.Types;
+using Rudzoft.ChessLib.Validation;
 
 namespace Rudzoft.ChessLib.Test.NotationTests;
 
@@ -45,6 +46,7 @@ public sealed class IccfTests
         _serviceProvider = new ServiceCollection()
             .AddTransient<IBoard, Board>()
             .AddSingleton<IValues, Values>()
+            .AddSingleton<IPositionValidator, PositionValidator>()
             .AddTransient<IPosition, Position>()
             .AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>()
             .AddSingleton(static serviceProvider =>

@@ -32,6 +32,7 @@ using Rudzoft.ChessLib.Evaluation;
 using Rudzoft.ChessLib.Fen;
 using Rudzoft.ChessLib.ObjectPoolPolicies;
 using Rudzoft.ChessLib.Types;
+using Rudzoft.ChessLib.Validation;
 
 namespace Rudzoft.ChessLib.Test.EvaluationTests;
 
@@ -44,6 +45,7 @@ public sealed class KpkBitBaseTests
         _serviceProvider = new ServiceCollection()
             .AddTransient<IBoard, Board>()
             .AddSingleton<IValues, Values>()
+            .AddSingleton<IPositionValidator, PositionValidator>()
             .AddTransient<IPosition, Position>()
             .AddSingleton<IKpkBitBase, KpkBitBase>()
             .AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>()

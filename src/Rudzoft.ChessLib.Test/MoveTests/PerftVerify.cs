@@ -8,6 +8,7 @@ using Rudzoft.ChessLib.Hash.Tables.Transposition;
 using Rudzoft.ChessLib.ObjectPoolPolicies;
 using Rudzoft.ChessLib.Protocol.UCI;
 using Rudzoft.ChessLib.Types;
+using Rudzoft.ChessLib.Validation;
 
 namespace Rudzoft.ChessLib.Test.MoveTests;
 
@@ -24,6 +25,7 @@ public abstract class PerftVerify
             .AddSingleton(ttOptions)
             .AddTransient<IBoard, Board>()
             .AddSingleton<IValues, Values>()
+            .AddSingleton<IPositionValidator, PositionValidator>()
             .AddTransient<IPosition, Position>()
             .AddSingleton<ISearchParameters, SearchParameters>()
             .AddSingleton<IUci, Uci>()

@@ -59,7 +59,11 @@ public sealed class Position : IPosition
     private readonly IPositionValidator _positionValidator;
     private Player _sideToMove;
 
-    public Position(IBoard board, IValues values, ObjectPool<IMoveList> moveListPool)
+    public Position(
+        IBoard board,
+        IValues values,
+        IPositionValidator positionValidator,
+        ObjectPool<IMoveList> moveListPool)
     {
         _castleKingPath = new BitBoard[CastleRight.Count];
         _castleRookPath = new BitBoard[CastleRight.Count];
@@ -68,7 +72,7 @@ public sealed class Position : IPosition
         _castlingRookSquare = new Square[CastleRight.Count];
         _outputObjectPool = new DefaultObjectPool<StringBuilder>(new StringBuilderPooledObjectPolicy());
         _moveListPool = moveListPool;
-        _positionValidator = new PositionValidator(this, board);
+        _positionValidator = positionValidator;
         Board = board;
         IsProbing = true;
         Values = values;
@@ -867,7 +871,7 @@ public sealed class Position : IPosition
 
         State.Repetition = 0;
 
-        Debug.Assert(_positionValidator.Validate(PositionValidationTypes.Basic).IsOk);
+        Debug.Assert(_positionValidator.Validate(this, PositionValidationTypes.Basic).IsOk);
     }
 
     public Piece MovedPiece(Move m)
@@ -1362,7 +1366,7 @@ public sealed class Position : IPosition
     }
 
     public IPositionValidator Validate(PositionValidationTypes type = PositionValidationTypes.Basic)
-        => _positionValidator.Validate(type);
+        => _positionValidator.Validate(this, type);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static CastleRights OrCastlingRight(Player c, bool isKingSide)

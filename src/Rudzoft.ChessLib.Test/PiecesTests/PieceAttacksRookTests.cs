@@ -28,6 +28,7 @@ using Microsoft.Extensions.ObjectPool;
 using Rudzoft.ChessLib.MoveGeneration;
 using Rudzoft.ChessLib.ObjectPoolPolicies;
 using Rudzoft.ChessLib.Types;
+using Rudzoft.ChessLib.Validation;
 
 namespace Rudzoft.ChessLib.Test.PiecesTests;
 
@@ -68,8 +69,9 @@ public sealed class PieceAttacksRookTests : PieceAttacks
         var board = new Board();
         var pieceValue = new Values();
         var moveListObjectPool = new DefaultObjectPool<IMoveList>(new MoveListPolicy());
+        var validator = new PositionValidator();
 
-        var pos = new Position(board, pieceValue, moveListObjectPool);
+        var pos = new Position(board, pieceValue, validator, moveListObjectPool);
 
         while (border)
         {

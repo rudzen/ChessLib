@@ -4,6 +4,7 @@ using Rudzoft.ChessLib.Fen;
 using Rudzoft.ChessLib.MoveGeneration;
 using Rudzoft.ChessLib.ObjectPoolPolicies;
 using Rudzoft.ChessLib.Types;
+using Rudzoft.ChessLib.Validation;
 
 namespace Rudzoft.ChessLib.Benchmark;
 
@@ -24,8 +25,9 @@ public class FenBenchmark
         var pieceValue = new Values();
         var fp = new FenData(F);
         var state = new State();
+        var validator = new PositionValidator();
         var moveListObjectPool = new DefaultObjectPool<IMoveList>(new MoveListPolicy());
-        _pos = new Position(board, pieceValue, moveListObjectPool);
+        _pos = new Position(board, pieceValue, validator, moveListObjectPool);
         _pos.Set(in fp, ChessMode.Normal, state);
     }
 

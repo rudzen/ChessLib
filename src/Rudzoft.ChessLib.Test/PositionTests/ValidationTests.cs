@@ -45,6 +45,7 @@ public sealed class ValidationTests
         _serviceProvider = new ServiceCollection()
             .AddTransient<IBoard, Board>()
             .AddSingleton<IValues, Values>()
+            .AddSingleton<IPositionValidator, PositionValidator>()
             .AddTransient<IPosition, Position>()
             .AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>()
             .AddSingleton(static serviceProvider =>
@@ -75,6 +76,7 @@ public sealed class ValidationTests
 
         var validator = pos.Validate(type);
 
+        Assert.NotNull(validator.ErrorMsg);
         Assert.NotEmpty(validator.ErrorMsg);
 
         var actualErrorMessage = validator.ErrorMsg;
@@ -100,7 +102,8 @@ public sealed class ValidationTests
         var validator = pos.Validate(validationType);
 
         Assert.True(validator.IsOk);
-        Assert.True(validator.ErrorMsg.IsNullOrEmpty());
+        Assert.NotNull(validator.ErrorMsg);
+        Assert.Empty(validator.ErrorMsg);
     }
 
     // TODO : Add tests for the rest of the validations
