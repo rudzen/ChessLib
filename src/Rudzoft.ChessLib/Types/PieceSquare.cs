@@ -1,3 +1,3 @@
 ﻿namespace Rudzoft.ChessLib.Types;
 
-public record struct PieceSquare(Piece Piece, Square Square);
+public readonly record struct PieceSquare(Piece Piece, Square Square);

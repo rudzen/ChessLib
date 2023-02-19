@@ -42,6 +42,12 @@ public sealed class PieceSquareEventArgs : EventArgs, ISpanFormattable, IPieceSq
         Square = sq;
     }
 
+    public PieceSquareEventArgs(PieceSquare ps)
+    {
+        Piece = ps.Piece;
+        Square = ps.Square;
+    }
+
     public Piece Piece { get; set; }
 
     public Square Square { get; set; }
