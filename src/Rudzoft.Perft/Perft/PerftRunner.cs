@@ -35,8 +35,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.ObjectPool;
-using Rudzoft.ChessLib;
 using Rudzoft.ChessLib.Extensions;
+using Rudzoft.ChessLib.Hash.Tables.Transposition;
 using Rudzoft.ChessLib.Perft;
 using Rudzoft.ChessLib.Perft.Interfaces;
 using Rudzoft.ChessLib.Protocol.UCI;
@@ -49,7 +49,7 @@ namespace Rudzoft.Perft.Perft;
 
 public sealed class PerftRunner : IPerftRunner
 {
-    private const string Version = "v0.1.4";
+    private const string Version = "v0.2.0";
 
     private static readonly string Line = new('-', 65);
 
@@ -65,6 +65,8 @@ public sealed class PerftRunner : IPerftRunner
 
     private readonly IPerft _perft;
 
+    private readonly ITranspositionTable _transpositionTable;
+
     private readonly ObjectPool<PerftResult> _resultPool;
 
     private readonly IUci _uci;
@@ -79,6 +81,7 @@ public sealed class PerftRunner : IPerftRunner
         IBuildTimeStamp buildTimeStamp,
         IPerft perft,
         IConfiguration configuration,
+        ITranspositionTable transpositionTable,
         ObjectPool<PerftResult> resultPool,
         IUci uci)
     {
@@ -87,11 +90,9 @@ public sealed class PerftRunner : IPerftRunner
         _buildTimeStamp = buildTimeStamp;
         _perft = perft;
         _perft.BoardPrintCallback ??= s => _log.Information("Board:\n{0}", s);
+        _transpositionTable = transpositionTable;
         _resultPool = resultPool;
-
         _uci = uci;
-        _uci.Initialize();
-
         _runners = new Func<CancellationToken, IAsyncEnumerable<PerftPosition>>[] { ParseEpd, ParseFen };
 
         configuration.Bind("TranspositionTable", TranspositionTableOptions);
@@ -114,7 +115,7 @@ public sealed class PerftRunner : IPerftRunner
         InternalRunArgumentCheck(Options);
 
         if (TranspositionTableOptions is TTOptions { Use: true } ttOptions)
-            Game.Table.SetSize(ttOptions.Size);
+            _transpositionTable.SetSize(ttOptions.Size);
 
         var errors = 0;
         var runnerIndex = (Options is FenOptions).AsByte();
@@ -270,7 +271,7 @@ public sealed class PerftRunner : IPerftRunner
         results.Nps = _uci.Nps(in result, results.Elapsed);
         results.CorrectResult = expected;
         results.Passed = expected == result;
-        results.TableHits = Game.Table.Hits;
+        results.TableHits = _transpositionTable.Hits;
     }
 
     private void LogInfoHeader()
@@ -296,7 +297,7 @@ public sealed class PerftRunner : IPerftRunner
         else
             _log.Information("Result      : {0}", result.Result);
 
-        _log.Information("TT hits     : {0}", Game.Table.Hits);
+        _log.Information("TT hits     : {0}", _transpositionTable.Hits);
 
         var error = 0;
 
@@ -307,7 +308,7 @@ public sealed class PerftRunner : IPerftRunner
             _log.Information("Move count matches!");
         else
         {
-            _log.Error("Failed for position: {0}", _perft.CurrentGame.Pos.GenerateFen());
+            _log.Error("Failed for position: {0}", _perft.Game.Pos.GenerateFen());
             error = 1;
         }
 

@@ -1,5 +1,5 @@
 ﻿/*
-Perft, a chess perft test library
+ChessLib, a chess data structure library
 
 MIT License
 
@@ -24,10 +24,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System.Collections.Generic;
+namespace Rudzoft.ChessLib.Factories;
 
-namespace Rudzoft.ChessLib.Perft.Interfaces;
-
-public record struct PerftPositionValue(int Depth, ulong MoveCount);
-
-public sealed record PerftPosition(string Id, string Fen, List<PerftPositionValue> Value);
+public interface IServiceFactory<out T>
+{
+    T Create();
+}

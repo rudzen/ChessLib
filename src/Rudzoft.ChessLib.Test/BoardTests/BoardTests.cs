@@ -24,13 +24,27 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using Rudzoft.ChessLib.Factories;
+using System;
+using Microsoft.Extensions.DependencyInjection;
+using Rudzoft.ChessLib.Enums;
+using Rudzoft.ChessLib.Fen;
 using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Test.BoardTests;
 
 public sealed class BoardTests
 {
+    private readonly IServiceProvider _serviceProvider;
+
+    public BoardTests()
+    {
+        _serviceProvider = new ServiceCollection()
+            .AddTransient<IBoard, Board>()
+            .AddSingleton<IValues, Values>()
+            .AddTransient<IPosition, Position>()
+            .BuildServiceProvider();
+    }
+    
     [Theory]
     [InlineData("rnbqkbnr/1ppQpppp/p2p4/8/8/2P5/PP1PPPPP/RNB1KBNR b KQkq - 1 6", PieceTypes.Pawn, Players.White, 8)]
     [InlineData("rnbqkbnr/1ppQpppp/p2p4/8/8/2P5/PP1PPPPP/RNB1KBNR b KQkq - 1 6", PieceTypes.Pawn, Players.Black, 8)]
@@ -58,8 +72,13 @@ public sealed class BoardTests
     [InlineData("5r1k/p6p/4r1n1/3NPp2/8/8/PP4RP/4R1K1 w - - 3 53", PieceTypes.King, Players.Black, 1)]
     public void BoardPieceCount(string fen, PieceTypes pt, Player p, int expected)
     {
-        var game = GameFactory.Create(fen);
-        var pos = game.Pos;
+        var pos = _serviceProvider.GetRequiredService<IPosition>();
+
+        var fenData = new FenData(fen);
+        var state = new State();
+
+        pos.Set(in fenData, ChessMode.Normal, state);
+
         var board = pos.Board;
 
         var posCount = pos.Pieces(pt, p).Count;

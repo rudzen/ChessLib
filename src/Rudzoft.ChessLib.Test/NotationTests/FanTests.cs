@@ -24,8 +24,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using System;
+using Microsoft.Extensions.DependencyInjection;
+using Rudzoft.ChessLib.Enums;
 using Rudzoft.ChessLib.Extensions;
-using Rudzoft.ChessLib.Factories;
+using Rudzoft.ChessLib.Fen;
 using Rudzoft.ChessLib.Notation;
 using Rudzoft.ChessLib.Notation.Notations;
 using Rudzoft.ChessLib.Types;
@@ -34,14 +37,31 @@ namespace Rudzoft.ChessLib.Test.NotationTests;
 
 public sealed class FanTests
 {
+    private readonly IServiceProvider _serviceProvider;
+
+    public FanTests()
+    {
+        _serviceProvider = new ServiceCollection()
+            .AddTransient<IBoard, Board>()
+            .AddSingleton<IValues, Values>()
+            .AddTransient<IPosition, Position>()
+            .BuildServiceProvider();
+    }
+
     [Theory]
     [InlineData("8/6k1/8/8/8/8/1K1N1N2/8 w - - 0 1", MoveNotations.Fan, PieceTypes.Knight, Squares.d2, Squares.f2,
         Squares.e4)]
     public void FanRankAmbiguities(string fen, MoveNotations moveNotation, PieceTypes movingPt, Squares fromSqOne,
         Squares fromSqTwo, Squares toSq)
     {
-        var g = GameFactory.Create(fen);
-        var pc = movingPt.MakePiece(g.Pos.SideToMove);
+        var pos = _serviceProvider.GetRequiredService<IPosition>();
+
+        var fenData = new FenData(fen);
+        var state = new State();
+
+        pos.Set(in fenData, ChessMode.Normal, state);
+        
+        var pc = movingPt.MakePiece(pos.SideToMove);
 
         var fromOne = new Square(fromSqOne);
         var fromTwo = new Square(fromSqTwo);
@@ -57,7 +77,7 @@ public sealed class FanTests
         var moveOne = Move.Create(fromOne, to);
         var moveTwo = Move.Create(fromTwo, to);
 
-        var ambiguity = MoveNotation.Create(g.Pos);
+        var ambiguity = MoveNotation.Create(pos);
 
         var expectedOne = $"{pieceChar}{fromOne.FileChar}{toString}";
         var expectedTwo = $"{pieceChar}{fromTwo.FileChar}{toString}";
@@ -75,8 +95,14 @@ public sealed class FanTests
     public void FanFileAmbiguities(string fen, MoveNotations moveNotation, PieceTypes movingPt, Squares fromSqOne,
         Squares fromSqTwo, Squares toSq)
     {
-        var g = GameFactory.Create(fen);
-        var pc = movingPt.MakePiece(g.Pos.SideToMove);
+        var pos = _serviceProvider.GetRequiredService<IPosition>();
+
+        var fenData = new FenData(fen);
+        var state = new State();
+
+        pos.Set(in fenData, ChessMode.Normal, state);
+        
+        var pc = movingPt.MakePiece(pos.SideToMove);
 
         var fromOne = new Square(fromSqOne);
         var fromTwo = new Square(fromSqTwo);
@@ -92,7 +118,7 @@ public sealed class FanTests
         var moveOne = Move.Create(fromOne, to);
         var moveTwo = Move.Create(fromTwo, to);
 
-        var ambiguity = MoveNotation.Create(g.Pos);
+        var ambiguity = MoveNotation.Create(pos);
 
         var expectedOne = $"{pieceChar}{fromOne.RankChar}{toString}";
         var expectedTwo = $"{pieceChar}{fromTwo.RankChar}{toString}";

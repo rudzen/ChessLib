@@ -32,5 +32,5 @@ public interface IBlockage
     /// Computes whether the current position contains a pawn fence which makes the game a draw.
     /// </summary>
     /// <returns>true if the game is a draw position - otherwise false</returns>
-    bool IsBlocked();
+    bool IsBlocked(in IPosition pos);
 }

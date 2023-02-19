@@ -28,13 +28,14 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Rudzoft.ChessLib.Extensions;
 using Rudzoft.ChessLib.MoveGeneration;
 using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Polyglot;
 
-public sealed class PolyglotBook : IDisposable
+public sealed class PolyglotBook : IPolyglotBook
 {
     // PolyGlot pieces are: BP = 0, WP = 1, BN = 2, ... BK = 10, WK = 11
     private static readonly int[] PieceMapping = { -1, 1, 3, 5, 7, 9, 11, -1, -1, 0, 2, 4, 6, 8, 10 };
@@ -47,44 +48,59 @@ public sealed class PolyglotBook : IDisposable
         CastleRight.BlackQueen
     };
 
-    private readonly IPosition _pos;
-    private readonly FileStream _fileStream;
-    private readonly BinaryReader _binaryReader;
-    private readonly string _fileName;
+    private readonly FileStream? _fileStream;
+    private readonly BinaryReader? _binaryReader;
+    private readonly string _bookFilePath;
     private readonly int _entrySize;
     private readonly Random _rnd;
 
-    public unsafe PolyglotBook(IPosition pos)
+    private unsafe PolyglotBook()
     {
-        _pos = pos;
         _entrySize = sizeof(PolyglotBookEntry);
         _rnd = new Random(DateTime.Now.Millisecond);
     }
 
-    public string FileName
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    internal static PolyglotBook Create()
     {
-        get => _fileName;
+        return new PolyglotBook();
+    }
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    internal static PolyglotBook Create(string path, string file)
+    {
+        return new PolyglotBook
+        {
+            BookFile = Path.Combine(path, file)
+        };
+    }
+
+    public string BookFile
+    {
+        get => _bookFilePath;
         init
         {
             if (string.IsNullOrEmpty(value))
                 return;
-            if (_fileName == value)
+            if (_bookFilePath == value)
                 return;
-            _fileName = value;
+            _bookFilePath = value;
             _fileStream = new FileStream(value, FileMode.Open, FileAccess.Read);
-            _binaryReader = new LittleEndianBinaryStreamReader(_fileStream);
+            _binaryReader = BitConverter.IsLittleEndian
+                ? new LittleEndianBinaryStreamReader(_fileStream)
+                : new BinaryReader(_fileStream);
         }
     }
 
     public Move Probe(IPosition pos, bool pickBest = true)
     {
-        if (_fileName.IsNullOrEmpty() || _fileStream == null)
+        if (_bookFilePath.IsNullOrEmpty() || _fileStream == null ||_binaryReader == null)
             return Move.EmptyMove;
 
         var polyMove = ushort.MinValue;
         var best = ushort.MinValue;
         var sum = uint.MinValue;
-        var key = ComputePolyglotKey();
+        var key = ComputePolyglotKey(pos);
         var firstIndex = FindFirst(in key);
 
         _fileStream.Seek(firstIndex * _entrySize, SeekOrigin.Begin);
@@ -120,7 +136,7 @@ public sealed class PolyglotBook : IDisposable
         _binaryReader?.Dispose();
     }
 
-    private Move ConvertMove(IPosition pos, ushort polyMove)
+    private static Move ConvertMove(IPosition pos, ushort polyMove)
     {
         // A PolyGlot book move is encoded as follows:
         //
@@ -141,7 +157,7 @@ public sealed class PolyglotBook : IDisposable
             move = Move.Create(from, to, MoveTypes.Promotion, PolyToPt(polyPt));
         }
 
-        var ml = _pos.GenerateMoves();
+        var ml = pos.GenerateMoves();
 
         // Iterate all known moves for current position to find a match.
         var emMoves = ml.Select(static em => em.Move)
@@ -159,16 +175,13 @@ public sealed class PolyglotBook : IDisposable
         return emMoves.FirstOrDefault(Move.EmptyMove);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static bool IsInCheck(IPosition pos, Move m)
     {
-        pos.GivesCheck(m);
-        var state = new State();
-        pos.MakeMove(m, in state);
-        var inCheck = pos.InCheck;
-        pos.TakeMove(m);
-        return inCheck;
+        return pos.GivesCheck(m);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private PolyglotBookEntry ReadEntry() => new(
         _binaryReader.ReadUInt64(),
         _binaryReader.ReadUInt16(),
@@ -176,26 +189,27 @@ public sealed class PolyglotBook : IDisposable
         _binaryReader.ReadUInt32()
     );
 
-    public HashKey ComputePolyglotKey()
+    public HashKey ComputePolyglotKey(in IPosition pos)
     {
         var k = HashKey.Empty;
-        var b = _pos.Pieces();
+        var b = pos.Pieces();
 
         while (b)
         {
             var s = BitBoards.PopLsb(ref b);
-            var pc = _pos.GetPiece(s);
+            var pc = pos.GetPiece(s);
             var p = PieceMapping[pc.AsInt()];
             k ^= PolyglotBookZobrist.Psq(p, s);
         }
 
-        foreach (var cr in CastleRights.Where(cr => _pos.State.CastlelingRights.Has(cr)))
-            k ^= PolyglotBookZobrist.Castle(cr);
+        foreach (var cr in CastleRights.AsSpan())
+            if (pos.State.CastlelingRights.Has(cr))
+                k ^= PolyglotBookZobrist.Castle(cr);
 
-        if (_pos.State.EnPassantSquare != Square.None)
-            k ^= PolyglotBookZobrist.EnPassant(_pos.State.EnPassantSquare.File);
+        if (pos.State.EnPassantSquare != Square.None)
+            k ^= PolyglotBookZobrist.EnPassant(pos.State.EnPassantSquare.File);
 
-        if (_pos.SideToMove.IsWhite)
+        if (pos.SideToMove.IsWhite)
             k ^= PolyglotBookZobrist.Turn();
 
         return k;

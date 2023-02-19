@@ -1,8 +1,6 @@
 ﻿using Rudzoft.ChessLib.Extensions;
 using System;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Rudzoft.ChessLib.Benchmark;
 
@@ -25,7 +23,7 @@ public class IsNumericBenchmark
     {
         foreach (var c in _s.AsSpan())
         {
-            var b = MathExtensions.InBetween(c, '0', '9');
+            var b = c.InBetween('0', '9');
         }
     }
 

@@ -24,7 +24,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using Rudzoft.ChessLib.Factories;
+using System;
+using Microsoft.Extensions.DependencyInjection;
+using Rudzoft.ChessLib.Enums;
+using Rudzoft.ChessLib.Fen;
 using Rudzoft.ChessLib.Notation;
 using Rudzoft.ChessLib.Notation.Notations;
 using Rudzoft.ChessLib.Types;
@@ -33,6 +36,17 @@ namespace Rudzoft.ChessLib.Test.NotationTests;
 
 public sealed class IccfTests
 {
+    private readonly IServiceProvider _serviceProvider;
+
+    public IccfTests()
+    {
+        _serviceProvider = new ServiceCollection()
+            .AddTransient<IBoard, Board>()
+            .AddSingleton<IValues, Values>()
+            .AddTransient<IPosition, Position>()
+            .BuildServiceProvider();
+    }
+
     [Fact]
     public void IccfRegularMove()
     {
@@ -40,11 +54,12 @@ public sealed class IccfTests
         const MoveNotations notation = MoveNotations.ICCF;
         const string expectedPrimary = "4263";
 
-        var board = new Board();
-        var pieceValue = new Values();
-        var pos = new Position(board, pieceValue);
-        var g = GameFactory.Create(pos);
-        g.NewGame(fen);
+        var pos = _serviceProvider.GetRequiredService<IPosition>();
+
+        var fenData = new FenData(fen);
+        var state = new State();
+
+        pos.Set(in fenData, ChessMode.Normal, state);
 
         var w1 = Move.Create(Squares.d2, Squares.f3);
 
@@ -64,11 +79,12 @@ public sealed class IccfTests
     {
         const MoveNotations notation = MoveNotations.ICCF;
 
-        var board = new Board();
-        var pieceValue = new Values();
-        var pos = new Position(board, pieceValue);
-        var g = GameFactory.Create(pos);
-        g.NewGame(fen);
+        var pos = _serviceProvider.GetRequiredService<IPosition>();
+
+        var fenData = new FenData(fen);
+        var state = new State();
+
+        pos.Set(in fenData, ChessMode.Normal, state);
 
         var w1 = Move.Create(Squares.b7, Squares.b8, MoveTypes.Promotion, promoPt);
 

@@ -33,7 +33,6 @@ using Rudzoft.ChessLib.Enums;
 using Rudzoft.ChessLib.Extensions;
 using Rudzoft.ChessLib.MoveGeneration;
 using Rudzoft.ChessLib.Types;
-using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace Rudzoft.ChessLib.Protocol.UCI;
@@ -109,12 +108,12 @@ public class Uci : IUci
 
     public IEnumerable<Move> MovesFromUci(IPosition pos, Stack<State> states, IEnumerable<string> moves)
     {
-        var uciMoves = moves
-            .Select(x => MoveFromUci(pos, x))
-            .Where(static x => !x.IsNullMove());
-
-        foreach (var move in uciMoves)
+        foreach (var uciMove in moves)
         {
+            var move = MoveFromUci(pos, uciMove);
+            if (move.IsNullMove())
+                continue;
+            
             var state = new State();
             states.Push(state);
             pos.MakeMove(move, in state);
@@ -157,7 +156,9 @@ public class Uci : IUci
         int beta,
         in TimeSpan time,
         IEnumerable<Move> pvLine,
-        in ulong nodes)
+        in ulong nodes,
+        in ulong tableHits
+        )
     {
         var sb = _pvPool.Get();
 
@@ -168,7 +169,7 @@ public class Uci : IUci
         else if (score <= alpha)
             sb.Append("upperbound ");
 
-        sb.Append($"nodes {nodes} nps {Nps(in nodes, in time)} tbhits {Game.Table.Hits} time {time.Milliseconds} ");
+        sb.Append($"nodes {nodes} nps {Nps(in nodes, in time)} tbhits {tableHits} time {time.Milliseconds} ");
         sb.AppendJoin(' ', pvLine);
 
         var result = sb.ToString();
@@ -176,9 +177,9 @@ public class Uci : IUci
         return result;
     }
 
-    public string Fullness(in ulong tbHits, in ulong nodes, in TimeSpan time)
+    public string Fullness(int fullNess, in ulong tbHits, in ulong nodes, in TimeSpan time)
         =>
-            $"info hashfull {Game.Table.Fullness()} tbhits {tbHits} nodes {nodes} time {time.Milliseconds} nps {Nps(in nodes, in time)}";
+            $"info hashfull {fullNess} tbhits {tbHits} nodes {nodes} time {time.Milliseconds} nps {Nps(in nodes, in time)}";
 
     [SkipLocalsInit]
     public string MoveToString(Move m, ChessMode chessMode = ChessMode.Normal)

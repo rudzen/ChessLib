@@ -67,9 +67,19 @@ public interface IUci
 
     string Depth(int depth);
 
-    string Pv(int count, int score, int depth, int selectiveDepth, int alpha, int beta, in TimeSpan time, IEnumerable<Move> pvLine, in ulong nodes);
+    string Pv(
+        int count,
+        int score,
+        int depth,
+        int selectiveDepth,
+        int alpha,
+        int beta,
+        in TimeSpan time,
+        IEnumerable<Move> pvLine,
+        in ulong nodes,
+        in ulong tableHits);
 
-    string Fullness(in ulong tbHits, in ulong nodes, in TimeSpan time);
+    string Fullness(int fullNess, in ulong tbHits, in ulong nodes, in TimeSpan time);
 
     string ToString();
 }

@@ -24,12 +24,28 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using Rudzoft.ChessLib.Factories;
+using System;
+using Microsoft.Extensions.DependencyInjection;
+using Rudzoft.ChessLib.Enums;
+using Rudzoft.ChessLib.Fen;
+using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Test.FenceTests;
 
 public sealed class FenceTests
 {
+    private readonly IServiceProvider _serviceProvider;
+
+    public FenceTests()
+    {
+        _serviceProvider = new ServiceCollection()
+            .AddTransient<IBoard, Board>()
+            .AddSingleton<IValues, Values>()
+            .AddTransient<IPosition, Position>()
+            .AddSingleton<IBlockage, Blockage>()
+            .BuildServiceProvider();
+    }
+
     [Theory]
     [InlineData("8/8/k7/p1p1p1p1/P1P1P1P1/8/8/4K3 w - - 0 1", true)]
     [InlineData("4k3/5p2/1p1p1P1p/1P1P1P1P/3P4/8/4K3/8 w - - 0 1", true)]
@@ -39,10 +55,13 @@ public sealed class FenceTests
     [InlineData("8/2p5/kp2p1p1/p1p1P1P1/P1P2P2/1P4K1/8/8 w - - 0 1", false)]
     public void Blocked(string fen, bool expected)
     {
-        var g = GameFactory.Create(fen);
-        var pos = g.Pos;
+        var pos = _serviceProvider.GetRequiredService<IPosition>();
+        var fenData = new FenData(fen);
+        var state = new State();
+        pos.Set(in fenData, ChessMode.Normal, state);
 
-        var actual = BlockageFactory.IsBlocked(in pos);
+        var blockage = _serviceProvider.GetRequiredService<IBlockage>();
+        var actual = blockage.IsBlocked(in pos);
 
         Assert.Equal(expected, actual);
     }

@@ -1,4 +1,4 @@
 
 namespace Rudzoft.ChessLib.WebApi;
 
-public record Moves(IList<string> MoveList, int Size);
+public record Moves(List<string> MoveList, int Size);

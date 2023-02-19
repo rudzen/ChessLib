@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Numerics;
-using BenchmarkDotNet.Attributes;
 using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Benchmark;

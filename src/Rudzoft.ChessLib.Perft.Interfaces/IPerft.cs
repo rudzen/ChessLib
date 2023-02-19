@@ -34,13 +34,13 @@ public interface IPerft
 {
     Action<string> BoardPrintCallback { get; set; }
 
-    IList<PerftPosition> Positions { get; set; }
+    List<PerftPosition> Positions { get; set; }
 
     int Depth { get; set; }
 
     ulong Expected { get; set; }
 
-    public IGame CurrentGame { get; set; }
+    public IGame Game { get; set; }
 
     IAsyncEnumerable<ulong> DoPerft(int depth);
 

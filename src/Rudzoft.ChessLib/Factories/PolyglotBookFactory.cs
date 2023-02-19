@@ -1,5 +1,5 @@
 ﻿/*
-Perft, a chess perft test library
+ChessLib, a chess data structure library
 
 MIT License
 
@@ -24,10 +24,31 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using Microsoft.Extensions.Options;
+using Rudzoft.ChessLib.Polyglot;
 
-namespace Rudzoft.ChessLib.Perft.Interfaces;
+namespace Rudzoft.ChessLib.Factories;
 
-public record struct PerftPositionValue(int Depth, ulong MoveCount);
+public sealed class PolyglotBookFactory : IPolyglotBookFactory
+{
+    private readonly string _path;
 
-public sealed record PerftPosition(string Id, string Fen, List<PerftPositionValue> Value);
+    public PolyglotBookFactory(IOptions<PolyglotBookConfiguration> options)
+    {
+        var config = options.Value;
+        _path = string.IsNullOrWhiteSpace(config.BookPath) ? string.Empty : config.BookPath;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public IPolyglotBook Create(string bookFile)
+    {
+        return PolyglotBook.Create(_path, bookFile);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public IPolyglotBook Create()
+    {
+        return PolyglotBook.Create();
+    }
+}

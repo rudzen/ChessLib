@@ -1,5 +1,5 @@
 ﻿/*
-Perft, a chess perft test library
+ChessLib, a chess data structure library
 
 MIT License
 
@@ -24,19 +24,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using Rudzoft.ChessLib.Factories;
-using Rudzoft.ChessLib.Perft.Interfaces;
+using System.ComponentModel.DataAnnotations;
 
-namespace Rudzoft.ChessLib.Perft;
+namespace Rudzoft.ChessLib.Hash.Tables.Transposition;
 
-public static class PerftFactory
+public sealed class TranspositionTableConfiguration
 {
-    public static IPerft Create(Action<string> boardPrintCallback = null, IEnumerable<PerftPosition> positions = null)
-    {
-        positions ??= Enumerable.Empty<PerftPosition>();
-        return new Perft(GameFactory.Create(), positions);
-    }
+    public const string Section = "TranspositionTable";
+    
+    [Range(1, 1 << 31, ErrorMessage = "Default size for TT: {0} must be between {1} and {2}.")]
+    public int DefaultSize { get; init; }
 }

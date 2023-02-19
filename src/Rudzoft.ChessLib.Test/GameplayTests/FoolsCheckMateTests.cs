@@ -24,7 +24,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using Rudzoft.ChessLib.Factories;
+using System;
+using Microsoft.Extensions.DependencyInjection;
+using Rudzoft.ChessLib.Enums;
 using Rudzoft.ChessLib.Fen;
 using Rudzoft.ChessLib.MoveGeneration;
 using Rudzoft.ChessLib.Types;
@@ -33,6 +35,17 @@ namespace Rudzoft.ChessLib.Test.GameplayTests;
 
 public sealed class FoolsCheckMateTests
 {
+    private readonly IServiceProvider _serviceProvider;
+
+    public FoolsCheckMateTests()
+    {
+        _serviceProvider = new ServiceCollection()
+            .AddTransient<IBoard, Board>()
+            .AddSingleton<IValues, Values>()
+            .AddTransient<IPosition, Position>()
+            .BuildServiceProvider();
+    }
+
     [Fact]
     public void FoolsCheckMate()
     {
@@ -45,19 +58,19 @@ public sealed class FoolsCheckMateTests
             Move.Create(Square.D8, Square.H4)
         };
 
-        // construct game and start a new game
-        var game = GameFactory.Create(Fen.Fen.StartPositionFen);
-        var position = game.Pos;
+        var pos = _serviceProvider.GetRequiredService<IPosition>();
+        var fenData = new FenData(Fen.Fen.StartPositionFen);
         var state = new State();
+        pos.Set(in fenData, ChessMode.Normal, state);
 
         // make the moves necessary to create a mate
         foreach (var move in moves)
-            position.MakeMove(move, state);
+            pos.MakeMove(move, state);
 
         // verify in check is actually true
-        Assert.True(position.InCheck);
+        Assert.True(pos.InCheck);
 
-        var resultingMoves = position.GenerateMoves();
+        var resultingMoves = pos.GenerateMoves();
 
         // verify that no legal moves actually exists.
         Assert.True(resultingMoves.Length == 0);

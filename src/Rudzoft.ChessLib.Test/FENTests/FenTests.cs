@@ -24,13 +24,28 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using System;
+using Microsoft.Extensions.DependencyInjection;
+using Rudzoft.ChessLib.Enums;
 using Rudzoft.ChessLib.Exceptions;
-using Rudzoft.ChessLib.Factories;
+using Rudzoft.ChessLib.Fen;
+using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Test.FENTests;
 
 public sealed class FenTests
 {
+    private readonly IServiceProvider _serviceProvider;
+
+    public FenTests()
+    {
+        _serviceProvider = new ServiceCollection()
+            .AddTransient<IBoard, Board>()
+            .AddSingleton<IValues, Values>()
+            .AddTransient<IPosition, Position>()
+            .BuildServiceProvider();
+    }
+
     [Theory]
     [InlineData(Fen.Fen.StartPositionFen)]
     [InlineData("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1")]
@@ -41,18 +56,29 @@ public sealed class FenTests
     [InlineData("r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 1")]
     public void GetFen(string fen)
     {
-        var g = GameFactory.Create(fen);
-        var actualFen = g.GetFen().ToString();
+        var pos = _serviceProvider.GetRequiredService<IPosition>();
+        var fenData = new FenData(fen);
+        var state = new State();
+        pos.Set(in fenData, ChessMode.Normal, state);
+        
+        var actualFen = pos.GenerateFen().ToString();
         Assert.Equal(fen, actualFen);
     }
 
     [Theory]
-    [InlineData("z3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1")]
-    [InlineData("r3k2r/p1ppqpb1/bn2pnp1/3PN3/ip2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1")]
-    [InlineData("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/lPPBBPPP/R3K2R w KQkq - 0 1")]
-    public void Validate(string fen)
+    [InlineData("z3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1", typeof(InvalidFen))]
+    [InlineData("r3k2r/p1ppqpb1/bn2pnp1/3PN3/ip2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1", typeof(InvalidFen))]
+    [InlineData("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/lPPBBPPP/R3K2R w KQkq - 0 1", typeof(InvalidFen))]
+    public void Validate(string fen, Type expectedException)
     {
-        var exception = Assert.Throws<InvalidFen>(() => GameFactory.Create(fen, true));
+        var pos = _serviceProvider.GetRequiredService<IPosition>();
+
+        var exception = Assert.Throws(expectedException, () =>
+        {
+            var fenData = new FenData(fen);
+            var state = new State();
+            pos.Set(in fenData, ChessMode.Normal, state);
+        });
         Assert.NotNull(exception.Message);
         Assert.StartsWith("Invalid char detected", exception.Message);
     }

@@ -45,17 +45,18 @@ public sealed class Game : IGame
     private readonly ObjectPool<IMoveList> _moveLists;
     private readonly IPosition _pos;
 
-    public Game(IPosition pos)
+    public Game(
+        ITranspositionTable transpositionTable,
+        IUci uci,
+        ISearchParameters searchParameters,
+        IPosition pos)
     {
-        _pos = pos;
         _moveLists = new DefaultObjectPool<IMoveList>(new MoveListPolicy());
-        SearchParameters = new SearchParameters();
-    }
-
-    static Game()
-    {
-        Table = new TranspositionTable(256);
-        Uci = new Uci();
+        _pos = pos;
+        
+        Table = transpositionTable;
+        SearchParameters = searchParameters;
+        Uci = uci;
     }
 
     public Action<IPieceSquare> PieceUpdated => _pos.PieceUpdated;
@@ -68,11 +69,11 @@ public sealed class Game : IGame
 
     public GameEndTypes GameEndType { get; set; }
 
-    public static TranspositionTable Table { get; }
+    public ITranspositionTable Table { get; }
 
-    public SearchParameters SearchParameters { get; }
+    public ISearchParameters SearchParameters { get; }
 
-    public static IUci Uci { get; }
+    public IUci Uci { get; }
 
     public bool IsRepetition => _pos.IsRepetition;
 
@@ -113,17 +114,16 @@ public sealed class Game : IGame
     }
 
     public override string ToString()
-        => _pos.ToString();
+    {
+        return _pos.ToString() ?? string.Empty;
+    }
 
-    IEnumerator IEnumerable.GetEnumerator()
-        => GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-    public IEnumerator<Piece> GetEnumerator()
-        => _pos.GetEnumerator();
+    public IEnumerator<Piece> GetEnumerator() => _pos.GetEnumerator();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public BitBoard OccupiedBySide(Player p)
-        => _pos.Pieces(p);
+    public BitBoard OccupiedBySide(Player p) => _pos.Pieces(p);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Player CurrentPlayer() => _pos.SideToMove;

@@ -24,8 +24,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using System;
+using Microsoft.Extensions.DependencyInjection;
+using Rudzoft.ChessLib.Enums;
 using Rudzoft.ChessLib.Extensions;
-using Rudzoft.ChessLib.Factories;
+using Rudzoft.ChessLib.Fen;
 using Rudzoft.ChessLib.Types;
 using Rudzoft.ChessLib.Validation;
 
@@ -33,20 +36,35 @@ namespace Rudzoft.ChessLib.Test.PositionTests;
 
 public sealed class ValidationTests
 {
+    private readonly IServiceProvider _serviceProvider;
+
+    public ValidationTests()
+    {
+        _serviceProvider = new ServiceCollection()
+            .AddTransient<IBoard, Board>()
+            .AddSingleton<IValues, Values>()
+            .AddTransient<IPosition, Position>()
+            .BuildServiceProvider();
+    }
+
     [Fact]
     public void ValidationKingsNegative()
     {
         const PositionValidationTypes type = PositionValidationTypes.Kings;
         var expectedErrorMsg = $"king count for player {Player.White} was 2";
 
-        var game = GameFactory.Create();
-        game.NewGame();
+        var pos = _serviceProvider.GetRequiredService<IPosition>();
+
+        var fenData = new FenData(Fen.Fen.StartPositionFen);
+        var state = new State();
+
+        pos.Set(in fenData, ChessMode.Normal, state);
 
         var pc = PieceTypes.King.MakePiece(Player.White);
 
-        game.Pos.AddPiece(pc, Square.E4);
+        pos.AddPiece(pc, Square.E4);
 
-        var validator = game.Pos.Validate(type);
+        var validator = pos.Validate(type);
 
         Assert.NotEmpty(validator.ErrorMsg);
 
@@ -62,10 +80,15 @@ public sealed class ValidationTests
         // position only has pawns, rooks and kings
         const string fen = "r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 1";
         const PositionValidationTypes validationType = PositionValidationTypes.Castle;
-        var game = GameFactory.Create();
-        game.NewGame(fen);
+        
+        var pos = _serviceProvider.GetRequiredService<IPosition>();
 
-        var validator = game.Pos.Validate(validationType);
+        var fenData = new FenData(fen);
+        var state = new State();
+
+        pos.Set(in fenData, ChessMode.Normal, state);
+
+        var validator = pos.Validate(validationType);
 
         Assert.True(validator.IsOk);
         Assert.True(validator.ErrorMsg.IsNullOrEmpty());

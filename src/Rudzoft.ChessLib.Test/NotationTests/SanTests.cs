@@ -24,9 +24,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using System;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
+using Rudzoft.ChessLib.Enums;
 using Rudzoft.ChessLib.Extensions;
-using Rudzoft.ChessLib.Factories;
+using Rudzoft.ChessLib.Fen;
 using Rudzoft.ChessLib.MoveGeneration;
 using Rudzoft.ChessLib.Notation;
 using Rudzoft.ChessLib.Notation.Notations;
@@ -36,14 +39,31 @@ namespace Rudzoft.ChessLib.Test.NotationTests;
 
 public sealed class SanTests
 {
+    private readonly IServiceProvider _serviceProvider;
+
+    public SanTests()
+    {
+        _serviceProvider = new ServiceCollection()
+            .AddTransient<IBoard, Board>()
+            .AddSingleton<IValues, Values>()
+            .AddTransient<IPosition, Position>()
+            .BuildServiceProvider();
+    }
+
     [Theory]
     [InlineData("8/6k1/8/8/8/8/1K1N1N2/8 w - - 0 1", MoveNotations.San, PieceTypes.Knight, Squares.d2, Squares.f2,
         Squares.e4)]
     public void SanRankAmbiguities(string fen, MoveNotations moveNotation, PieceTypes movingPt, Squares fromSqOne,
         Squares fromSqTwo, Squares toSq)
     {
-        var g = GameFactory.Create(fen);
-        var pc = movingPt.MakePiece(g.Pos.SideToMove);
+        var pos = _serviceProvider.GetRequiredService<IPosition>();
+
+        var fenData = new FenData(fen);
+        var state = new State();
+
+        pos.Set(in fenData, ChessMode.Normal, state);
+
+        var pc = movingPt.MakePiece(pos.SideToMove);
 
         var fromOne = new Square(fromSqOne);
         var fromTwo = new Square(fromSqTwo);
@@ -59,7 +79,7 @@ public sealed class SanTests
         var moveOne = Move.Create(fromOne, to);
         var moveTwo = Move.Create(fromTwo, to);
 
-        var ambiguity = MoveNotation.Create(g.Pos);
+        var ambiguity = MoveNotation.Create(pos);
 
         var expectedOne = $"{pieceChar}{fromOne.FileChar}{toString}";
         var expectedTwo = $"{pieceChar}{fromTwo.FileChar}{toString}";
@@ -77,8 +97,14 @@ public sealed class SanTests
     public void SanFileAmbiguities(string fen, MoveNotations moveNotation, PieceTypes movingPt, Squares fromSqOne,
         Squares fromSqTwo, Squares toSq)
     {
-        var g = GameFactory.Create(fen);
-        var pc = movingPt.MakePiece(g.Pos.SideToMove);
+        var pos = _serviceProvider.GetRequiredService<IPosition>();
+
+        var fenData = new FenData(fen);
+        var state = new State();
+
+        pos.Set(in fenData, ChessMode.Normal, state);
+
+        var pc = movingPt.MakePiece(pos.SideToMove);
 
         var fromOne = new Square(fromSqOne);
         var fromTwo = new Square(fromSqTwo);
@@ -94,7 +120,7 @@ public sealed class SanTests
         var moveOne = Move.Create(fromOne, to);
         var moveTwo = Move.Create(fromTwo, to);
 
-        var ambiguity = MoveNotation.Create(g.Pos);
+        var ambiguity = MoveNotation.Create(pos);
 
         var expectedOne = $"{pieceChar}{fromOne.RankChar}{toString}";
         var expectedTwo = $"{pieceChar}{fromTwo.RankChar}{toString}";
@@ -115,17 +141,22 @@ public sealed class SanTests
         const MoveNotations notation = MoveNotations.San;
         var expectedNotations = new[] { "Ree2", "Rge2" };
 
-        var game = GameFactory.Create(fen);
+        var pos = _serviceProvider.GetRequiredService<IPosition>();
 
-        var sideToMove = game.Pos.SideToMove;
+        var fenData = new FenData(fen);
+        var state = new State();
+
+        pos.Set(in fenData, ChessMode.Normal, state);
+
+        var sideToMove = pos.SideToMove;
         var targetPiece = PieceTypes.Rook.MakePiece(sideToMove);
 
-        var moveNotation = MoveNotation.Create(game.Pos);
+        var moveNotation = MoveNotation.Create(pos);
 
-        var sanMoves = game.Pos
+        var sanMoves = pos
             .GenerateMoves()
             .Select(static em => em.Move)
-            .Where(m => game.Pos.GetPiece(m.FromSquare()) == targetPiece)
+            .Where(m => pos.GetPiece(m.FromSquare()) == targetPiece)
             .Select(m => moveNotation.ToNotation(notation).Convert(m))
             .ToArray();
 
@@ -139,8 +170,14 @@ public sealed class SanTests
     {
         // author: skotz
 
-        var game = GameFactory.Create(fen);
-        var notation = MoveNotation.Create(game.Pos);
+        var pos = _serviceProvider.GetRequiredService<IPosition>();
+
+        var fenData = new FenData(fen);
+        var state = new State();
+
+        pos.Set(in fenData, ChessMode.Normal, state);
+
+        var notation = MoveNotation.Create(pos);
 
         var move = Move.Create(Squares.d1, Squares.d8, MoveTypes.Normal);
         var sanMove = notation.ToNotation(MoveNotations.San).Convert(move);
@@ -155,10 +192,15 @@ public sealed class SanTests
     {
         // author: skotz
         
-        var game = GameFactory.Create(fen);
-        var pos = game.Pos;
+        var pos = _serviceProvider.GetRequiredService<IPosition>();
+
+        var fenData = new FenData(fen);
+        var state = new State();
+
+        pos.Set(in fenData, ChessMode.Normal, state);
+
         var notation = MoveNotation.Create(pos);
-        var allMoves = game.Pos.GenerateMoves().Get();
+        var allMoves = pos.GenerateMoves().Get();
 
         foreach (var move in allMoves)
         {

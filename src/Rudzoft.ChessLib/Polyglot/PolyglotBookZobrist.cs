@@ -30,6 +30,7 @@ namespace Rudzoft.ChessLib.Polyglot;
 
 internal static class PolyglotBookZobrist
 {
+    // TODO : re-write to jagged array
     private static readonly ulong[,] PsqKeys =
     {
         {

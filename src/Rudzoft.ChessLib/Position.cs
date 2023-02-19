@@ -33,6 +33,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using Microsoft.Extensions.ObjectPool;
 using Rudzoft.ChessLib.Enums;
+using Rudzoft.ChessLib.Exceptions;
 using Rudzoft.ChessLib.Extensions;
 using Rudzoft.ChessLib.Fen;
 using Rudzoft.ChessLib.Hash;
@@ -57,11 +58,11 @@ public sealed class Position : IPosition
     private readonly IPositionValidator _positionValidator;
     private Player _sideToMove;
 
-    public Position(IBoard board, IValues valueses)
+    public Position(IBoard board, IValues values)
     {
         Board = board;
-        Values = valueses;
-        State = default;
+        Values = values;
+        State = new State();
         _outputObjectPool = new DefaultObjectPool<StringBuilder>(new StringBuilderPooledObjectPolicy());
         _positionValidator = new PositionValidator(this, Board);
         _castleKingPath = new BitBoard[CastleRight.Count];
@@ -75,41 +76,34 @@ public sealed class Position : IPosition
 
     public IBoard Board { get; }
 
-    public BitBoard Checkers
-        => State.Checkers;
+    public BitBoard Checkers => State.Checkers;
 
     public ChessMode ChessMode { get; set; }
 
-    public Square EnPassantSquare
-        => State.EnPassantSquare;
+    public Square EnPassantSquare => State.EnPassantSquare;
 
-    public string FenNotation
-        => GenerateFen().ToString();
+    public string FenNotation => GenerateFen().ToString();
 
-    public bool InCheck
-        => State.Checkers;
+    public bool InCheck => State.Checkers;
 
-    public bool IsMate
-        => this.GenerateMoves().Length == 0;
+    public bool IsMate => this.GenerateMoves().Length == 0;
 
     public bool IsProbing { get; set; }
 
-    public bool IsRepetition
-        => State.Repetition >= 3;
+    public bool IsRepetition => State.Repetition >= 3;
 
     /// <summary>
     /// To let something outside the library be aware of changes (like a UI etc)
     /// </summary>
-    public Action<IPieceSquare> PieceUpdated { get; set; }
+    public Action<IPieceSquare>? PieceUpdated { get; set; }
 
     public IValues Values { get; }
 
     public int Ply { get; private set; }
 
-    public int Rule50 => State!.Rule50;
+    public int Rule50 => State.Rule50;
 
-    public Player SideToMove
-        => _sideToMove;
+    public Player SideToMove => _sideToMove;
 
     public State State { get; private set; }
 
@@ -315,25 +309,39 @@ public sealed class Position : IPosition
             fen[length++] = dash;
         else
         {
-            if (CanCastle(CastleRight.WhiteKing))
-                fen[length++] = ChessMode == ChessMode.Chess960
-                    ? CastlingRookSquare(CastleRight.WhiteKing).FileChar
-                    : 'K';
+            switch (ChessMode)
+            {
+                case ChessMode.Normal:
+                    if (CanCastle(CastleRight.WhiteKing))
+                        fen[length++] = 'K';
 
-            if (CanCastle(CastleRight.WhiteQueen))
-                fen[length++] = ChessMode == ChessMode.Chess960
-                    ? CastlingRookSquare(CastleRight.WhiteQueen).FileChar
-                    : 'Q';
+                    if (CanCastle(CastleRight.WhiteQueen))
+                        fen[length++] = 'Q';
 
-            if (CanCastle(CastleRight.BlackKing))
-                fen[length++] = ChessMode == ChessMode.Chess960
-                    ? CastlingRookSquare(CastleRight.BlackQueen).FileChar
-                    : 'k';
+                    if (CanCastle(CastleRight.BlackKing))
+                        fen[length++] = 'k';
 
-            if (CanCastle(CastleRight.BlackQueen))
-                fen[length++] = ChessMode == ChessMode.Chess960
-                    ? CastlingRookSquare(CastleRight.BlackQueen).FileChar
-                    : 'q';
+                    if (CanCastle(CastleRight.BlackQueen))
+                        fen[length++] = 'q';
+                    
+                    break;
+                case ChessMode.Chess960:
+                    if (CanCastle(CastleRight.WhiteKing))
+                        fen[length++] = CastlingRookSquare(CastleRight.WhiteKing).FileChar;
+
+                    if (CanCastle(CastleRight.WhiteQueen))
+                        fen[length++] = CastlingRookSquare(CastleRight.WhiteQueen).FileChar;
+
+                    if (CanCastle(CastleRight.BlackKing))
+                        fen[length++] = CastlingRookSquare(CastleRight.BlackQueen).FileChar;
+
+                    if (CanCastle(CastleRight.BlackQueen))
+                        fen[length++] = CastlingRookSquare(CastleRight.BlackQueen).FileChar;
+                    
+                    break;
+                default:
+                    throw new Exception($"Invalid chess mode. mode={ChessMode}");
+            }
         }
 
         fen[length++] = space;
@@ -1120,6 +1128,9 @@ public sealed class Position : IPosition
             else
             {
                 var pieceIndex = PieceExtensions.PieceChars.IndexOf(c);
+
+                if (pieceIndex == -1)
+                    throw new InvalidFen("Invalid char detected");
 
                 Player p = new(char.IsLower(PieceExtensions.PieceChars[pieceIndex]));
 

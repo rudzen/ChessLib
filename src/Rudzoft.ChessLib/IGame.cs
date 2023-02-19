@@ -43,7 +43,7 @@ public interface IGame : IEnumerable<Piece>
 
     GameEndTypes GameEndType { get; set; }
 
-    SearchParameters SearchParameters { get; }
+    ISearchParameters SearchParameters { get; }
 
     bool IsRepetition { get; }
 

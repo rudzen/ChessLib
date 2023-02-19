@@ -2,4 +2,4 @@
 
 namespace Rudzoft.ChessLib.WebApi.Queries;
 
-public sealed record MoveQuery(string Fen = Fen.Fen.StartPositionFen, MoveGenerationType Type = MoveGenerationType.Legal);
+public sealed record MoveQuery(string Fen = Fen.Fen.StartPositionFen, MoveGenerationType Type = MoveGenerationType.Legal, ChessMode Mode = ChessMode.Normal);

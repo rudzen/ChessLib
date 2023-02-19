@@ -1,5 +1,4 @@
-using Rudzoft.ChessLib;
-using Rudzoft.ChessLib.Types;
+using Rudzoft.ChessLib.Extensions;
 using Rudzoft.ChessLib.WebApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,11 +10,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddTransient<IMoveGeneratorService, MoveGeneratorService>();
-builder.Services.AddTransient<IPosition, Position>();
-builder.Services.AddTransient<IBoard, Board>();
-builder.Services.AddSingleton<IValues, Values>();
-builder.Services.AddTransient<IGame, Game>();
+builder.Services.AddChessLib(null)
+    .AddTransient<IMoveGeneratorService, MoveGeneratorService>();
 
 var app = builder.Build();
 

@@ -27,8 +27,12 @@ SOFTWARE.
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
+using Rudzoft.ChessLib.Hash.Tables.Transposition;
 using Rudzoft.ChessLib.Perft;
 using Rudzoft.ChessLib.Perft.Interfaces;
+using Rudzoft.ChessLib.Protocol.UCI;
+using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Benchmark;
 
@@ -38,22 +42,9 @@ public class PerftBench
 {
     private IPerft _perft;
 
-    private readonly PerftPosition _pp;
-
     public PerftBench()
     {
-        _pp = PerftPositionFactory.Create(
-            Guid.NewGuid().ToString(),
-            Fen.Fen.StartPositionFen,
-            new List<PerftPositionValue>(6)
-            {
-                    new(1, 20),
-                    new(2, 400),
-                    new(3, 8902),
-                    new(4, 197281),
-                    new(5, 4865609),
-                    new(6, 119060324)
-            });
+
     }
 
     [Params(5, 6)]
@@ -62,8 +53,35 @@ public class PerftBench
     [GlobalSetup]
     public void Setup()
     {
-        _perft = PerftFactory.Create();
-        _perft.AddPosition(_pp);
+        
+        var pp = PerftPositionFactory.Create(
+            Guid.NewGuid().ToString(),
+            Fen.Fen.StartPositionFen,
+            new List<PerftPositionValue>(6)
+            {
+                new(1, 20),
+                new(2, 400),
+                new(3, 8902),
+                new(4, 197281),
+                new(5, 4865609),
+                new(6, 119060324)
+            });
+        
+        var ttConfig = new TranspositionTableConfiguration { DefaultSize = 1 };
+        var options = Options.Create(ttConfig);
+        var tt = new TranspositionTable(options);
+
+        var uci = new Uci();
+        uci.Initialize();
+
+        var sp = new SearchParameters();
+        
+        var board = new Board();
+        var values = new Values();
+        var pos = new Position(board, values);
+        
+        var game = new Game(tt, uci, sp, pos);
+        _perft = new Perft.Perft(game, new []{ pp });
     }
 
     [Benchmark]
@@ -85,5 +103,4 @@ public class PerftBench
 
         return total;
     }
-
 }

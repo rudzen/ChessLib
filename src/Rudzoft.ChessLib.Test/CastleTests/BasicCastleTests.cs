@@ -24,8 +24,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using System;
+using Microsoft.Extensions.DependencyInjection;
 using Rudzoft.ChessLib.Enums;
-using Rudzoft.ChessLib.Factories;
 using Rudzoft.ChessLib.Fen;
 using Rudzoft.ChessLib.Types;
 
@@ -33,6 +34,17 @@ namespace Rudzoft.ChessLib.Test.CastleTests;
 
 public sealed class BasicCastleTests
 {
+    private readonly IServiceProvider _serviceProvider;
+
+    public BasicCastleTests()
+    {
+        _serviceProvider = new ServiceCollection()
+            .AddTransient<IBoard, Board>()
+            .AddSingleton<IValues, Values>()
+            .AddTransient<IPosition, Position>()
+            .BuildServiceProvider();
+    }
+
     [Theory]
     [InlineData(Fen.Fen.StartPositionFen, CastleRights.None, false)]
     [InlineData("rnbqk2r/pppppppp/8/8/8/8/PPPPPPPP/RNBQK2R w KQkq - 0 1", CastleRights.King, true)]
@@ -41,10 +53,11 @@ public sealed class BasicCastleTests
     [InlineData("r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 1", CastleRights.Queen, true)]
     public void CanPotentiallyCastle(string fen, CastleRights cr, bool expected)
     {
-        var pos = GameFactory.Create(fen).Pos;
-        var fd = new FenData(fen);
+        var pos = _serviceProvider.GetRequiredService<IPosition>();
+        var fenData = new FenData(fen);
         var state = new State();
-        pos.Set(in fd, ChessMode.Normal, state);
+        pos.Set(in fenData, ChessMode.Normal, state);
+
         var actual = pos.CanCastle(cr);
         Assert.Equal(expected, actual);
     }
@@ -64,10 +77,11 @@ public sealed class BasicCastleTests
     [InlineData("r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 1", CastleRights.BlackQueen, false)]
     public void IsCastleImpeeded(string fen, CastleRights cr, bool expected)
     {
-        var pos = GameFactory.Create(fen).Pos;
-        var fd = new FenData(fen);
+        var pos = _serviceProvider.GetRequiredService<IPosition>();
+        var fenData = new FenData(fen);
         var state = new State();
-        pos.Set(in fd, ChessMode.Normal, state);
+        pos.Set(in fenData, ChessMode.Normal, state);
+
         var actual = pos.CastlingImpeded(cr);
         Assert.Equal(expected, actual);
     }

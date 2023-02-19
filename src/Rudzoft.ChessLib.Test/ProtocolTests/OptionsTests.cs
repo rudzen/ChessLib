@@ -28,7 +28,7 @@ using Rudzoft.ChessLib.Protocol.UCI;
 
 namespace Rudzoft.ChessLib.Test.ProtocolTests;
 
-public class OptionsTests
+public sealed class OptionsTests
 {
     [Theory]
     [InlineData("Boolean Test", true, true, "option name Boolean Test type Check default true")]

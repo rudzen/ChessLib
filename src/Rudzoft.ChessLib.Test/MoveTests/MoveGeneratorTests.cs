@@ -24,8 +24,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using System;
+using Microsoft.Extensions.DependencyInjection;
 using Rudzoft.ChessLib.Enums;
-using Rudzoft.ChessLib.Factories;
 using Rudzoft.ChessLib.Fen;
 using Rudzoft.ChessLib.MoveGeneration;
 using Rudzoft.ChessLib.Types;
@@ -34,19 +35,33 @@ namespace Rudzoft.ChessLib.Test.MoveTests;
 
 public sealed class MoveGeneratorTests
 {
+    private readonly IServiceProvider _serviceProvider;
+
+    public MoveGeneratorTests()
+    {
+        _serviceProvider = new ServiceCollection()
+            .AddTransient<IBoard, Board>()
+            .AddSingleton<IValues, Values>()
+            .AddTransient<IPosition, Position>()
+            .BuildServiceProvider();
+    }
+
     [Fact]
     public void InCheckMoveGeneration()
     {
         const string fen = "rnbqkbnr/1ppQpppp/p2p4/8/8/2P5/PP1PPPPP/RNB1KBNR b KQkq - 1 6";
         const int expectedMoves = 4;
 
-        var g = GameFactory.Create(fen);
+        var pos = _serviceProvider.GetRequiredService<IPosition>();
+        var fenData = new FenData(fen);
+        var state = new State();
+        pos.Set(in fenData, ChessMode.Normal, state);
 
         // make sure black is in check
-        Assert.True(g.Pos.InCheck);
+        Assert.True(pos.InCheck);
 
         // generate moves for black
-        var mg = g.Pos.GenerateMoves();
+        var mg = pos.GenerateMoves();
         var actualMoves = mg.Length;
 
         Assert.Equal(expectedMoves, actualMoves);

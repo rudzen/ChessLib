@@ -27,6 +27,7 @@ SOFTWARE.
 using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Microsoft.Extensions.Options;
 using Rudzoft.ChessLib.Exceptions;
 using Rudzoft.ChessLib.Types;
 
@@ -49,10 +50,11 @@ public sealed class TranspositionTable : ITranspositionTable
         }
     }
 
-    public TranspositionTable(int mbSize)
+    public TranspositionTable(IOptions<TranspositionTableConfiguration> options)
     {
         _table = Array.Empty<Cluster>();
-        SetSize(mbSize);
+        Size = options.Value.DefaultSize;
+        SetSize(Size);
     }
 
     /// <summary>
@@ -123,6 +125,7 @@ public sealed class TranspositionTable : ITranspositionTable
     /// Probes the transposition table for a entry that matches the position key.
     /// </summary>
     /// <param name="key">The position key</param>
+    /// <param name="e">Target entry</param>
     /// <returns>(true, entry) if one was found, (false, empty) if not found</returns>
     public bool Probe(in HashKey key, ref TranspositionTableEntry e)
     {

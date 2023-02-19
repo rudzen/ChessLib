@@ -25,8 +25,11 @@ SOFTWARE.
 */
 
 using System;
-using System.Runtime.CompilerServices;
-using Rudzoft.ChessLib.Factories;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using Rudzoft.ChessLib.Enums;
+using Rudzoft.ChessLib.Fen;
+using Rudzoft.ChessLib.Hash.Tables.Transposition;
 using Rudzoft.ChessLib.Protocol.UCI;
 using Rudzoft.ChessLib.Types;
 
@@ -34,6 +37,27 @@ namespace Rudzoft.ChessLib.Test.ProtocolTests;
 
 public sealed class UciTests
 {
+    private readonly IServiceProvider _serviceProvider;
+
+    public UciTests()
+    {
+        var transpositionTableConfiguration = new TranspositionTableConfiguration { DefaultSize = 1 };
+        var options = Options.Create(transpositionTableConfiguration);
+
+        _serviceProvider = new ServiceCollection()
+            .AddSingleton(options)
+            .AddSingleton<IValues, Values>()
+            .AddTransient<IBoard, Board>()
+            .AddTransient<IPosition, Position>()
+            .AddSingleton(static _ =>
+            {
+                IUci uci = new Uci();
+                uci.Initialize();
+                return uci;
+            })
+            .BuildServiceProvider();
+    }
+
     [Fact]
     public void NpsSimple()
     {
@@ -43,7 +67,7 @@ public sealed class UciTests
 
         var ts = TimeSpan.FromSeconds(1);
 
-        var uci = new Uci();
+        var uci = _serviceProvider.GetRequiredService<IUci>();
 
         var actual = uci.Nps(nodes, in ts);
 
@@ -55,12 +79,16 @@ public sealed class UciTests
     {
         const string uciMove = "a2a3";
         var expected = Move.Create(Square.A2, Square.A3);
-        var uci = new Uci();
 
-        var game = GameFactory.Create();
-        game.NewGame();
+        var uci = _serviceProvider.GetRequiredService<IUci>();
+        var pos = _serviceProvider.GetRequiredService<IPosition>();
 
-        var actual = uci.MoveFromUci(game.Pos, uciMove);
+        var fenData = new FenData(Fen.Fen.StartPositionFen);
+        var state = new State();
+
+        pos.Set(in fenData, ChessMode.Normal, state);
+
+        var actual = uci.MoveFromUci(pos, uciMove);
 
         Assert.Equal(expected, actual);
     }

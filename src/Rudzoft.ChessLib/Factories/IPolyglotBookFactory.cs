@@ -1,4 +1,4 @@
-/*
+﻿/*
 ChessLib, a chess data structure library
 
 MIT License
@@ -24,11 +24,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using Rudzoft.ChessLib.Polyglot;
+
 namespace Rudzoft.ChessLib.Factories;
 
-public static class BlockageFactory
+public interface IPolyglotBookFactory
 {
-    public static IBlockage Create(in IPosition pos) => new Blockage(in pos);
-
-    public static bool IsBlocked(in IPosition pos) => Create(in pos).IsBlocked();
+    IPolyglotBook Create(string bookFile);
+    IPolyglotBook Create();
 }

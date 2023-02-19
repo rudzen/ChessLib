@@ -31,11 +31,20 @@ namespace Rudzoft.ChessLib.Perft;
 
 internal static class PerftTable
 {
-    private const int EntrySize = 24;
     private const int HashMemory = 256;
-    private const int TtSize = HashMemory * 1024 * 1024 / EntrySize;
-    private static readonly PerftHashEntry[] Table = new PerftHashEntry[TtSize];
+    private static readonly ulong TtSize;
+    private static readonly PerftHashEntry[] Table;
 
+    static PerftTable()
+    {
+        unsafe
+        {
+            var entrySize = sizeof(PerftHashEntry);
+            TtSize = (ulong)(HashMemory * 1024 * 1024 / entrySize);
+            Table = new PerftHashEntry[TtSize];
+        }
+    }
+    
     private struct PerftHashEntry
     {
         public HashKey Hash;
@@ -46,22 +55,23 @@ internal static class PerftTable
     public static void Store(in HashKey key, int depth, in ulong childCount)
     {
         var slot = (int)(key.Key % TtSize);
-        Table[slot].Hash = key;
-        Table[slot].Count = childCount;
-        Table[slot].Depth = depth;
+        ref var entry = ref Table[slot];
+        entry.Hash = key;
+        entry.Count = childCount;
+        entry.Depth = depth;
     }
 
     public static bool Retrieve(in HashKey key, int depth, out ulong childCount)
     {
         var slot = (int)(key.Key % TtSize);
-        var match = Table[slot].Depth == depth && Table[slot].Hash == key;
-
-        childCount = match ? Table[slot].Count : 0;
+        ref var entry = ref Table[slot];
+        var match = entry.Depth == depth && entry.Hash == key;
+        childCount = match ? entry.Count : 0;
         return match;
     }
 
     public static void Clear()
     {
-        Array.Clear(Table, 0, TtSize);
+        Array.Clear(Table, 0, (int)TtSize);
     }
 }

@@ -52,6 +52,8 @@ public interface ISearchParameters
 
     ulong WhiteTimeMilliseconds { get; set; }
 
+    ref Clock Clock(Player p);
+    
     void Clear();
 
     ulong Inc(Player p);

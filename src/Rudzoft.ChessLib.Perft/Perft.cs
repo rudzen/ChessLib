@@ -59,17 +59,17 @@ public sealed class Perft : IPerft
     public Perft(IGame game, IEnumerable<PerftPosition> positions)
     {
         Positions = positions.ToList();
-        CurrentGame = game;
+        Game = game;
     }
 
-    public Action<string> BoardPrintCallback { get; set; }
+    public Action<string>? BoardPrintCallback { get; set; }
 
     /// <summary>
     /// The positional data for the run
     /// </summary>
-    public IList<PerftPosition> Positions { get; set; }
+    public List<PerftPosition> Positions { get; set; }
 
-    public IGame CurrentGame { get; set; }
+    public IGame Game { get; set; }
     public int Depth { get; set; }
     public ulong Expected { get; set; }
 
@@ -83,16 +83,15 @@ public sealed class Perft : IPerft
 
         foreach (var fd in Positions.Select(static p => new FenData(p.Fen)))
         {
-            Game.Table.NewSearch();
             var state = new State();
-            CurrentGame.Pos.Set(in fd, ChessMode.Normal, state);
+            Game.Pos.Set(in fd, ChessMode.Normal, state);
 
-            if (PerftTable.Retrieve(CurrentGame.Pos.State.Key, depth, out var result))
+            if (PerftTable.Retrieve(Game.Pos.State.Key, depth, out var result))
                 yield return result;
             else
             {
-                result = CurrentGame.Perft(depth);
-                PerftTable.Store(CurrentGame.Pos.State.Key, depth, result);
+                result = Game.Perft(depth);
+                PerftTable.Store(Game.Pos.State.Key, depth, result);
                 yield return result;
             }
         }
@@ -100,16 +99,16 @@ public sealed class Perft : IPerft
 
     public Task<ulong> DoPerftAsync(int depth)
         => Task.Run(()
-            => CurrentGame.Perft(depth));
+            => Game.Perft(depth));
 
     public string GetBoard()
-        => CurrentGame.ToString();
+        => Game.ToString();
 
     public void SetGamePosition(PerftPosition pp)
     {
         var fp = new FenData(pp.Fen);
         var state = new State();
-        CurrentGame.Pos.Set(in fp, ChessMode.Normal, state);
+        Game.Pos.Set(in fp, ChessMode.Normal, state);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

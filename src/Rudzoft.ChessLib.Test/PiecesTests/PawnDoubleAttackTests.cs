@@ -24,20 +24,37 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using Rudzoft.ChessLib.Factories;
+using System;
+using Microsoft.Extensions.DependencyInjection;
+using Rudzoft.ChessLib.Enums;
+using Rudzoft.ChessLib.Fen;
 using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Test.PiecesTests;
 
 public sealed class PawnDoubleAttackTests
 {
-    [Fact]
-    public void b()
+    private readonly IServiceProvider _serviceProvider;
+
+    public PawnDoubleAttackTests()
     {
-        var g = GameFactory.Create(Fen.Fen.StartPositionFen);
+        _serviceProvider = new ServiceCollection()
+            .AddTransient<IBoard, Board>()
+            .AddSingleton<IValues, Values>()
+            .AddTransient<IPosition, Position>()
+            .BuildServiceProvider();
+    }
+    
+    [Fact]
+    public void WhitePlayerPawnDoubleAttacksAttackSpan()
+    {
+        var pos = _serviceProvider.GetRequiredService<IPosition>();
 
-        var pos = g.Pos;
-
+        var fenData = new FenData(Fen.Fen.StartPositionFen);
+        var state = new State();
+        
+        pos.Set(in fenData, ChessMode.Normal, state);
+        
         var whitePawns = pos.Pieces(PieceTypes.Pawn, Player.White);
 
         var attackSpan = whitePawns.PawnDoubleAttacks(Player.White);

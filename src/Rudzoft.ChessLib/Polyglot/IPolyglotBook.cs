@@ -24,24 +24,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using Rudzoft.ChessLib.Fen;
+using System;
 using Rudzoft.ChessLib.Types;
 
-namespace Rudzoft.ChessLib.Factories;
+namespace Rudzoft.ChessLib.Polyglot;
 
-public static class GameFactory
+public interface IPolyglotBook : IDisposable
 {
-    public static IGame Create(IPosition position) => new Game(position);
-
-    public static IGame Create(string fen, bool validate = false)
-    {
-        var g = Create();
-        var fenData = new FenData(fen);
-        var state = new State();
-        g.Pos.Set(in fenData, Enums.ChessMode.Normal, state, validate);
-        return g;
-    }
-
-    public static IGame Create()
-        => new Game(new Position(new Board(), new Values()));
+    string BookFile { get; init; }
+    Move Probe(IPosition pos, bool pickBest = true);
+    HashKey ComputePolyglotKey(in IPosition pos);
 }
