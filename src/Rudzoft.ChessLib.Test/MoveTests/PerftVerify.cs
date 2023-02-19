@@ -1,9 +1,11 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.ObjectPool;
 using Microsoft.Extensions.Options;
 using Rudzoft.ChessLib.Enums;
 using Rudzoft.ChessLib.Fen;
 using Rudzoft.ChessLib.Hash.Tables.Transposition;
+using Rudzoft.ChessLib.ObjectPoolPolicies;
 using Rudzoft.ChessLib.Protocol.UCI;
 using Rudzoft.ChessLib.Types;
 
@@ -26,6 +28,13 @@ public abstract class PerftVerify
             .AddSingleton<ISearchParameters, SearchParameters>()
             .AddSingleton<IUci, Uci>()
             .AddTransient<IGame, Game>()
+            .AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>()
+            .AddSingleton(static serviceProvider =>
+            {
+                var provider = serviceProvider.GetRequiredService<ObjectPoolProvider>();
+                var policy = new MoveListPolicy();
+                return provider.Create(policy);
+            })
             .AddSingleton<ITranspositionTable, TranspositionTable>()
             .BuildServiceProvider();
     }

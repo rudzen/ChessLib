@@ -1,5 +1,8 @@
-﻿using Rudzoft.ChessLib.Enums;
+﻿using Microsoft.Extensions.ObjectPool;
+using Rudzoft.ChessLib.Enums;
 using Rudzoft.ChessLib.Fen;
+using Rudzoft.ChessLib.MoveGeneration;
+using Rudzoft.ChessLib.ObjectPoolPolicies;
 using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Benchmark;
@@ -21,7 +24,8 @@ public class FenBenchmark
         var pieceValue = new Values();
         var fp = new FenData(F);
         var state = new State();
-        _pos = new Position(board, pieceValue);
+        var moveListObjectPool = new DefaultObjectPool<IMoveList>(new MoveListPolicy());
+        _pos = new Position(board, pieceValue, moveListObjectPool);
         _pos.Set(in fp, ChessMode.Normal, state);
     }
 

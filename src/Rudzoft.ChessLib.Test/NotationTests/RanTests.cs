@@ -26,11 +26,13 @@ SOFTWARE.
 
 using System;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.ObjectPool;
 using Rudzoft.ChessLib.Enums;
 using Rudzoft.ChessLib.Extensions;
 using Rudzoft.ChessLib.Fen;
 using Rudzoft.ChessLib.Notation;
 using Rudzoft.ChessLib.Notation.Notations;
+using Rudzoft.ChessLib.ObjectPoolPolicies;
 using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Test.NotationTests;
@@ -45,6 +47,13 @@ public sealed class RanTests
             .AddTransient<IBoard, Board>()
             .AddSingleton<IValues, Values>()
             .AddTransient<IPosition, Position>()
+            .AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>()
+            .AddSingleton(static serviceProvider =>
+            {
+                var provider = serviceProvider.GetRequiredService<ObjectPoolProvider>();
+                var policy = new MoveListPolicy();
+                return provider.Create(policy);
+            })
             .BuildServiceProvider();
     }
 
@@ -83,13 +92,13 @@ public sealed class RanTests
         var moveOne = Move.Create(fromOne, to);
         var moveTwo = Move.Create(fromTwo, to);
 
-        var ambiguity = MoveNotation.Create(pos);
+        var notation = MoveNotation.Create(pos);
 
         var expectedOne = $"{pieceChar}{fromOne}-{toString}";
         var expectedTwo = $"{pieceChar}{fromTwo}-{toString}";
 
-        var actualOne = ambiguity.ToNotation(moveNotation).Convert(moveOne);
-        var actualTwo = ambiguity.ToNotation(moveNotation).Convert(moveTwo);
+        var actualOne = notation.ToNotation(moveNotation).Convert(moveOne);
+        var actualTwo = notation.ToNotation(moveNotation).Convert(moveTwo);
 
         Assert.Equal(expectedOne, actualOne);
         Assert.Equal(expectedTwo, actualTwo);

@@ -36,11 +36,11 @@ namespace Rudzoft.ChessLib.Notation;
 /// </summary>
 public sealed class MoveNotation : IMoveNotation
 {
-    private readonly INotation[] _notations;
+    private readonly INotation?[] _notations;
 
     private MoveNotation(IPosition pos)
     {
-        _notations = new INotation[]
+        _notations = new INotation?[]
         {
             new SanNotation(pos),
             new FanNotation(pos),

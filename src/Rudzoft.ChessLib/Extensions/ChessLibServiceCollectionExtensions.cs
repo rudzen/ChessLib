@@ -29,8 +29,10 @@ using System.IO;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.ObjectPool;
 using Rudzoft.ChessLib.Factories;
 using Rudzoft.ChessLib.Hash.Tables.Transposition;
+using Rudzoft.ChessLib.ObjectPoolPolicies;
 using Rudzoft.ChessLib.Polyglot;
 using Rudzoft.ChessLib.Protocol.UCI;
 using Rudzoft.ChessLib.Tables;
@@ -67,7 +69,14 @@ public static class ChessLibServiceCollectionExtensions
                     .Bind(settings));
 
         serviceCollection.TryAddSingleton<ITranspositionTable, TranspositionTable>();
-
+        serviceCollection.TryAddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>();
+        serviceCollection.TryAddSingleton(static serviceProvider =>
+        {
+            var provider = serviceProvider.GetRequiredService<ObjectPoolProvider>();
+            var policy = new MoveListPolicy();
+            return provider.Create(policy);
+        });
+        
         return serviceCollection.AddSingleton(static _ =>
             {
                 IUci uci = new Uci();

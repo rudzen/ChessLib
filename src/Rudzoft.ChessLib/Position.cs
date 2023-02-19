@@ -55,22 +55,24 @@ public sealed class Position : IPosition
     private readonly CastleRight[] _castlingRightsMask;
     private readonly Square[] _castlingRookSquare;
     private readonly ObjectPool<StringBuilder> _outputObjectPool;
+    private readonly ObjectPool<IMoveList> _moveListPool;
     private readonly IPositionValidator _positionValidator;
     private Player _sideToMove;
 
-    public Position(IBoard board, IValues values)
+    public Position(IBoard board, IValues values, ObjectPool<IMoveList> moveListPool)
     {
-        Board = board;
-        Values = values;
-        State = new State();
-        _outputObjectPool = new DefaultObjectPool<StringBuilder>(new StringBuilderPooledObjectPolicy());
-        _positionValidator = new PositionValidator(this, Board);
         _castleKingPath = new BitBoard[CastleRight.Count];
         _castleRookPath = new BitBoard[CastleRight.Count];
-        _castlingRookSquare = new Square[CastleRight.Count];
         _castlingRightsMask = new CastleRight[Square.Count];
         _castlingRightsMask.Fill(CastleRight.None);
+        _castlingRookSquare = new Square[CastleRight.Count];
+        _outputObjectPool = new DefaultObjectPool<StringBuilder>(new StringBuilderPooledObjectPolicy());
+        _moveListPool = moveListPool;
+        _positionValidator = new PositionValidator(this, board);
+        Board = board;
         IsProbing = true;
+        Values = values;
+        State = new State();
         Clear();
     }
 
@@ -86,7 +88,7 @@ public sealed class Position : IPosition
 
     public bool InCheck => State.Checkers;
 
-    public bool IsMate => this.GenerateMoves().Length == 0;
+    public bool IsMate => !HasMoves();
 
     public bool IsProbing { get; set; }
 
@@ -522,7 +524,7 @@ public sealed class Position : IPosition
     public bool IsDraw(int ply)
         => State.Rule50 switch
         {
-            > 99 when State.Checkers.IsEmpty || this.GenerateMoves().Length > 0 => true,
+            > 99 when State.Checkers.IsEmpty || HasMoves() => true,
             _ => State.Repetition > 0 && State.Repetition < ply
         };
 
@@ -621,7 +623,7 @@ public sealed class Position : IPosition
     {
         // Use a slower but simpler function for uncommon cases
         if (m.MoveType() != MoveTypes.Normal)
-            return this.GenerateMoves().Contains(m);
+            return ContainsMove(m);
 
         // Is not a promotion, so promotion piece must be empty
         if (m.PromotedPieceType() - 2 != PieceTypes.NoPieceType)
@@ -1561,5 +1563,24 @@ public sealed class Position : IPosition
         }
 
         return result;
+    }
+
+    private bool HasMoves()
+    {
+        var ml = _moveListPool.Get();
+        ml.Generate(this);
+        var moves = ml.Get();
+        var hasMoves = !moves.IsEmpty;
+        _moveListPool.Return(ml);
+        return hasMoves;
+    }
+
+    private bool ContainsMove(Move m)
+    {
+        var ml = _moveListPool.Get();
+        ml.Generate(this);
+        var contains = ml.Contains(m);
+        _moveListPool.Return(ml);
+        return contains;
     }
 }

@@ -29,8 +29,10 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.ObjectPool;
 using Rudzoft.ChessLib.Enums;
 using Rudzoft.ChessLib.Fen;
+using Rudzoft.ChessLib.ObjectPoolPolicies;
 using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Test.MoveTests;
@@ -45,6 +47,13 @@ public sealed class MoveTests
             .AddTransient<IBoard, Board>()
             .AddSingleton<IValues, Values>()
             .AddTransient<IPosition, Position>()
+            .AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>()
+            .AddSingleton(static serviceProvider =>
+            {
+                var provider = serviceProvider.GetRequiredService<ObjectPoolProvider>();
+                var policy = new MoveListPolicy();
+                return provider.Create(policy);
+            })
             .BuildServiceProvider();
     }
 

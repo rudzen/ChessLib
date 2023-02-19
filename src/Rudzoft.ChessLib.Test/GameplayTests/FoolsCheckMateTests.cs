@@ -26,9 +26,11 @@ SOFTWARE.
 
 using System;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.ObjectPool;
 using Rudzoft.ChessLib.Enums;
 using Rudzoft.ChessLib.Fen;
 using Rudzoft.ChessLib.MoveGeneration;
+using Rudzoft.ChessLib.ObjectPoolPolicies;
 using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Test.GameplayTests;
@@ -43,6 +45,13 @@ public sealed class FoolsCheckMateTests
             .AddTransient<IBoard, Board>()
             .AddSingleton<IValues, Values>()
             .AddTransient<IPosition, Position>()
+            .AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>()
+            .AddSingleton(static serviceProvider =>
+            {
+                var provider = serviceProvider.GetRequiredService<ObjectPoolProvider>();
+                var policy = new MoveListPolicy();
+                return provider.Create(policy);
+            })
             .BuildServiceProvider();
     }
 
@@ -70,9 +79,8 @@ public sealed class FoolsCheckMateTests
         // verify in check is actually true
         Assert.True(pos.InCheck);
 
-        var resultingMoves = pos.GenerateMoves();
+        var isMate = pos.IsMate;
 
-        // verify that no legal moves actually exists.
-        Assert.True(resultingMoves.Length == 0);
+        Assert.True(isMate);
     }
 }

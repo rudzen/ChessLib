@@ -29,10 +29,12 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.ObjectPool;
 using Microsoft.Extensions.Options;
 using Rudzoft.ChessLib.Enums;
 using Rudzoft.ChessLib.Factories;
 using Rudzoft.ChessLib.Fen;
+using Rudzoft.ChessLib.ObjectPoolPolicies;
 using Rudzoft.ChessLib.Polyglot;
 using Rudzoft.ChessLib.Protocol.UCI;
 using Rudzoft.ChessLib.Types;
@@ -56,6 +58,13 @@ public sealed class PolyglotTests : IClassFixture<BookFixture>
             .AddSingleton<IValues, Values>()
             .AddTransient<IPosition, Position>()
             .AddSingleton<IPolyglotBookFactory, PolyglotBookFactory>()
+            .AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>()
+            .AddSingleton(static serviceProvider =>
+            {
+                var provider = serviceProvider.GetRequiredService<ObjectPoolProvider>();
+                var policy = new MoveListPolicy();
+                return provider.Create(policy);
+            })
             .AddSingleton(static _ =>
             {
                 IUci uci = new Uci();

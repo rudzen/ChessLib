@@ -27,8 +27,11 @@ SOFTWARE.
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Extensions.ObjectPool;
 using Microsoft.Extensions.Options;
 using Rudzoft.ChessLib.Hash.Tables.Transposition;
+using Rudzoft.ChessLib.MoveGeneration;
+using Rudzoft.ChessLib.ObjectPoolPolicies;
 using Rudzoft.ChessLib.Perft;
 using Rudzoft.ChessLib.Perft.Interfaces;
 using Rudzoft.ChessLib.Protocol.UCI;
@@ -41,11 +44,6 @@ namespace Rudzoft.ChessLib.Benchmark;
 public class PerftBench
 {
     private IPerft _perft;
-
-    public PerftBench()
-    {
-
-    }
 
     [Params(5, 6)]
     public int N;
@@ -74,13 +72,15 @@ public class PerftBench
         var uci = new Uci();
         uci.Initialize();
 
+        var moveListObjectPool = new DefaultObjectPool<IMoveList>(new MoveListPolicy());
+        
         var sp = new SearchParameters();
         
         var board = new Board();
         var values = new Values();
-        var pos = new Position(board, values);
+        var pos = new Position(board, values, moveListObjectPool);
         
-        var game = new Game(tt, uci, sp, pos);
+        var game = new Game(tt, uci, sp, pos, moveListObjectPool);
         _perft = new Perft.Perft(game, new []{ pp });
     }
 

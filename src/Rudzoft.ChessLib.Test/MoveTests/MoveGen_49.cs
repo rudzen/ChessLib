@@ -24,9 +24,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using Microsoft.Extensions.ObjectPool;
 using Rudzoft.ChessLib.Enums;
 using Rudzoft.ChessLib.Fen;
 using Rudzoft.ChessLib.MoveGeneration;
+using Rudzoft.ChessLib.ObjectPoolPolicies;
 using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Test.MoveTests;
@@ -40,7 +42,9 @@ public sealed class MoveGen_49
 
         var board = new Board();
         var pieceValue = new Values();
-        var pos = new Position(board, pieceValue);
+        var moveListObjectPool = new DefaultObjectPool<IMoveList>(new MoveListPolicy());
+
+        var pos = new Position(board, pieceValue, moveListObjectPool);
         var fd = new FenData(fen);
         var state = new State();
 

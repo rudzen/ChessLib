@@ -34,7 +34,6 @@ using Rudzoft.ChessLib.Enums;
 using Rudzoft.ChessLib.Fen;
 using Rudzoft.ChessLib.Hash.Tables.Transposition;
 using Rudzoft.ChessLib.MoveGeneration;
-using Rudzoft.ChessLib.ObjectPoolPolicies;
 using Rudzoft.ChessLib.Protocol.UCI;
 using Rudzoft.ChessLib.Types;
 
@@ -42,16 +41,17 @@ namespace Rudzoft.ChessLib;
 
 public sealed class Game : IGame
 {
-    private readonly ObjectPool<IMoveList> _moveLists;
+    private readonly ObjectPool<IMoveList> _moveListPool;
     private readonly IPosition _pos;
 
     public Game(
         ITranspositionTable transpositionTable,
         IUci uci,
         ISearchParameters searchParameters,
-        IPosition pos)
+        IPosition pos,
+        ObjectPool<IMoveList> moveListPoolPool)
     {
-        _moveLists = new DefaultObjectPool<IMoveList>(new MoveListPolicy());
+        _moveListPool = moveListPoolPool;
         _pos = pos;
         
         Table = transpositionTable;
@@ -96,7 +96,7 @@ public sealed class Game : IGame
         if (Pos.Rule50 >= 100)
             gameEndType |= GameEndTypes.FiftyMove;
 
-        var moveList = _moveLists.Get();
+        var moveList = _moveListPool.Get();
         moveList.Generate(in _pos);
 
         var moves = moveList.Get();
@@ -132,7 +132,7 @@ public sealed class Game : IGame
     {
         var tot = ulong.MinValue;
 
-        var ml = _moveLists.Get();
+        var ml = _moveListPool.Get();
         ml.Generate(in _pos);
         var state = new State();
 
@@ -150,10 +150,10 @@ public sealed class Game : IGame
 
                 if (depth <= 2)
                 {
-                    var ml2 = _moveLists.Get();
+                    var ml2 = _moveListPool.Get();
                     ml2.Generate(in _pos);
                     tot += (ulong)ml2.Length;
-                    _moveLists.Return(ml2);
+                    _moveListPool.Return(ml2);
                 }
                 else
                     tot += Perft(depth - 1, false);
@@ -162,7 +162,7 @@ public sealed class Game : IGame
             }
         }
 
-        _moveLists.Return(ml);
+        _moveListPool.Return(ml);
 
         return tot;
     }

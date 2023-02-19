@@ -26,10 +26,12 @@ SOFTWARE.
 
 using System;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.ObjectPool;
 using Rudzoft.ChessLib.Enums;
 using Rudzoft.ChessLib.Fen;
 using Rudzoft.ChessLib.Notation;
 using Rudzoft.ChessLib.Notation.Notations;
+using Rudzoft.ChessLib.ObjectPoolPolicies;
 using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Test.NotationTests;
@@ -44,6 +46,13 @@ public sealed class IccfTests
             .AddTransient<IBoard, Board>()
             .AddSingleton<IValues, Values>()
             .AddTransient<IPosition, Position>()
+            .AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>()
+            .AddSingleton(static serviceProvider =>
+            {
+                var provider = serviceProvider.GetRequiredService<ObjectPoolProvider>();
+                var policy = new MoveListPolicy();
+                return provider.Create(policy);
+            })
             .BuildServiceProvider();
     }
 
@@ -63,9 +72,9 @@ public sealed class IccfTests
 
         var w1 = Move.Create(Squares.d2, Squares.f3);
 
-        var ambiguity = MoveNotation.Create(pos);
+        var moveNotation = MoveNotation.Create(pos);
 
-        var actualPrimary = ambiguity.ToNotation(notation).Convert(w1);
+        var actualPrimary = moveNotation.ToNotation(notation).Convert(w1);
 
         Assert.Equal(expectedPrimary, actualPrimary);
     }
@@ -88,9 +97,9 @@ public sealed class IccfTests
 
         var w1 = Move.Create(Squares.b7, Squares.b8, MoveTypes.Promotion, promoPt);
 
-        var ambiguity = MoveNotation.Create(pos);
+        var moveNotation = MoveNotation.Create(pos);
 
-        var actual = ambiguity.ToNotation(notation).Convert(w1);
+        var actual = moveNotation.ToNotation(notation).Convert(w1);
 
         Assert.Equal(expected, actual);
     }

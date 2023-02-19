@@ -24,6 +24,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using Microsoft.Extensions.ObjectPool;
+using Rudzoft.ChessLib.MoveGeneration;
+using Rudzoft.ChessLib.ObjectPoolPolicies;
 using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Test.PiecesTests;
@@ -64,7 +67,9 @@ public sealed class PieceAttacksRookTests : PieceAttacks
         // just to get the attacks
         var board = new Board();
         var pieceValue = new Values();
-        var pos = new Position(board, pieceValue);
+        var moveListObjectPool = new DefaultObjectPool<IMoveList>(new MoveListPolicy());
+
+        var pos = new Position(board, pieceValue, moveListObjectPool);
 
         while (border)
         {

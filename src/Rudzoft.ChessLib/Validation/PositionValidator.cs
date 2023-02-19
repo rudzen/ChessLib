@@ -64,35 +64,35 @@ public sealed class PositionValidator : IPositionValidator
         _board = board;
     }
 
-    public string ErrorMsg { get; private set; }
+    public string? ErrorMsg { get; private set; }
     public bool IsOk { get; private set; }
 
-    public IPositionValidator Validate(PositionValidationTypes types = PositionValidationTypes.All)
+    public IPositionValidator Validate(PositionValidationTypes type = PositionValidationTypes.All)
     {
         var error = string.Empty;
 
-        if (types.HasFlagFast(PositionValidationTypes.Basic))
+        if (type.HasFlagFast(PositionValidationTypes.Basic))
             error = ValidateBasic();
 
-        if (types.HasFlagFast(PositionValidationTypes.Castle))
+        if (type.HasFlagFast(PositionValidationTypes.Castle))
             error = ValidateCastleling(error);
 
-        if (types.HasFlagFast(PositionValidationTypes.Kings))
+        if (type.HasFlagFast(PositionValidationTypes.Kings))
             error = ValidateKings(error);
 
-        if (types.HasFlagFast(PositionValidationTypes.Pawns))
+        if (type.HasFlagFast(PositionValidationTypes.Pawns))
             error = ValidatePawns(error);
 
-        if (types.HasFlagFast(PositionValidationTypes.PieceConsistency))
+        if (type.HasFlagFast(PositionValidationTypes.PieceConsistency))
             error = ValidatePieceConsistency(error);
 
-        if (types.HasFlagFast(PositionValidationTypes.PieceCount))
+        if (type.HasFlagFast(PositionValidationTypes.PieceCount))
             error = ValidatePieceCount(error);
 
-        if (types.HasFlagFast(PositionValidationTypes.PieceTypes))
+        if (type.HasFlagFast(PositionValidationTypes.PieceTypes))
             error = ValidatePieceTypes(error);
 
-        if (types.HasFlagFast(PositionValidationTypes.State))
+        if (type.HasFlagFast(PositionValidationTypes.State))
             error = ValidateState(error);
 
         IsOk = error.IsNullOrEmpty();

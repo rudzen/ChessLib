@@ -26,8 +26,10 @@ SOFTWARE.
 
 using System;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.ObjectPool;
 using Rudzoft.ChessLib.Enums;
 using Rudzoft.ChessLib.Fen;
+using Rudzoft.ChessLib.ObjectPoolPolicies;
 using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Test.FenceTests;
@@ -43,6 +45,13 @@ public sealed class FenceTests
             .AddSingleton<IValues, Values>()
             .AddTransient<IPosition, Position>()
             .AddSingleton<IBlockage, Blockage>()
+            .AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>()
+            .AddSingleton(static serviceProvider =>
+            {
+                var provider = serviceProvider.GetRequiredService<ObjectPoolProvider>();
+                var policy = new MoveListPolicy();
+                return provider.Create(policy);
+            })
             .BuildServiceProvider();
     }
 

@@ -27,8 +27,9 @@ SOFTWARE.
 using System;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using Microsoft.Extensions.ObjectPool;
 using Rudzoft.ChessLib.Extensions;
 using Rudzoft.ChessLib.MoveGeneration;
 using Rudzoft.ChessLib.Types;
@@ -53,23 +54,25 @@ public sealed class PolyglotBook : IPolyglotBook
     private readonly string _bookFilePath;
     private readonly int _entrySize;
     private readonly Random _rnd;
+    private readonly ObjectPool<IMoveList> _moveListPool;
 
-    private unsafe PolyglotBook()
+    private unsafe PolyglotBook(ObjectPool<IMoveList> pool)
     {
         _entrySize = sizeof(PolyglotBookEntry);
         _rnd = new Random(DateTime.Now.Millisecond);
+        _moveListPool = pool;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static PolyglotBook Create()
+    internal static PolyglotBook Create(ObjectPool<IMoveList> pool)
     {
-        return new PolyglotBook();
+        return new PolyglotBook(pool);
     }
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static PolyglotBook Create(string path, string file)
+    internal static PolyglotBook Create(ObjectPool<IMoveList> pool, string path, string file)
     {
-        return new PolyglotBook
+        return new PolyglotBook(pool)
         {
             BookFile = Path.Combine(path, file)
         };
@@ -136,7 +139,7 @@ public sealed class PolyglotBook : IPolyglotBook
         _binaryReader?.Dispose();
     }
 
-    private static Move ConvertMove(IPosition pos, ushort polyMove)
+    private Move ConvertMove(IPosition pos, ushort polyMove)
     {
         // A PolyGlot book move is encoded as follows:
         //
@@ -157,24 +160,68 @@ public sealed class PolyglotBook : IPolyglotBook
             move = Move.Create(from, to, MoveTypes.Promotion, PolyToPt(polyPt));
         }
 
-        var ml = pos.GenerateMoves();
+        var ml = _moveListPool.Get();
+        ml.Generate(in pos);
+        var moves = ml.Get();
 
+        var mm = SelectMove(in pos, from, to, move.MoveType(), moves);
+        
+        _moveListPool.Return(ml);
+
+        return mm;
+        
         // Iterate all known moves for current position to find a match.
-        var emMoves = ml.Select(static em => em.Move)
-            .Where(m => from == m.FromSquare())
-            .Where(m => to == m.ToSquare())
-            .Where(m =>
-            {
-                var type = move.MoveType();
-                return m.IsPromotionMove()
-                    ? type == MoveTypes.Promotion
-                    : type != MoveTypes.Promotion;
-            })
-            .Where(m => !IsInCheck(pos, m));
-
-        return emMoves.FirstOrDefault(Move.EmptyMove);
+        // foreach (var valMove in moves)
+        // {
+        //     var m = valMove.Move;
+        //
+        //     if (from != m.FromSquare() || to != m.ToSquare())
+        //         continue;
+        //     
+        //     var type = move.MoveType();
+        //     
+        //     if ((m.IsPromotionMove() ? type == MoveTypes.Promotion : type != MoveTypes.Promotion) && !IsInCheck(pos, m))
+        //         return m;
+        // }
+        //
+        // return Move.EmptyMove;
+        
+        // var emMoves = ml.Select(static em => em.Move)
+        //     .Where(m => from == m.FromSquare())
+        //     .Where(m => to == m.ToSquare())
+        //     .Where(m =>
+        //     {
+        //         var type = move.MoveType();
+        //         return m.IsPromotionMove()
+        //             ? type == MoveTypes.Promotion
+        //             : type != MoveTypes.Promotion;
+        //     })
+        //     .Where(m => !IsInCheck(pos, m));
+        //
+        // return emMoves.FirstOrDefault(Move.EmptyMove);
     }
 
+    private static Move SelectMove(in IPosition pos, Square polyFrom, Square polyTo, MoveTypes polyType, ReadOnlySpan<ValMove> moves)
+    {
+        // Iterate all known moves for current position to find a match.
+        foreach (var valMove in moves)
+        {
+            var m = valMove.Move;
+
+            if (polyFrom != m.FromSquare() || polyTo != m.ToSquare())
+                continue;
+
+            var promotionMatches = m.IsPromotionMove()
+                ? polyType == MoveTypes.Promotion
+                : polyType != MoveTypes.Promotion;
+            
+            if (promotionMatches && !IsInCheck(pos, m))
+                return m;
+        }
+
+        return Move.EmptyMove;
+    }
+    
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static bool IsInCheck(IPosition pos, Move m)
     {
@@ -202,9 +249,14 @@ public sealed class PolyglotBook : IPolyglotBook
             k ^= PolyglotBookZobrist.Psq(p, s);
         }
 
-        foreach (var cr in CastleRights.AsSpan())
+        var crSpan = CastleRights.AsSpan();
+        ref var crSpace = ref MemoryMarshal.GetReference(crSpan);
+        for (var i = 0; i < CastleRights.Length; ++i)
+        {
+            var cr = Unsafe.Add(ref crSpace, i);
             if (pos.State.CastlelingRights.Has(cr))
                 k ^= PolyglotBookZobrist.Castle(cr);
+        }
 
         if (pos.State.EnPassantSquare != Square.None)
             k ^= PolyglotBookZobrist.EnPassant(pos.State.EnPassantSquare.File);

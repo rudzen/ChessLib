@@ -26,9 +26,11 @@ SOFTWARE.
 
 using System;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.ObjectPool;
 using Rudzoft.ChessLib.Enums;
 using Rudzoft.ChessLib.Evaluation;
 using Rudzoft.ChessLib.Fen;
+using Rudzoft.ChessLib.ObjectPoolPolicies;
 using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Test.EvaluationTests;
@@ -44,6 +46,13 @@ public sealed class KpkBitBaseTests
             .AddSingleton<IValues, Values>()
             .AddTransient<IPosition, Position>()
             .AddSingleton<IKpkBitBase, KpkBitBase>()
+            .AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>()
+            .AddSingleton(static serviceProvider =>
+            {
+                var provider = serviceProvider.GetRequiredService<ObjectPoolProvider>();
+                var policy = new MoveListPolicy();
+                return provider.Create(policy);
+            })
             .BuildServiceProvider();
     }
 
