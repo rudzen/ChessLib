@@ -72,6 +72,7 @@ public class PerftBench
 
         var uci = new Uci();
         uci.Initialize();
+        var cpu = new Cpu();
 
         var moveListObjectPool = new DefaultObjectPool<IMoveList>(new MoveListPolicy());
         
@@ -83,7 +84,7 @@ public class PerftBench
 
         var pos = new Position(board, values, validator, moveListObjectPool);
         
-        var game = new Game(tt, uci, sp, pos, moveListObjectPool);
+        var game = new Game(tt, uci, cpu, sp, pos, moveListObjectPool);
         _perft = new Perft.Perft(game, new []{ pp });
     }
 

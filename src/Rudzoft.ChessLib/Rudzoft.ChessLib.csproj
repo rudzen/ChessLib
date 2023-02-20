@@ -19,7 +19,7 @@
     <PackageProjectUrl>https://github.com/rudzen/ChessLib</PackageProjectUrl>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
-    <Nullable>enable</Nullable>
+    <Nullable>warnings</Nullable>
     <EnforceCodeStyleInBuild>False</EnforceCodeStyleInBuild>
     <Title>Rudzoft.ChessLib</Title>
     <PackageReadmeFile>README.md</PackageReadmeFile>

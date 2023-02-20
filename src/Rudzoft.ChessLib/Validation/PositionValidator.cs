@@ -55,7 +55,7 @@ public static class PositionValidationTypesExtensions
 
 public sealed class PositionValidator : IPositionValidator
 {
-    public string? ErrorMsg { get; private set; }
+    public string ErrorMsg { get; private set; }
     public bool IsOk { get; private set; }
 
     public IPositionValidator Validate(in IPosition pos, PositionValidationTypes type = PositionValidationTypes.All)
@@ -232,7 +232,7 @@ public sealed class PositionValidator : IPositionValidator
             error = AddError(error, "state key is invalid");
 
         if (pos.Pieces(PieceTypes.Pawn, pos.SideToMove).IsEmpty &&
-            state.PawnStructureKey.Key != Zobrist.ZobristNoPawn)
+            state.PawnKey.Key != Zobrist.ZobristNoPawn)
             error = AddError(error, "empty pawn key is invalid");
 
         if (state.Repetition < 0)

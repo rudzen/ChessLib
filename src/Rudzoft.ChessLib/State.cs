@@ -26,6 +26,7 @@ SOFTWARE.
 
 using System;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Rudzoft.ChessLib.Extensions;
 using Rudzoft.ChessLib.Types;
 
@@ -34,23 +35,18 @@ namespace Rudzoft.ChessLib;
 
 public sealed class State : IEquatable<State>
 {
-    public Move LastMove { get; set; }
-
-    public Value[] NonPawnMaterial { get; }
-
-    public HashKey PawnStructureKey { get; set; }
-
     public HashKey MaterialKey { get; set; }
-
-    public int PliesFromNull { get; set; }
+    
+    public HashKey PawnKey { get; set; }
 
     public int Rule50 { get; set; }
+    
+    public int PliesFromNull { get; set; }
 
     public CastleRight CastlelingRights { get; set; }
 
     public Square EnPassantSquare { get; set; }
 
-    public State Previous { get; private set; }
 
     // -----------------------------
     // Properties below this point are not copied from other state
@@ -72,7 +68,11 @@ public sealed class State : IEquatable<State>
 
     public Piece CapturedPiece { get; set; }
 
+    public Move LastMove { get; set; }
+
     public int Repetition { get; set; }
+
+    public State Previous { get; private set; }
 
     /// <summary>
     /// Partial copy from existing state The properties not copied are re-calculated
@@ -80,13 +80,12 @@ public sealed class State : IEquatable<State>
     /// <param name="other">The current state</param>
     public State(State other)
     {
-        PawnStructureKey = other.PawnStructureKey;
+        PawnKey = other.PawnKey;
         MaterialKey = other.MaterialKey;
         CastlelingRights = other.CastlelingRights;
         Rule50 = other.Rule50;
         PliesFromNull = other.PliesFromNull;
         EnPassantSquare = other.EnPassantSquare;
-        NonPawnMaterial = new[] { other.NonPawnMaterial[0], other.NonPawnMaterial[1] };
         Previous = other;
 
         Checkers = BitBoard.Empty;
@@ -99,7 +98,6 @@ public sealed class State : IEquatable<State>
     public State()
     {
         LastMove = Move.EmptyMove;
-        NonPawnMaterial = new[] { Value.ValueZero, Value.ValueZero };
         CastlelingRights = CastleRight.None;
         EnPassantSquare = Square.None;
         Checkers = BitBoard.Empty;
@@ -111,27 +109,20 @@ public sealed class State : IEquatable<State>
 
     public State CopyTo(State other)
     {
+        other ??= new State();
+        
         // copy over preserved values
-        other.PawnStructureKey = PawnStructureKey;
         other.MaterialKey = MaterialKey;
-        other.CastlelingRights = CastlelingRights;
+        other.PawnKey = PawnKey;
         other.Rule50 = Rule50;
         other.PliesFromNull = PliesFromNull;
+        other.CastlelingRights = CastlelingRights;
         other.EnPassantSquare = EnPassantSquare;
         other.Previous = this;
-
-        // copy over material
-        other.NonPawnMaterial[0] = NonPawnMaterial[0];
-        other.NonPawnMaterial[1] = NonPawnMaterial[1];
 
         // initialize the rest of the values
         if (other.CheckedSquares == null)
             other.CheckedSquares = new BitBoard[PieceTypes.PieceTypeNb.AsInt()];
-        else
-            other.CheckedSquares.Fill(BitBoard.Empty);
-
-        other.Pinners[0] = other.Pinners[1] = BitBoard.Empty;
-        other.BlockersForKing[0] = other.BlockersForKing[1] = BitBoard.Empty;
 
         return other;
     }
@@ -139,8 +130,7 @@ public sealed class State : IEquatable<State>
     public void Clear()
     {
         LastMove = Move.EmptyMove;
-        NonPawnMaterial.Clear();
-        PawnStructureKey = Key = MaterialKey = HashKey.Empty;
+        PawnKey = Key = MaterialKey = HashKey.Empty;
         PliesFromNull = 0;
         Repetition = 0;
         CastlelingRights = CastleRight.None;
@@ -154,11 +144,9 @@ public sealed class State : IEquatable<State>
 
     public void UpdateRepetition()
     {
-        var end = Rule50 < PliesFromNull
-            ? Rule50
-            : PliesFromNull;
-
         Repetition = 0;
+        
+        var end = End();
 
         if (end < 4)
             return;
@@ -174,16 +162,17 @@ public sealed class State : IEquatable<State>
         }
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public int End() => Math.Min(Rule50, PliesFromNull);
+
     public bool Equals(State other)
     {
         if (other is null) return false;
         return LastMove.Equals(other.LastMove)
                && Key.Equals(other.Key)
-               && PawnStructureKey.Equals(other.PawnStructureKey)
+               && PawnKey.Equals(other.PawnKey)
                && EnPassantSquare.Equals(other.EnPassantSquare)
                && CastlelingRights == other.CastlelingRights
-               && NonPawnMaterial[0] == other.NonPawnMaterial[0]
-               && NonPawnMaterial[1] == other.NonPawnMaterial[1]
                && PliesFromNull == other.PliesFromNull
                && Rule50 == other.Rule50
                && Pinners.Equals(other.Pinners)
@@ -199,8 +188,7 @@ public sealed class State : IEquatable<State>
     {
         var hashCode = new HashCode();
         hashCode.Add(LastMove);
-        hashCode.Add(NonPawnMaterial);
-        hashCode.Add(PawnStructureKey);
+        hashCode.Add(PawnKey);
         hashCode.Add(MaterialKey);
         hashCode.Add(PliesFromNull);
         hashCode.Add(Rule50);

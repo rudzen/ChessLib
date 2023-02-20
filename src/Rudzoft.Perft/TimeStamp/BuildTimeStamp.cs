@@ -41,7 +41,7 @@ internal sealed class BuildTimeStamp : IBuildTimeStamp
     {
         var attribute = Assembly.GetExecutingAssembly()
             .GetCustomAttributesData()
-            .First(x => x.AttributeType.Name == AttributeName);
+            .First(static x => x.AttributeType.Name == AttributeName);
 
         return (string)attribute.ConstructorArguments.First().Value;
     }

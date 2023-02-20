@@ -58,7 +58,6 @@ public static class ObjectExtensions
     /// <returns></returns>
     public static IEnumerable<object> ConcatParameters(this object @this, params object[] args)
     {
-        var result = new[] { @this };
-        return result.Concat(args);
+        return new[] { @this }.Concat(args);
     }
 }

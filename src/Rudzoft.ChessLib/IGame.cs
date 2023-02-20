@@ -47,6 +47,10 @@ public interface IGame : IEnumerable<Piece>
 
     bool IsRepetition { get; }
 
+    public IUci Uci { get; }
+    
+    public ICpu Cpu { get; }
+
     void NewGame(string fen = Fen.Fen.StartPositionFen);
 
     FenData GetFen();

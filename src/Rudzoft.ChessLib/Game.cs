@@ -31,6 +31,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Microsoft.Extensions.ObjectPool;
 using Rudzoft.ChessLib.Enums;
+using Rudzoft.ChessLib.Extensions;
 using Rudzoft.ChessLib.Fen;
 using Rudzoft.ChessLib.Hash.Tables.Transposition;
 using Rudzoft.ChessLib.MoveGeneration;
@@ -47,6 +48,7 @@ public sealed class Game : IGame
     public Game(
         ITranspositionTable transpositionTable,
         IUci uci,
+        ICpu cpu,
         ISearchParameters searchParameters,
         IPosition pos,
         ObjectPool<IMoveList> moveListPoolPool)
@@ -57,11 +59,12 @@ public sealed class Game : IGame
         Table = transpositionTable;
         SearchParameters = searchParameters;
         Uci = uci;
+        Cpu = cpu;
     }
 
     public Action<IPieceSquare> PieceUpdated => _pos.PieceUpdated;
 
-    public int MoveNumber => 0; //(PositionIndex - 1) / 2 + 1;
+    public int MoveNumber => 1 + (Pos.Ply - Pos.SideToMove.IsBlack.AsByte() / 2);
 
     public BitBoard Occupied => Pos.Pieces();
 
@@ -74,6 +77,8 @@ public sealed class Game : IGame
     public ISearchParameters SearchParameters { get; }
 
     public IUci Uci { get; }
+    
+    public ICpu Cpu { get; }
 
     public bool IsRepetition => _pos.IsRepetition;
 
@@ -134,7 +139,6 @@ public sealed class Game : IGame
 
         var ml = _moveListPool.Get();
         ml.Generate(in _pos);
-        var state = new State();
 
         var moves = ml.Get();
         ref var movesSpace = ref MemoryMarshal.GetReference(moves);
@@ -146,6 +150,7 @@ public sealed class Game : IGame
             else
             {
                 var m = em.Move;
+                var state = new State();
                 _pos.MakeMove(m, in state);
 
                 if (depth <= 2)

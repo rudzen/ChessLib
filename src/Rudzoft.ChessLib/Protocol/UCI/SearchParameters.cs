@@ -35,8 +35,10 @@ namespace Rudzoft.ChessLib.Protocol.UCI;
 /// <summary>
 /// Contains the information related to search parameters for a UCI chess engine.
 /// </summary>
-public sealed class SearchParameters : ISearchParameters, ISpanFormattable
+public sealed class SearchParameters : ISearchParameters
 {
+    private static readonly Clock ZeroClock = new(0UL, 0UL);
+    
     private readonly Clock[] _clock;
     private ulong _movesToGo;
     private ulong _moveTime;
@@ -145,11 +147,7 @@ public sealed class SearchParameters : ISearchParameters, ISpanFormattable
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Clear()
     {
-        _clock[Player.White.Side].Time = ulong.MinValue;
-        _clock[Player.White.Side].Time = ulong.MinValue;
-        _clock[Player.Black.Side].Inc = ulong.MinValue;
-        _clock[Player.Black.Side].Inc = ulong.MinValue;
-        
+        _clock.Fill(ZeroClock);
         MoveTime = 0;
         Infinite = false;
     }

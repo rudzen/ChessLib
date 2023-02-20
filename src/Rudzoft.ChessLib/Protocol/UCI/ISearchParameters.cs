@@ -24,11 +24,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using System;
 using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Protocol.UCI;
 
-public interface ISearchParameters
+public interface ISearchParameters : ISpanFormattable
 {
     ulong BlackIncrementTimeMilliseconds { get; set; }
 

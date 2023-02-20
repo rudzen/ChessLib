@@ -29,7 +29,7 @@ using System.Diagnostics;
 
 namespace Rudzoft.ChessLib.Protocol.UCI;
 
-public sealed class CPU
+public sealed class Cpu : ICpu
 {
     private const int Interval = 500;
 
@@ -45,15 +45,15 @@ public sealed class CPU
 
     private TimeSpan _lastUserCpu;
 
-    public CPU()
+    public Cpu()
     {
         _currentProcessName = Process.GetCurrentProcess();
         _numProcessors = Environment.ProcessorCount;
     }
 
-    public double CpuUse { get; set; }
+    public double CpuUse => Usage();
 
-    public double Usage()
+    private double Usage()
     {
         var now = DateTime.UtcNow;
         var total = _currentProcessName.TotalProcessorTime;
@@ -77,7 +77,6 @@ public sealed class CPU
         _lastCpu = now;
         _lastSysCpu = total;
         _lastUserCpu = user;
-        CpuUse = percentage;
 
         return percentage switch
         {

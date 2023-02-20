@@ -54,6 +54,7 @@ public sealed class Position : IPosition
     private readonly BitBoard[] _castleRookPath;
     private readonly CastleRight[] _castlingRightsMask;
     private readonly Square[] _castlingRookSquare;
+    private readonly Value[] _nonPawnMaterial;
     private readonly ObjectPool<StringBuilder> _outputObjectPool;
     private readonly ObjectPool<IMoveList> _moveListPool;
     private readonly IPositionValidator _positionValidator;
@@ -70,6 +71,7 @@ public sealed class Position : IPosition
         _castlingRightsMask = new CastleRight[Square.Count];
         _castlingRightsMask.Fill(CastleRight.None);
         _castlingRookSquare = new Square[CastleRight.Count];
+        _nonPawnMaterial = new[] { Value.ValueZero, Value.ValueZero };
         _outputObjectPool = new DefaultObjectPool<StringBuilder>(new StringBuilderPooledObjectPolicy());
         _moveListPool = moveListPool;
         _positionValidator = positionValidator;
@@ -101,7 +103,7 @@ public sealed class Position : IPosition
     /// <summary>
     /// To let something outside the library be aware of changes (like a UI etc)
     /// </summary>
-    public Action<IPieceSquare>? PieceUpdated { get; set; }
+    public Action<IPieceSquare> PieceUpdated { get; set; }
 
     public IValues Values { get; }
 
@@ -269,8 +271,6 @@ public sealed class Position : IPosition
         _castlingRookSquare.Fill(Square.None);
         _sideToMove = Player.White;
         ChessMode = ChessMode.Normal;
-
-        State ??= new State();
     }
 
     /// <summary>
@@ -315,39 +315,36 @@ public sealed class Position : IPosition
             fen[length++] = dash;
         else
         {
-            switch (ChessMode)
+            if (ChessMode == ChessMode.Normal)
             {
-                case ChessMode.Normal:
-                    if (CanCastle(CastleRight.WhiteKing))
-                        fen[length++] = 'K';
+                if (CanCastle(CastleRight.WhiteKing))
+                    fen[length++] = 'K';
 
-                    if (CanCastle(CastleRight.WhiteQueen))
-                        fen[length++] = 'Q';
+                if (CanCastle(CastleRight.WhiteQueen))
+                    fen[length++] = 'Q';
 
-                    if (CanCastle(CastleRight.BlackKing))
-                        fen[length++] = 'k';
+                if (CanCastle(CastleRight.BlackKing))
+                    fen[length++] = 'k';
 
-                    if (CanCastle(CastleRight.BlackQueen))
-                        fen[length++] = 'q';
-                    
-                    break;
-                case ChessMode.Chess960:
-                    if (CanCastle(CastleRight.WhiteKing))
-                        fen[length++] = CastlingRookSquare(CastleRight.WhiteKing).FileChar;
-
-                    if (CanCastle(CastleRight.WhiteQueen))
-                        fen[length++] = CastlingRookSquare(CastleRight.WhiteQueen).FileChar;
-
-                    if (CanCastle(CastleRight.BlackKing))
-                        fen[length++] = CastlingRookSquare(CastleRight.BlackQueen).FileChar;
-
-                    if (CanCastle(CastleRight.BlackQueen))
-                        fen[length++] = CastlingRookSquare(CastleRight.BlackQueen).FileChar;
-                    
-                    break;
-                default:
-                    throw new Exception($"Invalid chess mode. mode={ChessMode}");
+                if (CanCastle(CastleRight.BlackQueen))
+                    fen[length++] = 'q';
             }
+            else if (ChessMode == ChessMode.Chess960)
+            {
+                if (CanCastle(CastleRight.WhiteKing))
+                    fen[length++] = CastlingRookSquare(CastleRight.WhiteKing).FileChar;
+
+                if (CanCastle(CastleRight.WhiteQueen))
+                    fen[length++] = CastlingRookSquare(CastleRight.WhiteQueen).FileChar;
+
+                if (CanCastle(CastleRight.BlackKing))
+                    fen[length++] = CastlingRookSquare(CastleRight.BlackQueen).FileChar;
+
+                if (CanCastle(CastleRight.BlackQueen))
+                    fen[length++] = CastlingRookSquare(CastleRight.BlackQueen).FileChar;
+            }
+            else
+                throw new Exception($"Invalid chess mode. mode={ChessMode}");
         }
 
         fen[length++] = space;
@@ -382,20 +379,15 @@ public sealed class Position : IPosition
         };
     }
 
-    public BitBoard GetAttacks(Square sq, PieceTypes pt)
-        => GetAttacks(sq, pt, Pieces());
+    public BitBoard GetAttacks(Square sq, PieceTypes pt) => GetAttacks(sq, pt, Pieces());
 
-    public CastleRight GetCastleRightsMask(Square sq)
-        => _castlingRightsMask[sq.AsInt()];
+    public CastleRight GetCastleRightsMask(Square sq) => _castlingRightsMask[sq.AsInt()];
 
-    public IEnumerator<Piece> GetEnumerator()
-        => Board.GetEnumerator();
+    public IEnumerator<Piece> GetEnumerator() => Board.GetEnumerator();
 
-    IEnumerator IEnumerable.GetEnumerator()
-        => GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-    public Square GetKingSquare(Player p)
-        => Board.Square(PieceTypes.King, p);
+    public Square GetKingSquare(Player p) => Board.Square(PieceTypes.King, p);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public HashKey GetPawnKey()
@@ -430,8 +422,7 @@ public sealed class Position : IPosition
         return result;
     }
 
-    public Square GetPieceSquare(PieceTypes pt, Player p)
-        => Board.Square(pt, p);
+    public Square GetPieceSquare(PieceTypes pt, Player p) => Board.Square(pt, p);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public PieceTypes GetPieceType(Square sq) => Board.PieceAt(sq).Type();
@@ -502,21 +493,18 @@ public sealed class Position : IPosition
 
     public bool HasGameCycle(int ply)
     {
-        var end = State.Rule50 < State.PliesFromNull
-            ? State.Rule50
-            : State.PliesFromNull;
-
+        var end = State.End();
         return end >= 3 && Cuckoo.HashCuckooCycle(this, end, ply);
     }
 
     public bool HasRepetition()
     {
         var currentState = State;
-        var end = Math.Min(State.Rule50, State.PliesFromNull);
+        var end = currentState.End();
 
         while (end-- >= 4)
         {
-            if (currentState.Repetition > 0)
+            if (currentState!.Repetition > 0)
                 return true;
 
             currentState = currentState.Previous;
@@ -691,18 +679,19 @@ public sealed class Position : IPosition
     }
 
     public void MakeMove(Move m, in State newState)
-        => MakeMove(m, newState, GivesCheck(m));
+        => MakeMove(m, in newState, GivesCheck(m));
 
     public void MakeMove(Move m, in State newState, bool givesCheck)
     {
-        State = State.CopyTo(newState);
         State.LastMove = m;
+        State = State.CopyTo(newState);
+        var state = State;
 
-        var k = State.Key ^ Zobrist.GetZobristSide();
+        var k = state.Key ^ Zobrist.GetZobristSide();
 
         Ply++;
-        State.Rule50++;
-        State.PliesFromNull++;
+        state.Rule50++;
+        state.PliesFromNull++;
 
         var us = _sideToMove;
         var them = ~us;
@@ -750,11 +739,11 @@ public sealed class Position : IPosition
                     Debug.Assert(GetPiece(captureSquare) == pt.MakePiece(them));
                 }
 
-                State.PawnStructureKey ^= capturedPiece.GetZobristPst(captureSquare);
+                state.PawnKey ^= capturedPiece.GetZobristPst(captureSquare);
             }
             else
             {
-                State.NonPawnMaterial[them.Side] -= Values.GetPieceValue(capturedPiece, Phases.Mg);
+                _nonPawnMaterial[them.Side] -= Values.GetPieceValue(capturedPiece, Phases.Mg);
                 // TODO : Update material here
             }
 
@@ -768,26 +757,26 @@ public sealed class Position : IPosition
             // TODO : Update other depending keys and psq values here
 
             // Reset rule 50 counter
-            State.Rule50 = 0;
+            state.Rule50 = 0;
         }
 
         // update key with moved piece
         k ^= pc.GetZobristPst(from) ^ pc.GetZobristPst(to);
 
         // reset en-passant square if it is set
-        if (State.EnPassantSquare != Square.None)
+        if (state.EnPassantSquare != Square.None)
         {
-            k ^= State.EnPassantSquare.File.GetZobristEnPassant();
-            State.EnPassantSquare = Square.None;
+            k ^= state.EnPassantSquare.File.GetZobristEnPassant();
+            state.EnPassantSquare = Square.None;
         }
 
         // Update castling rights if needed
-        if (State.CastlelingRights != CastleRight.None &&
+        if (state.CastlelingRights != CastleRight.None &&
             (_castlingRightsMask[from.AsInt()] | _castlingRightsMask[to.AsInt()]) != CastleRight.None)
         {
             var cr = _castlingRightsMask[from.AsInt()] | _castlingRightsMask[to.AsInt()];
-            k ^= (State.CastlelingRights & cr).Key();
-            State.CastlelingRights &= ~cr;
+            k ^= (state.CastlelingRights & cr).Key();
+            state.CastlelingRights &= ~cr;
         }
 
         // Move the piece. The tricky Chess960 castle is handled earlier
@@ -801,8 +790,8 @@ public sealed class Position : IPosition
             if ((to.Value.AsInt() ^ from.Value.AsInt()) == 16
                 && !((to - us.PawnPushDistance()).PawnAttack(us) & Pieces(PieceTypes.Pawn, them)).IsEmpty)
             {
-                State.EnPassantSquare = to - us.PawnPushDistance();
-                k ^= State.EnPassantSquare.File.GetZobristEnPassant();
+                state.EnPassantSquare = to - us.PawnPushDistance();
+                k ^= state.EnPassantSquare.File.GetZobristEnPassant();
             }
             else if (type == MoveTypes.Promotion)
             {
@@ -816,16 +805,16 @@ public sealed class Position : IPosition
 
                 // Update hash keys
                 k ^= pc.GetZobristPst(to) ^ promotionPiece.GetZobristPst(to);
-                State.PawnStructureKey ^= pc.GetZobristPst(to);
+                state.PawnKey ^= pc.GetZobristPst(to);
 
-                State.NonPawnMaterial[us.Side] += Values.GetPieceValue(promotionPiece, Phases.Mg);
+                _nonPawnMaterial[us.Side] += Values.GetPieceValue(promotionPiece, Phases.Mg);
             }
 
             // Update pawn hash key
-            State.PawnStructureKey ^= pc.GetZobristPst(from) ^ pc.GetZobristPst(to);
+            state.PawnKey ^= pc.GetZobristPst(from) ^ pc.GetZobristPst(to);
 
             // Reset rule 50 draw counter
-            State.Rule50 = 0;
+            state.Rule50 = 0;
         }
 
         // TODO : Update piece values here
@@ -834,15 +823,15 @@ public sealed class Position : IPosition
         Debug.Assert(GetKingSquare(them).IsOk);
 
         // Update state properties
-        State.Key = k;
-        State.CapturedPiece = capturedPiece;
+        state.Key = k;
+        state.CapturedPiece = capturedPiece;
 
-        State.Checkers = givesCheck ? AttacksTo(GetKingSquare(them)) & Board.Pieces(us) : BitBoard.Empty;
+        state.Checkers = givesCheck ? AttacksTo(GetKingSquare(them)) & Board.Pieces(us) : BitBoard.Empty;
 
         _sideToMove = ~_sideToMove;
 
-        SetCheckInfo(State);
-        State.UpdateRepetition();
+        SetCheckInfo(state);
+        state.UpdateRepetition();
 
         //Debug.Assert(_positionValidator.Validate().IsOk);
     }
@@ -967,20 +956,15 @@ public sealed class Position : IPosition
     public BitBoard Pieces(PieceTypes pt1, PieceTypes pt2, Player p)
         => Board.Pieces(p, pt1, pt2);
 
-    public int PieceCount()
-        => Board.PieceCount();
+    public int PieceCount() => Board.PieceCount();
 
-    public int PieceCount(Piece pc)
-        => Board.PieceCount(pc.Type(), pc.ColorOf());
+    public int PieceCount(Piece pc) => Board.PieceCount(pc.Type(), pc.ColorOf());
 
-    public int PieceCount(PieceTypes pt)
-        => Board.PieceCount(pt);
+    public int PieceCount(PieceTypes pt) => Board.PieceCount(pt);
 
-    public int PieceCount(PieceTypes pt, Player p)
-        => Board.PieceCount(pt, p);
+    public int PieceCount(PieceTypes pt, Player p) => Board.PieceCount(pt, p);
 
-    public BitBoard PawnsOnColor(Player p, Square sq)
-        => Pieces(PieceTypes.Pawn, p) & sq.Color().ColorBB();
+    public BitBoard PawnsOnColor(Player p, Square sq) => Pieces(PieceTypes.Pawn, p) & sq.Color().ColorBB();
 
     public bool SemiOpenFileOn(Player p, Square sq)
         => (Board.Pieces(p, PieceTypes.Pawn) & sq.File.BitBoardFile()).IsEmpty;
@@ -997,7 +981,10 @@ public sealed class Position : IPosition
             .IsOppositeColor(Board.Square(PieceTypes.Bishop, Player.Black));
 
     public BitBoard PinnedPieces(Player p)
-        => State.Pinners[p.Side];
+    {
+        Debug.Assert(State != null);
+        return State.Pinners[p.Side];
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void RemovePiece(Square sq)
@@ -1111,9 +1098,9 @@ public sealed class Position : IPosition
         return res > 0;
     }
 
-    public Value NonPawnMaterial(Player p) => State.NonPawnMaterial[p.Side];
+    public Value NonPawnMaterial(Player p) => _nonPawnMaterial[p.Side];
 
-    public Value NonPawnMaterial() => State.NonPawnMaterial[0] - State.NonPawnMaterial[1];
+    public Value NonPawnMaterial() => _nonPawnMaterial[0] - _nonPawnMaterial[1];
 
     private void SetupPieces(ReadOnlySpan<char> fenChunk)
     {
@@ -1217,17 +1204,16 @@ public sealed class Position : IPosition
 
         Clear();
 
+        ChessMode = chessMode;
         Searcher = searcher;
 
-        state.CopyTo(State);
+        State = state.CopyTo(State);
 
         SetupPieces(fenData.Chunk());
         SetupPlayer(fenData.Chunk());
         SetupCastleling(fenData.Chunk());
         SetupEnPassant(fenData.Chunk());
         SetupMoveNumber(fenData);
-
-        ChessMode = chessMode;
 
         SetState();
 
@@ -1257,7 +1243,7 @@ public sealed class Position : IPosition
 
     public void TakeMove(Move m)
     {
-        Debug.Assert(!m.IsNullMove());
+        Debug.Assert(m.IsValidMove());
 
         // flip sides
         _sideToMove = ~_sideToMove;
@@ -1314,13 +1300,21 @@ public sealed class Position : IPosition
         // Set state to previous state
         State = State.Previous;
         Ply--;
-
-        //Debug.Assert(_positionValidator.Validate().IsOk);
+        
+#if DEBUG
+        Debug.Assert(_positionValidator.Validate(this).IsOk);
+#endif
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void TakeNullMove()
     {
+        Debug.Assert(State != null);
+        Debug.Assert(State.Previous != null);
+        Debug.Assert(State.PliesFromNull == 0);
+        Debug.Assert(State.CapturedPiece == Piece.EmptyPiece);
+        Debug.Assert(State.Checkers.IsEmpty);
+
         Debug.Assert(!InCheck);
         State = State.Previous;
         _sideToMove = ~_sideToMove;
@@ -1465,7 +1459,7 @@ public sealed class Position : IPosition
         var pawnKey = Zobrist.ZobristNoPawn;
 
         State.Checkers = AttacksTo(GetKingSquare(_sideToMove)) & Board.Pieces(~_sideToMove);
-        State.NonPawnMaterial[Player.White.Side] = State.NonPawnMaterial[Player.Black.Side] = Value.ValueZero;
+        _nonPawnMaterial[Player.White.Side] = _nonPawnMaterial[Player.Black.Side] = Value.ValueZero;
         SetCheckInfo(State);
 
         // compute hash keys
@@ -1480,7 +1474,7 @@ public sealed class Position : IPosition
             if (pt == PieceTypes.Pawn)
                 pawnKey ^= pc.GetZobristPst(sq);
             else if (pt != PieceTypes.King)
-                State.NonPawnMaterial[pc.ColorOf().Side] += Values.GetPieceValue(pc, Phases.Mg);
+                _nonPawnMaterial[pc.ColorOf().Side] += Values.GetPieceValue(pc, Phases.Mg);
         }
 
         if (State.EnPassantSquare != Square.None)
@@ -1501,7 +1495,7 @@ public sealed class Position : IPosition
         }
 
         State.Key = key;
-        State.PawnStructureKey = pawnKey;
+        State.PawnKey = pawnKey;
         State.MaterialKey = materialKey;
     }
 
@@ -1509,11 +1503,9 @@ public sealed class Position : IPosition
     {
         Square RookSquare(Square startSq, Piece rook)
         {
-            Square targetSq;
-            for (targetSq = startSq; Board.PieceAt(targetSq) != rook; --targetSq)
-            {
-            }
-
+            var targetSq = startSq;
+            while (Board.PieceAt(targetSq) != rook)
+                --targetSq;
             return targetSq;
         }
 

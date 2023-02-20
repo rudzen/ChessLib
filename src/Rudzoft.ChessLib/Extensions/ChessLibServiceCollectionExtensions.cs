@@ -45,8 +45,8 @@ public static class ChessLibServiceCollectionExtensions
 {
     public static IServiceCollection AddChessLib(
         this IServiceCollection serviceCollection,
-        IConfiguration? configuration,
-        string? configurationFile = null)
+        IConfiguration configuration,
+        string configurationFile = null)
     {
         if (serviceCollection == null)
             throw new ArgumentNullException(nameof(serviceCollection));
@@ -77,7 +77,7 @@ public static class ChessLibServiceCollectionExtensions
             var policy = new MoveListPolicy();
             return provider.Create(policy);
         });
-        
+
         return serviceCollection.AddSingleton(static _ =>
             {
                 IUci uci = new Uci();
@@ -91,7 +91,8 @@ public static class ChessLibServiceCollectionExtensions
             .AddSingleton<IPositionValidator, PositionValidator>()
             .AddTransient<IPosition, Position>()
             .AddTransient<IGame, Game>()
-            .AddSingleton<IPolyglotBookFactory, PolyglotBookFactory>();
+            .AddSingleton<IPolyglotBookFactory, PolyglotBookFactory>()
+            .AddSingleton<ICpu, Cpu>();
     }
 
     private static IConfigurationRoot LoadConfiguration(string? file)

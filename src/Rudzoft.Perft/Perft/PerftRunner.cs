@@ -71,7 +71,7 @@ public sealed class PerftRunner : IPerftRunner
 
     private readonly IUci _uci;
 
-    private readonly CPU _cpu;
+    private readonly Cpu _cpu;
 
     private bool _usingEpd;
 
@@ -97,7 +97,7 @@ public sealed class PerftRunner : IPerftRunner
 
         configuration.Bind("TranspositionTable", TranspositionTableOptions);
 
-        _cpu = new CPU();
+        _cpu = new Cpu();
     }
 
     public bool SaveResults { get; set; }

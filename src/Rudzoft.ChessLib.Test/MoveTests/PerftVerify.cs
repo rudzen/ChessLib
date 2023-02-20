@@ -29,6 +29,7 @@ public abstract class PerftVerify
             .AddTransient<IPosition, Position>()
             .AddSingleton<ISearchParameters, SearchParameters>()
             .AddSingleton<IUci, Uci>()
+            .AddSingleton<ICpu, Cpu>()
             .AddTransient<IGame, Game>()
             .AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>()
             .AddSingleton(static serviceProvider =>
@@ -43,11 +44,8 @@ public abstract class PerftVerify
 
     protected void AssertPerft(string fen, int depth, in ulong expected)
     {
-        var fenData = new FenData(fen);
-        var state = new State();
-
         var g = _serviceProvider.GetRequiredService<IGame>();
-        g.Pos.Set(in fenData, ChessMode.Normal, state);
+        g.NewGame(fen);
         
         var actual = g.Perft(depth);
         Assert.Equal(expected, actual);
