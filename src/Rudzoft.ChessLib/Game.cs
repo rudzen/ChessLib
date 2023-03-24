@@ -36,6 +36,7 @@ using Rudzoft.ChessLib.Fen;
 using Rudzoft.ChessLib.Hash.Tables.Transposition;
 using Rudzoft.ChessLib.MoveGeneration;
 using Rudzoft.ChessLib.Protocol.UCI;
+using Rudzoft.ChessLib.Tables.Perft;
 using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib;
@@ -105,16 +106,12 @@ public sealed class Game : IGame
         moveList.Generate(in _pos);
 
         var moves = moveList.Get();
-        ref var movesSpace = ref MemoryMarshal.GetReference(moves);
-        for (var i = 0; i < moves.Length; ++i)
-        {
-            var em = Unsafe.Add(ref movesSpace, i);
-            if (Pos.IsLegal(em.Move))
-                continue;
-            gameEndType |= GameEndTypes.Pat;
-            break;
-        }
 
+        if (moves.IsEmpty)
+            gameEndType |= GameEndTypes.Pat;
+        
+        _moveListPool.Return(moveList);
+        
         GameEndType = gameEndType;
     }
 
@@ -135,8 +132,17 @@ public sealed class Game : IGame
 
     public ulong Perft(int depth, bool root = true)
     {
-        var tot = ulong.MinValue;
+        // ref var entry = ref _perftTable.TryGet(in _pos, depth, out var tableValue);
+        //
+        // if (tableValue)
+        //     return entry.Count;
+        //
+        // entry.Count = ulong.MinValue;
+        // entry.Depth = depth;
+        // entry.Key = _pos.State.Key;
 
+        var tot = ulong.MinValue;
+        
         var ml = _moveListPool.Get();
         ml.Generate(in _pos);
 
@@ -144,12 +150,12 @@ public sealed class Game : IGame
         ref var movesSpace = ref MemoryMarshal.GetReference(moves);
         for (var i = 0; i < moves.Length; ++i)
         {
-            var em = Unsafe.Add(ref movesSpace, i);
+            var valMove = Unsafe.Add(ref movesSpace, i);
             if (root && depth <= 1)
                 tot++;
             else
             {
-                var m = em.Move;
+                var m = valMove.Move;
                 var state = new State();
                 _pos.MakeMove(m, in state);
 
@@ -161,12 +167,18 @@ public sealed class Game : IGame
                     _moveListPool.Return(ml2);
                 }
                 else
-                    tot += Perft(depth - 1, false);
+                {
+                    var next = Perft(depth - 1, false);
+                    tot += next;
+                }
 
                 _pos.TakeMove(m);
             }
         }
 
+        // if (!root)
+        //     _perftTable.Store(_pos.State.Key, depth, tot);
+        
         _moveListPool.Return(ml);
 
         return tot;

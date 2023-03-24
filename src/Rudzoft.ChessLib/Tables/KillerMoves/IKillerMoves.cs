@@ -24,57 +24,20 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using Rudzoft.ChessLib.Enums;
+using System;
 using Rudzoft.ChessLib.Types;
 
-namespace Rudzoft.ChessLib;
+namespace Rudzoft.ChessLib.Tables.KillerMoves;
 
-public interface IValues
+public interface IKillerMoves : IEquatable<IKillerMoves>
 {
-    Value MaxValueWithoutPawns { get; }
-    Value MaxValue { get; }
+    int GetValue(int depth, Move m, Piece fromPc);
 
-    Value PawnValueMg { get; set; }
+    ref PieceSquare Get(int depth, int index);
 
-    Value PawnValueEg { get; set; }
+    void UpdateValue(int depth, Move m, Piece fromPc);
 
-    Value KnightValueMg { get; set; }
+    void Shift(int depth);
 
-    Value KnightValueEg { get; set; }
-
-    Value BishopValueMg { get; set; }
-
-    Value BishopValueEg { get; set; }
-
-    Value RookValueMg { get; set; }
-
-    Value RookValueEg { get; set; }
-
-    Value QueenValueMg { get; set; }
-
-    Value QueenValueEg { get; set; }
-
-    public Value ValueZero { get; set; }
-
-    public Value ValueDraw { get; set; }
-
-    public Value ValueKnownWin { get; set; }
-
-    public Value ValueMate { get; set; }
-
-    public Value ValueInfinite { get; set; }
-
-    public Value ValueNone { get; set; }
-
-    public Value ValueMateInMaxPly { get; }
-
-    public Value ValueMatedInMaxPly { get; }
-
-    void SetDefaults();
-
-    void SetPieceValues(DefaultPieceValues[] values, Phases phase);
-
-    DefaultPieceValues GetPieceValue(Piece pc, Phases phase);
-    
-    DefaultPieceValues GetPieceValue(PieceTypes pt, Phases phase);
+    void Reset();
 }

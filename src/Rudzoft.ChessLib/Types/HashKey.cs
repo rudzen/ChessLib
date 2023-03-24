@@ -84,6 +84,10 @@ public readonly struct HashKey : IEquatable<HashKey>
         => new(left.Key << right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static HashKey operator &(HashKey left, int right)
+        => new(left.Key & (ulong)right);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static HashKey operator ^(HashKey left, int right)
         => new(left.Key ^ (ulong)right);
 

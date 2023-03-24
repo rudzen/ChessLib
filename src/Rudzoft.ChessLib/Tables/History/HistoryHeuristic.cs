@@ -24,15 +24,44 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using Rudzoft.ChessLib.Extensions;
 using Rudzoft.ChessLib.Types;
 
-namespace Rudzoft.ChessLib.Tables;
+namespace Rudzoft.ChessLib.Tables.History;
 
-public interface IHistoryHeuristic
+public sealed class HistoryHeuristic : IHistoryHeuristic
 {
-    void Clear();
+    private readonly int[][][] _table;
 
-    void Set(Player p, Square from, Square to, int value);
+    public HistoryHeuristic()
+    {
+        _table = new int[Player.Count][][];
+        Initialize(Player.White);
+        Initialize(Player.Black);
+    }
 
-    int Retrieve(Player p, Square from, Square to);
+    public void Clear()
+    {
+        ClearTable(Player.White);
+        ClearTable(Player.Black);
+    }
+
+    public void Set(Player p, Square from, Square to, int value)
+        => _table[p.Side][from.AsInt()][to.AsInt()] = value;
+
+    public int Retrieve(Player p, Square from, Square to)
+        => _table[p.Side][from.AsInt()][to.AsInt()];
+
+    private void Initialize(Player p)
+    {
+        _table[p.Side] = new int[Square.Count][];
+        for (var i = 0; i < _table[p.Side].Length; ++i)
+            _table[p.Side][i] = new int[Square.Count];
+    }
+
+    private void ClearTable(Player p)
+    {
+        for (var i = 0; i < _table[p.Side].Length; i++)
+            _table[p.Side][i].Clear();
+    }
 }

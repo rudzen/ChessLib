@@ -29,6 +29,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using Rudzoft.ChessLib.Enums;
 using Rudzoft.ChessLib.Types;
 
@@ -82,10 +83,15 @@ public sealed class MoveList : IMoveList
         => Contains(item.Move);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool Contains(Move item)
+    public bool Contains(Move move)
     {
-        for (var i = 0; i < Length; ++i)
-            if (_moves[i].Move == item)
+        var moveSpan = _moves.AsSpan()[..Length];
+        if (moveSpan.IsEmpty)
+            return false;
+
+        ref var movesSpace = ref MemoryMarshal.GetReference(moveSpan);
+        for (var i = 0; i < moveSpan.Length; ++i)
+            if (move == Unsafe.Add(ref movesSpace, i).Move)
                 return true;
 
         return false;
@@ -94,10 +100,15 @@ public sealed class MoveList : IMoveList
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Contains(Square from, Square to)
     {
-        for (var i = 0; i < Length; ++i)
+        var moveSpan = _moves.AsSpan()[..Length];
+        if (moveSpan.IsEmpty)
+            return false;
+
+        ref var movesSpace = ref MemoryMarshal.GetReference(moveSpan);
+        for (var i = 0; i < moveSpan.Length; ++i)
         {
-            var move = _moves[i].Move;
-            if (move.FromSquare() == from && move.ToSquare() == to)
+            var m = Unsafe.Add(ref movesSpace, i).Move;
+            if (m.FromSquare() == from && m.ToSquare() == to)
                 return true;
         }
 

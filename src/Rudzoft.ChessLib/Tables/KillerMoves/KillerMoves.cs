@@ -28,7 +28,7 @@ using System.Runtime.CompilerServices;
 using Rudzoft.ChessLib.Extensions;
 using Rudzoft.ChessLib.Types;
 
-namespace Rudzoft.ChessLib.Tables;
+namespace Rudzoft.ChessLib.Tables.KillerMoves;
 
 public sealed class KillerMoves : IKillerMoves
 {

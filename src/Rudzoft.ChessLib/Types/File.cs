@@ -49,8 +49,7 @@ public enum Files
 public static class FilesExtensions
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static int AsInt(this Files f)
-        => (int)f;
+    public static int AsInt(this Files f) => (int)f;
 }
 
 public readonly record struct File(Files Value) : IComparable<File>, ISpanFormattable, IValidationType
@@ -68,132 +67,100 @@ public readonly record struct File(Files Value) : IComparable<File>, ISpanFormat
     public static File[] AllFiles { get; } = { FileA, FileB, FileC, FileD, FileE, FileF, FileG, FileH };
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public File(int file)
-        : this((Files)file) { }
+    public File(int file) : this((Files)file) { }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public File(File f)
-        : this(f.Value) { }
+    public File(File f) : this(f.Value) { }
 
-    public char Char
-        => (char)('a' + Value);
+    public char Char => (char)('a' + Value);
 
-    public bool IsOk
-        => Value.AsInt().InBetween(Files.FileA.AsInt(), Files.FileH.AsInt());
+    public bool IsOk => Value.AsInt().InBetween(Files.FileA.AsInt(), Files.FileH.AsInt());
 
     public const int Count = (int)Files.FileNb;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator File(int value)
-        => new(value);
+    public static implicit operator File(int value) => new(value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator File(Files value)
-        => new(value);
+    public static implicit operator File(Files value) => new(value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator ==(File left, Files right)
-        => left.Value == right;
+    public static bool operator ==(File left, Files right) => left.Value == right;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator !=(File left, Files right)
-        => left.Value != right;
+    public static bool operator !=(File left, Files right) => left.Value != right;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator ==(File left, int right)
-        => left.Value == (Files)right;
+    public static bool operator ==(File left, int right) => left.Value == (Files)right;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator !=(File left, int right)
-        => left.Value != (Files)right;
+    public static bool operator !=(File left, int right) => left.Value != (Files)right;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static File operator +(File left, File right)
-        => new(left.AsInt() + right.AsInt());
+    public static File operator +(File left, File right) => new(left.AsInt() + right.AsInt());
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static File operator +(File left, int right)
-        => new(left.AsInt() + right);
+    public static File operator +(File left, int right) => new(left.AsInt() + right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static File operator +(File left, Files right)
-        => new(left.AsInt() + (int)right);
+    public static File operator +(File left, Files right) => new(left.AsInt() + (int)right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static File operator -(File left, File right)
-        => new(left.AsInt() - right.AsInt());
+    public static File operator -(File left, File right) => new(left.AsInt() - right.AsInt());
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static File operator -(File left, int right)
-        => new(left.AsInt() - right);
+    public static File operator -(File left, int right) => new(left.AsInt() - right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static File operator -(File left, Files right)
-        => new(left.AsInt() - (int)right);
+    public static File operator -(File left, Files right) => new(left.AsInt() - (int)right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static File operator ++(File f)
-        => new(f.Value + 1);
+    public static File operator ++(File f) => new(f.Value + 1);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard operator &(File left, ulong right)
-        => left.BitBoardFile() & right;
+    public static BitBoard operator &(File left, ulong right) => left.BitBoardFile() & right;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard operator &(ulong left, File right)
-        => left & right.BitBoardFile();
+    public static BitBoard operator &(ulong left, File right) => left & right.BitBoardFile();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard operator |(File left, File right)
-        => left.BitBoardFile() | right.BitBoardFile();
+    public static BitBoard operator |(File left, File right) => left.BitBoardFile() | right.BitBoardFile();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard operator |(ulong left, File right)
-        => left | right.BitBoardFile();
+    public static BitBoard operator |(ulong left, File right) => left | right.BitBoardFile();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static int operator |(File left, int right)
-        => left.AsInt() | right;
+    public static int operator |(File left, int right) => left.AsInt() | right;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard operator ~(File left)
-        => ~left.BitBoardFile();
+    public static BitBoard operator ~(File left) => ~left.BitBoardFile();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static int operator >>(File left, int right)
-        => left.AsInt() >> right;
+    public static int operator >>(File left, int right) => left.AsInt() >> right;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator >(File left, File right)
-        => left.AsInt() > right.AsInt();
+    public static bool operator >(File left, File right) => left.AsInt() > right.AsInt();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator <(File left, File right)
-        => left.AsInt() < right.AsInt();
+    public static bool operator <(File left, File right) => left.AsInt() < right.AsInt();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator >=(File left, File right)
-        => left.AsInt() >= right.AsInt();
+    public static bool operator >=(File left, File right) => left.AsInt() >= right.AsInt();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator <=(File left, File right)
-        => left.AsInt() <= right.AsInt();
+    public static bool operator <=(File left, File right) => left.AsInt() <= right.AsInt();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator true(File f)
-        => f.IsOk;
+    public static bool operator true(File f) => f.IsOk;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator false(File f)
-        => !f.IsOk;
+    public static bool operator false(File f) => !f.IsOk;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public int AsInt()
-        => (int)Value;
+    public int AsInt() => (int)Value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override string ToString()
-        => FileStrings[AsInt()];
+    public override string ToString() => FileStrings[AsInt()];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public string ToString(string format, IFormatProvider formatProvider)
@@ -208,26 +175,24 @@ public readonly record struct File(Files Value) : IComparable<File>, ISpanFormat
         => Value.AsInt().TryFormat(destination, out charsWritten, format, provider);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool Equals(File other)
-        => Value == other.Value;
+    public bool Equals(File other) => Value == other.Value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public int CompareTo(File other)
-        => Value.AsInt().CompareTo(other.Value.AsInt());
+    public int CompareTo(File other) => Value.AsInt().CompareTo(other.Value.AsInt());
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override int GetHashCode()
-        => AsInt();
+    public override int GetHashCode() => AsInt();
 
     /// <summary>
     /// Fold file [ABCDEFGH] to file [ABCDDCBA]
     /// </summary>
     /// <returns>The distance to the edge file</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public int EdgeDistance()
-        => Math.Min(AsInt() - FileA.AsInt(), FileH.AsInt() - AsInt());
+    public int EdgeDistance() => Math.Min(AsInt() - FileA.AsInt(), FileH.AsInt() - AsInt());
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public File Clamp(File min, File max)
-        => new(Value.AsInt().Clamp(min.AsInt(), max.AsInt()));
+    public File Clamp(File min, File max) => new(Value.AsInt().Clamp(min.AsInt(), max.AsInt()));
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public int Distance(File other) => Math.Abs(AsInt() - other.AsInt());
 }

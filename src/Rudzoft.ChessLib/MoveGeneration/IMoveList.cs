@@ -46,7 +46,7 @@ public interface IMoveList : IReadOnlyCollection<ValMove>
     void Clear();
 
     bool Contains(in ValMove item);
-    bool Contains(Move item);
+    bool Contains(Move move);
     bool Contains(Square from, Square to);
     void Generate(in IPosition pos, MoveGenerationType type = MoveGenerationType.Legal);
     ReadOnlySpan<ValMove> Get();

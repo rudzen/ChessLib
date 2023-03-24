@@ -85,15 +85,8 @@ public sealed class Perft : IPerft
         {
             var state = new State();
             Game.Pos.Set(in fd, ChessMode.Normal, state);
-
-            if (PerftTable.Retrieve(Game.Pos.State.Key, depth, out var result))
-                yield return result;
-            else
-            {
-                result = Game.Perft(depth);
-                PerftTable.Store(Game.Pos.State.Key, depth, result);
-                yield return result;
-            }
+            var result = Game.Perft(depth);
+            yield return result;
         }
     }
 

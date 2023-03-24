@@ -66,7 +66,7 @@ public sealed class State : IEquatable<State>
 
     public BitBoard[] CheckedSquares { get; private set; }
 
-    public Piece CapturedPiece { get; set; }
+    public PieceTypes CapturedPiece { get; set; }
 
     public Move LastMove { get; set; }
 
@@ -92,7 +92,7 @@ public sealed class State : IEquatable<State>
         BlockersForKing = new[] { BitBoard.Empty, BitBoard.Empty };
         Pinners = new[] { BitBoard.Empty, BitBoard.Empty };
         CheckedSquares = new BitBoard[PieceTypes.PieceTypeNb.AsInt()];
-        CapturedPiece = Piece.EmptyPiece;
+        CapturedPiece = PieceTypes.NoPieceType;
     }
 
     public State()
@@ -104,7 +104,7 @@ public sealed class State : IEquatable<State>
         CheckedSquares = new BitBoard[PieceTypes.PieceTypeNb.AsInt()];
         Pinners = new[] { BitBoard.Empty, BitBoard.Empty };
         BlockersForKing = new[] { BitBoard.Empty, BitBoard.Empty };
-        CapturedPiece = Piece.EmptyPiece;
+        CapturedPiece = PieceTypes.NoPieceType;
     }
 
     public State CopyTo(State other)
@@ -138,7 +138,7 @@ public sealed class State : IEquatable<State>
         CheckedSquares.Fill(BitBoard.Empty);
         Pinners[0] = Pinners[1] = BitBoard.Empty;
         BlockersForKing[0] = BlockersForKing[1] = BitBoard.Empty;
-        CapturedPiece = Piece.EmptyPiece;
+        CapturedPiece = PieceTypes.NoPieceType;
         Previous = null;
     }
 

@@ -170,6 +170,8 @@ public interface IPosition : IEnumerable<Piece>
 
     bool IsPawnPassedAt(Player p, Square sq);
 
+    BitBoard PawnPassSpan(Player p, Square sq);
+    
     bool CanCastle(CastleRight cr);
 
     bool CanCastle(Player p);

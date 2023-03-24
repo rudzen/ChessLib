@@ -49,6 +49,8 @@ public readonly struct Value : IEquatable<Value>
 
     public static Value MinusInfinite { get; } = new(DefaultPieceValues.ValueMinusInfinite);
 
+    public static Value Of(int v) => v;
+
     public static implicit operator Value(int value)
         => new(value);
 

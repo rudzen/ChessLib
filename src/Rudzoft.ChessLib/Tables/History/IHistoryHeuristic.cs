@@ -24,57 +24,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using Rudzoft.ChessLib.Enums;
 using Rudzoft.ChessLib.Types;
 
-namespace Rudzoft.ChessLib;
+namespace Rudzoft.ChessLib.Tables.History;
 
-public interface IValues
+public interface IHistoryHeuristic
 {
-    Value MaxValueWithoutPawns { get; }
-    Value MaxValue { get; }
+    void Clear();
 
-    Value PawnValueMg { get; set; }
+    void Set(Player p, Square from, Square to, int value);
 
-    Value PawnValueEg { get; set; }
-
-    Value KnightValueMg { get; set; }
-
-    Value KnightValueEg { get; set; }
-
-    Value BishopValueMg { get; set; }
-
-    Value BishopValueEg { get; set; }
-
-    Value RookValueMg { get; set; }
-
-    Value RookValueEg { get; set; }
-
-    Value QueenValueMg { get; set; }
-
-    Value QueenValueEg { get; set; }
-
-    public Value ValueZero { get; set; }
-
-    public Value ValueDraw { get; set; }
-
-    public Value ValueKnownWin { get; set; }
-
-    public Value ValueMate { get; set; }
-
-    public Value ValueInfinite { get; set; }
-
-    public Value ValueNone { get; set; }
-
-    public Value ValueMateInMaxPly { get; }
-
-    public Value ValueMatedInMaxPly { get; }
-
-    void SetDefaults();
-
-    void SetPieceValues(DefaultPieceValues[] values, Phases phase);
-
-    DefaultPieceValues GetPieceValue(Piece pc, Phases phase);
-    
-    DefaultPieceValues GetPieceValue(PieceTypes pt, Phases phase);
+    int Retrieve(Player p, Square from, Square to);
 }

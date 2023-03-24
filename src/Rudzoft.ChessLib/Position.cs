@@ -60,6 +60,14 @@ public sealed class Position : IPosition
     private readonly IPositionValidator _positionValidator;
     private Player _sideToMove;
 
+    public Position()
+    {
+        Board = new Board();
+        Values = new Values();
+        State = new State();
+        Clear();
+    }
+    
     public Position(
         IBoard board,
         IValues values,
@@ -182,6 +190,9 @@ public sealed class Position : IPosition
 
     public bool IsPawnPassedAt(Player p, Square sq)
         => (Board.Pieces(~p, PieceTypes.Pawn) & sq.PassedPawnFrontAttackSpan(p)).IsEmpty;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public BitBoard PawnPassSpan(Player p, Square sq) => p.FrontSquares(sq) | sq.PawnAttackSpan(p);
 
     public BitBoard AttacksTo(Square sq, in BitBoard occ)
     {
@@ -715,8 +726,7 @@ public sealed class Position : IPosition
 
             var (rookFrom, rookTo) = DoCastleling(us, from, ref to, CastlePerform.Do);
 
-            k ^= capturedPiece.GetZobristPst(rookFrom);
-            k ^= capturedPiece.GetZobristPst(rookTo);
+            k ^= capturedPiece.GetZobristPst(rookFrom) ^ capturedPiece.GetZobristPst(rookTo);
 
             // reset captured piece type as castleling is "king-captures-rook"
             capturedPiece = Piece.EmptyPiece;
@@ -774,9 +784,9 @@ public sealed class Position : IPosition
         if (state.CastlelingRights != CastleRight.None &&
             (_castlingRightsMask[from.AsInt()] | _castlingRightsMask[to.AsInt()]) != CastleRight.None)
         {
-            var cr = _castlingRightsMask[from.AsInt()] | _castlingRightsMask[to.AsInt()];
-            k ^= (state.CastlelingRights & cr).Key();
-            state.CastlelingRights &= ~cr;
+            k ^= state.CastlelingRights.Key();
+            state.CastlelingRights &= ~(_castlingRightsMask[from.AsInt()] | _castlingRightsMask[to.AsInt()]);
+            k ^= state.CastlelingRights.Key();
         }
 
         // Move the piece. The tricky Chess960 castle is handled earlier
@@ -824,7 +834,7 @@ public sealed class Position : IPosition
 
         // Update state properties
         state.Key = k;
-        state.CapturedPiece = capturedPiece;
+        state.CapturedPiece = capturedPiece.Type();
 
         state.Checkers = givesCheck ? AttacksTo(GetKingSquare(them)) & Board.Pieces(us) : BitBoard.Empty;
 
@@ -1253,7 +1263,7 @@ public sealed class Position : IPosition
         var pc = GetPiece(to);
 
         Debug.Assert(!IsOccupied(from) || m.IsCastleMove());
-        Debug.Assert(State.CapturedPiece.Type() != PieceTypes.King);
+        Debug.Assert(State.CapturedPiece != PieceTypes.King);
 
         if (type == MoveTypes.Promotion)
         {
@@ -1264,6 +1274,7 @@ public sealed class Position : IPosition
             RemovePiece(to);
             pc = PieceTypes.Pawn.MakePiece(us);
             AddPiece(pc, to);
+            _nonPawnMaterial[_sideToMove.Side] -= Values.GetPieceValue(pc, Phases.Mg);
         }
 
         if (type == MoveTypes.Castling)
@@ -1275,7 +1286,7 @@ public sealed class Position : IPosition
             MovePiece(to, from);
 #pragma warning restore S2234 // Parameters should be passed in the correct order
 
-            if (State.CapturedPiece != Piece.EmptyPiece)
+            if (State.CapturedPiece != PieceTypes.NoPieceType)
             {
                 var captureSquare = to;
 
@@ -1290,7 +1301,13 @@ public sealed class Position : IPosition
                     Debug.Assert(!IsOccupied(captureSquare));
                 }
 
-                AddPiece(State.CapturedPiece, captureSquare);
+                AddPiece(State.CapturedPiece.MakePiece(~_sideToMove), captureSquare);
+
+                if (State.CapturedPiece != PieceTypes.Pawn)
+                {
+                    var them = ~_sideToMove;
+                    _nonPawnMaterial[them.Side] += Values.GetPieceValue(State.CapturedPiece, Phases.Mg);
+                }
             }
         }
 
@@ -1312,7 +1329,7 @@ public sealed class Position : IPosition
         Debug.Assert(State != null);
         Debug.Assert(State.Previous != null);
         Debug.Assert(State.PliesFromNull == 0);
-        Debug.Assert(State.CapturedPiece == Piece.EmptyPiece);
+        Debug.Assert(State.CapturedPiece == PieceTypes.NoPieceType);
         Debug.Assert(State.Checkers.IsEmpty);
 
         Debug.Assert(!InCheck);
@@ -1527,7 +1544,6 @@ public sealed class Position : IPosition
 
             if (rsq != Square.None)
                 SetCastlingRight(c, rsq);
-
         }
     }
 

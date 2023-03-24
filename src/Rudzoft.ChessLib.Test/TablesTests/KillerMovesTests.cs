@@ -25,6 +25,7 @@ SOFTWARE.
 */
 
 using Rudzoft.ChessLib.Tables;
+using Rudzoft.ChessLib.Tables.KillerMoves;
 using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Test.TablesTests;

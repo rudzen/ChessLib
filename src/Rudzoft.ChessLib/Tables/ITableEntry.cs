@@ -24,20 +24,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System;
 using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Tables;
 
-public interface IKillerMoves : IEquatable<IKillerMoves>
+public interface ITableEntry
 {
-    int GetValue(int depth, Move m, Piece fromPc);
+    HashKey Key { get; set; }
 
-    ref PieceSquare Get(int depth, int index);
-
-    void UpdateValue(int depth, Move m, Piece fromPc);
-
-    void Shift(int depth);
-
-    void Reset();
+    Score Evaluate(IPosition pos);
 }

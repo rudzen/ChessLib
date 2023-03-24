@@ -2,15 +2,13 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.ObjectPool;
 using Microsoft.Extensions.Options;
-using Rudzoft.ChessLib.Enums;
-using Rudzoft.ChessLib.Fen;
 using Rudzoft.ChessLib.Hash.Tables.Transposition;
 using Rudzoft.ChessLib.ObjectPoolPolicies;
 using Rudzoft.ChessLib.Protocol.UCI;
 using Rudzoft.ChessLib.Types;
 using Rudzoft.ChessLib.Validation;
 
-namespace Rudzoft.ChessLib.Test.MoveTests;
+namespace Rudzoft.ChessLib.Test.PerftTests;
 
 public abstract class PerftVerify
 {

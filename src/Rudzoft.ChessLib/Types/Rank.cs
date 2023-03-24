@@ -70,143 +70,109 @@ public readonly record struct Rank(Ranks Value) : ISpanFormattable, IValidationT
     public static Rank[] All { get; } = { Rank1, Rank2, Rank3, Rank4, Rank5, Rank6, Rank7, Rank8 };
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Rank(int rank)
-        : this((Ranks)rank) { }
+    public Rank(int rank) : this((Ranks)rank) { }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Rank(Rank r)
-        : this(r.Value) { }
+    public Rank(Rank r) : this(r.Value) { }
 
     public char Char => (char)('1' + Value.AsInt());
 
-    public bool IsOk
-        => Value.AsInt().InBetween(Ranks.Rank1.AsInt(), Ranks.Rank8.AsInt());
+    public bool IsOk => Value.AsInt().InBetween(Ranks.Rank1.AsInt(), Ranks.Rank8.AsInt());
 
     public const int Count = (int)Ranks.RankNb;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator Rank(int value)
-        => new(value);
+    public static implicit operator Rank(int value) => new(value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator Rank(Ranks value)
-        => new(value);
+    public static implicit operator Rank(Ranks value) => new(value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator ==(Rank left, Ranks right)
-        => left.Value == right;
+    public static bool operator ==(Rank left, Ranks right) => left.Value == right;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator !=(Rank left, Ranks right)
-        => left.Value != right;
+    public static bool operator !=(Rank left, Ranks right) => left.Value != right;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator ==(Rank left, int right)
-        => left.Value == (Ranks)right;
+    public static bool operator ==(Rank left, int right) => left.Value == (Ranks)right;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator !=(Rank left, int right)
-        => left.Value != (Ranks)right;
+    public static bool operator !=(Rank left, int right) => left.Value != (Ranks)right;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Rank operator +(Rank left, Rank right)
-        => new(left.AsInt() + right.AsInt());
+    public static Rank operator +(Rank left, Rank right) => new(left.AsInt() + right.AsInt());
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Rank operator +(Rank left, int right)
-        => new(left.AsInt() + right);
+    public static Rank operator +(Rank left, int right) => new(left.AsInt() + right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Rank operator +(Rank left, Ranks right)
-        => new(left.AsInt() + (int)right);
+    public static Rank operator +(Rank left, Ranks right) => new(left.AsInt() + (int)right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Rank operator -(Rank left, Rank right)
-        => new(left.AsInt() - right.AsInt());
+    public static Rank operator -(Rank left, Rank right) => new(left.AsInt() - right.AsInt());
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Rank operator -(Rank left, int right)
-        => new(left.AsInt() - right);
+    public static Rank operator -(Rank left, int right) => new(left.AsInt() - right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Rank operator -(Rank left, Ranks right)
-        => new(left.AsInt() - (int)right);
+    public static Rank operator -(Rank left, Ranks right) => new(left.AsInt() - (int)right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Rank operator ++(Rank r)
-        => new(r.Value + 1);
+    public static Rank operator ++(Rank r) => new(r.Value + 1);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Rank operator --(Rank r)
-        => new(r.Value - 1);
+    public static Rank operator --(Rank r) => new(r.Value - 1);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard operator &(Rank left, ulong right)
-        => new(left.BitBoardRank().Value & right);
+    public static BitBoard operator &(Rank left, ulong right) => new(left.BitBoardRank().Value & right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard operator &(ulong left, Rank right)
-        => new(left & right.BitBoardRank().Value);
+    public static BitBoard operator &(ulong left, Rank right) => new(left & right.BitBoardRank().Value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard operator |(Rank left, Rank right)
-        => left.BitBoardRank() | right.BitBoardRank();
+    public static BitBoard operator |(Rank left, Rank right) => left.BitBoardRank() | right.BitBoardRank();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard operator |(ulong left, Rank right)
-        => new(left | right.BitBoardRank().Value);
+    public static BitBoard operator |(ulong left, Rank right) => new(left | right.BitBoardRank().Value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static int operator |(Rank left, int right)
-        => left.AsInt() | right;
+    public static int operator |(Rank left, int right) => left.AsInt() | right;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard operator ~(Rank left)
-        => ~left.BitBoardRank();
+    public static BitBoard operator ~(Rank left) => ~left.BitBoardRank();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static int operator >>(Rank left, int right)
-        => left.AsInt() >> right;
+    public static int operator >>(Rank left, int right) => left.AsInt() >> right;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator >=(Rank left, Rank right)
-        => left.Value >= right.Value;
+    public static bool operator >=(Rank left, Rank right) => left.Value >= right.Value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator >=(Rank left, Ranks right)
-        => left.Value >= right;
+    public static bool operator >=(Rank left, Ranks right) => left.Value >= right;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator >(Rank left, Rank right)
-        => left.AsInt() > right.AsInt();
+    public static bool operator >(Rank left, Rank right) => left.AsInt() > right.AsInt();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator <=(Rank left, Rank right)
-        => left.Value <= right.Value;
+    public static bool operator <=(Rank left, Rank right) => left.Value <= right.Value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator <=(Rank left, Ranks right)
-        => left.Value <= right;
+    public static bool operator <=(Rank left, Ranks right) => left.Value <= right;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator <(Rank left, Rank right)
-        => left.AsInt() < right.AsInt();
+    public static bool operator <(Rank left, Rank right) => left.AsInt() < right.AsInt();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator true(Rank r)
-        => r.IsOk;
+    public static bool operator true(Rank r) => r.IsOk;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator false(Rank r)
-        => !r.IsOk;
+    public static bool operator false(Rank r) => !r.IsOk;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public int AsInt()
-        => (int)Value;
+    public int AsInt() => (int)Value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override string ToString()
-        => RankStrings[AsInt()];
+    public override string ToString() => RankStrings[AsInt()];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public string ToString(string format, IFormatProvider formatProvider)
@@ -221,26 +187,24 @@ public readonly record struct Rank(Ranks Value) : ISpanFormattable, IValidationT
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool Equals(Rank other)
-        => Value == other.Value;
+    public bool Equals(Rank other) => Value == other.Value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override int GetHashCode()
-        => AsInt();
+    public override int GetHashCode() => AsInt();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Rank Relative(Player p)
-        => new(AsInt() ^ (p.Side * 7));
+    public Rank Relative(Player p) => new(AsInt() ^ (p.Side * 7));
 
     /// <summary>
     /// Fold rank [12345678] to rank [12344321]
     /// </summary>
     /// <returns>The distance to the edge rank</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public int EdgeDistance()
-        => Math.Min(AsInt() - Rank1.AsInt(), Rank8.AsInt() - AsInt());
+    public int EdgeDistance() => Math.Min(AsInt() - Rank1.AsInt(), Rank8.AsInt() - AsInt());
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Rank Clamp(Rank min, Rank max)
-        => new(Value.AsInt().Clamp(min.AsInt(), max.AsInt()));
+    public Rank Clamp(Rank min, Rank max) => new(Value.AsInt().Clamp(min.AsInt(), max.AsInt()));
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public int Distance(Rank other) => Math.Abs(AsInt() - other.AsInt());
 }

@@ -25,6 +25,7 @@ SOFTWARE.
 */
 
 using System;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using Rudzoft.ChessLib.Extensions;
 using Rudzoft.ChessLib.MoveGeneration;
@@ -70,14 +71,11 @@ public sealed class SanNotation : Notation
             re[i++] = 'p';
             re[i++] = from.FileChar;
         }
-        else
+        else if (Pos.GetPiece(to) != Piece.EmptyPiece)
         {
-            if (Pos.GetPiece(to) != Piece.EmptyPiece)
-            {
-                if (pt == PieceTypes.Pawn)
-                    re[i++] = from.FileChar;
-                re[i++] = 'x';
-            }
+            if (pt == PieceTypes.Pawn)
+                re[i++] = from.FileChar;
+            re[i++] = 'x';
         }
 
         re[i++] = to.FileChar;

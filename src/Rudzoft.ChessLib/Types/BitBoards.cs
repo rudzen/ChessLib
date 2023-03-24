@@ -621,7 +621,7 @@ public static class BitBoards
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Square Msb(this in BitBoard bb)
-        => new(63 - BitOperations.LeadingZeroCount(bb.Value));
+        => new(63 ^ BitOperations.LeadingZeroCount(bb.Value));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Square FrontMostSquare(in BitBoard bb, Player p)
