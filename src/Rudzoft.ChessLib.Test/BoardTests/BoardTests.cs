@@ -25,6 +25,9 @@ SOFTWARE.
 */
 
 using System;
+using System.Diagnostics.Contracts;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.ObjectPool;
 using Rudzoft.ChessLib.Enums;
@@ -55,32 +58,90 @@ public sealed class BoardTests
             })
             .BuildServiceProvider();
     }
-    
+
+    public sealed class BoardTestsTheoryData : TheoryData<string, PieceTypes, Player, int>
+    {
+        public BoardTestsTheoryData(string[] fens, PieceTypes[] pts, Player[] players, int[] expectedCounts)
+        {
+            Contract.Assert(fens != null);
+            Contract.Assert(pts != null);
+            Contract.Assert(players != null);
+            Contract.Assert(expectedCounts != null);
+            Contract.Assert(fens.Length == pts.Length);
+            Contract.Assert(fens.Length == players.Length);
+            Contract.Assert(fens.Length == expectedCounts.Length);
+
+            var fensSpan = fens.AsSpan();
+            var ptsSpan = pts.AsSpan();
+            var playersSpan = players.AsSpan();
+            var expectedCountSpan = expectedCounts.AsSpan();
+            
+            ref var fenSpace = ref MemoryMarshal.GetReference(fensSpan);
+            ref var ptsSpace = ref MemoryMarshal.GetReference(ptsSpan);
+            ref var playersSpace = ref MemoryMarshal.GetReference(playersSpan);
+            ref var expectedCountSpace = ref MemoryMarshal.GetReference(expectedCountSpan);
+            
+            for (var i = 0; i < fens.Length; ++i)
+            {
+                var fen = Unsafe.Add(ref fenSpace, i);
+                var pt = Unsafe.Add(ref ptsSpace, i);
+                var player = Unsafe.Add(ref playersSpace, i);
+                var expectedCount = Unsafe.Add(ref expectedCountSpace, i);
+                Add(fen, pt, player, expectedCount);
+            }
+        }
+    }
+
+    private static readonly string[] Fens = {
+        "rnbqkbnr/1ppQpppp/p2p4/8/8/2P5/PP1PPPPP/RNB1KBNR b KQkq - 1 6",
+        "rnbqkbnr/1ppQpppp/p2p4/8/8/2P5/PP1PPPPP/RNB1KBNR b KQkq - 1 6",
+        "rnbqkbnr/1ppQpppp/p2p4/8/8/2P5/PP1PPPPP/RNB1KBNR b KQkq - 1 6",
+        "rnbqkbnr/1ppQpppp/p2p4/8/8/2P5/PP1PPPPP/RNB1KBNR b KQkq - 1 6",
+        "rnbqkbnr/1ppQpppp/p2p4/8/8/2P5/PP1PPPPP/RNB1KBNR b KQkq - 1 6",
+        "rnbqkbnr/1ppQpppp/p2p4/8/8/2P5/PP1PPPPP/RNB1KBNR b KQkq - 1 6",
+        "rnbqkbnr/1ppQpppp/p2p4/8/8/2P5/PP1PPPPP/RNB1KBNR b KQkq - 1 6",
+        "rnbqkbnr/1ppQpppp/p2p4/8/8/2P5/PP1PPPPP/RNB1KBNR b KQkq - 1 6",
+        "rnbqkbnr/1ppQpppp/p2p4/8/8/2P5/PP1PPPPP/RNB1KBNR b KQkq - 1 6",
+        "rnbqkbnr/1ppQpppp/p2p4/8/8/2P5/PP1PPPPP/RNB1KBNR b KQkq - 1 6",
+        "rnbqkbnr/1ppQpppp/p2p4/8/8/2P5/PP1PPPPP/RNB1KBNR b KQkq - 1 6",
+        "rnbqkbnr/1ppQpppp/p2p4/8/8/2P5/PP1PPPPP/RNB1KBNR b KQkq - 1 6",
+        "5r1k/p6p/4r1n1/3NPp2/8/8/PP4RP/4R1K1 w - - 3 53",
+        "5r1k/p6p/4r1n1/3NPp2/8/8/PP4RP/4R1K1 w - - 3 53",
+        "5r1k/p6p/4r1n1/3NPp2/8/8/PP4RP/4R1K1 w - - 3 53",
+        "5r1k/p6p/4r1n1/3NPp2/8/8/PP4RP/4R1K1 w - - 3 53",
+        "5r1k/p6p/4r1n1/3NPp2/8/8/PP4RP/4R1K1 w - - 3 53",
+        "5r1k/p6p/4r1n1/3NPp2/8/8/PP4RP/4R1K1 w - - 3 53",
+        "5r1k/p6p/4r1n1/3NPp2/8/8/PP4RP/4R1K1 w - - 3 53",
+        "5r1k/p6p/4r1n1/3NPp2/8/8/PP4RP/4R1K1 w - - 3 53",
+        "5r1k/p6p/4r1n1/3NPp2/8/8/PP4RP/4R1K1 w - - 3 53",
+        "5r1k/p6p/4r1n1/3NPp2/8/8/PP4RP/4R1K1 w - - 3 53",
+        "5r1k/p6p/4r1n1/3NPp2/8/8/PP4RP/4R1K1 w - - 3 53",
+        "5r1k/p6p/4r1n1/3NPp2/8/8/PP4RP/4R1K1 w - - 3 53",
+    };
+
+    private static readonly PieceTypes[] PieceType = {
+        PieceTypes.Pawn, PieceTypes.Pawn, PieceTypes.Knight, PieceTypes.Knight, PieceTypes.Bishop, PieceTypes.Bishop,
+        PieceTypes.Rook, PieceTypes.Rook, PieceTypes.Queen, PieceTypes.Queen, PieceTypes.King, PieceTypes.King,
+        PieceTypes.Pawn, PieceTypes.Pawn, PieceTypes.Knight, PieceTypes.Knight, PieceTypes.Bishop, PieceTypes.Bishop,
+        PieceTypes.Rook, PieceTypes.Rook, PieceTypes.Queen, PieceTypes.Queen, PieceTypes.King, PieceTypes.King,
+    };
+
+    private static readonly Player[] Player = {
+        Types.Player.White, Types.Player.Black, Types.Player.White, Types.Player.Black, Types.Player.White, Types.Player.Black,
+        Types.Player.White, Types.Player.Black, Types.Player.White, Types.Player.Black, Types.Player.White, Types.Player.Black,
+        Types.Player.White, Types.Player.Black, Types.Player.White, Types.Player.Black, Types.Player.White, Types.Player.Black,
+        Types.Player.White, Types.Player.Black, Types.Player.White, Types.Player.Black, Types.Player.White, Types.Player.Black,
+    };
+
+    private static readonly int[] ExpectedCount = {
+        8, 8, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1,
+        4, 3, 1, 1, 0, 0, 2, 2, 0, 0, 1, 1
+    };
+
+    public static readonly BoardTestsTheoryData TheoryData = new(Fens, PieceType, Player, ExpectedCount);
+
     [Theory]
-    [InlineData("rnbqkbnr/1ppQpppp/p2p4/8/8/2P5/PP1PPPPP/RNB1KBNR b KQkq - 1 6", PieceTypes.Pawn, Players.White, 8)]
-    [InlineData("rnbqkbnr/1ppQpppp/p2p4/8/8/2P5/PP1PPPPP/RNB1KBNR b KQkq - 1 6", PieceTypes.Pawn, Players.Black, 8)]
-    [InlineData("rnbqkbnr/1ppQpppp/p2p4/8/8/2P5/PP1PPPPP/RNB1KBNR b KQkq - 1 6", PieceTypes.Knight, Players.White, 2)]
-    [InlineData("rnbqkbnr/1ppQpppp/p2p4/8/8/2P5/PP1PPPPP/RNB1KBNR b KQkq - 1 6", PieceTypes.Knight, Players.Black, 2)]
-    [InlineData("rnbqkbnr/1ppQpppp/p2p4/8/8/2P5/PP1PPPPP/RNB1KBNR b KQkq - 1 6", PieceTypes.Bishop, Players.White, 2)]
-    [InlineData("rnbqkbnr/1ppQpppp/p2p4/8/8/2P5/PP1PPPPP/RNB1KBNR b KQkq - 1 6", PieceTypes.Bishop, Players.Black, 2)]
-    [InlineData("rnbqkbnr/1ppQpppp/p2p4/8/8/2P5/PP1PPPPP/RNB1KBNR b KQkq - 1 6", PieceTypes.Rook, Players.White, 2)]
-    [InlineData("rnbqkbnr/1ppQpppp/p2p4/8/8/2P5/PP1PPPPP/RNB1KBNR b KQkq - 1 6", PieceTypes.Rook, Players.Black, 2)]
-    [InlineData("rnbqkbnr/1ppQpppp/p2p4/8/8/2P5/PP1PPPPP/RNB1KBNR b KQkq - 1 6", PieceTypes.Queen, Players.White, 1)]
-    [InlineData("rnbqkbnr/1ppQpppp/p2p4/8/8/2P5/PP1PPPPP/RNB1KBNR b KQkq - 1 6", PieceTypes.Queen, Players.Black, 1)]
-    [InlineData("rnbqkbnr/1ppQpppp/p2p4/8/8/2P5/PP1PPPPP/RNB1KBNR b KQkq - 1 6", PieceTypes.King, Players.White, 1)]
-    [InlineData("rnbqkbnr/1ppQpppp/p2p4/8/8/2P5/PP1PPPPP/RNB1KBNR b KQkq - 1 6", PieceTypes.King, Players.Black, 1)]
-    [InlineData("5r1k/p6p/4r1n1/3NPp2/8/8/PP4RP/4R1K1 w - - 3 53", PieceTypes.Pawn, Players.White, 4)]
-    [InlineData("5r1k/p6p/4r1n1/3NPp2/8/8/PP4RP/4R1K1 w - - 3 53", PieceTypes.Pawn, Players.Black, 3)]
-    [InlineData("5r1k/p6p/4r1n1/3NPp2/8/8/PP4RP/4R1K1 w - - 3 53", PieceTypes.Knight, Players.White, 1)]
-    [InlineData("5r1k/p6p/4r1n1/3NPp2/8/8/PP4RP/4R1K1 w - - 3 53", PieceTypes.Knight, Players.Black, 1)]
-    [InlineData("5r1k/p6p/4r1n1/3NPp2/8/8/PP4RP/4R1K1 w - - 3 53", PieceTypes.Bishop, Players.White, 0)]
-    [InlineData("5r1k/p6p/4r1n1/3NPp2/8/8/PP4RP/4R1K1 w - - 3 53", PieceTypes.Bishop, Players.Black, 0)]
-    [InlineData("5r1k/p6p/4r1n1/3NPp2/8/8/PP4RP/4R1K1 w - - 3 53", PieceTypes.Rook, Players.White, 2)]
-    [InlineData("5r1k/p6p/4r1n1/3NPp2/8/8/PP4RP/4R1K1 w - - 3 53", PieceTypes.Rook, Players.Black, 2)]
-    [InlineData("5r1k/p6p/4r1n1/3NPp2/8/8/PP4RP/4R1K1 w - - 3 53", PieceTypes.Queen, Players.White, 0)]
-    [InlineData("5r1k/p6p/4r1n1/3NPp2/8/8/PP4RP/4R1K1 w - - 3 53", PieceTypes.Queen, Players.Black, 0)]
-    [InlineData("5r1k/p6p/4r1n1/3NPp2/8/8/PP4RP/4R1K1 w - - 3 53", PieceTypes.King, Players.White, 1)]
-    [InlineData("5r1k/p6p/4r1n1/3NPp2/8/8/PP4RP/4R1K1 w - - 3 53", PieceTypes.King, Players.Black, 1)]
+    [MemberData(nameof(TheoryData))]
     public void BoardPieceCount(string fen, PieceTypes pt, Player p, int expected)
     {
         var pos = _serviceProvider.GetRequiredService<IPosition>();
@@ -94,8 +155,8 @@ public sealed class BoardTests
 
         var posCount = pos.Pieces(pt, p).Count;
         var boardCount = board.PieceCount(pt, p);
-        
+
         Assert.Equal(posCount, boardCount);
-        Assert.Equal(expected, boardCount);        
+        Assert.Equal(expected, boardCount);
     }
 }

@@ -1319,7 +1319,8 @@ public sealed class Position : IPosition
         Ply--;
         
 #if DEBUG
-        Debug.Assert(_positionValidator.Validate(this).IsOk);
+        var validator = _positionValidator.Validate(this);
+        Debug.Assert(validator.IsOk);
 #endif
     }
 
