@@ -99,7 +99,7 @@ public static class StringExtensions
     public static bool IsNullOrEmpty(this string @this) => string.IsNullOrEmpty(@this);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool IsNullOrWhiteSpace(this string? @this) => string.IsNullOrWhiteSpace(@this);
+    public static bool IsNullOrWhiteSpace(this string @this) => string.IsNullOrWhiteSpace(@this);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static char FlipCase(this char c)

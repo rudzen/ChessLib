@@ -36,6 +36,21 @@ public sealed class RootMove : List<Move>
 
     public static bool operator >(RootMove left, RootMove right)
         => left.NewValue < right.NewValue || left.NewValue == right.NewValue && left.OldValue < right.OldValue;
+    
+    private bool Equals(RootMove other)
+    {
+        return this.FirstOrDefault().Equals(other.FirstOrDefault());
+    }
+
+    public override bool Equals(object obj)
+    {
+        return ReferenceEquals(this, obj) || obj is RootMove other && Equals(other);
+    }
+
+    public override int GetHashCode()
+    {
+        return this.FirstOrDefault().GetHashCode();
+    }
 }
 
 public sealed class RootMoves : List<RootMove>

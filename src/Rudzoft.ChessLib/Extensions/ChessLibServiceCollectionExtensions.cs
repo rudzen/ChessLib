@@ -96,7 +96,7 @@ public static class ChessLibServiceCollectionExtensions
             .AddSingleton<ICpu, Cpu>();
     }
 
-    private static IConfigurationRoot LoadConfiguration(string? file)
+    private static IConfigurationRoot LoadConfiguration(string file)
     {
         var configurationFile = string.IsNullOrWhiteSpace(file) ? "chesslib.json" : file;
         var configurationFilePath = Path.Combine(AppContext.BaseDirectory, configurationFile);

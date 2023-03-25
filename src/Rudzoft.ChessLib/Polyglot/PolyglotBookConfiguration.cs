@@ -31,5 +31,5 @@ public sealed class PolyglotBookConfiguration
     public const string Section = "PolyglotBook";
     
     // ReSharper disable once UnusedAutoPropertyAccessor.Global
-    public string? BookPath { get; init; }
+    public string BookPath { get; init; }
 }

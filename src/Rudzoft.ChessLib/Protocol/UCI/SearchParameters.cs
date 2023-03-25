@@ -175,10 +175,10 @@ public sealed class SearchParameters : ISearchParameters
         return index;
     }
 
-    public string ToString(string? format, IFormatProvider? formatProvider)
+    public string ToString(string format, IFormatProvider formatProvider)
         => string.Format(formatProvider, format, ToString());
 
-    public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
+    public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format = default, IFormatProvider provider = null)
     {
         var index = 0;
 

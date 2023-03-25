@@ -49,8 +49,8 @@ public sealed class PolyglotBook : IPolyglotBook
         CastleRight.BlackQueen
     };
 
-    private readonly FileStream? _fileStream;
-    private readonly BinaryReader? _binaryReader;
+    private readonly FileStream _fileStream;
+    private readonly BinaryReader _binaryReader;
     private readonly string _bookFilePath;
     private readonly int _entrySize;
     private readonly Random _rnd;

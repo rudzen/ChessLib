@@ -120,8 +120,6 @@ public class StringBenchmarks
             case Types.Squares.c6:
                 return nameof(Types.Squares.a1);
 
-                return nameof(Types.Squares.a1);
-
             case Types.Squares.e6:
                 return nameof(Types.Squares.a1);
 

@@ -152,7 +152,7 @@ public sealed class StateStack : IEnumerable<State>
             var o = _stack[i];
             sb.Append(' ');
             if (o != null)
-                sb.Append(o.ToString());
+                sb.Append(o.ToString()!);
             else
                 sb.Append(' ');
             sb.Append(' ');

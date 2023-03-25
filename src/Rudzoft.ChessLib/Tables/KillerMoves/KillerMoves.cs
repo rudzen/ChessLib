@@ -110,7 +110,7 @@ public sealed class KillerMoves : IKillerMoves
         }
     }
 
-    public bool Equals(IKillerMoves? other)
+    public bool Equals(IKillerMoves other)
     {
         if (other is null) return false;
         if (ReferenceEquals(this, other)) return true;
@@ -128,7 +128,7 @@ public sealed class KillerMoves : IKillerMoves
         return false;
     }
 
-    public override bool Equals(object? obj)
+    public override bool Equals(object obj)
         => ReferenceEquals(this, obj) || obj is KillerMoves other && Equals(other);
 
     public override int GetHashCode()

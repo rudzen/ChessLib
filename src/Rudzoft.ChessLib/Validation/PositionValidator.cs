@@ -231,8 +231,7 @@ public sealed class PositionValidator : IPositionValidator
         if (state.Key.Key == 0 && !pos.Pieces().IsEmpty)
             error = AddError(error, "state key is invalid");
 
-        if (pos.Pieces(PieceTypes.Pawn, pos.SideToMove).IsEmpty &&
-            state.PawnKey.Key != Zobrist.ZobristNoPawn)
+        if (pos.PieceCount(PieceTypes.Pawn) == 0 && state.PawnKey.Key != Zobrist.ZobristNoPawn)
             error = AddError(error, "empty pawn key is invalid");
 
         if (state.Repetition < 0)
