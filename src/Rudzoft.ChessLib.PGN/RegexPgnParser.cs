@@ -29,10 +29,15 @@ using System.Text.RegularExpressions;
 
 namespace Rudzoft.ChessLib.PGN;
 
-public class RegexPgnParser : IPgnParser
+public sealed class RegexPgnParser : IPgnParser
 {
-    private static readonly Regex TagPairRegex = new(@"\[(?<tagName>\w+)\s+""(?<tagValue>[^""]+)""\]",
-        RegexOptions.Compiled | RegexOptions.NonBacktracking);
+
+    private const int DefaultTagCapacity = 7;
+    private const int DefaultMoveListCapacity = 24;
+
+    private static readonly Regex TagPairRegex =
+        new(@"\[(?<tagName>\w+)\s+""(?<tagValue>[^""]+)""\]",
+            RegexOptions.Compiled | RegexOptions.NonBacktracking);
 
     private static readonly Regex MoveTextRegex =
         new(@"(?<moveNumber>\d+)\.\s*(?<whiteMove>\S+)(\s+(?<blackMove>\S+))?",
@@ -46,11 +51,11 @@ public class RegexPgnParser : IPgnParser
     {
         if (string.IsNullOrWhiteSpace(pgnFile))
             yield break;
-        
+
         await using var fileStream = new FileStream(pgnFile, FileMode.Open, FileAccess.Read);
         using var streamReader = new StreamReader(fileStream);
-        var currentGameTags = new Dictionary<string, string>(7);
-        var currentGameMoves = new List<PgnMove>(24);
+        var currentGameTags = new Dictionary<string, string>(DefaultTagCapacity);
+        var currentGameMoves = new List<PgnMove>(DefaultMoveListCapacity);
         var inMoveSection = false;
 
         var line = await streamReader.ReadLineAsync(cancellationToken);
@@ -58,23 +63,18 @@ public class RegexPgnParser : IPgnParser
         while (line != null)
         {
             if (line.AsSpan().IsWhiteSpace())
-            {
                 inMoveSection = currentGameTags.Count > 0;
-                line = await streamReader.ReadLineAsync(cancellationToken);
-                continue;
-            }
-
-            if (inMoveSection)
+            else if (inMoveSection)
             {
                 var lineMoves = ParseMovesLine(line);
 
                 currentGameMoves.AddRange(lineMoves);
 
-                if (line.Contains("1-0") || line.Contains("0-1") || line.Contains("1/2-1/2") || line.Contains('*'))
+                if (IsPgnGameResult(line))
                 {
-                    yield return new PgnGame(currentGameTags, currentGameMoves);
-                    currentGameTags = new Dictionary<string, string>();
-                    currentGameMoves = new List<PgnMove>();
+                    yield return new(currentGameTags, currentGameMoves);
+                    currentGameTags = new Dictionary<string, string>(DefaultTagCapacity);
+                    currentGameMoves = new List<PgnMove>(DefaultMoveListCapacity);
                     inMoveSection = false;
                 }
             }
@@ -88,13 +88,28 @@ public class RegexPgnParser : IPgnParser
             yield return new(currentGameTags, currentGameMoves);
     }
 
+    private static bool IsPgnGameResult(ReadOnlySpan<char> line)
+    {
+        if (line.EndsWith(stackalloc char[] { '*' }, StringComparison.InvariantCultureIgnoreCase))
+            return true;
+
+        if (line.Contains(stackalloc char[] { '1', '-', '0' }, StringComparison.InvariantCultureIgnoreCase))
+            return true;
+
+        if (line.Contains(stackalloc char[] { '0', '-', '1' }, StringComparison.InvariantCultureIgnoreCase))
+            return true;
+
+        return line.Contains(stackalloc char[] { '1', '/', '2', '-', '1', '/', '2' },
+            StringComparison.InvariantCultureIgnoreCase);
+    }
+
     private static void ParseTag(string line, IDictionary<string, string> currentGameTags)
     {
         var tagMatch = TagPairRegex.Match(line);
-        
+
         if (!tagMatch.Success)
             return;
-        
+
         var tagName = tagMatch.Groups["tagName"].Value;
         var tagValue = tagMatch.Groups["tagValue"].Value;
         currentGameTags[tagName] = tagValue;
@@ -112,7 +127,7 @@ public class RegexPgnParser : IPgnParser
             if (string.IsNullOrWhiteSpace(blackMove))
                 return EmptyPgnMove with { MoveNumber = moveNumber, WhiteMove = whiteMove };
 
-            return new PgnMove(moveNumber, whiteMove, blackMove);
+            return new(moveNumber, whiteMove, blackMove);
         });
     }
 }
