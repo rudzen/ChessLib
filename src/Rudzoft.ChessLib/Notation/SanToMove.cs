@@ -25,6 +25,8 @@ SOFTWARE.
 */
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Extensions.ObjectPool;
 using Rudzoft.ChessLib.MoveGeneration;
 using Rudzoft.ChessLib.Notation.Notations;
@@ -41,7 +43,46 @@ public sealed class SanToMove : ISanToMove
         _moveListPool = moveListPool;
     }
 
-    public Move FromSan(IPosition pos, ReadOnlySpan<char> sanMove, INotation notation)
+    public IReadOnlyList<Move> FromNotation(IPosition pos, IEnumerable<string> notationalMoves, INotation notation)
+    {
+        var moveList = _moveListPool.Get();
+        var result = new List<Move>();
+
+        var validNotationalMoves = notationalMoves
+            .Where(static notationalMove => !string.IsNullOrWhiteSpace(notationalMove));
+
+        var state = new State();
+
+        foreach (var notationalMove in validNotationalMoves)
+        {
+            moveList.Generate(pos);
+            
+            var moves = moveList.Get();
+            
+            if (moves.IsEmpty)
+                break;
+
+            foreach (var move in moves)
+            {
+                var notatedMove = notation.Convert(move);
+                if (string.IsNullOrWhiteSpace(notatedMove))
+                    continue;
+
+                if (notationalMove.Equals(notatedMove))
+                {
+                    pos.MakeMove(move.Move, in state);
+                    result.Add(move);
+                    break;
+                }
+            }
+        }
+
+        _moveListPool.Return(moveList);
+
+        return result;
+    }
+
+    public Move FromNotation(IPosition pos, ReadOnlySpan<char> sanMove, INotation notation)
     {
         if (sanMove.IsEmpty || sanMove[0] == '*')
             return Move.EmptyMove;

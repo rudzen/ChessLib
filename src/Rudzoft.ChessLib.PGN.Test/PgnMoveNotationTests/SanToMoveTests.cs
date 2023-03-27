@@ -63,7 +63,7 @@ public sealed class SanToMoveTests
     }
 
     [Fact]
-    public async Task A()
+    public async Task BasicSanConvert()
     {
         var pos = _serviceProvider.GetRequiredService<IPosition>();
         var fenData = new FenData(Fen.Fen.StartPositionFen);
@@ -90,7 +90,7 @@ public sealed class SanToMoveTests
         var converter = _serviceProvider.GetRequiredService<ISanToMove>();
 
         var chessMoves = sanMoves
-            .Select(sanMove => converter.FromSan(pos, sanMove, notation))
+            .Select(sanMove => converter.FromNotation(pos, sanMove, notation))
             .TakeWhile(static move => move != Move.EmptyMove);
 
         foreach (var move in chessMoves)
@@ -98,6 +98,41 @@ public sealed class SanToMoveTests
         
         Assert.Equal(ExpectedGameCount, games.Count);
         Assert.NotEmpty(games);
+        Assert.Equal(sanMoves.Count - 1, pos.Ply);
+    }
+
+    [Fact]
+    public async Task AllAtOnceConvert()
+    {
+        var pos = _serviceProvider.GetRequiredService<IPosition>();
+        var fenData = new FenData(Fen.Fen.StartPositionFen);
+        var state = new State();
+        pos.Set(in fenData, ChessMode.Normal, state);
+        
+        var games = new List<PgnGame>();
+        var parser = _serviceProvider.GetRequiredService<IPgnParser>();
+
+        await foreach (var game in parser.ParseFile(SampleFilePath))
+            games.Add(game);
+
+        var sanMoves = new List<string>();
+
+        foreach (var pgnMove in games.First().Moves)
+        {
+            sanMoves.Add(pgnMove.WhiteMove);
+            if (!string.IsNullOrWhiteSpace(pgnMove.BlackMove))
+                sanMoves.Add(pgnMove.BlackMove);
+        }
+
+        var moveNotation = MoveNotation.Create(pos);
+        var notation = moveNotation.ToNotation(MoveNotations.San);
+        var converter = _serviceProvider.GetRequiredService<ISanToMove>();
+
+        var actualMoves = converter.FromNotation(pos, sanMoves, notation);
+
+        Assert.Equal(ExpectedGameCount, games.Count);
+        Assert.NotEmpty(games);
+        Assert.Equal(sanMoves.Count - 1, actualMoves.Count);
         Assert.Equal(sanMoves.Count - 1, pos.Ply);
     }
 }

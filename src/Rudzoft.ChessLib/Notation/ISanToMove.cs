@@ -25,6 +25,7 @@ SOFTWARE.
 */
 
 using System;
+using System.Collections.Generic;
 using Rudzoft.ChessLib.Notation.Notations;
 using Rudzoft.ChessLib.Types;
 
@@ -32,5 +33,7 @@ namespace Rudzoft.ChessLib.Notation;
 
 public interface ISanToMove
 {
-    Move FromSan(IPosition pos, ReadOnlySpan<char> sanMove, INotation notation);
+    IReadOnlyList<Move> FromNotation(IPosition pos, IEnumerable<string> notationalMoves, INotation notation);
+    
+    Move FromNotation(IPosition pos, ReadOnlySpan<char> sanMove, INotation notation);
 }
