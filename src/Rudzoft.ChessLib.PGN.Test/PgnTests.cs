@@ -55,15 +55,15 @@ public sealed class PgnTests
         Assert.Equal(ExpectedGameCount, games.Count);
 
         var game1 = games[0];
-        Assert.Equal("London", game1.Tags["Event"]);
-        Assert.Equal(44, game1.Moves.Count);
+        Assert.Equal("Test event", game1.Tags["Event"]);
+        Assert.Equal(3, game1.Moves.Count);
         Assert.Equal("e4", game1.Moves[0].WhiteMove);
         Assert.Equal("e5", game1.Moves[0].BlackMove);
 
         var game2 = games[1];
-        Assert.Equal("Reykjavik", game2.Tags["Event"]);
-        Assert.Equal(28, game2.Moves.Count);
-        Assert.Equal("e4", game2.Moves[0].WhiteMove);
-        Assert.Equal("c5", game2.Moves[0].BlackMove);
+        Assert.Equal("Test event 2", game2.Tags["Event"]);
+        Assert.Equal(3, game2.Moves.Count);
+        Assert.Equal("d4", game2.Moves[0].WhiteMove);
+        Assert.Equal("d5", game2.Moves[0].BlackMove);
     }
 }

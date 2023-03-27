@@ -93,13 +93,13 @@ public sealed class RegexPgnParser : IPgnParser
         if (line.EndsWith(stackalloc char[] { '*' }, StringComparison.InvariantCultureIgnoreCase))
             return true;
 
-        if (line.Contains(stackalloc char[] { '1', '-', '0' }, StringComparison.InvariantCultureIgnoreCase))
+        if (line.EndsWith(stackalloc char[] { '1', '-', '0' }, StringComparison.InvariantCultureIgnoreCase))
             return true;
 
-        if (line.Contains(stackalloc char[] { '0', '-', '1' }, StringComparison.InvariantCultureIgnoreCase))
+        if (line.EndsWith(stackalloc char[] { '0', '-', '1' }, StringComparison.InvariantCultureIgnoreCase))
             return true;
 
-        return line.Contains(stackalloc char[] { '1', '/', '2', '-', '1', '/', '2' },
+        return line.EndsWith(stackalloc char[] { '1', '/', '2', '-', '1', '/', '2' },
             StringComparison.InvariantCultureIgnoreCase);
     }
 
