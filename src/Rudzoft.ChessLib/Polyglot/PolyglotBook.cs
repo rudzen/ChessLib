@@ -169,36 +169,6 @@ public sealed class PolyglotBook : IPolyglotBook
         _moveListPool.Return(ml);
 
         return mm;
-        
-        // Iterate all known moves for current position to find a match.
-        // foreach (var valMove in moves)
-        // {
-        //     var m = valMove.Move;
-        //
-        //     if (from != m.FromSquare() || to != m.ToSquare())
-        //         continue;
-        //     
-        //     var type = move.MoveType();
-        //     
-        //     if ((m.IsPromotionMove() ? type == MoveTypes.Promotion : type != MoveTypes.Promotion) && !IsInCheck(pos, m))
-        //         return m;
-        // }
-        //
-        // return Move.EmptyMove;
-        
-        // var emMoves = ml.Select(static em => em.Move)
-        //     .Where(m => from == m.FromSquare())
-        //     .Where(m => to == m.ToSquare())
-        //     .Where(m =>
-        //     {
-        //         var type = move.MoveType();
-        //         return m.IsPromotionMove()
-        //             ? type == MoveTypes.Promotion
-        //             : type != MoveTypes.Promotion;
-        //     })
-        //     .Where(m => !IsInCheck(pos, m));
-        //
-        // return emMoves.FirstOrDefault(Move.EmptyMove);
     }
 
     private static Move SelectMove(in IPosition pos, Square polyFrom, Square polyTo, MoveTypes polyType, ReadOnlySpan<ValMove> moves)

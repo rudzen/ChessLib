@@ -63,6 +63,7 @@
     <PackageReference Include="ZString" Version="2.5.0" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Pgn" />
     <Folder Include="Protocol\" />
     <Folder Include="Validation\" />
   </ItemGroup>

@@ -26,7 +26,7 @@ SOFTWARE.
 
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Rudzoft.ChessLib.PGN.Test;
+namespace Rudzoft.ChessLib.PGN.Test.PgnTests;
 
 public sealed class PgnTests
 {
