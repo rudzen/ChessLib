@@ -38,7 +38,7 @@ public sealed class PgnTests
     public PgnTests()
     {
         _serviceProvider = new ServiceCollection()
-                .AddPgnParser()
+                .AddPgnParser(static () => false)
                 .BuildServiceProvider();
     }
     
