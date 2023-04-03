@@ -31,9 +31,9 @@ using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Notation;
 
-public interface ISanToMove
+public interface INotationToMove
 {
     IReadOnlyList<Move> FromNotation(IPosition pos, IEnumerable<string> notationalMoves, INotation notation);
     
-    Move FromNotation(IPosition pos, ReadOnlySpan<char> sanMove, INotation notation);
+    Move FromNotation(IPosition pos, ReadOnlySpan<char> notatedMove, INotation notation);
 }

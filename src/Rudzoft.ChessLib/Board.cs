@@ -76,11 +76,9 @@ public sealed class Board : IBoard
         Array.Fill(_index, 0);
     }
 
-    public Piece PieceAt(Square sq)
-        => _pieces[sq.AsInt()];
+    public Piece PieceAt(Square sq) => _pieces[sq.AsInt()];
 
-    public bool IsEmpty(Square sq)
-        => _pieces[sq.AsInt()] == Piece.EmptyPiece;
+    public bool IsEmpty(Square sq) => _pieces[sq.AsInt()] == Piece.EmptyPiece;
 
     public void AddPiece(Piece pc, Square sq)
     {
@@ -129,23 +127,17 @@ public sealed class Board : IBoard
         _pieceList[pc.AsInt()][_index[to.AsInt()]] = to;
     }
 
-    public Piece MovedPiece(Move m)
-        => PieceAt(m.FromSquare());
+    public Piece MovedPiece(Move m) => PieceAt(m.FromSquare());
 
-    public BitBoard Pieces()
-        => _byType[PieceTypes.AllPieces.AsInt()];
+    public BitBoard Pieces() => _byType[PieceTypes.AllPieces.AsInt()];
 
-    public BitBoard Pieces(PieceTypes pt)
-        => _byType[pt.AsInt()];
+    public BitBoard Pieces(PieceTypes pt) => _byType[pt.AsInt()];
 
-    public BitBoard Pieces(PieceTypes pt1, PieceTypes pt2)
-        => _byType[pt1.AsInt()] | _byType[pt2.AsInt()];
+    public BitBoard Pieces(PieceTypes pt1, PieceTypes pt2) => _byType[pt1.AsInt()] | _byType[pt2.AsInt()];
 
-    public BitBoard Pieces(Player p)
-        => _bySide[p.Side];
+    public BitBoard Pieces(Player p) => _bySide[p.Side];
 
-    public BitBoard Pieces(Player p, PieceTypes pt)
-        => _bySide[p.Side] & _byType[pt.AsInt()];
+    public BitBoard Pieces(Player p, PieceTypes pt) => _bySide[p.Side] & _byType[pt.AsInt()];
 
     public BitBoard Pieces(Player p, PieceTypes pt1, PieceTypes pt2)
         => _bySide[p.Side] & (_byType[pt1.AsInt()] | _byType[pt2.AsInt()]);
@@ -164,21 +156,17 @@ public sealed class Board : IBoard
             : squares.AsSpan()[..Array.IndexOf(squares, Types.Square.None)];
     }
 
-    public int PieceCount(Piece pc)
-        => _pieceCount[pc.AsInt()];
+    public int PieceCount(Piece pc) => _pieceCount[pc.AsInt()];
 
-    public int PieceCount(PieceTypes pt, Player p)
-        => PieceCount(pt.MakePiece(p));
+    public int PieceCount(PieceTypes pt, Player p) => PieceCount(pt.MakePiece(p));
 
     public int PieceCount(PieceTypes pt)
         => _pieceCount[pt.MakePiece(Player.White).AsInt()] + _pieceCount[pt.MakePiece(Player.Black).AsInt()];
 
-    public int PieceCount()
-        => PieceCount(PieceTypes.AllPieces);
+    public int PieceCount() => PieceCount(PieceTypes.AllPieces);
 
     public IEnumerator<Piece> GetEnumerator()
         => _pieces.Where(static pc => pc != Piece.EmptyPiece).GetEnumerator();
 
-    IEnumerator IEnumerable.GetEnumerator()
-        => GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }

@@ -30,12 +30,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.ObjectPool;
+using Rudzoft.ChessLib.Evaluation;
 using Rudzoft.ChessLib.Factories;
 using Rudzoft.ChessLib.Hash.Tables.Transposition;
 using Rudzoft.ChessLib.ObjectPoolPolicies;
 using Rudzoft.ChessLib.Polyglot;
 using Rudzoft.ChessLib.Protocol.UCI;
-using Rudzoft.ChessLib.Tables;
 using Rudzoft.ChessLib.Tables.KillerMoves;
 using Rudzoft.ChessLib.Types;
 using Rudzoft.ChessLib.Validation;
@@ -46,7 +46,7 @@ public static class ChessLibServiceCollectionExtensions
 {
     public static IServiceCollection AddChessLib(
         this IServiceCollection serviceCollection,
-        IConfiguration configuration,
+        IConfiguration configuration = null,
         string configurationFile = null)
     {
         if (serviceCollection == null)
@@ -88,6 +88,7 @@ public static class ChessLibServiceCollectionExtensions
             .AddTransient(static _ => KillerMoves.Create(64))
             .AddSingleton<ISearchParameters, SearchParameters>()
             .AddSingleton<IValues, Values>()
+            .AddSingleton<IKpkBitBase, KpkBitBase>()
             .AddTransient<IBoard, Board>()
             .AddSingleton<IPositionValidator, PositionValidator>()
             .AddTransient<IPosition, Position>()

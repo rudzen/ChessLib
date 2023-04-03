@@ -52,9 +52,9 @@ public sealed class Game : IGame
         ICpu cpu,
         ISearchParameters searchParameters,
         IPosition pos,
-        ObjectPool<IMoveList> moveListPoolPool)
+        ObjectPool<IMoveList> moveListPool)
     {
-        _moveListPool = moveListPoolPool;
+        _moveListPool = moveListPool;
         _pos = pos;
         
         Table = transpositionTable;

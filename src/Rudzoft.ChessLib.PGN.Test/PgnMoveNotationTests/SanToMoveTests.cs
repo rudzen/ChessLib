@@ -51,7 +51,7 @@ public sealed class SanToMoveTests
             .AddSingleton<IPositionValidator, PositionValidator>()
             .AddTransient<IPosition, Position>()
             .AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>()
-            .AddSingleton<ISanToMove, SanToMove>()
+            .AddSingleton<INotationToMove, NotationToMove>()
             .AddSingleton(static serviceProvider =>
             {
                 var provider = serviceProvider.GetRequiredService<ObjectPoolProvider>();
@@ -87,7 +87,7 @@ public sealed class SanToMoveTests
 
         var moveNotation = MoveNotation.Create(pos);
         var notation = moveNotation.ToNotation(MoveNotations.San);
-        var converter = _serviceProvider.GetRequiredService<ISanToMove>();
+        var converter = _serviceProvider.GetRequiredService<INotationToMove>();
 
         var chessMoves = sanMoves
             .Select(sanMove => converter.FromNotation(pos, sanMove, notation))
@@ -126,7 +126,7 @@ public sealed class SanToMoveTests
 
         var moveNotation = MoveNotation.Create(pos);
         var notation = moveNotation.ToNotation(MoveNotations.San);
-        var converter = _serviceProvider.GetRequiredService<ISanToMove>();
+        var converter = _serviceProvider.GetRequiredService<INotationToMove>();
 
         var actualMoves = converter.FromNotation(pos, sanMoves, notation);
 

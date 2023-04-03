@@ -192,6 +192,8 @@ public interface IPosition : IEnumerable<Piece>
 
     IPosition Set(in FenData fenData, ChessMode chessMode, State state, bool validate = false, int searcher = 0);
 
+    IPosition Set(string fen, ChessMode chessMode, State state, bool validate = false, int searcher = 0);
+
     IPosition Set(ReadOnlySpan<char> code, Player p, State state);
     
     HashKey GetPiecesKey();

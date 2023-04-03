@@ -24,7 +24,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using Rudzoft.ChessLib.Tables;
 using Rudzoft.ChessLib.Tables.KillerMoves;
 using Rudzoft.ChessLib.Types;
 

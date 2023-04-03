@@ -32,6 +32,6 @@ public sealed class TranspositionTableConfiguration
 {
     public const string Section = "TranspositionTable";
     
-    [Range(1, 1 << 31, ErrorMessage = "Default size for TT: {0} must be between {1} and {2}.")]
+    [Range(0, 1 << 31, ErrorMessage = "Default size for TT: {0} must be between {1} and {2}.")]
     public int DefaultSize { get; init; }
 }

@@ -34,11 +34,11 @@ using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Notation;
 
-public sealed class SanToMove : ISanToMove
+public sealed class NotationToMove : INotationToMove
 {
     private readonly ObjectPool<IMoveList> _moveListPool;
 
-    public SanToMove(ObjectPool<IMoveList> moveListPool)
+    public NotationToMove(ObjectPool<IMoveList> moveListPool)
     {
         _moveListPool = moveListPool;
     }
@@ -68,12 +68,12 @@ public sealed class SanToMove : ISanToMove
                 if (string.IsNullOrWhiteSpace(notatedMove))
                     continue;
 
-                if (notationalMove.Equals(notatedMove))
-                {
-                    pos.MakeMove(move.Move, in state);
-                    result.Add(move);
-                    break;
-                }
+                if (!notationalMove.Equals(notatedMove))
+                    continue;
+                
+                pos.MakeMove(move.Move, in state);
+                result.Add(move);
+                break;
             }
         }
 
@@ -82,9 +82,9 @@ public sealed class SanToMove : ISanToMove
         return result;
     }
 
-    public Move FromNotation(IPosition pos, ReadOnlySpan<char> sanMove, INotation notation)
+    public Move FromNotation(IPosition pos, ReadOnlySpan<char> notatedMove, INotation notation)
     {
-        if (sanMove.IsEmpty || sanMove[0] == '*')
+        if (notatedMove.IsEmpty || notatedMove[0] == '*')
             return Move.EmptyMove;
 
         var moveList = _moveListPool.Get();
@@ -100,7 +100,7 @@ public sealed class SanToMove : ISanToMove
             if (string.IsNullOrWhiteSpace(san))
                 continue;
             
-            if (!sanMove.Equals(san.AsSpan(), StringComparison.InvariantCulture))
+            if (!notatedMove.Equals(san.AsSpan(), StringComparison.InvariantCulture))
                 continue;
             
             m = move;

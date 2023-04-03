@@ -77,8 +77,13 @@ public sealed class TranspositionTable : ITranspositionTable
     /// <returns>The number of clusters in the table</returns>
     public ulong SetSize(int mbSize)
     {
-        if (mbSize < 0)
-            throw new TranspositionTableFailure($"Unable to create table with negative size: {mbSize}");
+        switch (mbSize)
+        {
+            case < 0:
+                throw new TranspositionTableFailure($"Unable to create table with negative size: {mbSize}");
+            case 0:
+                return 0;
+        }
 
         Size = mbSize;
         var size = (int)(((ulong)mbSize << 20) / (ulong)ClusterSize);

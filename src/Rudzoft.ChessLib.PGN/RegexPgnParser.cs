@@ -29,19 +29,16 @@ using System.Text.RegularExpressions;
 
 namespace Rudzoft.ChessLib.PGN;
 
-public sealed class RegexPgnParser : IPgnParser
+public sealed partial class RegexPgnParser : IPgnParser
 {
-
     private const int DefaultTagCapacity = 7;
     private const int DefaultMoveListCapacity = 24;
 
-    private static readonly Regex TagPairRegex =
-        new(@"\[(?<tagName>\w+)\s+""(?<tagValue>[^""]+)""\]",
-            RegexOptions.Compiled | RegexOptions.NonBacktracking);
+    [GeneratedRegex(@"\[(?<tagName>\w+)\s+""(?<tagValue>[^""]+)""\]",  RegexOptions.NonBacktracking)]
+    private static partial Regex TagPairRegex();
 
-    private static readonly Regex MoveTextRegex =
-        new(@"(?<moveNumber>\d+)\.\s*(?<whiteMove>\S+)(\s+(?<blackMove>\S+))?",
-            RegexOptions.Compiled | RegexOptions.NonBacktracking);
+    [GeneratedRegex(@"(?<moveNumber>\d+)\.\s*(?<whiteMove>\S+)(\s+(?<blackMove>\S+))?",  RegexOptions.NonBacktracking)]
+    private static partial Regex MoveTextRegex();
 
     private static readonly PgnMove EmptyPgnMove = new(0, string.Empty, string.Empty);
 
@@ -90,22 +87,24 @@ public sealed class RegexPgnParser : IPgnParser
 
     private static bool IsPgnGameResult(ReadOnlySpan<char> line)
     {
-        if (line.EndsWith(stackalloc char[] { '*' }, StringComparison.InvariantCultureIgnoreCase))
+        var trimmedLine = line.TrimEnd();
+        
+        if (trimmedLine.EndsWith(stackalloc char[] { '*' }, StringComparison.InvariantCultureIgnoreCase))
             return true;
 
-        if (line.EndsWith(stackalloc char[] { '1', '-', '0' }, StringComparison.InvariantCultureIgnoreCase))
+        if (trimmedLine.EndsWith(stackalloc char[] { '1', '-', '0' }, StringComparison.InvariantCultureIgnoreCase))
             return true;
 
-        if (line.EndsWith(stackalloc char[] { '0', '-', '1' }, StringComparison.InvariantCultureIgnoreCase))
+        if (trimmedLine.EndsWith(stackalloc char[] { '0', '-', '1' }, StringComparison.InvariantCultureIgnoreCase))
             return true;
 
-        return line.EndsWith(stackalloc char[] { '1', '/', '2', '-', '1', '/', '2' },
+        return trimmedLine.EndsWith(stackalloc char[] { '1', '/', '2', '-', '1', '/', '2' },
             StringComparison.InvariantCultureIgnoreCase);
     }
 
     private static void ParseTag(string line, IDictionary<string, string> currentGameTags)
     {
-        var tagMatch = TagPairRegex.Match(line);
+        var tagMatch = TagPairRegex().Match(line);
 
         if (!tagMatch.Success)
             return;
@@ -117,7 +116,7 @@ public sealed class RegexPgnParser : IPgnParser
 
     private static IEnumerable<PgnMove> ParseMovesLine(string line)
     {
-        var moveMatches = MoveTextRegex.Matches(line);
+        var moveMatches = MoveTextRegex().Matches(line);
         return moveMatches.Select(static x =>
         {
             var moveNumber = int.Parse(x.Groups["moveNumber"].Value);

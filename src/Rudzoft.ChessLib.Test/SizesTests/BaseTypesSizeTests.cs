@@ -63,11 +63,18 @@ public sealed class BaseTypesSizeTests
     }
 
     [Fact]
+    public unsafe void FileSize()
+    {
+        const int expected = 4;
+        var actual = sizeof(File);
+        Assert.Equal(expected, actual);
+    }
+
+    [Fact]
     public unsafe void DepthSize()
     {
         const int expected = 4;
         var actual = sizeof(Depth);
         Assert.Equal(expected, actual);
     }
-
 }

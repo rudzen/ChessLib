@@ -26,6 +26,7 @@ SOFTWARE.
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -37,13 +38,16 @@ namespace Rudzoft.ChessLib.Fen;
 /// For more information about the format, see
 /// https://chessprogramming.wikispaces.com/Forsyth-Edwards+Notation
 /// </summary>
+[DebuggerDisplay("Fen='{Fen.ToString()}', Chunks={_splitPoints.Count}")]
 public sealed class FenData : EventArgs, IFenData
 {
-    private readonly Queue<(int, int)> _splitPoints;
+    private record struct SplitPoint(int Begin, int End);
+    
+    private readonly Queue<SplitPoint> _splitPoints;
 
     private FenData()
     {
-        _splitPoints = new Queue<(int, int)>(6);
+        _splitPoints = new Queue<SplitPoint>(6);
     }
 
     public FenData(ReadOnlyMemory<char> fen) : this()
@@ -61,12 +65,12 @@ public sealed class FenData : EventArgs, IFenData
             if (splitPoint != ' ')
                 continue;
 
-            _splitPoints.Enqueue((start, i));
+            _splitPoints.Enqueue(new(start, i));
             start = i + 1;
         }
 
         // add last
-        _splitPoints.Enqueue((start, s.Length));
+        _splitPoints.Enqueue(new(start, s.Length));
     }
 
     public FenData(ReadOnlySpan<string> fen) : this()
@@ -94,12 +98,12 @@ public sealed class FenData : EventArgs, IFenData
             if (splitPoint != ' ')
                 continue;
 
-            _splitPoints.Enqueue((start, i));
+            _splitPoints.Enqueue(new(start, i));
             start = i + 1;
         }
 
         // add last
-        _splitPoints.Enqueue((start, s.Length));
+        _splitPoints.Enqueue(new(start, s.Length));
     }
 
     public FenData(char[] fen) : this(fen.AsMemory())
@@ -123,8 +127,8 @@ public sealed class FenData : EventArgs, IFenData
     {
         // ReSharper disable once InlineOutVariableDeclaration
         Index++;
-        return _splitPoints.TryDequeue(out (int start, int end) result)
-            ? Fen.Span[result.start..result.end]
+        return _splitPoints.TryDequeue(out var splitPoint)
+            ? Fen.Span[splitPoint.Begin..splitPoint.End]
             : ReadOnlySpan<char>.Empty;
     }
 

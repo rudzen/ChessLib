@@ -54,7 +54,7 @@ public static class Fen
 
     private static readonly Lazy<Regex> ValidFenRegex = new(static () => new Regex(
        string.Format(@"^ \s* {0}/{0}/{0}/{0}/{0}/{0}/{0}/{0} \s+ (?:w|b) \s+ (?:[KkQq]+|\-) \s+ (?:[a-h][1-8]|\-) \s+ \d+ \s+ \d+ \s* $", FenRankRegexSnippet),
-       RegexOptions.Compiled | RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.NonBacktracking));
+       RegexOptions.Compiled | RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.NonBacktracking | RegexOptions.ExplicitCapture));
 
     /// <summary>
     /// Performs basic validation of FEN string.
@@ -69,6 +69,9 @@ public static class Fen
     public static void Validate(string fen)
     {
         var f = fen.AsSpan().Trim();
+
+        if (f.IsEmpty)
+            throw new InvalidFen("Fen is empty.");
 
         var invalidCharIndex = f.IndexOfAnyExcept(ValidChars.AsSpan());
 
@@ -137,7 +140,8 @@ public static class Fen
             var limit = limits[pt.AsInt()];
 
             if (pieceCount[pc.AsInt()] > limit)
-                throw new InvalidFen($"Invalid fen (piece limit exceeded for {pc}. index={i},limit={limit},count={pieceCount[pc.AsInt()]}) {s.ToString()}");
+                throw new InvalidFen(
+                    $"Invalid fen (piece limit exceeded for {pc}. index={i},limit={limit},count={pieceCount[pc.AsInt()]}) {s.ToString()}");
         }
 
         // check for summed up values

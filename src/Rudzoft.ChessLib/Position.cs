@@ -38,6 +38,7 @@ using Rudzoft.ChessLib.Extensions;
 using Rudzoft.ChessLib.Fen;
 using Rudzoft.ChessLib.Hash;
 using Rudzoft.ChessLib.MoveGeneration;
+using Rudzoft.ChessLib.ObjectPoolPolicies;
 using Rudzoft.ChessLib.Types;
 using Rudzoft.ChessLib.Validation;
 
@@ -60,14 +61,14 @@ public sealed class Position : IPosition
     private readonly IPositionValidator _positionValidator;
     private Player _sideToMove;
 
-    public Position()
+    public Position() : this(
+        new Board(),
+        new Values(),
+        new PositionValidator(),
+        new DefaultObjectPool<IMoveList>(new MoveListPolicy()))
     {
-        Board = new Board();
-        Values = new Values();
-        State = new State();
-        Clear();
     }
-    
+
     public Position(
         IBoard board,
         IValues values,
@@ -1001,7 +1002,7 @@ public sealed class Position : IPosition
     {
         Board.RemovePiece(sq);
         if (!IsProbing)
-            PieceUpdated?.Invoke( new PieceSquareEventArgs(Piece.EmptyPiece, sq));
+            PieceUpdated?.Invoke(new PieceSquareEventArgs(Piece.EmptyPiece, sq));
     }
 
     public bool SeeGe(Move m, Value threshold)
@@ -1165,8 +1166,10 @@ public sealed class Position : IPosition
             var otherSide = ~_sideToMove;
 
             enPassant = !(State.EnPassantSquare.PawnAttack(otherSide) & Pieces(PieceTypes.Pawn, _sideToMove)).IsEmpty
-                        && !(Pieces(PieceTypes.Pawn, otherSide) & (State.EnPassantSquare + otherSide.PawnPushDistance())).IsEmpty
-                        && (Pieces() & (State.EnPassantSquare | (State.EnPassantSquare + _sideToMove.PawnPushDistance()))).IsEmpty;
+                        && !(Pieces(PieceTypes.Pawn, otherSide) &
+                             (State.EnPassantSquare + otherSide.PawnPushDistance())).IsEmpty
+                        && (Pieces() &
+                            (State.EnPassantSquare | (State.EnPassantSquare + _sideToMove.PawnPushDistance()))).IsEmpty;
         }
 
         if (!enPassant)
@@ -1230,6 +1233,9 @@ public sealed class Position : IPosition
         return this;
     }
 
+    public IPosition Set(string fen, ChessMode chessMode, State state, bool validate = false, int searcher = 0)
+        => Set(new FenData(fen), chessMode, state, validate, searcher);
+
     public IPosition Set(ReadOnlySpan<char> code, Player p, State state)
     {
         Debug.Assert(code[0] == 'K' && code[1..].IndexOf('K') != -1);
@@ -1237,16 +1243,15 @@ public sealed class Position : IPosition
         Debug.Assert(code[0] == 'K');
 
         var kingPos = code.LastIndexOf('K');
-        var sides = new [] { code[kingPos..].ToString(), code[..kingPos].ToString() };
-        
+        var sides = new[] { code[kingPos..].ToString(), code[..kingPos].ToString() };
+
         sides[p.Side] = sides[p.Side].ToLower();
 
         var fenStr = $"{sides[0]}{8 - sides[0].Length}/8/8/8/8/8/8/{sides[1]}{8 - sides[1].Length} w - - 0 10";
-        var fen = new FenData(fenStr);
 
-        return Set(in fen, ChessMode.Normal, state);
+        return Set(fenStr, ChessMode.Normal, state);
     }
-    
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public ReadOnlySpan<Square> Squares(PieceTypes pt, Player p)
         => Board.Squares(pt, p);
@@ -1317,7 +1322,7 @@ public sealed class Position : IPosition
         // Set state to previous state
         State = State.Previous;
         Ply--;
-        
+
 #if DEBUG
         var validator = _positionValidator.Validate(this);
         Debug.Assert(validator.IsOk);
@@ -1540,7 +1545,9 @@ public sealed class Position : IPosition
             {
                 'K' => RookSquare(Square.H1.Relative(c), rook),
                 'Q' => RookSquare(Square.A1.Relative(c), rook),
-                _ => char.IsBetween(token, 'A', 'H') ? new Square(Rank.Rank1.Relative(c), new File(token - 'A')) : Square.None
+                _ => char.IsBetween(token, 'A', 'H')
+                    ? new Square(Rank.Rank1.Relative(c), new File(token - 'A'))
+                    : Square.None
             };
 
             if (rsq != Square.None)
