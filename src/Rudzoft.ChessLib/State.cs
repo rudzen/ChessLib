@@ -121,8 +121,7 @@ public sealed class State : IEquatable<State>
         other.Previous = this;
 
         // initialize the rest of the values
-        if (other.CheckedSquares == null)
-            other.CheckedSquares = new BitBoard[PieceTypes.PieceTypeNb.AsInt()];
+        other.CheckedSquares ??= new BitBoard[PieceTypes.PieceTypeNb.AsInt()];
 
         return other;
     }

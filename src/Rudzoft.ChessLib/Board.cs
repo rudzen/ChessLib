@@ -150,10 +150,12 @@ public sealed class Board : IBoard
 
     public ReadOnlySpan<Square> Squares(PieceTypes pt, Player c)
     {
-        var squares = _pieceList[pt.MakePiece(c).AsInt()];
-        return squares[0] == Types.Square.None
+        var pcIndex = pt.MakePiece(c).AsInt();
+        var pcCount = _pieceCount[pcIndex];
+
+        return pcCount == 0
             ? ReadOnlySpan<Square>.Empty
-            : squares.AsSpan()[..Array.IndexOf(squares, Types.Square.None)];
+            : _pieceList[pcIndex].AsSpan()[..pcCount];
     }
 
     public int PieceCount(Piece pc) => _pieceCount[pc.AsInt()];

@@ -58,6 +58,8 @@ public readonly record struct BitBoard(ulong Value) : IEnumerable<Square>, IMinM
     public int Count => BitBoards.PopCount(in this);
 
     public bool IsEmpty => Value == 0;
+    
+    public bool IsNotEmpty => Value != 0;
 
     public static BitBoard Empty => BitBoards.EmptyBitBoard;
 
@@ -75,84 +77,64 @@ public readonly record struct BitBoard(ulong Value) : IEnumerable<Square>, IMinM
     public Square this[int index] => this.Get(index);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator BitBoard(ulong value)
-        => new(value);
+    public static implicit operator BitBoard(ulong value) => new(value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator BitBoard(int value)
-        => new(value);
+    public static implicit operator BitBoard(int value) => new(value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator BitBoard(Square sq)
-        => new(sq.AsBb());
+    public static implicit operator BitBoard(Square sq) => new(sq.AsBb());
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard Create(ulong value)
-        => new(value);
+    public static BitBoard Create(ulong value) => new(value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard Create(uint value)
-        => new(value);
+    public static BitBoard Create(uint value) => new(value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard operator *(BitBoard left, ulong right)
-        => new(left.Value * right);
+    public static BitBoard operator *(BitBoard left, ulong right) => new(left.Value * right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard operator *(ulong left, BitBoard right)
-        => new(left * right.Value);
+    public static BitBoard operator *(ulong left, BitBoard right) => new(left * right.Value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard operator -(BitBoard left, int right)
-        => new(left.Value - (ulong)right);
+    public static BitBoard operator -(BitBoard left, int right) => new(left.Value - (ulong)right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard operator >>(BitBoard left, int right)
-        => new(left.Value >> right);
+    public static BitBoard operator >>(BitBoard left, int right) => new(left.Value >> right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard operator <<(BitBoard left, int right)
-        => new(left.Value << right);
+    public static BitBoard operator <<(BitBoard left, int right) => new(left.Value << right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard operator |(BitBoard left, Square right)
-        => new(left.Value | right.AsBb());
+    public static BitBoard operator |(BitBoard left, Square right) => new(left.Value | right.AsBb());
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard operator |(BitBoard left, BitBoard right)
-        => new(left.Value | right.Value);
+    public static BitBoard operator |(BitBoard left, BitBoard right) => new(left.Value | right.Value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard operator ^(BitBoard left, BitBoard right)
-        => new(left.Value ^ right.Value);
+    public static BitBoard operator ^(BitBoard left, BitBoard right) => new(left.Value ^ right.Value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard operator &(BitBoard left, BitBoard right)
-        => new(left.Value & right.Value);
+    public static BitBoard operator &(BitBoard left, BitBoard right) => new(left.Value & right.Value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard operator &(ulong left, BitBoard right)
-        => new(left & right.Value);
+    public static BitBoard operator &(ulong left, BitBoard right) => new(left & right.Value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard operator &(BitBoard left, ulong right)
-        => new(left.Value & right);
+    public static BitBoard operator &(BitBoard left, ulong right) => new(left.Value & right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard operator &(BitBoard left, Square right)
-        => left.Value & right.AsBb();
+    public static BitBoard operator &(BitBoard left, Square right) => left.Value & right.AsBb();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard operator &(BitBoard left, File right)
-        => left.Value & right.BitBoardFile();
+    public static BitBoard operator &(BitBoard left, File right) => left.Value & right.BitBoardFile();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard operator &(Square left, BitBoard right)
-        => left.AsBb() & right.Value;
+    public static BitBoard operator &(Square left, BitBoard right) => left.AsBb() & right.Value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard operator ~(BitBoard bb)
-        => new(~bb.Value);
+    public static BitBoard operator ~(BitBoard bb) => new(~bb.Value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static BitBoard operator --(BitBoard bb)
@@ -162,56 +144,43 @@ public readonly record struct BitBoard(ulong Value) : IEnumerable<Square>, IMinM
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator <(BitBoard left, BitBoard right)
-        => left.Count < right.Count;
+    public static bool operator <(BitBoard left, BitBoard right) => left.Count < right.Count;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator >(BitBoard left, BitBoard right)
-        => left.Count > right.Count;
+    public static bool operator >(BitBoard left, BitBoard right) => left.Count > right.Count;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator >=(BitBoard left, BitBoard right)
-        => left.Count >= right.Count;
+    public static bool operator >=(BitBoard left, BitBoard right) => left.Count >= right.Count;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator <=(BitBoard left, BitBoard right)
-        => left.Count <= right.Count;
+    public static bool operator <=(BitBoard left, BitBoard right) => left.Count <= right.Count;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator true(BitBoard bb)
-        => bb.Value != ulong.MinValue;
+    public static bool operator true(BitBoard bb) => bb.Value != ulong.MinValue;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator false(BitBoard bb)
-        => bb.Value == 0;
+    public static bool operator false(BitBoard bb) => bb.Value == 0;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator !(BitBoard bb)
-        => bb.Value == 0;
+    public static bool operator !(BitBoard bb) => bb.Value == 0;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator bool(BitBoard b)
-        => b.Value != 0;
+    public static implicit operator bool(BitBoard b) => b.Value != 0;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool Contains(Square sq)
-        => !(this & sq).IsEmpty;
+    public bool Contains(Square sq) => !(this & sq).IsEmpty;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Square FirstOrDefault()
-        => IsEmpty ? Square.None : this.Lsb();
+    public Square FirstOrDefault() => IsEmpty ? Square.None : this.Lsb();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public BitBoard Xor(int pos)
-        => new(Value ^ (uint)pos);
+    public BitBoard Xor(int pos) => new(Value ^ (uint)pos);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public BitBoard And(BitBoard other)
-        => Value & other;
+    public BitBoard And(in BitBoard other) => Value & other.Value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public BitBoard Or(BitBoard other)
-        => this | other;
+    public BitBoard Or(in BitBoard other) => this | other.Value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public BitBoard OrAll(params BitBoard[] bbs)

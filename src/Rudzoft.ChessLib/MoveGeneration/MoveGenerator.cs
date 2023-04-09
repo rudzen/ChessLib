@@ -250,9 +250,10 @@ public static class MoveGenerator
                     !(pt.PseudoAttacks(from) & target & pos.CheckedSquares(pt))))
                 continue;
 
-            var b = checks
-                ? pos.GetAttacks(from, pt) & target & pos.CheckedSquares(pt)
-                : pos.GetAttacks(from, pt) & target;
+            var b = pos.GetAttacks(from, pt) & target;
+
+            if (checks)
+                b &= pos.CheckedSquares(pt);
 
             index = Move.Create(moves, index, from, ref b);
         }

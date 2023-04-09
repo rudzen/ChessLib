@@ -19,9 +19,8 @@ public sealed class MoveGeneratorService : IMoveGeneratorService
     {
         _logger.LogInformation("Generating moves. fen={Fen},type={Type},mode={Mode}", parameters.Fen, parameters.Type, parameters.Mode);
 
-        var fd = new FenData(parameters.Fen);
         var state = new State();
-        _position.Set(in fd, parameters.Mode, state);
+        _position.Set(parameters.Fen, parameters.Mode, state);
         return _position.GenerateMoves(parameters.Type).Select(static em => em.Move.ToString());
     }
 }
