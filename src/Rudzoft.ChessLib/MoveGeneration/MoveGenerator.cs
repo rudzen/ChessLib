@@ -51,7 +51,7 @@ public static class MoveGenerator
         switch (type)
         {
             case MoveGenerationType.Legal:
-                return GenerateLegal(in pos, moves, index, us);
+                return GenerateLegal(index, in pos, moves, us);
 
             case MoveGenerationType.Captures:
             case MoveGenerationType.Quiets:
@@ -59,10 +59,10 @@ public static class MoveGenerator
                 return GenerateCapturesQuietsNonEvasions(in pos, moves, index, us, type);
 
             case MoveGenerationType.Evasions:
-                return GenerateEvasions(in pos, moves, index, us);
+                return GenerateEvasions(index, in pos, moves, us);
 
             case MoveGenerationType.QuietChecks:
-                return GenerateQuietChecks(in pos, moves, index, us);
+                return GenerateQuietChecks(index, in pos, moves, us);
 
             default:
                 Debug.Assert(false);
@@ -78,12 +78,12 @@ public static class MoveGenerator
         Player us,
         MoveGenerationType type)
     {
-        index = GeneratePawnMoves(in pos, moves, index, in target, us, type);
+        index = GeneratePawnMoves(index, in pos, moves, in target, us, type);
 
         var checks = type == MoveGenerationType.QuietChecks;
 
         for (var pt = PieceTypes.Knight; pt <= PieceTypes.Queen; ++pt)
-            index = GenerateMoves(in pos, moves, index, us, in target, pt, checks);
+            index = GenerateMoves(index, in pos, moves, us, in target, pt, checks);
 
         if (checks || type == MoveGenerationType.Evasions)
             return index;
@@ -146,9 +146,9 @@ public static class MoveGenerator
     /// <param name="us"></param>
     /// <returns></returns>
     private static int GenerateEvasions(
+        int index,
         in IPosition pos,
         Span<ValMove> moves,
-        int index,
         Player us)
     {
         Debug.Assert(pos.InCheck);
@@ -192,13 +192,13 @@ public static class MoveGenerator
     /// <param name="us"></param>
     /// <returns></returns>
     private static int GenerateLegal(
+        int index,
         in IPosition pos,
         Span<ValMove> moves,
-        int index,
         Player us)
     {
         var end = pos.InCheck
-            ? GenerateEvasions(in pos, moves, index, us)
+            ? GenerateEvasions(index, in pos, moves, us)
             : Generate(in pos, moves, index, us, MoveGenerationType.NonEvasions);
 
         var pinned = pos.KingBlockers(us) & pos.Pieces(us);
@@ -229,9 +229,9 @@ public static class MoveGenerator
     /// <param name="checks">Position is in check</param>
     /// <returns>The new move index</returns>
     private static int GenerateMoves(
+        int index,
         in IPosition pos,
         Span<ValMove> moves,
-        int index,
         Player us,
         in BitBoard target,
         PieceTypes pt,
@@ -272,9 +272,9 @@ public static class MoveGenerator
     /// <param name="type">The type of moves to generate</param>
     /// <returns>The new move index</returns>
     private static int GeneratePawnMoves(
+        int index,
         in IPosition pos,
         Span<ValMove> moves,
-        int index,
         in BitBoard target,
         Player us,
         MoveGenerationType type)
@@ -436,9 +436,9 @@ public static class MoveGenerator
     /// <param name="us"></param>
     /// <returns></returns>
     private static int GenerateQuietChecks(
+        int index,
         in IPosition pos,
         Span<ValMove> moves,
-        int index,
         Player us)
     {
         Debug.Assert(!pos.InCheck);
