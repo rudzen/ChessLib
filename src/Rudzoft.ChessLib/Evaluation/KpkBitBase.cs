@@ -60,26 +60,25 @@ public sealed class KpkBitBase : IKpkBitBase
         // changed to either wins or draws (15 cycles needed).
         var repeat = 1;
 
-        while (repeat != 0)
+        ref var dbSpace = ref MemoryMarshal.GetReference(db);
+
+        do
         {
             repeat = 1;
-            ref var dbSpace = ref MemoryMarshal.GetReference(db);
             for (var i = 0; i < db.Length; ++i)
             {
                 var kpkPosition = Unsafe.Add(ref dbSpace, i);
-                repeat = (kpkPosition.Result == Results.Unknown && kpkPosition.Classify(db) != Results.Unknown).AsByte();
+                repeat = (kpkPosition.Result == Results.Unknown
+                          && kpkPosition.Classify(db) != Results.Unknown).AsByte();
             }
-        }
+        } while (repeat != 0);
 
         // Fill the bitbase with the decisive results
-        var idx = 0;
-        ref var setDbSpace = ref MemoryMarshal.GetReference(db);
         for (var i = 0; i < db.Length; ++i)
         {
-            var kpkPosition = Unsafe.Add(ref setDbSpace, i);
+            var kpkPosition = Unsafe.Add(ref dbSpace, i);
             if (kpkPosition.Result == Results.Win)
-                _kpKbb.Set(idx, true);
-            idx++;
+                _kpKbb.Set(i, true);
         }
     }
 
@@ -176,20 +175,8 @@ public sealed class KpkBitBase : IKpkBitBase
         /// <returns>Result after classification</returns>
         public Results Classify(ReadOnlySpan<KpkPosition> db)
         {
-            var (good, bad) = Stm.IsWhite
-                ? (Results.Win, Results.Draw)
-                : (Results.Draw, Results.Win);
-
-            var r = Results.None;
-            var b = PieceTypes.King.PseudoAttacks(KingSquares[Stm.Side]);
-
-            while (b)
-            {
-                var (bkSq, wkSq) = Stm.IsWhite
-                    ? (KingSquares[Player.Black.Side], BitBoards.PopLsb(ref b))
-                    : (BitBoards.PopLsb(ref b), KingSquares[Player.White.Side]);
-                r |= db[Index(~Stm, bkSq, wkSq, PawnSquare)].Result;
-            }
+            var (good, bad) = InitResults();
+            var r = GetInitialKingResults(db);
 
             if (Stm.IsWhite)
             {
@@ -212,8 +199,31 @@ public sealed class KpkBitBase : IKpkBitBase
                 return good;
 
             return (r & Results.Unknown) != 0
-                    ? Results.Unknown
-                    : bad;
+                ? Results.Unknown
+                : bad;
+        }
+
+        private (Results, Results) InitResults()
+        {
+            return Stm.IsWhite
+                ? (Results.Win, Results.Draw)
+                : (Results.Draw, Results.Win);
+        }
+
+        private Results GetInitialKingResults(ReadOnlySpan<KpkPosition> db)
+        {
+            var r = Results.None;
+            var b = PieceTypes.King.PseudoAttacks(KingSquares[Stm.Side]);
+
+            while (b)
+            {
+                var (bkSq, wkSq) = Stm.IsWhite
+                    ? (KingSquares[Player.Black.Side], BitBoards.PopLsb(ref b))
+                    : (BitBoards.PopLsb(ref b), KingSquares[Player.White.Side]);
+                r |= db[Index(~Stm, bkSq, wkSq, PawnSquare)].Result;
+            }
+
+            return r;
         }
     }
 
@@ -240,7 +250,7 @@ public sealed class KpkBitBase : IKpkBitBase
     {
         return _kpKbb[Index(stngActive, skSq, wkSq, spSq)];
     }
-    
+
     public bool IsDraw(IPosition pos)
     {
         return !Probe(
