@@ -8,6 +8,7 @@
     <IsOSX Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))' == 'true'">true</IsOSX>
     <IsLinux Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))' == 'true'">true</IsLinux>
     <TargetFramework>net7.0</TargetFramework>
+    <TieredPGO>true</TieredPGO>
     <PackageVersion>0.0.4</PackageVersion>
     <Authors>Rudy Alex Kohn</Authors>
     <Company>None</Company>

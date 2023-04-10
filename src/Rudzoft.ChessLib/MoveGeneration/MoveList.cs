@@ -115,6 +115,23 @@ public sealed class MoveList : IMoveList
         return false;
     }
 
+    public bool ContainsType(MoveTypes type)
+    {
+        var moveSpan = _moves.AsSpan()[..Length];
+        if (moveSpan.IsEmpty)
+            return false;
+
+        ref var movesSpace = ref MemoryMarshal.GetReference(moveSpan);
+        for (var i = 0; i < moveSpan.Length; ++i)
+        {
+            var m = Unsafe.Add(ref movesSpace, i).Move;
+            if (m.MoveType() == type)
+                return true;
+        }
+
+        return false;
+    }
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Generate(in IPosition pos, MoveGenerationTypes types = MoveGenerationTypes.Legal)
     {
