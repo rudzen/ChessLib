@@ -31,10 +31,10 @@ namespace Rudzoft.ChessLib.MoveGeneration;
 
 public static class MoveFactory
 {
-    public static MoveList GenerateMoves(this IPosition pos, MoveGenerationType type = MoveGenerationType.Legal)
+    public static MoveList GenerateMoves(this IPosition pos, MoveGenerationTypes types = MoveGenerationTypes.Legal)
     {
         var ml = new MoveList();
-        ml.Generate(pos, type);
+        ml.Generate(pos, types);
         return ml;
     }
 }

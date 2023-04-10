@@ -17,10 +17,10 @@ public sealed class MoveGeneratorService : IMoveGeneratorService
 
     public IEnumerable<string> GenerateMoves(MoveQuery parameters)
     {
-        _logger.LogInformation("Generating moves. fen={Fen},type={Type},mode={Mode}", parameters.Fen, parameters.Type, parameters.Mode);
+        _logger.LogInformation("Generating moves. fen={Fen},type={Type},mode={Mode}", parameters.Fen, parameters.Types, parameters.Mode);
 
         var state = new State();
         _position.Set(parameters.Fen, parameters.Mode, state);
-        return _position.GenerateMoves(parameters.Type).Select(static em => em.Move.ToString());
+        return _position.GenerateMoves(parameters.Types).Select(static em => em.Move.ToString());
     }
 }

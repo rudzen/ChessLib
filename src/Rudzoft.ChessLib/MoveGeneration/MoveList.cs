@@ -116,18 +116,18 @@ public sealed class MoveList : IMoveList
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void Generate(in IPosition pos, MoveGenerationType type = MoveGenerationType.Legal)
+    public void Generate(in IPosition pos, MoveGenerationTypes types = MoveGenerationTypes.Legal)
     {
         _cur = 0;
-        Length = MoveGenerator.Generate(in pos, _moves.AsSpan(), 0, pos.SideToMove, type);
+        Length = MoveGenerator.Generate(in pos, _moves.AsSpan(), 0, pos.SideToMove, types);
         _moves[Length] = ValMove.Empty;
     }
 
     [SkipLocalsInit]
-    public static int GenerateMoveCount(in IPosition pos, MoveGenerationType type = MoveGenerationType.Legal)
+    public static int GenerateMoveCount(in IPosition pos, MoveGenerationTypes types = MoveGenerationTypes.Legal)
     {
         Span<ValMove> moves = stackalloc ValMove[218];
-        return MoveGenerator.Generate(in pos, moves, 0, pos.SideToMove, type);
+        return MoveGenerator.Generate(in pos, moves, 0, pos.SideToMove, types);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

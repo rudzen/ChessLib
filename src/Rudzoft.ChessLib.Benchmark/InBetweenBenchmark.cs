@@ -67,5 +67,4 @@ public class InBetweenBenchmark
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static bool InBetweenTrad(int v, int min, int max) => v >= min && v <= max;
-
 }

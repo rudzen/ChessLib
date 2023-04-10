@@ -46,27 +46,26 @@ public static class MoveGenerator
         Span<ValMove> moves,
         int index,
         Player us,
-        MoveGenerationType type)
+        MoveGenerationTypes types)
     {
-        switch (type)
+        if (types == MoveGenerationTypes.Legal)
+            return GenerateLegal(index, in pos, moves, us);
+
+        const MoveGenerationTypes capturesQuietsNonEvasions =
+            MoveGenerationTypes.Captures | MoveGenerationTypes.Quiets | MoveGenerationTypes.NonEvasions;
+
+        if (capturesQuietsNonEvasions.HasFlagFast(types))
+            return GenerateCapturesQuietsNonEvasions(in pos, moves, index, us, types);
+
+        switch (types)
         {
-            case MoveGenerationType.Legal:
-                return GenerateLegal(index, in pos, moves, us);
-
-            case MoveGenerationType.Captures:
-            case MoveGenerationType.Quiets:
-            case MoveGenerationType.NonEvasions:
-                return GenerateCapturesQuietsNonEvasions(in pos, moves, index, us, type);
-
-            case MoveGenerationType.Evasions:
+            case MoveGenerationTypes.Evasions:
                 return GenerateEvasions(index, in pos, moves, us);
-
-            case MoveGenerationType.QuietChecks:
+            case MoveGenerationTypes.QuietChecks:
                 return GenerateQuietChecks(index, in pos, moves, us);
-
             default:
                 Debug.Assert(false);
-                throw new ArgumentOutOfRangeException(nameof(type), type, null);
+                throw new ArgumentOutOfRangeException(nameof(types), types, null);
         }
     }
 
@@ -76,23 +75,23 @@ public static class MoveGenerator
         int index,
         in BitBoard target,
         Player us,
-        MoveGenerationType type)
+        MoveGenerationTypes types)
     {
-        index = GeneratePawnMoves(index, in pos, moves, in target, us, type);
+        index = GeneratePawnMoves(index, in pos, moves, in target, us, types);
 
-        var checks = type == MoveGenerationType.QuietChecks;
+        var checks = types == MoveGenerationTypes.QuietChecks;
 
         for (var pt = PieceTypes.Knight; pt <= PieceTypes.Queen; ++pt)
             index = GenerateMoves(index, in pos, moves, us, in target, pt, checks);
 
-        if (checks || type == MoveGenerationType.Evasions)
+        if (checks || types == MoveGenerationTypes.Evasions)
             return index;
 
         var ksq = pos.GetKingSquare(us);
         var b = pos.GetAttacks(ksq, PieceTypes.King) & target;
         index = Move.Create(moves, index, ksq, ref b);
 
-        if (type == MoveGenerationType.Captures || !pos.CanCastle(pos.SideToMove))
+        if (types == MoveGenerationTypes.Captures || !pos.CanCastle(pos.SideToMove))
             return index;
 
         var (kingSide, queenSide) = CastleSideRights[us.Side];
@@ -113,27 +112,27 @@ public static class MoveGenerator
     /// <param name="moves"></param>
     /// <param name="index"></param>
     /// <param name="us"></param>
-    /// <param name="type"></param>
+    /// <param name="types"></param>
     /// <returns></returns>
     private static int GenerateCapturesQuietsNonEvasions(
         in IPosition pos,
         Span<ValMove> moves,
         int index,
         Player us,
-        MoveGenerationType type)
+        MoveGenerationTypes types)
     {
-        Debug.Assert(type is MoveGenerationType.Captures or MoveGenerationType.Quiets
-            or MoveGenerationType.NonEvasions);
+        Debug.Assert(types is MoveGenerationTypes.Captures or MoveGenerationTypes.Quiets
+            or MoveGenerationTypes.NonEvasions);
         Debug.Assert(!pos.InCheck);
-        var target = type switch
+        var target = types switch
         {
-            MoveGenerationType.Captures => pos.Pieces(~us),
-            MoveGenerationType.Quiets => ~pos.Pieces(),
-            MoveGenerationType.NonEvasions => ~pos.Pieces(us),
+            MoveGenerationTypes.Captures => pos.Pieces(~us),
+            MoveGenerationTypes.Quiets => ~pos.Pieces(),
+            MoveGenerationTypes.NonEvasions => ~pos.Pieces(us),
             _ => BitBoard.Empty
         };
 
-        return GenerateAll(in pos, moves, index, in target, us, type);
+        return GenerateAll(in pos, moves, index, in target, us, types);
     }
 
     /// <summary>
@@ -180,7 +179,7 @@ public static class MoveGenerator
         checkSquare = pos.Checkers.Lsb();
         var target = checkSquare.BitboardBetween(ksq) | checkSquare;
 
-        return GenerateAll(in pos, moves, index, in target, us, MoveGenerationType.Evasions);
+        return GenerateAll(in pos, moves, index, in target, us, MoveGenerationTypes.Evasions);
     }
 
     /// <summary>
@@ -199,7 +198,7 @@ public static class MoveGenerator
     {
         var end = pos.InCheck
             ? GenerateEvasions(index, in pos, moves, us)
-            : Generate(in pos, moves, index, us, MoveGenerationType.NonEvasions);
+            : Generate(in pos, moves, index, us, MoveGenerationTypes.NonEvasions);
 
         var pinned = pos.KingBlockers(us) & pos.Pieces(us);
         var ksq = pos.GetKingSquare(us);
@@ -262,14 +261,14 @@ public static class MoveGenerator
     }
 
     /// <summary>
-    /// Generate all pawn moves. The type of moves are determined by the <see cref="MoveGenerationType"/>
+    /// Generate all pawn moves. The type of moves are determined by the <see cref="MoveGenerationTypes"/>
     /// </summary>
     /// <param name="pos">The current position</param>
     /// <param name="moves">The current moves so far</param>
     /// <param name="index">The index of the current moves</param>
     /// <param name="target">The target squares</param>
     /// <param name="us">The current player</param>
-    /// <param name="type">The type of moves to generate</param>
+    /// <param name="types">The type of moves to generate</param>
     /// <returns>The new move index</returns>
     private static int GeneratePawnMoves(
         int index,
@@ -277,7 +276,7 @@ public static class MoveGenerator
         Span<ValMove> moves,
         in BitBoard target,
         Player us,
-        MoveGenerationType type)
+        MoveGenerationTypes types)
     {
         // Compute our parametrized parameters named according to the point of view of white side.
 
@@ -286,10 +285,10 @@ public static class MoveGenerator
 
         var pawns = pos.Pieces(PieceTypes.Pawn, us);
 
-        var enemies = type switch
+        var enemies = types switch
         {
-            MoveGenerationType.Evasions => pos.Pieces(them) & target,
-            MoveGenerationType.Captures => target,
+            MoveGenerationTypes.Evasions => pos.Pieces(them) & target,
+            MoveGenerationTypes.Captures => target,
             _ => pos.Pieces(them)
         };
 
@@ -301,9 +300,11 @@ public static class MoveGenerator
         BitBoard pawnTwo;
 
         // Single and double pawn pushes, no promotions
-        if (type != MoveGenerationType.Captures)
+        if (types != MoveGenerationTypes.Captures)
         {
-            emptySquares = type is MoveGenerationType.Quiets or MoveGenerationType.QuietChecks
+            const MoveGenerationTypes quiets = MoveGenerationTypes.Quiets | MoveGenerationTypes.QuietChecks;
+
+            emptySquares = quiets.HasFlagFast(types)
                 ? target
                 : ~pos.Pieces();
 
@@ -311,15 +312,15 @@ public static class MoveGenerator
             pawnTwo = (pawnOne & us.Rank3()).Shift(up) & emptySquares;
 
             // ReSharper disable once SwitchStatementMissingSomeEnumCasesNoDefault
-            switch (type)
+            switch (types)
             {
                 // Consider only blocking squares
-                case MoveGenerationType.Evasions:
+                case MoveGenerationTypes.Evasions:
                     pawnOne &= target;
                     pawnTwo &= target;
                     break;
 
-                case MoveGenerationType.QuietChecks:
+                case MoveGenerationTypes.QuietChecks:
                 {
                     pawnOne &= ksq.PawnAttack(them);
                     pawnTwo &= ksq.PawnAttack(them);
@@ -361,13 +362,13 @@ public static class MoveGenerator
         // Promotions and under-promotions
         if (pawnsOn7)
         {
-            switch (type)
+            switch (types)
             {
-                case MoveGenerationType.Captures:
+                case MoveGenerationTypes.Captures:
                     emptySquares = ~pos.Pieces();
                     break;
 
-                case MoveGenerationType.Evasions:
+                case MoveGenerationTypes.Evasions:
                     emptySquares &= target;
                     break;
             }
@@ -377,19 +378,20 @@ public static class MoveGenerator
             var pawnPromoUp = pawnsOn7.Shift(up) & emptySquares;
 
             while (pawnPromoRight)
-                index = MakePromotions(moves, index, BitBoards.PopLsb(ref pawnPromoRight), ksq, right, type);
+                index = MakePromotions(index, moves, BitBoards.PopLsb(ref pawnPromoRight), ksq, right, types);
 
             while (pawnPromoLeft)
-                index = MakePromotions(moves, index, BitBoards.PopLsb(ref pawnPromoLeft), ksq, left, type);
+                index = MakePromotions(index, moves, BitBoards.PopLsb(ref pawnPromoLeft), ksq, left, types);
 
             while (pawnPromoUp)
-                index = MakePromotions(moves, index, BitBoards.PopLsb(ref pawnPromoUp), ksq, up, type);
+                index = MakePromotions(index, moves, BitBoards.PopLsb(ref pawnPromoUp), ksq, up, types);
         }
 
+        const MoveGenerationTypes capturesEnPassant = MoveGenerationTypes.Captures | MoveGenerationTypes.Evasions |
+                                                      MoveGenerationTypes.NonEvasions;
+
         // Standard and en-passant captures
-        if (type != MoveGenerationType.Captures
-            && type != MoveGenerationType.Evasions
-            && type != MoveGenerationType.NonEvasions)
+        if (!types.HasFlagFast(capturesEnPassant))
             return index;
 
         pawnOne = pawnsNotOn7.Shift(right) & enemies;
@@ -415,7 +417,7 @@ public static class MoveGenerator
         // An en passant capture can be an evasion only if the checking piece is the double
         // pushed pawn and so is in the target. Otherwise this is a discovery check and we are
         // forced to do otherwise.
-        if (type == MoveGenerationType.Evasions && (target & (pos.EnPassantSquare - up)).IsEmpty)
+        if (types == MoveGenerationTypes.Evasions && (target & (pos.EnPassantSquare - up)).IsEmpty)
             return index;
 
         pawnOne = pawnsNotOn7 & pos.EnPassantSquare.PawnAttack(them);
@@ -463,7 +465,7 @@ public static class MoveGenerator
             index = Move.Create(moves, index, from, ref b);
         }
 
-        return GenerateAll(in pos, moves, index, in emptySquares, us, MoveGenerationType.QuietChecks);
+        return GenerateAll(in pos, moves, index, in emptySquares, us, MoveGenerationTypes.QuietChecks);
     }
 
     /// <summary>
@@ -474,32 +476,34 @@ public static class MoveGenerator
     /// <param name="to"></param>
     /// <param name="ksq"></param>
     /// <param name="direction"></param>
-    /// <param name="type"></param>
+    /// <param name="types"></param>
     /// <returns></returns>
     private static int MakePromotions(
-        Span<ValMove> moves,
         int index,
+        Span<ValMove> moves,
         Square to,
         Square ksq,
         Direction direction,
-        MoveGenerationType type)
+        MoveGenerationTypes types)
     {
         var from = to - direction;
 
-        switch (type)
+        const MoveGenerationTypes queenPromotion = MoveGenerationTypes.Captures
+                                                   | MoveGenerationTypes.Evasions
+                                                   | MoveGenerationTypes.NonEvasions;
+
+        if (types.HasFlagFast(queenPromotion))
         {
-            case MoveGenerationType.Captures:
-            case MoveGenerationType.Evasions:
-            case MoveGenerationType.NonEvasions:
-                moves[index++].Move = Move.Create(from, to, MoveTypes.Promotion, PieceTypes.Queen);
-                if (PieceTypes.Knight.PseudoAttacks(to) & ksq)
-                    moves[index++].Move = Move.Create(from, to, MoveTypes.Promotion);
-                break;
+            moves[index++].Move = Move.Create(from, to, MoveTypes.Promotion, PieceTypes.Queen);
+            if (PieceTypes.Knight.PseudoAttacks(to) & ksq)
+                moves[index++].Move = Move.Create(from, to, MoveTypes.Promotion);
         }
 
-        if (type != MoveGenerationType.Quiets
-            && type != MoveGenerationType.Evasions
-            && type != MoveGenerationType.NonEvasions)
+        const MoveGenerationTypes noneQueenPromotion = MoveGenerationTypes.Quiets
+                                                       | MoveGenerationTypes.Evasions
+                                                       | MoveGenerationTypes.NonEvasions;
+
+        if (!types.HasFlagFast(noneQueenPromotion))
             return index;
 
         moves[index++].Move = Move.Create(from, to, MoveTypes.Promotion, PieceTypes.Rook);

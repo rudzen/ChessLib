@@ -37,8 +37,7 @@ public sealed class NonRegexPgnParser : IPgnParser
         var currentGameMoves = new List<PgnMove>();
         var inMoveSection = false;
 
-        string line;
-        while ((line = streamReader.ReadLine()) != null)
+        while (await streamReader.ReadLineAsync(cancellationToken) is { } line)
         {
             if (string.IsNullOrWhiteSpace(line))
             {

@@ -24,40 +24,57 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using System;
+using System.Runtime.CompilerServices;
+
 namespace Rudzoft.ChessLib.Enums;
 
 /// <summary>
 /// Move generation flag
 /// </summary>
-public enum MoveGenerationType
+[Flags]
+public enum MoveGenerationTypes
 {
+    None = 0,
+    
     /// <summary>
     /// Generate all legal moves
     /// </summary>
-    Legal,
+    Legal = 1,
 
     /// <summary>
     /// Generate only captures
     /// </summary>
-    Captures,
+    Captures = 2,
 
     /// <summary>
     /// Generate only quiet moves (non-captures)
     /// </summary>
-    Quiets,
+    Quiets = 4,
 
     /// <summary>
     /// Generate only moves which are not evasions
     /// </summary>
-    NonEvasions,
+    NonEvasions = 8,
 
     /// <summary>
     /// Generate only evasion moves (if fx in check)
     /// </summary>
-    Evasions,
+    Evasions = 16,
 
     /// <summary>
     /// Generate only moves which are not captures and gives check
     /// </summary>
-    QuietChecks
+    QuietChecks = 32,
+    
+    All = Legal | Captures | Quiets | NonEvasions | Evasions | QuietChecks
+}
+
+public static class MoveGenerationTypesExtensions
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool HasFlagFast(this MoveGenerationTypes value, MoveGenerationTypes flag)
+    {
+        return (value & flag) != 0;
+    }
 }
