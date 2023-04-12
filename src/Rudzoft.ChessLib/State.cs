@@ -36,11 +36,11 @@ namespace Rudzoft.ChessLib;
 public sealed class State : IEquatable<State>
 {
     public HashKey MaterialKey { get; set; }
-    
+
     public HashKey PawnKey { get; set; }
 
     public int Rule50 { get; set; }
-    
+
     public int PliesFromNull { get; set; }
 
     public CastleRight CastlelingRights { get; set; }
@@ -110,7 +110,7 @@ public sealed class State : IEquatable<State>
     public State CopyTo(State other)
     {
         other ??= new State();
-        
+
         // copy over preserved values
         other.MaterialKey = MaterialKey;
         other.PawnKey = PawnKey;
@@ -144,7 +144,7 @@ public sealed class State : IEquatable<State>
     public void UpdateRepetition()
     {
         Repetition = 0;
-        
+
         var end = End();
 
         if (end < 4)
@@ -180,8 +180,7 @@ public sealed class State : IEquatable<State>
                && Equals(Previous, other.Previous);
     }
 
-    public override bool Equals(object obj)
-        => ReferenceEquals(this, obj) || obj is State other && Equals(other);
+    public override bool Equals(object obj) => ReferenceEquals(this, obj) || obj is State other && Equals(other);
 
     public override int GetHashCode()
     {
@@ -197,8 +196,8 @@ public sealed class State : IEquatable<State>
         hashCode.Add(Checkers);
         hashCode.Add(Previous);
         hashCode.Add(CapturedPiece);
-        hashCode.Add(Pinners.Where(static p => !p.IsEmpty));
-        hashCode.Add(CheckedSquares.Where(static csq => !csq.IsEmpty));
+        hashCode.Add(Pinners.Where(static p => p.IsNotEmpty));
+        hashCode.Add(CheckedSquares.Where(static csq => csq.IsNotEmpty));
         return hashCode.ToHashCode();
     }
 }

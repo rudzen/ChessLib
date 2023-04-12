@@ -178,14 +178,14 @@ public sealed class PositionValidator : IPositionValidator
 
     private static IEnumerable<string> ValidatePieceTypes(IPosition pos)
         => Piece.AllPieceTypes.SelectMany(p1 => Piece.AllPieceTypes
-                .Where(p2 => p1 != p2 && !(pos.Pieces(p1) & pos.Pieces(p2)).IsEmpty),
+                .Where(p2 => p1 != p2 && (pos.Pieces(p1) & pos.Pieces(p2)).IsNotEmpty),
             static (p1, p2) => $"piece types {p1} and {p2} doesn't align");
 
     private static IEnumerable<string> ValidateState(IPosition pos)
     {
         var state = pos.State;
 
-        if (state.Key.Key == 0 && !pos.Pieces().IsEmpty)
+        if (state.Key.Key == 0 && pos.PieceCount() != 0)
             yield return "state key is invalid";
 
         if (pos.PieceCount(PieceTypes.Pawn) == 0 && state.PawnKey != Zobrist.ZobristNoPawn)

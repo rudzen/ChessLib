@@ -60,7 +60,7 @@ public sealed class ValidationTests
     public void ValidationKingsNegative()
     {
         const PositionValidationTypes type = PositionValidationTypes.Kings;
-        var expectedErrorMsg = $"king count for player {Players.White} was 2";
+        var expectedErrorMsg = $"king count for player {Player.White} was 2";
 
         var pos = _serviceProvider.GetRequiredService<IPosition>();
 

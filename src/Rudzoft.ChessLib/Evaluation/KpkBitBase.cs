@@ -129,7 +129,7 @@ public sealed class KpkBitBase : IKpkBitBase
             if (ksq[Player.White.Side].Distance(ksq[Player.Black.Side]) <= 1
                 || ksq[Player.White.Side] == psq
                 || ksq[Player.Black.Side] == psq
-                || (stm.IsWhite && !(psq.PawnAttack(Player.White) & ksq[Player.Black.Side]).IsEmpty))
+                || (stm.IsWhite && (psq.PawnAttack(Player.White) & ksq[Player.Black.Side]).IsNotEmpty))
                 results = Results.None;
 
             // Win if the pawn can be promoted without getting captured

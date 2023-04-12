@@ -51,7 +51,7 @@ public sealed class PieceAttacksKingTests : PieceAttacks, IClassFixture<RegularM
         {
             var sq = BitBoards.PopLsb(ref bb);
             var attacks = _fixture.RegAttacks[attackIndex](sq);
-            var isCorner = !(_fixture.BoardCorners & sq).IsEmpty;
+            var isCorner = (_fixture.BoardCorners & sq).IsNotEmpty;
             var expected = _fixture.KingExpected[index];
             if (isCorner)
                 expected -= 2; /* for corners */

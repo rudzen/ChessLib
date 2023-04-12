@@ -245,8 +245,8 @@ public static class MoveGenerator
         {
             var from = Unsafe.Add(ref squaresSpace, i);
             if (checks
-                && (!(pos.KingBlockers(~us) & from).IsEmpty ||
-                    !(pt.PseudoAttacks(from) & target & pos.CheckedSquares(pt))))
+                && ((pos.KingBlockers(~us) & from).IsNotEmpty ||
+                    (pt.PseudoAttacks(from) & target & pos.CheckedSquares(pt)).IsNotEmpty))
                 continue;
 
             var b = pos.GetAttacks(from, pt) & target;

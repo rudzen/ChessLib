@@ -207,8 +207,8 @@ public sealed class Blockage : IBlockage
     {
         return pos.GetPiece(sq + Direction.West) == ourPawn
                && BitBoards.PopCount(ourPawns & (f - 1)) <= 1
-               && !(fixedPawns & Square.Create(r, PreviousFile(f))).IsEmpty
-               && !(fence & Square.Create(r, PreviousFile(f))).IsEmpty;
+               && (fixedPawns & Square.Create(r, PreviousFile(f))).IsNotEmpty
+               && (fence & Square.Create(r, PreviousFile(f))).IsNotEmpty;
     }
 
     private static bool LowerRankFenceNonFileANotBlocked(
@@ -222,8 +222,8 @@ public sealed class Blockage : IBlockage
     {
         return pos.GetPiece(sq + Direction.West) == ourPawn
                && BitBoards.PopCount(ourPawns & PreviousFile(f)) <= 1
-               && !(fixedPawns & (sq + Direction.West)).IsEmpty
-               && !(fence & (sq + Direction.West)).IsEmpty;
+               && (fixedPawns & (sq + Direction.West)).IsNotEmpty
+               && (fence & (sq + Direction.West)).IsNotEmpty;
     }
 
     /// <summary>
@@ -261,7 +261,7 @@ public sealed class Blockage : IBlockage
             var psq = BitBoards.PopLsb(ref ourPawns);
             var rr = psq.RelativeRank(us);
             if (rr < Rank.Rank7
-                && (pos.GetPiece(psq + up) == theirPawn || !(fixedPawns & (psq + up)).IsEmpty)
+                && (pos.GetPiece(psq + up) == theirPawn || (fixedPawns & (psq + up)).IsNotEmpty)
                 && (psq.PawnAttack(us) & theirPawns).IsEmpty)
             {
                 fixedPawns |= psq;
@@ -311,7 +311,7 @@ public sealed class Blockage : IBlockage
         {
             var direction = Unsafe.Add(ref directionSpace, i);
             var s = sq + direction;
-            if ((marked & s).IsEmpty || !(processed & s).IsEmpty ||
+            if ((marked & s).IsEmpty || (processed & s).IsNotEmpty ||
                 !FormsFence(s, ref processed, ref fence, in marked, us))
                 continue;
             fence |= s;
