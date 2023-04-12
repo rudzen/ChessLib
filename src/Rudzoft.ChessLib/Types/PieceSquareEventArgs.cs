@@ -74,6 +74,7 @@ public sealed class PieceSquareEventArgs : EventArgs, ISpanFormattable, IPieceSq
     public string ToString(string format, IFormatProvider formatProvider)
         => string.Format(formatProvider, format, Piece + Square.ToString());
 
+    [SkipLocalsInit]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format = default, IFormatProvider provider = null)
     {

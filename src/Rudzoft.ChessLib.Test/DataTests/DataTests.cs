@@ -25,12 +25,14 @@ SOFTWARE.
 */
 
 using System;
+using System.Runtime.CompilerServices;
 using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Test.DataTests;
 
 public sealed class DataTests
 {
+    [SkipLocalsInit]
     [Fact]
     public void SquareChars()
     {

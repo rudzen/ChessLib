@@ -125,6 +125,16 @@ public readonly record struct Piece(Pieces Value)
         Pieces.BlackQueen,
         Pieces.BlackKing
     };
+    
+    public static PieceTypes[] AllPieceTypes { get; } =
+    {
+        PieceTypes.Pawn,
+        PieceTypes.Knight,
+        PieceTypes.Bishop,
+        PieceTypes.Rook,
+        PieceTypes.Queen,
+        PieceTypes.King
+    };
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator Piece(char value)

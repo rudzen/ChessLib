@@ -25,6 +25,7 @@ SOFTWARE.
 */
 
 using System;
+using System.Runtime.CompilerServices;
 
 namespace Rudzoft.ChessLib.Extensions;
 
@@ -38,6 +39,7 @@ public static class SpanExtensions
     /// <param name="targetIndex">The current index for target span</param>
     /// <param name="capacity">Max size of "value".ToString(), defaults to 3</param>
     /// <returns>New index after append</returns>
+    [SkipLocalsInit]
     public static int Append(this Span<char> target, int v, int targetIndex, int capacity = 3)
     {
         Span<char> s = stackalloc char[capacity];
@@ -55,6 +57,7 @@ public static class SpanExtensions
     /// <param name="targetIndex">The current index for target span</param>
     /// <param name="capacity">Max size of "value".ToString(), defaults to 20</param>
     /// <returns>New index after append</returns>
+    [SkipLocalsInit]
     public static int Append(this Span<char> target, in ulong v, int targetIndex, int capacity = 20)
     {
         Span<char> s = stackalloc char[capacity];

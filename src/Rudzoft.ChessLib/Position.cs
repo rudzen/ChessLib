@@ -871,7 +871,7 @@ public sealed class Position : IPosition
 
         State.Repetition = 0;
 
-        Debug.Assert(_positionValidator.Validate(this, PositionValidationTypes.Basic).IsOk);
+        Debug.Assert(_positionValidator.Validate(this, PositionValidationTypes.Basic).Ok);
     }
 
     public Piece MovedPiece(Move m)
@@ -1324,8 +1324,8 @@ public sealed class Position : IPosition
         Ply--;
 
 #if DEBUG
-        var validator = _positionValidator.Validate(this);
-        Debug.Assert(validator.IsOk);
+        var validatorResult = _positionValidator.Validate(this);
+        Debug.Assert(validatorResult.Ok);
 #endif
     }
 
@@ -1382,7 +1382,7 @@ public sealed class Position : IPosition
         return result;
     }
 
-    public IPositionValidator Validate(PositionValidationTypes type = PositionValidationTypes.Basic)
+    public PositionValidationResult Validate(PositionValidationTypes type = PositionValidationTypes.Basic)
         => _positionValidator.Validate(this, type);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

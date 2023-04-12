@@ -28,7 +28,5 @@ namespace Rudzoft.ChessLib.Validation;
 
 public interface IPositionValidator
 {
-    string ErrorMsg { get; }
-    bool IsOk { get; }
-    IPositionValidator Validate(in IPosition pos, PositionValidationTypes type = PositionValidationTypes.All);
+    PositionValidationResult Validate(in IPosition pos, PositionValidationTypes type = PositionValidationTypes.All);
 }

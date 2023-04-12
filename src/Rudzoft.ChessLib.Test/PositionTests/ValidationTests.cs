@@ -28,7 +28,6 @@ using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.ObjectPool;
 using Rudzoft.ChessLib.Enums;
-using Rudzoft.ChessLib.Extensions;
 using Rudzoft.ChessLib.Fen;
 using Rudzoft.ChessLib.ObjectPoolPolicies;
 using Rudzoft.ChessLib.Types;
@@ -61,7 +60,7 @@ public sealed class ValidationTests
     public void ValidationKingsNegative()
     {
         const PositionValidationTypes type = PositionValidationTypes.Kings;
-        var expectedErrorMsg = $"king count for player {Player.White} was 2";
+        var expectedErrorMsg = $"king count for player {Players.White} was 2";
 
         var pos = _serviceProvider.GetRequiredService<IPosition>();
 
@@ -74,15 +73,12 @@ public sealed class ValidationTests
 
         pos.AddPiece(pc, Square.E4);
 
-        var validator = pos.Validate(type);
+        var (ok, actualErrorMessage) = pos.Validate(type);
 
-        Assert.NotNull(validator.ErrorMsg);
-        Assert.NotEmpty(validator.ErrorMsg);
-
-        var actualErrorMessage = validator.ErrorMsg;
-
+        Assert.NotNull(actualErrorMessage);
+        Assert.NotEmpty(actualErrorMessage);
         Assert.Equal(expectedErrorMsg, actualErrorMessage);
-        Assert.False(validator.IsOk);
+        Assert.False(ok);
     }
 
     [Fact]
@@ -101,9 +97,9 @@ public sealed class ValidationTests
 
         var validator = pos.Validate(validationType);
 
-        Assert.True(validator.IsOk);
-        Assert.NotNull(validator.ErrorMsg);
-        Assert.Empty(validator.ErrorMsg);
+        Assert.True(validator.Ok);
+        Assert.NotNull(validator.Errors);
+        Assert.Empty(validator.Errors);
     }
 
     // TODO : Add tests for the rest of the validations

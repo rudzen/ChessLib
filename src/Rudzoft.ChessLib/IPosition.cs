@@ -218,5 +218,5 @@ public interface IPosition : IEnumerable<Piece>
     
     Value NonPawnMaterial();
     
-    IPositionValidator Validate(PositionValidationTypes type = PositionValidationTypes.Basic);
+    PositionValidationResult Validate(PositionValidationTypes type = PositionValidationTypes.Basic);
 }
