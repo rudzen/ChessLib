@@ -47,31 +47,22 @@ public struct ValMove : IEquatable<ValMove>, IComparable<ValMove>
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator ValMove(Move m)
-        => new(m, 0);
+    public static implicit operator ValMove(Move m) => new(m, 0);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator ValMove(int s)
-        => new(Move.EmptyMove, s);
+    public static implicit operator ValMove(int s) => new(Move.EmptyMove, s);
 
-    public static bool operator !=(ValMove left, ValMove right)
-        => !(left.Move == right.Move);
+    public static bool operator !=(ValMove left, ValMove right) => !(left.Move == right.Move);
 
-    public static bool operator ==(ValMove left, ValMove right)
-        => left.Move == right.Move;
+    public static bool operator ==(ValMove left, ValMove right) => left.Move == right.Move;
 
-    public override bool Equals(object obj)
-        => obj is ValMove other && Equals(other);
+    public override bool Equals(object obj) => obj is ValMove other && Equals(other);
 
-    public bool Equals(ValMove other)
-        => Move.Equals(other.Move);
+    public bool Equals(ValMove other) => Move.Equals(other.Move);
 
-    public readonly int CompareTo(ValMove other)
-        => other.Score.CompareTo(Score);
+    public readonly int CompareTo(ValMove other) => other.Score.CompareTo(Score);
     
-    public readonly override int GetHashCode()
-        => Move.GetHashCode();
+    public readonly override int GetHashCode() => Move.GetHashCode();
 
-    public readonly override string ToString()
-        => $"{Move}, {Score}";
+    public readonly override string ToString()=> $"{Move}, {Score}";
 }

@@ -85,7 +85,7 @@ public static class ChessLibServiceCollectionExtensions
                 uci.Initialize();
                 return uci;
             })
-            .AddTransient(static _ => KillerMoves.Create(64))
+            .AddTransient<IKillerMovesFactory, KillerMovesFactory>()
             .AddSingleton<ISearchParameters, SearchParameters>()
             .AddSingleton<IValues, Values>()
             .AddSingleton<IKpkBitBase, KpkBitBase>()

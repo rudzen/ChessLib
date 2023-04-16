@@ -25,6 +25,7 @@ SOFTWARE.
 */
 
 using System;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
 namespace Rudzoft.ChessLib.Extensions;
@@ -34,8 +35,7 @@ public static class ArrayExtensions
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void Fill<T>(this T[] arr, in T value)
     {
-        if (arr == null)
-            throw new ArgumentNullException(nameof(arr));
+        Debug.Assert(arr != null);
         Array.Fill(arr, value);
     }
 

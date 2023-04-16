@@ -58,7 +58,7 @@ public sealed class KpkBitBase : IKpkBitBase
 
         // Iterate through the positions until none of the unknown positions can be
         // changed to either wins or draws (15 cycles needed).
-        var repeat = 1;
+        int repeat;
 
         ref var dbSpace = ref MemoryMarshal.GetReference(db);
 

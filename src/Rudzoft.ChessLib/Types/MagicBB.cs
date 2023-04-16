@@ -47,7 +47,7 @@ public static class MagicBB
 
     private static readonly BitBoard[][] MagicBishopDb = new BitBoard[Square.Count][];
 
-    private static readonly ulong[] BishopMagics =
+    private static readonly Memory<ulong> BishopMagics = new[]
     {
         0x0002020202020200UL, 0x0002020202020000UL, 0x0004010202000000UL, 0x0004040080000000UL,
         0x0001104000000000UL, 0x0000821040000000UL, 0x0000410410400000UL, 0x0000104104104000UL,
@@ -67,7 +67,7 @@ public static class MagicBB
         0x0000000010020200UL, 0x0000000404080200UL, 0x0000040404040400UL, 0x0002020202020200UL
     };
 
-    private static readonly ulong[] BishopMask =
+    private static readonly Memory<ulong> BishopMask = new[]
     {
         0x0040201008040200UL, 0x0000402010080400UL, 0x0000004020100A00UL, 0x0000000040221400UL,
         0x0000000002442800UL, 0x0000000204085000UL, 0x0000020408102000UL, 0x0002040810204000UL,
@@ -89,7 +89,7 @@ public static class MagicBB
 
     private static readonly BitBoard[][] MagicRookDb = new BitBoard[Square.Count][];
 
-    private static readonly ulong[] RookMagics =
+    private static readonly Memory<ulong> RookMagics = new[]
     {
         0x0080001020400080UL, 0x0040001000200040UL, 0x0080081000200080UL, 0x0080040800100080UL,
         0x0080020400080080UL, 0x0080010200040080UL, 0x0080008001000200UL, 0x0080002040800100UL,
@@ -109,7 +109,7 @@ public static class MagicBB
         0x0001000204080011UL, 0x0001000204000801UL, 0x0001000082000401UL, 0x0000002040810402UL
     };
 
-    private static readonly ulong[] RookMask =
+    private static readonly Memory<ulong> RookMask = new[]
     {
         0x000101010101017EUL, 0x000202020202027CUL, 0x000404040404047AUL, 0x0008080808080876UL,
         0x001010101010106EUL, 0x002020202020205EUL, 0x004040404040403EUL, 0x008080808080807EUL,
@@ -155,18 +155,18 @@ public static class MagicBB
 
         for (var i = 0; i < squares.Length; ++i)
         {
-            var numSquares = InitSquares(squares, BishopMask[i], initMagicMovesDb);
+            var numSquares = InitSquares(squares, BishopMask.Span[i], initMagicMovesDb);
             for (var temp = ulong.MinValue; temp < One << numSquares; ++temp)
             {
                 var occ = InitMagicMovesOccupancy(squares[..numSquares], in temp);
-                MagicBishopDb[i][occ * BishopMagics[i] >> 55] = InitmagicmovesBmoves(i, in occ);
+                MagicBishopDb[i][occ * BishopMagics.Span[i] >> 55] = InitmagicmovesBmoves(i, in occ);
             }
 
-            numSquares = InitSquares(squares, RookMask[i], initMagicMovesDb);
+            numSquares = InitSquares(squares, RookMask.Span[i], initMagicMovesDb);
             for (var temp = ulong.MinValue; temp < One << numSquares; ++temp)
             {
                 var occ = InitMagicMovesOccupancy(squares[..numSquares], in temp);
-                MagicRookDb[i][occ * RookMagics[i] >> 52] = InitmagicmovesRmoves(i, in occ);
+                MagicRookDb[i][occ * RookMagics.Span[i] >> 52] = InitmagicmovesRmoves(i, in occ);
             }
         }
     }
@@ -196,14 +196,14 @@ public static class MagicBB
         return ret;
     }
 
-    public static BitBoard BishopAttacks(this Square square, BitBoard occupied)
-        => MagicBishopDb[square.AsInt()][(occupied.Value & BishopMask[square.AsInt()]) * BishopMagics[square.AsInt()] >> 55];
+    public static BitBoard BishopAttacks(this Square square, in BitBoard occupied)
+        => MagicBishopDb[square.AsInt()][(occupied.Value & BishopMask.Span[square.AsInt()]) * BishopMagics.Span[square.AsInt()] >> 55];
 
-    public static BitBoard RookAttacks(this Square square, BitBoard occupied)
-        => MagicRookDb[square.AsInt()][(occupied.Value & RookMask[square.AsInt()]) * RookMagics[square.AsInt()] >> 52];
+    public static BitBoard RookAttacks(this Square square, in BitBoard occupied)
+        => MagicRookDb[square.AsInt()][(occupied.Value & RookMask.Span[square.AsInt()]) * RookMagics.Span[square.AsInt()] >> 52];
 
-    public static BitBoard QueenAttacks(this Square square, BitBoard occupied)
-        => square.BishopAttacks(occupied) | square.RookAttacks(occupied);
+    public static BitBoard QueenAttacks(this Square square, in BitBoard occupied)
+        => square.BishopAttacks(in occupied) | square.RookAttacks(in occupied);
 
     private static ulong InitmagicmovesRmoves(int square, in ulong occ)
     {
@@ -215,16 +215,14 @@ public static class MagicBB
         {
             bit <<= 8;
             ret |= bit;
-        }
-        while (bit != 0 && (bit & occ) == ulong.MinValue);
+        } while (bit != 0 && (bit & occ) == ulong.MinValue);
 
         bit = One << square;
         do
         {
             bit >>= 8;
             ret |= bit;
-        }
-        while (bit != 0 && (bit & occ) == ulong.MinValue);
+        } while (bit != 0 && (bit & occ) == ulong.MinValue);
 
         bit = One << square;
         do
@@ -234,8 +232,7 @@ public static class MagicBB
                 ret |= bit;
             else
                 break;
-        }
-        while ((bit & occ) == ulong.MinValue);
+        } while ((bit & occ) == ulong.MinValue);
 
         bit = One << square;
         do
@@ -245,8 +242,7 @@ public static class MagicBB
                 ret |= bit;
             else
                 break;
-        }
-        while ((bit & occ) == ulong.MinValue);
+        } while ((bit & occ) == ulong.MinValue);
 
         return ret;
     }
@@ -266,8 +262,7 @@ public static class MagicBB
                 ret |= bit;
             else
                 break;
-        }
-        while (bit != 0 && (bit & occ) == ulong.MinValue);
+        } while (bit != 0 && (bit & occ) == ulong.MinValue);
 
         bit = One << square;
         bit2 = bit;
@@ -279,8 +274,7 @@ public static class MagicBB
                 ret |= bit;
             else
                 break;
-        }
-        while (bit != 0 && (bit & occ) == ulong.MinValue);
+        } while (bit != 0 && (bit & occ) == ulong.MinValue);
 
         bit = One << square;
         bit2 = bit;
@@ -292,8 +286,7 @@ public static class MagicBB
                 ret |= bit;
             else
                 break;
-        }
-        while (bit != 0 && (bit & occ) == ulong.MinValue);
+        } while (bit != 0 && (bit & occ) == ulong.MinValue);
 
         bit = One << square;
         bit2 = bit;
@@ -305,8 +298,7 @@ public static class MagicBB
                 ret |= bit;
             else
                 break;
-        }
-        while (bit != 0 && (bit & occ) == ulong.MinValue);
+        } while (bit != 0 && (bit & occ) == ulong.MinValue);
 
         return ret;
     }

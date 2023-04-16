@@ -7,7 +7,7 @@ A C# chess data library with complete move generation and all needed custom type
 
 ## Requirements
 
-* .NET 6.0+
+* .NET 7.0+
 
 ## What is this for?
 
@@ -73,6 +73,7 @@ Yes you can, it is designed with that in mind.
 * Pawn blockage algorithm
 * Cuckoo repetition algorithm
 * Polyglot book support
+* Basic PGN file import support
 * Plenty of unit tests to see how it works
 
 ### Perft
@@ -80,7 +81,7 @@ Yes you can, it is designed with that in mind.
 Perft console test program approximate timings to depth 6 for normal start position
 
 * AMD-FX 8350 = ~12.5 seconds. (without TT) (earlier version)
-* Intel i7-8086k = ~3.3 seconds
+* Intel i7-8086k = ~2.3 seconds
 
 ### Transposition Table
 
@@ -88,7 +89,7 @@ ph
 
 ### Move Generator
 
-Example
+#### Example
 
 ```c#
 // generate all legal moves for current position
@@ -98,6 +99,24 @@ var game = GameFactory.Create(fen);
 var moveList = game.Pos.GenerateMoves();
 // ..
 ```
+
+#### MoveList example
+
+By using the MoveListPool you can avoid allocations and reuse the same MoveList instance.
+
+```c#
+var moveList = _moveListPool.Get();
+moveList.Generate(position, MoveType.Legal);
+var moves = moveList.Get();
+
+foreach (var move in moves)
+{
+    // do something
+}
+
+_moveListPool.Return(moveList);
+```
+
 
 ## What is not included?
 

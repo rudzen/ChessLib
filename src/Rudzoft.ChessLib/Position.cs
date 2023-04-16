@@ -148,11 +148,11 @@ public sealed class Position : IPosition
     public bool AttackedBySlider(Square sq, Player p)
     {
         var occupied = Board.Pieces();
-        var rookAttacks = sq.RookAttacks(occupied);
+        var rookAttacks = sq.RookAttacks(in occupied);
         if (Board.Pieces(p, PieceTypes.Rook) & rookAttacks)
             return true;
 
-        var bishopAttacks = sq.BishopAttacks(occupied);
+        var bishopAttacks = sq.BishopAttacks(in occupied);
         if (Board.Pieces(p, PieceTypes.Bishop) & bishopAttacks)
             return true;
 
@@ -377,9 +377,9 @@ public sealed class Position : IPosition
         {
             PieceTypes.Knight => pt.PseudoAttacks(sq),
             PieceTypes.King => pt.PseudoAttacks(sq),
-            PieceTypes.Bishop => sq.BishopAttacks(occ),
-            PieceTypes.Rook => sq.RookAttacks(occ),
-            PieceTypes.Queen => sq.QueenAttacks(occ),
+            PieceTypes.Bishop => sq.BishopAttacks(in occ),
+            PieceTypes.Rook => sq.RookAttacks(in occ),
+            PieceTypes.Queen => sq.QueenAttacks(in occ),
             _ => BitBoard.Empty
         };
     }
@@ -1487,8 +1487,8 @@ public sealed class Position : IPosition
         key ^= State.CastlelingRights.Key();
 
         var materialKey = HashKey.Empty;
-        ref var piecesSpace = ref MemoryMarshal.GetArrayDataReference(Piece.AllPieces);
-        for (var i = 0; i < Piece.AllPieces.Length; i++)
+        ref var piecesSpace = ref MemoryMarshal.GetArrayDataReference(Piece.All);
+        for (var i = 0; i < Piece.All.Length; i++)
         {
             var pc = Unsafe.Add(ref piecesSpace, i);
             for (var cnt = 0; cnt < Board.PieceCount(pc); ++cnt)

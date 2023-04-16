@@ -87,20 +87,21 @@ public static class CastleExtensions
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static CastleRights MakeCastleRights(this CastleRights cs, Player p)
-        => p.IsWhite
-            ? cs == CastleRights.Queen
+    {
+        if (p.IsWhite)
+            return cs == CastleRights.Queen
                 ? CastleRights.WhiteQueen
-                : CastleRights.WhiteKing
-            : cs == CastleRights.Queen
+                : CastleRights.WhiteKing;
+        else
+            return cs == CastleRights.Queen
                 ? CastleRights.BlackQueen
                 : CastleRights.BlackKing;
+    }
 }
 
 public readonly record struct CastleRight(CastleRights Rights)
 {
-    private CastleRight(int cr) : this((CastleRights)cr)
-    {
-    }
+    private CastleRight(int cr) : this((CastleRights)cr) { }
 
     public bool IsNone => Rights == CastleRights.None;
 

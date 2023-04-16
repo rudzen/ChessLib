@@ -220,31 +220,17 @@ public readonly record struct BitBoard(ulong Value) : IEnumerable<Square>, IMinM
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    IEnumerator IEnumerable.GetEnumerator()
-        => GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override string ToString()
-        => BitBoards.PrintBitBoard(in this, Value.ToString());
+    public override string ToString() => BitBoards.PrintBitBoard(in this, Value.ToString());
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void ToString(TextWriter textWriter)
-    {
-        try
-        {
-            textWriter.WriteLine(ToString());
-        }
-        catch (IOException ioe)
-        {
-            throw new IOException("Writer is closed", ioe);
-        }
-    }
+    public void ToString(TextWriter textWriter) => textWriter.WriteLine(ToString());
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool Equals(BitBoard other)
-        => Value == other.Value;
+    public bool Equals(BitBoard other) => Value == other.Value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override int GetHashCode()
-        => Value.GetHashCode();
+    public override int GetHashCode() => Value.GetHashCode();
 }

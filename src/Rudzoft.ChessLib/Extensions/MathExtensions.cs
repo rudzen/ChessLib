@@ -50,26 +50,6 @@ public static class MathExtensions
     public static bool InBetween(this uint v, int min, int max)
         => v - (uint)min <= (uint)max - (uint)min;
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static int Clamp(this int v, int min, int max)
-        => v < min ? min : v > max ? max : v;
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static double Clamp(this double v, double min, double max)
-        => v < min ? min : v > max ? max : v;
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static int Abs(this int @this)
-        => Math.Abs(@this);
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static int Max(this int @this, int value)
-        => Math.Max(@this, value);
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static double Round(this double @this, int digits)
-        => Math.Round(@this, digits);
-
     /// <summary>
     /// Converts a bool to a byte (0 or 1)
     ///

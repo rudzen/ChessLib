@@ -72,28 +72,22 @@ public struct Depth : IEquatable<Depth>
     public static Depth Offset => new(Depths.Offset);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator Depth(string value)
-        => new(Maths.ToIntegral(value));
+    public static implicit operator Depth(string value) => new(Maths.ToIntegral(value));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator Depth(Depths value)
-        => new(value);
+    public static implicit operator Depth(Depths value) => new(value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator Depth(int value)
-        => new(value);
+    public static implicit operator Depth(int value) => new(value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator Depth(byte value)
-        => new(value);
+    public static implicit operator Depth(byte value) => new(value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator ==(Depth left, Depth right)
-        => left.Value == right.Value;
+    public static bool operator ==(Depth left, Depth right) => left.Value == right.Value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator !=(Depth left, Depth right)
-        => left.Value != right.Value;
+    public static bool operator !=(Depth left, Depth right) => left.Value != right.Value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool operator <=(Depth left, Depth right) => left.Value <= right.Value;
@@ -117,30 +111,23 @@ public struct Depth : IEquatable<Depth>
     public static Depth operator -(Depth left, Depth right) => new(left.Value - right.Value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator ==(Depth left, int right)
-        => left.Value == right;
+    public static bool operator ==(Depth left, int right) => left.Value == right;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator !=(Depth left, int right)
-        => left.Value != right;
+    public static bool operator !=(Depth left, int right) => left.Value != right;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator ==(Depth left, Depths right)
-        => left.Value == right.AsInt();
+    public static bool operator ==(Depth left, Depths right) => left.Value == right.AsInt();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator !=(Depth left, Depths right)
-        => left.Value != right.AsInt();
+    public static bool operator !=(Depth left, Depths right) => left.Value != right.AsInt();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool Equals(Depth other)
-        => Value == other.Value;
+    public bool Equals(Depth other) => Value == other.Value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override bool Equals(object obj)
-        => obj is Depth other && Equals(other);
+    public override bool Equals(object obj) => obj is Depth other && Equals(other);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override int GetHashCode()
-        => Value;
+    public override int GetHashCode() => Value;
 }

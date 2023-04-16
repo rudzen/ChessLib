@@ -24,29 +24,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using Rudzoft.ChessLib.Types;
+using Rudzoft.ChessLib.Tables.KillerMoves;
 
-namespace Rudzoft.ChessLib.Test.PiecesTests;
+namespace Rudzoft.ChessLib.Factories;
 
-// ReSharper disable once ClassNeverInstantiated.Global
-public sealed class SliderMobilityFixture
+public interface IKillerMovesFactory : IServiceFactory<IKillerMoves>
 {
-    public int[] BishopExpected { get; } = { 7, 9, 11, 13 };
-
-    public int[] RookExpected { get; } = { 14, 14, 14, 14 };
-
-    public BitBoard SliderAttacks(PieceTypes pt, Square sq, in BitBoard occ)
-    {
-        var index = SliderIndex(pt);
-        return index switch
-
-        {
-            0 => sq.BishopAttacks(in occ),
-            1 => sq.RookAttacks(in occ),
-            _ => sq.QueenAttacks(in occ)
-        };
-    }
-
-    private static int SliderIndex(PieceTypes pt)
-        => pt.AsInt() - 3;
+    const int DefaultDepth = 64;
+    
+    IKillerMoves Create(int depth = DefaultDepth);
 }

@@ -66,8 +66,7 @@ public readonly record struct Player(byte Side) : ISpanFormattable
         : this((byte)p) { }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void Deconstruct(out byte side)
-        => side = Side;
+    public void Deconstruct(out byte side) => side = Side;
 
     public bool IsWhite => Side == byte.MinValue;
 
@@ -84,44 +83,34 @@ public readonly record struct Player(byte Side) : ISpanFormattable
     public const int Count = (int)Players.PlayerNb;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator Player(int value)
-        => new((byte)value);
+    public static implicit operator Player(int value) => new((byte)value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator Player(byte value)
-        => new(value);
+    public static implicit operator Player(byte value) => new(value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator Player(uint value)
-        => new((byte)value);
+    public static implicit operator Player(uint value) => new((byte)value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator Player(Players p)
-        => new(p);
+    public static implicit operator Player(Players p) => new(p);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator Player(bool value)
-        => new(value.AsByte());
+    public static implicit operator Player(bool value) => new(value.AsByte());
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Player Create(Players p)
-        => new(p);
+    public static Player Create(Players p) => new(p);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Player operator ~(Player p)
-        => new(p.Side ^ 1);
+    public static Player operator ~(Player p) => new(p.Side ^ 1);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static int operator <<(Player left, int right)
-        => left.Side << right;
+    public static int operator <<(Player left, int right) => left.Side << right;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static int operator >>(Player left, int right)
-        => left.Side >> right;
+    public static int operator >>(Player left, int right) => left.Side >> right;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Pieces operator +(PieceTypes pieceType, Player side)
-        => (Pieces)pieceType + (byte)(side.Side << 3);
+    public static Pieces operator +(PieceTypes pieceType, Player side) => (Pieces)pieceType + (byte)(side.Side << 3);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Equals(Player other) => Side == other.Side;
@@ -130,12 +119,10 @@ public readonly record struct Player(byte Side) : ISpanFormattable
     public override int GetHashCode() => Side << 24;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override string ToString()
-        => PlayerColors[Side];
+    public override string ToString() => PlayerColors[Side];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public string ToString(string format, IFormatProvider formatProvider)
-        => ToString();
+    public string ToString(string format, IFormatProvider formatProvider) => ToString();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider provider)
@@ -146,30 +133,23 @@ public readonly record struct Player(byte Side) : ISpanFormattable
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool IsOk()
-        => Side.InBetween(White.Side, Black.Side);
+    public bool IsOk() => Side.InBetween(White.Side, Black.Side);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public string GetName()
-        => PlayerColors[Side];
+    public string GetName() => PlayerColors[Side];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Direction PawnPushDistance()
-        => PawnPushDist[Side];
+    public Direction PawnPushDistance() => PawnPushDist[Side];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Direction PawnDoublePushDistance()
-        => PawnDoublePushDist[Side];
+    public Direction PawnDoublePushDistance() => PawnDoublePushDist[Side];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Direction PawnWestAttackDistance()
-        => PawnWestAttackDist[Side];
+    public Direction PawnWestAttackDistance() => PawnWestAttackDist[Side];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Direction PawnEastAttackDistance()
-        => PawnEastAttackDist[Side];
+    public Direction PawnEastAttackDistance() => PawnEastAttackDist[Side];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public BitBoard PawnPush(BitBoard bb)
-        => PawnPushModifiers[Side](bb);
+    public BitBoard PawnPush(BitBoard bb) => PawnPushModifiers[Side](bb);
 }

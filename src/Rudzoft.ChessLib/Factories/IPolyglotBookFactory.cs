@@ -28,8 +28,7 @@ using Rudzoft.ChessLib.Polyglot;
 
 namespace Rudzoft.ChessLib.Factories;
 
-public interface IPolyglotBookFactory
+public interface IPolyglotBookFactory : IServiceFactory<IPolyglotBook>
 {
     IPolyglotBook Create(string bookFile);
-    IPolyglotBook Create();
 }

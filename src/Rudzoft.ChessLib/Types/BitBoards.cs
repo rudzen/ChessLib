@@ -153,21 +153,21 @@ public static class BitBoards
     /// are a special case, as index range 0,sq are for White and 1,sq are for Black. This is
     /// possible because index 0 is NoPiece type.
     /// </summary>
-    private static readonly BitBoard[][] PseudoAttacksBB;
+    private static readonly BitBoard[][] PseudoAttacksBB = new BitBoard[PieceTypes.PieceTypeNb.AsInt()][];
 
-    private static readonly BitBoard[][] PawnAttackSpanBB;
+    private static readonly BitBoard[][] PawnAttackSpanBB = new BitBoard[Player.Count][];
 
-    private static readonly BitBoard[][] PassedPawnMaskBB;
+    private static readonly BitBoard[][] PassedPawnMaskBB = new BitBoard[Player.Count][];
 
-    private static readonly BitBoard[][] ForwardRanksBB;
+    private static readonly BitBoard[][] ForwardRanksBB = new BitBoard[Player.Count][];
 
-    private static readonly BitBoard[][] ForwardFileBB;
+    private static readonly BitBoard[][] ForwardFileBB = new BitBoard[Player.Count][];
 
-    private static readonly BitBoard[][] KingRingBB;
+    private static readonly BitBoard[][] KingRingBB = new BitBoard[Player.Count][];
 
-    private static readonly BitBoard[][] BetweenBB;
+    private static readonly BitBoard[][] BetweenBB = new BitBoard[Square.Count][];
 
-    private static readonly BitBoard[][] LineBB;
+    private static readonly BitBoard[][] LineBB = new BitBoard[Square.Count][];
 
     private static readonly BitBoard[] AdjacentFilesBB =
     {
@@ -175,9 +175,9 @@ public static class BitBoards
         FileFBB | FileHBB, FileGBB
     };
 
-    private static readonly int[][] SquareDistance; // chebyshev distance
+    private static readonly int[][] SquareDistance = new int[Square.Count][]; // chebyshev distance
 
-    private static readonly BitBoard[][] DistanceRingBB;
+    private static readonly BitBoard[][] DistanceRingBB = new BitBoard[Square.Count][];
 
     private static readonly BitBoard[] SlotFileBB;
 
@@ -189,43 +189,33 @@ public static class BitBoards
 
     static BitBoards()
     {
-        PseudoAttacksBB = new BitBoard[PieceTypes.PieceTypeNb.AsInt()][];
         for (var i = 0; i < PseudoAttacksBB.Length; i++)
             PseudoAttacksBB[i] = new BitBoard[Square.Count];
 
-        PawnAttackSpanBB = new BitBoard[Player.Count][];
         PawnAttackSpanBB[0] = new BitBoard[Square.Count];
         PawnAttackSpanBB[1] = new BitBoard[Square.Count];
 
-        PassedPawnMaskBB = new BitBoard[Player.Count][];
         PassedPawnMaskBB[0] = new BitBoard[Square.Count];
         PassedPawnMaskBB[1] = new BitBoard[Square.Count];
 
-        ForwardRanksBB = new BitBoard[Player.Count][];
         ForwardRanksBB[0] = new BitBoard[Square.Count];
         ForwardRanksBB[1] = new BitBoard[Square.Count];
 
-        ForwardFileBB = new BitBoard[Player.Count][];
         ForwardFileBB[0] = new BitBoard[Square.Count];
         ForwardFileBB[1] = new BitBoard[Square.Count];
 
-        KingRingBB = new BitBoard[Player.Count][];
         KingRingBB[0] = new BitBoard[Square.Count];
         KingRingBB[1] = new BitBoard[Square.Count];
 
-        BetweenBB = new BitBoard[Square.Count][];
         for (var i = 0; i < BetweenBB.Length; i++)
             BetweenBB[i] = new BitBoard[Square.Count];
 
-        LineBB = new BitBoard[Square.Count][];
         for (var i = 0; i < LineBB.Length; i++)
             LineBB[i] = new BitBoard[Square.Count];
 
-        SquareDistance = new int[Square.Count][];
         for (var i = 0; i < SquareDistance.Length; i++)
             SquareDistance[i] = new int[Square.Count];
 
-        DistanceRingBB = new BitBoard[Square.Count][];
         for (var i = 0; i < SquareDistance.Length; i++)
             DistanceRingBB[i] = new BitBoard[8];
 
@@ -263,18 +253,6 @@ public static class BitBoards
         }
 
         // mini local helpers
-        static BitBoard ComputeKnightAttack(in BitBoard bb)
-        {
-            var res = (bb & ~(FileABB | FileBBB)) << 6;
-            res |= (bb & ~FileABB) << 15;
-            res |= (bb & ~FileHBB) << 17;
-            res |= (bb & ~(FileGBB | FileHBB)) << 10;
-            res |= (bb & ~(FileGBB | FileHBB)) >> 6;
-            res |= (bb & ~FileHBB) >> 15;
-            res |= (bb & ~FileABB) >> 17;
-            res |= (bb & ~(FileABB | FileBBB)) >> 10;
-            return res;
-        }
 
         Span<PieceTypes> validMagicPieces = stackalloc PieceTypes[] { PieceTypes.Bishop, PieceTypes.Rook };
 
@@ -284,7 +262,6 @@ public static class BitBoards
         {
             var s1 = PopLsb(ref bb);
             var sq = s1.AsInt();
-            var b = s1.AsBb();
 
             var file = s1.File;
 
@@ -293,39 +270,19 @@ public static class BitBoards
             while (bb2)
             {
                 var s2 = PopLsb(ref bb2);
-                var dist = (byte)distanceFile(s1, s2).Max(distanceRank(s1, s2));
+                var dist = Math.Max(distanceFile(s1, s2), distanceRank(s1, s2));
                 SquareDistance[sq][s2.AsInt()] = dist;
                 DistanceRingBB[sq][dist] |= s2;
             }
 
-            PseudoAttacksBB[0][sq] = b.NorthEastOne() | b.NorthWestOne();
-            PseudoAttacksBB[1][sq] = b.SouthWestOne() | b.SouthEastOne();
-
-            var pt = PieceTypes.Knight.AsInt();
-            PseudoAttacksBB[pt][sq] = ComputeKnightAttack(in b);
-
-            var bishopAttacks = s1.BishopAttacks(EmptyBitBoard);
-            var rookAttacks = s1.RookAttacks(EmptyBitBoard);
-
-            pt = PieceTypes.Bishop.AsInt();
-            PseudoAttacksBB[pt][sq] = bishopAttacks;
-
-            pt = PieceTypes.Rook.AsInt();
-            PseudoAttacksBB[pt][sq] = rookAttacks;
-
-            pt = PieceTypes.Queen.AsInt();
-            PseudoAttacksBB[pt][sq] = bishopAttacks | rookAttacks;
-
-            pt = PieceTypes.King.AsInt();
-            PseudoAttacksBB[pt][sq] = b.NorthOne() | b.SouthOne() | b.EastOne() | b.WestOne()
-                                      | b.NorthEastOne() | b.NorthWestOne() | b.SouthEastOne() | b.SouthWestOne();
+            InitializePseudoAttacks(s1);
 
             // Compute lines and betweens
             ref var magicPiecesSpace = ref MemoryMarshal.GetReference(validMagicPieces);
             for (var i = 0; i < validMagicPieces.Length; i++)
             {
                 var validMagicPiece = Unsafe.Add(ref magicPiecesSpace, i);
-                pt = validMagicPiece.AsInt();
+                var pt = validMagicPiece.AsInt();
                 var bb3 = AllSquares;
                 while (bb3)
                 {
@@ -350,8 +307,41 @@ public static class BitBoards
         {
             File.FileE.FileBB() | File.FileF.FileBB() | File.FileG.FileBB() | File.FileH.FileBB(), // King
             File.FileA.FileBB() | File.FileB.FileBB() | File.FileC.FileBB() | File.FileD.FileBB(), // Queen
-            File.FileC.FileBB() | File.FileD.FileBB() | File.FileE.FileBB() | File.FileF.FileBB() // Center
+            File.FileC.FileBB() | File.FileD.FileBB() | File.FileE.FileBB() | File.FileF.FileBB()  // Center
         };
+    }
+
+    private static BitBoard ComputeKnightAttack(in BitBoard bb)
+    {
+        var res = (bb & ~(FileABB | FileBBB)) << 6;
+        res |= (bb & ~FileABB) << 15;
+        res |= (bb & ~FileHBB) << 17;
+        res |= (bb & ~(FileGBB | FileHBB)) << 10;
+        res |= (bb & ~(FileGBB | FileHBB)) >> 6;
+        res |= (bb & ~FileHBB) >> 15;
+        res |= (bb & ~FileABB) >> 17;
+        res |= (bb & ~(FileABB | FileBBB)) >> 10;
+        return res;
+    }
+
+    private static void InitializePseudoAttacks(Square sq)
+    {
+        var s = sq.AsInt();
+        var b = sq.AsBb();
+        var bishopAttacks = sq.BishopAttacks(EmptyBitBoard);
+        var rookAttacks = sq.RookAttacks(EmptyBitBoard);
+
+        // Pawns
+        PseudoAttacksBB[0][s] = b.NorthEastOne() | b.NorthWestOne();
+        PseudoAttacksBB[1][s] = b.SouthWestOne() | b.SouthEastOne();
+
+        PseudoAttacksBB[PieceTypes.Knight.AsInt()][s] = ComputeKnightAttack(in b);
+        PseudoAttacksBB[PieceTypes.Bishop.AsInt()][s] = bishopAttacks;
+        PseudoAttacksBB[PieceTypes.Rook.AsInt()][s] = rookAttacks;
+        PseudoAttacksBB[PieceTypes.Queen.AsInt()][s] = bishopAttacks | rookAttacks;
+        PseudoAttacksBB[PieceTypes.King.AsInt()][s] = b.NorthOne()       | b.SouthOne()     | b.EastOne()
+                                                      | b.WestOne()      | b.NorthEastOne() | b.NorthWestOne()
+                                                      | b.SouthEastOne() | b.SouthWestOne();
     }
 
     private static void InitializeKingRing(Square s1, int sq, File file)
@@ -780,9 +770,9 @@ public static class BitBoards
         {
             PieceTypes.Knight => PseudoAttacksBB[pt.AsInt()][sq.AsInt()],
             PieceTypes.King => PseudoAttacksBB[pt.AsInt()][sq.AsInt()],
-            PieceTypes.Bishop => sq.BishopAttacks(occ),
-            PieceTypes.Rook => sq.RookAttacks(occ),
-            PieceTypes.Queen => sq.QueenAttacks(occ),
+            PieceTypes.Bishop => sq.BishopAttacks(in occ),
+            PieceTypes.Rook => sq.RookAttacks(in occ),
+            PieceTypes.Queen => sq.QueenAttacks(in occ),
             _ => EmptyBitBoard
         };
     }

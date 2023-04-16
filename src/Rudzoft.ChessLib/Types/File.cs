@@ -191,7 +191,7 @@ public readonly record struct File(Files Value) : IComparable<File>, ISpanFormat
     public int EdgeDistance() => Math.Min(AsInt() - FileA.AsInt(), FileH.AsInt() - AsInt());
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public File Clamp(File min, File max) => new(Value.AsInt().Clamp(min.AsInt(), max.AsInt()));
+    public File Clamp(File min, File max) => new(Math.Clamp(Value.AsInt(), min.AsInt(), max.AsInt()));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public int Distance(File other) => Math.Abs(AsInt() - other.AsInt());

@@ -46,8 +46,8 @@ public static class Cuckoo
     static Cuckoo()
     {
         var count = 0;
-        ref var piecesSpace = ref MemoryMarshal.GetArrayDataReference(Piece.AllPieces);
-        for (var i = 0; i < Piece.AllPieces.Length; i++) {
+        ref var piecesSpace = ref MemoryMarshal.GetArrayDataReference(Piece.All);
+        for (var i = 0; i < Piece.All.Length; i++) {
             var pc = Unsafe.Add(ref piecesSpace, i);
             var bb = BitBoards.AllSquares;
             while (bb)

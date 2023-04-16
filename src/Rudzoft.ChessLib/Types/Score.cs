@@ -39,28 +39,22 @@ public struct Score : IEquatable<Score>
     private Vector2 _data;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private Score(Vector2 value)
-        => _data = value;
+    private Score(Vector2 value) => _data = value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private Score(int value)
-        => _data = new Vector2(value, 0);
+    private Score(int value) => _data = new Vector2(value, 0);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Score(float mg, float eg)
-        => _data = new Vector2(mg, eg);
+    public Score(float mg, float eg) => _data = new Vector2(mg, eg);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Score(int mg, int eg)
-        => _data = new Vector2(mg, eg);
+    public Score(int mg, int eg) => _data = new Vector2(mg, eg);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Score(Value mg, Value eg)
-        => _data = new Vector2((int)mg.Raw, (int)eg.Raw);
+    public Score(Value mg, Value eg) => _data = new Vector2((int)mg.Raw, (int)eg.Raw);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Score(Score s)
-        => _data = s._data;
+    public Score(Score s) => _data = s._data;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Score Create(int mg, int eg) => new(mg, eg);
@@ -69,35 +63,27 @@ public struct Score : IEquatable<Score>
     public static Score Create(in Vector2 v) => new(v);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator Score(int v)
-        => new(v);
+    public static implicit operator Score(int v) => new(v);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator Score(Vector2 v)
-        => new(v);
+    public static implicit operator Score(Vector2 v) => new(v);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Score operator *(Score s, int v)
-        => new(Vector2.Multiply(s._data, v));
+    public static Score operator *(Score s, int v) => new(Vector2.Multiply(s._data, v));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Score operator /(Score s, int v)
-        => new(Vector2.Divide(s._data, v));
+    public static Score operator /(Score s, int v) => new(Vector2.Divide(s._data, v));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Score operator *(Score s, bool b)
-        => b ? s : Zero;
+    public static Score operator *(Score s, bool b) => b ? s : Zero;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Score operator +(Score s1, Score s2)
-        => new(Vector2.Add(s1._data, s2._data));
+    public static Score operator +(Score s1, Score s2) => new(Vector2.Add(s1._data, s2._data));
 
-    public static Score operator -(Score s1, Score s2)
-        => new(Vector2.Subtract(s1._data, s2._data));
+    public static Score operator -(Score s1, Score s2) => new(Vector2.Subtract(s1._data, s2._data));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Score operator +(Score s, int v)
-        => new(Vector2.Add(s._data, new Vector2(v, v)));
+    public static Score operator +(Score s, int v) => new(Vector2.Add(s._data, new Vector2(v, v)));
 
     public static readonly Score Zero = new();
 
@@ -109,43 +95,30 @@ public struct Score : IEquatable<Score>
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void SetMg(int v)
-        => _data.X = v;
+    public void SetMg(int v) => _data.X = v;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void SetEg(int v)
-        => _data.Y = v;
+    public void SetEg(int v) => _data.Y = v;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public readonly float Eg()
-        => _data.Y;
+    public readonly float Eg() => _data.Y;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public readonly float Mg()
-        => _data.X;
+    public readonly float Mg() => _data.X;
 
-    public readonly override string ToString()
-        => $"Mg:{_data.X}, Eg:{_data.Y}";
+    public readonly override string ToString() => $"Mg:{_data.X}, Eg:{_data.Y}";
 
-    public bool Equals(Score other)
-        => _data.Equals(other._data);
+    public bool Equals(Score other) => _data.Equals(other._data);
 
-    public override bool Equals(object obj)
-        => obj is Score other && Equals(other);
+    public override bool Equals(object obj) => obj is Score other && Equals(other);
 
 #pragma warning disable S2328 // "GetHashCode" should not reference mutable fields
-    public readonly override int GetHashCode()
+    public readonly override int GetHashCode() => _data.GetHashCode();
 #pragma warning restore S2328 // "GetHashCode" should not reference mutable fields
-        => _data.GetHashCode();
 
-    public static bool operator ==(Score left, Score right)
-        => left._data.Equals(right._data);
+    public static bool operator ==(Score left, Score right) => left._data.Equals(right._data);
 
-    public static bool operator !=(Score left, Score right)
-        => !(left == right);
+    public static bool operator !=(Score left, Score right) => !(left == right);
 
-    public Score Negate()
-    {
-        return -_data;
-    }
+    public Score Negate() => -_data;
 }

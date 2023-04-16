@@ -35,11 +35,9 @@ public readonly struct Value : IEquatable<Value>
 {
     public readonly DefaultPieceValues Raw;
 
-    public Value(Value value)
-        : this(value.Raw) { }
+    public Value(Value value) : this(value.Raw) { }
 
-    public Value(int value)
-        : this((DefaultPieceValues)value) { }
+    public Value(int value) : this((DefaultPieceValues)value) { }
 
     private Value(DefaultPieceValues value) => Raw = value;
 
@@ -51,99 +49,67 @@ public readonly struct Value : IEquatable<Value>
 
     public static Value Of(int v) => v;
 
-    public static implicit operator Value(int value)
-        => new(value);
+    public static implicit operator Value(int value) => new(value);
 
-    public static implicit operator Value(DefaultPieceValues value)
-        => new(value);
+    public static implicit operator Value(DefaultPieceValues value) => new(value);
 
-    public static bool operator ==(Value left, Value right)
-        => left.Equals(right);
+    public static bool operator ==(Value left, Value right) => left.Equals(right);
 
-    public static bool operator !=(Value left, Value right)
-        => !left.Equals(right);
+    public static bool operator !=(Value left, Value right) => !left.Equals(right);
 
-    public static Value operator +(Value left, Value right)
-        => new((int)left.Raw + (int)right.Raw);
+    public static Value operator +(Value left, Value right) => new((int)left.Raw + (int)right.Raw);
 
-    public static Value operator +(Value left, int right)
-        => new((int)left.Raw + right);
+    public static Value operator +(Value left, int right) => new((int)left.Raw + right);
 
-    public static Value operator +(Value left, DefaultPieceValues right)
-        => new((int)left.Raw + (int)right);
+    public static Value operator +(Value left, DefaultPieceValues right) => new((int)left.Raw + (int)right);
 
-    public static Value operator +(int left, Value right)
-        => new(left + (int)right.Raw);
+    public static Value operator +(int left, Value right) => new(left + (int)right.Raw);
 
-    public static Value operator -(Value left, Value right)
-        => new(left.Raw - right.Raw);
+    public static Value operator -(Value left, Value right) => new(left.Raw - right.Raw);
 
-    public static Value operator -(Value left, int right)
-        => new((int)left.Raw - right);
+    public static Value operator -(Value left, int right) => new((int)left.Raw - right);
 
-    public static Value operator -(DefaultPieceValues left, Value right)
-        => new((int)left - right.Raw);
+    public static Value operator -(DefaultPieceValues left, Value right) => new((int)left - right.Raw);
 
-    public static Value operator -(Value left, DefaultPieceValues right)
-        => new(left.Raw - (int)right);
+    public static Value operator -(Value left, DefaultPieceValues right) => new(left.Raw - (int)right);
 
-    public static Value operator -(int left, Value right)
-        => new(left - (int)right.Raw);
+    public static Value operator -(int left, Value right) => new(left - (int)right.Raw);
 
-    public static Value operator ++(Value value)
-        => new((int)value.Raw + 1);
+    public static Value operator ++(Value value) => new((int)value.Raw + 1);
 
-    public static Value operator --(Value value)
-        => new((int)value.Raw - 1);
+    public static Value operator --(Value value) => new((int)value.Raw - 1);
 
-    public static Value operator *(Value left, int right)
-        => new((int)left.Raw * right);
+    public static Value operator *(Value left, int right) => new((int)left.Raw * right);
 
-    public static Value operator *(int left, Value right)
-        => new(left * right.Raw.AsInt());
+    public static Value operator *(int left, Value right) => new(left * right.Raw.AsInt());
 
-    public static bool operator >(Value left, Value right)
-        => left.Raw > right.Raw;
+    public static bool operator >(Value left, Value right) => left.Raw > right.Raw;
 
-    public static bool operator <(Value left, Value right)
-        => left.Raw < right.Raw;
+    public static bool operator <(Value left, Value right) => left.Raw < right.Raw;
 
-    public static bool operator <=(Value left, Value right)
-        => left.Raw <= right.Raw;
+    public static bool operator <=(Value left, Value right) => left.Raw <= right.Raw;
 
-    public static bool operator >=(Value left, Value right)
-        => left.Raw >= right.Raw;
+    public static bool operator >=(Value left, Value right) => left.Raw >= right.Raw;
 
-    public static bool operator >(Value left, DefaultPieceValues right)
-        => left.Raw > right;
+    public static bool operator >(Value left, DefaultPieceValues right) => left.Raw > right;
 
-    public static bool operator <(Value left, DefaultPieceValues right)
-        => left.Raw < right;
+    public static bool operator <(Value left, DefaultPieceValues right) => left.Raw < right;
 
-    public static bool operator <=(Value left, DefaultPieceValues right)
-        => left.Raw <= right;
+    public static bool operator <=(Value left, DefaultPieceValues right) => left.Raw <= right;
 
-    public static bool operator >=(Value left, DefaultPieceValues right)
-        => left.Raw >= right;
+    public static bool operator >=(Value left, DefaultPieceValues right) => left.Raw >= right;
 
-    public static bool operator true(Value value)
-        => value.Raw > 0;
+    public static bool operator true(Value value) => value.Raw > 0;
 
-    public static bool operator false(Value value)
-        => value.Raw <= 0;
+    public static bool operator false(Value value) => value.Raw <= 0;
 
-    public Value ForColor(Player p)
-        => p.IsWhite ? this : new Value(-(int)Raw);
+    public Value ForColor(Player p) => p.IsWhite ? this : new Value(-(int)Raw);
 
-    public bool Equals(Value other)
-        => Raw == other.Raw;
+    public bool Equals(Value other) => Raw == other.Raw;
 
-    public override bool Equals(object obj)
-        => obj is Value other && Equals(other);
+    public override bool Equals(object obj) => obj is Value other && Equals(other);
 
-    public override int GetHashCode()
-        => (int)Raw;
+    public override int GetHashCode() => (int)Raw;
 
-    public override string ToString()
-        => Raw.ToString();
+    public override string ToString() => Raw.ToString();
 }

@@ -60,64 +60,50 @@ public readonly struct HashKey : IEquatable<HashKey>
     public static HashKey Empty => new();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator HashKey(ulong value)
-        => new(value);
+    public static implicit operator HashKey(ulong value) => new(value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator HashKey(uint value)
-        => new(value);
+    public static implicit operator HashKey(uint value) => new(value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator ==(HashKey left, HashKey right)
-        => left.Key == right.Key;
+    public static bool operator ==(HashKey left, HashKey right) => left.Key == right.Key;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator !=(HashKey left, HashKey right)
-        => left.Key != right.Key;
+    public static bool operator !=(HashKey left, HashKey right) => left.Key != right.Key;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static HashKey operator >> (HashKey left, int right)
-        => new(left.Key >> right);
+    public static HashKey operator >> (HashKey left, int right) => new(left.Key >> right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static HashKey operator <<(HashKey left, int right)
-        => new(left.Key << right);
+    public static HashKey operator <<(HashKey left, int right) => new(left.Key << right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static HashKey operator &(HashKey left, int right)
-        => new(left.Key & (ulong)right);
+    public static HashKey operator &(HashKey left, int right) => new(left.Key & (ulong)right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static HashKey operator ^(HashKey left, int right)
-        => new(left.Key ^ (ulong)right);
+    public static HashKey operator ^(HashKey left, int right) => new(left.Key ^ (ulong)right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static HashKey operator ^(HashKey left, HashKey right)
-        => new(left.Key ^ right.Key);
+    public static HashKey operator ^(HashKey left, HashKey right) => new(left.Key ^ right.Key);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static HashKey operator ^(HashKey left, ulong right)
-        => new(left.Key ^ right);
+    public static HashKey operator ^(HashKey left, ulong right) => new(left.Key ^ right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static HashKey operator ^(HashKey left, CastleRights right)
         => new(left.Key ^ right.GetZobristCastleling().Key);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static HashKey operator ^(HashKey left, File right)
-        => new(left.Key ^ right.GetZobristEnPassant().Key);
+    public static HashKey operator ^(HashKey left, File right) => new(left.Key ^ right.GetZobristEnPassant().Key);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool Equals(HashKey other)
-        => Key == other.Key;
+    public bool Equals(HashKey other) => Key == other.Key;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override bool Equals(object obj)
-        => obj is HashKey other && Equals(other);
+    public override bool Equals(object obj) => obj is HashKey other && Equals(other);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override int GetHashCode()
-        => Key.GetHashCode();
+    public override int GetHashCode() => Key.GetHashCode();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override string ToString() => $"0x{Key:X}";

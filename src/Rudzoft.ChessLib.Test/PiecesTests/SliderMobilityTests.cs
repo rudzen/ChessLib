@@ -53,11 +53,11 @@ public sealed class SliderMobilityTests : PieceAttacks, IClassFixture<SliderMobi
     [InlineData(Delta, PieceTypes.Queen, 27)]
     public void BishopMobility(ulong pattern, PieceTypes pt, int expectedMobility)
     {
-        var sliderIndex = _fixture.SliderIndex(pt);
+        var empty = BitBoard.Empty;
         var bb = new BitBoard(pattern);
 
         var expected = bb.Count * expectedMobility;
-        var actual = bb.Select(x => _fixture.SliderAttacks[sliderIndex](x, BitBoard.Empty).Count).Sum();
+        var actual = bb.Select(x => _fixture.SliderAttacks(pt, x, in empty).Count).Sum();
 
         Assert.Equal(expected, actual);
     }

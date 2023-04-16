@@ -203,7 +203,7 @@ public readonly record struct Rank(Ranks Value) : ISpanFormattable, IValidationT
     public int EdgeDistance() => Math.Min(AsInt() - Rank1.AsInt(), Rank8.AsInt() - AsInt());
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Rank Clamp(Rank min, Rank max) => new(Value.AsInt().Clamp(min.AsInt(), max.AsInt()));
+    public Rank Clamp(Rank min, Rank max) => new(Math.Clamp(Value.AsInt(), min.AsInt(), max.AsInt()));
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public int Distance(Rank other) => Math.Abs(AsInt() - other.AsInt());

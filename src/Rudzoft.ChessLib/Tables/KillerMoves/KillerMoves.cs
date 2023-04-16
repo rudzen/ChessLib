@@ -37,8 +37,7 @@ public sealed class KillerMoves : IKillerMoves
     private readonly PieceSquare[][] _killerMoves;
     private readonly int _maxDepth;
 
-    public static IKillerMoves Create(int maxDepth)
-        => new KillerMoves(maxDepth).Initialize();
+    public static IKillerMoves Create(int maxDepth) => new KillerMoves(maxDepth).Initialize();
 
     private KillerMoves(int maxDepth)
     {

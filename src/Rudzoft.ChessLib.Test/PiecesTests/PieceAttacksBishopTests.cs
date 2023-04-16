@@ -62,7 +62,7 @@ public sealed class PieceAttacksBishopTests : PieceAttacks
         while (border)
         {
             var sq = BitBoards.PopLsb(ref border);
-            var attacks = sq.BishopAttacks(borderInner);
+            var attacks = sq.BishopAttacks(in borderInner);
             Assert.False(attacks.IsEmpty);
             var expected = corners & sq ? expectedCorner : expectedSide;
             var actual = attacks.Count;
