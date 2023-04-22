@@ -77,6 +77,14 @@ public sealed class Position : IPosition
     public BitBoard Checkers
         => State.Checkers;
 
+    /// <summary>
+    /// To let something outside the library be aware of changes (like a UI etc)
+    /// </summary>
+    public event PieceRemovedEvent PieceRemoved;
+
+    public event PieceAddedEvent PieceAdded;
+    public event PieceMovedEvent PieceMoved;
+
     public ChessMode ChessMode { get; set; }
 
     public Square EnPassantSquare
@@ -95,11 +103,6 @@ public sealed class Position : IPosition
 
     public bool IsRepetition
         => State.Repetition >= 3;
-
-    /// <summary>
-    /// To let something outside the library be aware of changes (like a UI etc)
-    /// </summary>
-    public Action<IPieceSquare> PieceUpdated { get; set; }
 
     public IPieceValue PieceValue { get; }
 
@@ -120,7 +123,7 @@ public sealed class Position : IPosition
         Board.AddPiece(pc, sq);
 
         if (!IsProbing)
-            PieceUpdated?.Invoke(new PieceSquareEventArgs(pc, sq));
+            PieceAdded?.Invoke(this, new PieceAddedEventArgs(sq, pc));
     }
 
     public bool AttackedByKing(Square sq, Player p)
@@ -973,9 +976,14 @@ public sealed class Position : IPosition
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void RemovePiece(Square sq)
     {
+        Piece removedPiece = Board.PieceAt(sq);
+
         Board.RemovePiece(sq);
+
         if (!IsProbing)
-            PieceUpdated?.Invoke( new PieceSquareEventArgs(Piece.EmptyPiece, sq));
+        {
+            PieceRemoved?.Invoke(this, new PieceRemovedEventArgs(sq, removedPiece));
+        }
     }
 
     public bool SeeGe(Move m, Value threshold)
@@ -1353,7 +1361,7 @@ public sealed class Position : IPosition
         if (IsProbing)
             return;
 
-        PieceUpdated?.Invoke(new PieceSquareEventArgs(Board.PieceAt(from), to));
+        PieceMoved?.Invoke(this, new PieceMovedEventArgs(from, to, Board.PieceAt(to)));
     }
 
     ///<summary>
@@ -1446,9 +1454,7 @@ public sealed class Position : IPosition
         Square RookSquare(Square startSq, Piece rook)
         {
             Square targetSq;
-            for (targetSq = startSq; Board.PieceAt(targetSq) != rook; --targetSq)
-            {
-            }
+            for (targetSq = startSq; Board.PieceAt(targetSq) != rook; --targetSq) { }
 
             return targetSq;
         }

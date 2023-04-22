@@ -26,11 +26,18 @@ SOFTWARE.
 
 using Rudzoft.ChessLib.Factories;
 using Rudzoft.ChessLib.Types;
+using Xunit.Abstractions;
 
 namespace Rudzoft.ChessLib.Test.PositionTests;
 
 public sealed class PositionTests
 {
+    private readonly ITestOutputHelper _testOutputHelper;
+    public PositionTests(ITestOutputHelper testOutputHelper)
+    {
+        _testOutputHelper = testOutputHelper;
+    }
+
     [Fact]
     public void AddPieceTest()
     {
@@ -88,4 +95,59 @@ public sealed class PositionTests
 
         Assert.Equal(expectedSquare, actual);
     }
+
+    [Fact]
+    public void PieceMovedGeneratesEventWithPieceInfo()
+    {
+        int moveEventsReceived = 0;
+        int removeEventsReceived = 0;
+        int addEventsReceived = 0;
+        var moves = new[]
+        {
+            Move.Create(Square.F2, Square.F3),
+            Move.Create(Square.E7, Square.E5),
+            Move.Create(Square.G2, Square.G4),
+            Move.Create(Square.D7, Square.D6),
+            Move.Create(Square.H2, Square.H4),
+            Move.Create(Square.D8, Square.H4)
+        };
+
+        // construct game and start a new game
+        var game = GameFactory.Create(Fen.Fen.StartPositionFen);
+        game.Pos.IsProbing = false;
+        game.Pos.PieceMoved += PieceUpdated;
+        game.Pos.PieceAdded += PieceAdded;
+        game.Pos.PieceRemoved += PieceRemoved;
+
+        var position = game.Pos;
+
+        // make the moves necessary to create a mate
+        foreach (var move in moves)
+            position.MakeMove(move, game.Pos.State);
+
+        //We should have received 6 move events and one remove.
+        Assert.Equal(6, moveEventsReceived);
+        Assert.Equal(1, removeEventsReceived);
+        Assert.Equal(0, addEventsReceived);
+
+        void PieceUpdated(object sender, PieceMovedEventArgs args)
+        {
+            moveEventsReceived++;
+            Assert.NotEqual(Pieces.NoPiece, args.MovedPiece.Value);
+            _testOutputHelper.WriteLine($"{args.MovedPiece.Value} moved from {args.From} to {args.To}.");
+        }
+        void PieceRemoved(object sender, PieceRemovedEventArgs args)
+        {
+            removeEventsReceived++;
+            Assert.NotEqual(Pieces.NoPiece, args.RemovedPiece.Value);
+            _testOutputHelper.WriteLine($"{args.RemovedPiece.Value} removed from {args.EmptiedSquare}.");
+        }
+
+        void PieceAdded(object sender, PieceAddedEventArgs args)
+        {
+            addEventsReceived++;
+        }
+    }
+
+
 }

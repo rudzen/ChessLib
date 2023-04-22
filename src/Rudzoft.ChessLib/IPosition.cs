@@ -38,7 +38,9 @@ public interface IPosition : IEnumerable<Piece>
 {
     bool IsProbing { get; set; }
 
-    Action<IPieceSquare> PieceUpdated { get; set; }
+    public event PieceAddedEvent PieceAdded;
+    public event PieceMovedEvent PieceMoved;
+    public event PieceRemovedEvent PieceRemoved;
 
     ChessMode ChessMode { get; set; }
 
@@ -201,4 +203,48 @@ public interface IPosition : IEnumerable<Piece>
     bool SeeGe(Move m, Value threshold);
 
     IPositionValidator Validate(PositionValidationTypes type = PositionValidationTypes.Basic);
+}
+
+public delegate void PieceRemovedEvent(object sender, PieceRemovedEventArgs args);
+
+public class PieceRemovedEventArgs
+{
+    public Square EmptiedSquare { get; }
+    public Piece RemovedPiece { get; }
+
+    public PieceRemovedEventArgs(Square emptiedSquare, Piece removedPiece)
+    {
+        EmptiedSquare = emptiedSquare;
+        RemovedPiece = removedPiece;
+    }
+}
+
+public delegate void PieceMovedEvent(object sender, PieceMovedEventArgs args);
+
+public class PieceMovedEventArgs
+{
+    public Square From { get; }
+    public Square To { get; }
+    public Piece MovedPiece { get; }
+
+    public PieceMovedEventArgs(Square from, Square to, Piece movedPiece)
+    {
+        From = from;
+        To = to;
+        MovedPiece = movedPiece;
+    }
+}
+
+public delegate void PieceAddedEvent(object sender, PieceAddedEventArgs args);
+
+public class PieceAddedEventArgs
+{
+    public Square Square { get; }
+    public Piece NewPiece { get; }
+
+    public PieceAddedEventArgs(Square square, Piece newPiece)
+    {
+        Square = square;
+        NewPiece = newPiece;
+    }
 }
