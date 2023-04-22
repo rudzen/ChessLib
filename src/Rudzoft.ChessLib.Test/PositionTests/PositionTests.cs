@@ -24,6 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using Rudzoft.ChessLib.Events;
 using Rudzoft.ChessLib.Factories;
 using Rudzoft.ChessLib.Types;
 using Xunit.Abstractions;

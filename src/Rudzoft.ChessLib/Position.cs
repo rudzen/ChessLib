@@ -32,6 +32,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using Microsoft.Extensions.ObjectPool;
 using Rudzoft.ChessLib.Enums;
+using Rudzoft.ChessLib.Events;
 using Rudzoft.ChessLib.Extensions;
 using Rudzoft.ChessLib.Fen;
 using Rudzoft.ChessLib.Hash;
