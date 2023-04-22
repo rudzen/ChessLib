@@ -35,8 +35,6 @@ namespace Rudzoft.ChessLib;
 
 public interface IGame : IEnumerable<Piece>
 {
-    Action<IPieceSquare> PieceUpdated { get; }
-
     BitBoard Occupied { get; }
 
     IPosition Pos { get; }
