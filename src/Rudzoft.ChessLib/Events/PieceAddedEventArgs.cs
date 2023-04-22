@@ -2,7 +2,7 @@
 
 namespace Rudzoft.ChessLib.Events;
 
-public class PieceAddedEventArgs
+public struct PieceAddedEventArgs
 {
     public Square Square { get; }
     public Piece NewPiece { get; }

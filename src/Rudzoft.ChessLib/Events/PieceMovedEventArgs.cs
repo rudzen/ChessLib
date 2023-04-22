@@ -2,7 +2,7 @@
 
 namespace Rudzoft.ChessLib.Events;
 
-public class PieceMovedEventArgs
+public struct PieceMovedEventArgs
 {
     public Square From { get; }
     public Square To { get; }

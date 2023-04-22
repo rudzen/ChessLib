@@ -2,7 +2,7 @@
 
 namespace Rudzoft.ChessLib.Events;
 
-public class PieceRemovedEventArgs
+public struct PieceRemovedEventArgs
 {
     public Square EmptiedSquare { get; }
     public Piece RemovedPiece { get; }
