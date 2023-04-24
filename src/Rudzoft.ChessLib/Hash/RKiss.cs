@@ -34,12 +34,12 @@ public sealed class RKiss : IRKiss
     private ulong _s;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private RKiss(ulong s)
+    private RKiss(in ulong s)
     {
         _s = s;
     }
 
-    public static IRKiss Create(ulong seed) => new RKiss(seed);
+    public static IRKiss Create(in ulong seed) => new RKiss(seed);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public IEnumerable<ulong> Get(int count)
