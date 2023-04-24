@@ -161,7 +161,7 @@ public readonly record struct CastleRight(CastleRights Rights)
     public static CastleRight operator ~(CastleRight cr) => new(~cr.Rights);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public HashKey Key() => Rights.GetZobristCastleling();
+    public ref HashKey Key() => ref Rights.GetZobristCastleling();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Has(CastleRights cr) => Rights.HasFlagFast(cr);

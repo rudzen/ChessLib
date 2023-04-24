@@ -117,14 +117,14 @@ public static class Zobrist
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static HashKey GetZobristPst(this Piece piece, Square square) => ZobristPst[piece.AsInt()][square.AsInt()];
+    public static ref HashKey GetZobristPst(this Piece piece, Square square) => ref ZobristPst[piece.AsInt()][square.AsInt()];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static HashKey GetZobristCastleling(this CastleRights index) => ZobristCastling[index.AsInt()];
+    public static ref HashKey GetZobristCastleling(this CastleRights index) => ref ZobristCastling[index.AsInt()];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static HashKey GetZobristSide() => ZobristSide;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static HashKey GetZobristEnPassant(this File file) => ZobristEpFile[file.AsInt()];
+    public static ref HashKey GetZobristEnPassant(this File file) => ref ZobristEpFile[file.AsInt()];
 }
