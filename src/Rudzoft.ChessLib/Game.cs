@@ -146,6 +146,8 @@ public sealed class Game : IGame
         var ml = _moveListPool.Get();
         ml.Generate(in _pos);
 
+        var state = new State();
+        
         var moves = ml.Get();
         ref var movesSpace = ref MemoryMarshal.GetReference(moves);
         for (var i = 0; i < moves.Length; ++i)
@@ -156,7 +158,6 @@ public sealed class Game : IGame
             else
             {
                 var m = valMove.Move;
-                var state = new State();
                 _pos.MakeMove(m, in state);
 
                 if (depth <= 2)

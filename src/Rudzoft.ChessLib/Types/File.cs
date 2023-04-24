@@ -26,6 +26,7 @@ SOFTWARE.
 
 using Rudzoft.ChessLib.Extensions;
 using System;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 
 // ReSharper disable UnusedMember.Global
@@ -52,7 +53,11 @@ public static class FilesExtensions
     public static int AsInt(this Files f) => (int)f;
 }
 
-public readonly record struct File(Files Value) : IComparable<File>, ISpanFormattable, IValidationType
+public readonly record struct File(Files Value)
+    : IComparable<File>, ISpanFormattable, IValidationType
+#if NET7_0_OR_GREATER 
+        , IMinMaxValue<File>
+#endif
 {
     private static readonly string[] FileStrings = { "a", "b", "c", "d", "e", "f", "g", "h" };
 
@@ -65,16 +70,22 @@ public readonly record struct File(Files Value) : IComparable<File>, ISpanFormat
     public static File FileG { get; } = new(Files.FileG);
     public static File FileH { get; } = new(Files.FileH);
     public static File[] AllFiles { get; } = { FileA, FileB, FileC, FileD, FileE, FileF, FileG, FileH };
+    public static File MaxValue => FileH;
+    public static File MinValue => FileA;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public File(int file) : this((Files)file) { }
+    public File(int file) : this((Files)file)
+    {
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public File(File f) : this(f.Value) { }
+    public File(File f) : this(f.Value)
+    {
+    }
 
     public char Char => (char)('a' + Value);
 
-    public bool IsOk => Value.AsInt().InBetween(Files.FileA.AsInt(), Files.FileH.AsInt());
+    public bool IsOk => Value.AsInt().IsBetween(Files.FileA.AsInt(), Files.FileH.AsInt());
 
     public const int Count = (int)Files.FileNb;
 
@@ -118,6 +129,9 @@ public readonly record struct File(Files Value) : IComparable<File>, ISpanFormat
     public static File operator ++(File f) => new(f.Value + 1);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static File operator --(File f) => new(f.Value - 1);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static BitBoard operator &(File left, ulong right) => left.BitBoardFile() & right;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -136,7 +150,7 @@ public readonly record struct File(Files Value) : IComparable<File>, ISpanFormat
     public static BitBoard operator ~(File left) => ~left.BitBoardFile();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static int operator >>(File left, int right) => left.AsInt() >> right;
+    public static int operator >> (File left, int right) => left.AsInt() >> right;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool operator >(File left, File right) => left.AsInt() > right.AsInt();

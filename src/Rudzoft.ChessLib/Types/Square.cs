@@ -51,15 +51,12 @@ public enum Squares : byte
 public static class SquaresExtensions
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard BitBoardSquare(this Squares sq)
-        => BitBoards.BbSquares[sq.AsInt()];
+    public static BitBoard BitBoardSquare(this Squares sq) => BitBoards.BbSquares[sq.AsInt()];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Square RelativeSquare(this Squares sq, Player p)
-        => sq.AsInt() ^ (p.Side * 56);
+    public static Square RelativeSquare(this Squares sq, Player p) => sq.AsInt() ^ (p.Side * 56);
 
-    public static int AsInt(this Squares sq)
-        => (int)sq;
+    public static int AsInt(this Squares sq) => (int)sq;
 }
 
 /// <summary>
@@ -111,12 +108,12 @@ public readonly record struct Square(Squares Value) : ISpanFormattable, ICompara
 
     public char FileChar => File.Char;
 
-    public bool IsOk => ((int)Value).InBetween((int)Squares.a1, (int)Squares.h8);
+    public bool IsOk => ((int)Value).IsBetween((int)Squares.a1, (int)Squares.h8);
 
     public bool IsPromotionRank => (BitBoards.PromotionRanksBB & this).IsNotEmpty;
 
     public bool IsDark => (Player.Black.ColorBB() & this).IsNotEmpty;
-
+    
     public static Square None { get; } = new(Squares.none);
 
     public static Square A1 { get; } = new(Squares.a1);
@@ -193,8 +190,23 @@ public readonly record struct Square(Squares Value) : ISpanFormattable, ICompara
 
     public const int Count = 64;
 
-    public static Square Create(Rank r, File f)
-        => new(r, f);
+    public static Square[] All => new[]
+    {
+        A1, A2, A3, A4, A5, A6, A7, A8,
+        B1, B2, B3, B4, B5, B6, B7, B8,
+        C1, C2, C3, C4, C5, C6, C7, C8,
+        D1, D2, D3, D4, D5, D6, D7, D8,
+        E1, E2, E3, E4, E5, E6, E7, E8,
+        F1, F2, F3, F4, F5, F6, F7, F8,
+        G1, G2, G3, G4, G5, G6, G7, G8,
+        H1, H2, H3, H4, H5, H6, H7, H8,
+    };
+
+    public static readonly Range WhiteSide = new(0, 32);
+
+    public static readonly Range BlackSide = new(32, 64);
+
+    public static Square Create(Rank r, File f) => new(r, f);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator Square(int value) => new(value);

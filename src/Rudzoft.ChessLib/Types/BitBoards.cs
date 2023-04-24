@@ -513,8 +513,10 @@ public static class BitBoards
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static BitBoard PromotionRank(this Player p) => PromotionRanks[p.Side];
 
+    public static string StringifyRaw(in ulong bb, string title = "") => Stringify(BitBoard.Create(bb), title);
+    
     [SkipLocalsInit]
-    public static string PrintBitBoard(in BitBoard bb, string title = "")
+    public static string Stringify(in BitBoard bb, string title = "")
     {
         const string line = "+---+---+---+---+---+---+---+---+---+";
         const string bottom = "|   | A | B | C | D | E | F | G | H |";

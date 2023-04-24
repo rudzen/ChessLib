@@ -33,7 +33,6 @@ namespace Rudzoft.ChessLib.Protocol.UCI;
 public interface IUci
 {
     public int MaxThreads { get; set; }
-    public IDictionary<string, IOption> O { get; set; }
     Action<IOption> OnLogger { get; set; }
     Action<IOption> OnEval { get; set; }
     Action<IOption> OnThreads { get; set; }
@@ -45,6 +44,8 @@ public interface IUci
 
     void AddOption(string name, IOption option);
 
+    bool TryGetOption(string name, out IOption option);
+    
     ulong Nps(in ulong nodes, in TimeSpan time);
 
     Move MoveFromUci(IPosition pos, ReadOnlySpan<char> uciMove);

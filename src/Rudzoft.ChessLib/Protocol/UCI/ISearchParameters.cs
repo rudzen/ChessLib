@@ -43,7 +43,7 @@ public interface ISearchParameters : ISpanFormattable
 
     ulong MoveTime { get; set; }
 
-    ulong Depth { get; set; }
+    int Depth { get; set; }
 
     ulong Nodes { get; set; }
 
@@ -62,4 +62,6 @@ public interface ISearchParameters : ISpanFormattable
     ulong Time(Player p);
 
     bool DecreaseMovesToGo();
+
+    bool UseTimeManagement();
 }

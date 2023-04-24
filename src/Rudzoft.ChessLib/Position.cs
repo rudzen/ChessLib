@@ -1222,7 +1222,7 @@ public sealed class Position : IPosition
     public IPosition Set(ReadOnlySpan<char> code, Player p, State state)
     {
         Debug.Assert(code[0] == 'K' && code[1..].IndexOf('K') != -1);
-        Debug.Assert(code.Length.InBetween(0, 8));
+        Debug.Assert(code.Length.IsBetween(0, 8));
         Debug.Assert(code[0] == 'K');
 
         var kingPos = code.LastIndexOf('K');

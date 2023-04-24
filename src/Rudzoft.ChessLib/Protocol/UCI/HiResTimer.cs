@@ -41,6 +41,8 @@ public sealed class HiResTimer : IHiResTimer, IEquatable<HiResTimer>
 
     public static readonly double Frequency = Stopwatch.Frequency;
 
+    private static readonly TimeSpan RestartThreshold = TimeSpan.FromHours(1);
+    
     private readonly object _intervalLock;
 
     private float _interval;
@@ -88,7 +90,7 @@ public sealed class HiResTimer : IHiResTimer, IEquatable<HiResTimer>
         }
     }
 
-    public bool IsRunning => _cancellationTokenSource != null && !_cancellationTokenSource.Token.IsCancellationRequested && _cancellationTokenSource.Token.CanBeCanceled;
+    public bool IsRunning => _cancellationTokenSource is { Token: { IsCancellationRequested: false, CanBeCanceled: true } };
 
     public bool UseHighPriorityThread { get; set; } = true;
 
@@ -207,8 +209,8 @@ public sealed class HiResTimer : IHiResTimer, IEquatable<HiResTimer>
             if (cancellationToken.IsCancellationRequested)
                 return;
 
-            // restarting the timer in every hour to prevent precision problems
-            if (Stopwatch.GetElapsedTime(timeStamp).TotalHours < 1d)
+            // restarting the timer in every day to hour precision problems
+            if (Stopwatch.GetElapsedTime(timeStamp) < RestartThreshold)
                 continue;
             timeStamp = Stopwatch.GetTimestamp();
             nextTrigger = 0f;

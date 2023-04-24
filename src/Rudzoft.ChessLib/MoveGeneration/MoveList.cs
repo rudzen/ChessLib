@@ -35,6 +35,11 @@ using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.MoveGeneration;
 
+/***
+ * Holds a list of moves.
+ * It works through an index pointer,
+ * which means that re-use is never actually clearing any data, just resetting the index.
+ */
 public sealed class MoveList : IMoveList
 {
     private readonly ValMove[] _moves;
@@ -83,22 +88,16 @@ public sealed class MoveList : IMoveList
         => Contains(item.Move);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool Contains(Move move)
-    {
-        var moveSpan = _moves.AsSpan()[..Length];
-        if (moveSpan.IsEmpty)
-            return false;
-
-        ref var movesSpace = ref MemoryMarshal.GetReference(moveSpan);
-        for (var i = 0; i < moveSpan.Length; ++i)
-            if (move == Unsafe.Add(ref movesSpace, i).Move)
-                return true;
-
-        return false;
-    }
+    public bool Contains(Move move) => Contains(m => m == move);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool Contains(Square from, Square to)
+    public bool Contains(Square from, Square to) => Contains(m => m.FromSquare() == from && m.ToSquare() == to);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool ContainsType(MoveTypes type) => Contains(m => m.MoveType() == type);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool Contains(Predicate<Move> predicate)
     {
         var moveSpan = _moves.AsSpan()[..Length];
         if (moveSpan.IsEmpty)
@@ -108,24 +107,7 @@ public sealed class MoveList : IMoveList
         for (var i = 0; i < moveSpan.Length; ++i)
         {
             var m = Unsafe.Add(ref movesSpace, i).Move;
-            if (m.FromSquare() == from && m.ToSquare() == to)
-                return true;
-        }
-
-        return false;
-    }
-
-    public bool ContainsType(MoveTypes type)
-    {
-        var moveSpan = _moves.AsSpan()[..Length];
-        if (moveSpan.IsEmpty)
-            return false;
-
-        ref var movesSpace = ref MemoryMarshal.GetReference(moveSpan);
-        for (var i = 0; i < moveSpan.Length; ++i)
-        {
-            var m = Unsafe.Add(ref movesSpace, i).Move;
-            if (m.MoveType() == type)
+            if (predicate(m))
                 return true;
         }
 

@@ -25,6 +25,7 @@ SOFTWARE.
 */
 
 using System;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 using Rudzoft.ChessLib.Extensions;
 
@@ -44,6 +45,9 @@ public enum PlayerTypes
 }
 
 public readonly record struct Player(byte Side) : ISpanFormattable
+#if NET7_0
+    , IMinMaxValue<Player>
+#endif
 {
     private static readonly Direction[] PawnPushDist = { Direction.North, Direction.South };
 
@@ -67,18 +71,15 @@ public readonly record struct Player(byte Side) : ISpanFormattable
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Deconstruct(out byte side) => side = Side;
-
+    
     public bool IsWhite => Side == byte.MinValue;
-
     public bool IsBlack => Side != byte.MinValue;
-
     public char Fen => PlayerFen[Side];
-
     public static Player White { get; } = new(Players.White);
-
     public static Player Black { get; } = new(Players.Black);
-
     public static Player[] AllPlayers { get; } = { White, Black };
+    public static Player MaxValue => White;
+    public static Player MinValue => Black;
 
     public const int Count = (int)Players.PlayerNb;
 
@@ -133,7 +134,7 @@ public readonly record struct Player(byte Side) : ISpanFormattable
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool IsOk() => Side.InBetween(White.Side, Black.Side);
+    public bool IsOk() => Side.IsBetween(White.Side, Black.Side);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public string GetName() => PlayerColors[Side];

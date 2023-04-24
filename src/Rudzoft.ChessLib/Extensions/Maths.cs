@@ -105,5 +105,5 @@ public static class Maths
         result = x;
         return true;
     }
-
+    
 }

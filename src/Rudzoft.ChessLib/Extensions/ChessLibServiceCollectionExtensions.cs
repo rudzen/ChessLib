@@ -36,7 +36,6 @@ using Rudzoft.ChessLib.Hash.Tables.Transposition;
 using Rudzoft.ChessLib.ObjectPoolPolicies;
 using Rudzoft.ChessLib.Polyglot;
 using Rudzoft.ChessLib.Protocol.UCI;
-using Rudzoft.ChessLib.Tables.KillerMoves;
 using Rudzoft.ChessLib.Types;
 using Rudzoft.ChessLib.Validation;
 

@@ -24,6 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using System;
 using System.Runtime.CompilerServices;
 using Rudzoft.ChessLib.Extensions;
 
@@ -76,11 +77,13 @@ public static class PieceTypesExtensions
         (uint)v - (uint)min <= (uint)max - (uint)min;
 }
 
-/// <inheritdoc />
 /// <summary>
 /// Piece. Contains the piece type which indicate what type and color the piece is
 /// </summary>
 public readonly record struct Piece(Pieces Value)
+#if net7_0
+    : IMinMaxValue<Piece>
+#endif
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private Piece(int pc) : this((Pieces)pc) { }
@@ -110,20 +113,18 @@ public readonly record struct Piece(Pieces Value)
 
     public static Piece[] All { get; } =
     {
-        WhitePawn,
-        WhiteKnight,
-        WhiteBishop,
-        WhiteRook,
-        WhiteQueen,
-        WhiteKing,
-        BlackPawn,
-        BlackKnight,
-        BlackBishop,
-        BlackRook,
-        BlackQueen,
-        BlackKing
+        WhitePawn, WhiteKnight, WhiteBishop, WhiteRook, WhiteQueen, WhiteKing,
+        BlackPawn, BlackKnight, BlackBishop, BlackRook, BlackQueen, BlackKing
     };
 
+    public static Piece MaxValue => WhitePawn;
+
+    public static Piece MinValue => BlackKing;
+
+    public static Range WhitePieces => new(0, 5);
+    
+    public static Range BlackPieces => new(6, 11);
+    
     public static PieceTypes[] AllTypes { get; } =
     {
         PieceTypes.Pawn,

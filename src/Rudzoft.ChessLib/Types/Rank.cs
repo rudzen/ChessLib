@@ -77,7 +77,7 @@ public readonly record struct Rank(Ranks Value) : ISpanFormattable, IValidationT
 
     public char Char => (char)('1' + Value.AsInt());
 
-    public bool IsOk => Value.AsInt().InBetween(Ranks.Rank1.AsInt(), Ranks.Rank8.AsInt());
+    public bool IsOk => Value.AsInt().IsBetween(Ranks.Rank1.AsInt(), Ranks.Rank8.AsInt());
 
     public const int Count = (int)Ranks.RankNb;
 

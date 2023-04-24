@@ -27,6 +27,7 @@ SOFTWARE.
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Numerics;
@@ -41,24 +42,28 @@ namespace Rudzoft.ChessLib.Types;
 /// Enumeration will yield each set bit as a Square struct.
 /// <para>For more information - please see https://github.com/rudzen/ChessLib/wiki/BitBoard</para>
 /// </summary>
+[DebuggerDisplay("{BitBoards.StringifyRaw(Value)}")]
 public readonly record struct BitBoard(ulong Value) : IEnumerable<Square>, IMinMaxValue<BitBoard>
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public BitBoard(BitBoard value)
-        : this(value.Value) { }
+    public BitBoard(BitBoard value) : this(value.Value)
+    {
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public BitBoard(Square sq)
-        : this(sq.AsBb()) { }
+    public BitBoard(Square sq) : this(sq.AsBb())
+    {
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private BitBoard(int value)
-        : this((ulong)value) { }
+    private BitBoard(int value) : this((ulong)value)
+    {
+    }
 
     public int Count => BitBoards.PopCount(in this);
 
     public bool IsEmpty => Value == 0;
-    
+
     public bool IsNotEmpty => Value != 0;
 
     public static BitBoard Empty => BitBoards.EmptyBitBoard;
@@ -101,7 +106,7 @@ public readonly record struct BitBoard(ulong Value) : IEnumerable<Square>, IMinM
     public static BitBoard operator -(BitBoard left, int right) => new(left.Value - (ulong)right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard operator >>(BitBoard left, int right) => new(left.Value >> right);
+    public static BitBoard operator >> (BitBoard left, int right) => new(left.Value >> right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static BitBoard operator <<(BitBoard left, int right) => new(left.Value << right);
@@ -223,7 +228,7 @@ public readonly record struct BitBoard(ulong Value) : IEnumerable<Square>, IMinM
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override string ToString() => BitBoards.PrintBitBoard(in this, Value.ToString());
+    public override string ToString() => BitBoards.Stringify(in this, Value.ToString());
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void ToString(TextWriter textWriter) => textWriter.WriteLine(ToString());

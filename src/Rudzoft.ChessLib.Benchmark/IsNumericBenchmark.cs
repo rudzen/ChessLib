@@ -23,7 +23,7 @@ public class IsNumericBenchmark
     {
         foreach (var c in _s.AsSpan())
         {
-            var b = c.InBetween('0', '9');
+            var b = c.IsBetween('0', '9');
         }
     }
 

@@ -370,9 +370,7 @@ public sealed class Blockage : IBlockage
         return result;
     }
 
-    private static File NextFile(File f)
-        => f + 1;
+    private static File NextFile(File f) => f + 1;
 
-    private static File PreviousFile(File f)
-        => f - 1;
+    private static File PreviousFile(File f) => f - 1;
 }

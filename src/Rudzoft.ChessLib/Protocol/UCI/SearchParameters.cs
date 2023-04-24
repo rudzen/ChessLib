@@ -98,7 +98,7 @@ public sealed class SearchParameters : ISearchParameters
         set => _movesToGo = value;
     }
 
-    public ulong Depth { get; set; }
+    public int Depth { get; set; }
 
     public ulong Nodes { get; set; }
 

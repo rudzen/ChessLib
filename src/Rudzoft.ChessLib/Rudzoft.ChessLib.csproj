@@ -7,7 +7,6 @@
     <IsWindows Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Windows)))' == 'true'">true</IsWindows>
     <IsOSX Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))' == 'true'">true</IsOSX>
     <IsLinux Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))' == 'true'">true</IsLinux>
-    <TargetFramework>net7.0</TargetFramework>
     <TieredPGO>true</TieredPGO>
     <PackageVersion>0.0.4</PackageVersion>
     <Authors>Rudy Alex Kohn</Authors>
@@ -31,6 +30,7 @@
     <RepositoryType>git</RepositoryType>
     <Product>Rudzoft.ChessLib</Product>
     <Configurations>Debug;Release</Configurations>
+    <TargetFramework>net7.0</TargetFramework>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(IsWindows)'=='true'">

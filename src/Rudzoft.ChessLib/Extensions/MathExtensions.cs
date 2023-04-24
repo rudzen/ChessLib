@@ -24,7 +24,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System;
 using System.Runtime.CompilerServices;
 using Rudzoft.ChessLib.Types;
 // ReSharper disable MemberCanBeInternal
@@ -35,20 +34,21 @@ namespace Rudzoft.ChessLib.Extensions;
 public static class MathExtensions
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool InBetween(this int v, int min, int max)
-        => ((v - min) | (max - v)) >= 0;
+    public static bool IsBetween(this int v, int min, int max) => ((v - min) | (max - v)) >= 0;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool InBetween(this byte v, byte min, byte max)
-        => (((int)v - (int)min) | ((int)max - (int)v)) >= 0;
+    public static bool IsBetween(this byte v, byte min, byte max) => (((int)v - (int)min) | ((int)max - (int)v)) >= 0;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool InBetween(this char v, char min, char max)
-        => (((int)v - (int)min) | ((int)max - (int)v)) >= 0;
+    public static bool IsBetween(this char v, char min, char max) => (((int)v - (int)min) | ((int)max - (int)v)) >= 0;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool InBetween(this uint v, int min, int max)
-        => v - (uint)min <= (uint)max - (uint)min;
+    public static bool IsBetween(this uint v, int min, int max) => v - (uint)min <= (uint)max - (uint)min;
+
+#if !NET7_0_OR_GREATER
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool IsAsciiDigit(this char c) => IsBetween(c, '0', '9');
+#endif
 
     /// <summary>
     /// Converts a bool to a byte (0 or 1)
@@ -63,33 +63,26 @@ public static class MathExtensions
     /// <param name="b"></param>
     /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static unsafe byte AsByte(this bool b)
-        => *(byte*)&b;
+    public static unsafe byte AsByte(this bool b) => *(byte*)&b;
 
     /// <summary>
     /// Modulo for pow^2 values...
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static int ModPow2(int input, int ceil)
-        => input & (ceil - 1);
+    public static int ModPow2(int input, int ceil) => input & (ceil - 1);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static int Pow2(this int value)
-        => 1 << BitBoards.Msb(value).AsInt();
+    public static int Pow2(this int value) => 1 << BitBoards.Msb(value).AsInt();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool IsEven(this int value)
-        => (value & 1) == 0;
+    public static bool IsEven(this int value) => (value & 1) == 0;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool IsOdd(this int value)
-        => !value.IsEven();
+    public static bool IsOdd(this int value) => !value.IsEven();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static long MidPoint(this long @this, long that)
-        => (@this + that) >> 1;
+    public static long MidPoint(this long @this, long that) => (@this + that) >> 1;
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Value Min(this Value @this, Value other)
-        => @this < other ? @this : other;
+    public static Value Min(this Value @this, Value other) => @this < other ? @this : other;
 }

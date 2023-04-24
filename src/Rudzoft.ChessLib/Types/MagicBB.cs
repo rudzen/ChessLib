@@ -197,10 +197,12 @@ public static class MagicBB
     }
 
     public static BitBoard BishopAttacks(this Square square, in BitBoard occupied)
-        => MagicBishopDb[square.AsInt()][(occupied.Value & BishopMask.Span[square.AsInt()]) * BishopMagics.Span[square.AsInt()] >> 55];
+        => MagicBishopDb[square.AsInt()][
+            (occupied.Value & BishopMask.Span[square.AsInt()]) * BishopMagics.Span[square.AsInt()] >> 55];
 
     public static BitBoard RookAttacks(this Square square, in BitBoard occupied)
-        => MagicRookDb[square.AsInt()][(occupied.Value & RookMask.Span[square.AsInt()]) * RookMagics.Span[square.AsInt()] >> 52];
+        => MagicRookDb[square.AsInt()][
+            (occupied.Value & RookMask.Span[square.AsInt()]) * RookMagics.Span[square.AsInt()] >> 52];
 
     public static BitBoard QueenAttacks(this Square square, in BitBoard occupied)
         => square.BishopAttacks(in occupied) | square.RookAttacks(in occupied);
