@@ -63,6 +63,8 @@ public readonly record struct Player(byte Side) : ISpanFormattable
 
     private static readonly Func<BitBoard, BitBoard>[] PawnPushModifiers = { BitBoards.NorthOne, BitBoards.SouthOne };
 
+    private static readonly int[] ScoreSign = { 1, -1 };
+
     public Player(Player p)
         : this(p.Side) { }
 
@@ -74,6 +76,7 @@ public readonly record struct Player(byte Side) : ISpanFormattable
     
     public bool IsWhite => Side == byte.MinValue;
     public bool IsBlack => Side != byte.MinValue;
+    public int Sign => ScoreSign[Side];
     public char Fen => PlayerFen[Side];
     public static Player White { get; } = new(Players.White);
     public static Player Black { get; } = new(Players.Black);
