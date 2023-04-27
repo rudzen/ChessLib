@@ -1487,13 +1487,10 @@ public sealed class Position : IPosition
         key ^= State.CastlelingRights.Key();
 
         var materialKey = HashKey.Empty;
-        ref var piecesSpace = ref MemoryMarshal.GetArrayDataReference(Piece.All);
-        for (var i = 0; i < Piece.All.Length; i++)
-        {
-            var pc = Unsafe.Add(ref piecesSpace, i);
+        
+        foreach (var pc in Piece.All)
             for (var cnt = 0; cnt < Board.PieceCount(pc); ++cnt)
                 materialKey ^= pc.GetZobristPst(cnt);
-        }
 
         State.Key = key;
         State.PawnKey = pawnKey;

@@ -198,7 +198,7 @@ public readonly record struct Piece(Pieces Value)
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override string ToString() => this.GetPieceString();
 
-    private static Piece GetPiece(char character)
+    public static Piece GetPiece(char character)
     {
         return character switch
         {

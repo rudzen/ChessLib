@@ -225,24 +225,18 @@ public static class BitBoards
         static int distanceRank(Square x, Square y) => distance(x.Rank.AsInt(), y.Rank.AsInt());
 
         // ForwardRanksBB population loop idea from sf
-        ref var rankSpace = ref MemoryMarshal.GetArrayDataReference(Rank.All);
-        for (var i = 0; i < Rank.All.Length; i++)
+        for (var r = Rank.Rank1; r <= Rank.Rank8; r++)
         {
-            var r = Unsafe.Add(ref rankSpace, i);
             var rank = r.AsInt();
             ForwardRanksBB[0][rank] = ~(ForwardRanksBB[1][rank + 1] = ForwardRanksBB[1][rank] | r.BitBoardRank());
         }
 
         BitBoard bb;
 
-        ref var playerSpace = ref MemoryMarshal.GetArrayDataReference(Player.AllPlayers);
-        for (var i = 0; i < Player.AllPlayers.Length; ++i)
+        foreach (var player in Player.AllPlayers)
         {
-            var player = Unsafe.Add(ref playerSpace, i);
-            bb = AllSquares;
-            while (bb)
+            foreach (var square in Square.All)
             {
-                var square = PopLsb(ref bb);
                 var s = square.AsInt();
                 var file = square.File;
                 var rank = square.Rank.AsInt();
@@ -251,7 +245,7 @@ public static class BitBoards
                 PassedPawnMaskBB[player.Side][s] = ForwardFileBB[player.Side][s] | PawnAttackSpanBB[player.Side][s];
             }
         }
-
+        
         // mini local helpers
 
         Span<PieceTypes> validMagicPieces = stackalloc PieceTypes[] { PieceTypes.Bishop, PieceTypes.Rook };
@@ -348,10 +342,9 @@ public static class BitBoards
     {
         const int pt = (int)PieceTypes.King;
 
-        ref var playerSpace = ref MemoryMarshal.GetArrayDataReference(Player.AllPlayers);
-        for (var i = 0; i < Player.AllPlayers.Length; ++i)
+        // TODO : Change to basic for-loop
+        foreach (var player in Player.AllPlayers)
         {
-            var player = Unsafe.Add(ref playerSpace, i);
             KingRingBB[player.Side][sq] = PseudoAttacksBB[pt][sq];
             if (s1.RelativeRank(player) == Ranks.Rank1)
                 KingRingBB[player.Side][sq] |= KingRingBB[player.Side][sq].Shift(PawnPushDirections[player.Side]);
@@ -362,7 +355,7 @@ public static class BitBoards
                 KingRingBB[player.Side][sq] |= KingRingBB[player.Side][sq].EastOne();
 
             Debug.Assert(!KingRingBB[player.Side][sq].IsEmpty);
-        }
+        }        
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

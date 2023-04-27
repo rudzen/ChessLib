@@ -56,16 +56,12 @@ public sealed class NonRegexPgnParser : IPgnParser
                     if (word.Contains('.'))
                     {
                         if (int.TryParse(word.TrimEnd('.'), out var moveNumber))
-                        {
                             currentMoveNumber = moveNumber;
-                        }
                     }
                     else if (char.IsLetter(word[0]))
                     {
                         if (currentGameMoves.Count == 0 || !string.IsNullOrEmpty(currentGameMoves[^1].BlackMove))
-                        {
                             currentGameMoves.Add(new PgnMove(currentMoveNumber, word, string.Empty));
-                        }
                         else
                         {
                             var lastMove = currentGameMoves[^1];
@@ -90,22 +86,20 @@ public sealed class NonRegexPgnParser : IPgnParser
                     var firstQuoteIndex = line.IndexOf('"');
                     var lastQuoteIndex = line.LastIndexOf('"');
 
-                    if (firstSpaceIndex > 0 && firstQuoteIndex > firstSpaceIndex &&
-                        lastQuoteIndex > firstQuoteIndex)
-                    {
-                        var tagName = line.Substring(1, firstSpaceIndex - 1).Trim();
-                        var tagValue = line.Substring(firstQuoteIndex + 1, lastQuoteIndex - firstQuoteIndex - 1)
-                            .Trim();
+                    if (firstSpaceIndex <= 0 || firstQuoteIndex <= firstSpaceIndex
+                                             || lastQuoteIndex <= firstQuoteIndex)
+                        continue;
+                    
+                    var tagName = line.Substring(1, firstSpaceIndex - 1).Trim();
+                    var tagValue = line.Substring(firstQuoteIndex + 1, lastQuoteIndex - firstQuoteIndex - 1)
+                        .Trim();
 
-                        currentGameTags[tagName] = tagValue;
-                    }
+                    currentGameTags[tagName] = tagValue;
                 }
             }
         }
 
         if (currentGameTags.Count > 0 && currentGameMoves.Count > 0)
-        {
             yield return new PgnGame(currentGameTags, currentGameMoves);
-        }
     }
 }

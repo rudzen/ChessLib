@@ -57,12 +57,14 @@ public static class ChessLibServiceCollectionExtensions
             serviceCollection.AddSingleton(configuration);
         }
 
+        // TODO : Add configuration "manually" to avoid IL2026 warning
         serviceCollection.AddOptions<TranspositionTableConfiguration>().Configure<IConfiguration>(
             static (settings, configuration)
                 => configuration
                     .GetSection(TranspositionTableConfiguration.Section)
                     .Bind(settings));
 
+        // TODO : Add configuration "manually" to avoid IL2026 warning
         serviceCollection.AddOptions<PolyglotBookConfiguration>().Configure<IConfiguration>(
             static (settings, configuration)
                 => configuration

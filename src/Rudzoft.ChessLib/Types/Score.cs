@@ -93,6 +93,18 @@ public struct Score : IEquatable<Score>
         mg = _data.X;
         eg = _data.Y;
     }
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void AddMg(int v) => _data.X += v;
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void AddEg(int v) => _data.Y += v;
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void SubtractMg(int v) => _data.X -= v;
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void SubtractEg(int v) => _data.Y -= v;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void SetMg(int v) => _data.X = v;

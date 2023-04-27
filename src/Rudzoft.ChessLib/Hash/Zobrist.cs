@@ -97,16 +97,10 @@ public static class Zobrist
         for (var i = 0; i < ZobristPst.Length; i++)
             ZobristPst[i] = new HashKey[Square.Count];
 
-        ref var piecesSpace = ref MemoryMarshal.GetArrayDataReference(Piece.All);
-        for (var i = 0; i < Piece.All.Length; ++i)
+        foreach (var pc in Piece.All)
         {
-            var pc = Unsafe.Add(ref piecesSpace, i);
-            var bb = BitBoards.AllSquares;
-            while (bb)
-            {
-                var sq = BitBoards.PopLsb(ref bb).AsInt();
-                ZobristPst[pc.AsInt()][sq] = rnd.Rand();
-            }
+            for (var sq = Squares.a1; sq <= Squares.h8; sq++)
+                ZobristPst[pc.AsInt()][sq.AsInt()] = rnd.Rand();
         }
     }
 

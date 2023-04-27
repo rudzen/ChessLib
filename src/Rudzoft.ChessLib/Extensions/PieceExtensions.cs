@@ -33,7 +33,7 @@ public static class PieceExtensions
 {
     private const string PgnPieceChars = " PNBRQK";
 
-    internal const string PieceChars = PgnPieceChars + "  pnbrqk";
+    public const string PieceChars = PgnPieceChars + "  pnbrqk";
 
     private const string PromotionPieceNotation = "  nbrq";
 

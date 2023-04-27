@@ -353,10 +353,8 @@ public sealed class Blockage : IBlockage
         var ourPawn = PieceTypes.Pawn.MakePiece(us);
         var result = BitBoard.Empty;
 
-        ref var fileSpace = ref MemoryMarshal.GetArrayDataReference(File.AllFiles);
-        for (var i = 0; i < File.AllFiles.Length; ++i)
+        foreach (var f in File.AllFiles)
         {
-            var f = Unsafe.Add(ref fileSpace, i);
             var sq = NextFenceRankSquare(fenceRank, f, them);
             var b = sq.ForwardFile(them) & theirPawns;
             while (b)
@@ -366,7 +364,7 @@ public sealed class Blockage : IBlockage
                     result |= sq;
             }
         }
-
+        
         return result;
     }
 
