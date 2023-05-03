@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Benchmark;
@@ -8,8 +10,7 @@ namespace Rudzoft.ChessLib.Benchmark;
 // ReSharper disable once ClassCanBeSealed.Global
 public class ShiftFuncBench
 {
-
-    private static readonly IDictionary<Direction, Func<BitBoard, BitBoard>> ShiftFuncs = MakeShiftFuncs();
+    private static readonly Dictionary<Direction, Func<BitBoard, BitBoard>> ShiftFuncs = MakeShiftFuncs();
 
     private static readonly Direction[] AllDirections = {
         Direction.North, Direction.South, Direction.East, Direction.West,
@@ -24,6 +25,16 @@ public class ShiftFuncBench
         var bb = BitBoards.EmptyBitBoard;
         foreach (var direction in AllDirections)
             bb = ShiftF(BitBoards.Center, direction);
+
+        return bb;
+    }
+
+    [Benchmark]
+    public BitBoard ShiftFunc2Lookup()
+    {
+        var bb = BitBoards.EmptyBitBoard;
+        foreach (var direction in AllDirections)
+            bb = ShiftF2(BitBoards.Center, direction);
 
         return bb;
     }
@@ -44,6 +55,16 @@ public class ShiftFuncBench
             return func(bb);
 
         throw new ArgumentException("Invalid shift argument.", nameof(direction));
+    }
+
+    private static BitBoard ShiftF2(in BitBoard bb, Direction direction)
+    {
+        ref var func = ref CollectionsMarshal.GetValueRefOrNullRef(ShiftFuncs, direction);
+        
+        if (Unsafe.IsNullRef(ref func))
+            throw new ArgumentException("Invalid shift argument.", nameof(direction));
+            
+        return func(bb);
     }
 
     private static BitBoard Shift(in BitBoard bb, Direction direction)
@@ -78,7 +99,7 @@ public class ShiftFuncBench
             throw new ArgumentException("Invalid shift argument.", nameof(direction));
     }
 
-    private static IDictionary<Direction, Func<BitBoard, BitBoard>> MakeShiftFuncs()
+    private static Dictionary<Direction, Func<BitBoard, BitBoard>> MakeShiftFuncs()
     {
         return new Dictionary<Direction, Func<BitBoard, BitBoard>>(13)
         {
@@ -97,5 +118,4 @@ public class ShiftFuncBench
             { Direction.West, static board => board.WestOne() }
         };
     }
-
 }

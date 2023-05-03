@@ -26,6 +26,7 @@ SOFTWARE.
 
 using Rudzoft.ChessLib.Types;
 using System;
+using System.Runtime.CompilerServices;
 
 namespace Rudzoft.ChessLib.Perft;
 
@@ -37,12 +38,9 @@ internal static class PerftTable
 
     static PerftTable()
     {
-        unsafe
-        {
-            var entrySize = sizeof(PerftHashEntry);
-            TtSize = (ulong)(HashMemory * 1024 * 1024 / entrySize);
-            Table = new PerftHashEntry[TtSize];
-        }
+        var entrySize = Unsafe.SizeOf<PerftHashEntry>();
+        TtSize = (ulong)(HashMemory * 1024 * 1024 / entrySize);
+        Table = new PerftHashEntry[TtSize];
     }
     
     private struct PerftHashEntry

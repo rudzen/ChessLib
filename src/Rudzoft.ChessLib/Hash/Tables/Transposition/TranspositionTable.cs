@@ -35,20 +35,12 @@ namespace Rudzoft.ChessLib.Hash.Tables.Transposition;
 
 public sealed class TranspositionTable : ITranspositionTable
 {
-    private static readonly int ClusterSize;
+    private static readonly int ClusterSize = Unsafe.SizeOf<TranspositionTableEntry>() * 4;
 
     private Cluster[] _table;
     private ulong _elements;
     private int _fullnessElements;
     private sbyte _generation;
-
-    static TranspositionTable()
-    {
-        unsafe
-        {
-            ClusterSize = sizeof(TranspositionTableEntry) * 4;
-        }
-    }
 
     public TranspositionTable(IOptions<TranspositionTableConfiguration> options)
     {

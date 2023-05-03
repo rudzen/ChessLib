@@ -36,17 +36,12 @@ public readonly struct HashKey : IEquatable<HashKey>
 {
     private HashKey(ulong key)
     {
-        LowerKey = UpperKey = 0;
-        Key16 = 0;
         Key = key;
     }
 
     private HashKey(uint key32)
     {
-        UpperKey = 0;
-        Key = 0;
-        Key16 = 0;
-        LowerKey = key32;
+        Key = key32;
     }
 
     [field: FieldOffset(0)] public ushort Key16 { get; }

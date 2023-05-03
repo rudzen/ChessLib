@@ -25,6 +25,7 @@ SOFTWARE.
 */
 
 using System;
+using System.Runtime.CompilerServices;
 using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Tables.Perft;
@@ -46,18 +47,10 @@ public struct PerftTableEntry : IPerftTableEntry
 public sealed class PerftTable : HashTable<IPerftTableEntry>
 {
     private const int HashMemory = 4;
-    private static readonly int ElementSize;
+    private static readonly int ElementSize = Unsafe.SizeOf<PerftTableEntry>();
 
     private readonly int _mask;
 
-    static PerftTable()
-    {
-        unsafe
-        {
-            ElementSize = sizeof(PerftTableEntry);
-        }
-    }
-    
     public PerftTable()
     {
         Initialize(ElementSize, HashMemory, static () => new PerftTableEntry { Key = 0, Count = ulong.MinValue, Depth = -1 });

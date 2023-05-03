@@ -24,6 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -47,7 +48,7 @@ public static class Cuckoo
     {
         var count = 0;
         
-        foreach (var pc in Piece.All)
+        foreach (var pc in Piece.All.AsSpan())
         {
             var bb = BitBoards.AllSquares;
             while (bb)

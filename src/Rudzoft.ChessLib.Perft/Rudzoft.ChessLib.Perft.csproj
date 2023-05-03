@@ -4,7 +4,6 @@
     <TargetFramework>net7.0</TargetFramework>
     <TieredPGO>true</TieredPGO>
     <LangVersion>default</LangVersion>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 

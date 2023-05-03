@@ -97,7 +97,7 @@ public static class Zobrist
         for (var i = 0; i < ZobristPst.Length; i++)
             ZobristPst[i] = new HashKey[Square.Count];
 
-        foreach (var pc in Piece.All)
+        foreach (var pc in Piece.All.AsSpan())
         {
             for (var sq = Squares.a1; sq <= Squares.h8; sq++)
                 ZobristPst[pc.AsInt()][sq.AsInt()] = rnd.Rand();

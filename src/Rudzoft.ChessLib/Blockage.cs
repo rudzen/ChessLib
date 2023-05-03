@@ -353,7 +353,7 @@ public sealed class Blockage : IBlockage
         var ourPawn = PieceTypes.Pawn.MakePiece(us);
         var result = BitBoard.Empty;
 
-        foreach (var f in File.AllFiles)
+        foreach (var f in File.AllFiles.AsSpan())
         {
             var sq = NextFenceRankSquare(fenceRank, f, them);
             var b = sq.ForwardFile(them) & theirPawns;

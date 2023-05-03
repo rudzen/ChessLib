@@ -54,18 +54,11 @@ public class Uci : IUci
     }
 
     public int MaxThreads { get; set; }
-
-
     public Action<IOption> OnLogger { get; set; }
-
     public Action<IOption> OnEval { get; set; }
-
     public Action<IOption> OnThreads { get; set; }
-
     public Action<IOption> OnHashSize { get; set; }
-
     public Action<IOption> OnClearHash { get; set; }
-
     public bool IsDebugModeEnabled { get; set; }
 
     public void Initialize(int maxThreads = 128)
@@ -86,7 +79,19 @@ public class Uci : IUci
 
     public void AddOption(string name, IOption option) => _options[name] = option;
     
-    public bool TryGetOption(string name, out IOption option) => _options.TryGetValue(name, out option);
+    public bool TryGetOption(string name, out IOption option)
+    {
+        ref var opt = ref CollectionsMarshal.GetValueRefOrNullRef(_options, name);
+        
+        if (Unsafe.IsNullRef(ref opt))
+        {
+            option = default;
+            return false;
+        }
+        
+        option = opt;
+        return true;
+    }
 
     public ulong Nps(in ulong nodes, in TimeSpan time)
         => (ulong)(nodes * 1000.0 / time.Milliseconds);
@@ -145,8 +150,8 @@ public class Uci : IUci
             var s = (value > 0 ? valueMate - value + 1 : -valueMate - value) / 2;
             return $"mate {s}";
         }
-        else
-            return $"cp {ToCenti(value)}";
+
+        return $"cp {ToCenti(value)}";
     }
 
     public string ScoreCp(int value)

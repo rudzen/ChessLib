@@ -183,7 +183,7 @@ public static class BitBoards
 
     private static readonly Direction[] PawnPushDirections = { Direction.North, Direction.South };
 
-    private static readonly IDictionary<Direction, Func<BitBoard, BitBoard>> ShiftFuncs = MakeShiftFuncs();
+    private static readonly Dictionary<Direction, Func<BitBoard, BitBoard>> ShiftFuncs = MakeShiftFuncs();
 
     private static readonly Func<BitBoard, BitBoard>[] FillFuncs = MakeFillFuncs();
 
@@ -233,16 +233,17 @@ public static class BitBoards
 
         BitBoard bb;
 
-        foreach (var player in Player.AllPlayers)
+        foreach (var player in Player.AllPlayers.AsSpan())
         {
-            foreach (var square in Square.All)
+            foreach (var square in Square.All.AsSpan())
             {
+                var side = player.Side;
                 var s = square.AsInt();
                 var file = square.File;
                 var rank = square.Rank.AsInt();
-                ForwardFileBB[player.Side][s] = ForwardRanksBB[player.Side][rank] & file.BitBoardFile();
-                PawnAttackSpanBB[player.Side][s] = ForwardRanksBB[player.Side][rank] & AdjacentFilesBB[file.AsInt()];
-                PassedPawnMaskBB[player.Side][s] = ForwardFileBB[player.Side][s] | PawnAttackSpanBB[player.Side][s];
+                ForwardFileBB[side][s] = ForwardRanksBB[side][rank] & file.BitBoardFile();
+                PawnAttackSpanBB[side][s] = ForwardRanksBB[side][rank] & AdjacentFilesBB[file.AsInt()];
+                PassedPawnMaskBB[side][s] = ForwardFileBB[side][s] | PawnAttackSpanBB[side][s];
             }
         }
         
@@ -631,10 +632,12 @@ public static class BitBoards
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public static BitBoard Shift(this in BitBoard bb, Direction d)
     {
-        if (ShiftFuncs.TryGetValue(d, out var func))
-            return func(bb);
-
-        throw new ArgumentException("Invalid shift argument.", nameof(d));
+        ref var func = ref CollectionsMarshal.GetValueRefOrNullRef(ShiftFuncs, d);
+        
+        if (Unsafe.IsNullRef(ref func))
+            throw new ArgumentException("Invalid shift argument.", nameof(d));
+            
+        return func(bb);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -739,8 +742,8 @@ public static class BitBoards
     /// Helper method to generate shift function dictionary for all directions.
     /// </summary>
     /// <returns>The generated shift dictionary</returns>
-    private static IDictionary<Direction, Func<BitBoard, BitBoard>> MakeShiftFuncs()
-        => new Dictionary<Direction, Func<BitBoard, BitBoard>>(13)
+    private static Dictionary<Direction, Func<BitBoard, BitBoard>> MakeShiftFuncs()
+        => new(13)
         {
             { Direction.None, static board => board },
             { Direction.North, static board => board.NorthOne() },

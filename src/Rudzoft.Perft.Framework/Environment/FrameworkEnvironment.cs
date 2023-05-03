@@ -39,8 +39,6 @@ public sealed class FrameworkEnvironment : IFrameworkEnvironment
     // ReSharper disable once IdentifierTypo
     public static extern uint getuid();
 
-    #region Public Properties
-
     private static readonly string FrameWork = Assembly.GetEntryAssembly()?.GetCustomAttribute<TargetFrameworkAttribute>()?.FrameworkName;
 
     public bool IsDevelopment { get; set; }
@@ -55,18 +53,12 @@ public sealed class FrameworkEnvironment : IFrameworkEnvironment
 
     public bool HighresTimer => Stopwatch.IsHighResolution;
 
-    #endregion Public Properties
-
-    #region Constructor
-
     public FrameworkEnvironment()
     {
 #if RELEASE
         IsDevelopment = false;
 #endif
     }
-
-    #endregion Constructor
 
     private static bool CheckIsAdmin()
     {

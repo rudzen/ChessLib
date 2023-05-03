@@ -56,9 +56,9 @@ public sealed class PolyglotBook : IPolyglotBook
     private readonly Random _rnd;
     private readonly ObjectPool<IMoveList> _moveListPool;
 
-    private unsafe PolyglotBook(ObjectPool<IMoveList> pool)
+    private PolyglotBook(ObjectPool<IMoveList> pool)
     {
-        _entrySize = sizeof(PolyglotBookEntry);
+        _entrySize = Unsafe.SizeOf<PolyglotBookEntry>();
         _rnd = new Random(DateTime.Now.Millisecond);
         _moveListPool = pool;
     }

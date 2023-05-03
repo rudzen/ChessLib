@@ -1488,7 +1488,7 @@ public sealed class Position : IPosition
 
         var materialKey = HashKey.Empty;
         
-        foreach (var pc in Piece.All)
+        foreach (var pc in Piece.All.AsSpan())
             for (var cnt = 0; cnt < Board.PieceCount(pc); ++cnt)
                 materialKey ^= pc.GetZobristPst(cnt);
 

@@ -24,6 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using System.Runtime.CompilerServices;
 using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Test.SizesTests;
@@ -31,18 +32,18 @@ namespace Rudzoft.ChessLib.Test.SizesTests;
 public sealed class BaseTypesSizeTests
 {
     [Fact]
-    public unsafe void MoveSize()
+    public void MoveSize()
     {
         const int expected = 2;
-        var actual = sizeof(Move);
+        var actual = Unsafe.SizeOf<Move>();
         Assert.Equal(expected, actual);
     }
 
     [Fact]
-    public unsafe void PieceSize()
+    public void PieceSize()
     {
         const int expected = 1;
-        var actual = sizeof(Piece);
+        var actual = Unsafe.SizeOf<Piece>();
         Assert.Equal(expected, actual);
     }
 
@@ -50,7 +51,7 @@ public sealed class BaseTypesSizeTests
     public unsafe void SquareSize()
     {
         const int expected = 1;
-        var actual = sizeof(Square);
+        var actual = Unsafe.SizeOf<Square>();
         Assert.Equal(expected, actual);
     }
 
@@ -58,23 +59,23 @@ public sealed class BaseTypesSizeTests
     public unsafe void RankSize()
     {
         const int expected = 4;
-        var actual = sizeof(Rank);
+        var actual = Unsafe.SizeOf<Rank>();
         Assert.Equal(expected, actual);
     }
 
     [Fact]
-    public unsafe void FileSize()
+    public void FileSize()
     {
         const int expected = 4;
-        var actual = sizeof(File);
+        var actual = Unsafe.SizeOf<File>();
         Assert.Equal(expected, actual);
     }
 
     [Fact]
-    public unsafe void DepthSize()
+    public void DepthSize()
     {
         const int expected = 4;
-        var actual = sizeof(Depth);
+        var actual = Unsafe.SizeOf<Depth>();
         Assert.Equal(expected, actual);
     }
 }
