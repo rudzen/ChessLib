@@ -71,22 +71,22 @@ public static class Fen
         var f = fen.AsSpan().Trim();
 
         if (f.IsEmpty)
-            throw new InvalidFen("Fen is empty.");
+            throw new InvalidFenException("Fen is empty.");
 
         var invalidCharIndex = f.IndexOfAnyExcept(ValidChars.AsSpan());
 
         if (invalidCharIndex > -1)
-            throw new InvalidFen($"Invalid char detected in fen. fen={f}, pos={invalidCharIndex}");
+            throw new InvalidFenException($"Invalid char detected in fen. fen={f}, pos={invalidCharIndex}");
 
         if (f.Length >= MaxFenLen)
-            throw new InvalidFen($"Invalid length for fen {fen}.");
+            throw new InvalidFenException($"Invalid length for fen {fen}.");
 
         if (!ValidFenRegex.Value.IsMatch(fen))
-            throw new InvalidFen($"Invalid format for fen {fen}.");
+            throw new InvalidFenException($"Invalid format for fen {fen}.");
 
         CountValidity(f);
         if (!CountPieceValidity(f))
-            throw new InvalidFen($"Invalid piece validity for fen {fen}");
+            throw new InvalidFenException($"Invalid piece validity for fen {fen}");
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -98,7 +98,7 @@ public static class Fen
     {
         var spaceIndex = s.IndexOf(Space);
         if (spaceIndex == -1)
-            throw new InvalidFen($"Invalid fen {s.ToString()}");
+            throw new InvalidFenException($"Invalid fen {s.ToString()}");
 
         var mainSection = s[..spaceIndex];
 
@@ -116,21 +116,21 @@ public static class Fen
             if (t == '/')
             {
                 if (++pieceCount[0] > SeparatorCount)
-                    throw new InvalidFen($"Invalid fen (too many separators) {s.ToString()}");
+                    throw new InvalidFenException($"Invalid fen (too many separators) {s.ToString()}");
                 continue;
             }
 
             if (char.IsNumber(t))
             {
                 if (!char.IsBetween(t, '1', '8'))
-                    throw new InvalidFen($"Invalid fen (not a valid square jump) {s.ToString()}");
+                    throw new InvalidFenException($"Invalid fen (not a valid square jump) {s.ToString()}");
                 continue;
             }
 
             var pieceIndex = PieceExtensions.PieceChars.IndexOf(t);
 
             if (pieceIndex == -1)
-                throw new InvalidFen($"Invalid fen (unknown piece) {s.ToString()}");
+                throw new InvalidFenException($"Invalid fen (unknown piece) {s.ToString()}");
 
             var pc = new Piece((Pieces)pieceIndex);
             var pt = pc.Type();
@@ -140,7 +140,7 @@ public static class Fen
             var limit = limits[pt.AsInt()];
 
             if (pieceCount[pc.AsInt()] > limit)
-                throw new InvalidFen(
+                throw new InvalidFenException(
                     $"Invalid fen (piece limit exceeded for {pc}. index={i},limit={limit},count={pieceCount[pc.AsInt()]}) {s.ToString()}");
         }
 
@@ -161,20 +161,20 @@ public static class Fen
         var valid = GetSpanSum(whitePieces, 15);
 
         if (!valid)
-            throw new InvalidFen($"Invalid fen (white piece count exceeds limit) {s.ToString()}");
+            throw new InvalidFenException($"Invalid fen (white piece count exceeds limit) {s.ToString()}");
 
         var blackPieces = pieceCount.Slice(9, 5);
 
         valid = GetSpanSum(blackPieces, 15);
 
         if (!valid)
-            throw new InvalidFen($"Invalid fen (black piece count exceeds limit) {s.ToString()}");
+            throw new InvalidFenException($"Invalid fen (black piece count exceeds limit) {s.ToString()}");
 
         spaceIndex = s.LastIndexOf(' ');
         var endSection = s[spaceIndex..];
 
         if (Maths.ToIntegral(endSection) >= 2048)
-            throw new InvalidFen($"Invalid half move count for fen {s.ToString()}");
+            throw new InvalidFenException($"Invalid half move count for fen {s.ToString()}");
 
         return true;
     }
@@ -193,12 +193,12 @@ public static class Fen
         var valid = spaceCount >= SpaceCount;
 
         if (!valid)
-            throw new InvalidFen($"Invalid space character count in fen {str.ToString()}");
+            throw new InvalidFenException($"Invalid space character count in fen {str.ToString()}");
 
         valid = separatorCount == SeparatorCount;
 
         if (!valid)
-            throw new InvalidFen($"Invalid separator count in fen {str.ToString()}");
+            throw new InvalidFenException($"Invalid separator count in fen {str.ToString()}");
     }
 
     private static (int, int) CountSpacesAndSeparators(ReadOnlySpan<char> str)

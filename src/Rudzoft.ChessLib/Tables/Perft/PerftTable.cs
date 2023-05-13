@@ -59,7 +59,7 @@ public sealed class PerftTable : HashTable<IPerftTableEntry>
     
     public ref IPerftTableEntry TryGet(in IPosition pos, int depth, out bool found)
     {
-        var posKey = pos.State.Key;
+        var posKey = pos.State.PositionKey;
         var entryKey = posKey & _mask ^ depth;
         ref var entry = ref this[entryKey];
         found = entry.Key == entryKey && entry.Depth == depth;

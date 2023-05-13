@@ -185,7 +185,7 @@ public sealed class PositionValidator : IPositionValidator
     {
         var state = pos.State;
 
-        if (state.Key.Key == 0 && pos.PieceCount() != 0)
+        if (state.PositionKey.Key == 0 && pos.PieceCount() != 0)
             yield return "state key is invalid";
 
         if (pos.PieceCount(PieceTypes.Pawn) == 0 && state.PawnKey != Zobrist.ZobristNoPawn)

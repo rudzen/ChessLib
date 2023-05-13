@@ -77,9 +77,9 @@ public sealed class FenTests
     }
 
     [Theory]
-    [InlineData("z3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1", typeof(InvalidFen))]
-    [InlineData("r3k2r/p1ppqpb1/bn2pnp1/3PN3/ip2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1", typeof(InvalidFen))]
-    [InlineData("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/lPPBBPPP/R3K2R w KQkq - 0 1", typeof(InvalidFen))]
+    [InlineData("z3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1", typeof(InvalidFenException))]
+    [InlineData("r3k2r/p1ppqpb1/bn2pnp1/3PN3/ip2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1", typeof(InvalidFenException))]
+    [InlineData("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/lPPBBPPP/R3K2R w KQkq - 0 1", typeof(InvalidFenException))]
     public void Validate(string fen, Type expectedException)
     {
         var pos = _serviceProvider.GetRequiredService<IPosition>();

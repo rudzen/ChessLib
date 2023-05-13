@@ -101,15 +101,13 @@ public class Uci : IUci
         var moveList = pos.GenerateMoves();
 
         var moves = moveList.Get();
-        ref var movesSpace = ref MemoryMarshal.GetReference(moves);
 
-        for (var i = 0; i < moves.Length; ++i)
+        foreach (var move in moves)
         {
-            var move = Unsafe.Add(ref movesSpace, i);
             if (uciMove.Equals(move.Move.ToString(), StringComparison.InvariantCultureIgnoreCase))
                 return move.Move;
         }
-
+        
         return Move.EmptyMove;
     }
 

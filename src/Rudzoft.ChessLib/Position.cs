@@ -349,7 +349,7 @@ public sealed class Position : IPosition
                     fen[length++] = CastlingRookSquare(CastleRight.BlackQueen).FileChar;
             }
             else
-                throw new Exception($"Invalid chess mode. mode={ChessMode}");
+                throw new InvalidFenException($"Invalid chess mode. mode={ChessMode}");
         }
 
         fen[length++] = space;
@@ -691,7 +691,7 @@ public sealed class Position : IPosition
         State = State.CopyTo(newState);
         var state = State;
 
-        var k = state.Key ^ Zobrist.GetZobristSide();
+        var k = state.PositionKey ^ Zobrist.GetZobristSide();
 
         Ply++;
         state.Rule50++;
@@ -717,7 +717,7 @@ public sealed class Position : IPosition
             Debug.Assert(pc == PieceTypes.King.MakePiece(us));
             Debug.Assert(capturedPiece == PieceTypes.Rook.MakePiece(us));
 
-            var (rookFrom, rookTo) = DoCastleling(us, from, ref to, CastlePerform.Do);
+            var (rookFrom, rookTo) = DoCastle(us, from, ref to, CastlePerform.Do);
 
             k ^= capturedPiece.GetZobristPst(rookFrom) ^ capturedPiece.GetZobristPst(rookTo);
 
@@ -826,7 +826,7 @@ public sealed class Position : IPosition
         Debug.Assert(GetKingSquare(them).IsOk);
 
         // Update state properties
-        state.Key = k;
+        state.PositionKey = k;
         state.CapturedPiece = capturedPiece.Type();
 
         state.Checkers = givesCheck ? AttacksTo(GetKingSquare(them)) & Board.Pieces(us) : BitBoard.Empty;
@@ -843,16 +843,16 @@ public sealed class Position : IPosition
     {
         Debug.Assert(!InCheck);
 
-        State = State.CopyTo(newState);
+        CopyState(in newState);
 
         if (State.EnPassantSquare != Square.None)
         {
             var enPassantFile = State.EnPassantSquare.File;
-            State.Key ^= enPassantFile.GetZobristEnPassant();
+            State.PositionKey ^= enPassantFile.GetZobristEnPassant();
             State.EnPassantSquare = Square.None;
         }
 
-        State.Key ^= Zobrist.GetZobristSide();
+        State.PositionKey ^= Zobrist.GetZobristSide();
 
         ++State.Rule50;
         State.PliesFromNull = 0;
@@ -1000,10 +1000,12 @@ public sealed class Position : IPosition
         var (from, to) = m;
 
         var swap = Values.GetPieceValue(GetPiece(to), Phases.Mg) - threshold;
+        
         if (swap < Value.ValueZero)
             return false;
 
         swap = Values.GetPieceValue(GetPiece(from), Phases.Mg) - swap;
+        
         if (swap <= Value.ValueZero)
             return true;
 
@@ -1118,7 +1120,7 @@ public sealed class Position : IPosition
                 var pieceIndex = PieceExtensions.PieceChars.IndexOf(c);
 
                 if (pieceIndex == -1)
-                    throw new InvalidFen("Invalid char detected");
+                    throw new InvalidFenException("Invalid char detected");
 
                 Player p = new(char.IsLower(PieceExtensions.PieceChars[pieceIndex]));
 
@@ -1193,7 +1195,7 @@ public sealed class Position : IPosition
     /// <param name="state">State reference to use. Allows to keep track of states if pre-created (i.e. in a stack) before engine search start</param>
     /// <param name="validate">If true, the fen should be validated, otherwise not</param>
     /// <param name="searcher">Searcher index, to help point to a specific search index in thread-based search array</param>
-    public IPosition Set(in FenData fenData, ChessMode chessMode, State state, bool validate = false, int searcher = 0)
+    public IPosition Set(in FenData fenData, ChessMode chessMode, in State state, bool validate = false, int searcher = 0)
     {
         if (validate)
             Fen.Fen.Validate(fenData.Fen.ToString());
@@ -1203,11 +1205,11 @@ public sealed class Position : IPosition
         ChessMode = chessMode;
         Searcher = searcher;
 
-        State = state.CopyTo(State);
+        CopyState(in state);
 
         SetupPieces(fenData.Chunk());
         SetupPlayer(fenData.Chunk());
-        SetupCastleling(fenData.Chunk());
+        SetupCastle(fenData.Chunk());
         SetupEnPassant(fenData.Chunk());
         SetupMoveNumber(fenData);
 
@@ -1216,10 +1218,10 @@ public sealed class Position : IPosition
         return this;
     }
 
-    public IPosition Set(string fen, ChessMode chessMode, State state, bool validate = false, int searcher = 0)
+    public IPosition Set(string fen, ChessMode chessMode, in State state, bool validate = false, int searcher = 0)
         => Set(new FenData(fen), chessMode, state, validate, searcher);
 
-    public IPosition Set(ReadOnlySpan<char> code, Player p, State state)
+    public IPosition Set(ReadOnlySpan<char> code, Player p, in State state)
     {
         Debug.Assert(code[0] == 'K' && code[1..].IndexOf('K') != -1);
         Debug.Assert(code.Length.IsBetween(0, 8));
@@ -1232,7 +1234,7 @@ public sealed class Position : IPosition
 
         var fenStr = $"{sides[0]}{8 - sides[0].Length}/8/8/8/8/8/8/{sides[1]}{8 - sides[1].Length} w - - 0 10";
 
-        return Set(fenStr, ChessMode.Normal, state);
+        return Set(fenStr, ChessMode.Normal, in state);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1265,7 +1267,7 @@ public sealed class Position : IPosition
         }
 
         if (type == MoveTypes.Castling)
-            DoCastleling(us, from, ref to, CastlePerform.Undo);
+            DoCastle(us, from, ref to, CastlePerform.Undo);
         else
         {
             // Note: The parameters are reversed, since we move the piece "back"
@@ -1358,10 +1360,27 @@ public sealed class Position : IPosition
         }
 
         output.AppendLine("    a   b   c   d   e   f   g   h");
-        output.AppendLine($"Zobrist : 0x{State.Key.Key:X}");
+        output.AppendLine($"Zobrist : 0x{State.PositionKey.Key:X}");
         var result = output.ToString();
         _outputObjectPool.Return(output);
         return result;
+    }
+
+    public HashKey MovePositionKey(Move m)
+    {
+        Debug.Assert(m.IsValidMove());
+
+        var movePositionKey = State.PositionKey
+                              ^ Zobrist.GetZobristSide()
+                              ^ Board.MovedPiece(m).GetZobristPst(m.FromSquare())
+                              ^ Board.MovedPiece(m).GetZobristPst(m.ToSquare());
+
+        if (!Board.IsEmpty(m.ToSquare()))
+            movePositionKey ^= Board.PieceAt(m.ToSquare()).GetZobristPst(m.ToSquare());
+
+        movePositionKey ^= State.EnPassantSquare.GetZobristEnPassant();
+
+        return movePositionKey;
     }
 
     public PositionValidationResult Validate(PositionValidationTypes type = PositionValidationTypes.Basic)
@@ -1372,7 +1391,7 @@ public sealed class Position : IPosition
         => (CastleRights)((int)CastleRights.WhiteKing << ((!isKingSide).AsByte() + 2 * c.Side));
 
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-    private (Square, Square) DoCastleling(Player us, Square from, ref Square to, CastlePerform castlePerform)
+    private (Square, Square) DoCastle(Player us, Square from, ref Square to, CastlePerform castlePerform)
     {
         var kingSide = to > from;
         var doCastleling = castlePerform == CastlePerform.Do;
@@ -1454,11 +1473,13 @@ public sealed class Position : IPosition
         state.CheckedSquares[PieceTypes.King.AsInt()] = BitBoard.Empty;
     }
 
+    private void CopyState(in State newState)
+    {
+        State = State.CopyTo(newState);
+    }
+    
     private void SetState()
     {
-        var key = HashKey.Empty;
-        var pawnKey = Zobrist.ZobristNoPawn;
-
         State.Checkers = AttacksTo(GetKingSquare(_sideToMove)) & Board.Pieces(~_sideToMove);
         _nonPawnMaterial[Player.White.Side] = _nonPawnMaterial[Player.Black.Side] = Value.ValueZero;
         SetCheckInfo(State);
@@ -1470,34 +1491,16 @@ public sealed class Position : IPosition
             var pc = GetPiece(sq);
             var pt = pc.Type();
 
-            key ^= pc.GetZobristPst(sq);
-
-            if (pt == PieceTypes.Pawn)
-                pawnKey ^= pc.GetZobristPst(sq);
-            else if (pt != PieceTypes.King)
+            if (pt != PieceTypes.King)
                 _nonPawnMaterial[pc.ColorOf().Side] += Values.GetPieceValue(pc, Phases.Mg);
         }
 
-        if (State.EnPassantSquare != Square.None)
-            key ^= State.EnPassantSquare.File.GetZobristEnPassant();
-
-        if (_sideToMove.IsBlack)
-            key ^= Zobrist.GetZobristSide();
-
-        key ^= State.CastlelingRights.Key();
-
-        var materialKey = HashKey.Empty;
-        
-        foreach (var pc in Piece.All.AsSpan())
-            for (var cnt = 0; cnt < Board.PieceCount(pc); ++cnt)
-                materialKey ^= pc.GetZobristPst(cnt);
-
-        State.Key = key;
-        State.PawnKey = pawnKey;
-        State.MaterialKey = materialKey;
+        State.MaterialKey = Zobrist.ComputeMaterialKey(this);
+        State.PawnKey = Zobrist.ComputePawnKey(this);
+        State.PositionKey = Zobrist.ComputePositionKey(this);
     }
 
-    private void SetupCastleling(ReadOnlySpan<char> castleling)
+    private void SetupCastle(ReadOnlySpan<char> castle)
     {
         Square RookSquare(Square startSq, Piece rook)
         {
@@ -1507,9 +1510,9 @@ public sealed class Position : IPosition
             return targetSq;
         }
 
-        ref var castleSpace = ref MemoryMarshal.GetReference(castleling);
+        ref var castleSpace = ref MemoryMarshal.GetReference(castle);
 
-        for (var i = 0; i < castleling.Length; ++i)
+        for (var i = 0; i < castle.Length; ++i)
         {
             var ca = Unsafe.Add(ref castleSpace, i);
             Player c = char.IsLower(ca);

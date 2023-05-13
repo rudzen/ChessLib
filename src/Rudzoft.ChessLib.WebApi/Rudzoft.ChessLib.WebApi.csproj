@@ -15,6 +15,7 @@
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="7.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="7.0.4" />
         <PackageReference Include="Microsoft.Extensions.Options" Version="7.0.1" />
         <PackageReference Include="Microsoft.OpenApi" Version="1.6.3" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />

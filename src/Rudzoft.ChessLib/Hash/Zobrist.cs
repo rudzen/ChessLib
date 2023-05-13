@@ -60,17 +60,17 @@ public static class Zobrist
     /// <summary>
     /// Represents the piece index (as in EPieces), with each a square of the board value to match.
     /// </summary>
-    private static readonly HashKey[][] ZobristPst = new HashKey[16][];
+    private static readonly HashKey[][] ZobristPst = new HashKey[Square.Count][];
 
     /// <summary>
     /// Represents the castleling rights.
     /// </summary>
-    private static readonly HashKey[] ZobristCastling = new HashKey[16];
+    private static readonly HashKey[] ZobristCastling = new HashKey[CastleRight.Count];
 
     /// <summary>
     /// En-Passant is only required to have 8 entries, one for each possible file where the En-Passant square can occur.
     /// </summary>
-    private static readonly HashKey[] ZobristEpFile = new HashKey[8];
+    private static readonly HashKey[] ZobristEpFile = new HashKey[File.Count];
 
     /// <summary>
     /// This is used if the side to move is black, if the side is white, no hashing will occur.
@@ -82,6 +82,9 @@ public static class Zobrist
     /// </summary>
     public static readonly HashKey ZobristNoPawn;
 
+
+    private static readonly HashKey Empty = HashKey.Empty;
+    
     static Zobrist()
     {
         var rnd = RKiss.Create(DefaultRandomSeed);
@@ -95,12 +98,13 @@ public static class Zobrist
     private static void InitializePst(in IRKiss rnd)
     {
         for (var i = 0; i < ZobristPst.Length; i++)
-            ZobristPst[i] = new HashKey[Square.Count];
+            ZobristPst[i] = new HashKey[Piece.Count];
 
-        foreach (var pc in Piece.All.AsSpan())
+        for (var sq = Squares.a1; sq <= Squares.h8; sq++)
         {
-            for (var sq = Squares.a1; sq <= Squares.h8; sq++)
-                ZobristPst[pc.AsInt()][sq.AsInt()] = rnd.Rand();
+            var s = sq.AsInt();
+            foreach (var pc in Piece.All.AsSpan())
+                ZobristPst[s][pc.AsInt()] = rnd.Rand();
         }
     }
 
@@ -110,8 +114,55 @@ public static class Zobrist
             array[i] = rnd.Rand();
     }
 
+    public static HashKey ComputeMaterialKey(IPosition pos)
+    {
+        var key = HashKey.Empty;
+        foreach (var pc in Piece.All.AsSpan())
+            for (var count = 0; count < pos.Board.PieceCount(pc); count++)
+                key ^= GetZobristPst(pc, count);
+        
+        return key;
+    }
+
+    public static HashKey ComputePawnKey(IPosition pos)
+    {
+        var key = ZobristNoPawn;
+
+        var pawns = pos.Pieces(Piece.WhitePawn);
+
+        while (pawns)
+            key ^= GetZobristPst(Piece.WhitePawn, BitBoards.PopLsb(ref pawns));
+
+        pawns = pos.Pieces(Piece.BlackPawn);
+        
+        while (pawns)
+            key ^= GetZobristPst(Piece.BlackPawn, BitBoards.PopLsb(ref pawns));
+        
+        return key; 
+    }
+
+    public static HashKey ComputePositionKey(IPosition pos)
+    {
+        var key = HashKey.Empty;
+
+        foreach (var pc in Piece.All.AsSpan())
+        {
+            var bb = pos.Pieces(pc);
+            while (bb)
+                key ^= GetZobristPst(pc, BitBoards.PopLsb(ref bb));
+        }
+
+        if (pos.SideToMove.IsWhite)
+            key ^= ZobristSide;
+
+        key ^= GetZobristCastleling(pos.State.CastlelingRights.Rights);
+        key ^= GetZobristEnPassant(pos.EnPassantSquare.File);
+        
+        return key;
+    }
+    
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ref HashKey GetZobristPst(this Piece piece, Square square) => ref ZobristPst[piece.AsInt()][square.AsInt()];
+    public static ref HashKey GetZobristPst(this Piece piece, Square square) => ref ZobristPst[square.AsInt()][piece.AsInt()];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static ref HashKey GetZobristCastleling(this CastleRights index) => ref ZobristCastling[index.AsInt()];
@@ -121,4 +172,10 @@ public static class Zobrist
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static ref HashKey GetZobristEnPassant(this File file) => ref ZobristEpFile[file.AsInt()];
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static HashKey GetZobristEnPassant(this Square sq)
+    {
+        return sq == Square.None ? HashKey.Empty : GetZobristEnPassant(sq.File);
+    }
 }

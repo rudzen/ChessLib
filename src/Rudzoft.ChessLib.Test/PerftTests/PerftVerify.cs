@@ -44,8 +44,14 @@ public abstract class PerftVerify
     {
         var g = _serviceProvider.GetRequiredService<IGame>();
         g.NewGame(fen);
+
+        var initialZobrist = g.Pos.State.PositionKey;
         
         var actual = g.Perft(depth);
+
+        var afterZobrist = g.Pos.State.PositionKey;
+        
         Assert.Equal(expected, actual);
+        Assert.Equal(initialZobrist, afterZobrist);
     }
 }

@@ -190,11 +190,11 @@ public interface IPosition : IEnumerable<Piece>
 
     FenData GenerateFen();
 
-    IPosition Set(in FenData fenData, ChessMode chessMode, State state, bool validate = false, int searcher = 0);
+    IPosition Set(in FenData fenData, ChessMode chessMode, in State state, bool validate = false, int searcher = 0);
 
-    IPosition Set(string fen, ChessMode chessMode, State state, bool validate = false, int searcher = 0);
+    IPosition Set(string fen, ChessMode chessMode, in State state, bool validate = false, int searcher = 0);
 
-    IPosition Set(ReadOnlySpan<char> code, Player p, State state);
+    IPosition Set(ReadOnlySpan<char> code, Player p, in State state);
     
     HashKey GetPiecesKey();
 
@@ -217,6 +217,8 @@ public interface IPosition : IEnumerable<Piece>
     Value NonPawnMaterial(Player p);
     
     Value NonPawnMaterial();
+
+    HashKey MovePositionKey(Move m);
     
     PositionValidationResult Validate(PositionValidationTypes type = PositionValidationTypes.Basic);
 }

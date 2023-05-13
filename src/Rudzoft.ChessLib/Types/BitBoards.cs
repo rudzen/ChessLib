@@ -246,7 +246,7 @@ public static class BitBoards
                 PassedPawnMaskBB[side][s] = ForwardFileBB[side][s] | PawnAttackSpanBB[side][s];
             }
         }
-        
+
         // mini local helpers
 
         Span<PieceTypes> validMagicPieces = stackalloc PieceTypes[] { PieceTypes.Bishop, PieceTypes.Rook };
@@ -273,10 +273,8 @@ public static class BitBoards
             InitializePseudoAttacks(s1);
 
             // Compute lines and betweens
-            ref var magicPiecesSpace = ref MemoryMarshal.GetReference(validMagicPieces);
-            for (var i = 0; i < validMagicPieces.Length; i++)
+            foreach (var validMagicPiece in validMagicPieces)
             {
-                var validMagicPiece = Unsafe.Add(ref magicPiecesSpace, i);
                 var pt = validMagicPiece.AsInt();
                 var bb3 = AllSquares;
                 while (bb3)
@@ -293,16 +291,16 @@ public static class BitBoards
                                          GetAttacks(s2, validMagicPiece, BbSquares[sq]);
                 }
             }
-
+            
             // Compute KingRings
             InitializeKingRing(s1, sq, file);
         }
 
         SlotFileBB = new[]
         {
-            File.FileE.FileBB() | File.FileF.FileBB() | File.FileG.FileBB() | File.FileH.FileBB(), // King
-            File.FileA.FileBB() | File.FileB.FileBB() | File.FileC.FileBB() | File.FileD.FileBB(), // Queen
-            File.FileC.FileBB() | File.FileD.FileBB() | File.FileE.FileBB() | File.FileF.FileBB()  // Center
+            FileEBB | FileFBB | FileGBB | FileHBB, // King
+            FileABB | FileBBB | FileCBB | FileDBB, // Queen
+            FileCBB | FileDBB | FileEBB | FileFBB // Center
         };
     }
 
@@ -334,8 +332,8 @@ public static class BitBoards
         PseudoAttacksBB[PieceTypes.Bishop.AsInt()][s] = bishopAttacks;
         PseudoAttacksBB[PieceTypes.Rook.AsInt()][s] = rookAttacks;
         PseudoAttacksBB[PieceTypes.Queen.AsInt()][s] = bishopAttacks | rookAttacks;
-        PseudoAttacksBB[PieceTypes.King.AsInt()][s] = b.NorthOne()       | b.SouthOne()     | b.EastOne()
-                                                      | b.WestOne()      | b.NorthEastOne() | b.NorthWestOne()
+        PseudoAttacksBB[PieceTypes.King.AsInt()][s] = b.NorthOne() | b.SouthOne() | b.EastOne()
+                                                      | b.WestOne() | b.NorthEastOne() | b.NorthWestOne()
                                                       | b.SouthEastOne() | b.SouthWestOne();
     }
 
@@ -356,7 +354,7 @@ public static class BitBoards
                 KingRingBB[player.Side][sq] |= KingRingBB[player.Side][sq].EastOne();
 
             Debug.Assert(!KingRingBB[player.Side][sq].IsEmpty);
-        }        
+        }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -508,11 +506,11 @@ public static class BitBoards
     public static BitBoard PromotionRank(this Player p) => PromotionRanks[p.Side];
 
     public static string StringifyRaw(in ulong bb, string title = "") => Stringify(BitBoard.Create(bb), title);
-    
+
     [SkipLocalsInit]
     public static string Stringify(in BitBoard bb, string title = "")
     {
-        const string line = "+---+---+---+---+---+---+---+---+---+";
+        const string line   = "+---+---+---+---+---+---+---+---+---+";
         const string bottom = "|   | A | B | C | D | E | F | G | H |";
         Span<char> span = stackalloc char[768];
         var idx = 0;
@@ -633,10 +631,10 @@ public static class BitBoards
     public static BitBoard Shift(this in BitBoard bb, Direction d)
     {
         ref var func = ref CollectionsMarshal.GetValueRefOrNullRef(ShiftFuncs, d);
-        
+
         if (Unsafe.IsNullRef(ref func))
             throw new ArgumentException("Invalid shift argument.", nameof(d));
-            
+
         return func(bb);
     }
 

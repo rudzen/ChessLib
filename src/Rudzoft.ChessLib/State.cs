@@ -53,7 +53,7 @@ public sealed class State : IEquatable<State>
     // since they are always recomputed
     // -----------------------------
 
-    public HashKey Key { get; set; }
+    public HashKey PositionKey { get; set; }
 
     /// <summary>
     /// Represents checked squares for side to move
@@ -129,7 +129,7 @@ public sealed class State : IEquatable<State>
     public void Clear()
     {
         LastMove = Move.EmptyMove;
-        PawnKey = Key = MaterialKey = HashKey.Empty;
+        PawnKey = PositionKey = MaterialKey = HashKey.Empty;
         PliesFromNull = 0;
         Repetition = 0;
         CastlelingRights = CastleRight.None;
@@ -154,7 +154,7 @@ public sealed class State : IEquatable<State>
         for (var i = 4; i <= end; i += 2)
         {
             statePrevious = statePrevious.Previous.Previous;
-            if (statePrevious.Key != Key)
+            if (statePrevious.PositionKey != PositionKey)
                 continue;
             Repetition = statePrevious.Repetition != 0 ? -i : i;
             break;
@@ -168,7 +168,7 @@ public sealed class State : IEquatable<State>
     {
         if (other is null) return false;
         return LastMove.Equals(other.LastMove)
-               && Key.Equals(other.Key)
+               && PositionKey.Equals(other.PositionKey)
                && PawnKey.Equals(other.PawnKey)
                && EnPassantSquare.Equals(other.EnPassantSquare)
                && CastlelingRights == other.CastlelingRights
@@ -190,7 +190,7 @@ public sealed class State : IEquatable<State>
         hashCode.Add(MaterialKey);
         hashCode.Add(PliesFromNull);
         hashCode.Add(Rule50);
-        hashCode.Add(Key);
+        hashCode.Add(PositionKey);
         hashCode.Add(CastlelingRights.Rights.AsInt());
         hashCode.Add(EnPassantSquare);
         hashCode.Add(Checkers);

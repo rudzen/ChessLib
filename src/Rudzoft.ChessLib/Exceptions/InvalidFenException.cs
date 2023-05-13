@@ -29,17 +29,17 @@ using System.Runtime.Serialization;
 
 namespace Rudzoft.ChessLib.Exceptions;
 
-public sealed class InvalidFen : ArgumentException
+public sealed class InvalidFenException : ArgumentException
 {
-    public InvalidFen()
+    public InvalidFenException()
     { }
 
-    public InvalidFen(string message)
+    public InvalidFenException(string message)
         : base(message) { }
 
-    public InvalidFen(string message, Exception innerException)
+    public InvalidFenException(string message, Exception innerException)
         : base(message, innerException) { }
 
-    public InvalidFen(SerializationInfo info, StreamingContext context)
+    public InvalidFenException(SerializationInfo info, StreamingContext context)
         : base(info, context) { }
 }

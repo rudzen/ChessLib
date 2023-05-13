@@ -91,13 +91,13 @@ public static class Cuckoo
             return false;
 
         var state = pos.State;
-        var originalKey = state.Key;
+        var originalKey = state.PositionKey;
         var statePrevious = state.Previous;
 
         for (var i = 3; i <= end; i += 2)
         {
             statePrevious = statePrevious.Previous.Previous;
-            var moveKey = originalKey ^ statePrevious.Key;
+            var moveKey = originalKey ^ statePrevious.PositionKey;
 
             var j = CuckooHashOne(in moveKey);
             var found = CuckooKeys[j] == moveKey;
