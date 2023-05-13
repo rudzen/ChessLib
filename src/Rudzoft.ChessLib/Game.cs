@@ -78,7 +78,7 @@ public sealed class Game : IGame
     public ISearchParameters SearchParameters { get; }
 
     public IUci Uci { get; }
-    
+
     public ICpu Cpu { get; }
 
     public bool IsRepetition => _pos.IsRepetition;
@@ -109,9 +109,9 @@ public sealed class Game : IGame
 
         if (moves.IsEmpty)
             gameEndType |= GameEndTypes.Pat;
-        
+
         _moveListPool.Return(moveList);
-        
+
         GameEndType = gameEndType;
     }
 
@@ -142,39 +142,41 @@ public sealed class Game : IGame
         // entry.Key = _pos.State.Key;
 
         var tot = ulong.MinValue;
-        
+
         var ml = _moveListPool.Get();
         ml.Generate(in _pos);
 
         var state = new State();
-        
+
         var moves = ml.Get();
         ref var movesSpace = ref MemoryMarshal.GetReference(moves);
         for (var i = 0; i < moves.Length; ++i)
         {
-            var valMove = Unsafe.Add(ref movesSpace, i);
             if (root && depth <= 1)
+            {
                 tot++;
+                continue;
+            }
+
+            var valMove = Unsafe.Add(ref movesSpace, i);
+            var m = valMove.Move;
+
+            _pos.MakeMove(m, in state);
+
+            if (depth <= 2)
+            {
+                var ml2 = _moveListPool.Get();
+                ml2.Generate(in _pos);
+                tot += (ulong)ml2.Length;
+                _moveListPool.Return(ml2);
+            }
             else
             {
-                var m = valMove.Move;
-                _pos.MakeMove(m, in state);
-
-                if (depth <= 2)
-                {
-                    var ml2 = _moveListPool.Get();
-                    ml2.Generate(in _pos);
-                    tot += (ulong)ml2.Length;
-                    _moveListPool.Return(ml2);
-                }
-                else
-                {
-                    var next = Perft(depth - 1, false);
-                    tot += next;
-                }
-
-                _pos.TakeMove(m);
+                var next = Perft(depth - 1, false);
+                tot += next;
             }
+
+            _pos.TakeMove(m);
         }
 
         // if (!root)
