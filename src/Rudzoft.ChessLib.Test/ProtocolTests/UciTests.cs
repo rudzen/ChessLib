@@ -30,6 +30,7 @@ using Microsoft.Extensions.ObjectPool;
 using Microsoft.Extensions.Options;
 using Rudzoft.ChessLib.Enums;
 using Rudzoft.ChessLib.Fen;
+using Rudzoft.ChessLib.Hash;
 using Rudzoft.ChessLib.Hash.Tables.Transposition;
 using Rudzoft.ChessLib.ObjectPoolPolicies;
 using Rudzoft.ChessLib.Protocol.UCI;
@@ -50,6 +51,8 @@ public sealed class UciTests
         _serviceProvider = new ServiceCollection()
             .AddSingleton(options)
             .AddSingleton<IValues, Values>()
+            .AddSingleton<IZobrist, Zobrist>()
+            .AddSingleton<ICuckoo, Cuckoo>()
             .AddSingleton<IPositionValidator, PositionValidator>()
             .AddTransient<IBoard, Board>()
             .AddTransient<IPosition, Position>()

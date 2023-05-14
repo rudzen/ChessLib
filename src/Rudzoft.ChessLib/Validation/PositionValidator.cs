@@ -55,6 +55,13 @@ public static class PositionValidationTypesExtensions
 
 public sealed class PositionValidator : IPositionValidator
 {
+    private readonly IZobrist _zobrist;
+
+    public PositionValidator(IZobrist zobrist)
+    {
+        _zobrist = zobrist;
+    }
+
     public PositionValidationResult Validate(in IPosition pos, PositionValidationTypes type = PositionValidationTypes.All)
     {
         var errors = new List<string>();
@@ -181,14 +188,14 @@ public sealed class PositionValidator : IPositionValidator
                 .Where(p2 => p1 != p2 && (pos.Pieces(p1) & pos.Pieces(p2)).IsNotEmpty),
             static (p1, p2) => $"piece types {p1} and {p2} doesn't align");
 
-    private static IEnumerable<string> ValidateState(IPosition pos)
+    private IEnumerable<string> ValidateState(IPosition pos)
     {
         var state = pos.State;
 
         if (state.PositionKey.Key == 0 && pos.PieceCount() != 0)
             yield return "state key is invalid";
 
-        if (pos.PieceCount(PieceTypes.Pawn) == 0 && state.PawnKey != Zobrist.ZobristNoPawn)
+        if (pos.PieceCount(PieceTypes.Pawn) == 0 && state.PawnKey != _zobrist.ZobristNoPawn)
             yield return "empty pawn key is invalid";
 
         if (state.Repetition < 0)

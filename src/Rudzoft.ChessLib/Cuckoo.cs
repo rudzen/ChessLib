@@ -38,13 +38,13 @@ namespace Rudzoft.ChessLib;
 /// situations. https://marcelk.net/2013-04-06/paper/upcoming-rep-v2.pdf
 /// TODO : Unit tests
 /// </summary>
-public static class Cuckoo
+public sealed class Cuckoo : ICuckoo
 {
-    private static readonly HashKey[] CuckooKeys = new HashKey[8192];
-    private static readonly Move[] CuckooMoves = new Move[8192];
+    private readonly HashKey[] CuckooKeys = new HashKey[8192];
+    private readonly Move[] CuckooMoves = new Move[8192];
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Minor Code Smell", "S3963:\"static\" fields should be initialized inline", Justification = "Multiple arrays in one go")]
-    static Cuckoo()
+    public Cuckoo(IZobrist zobrist)
     {
         var count = 0;
         
@@ -60,7 +60,7 @@ public static class Cuckoo
                         continue;
 
                     var move = Move.Create(sq1, sq2);
-                    var key = pc.GetZobristPst(sq1) ^ pc.GetZobristPst(sq2) ^ Zobrist.GetZobristSide();
+                    var key = zobrist.GetZobristPst(sq1, pc) ^ zobrist.GetZobristPst(sq2, pc) ^ zobrist.GetZobristSide();
                     var j = CuckooHashOne(in key);
                     do
                     {
@@ -85,7 +85,7 @@ public static class Cuckoo
         Debug.Assert(count == 3668);
     }
 
-    public static bool HashCuckooCycle(in IPosition pos, int end, int ply)
+    public bool HashCuckooCycle(in IPosition pos, int end, int ply)
     {
         if (end < 3)
             return false;

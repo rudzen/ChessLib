@@ -29,6 +29,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.ObjectPool;
 using Rudzoft.ChessLib.Enums;
 using Rudzoft.ChessLib.Fen;
+using Rudzoft.ChessLib.Hash;
 using Rudzoft.ChessLib.MoveGeneration;
 using Rudzoft.ChessLib.ObjectPoolPolicies;
 using Rudzoft.ChessLib.Types;
@@ -45,6 +46,8 @@ public sealed class MoveGeneratorTests
         _serviceProvider = new ServiceCollection()
             .AddTransient<IBoard, Board>()
             .AddSingleton<IValues, Values>()
+            .AddSingleton<ICuckoo, Cuckoo>()
+            .AddSingleton<IZobrist, Zobrist>()
             .AddSingleton<IPositionValidator, PositionValidator>()
             .AddTransient<IPosition, Position>()
             .AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>()
@@ -66,7 +69,7 @@ public sealed class MoveGeneratorTests
         var pos = _serviceProvider.GetRequiredService<IPosition>();
         var fenData = new FenData(fen);
         var state = new State();
-        pos.Set(in fenData, ChessMode.Normal, state);
+        pos.Set(in fenData, ChessMode.Normal, in state);
 
         // make sure black is in check
         Assert.True(pos.InCheck);

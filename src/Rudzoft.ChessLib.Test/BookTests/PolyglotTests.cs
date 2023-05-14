@@ -34,6 +34,7 @@ using Microsoft.Extensions.Options;
 using Rudzoft.ChessLib.Enums;
 using Rudzoft.ChessLib.Factories;
 using Rudzoft.ChessLib.Fen;
+using Rudzoft.ChessLib.Hash;
 using Rudzoft.ChessLib.ObjectPoolPolicies;
 using Rudzoft.ChessLib.Polyglot;
 using Rudzoft.ChessLib.Protocol.UCI;
@@ -57,6 +58,8 @@ public sealed class PolyglotTests : IClassFixture<BookFixture>
             .AddSingleton(polyOptions)
             .AddTransient<IBoard, Board>()
             .AddSingleton<IValues, Values>()
+            .AddSingleton<IZobrist, Zobrist>()
+            .AddSingleton<ICuckoo, Cuckoo>()
             .AddSingleton<IPositionValidator, PositionValidator>()
             .AddTransient<IPosition, Position>()
             .AddSingleton<IPolyglotBookFactory, PolyglotBookFactory>()
@@ -86,7 +89,7 @@ public sealed class PolyglotTests : IClassFixture<BookFixture>
         var fenData = new FenData(fen);
         var state = new State();
 
-        pos.Set(in fenData, ChessMode.Normal, state);
+        pos.Set(in fenData, ChessMode.Normal, in state);
 
         var book = _serviceProvider
             .GetRequiredService<IPolyglotBookFactory>()
@@ -183,7 +186,7 @@ public sealed class PolyglotTests : IClassFixture<BookFixture>
         foreach (var m in uciMoves.Select(uciMove => uci.MoveFromUci(pos, uciMove)))
         {
             Assert.False(m.IsNullMove());
-            pos.MakeMove(m, state);
+            pos.MakeMove(m, in state);
         }
 
         var actualKey = book.ComputePolyglotKey(pos).Key;

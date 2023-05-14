@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.ObjectPool;
 using Rudzoft.ChessLib.Enums;
 using Rudzoft.ChessLib.Fen;
+using Rudzoft.ChessLib.Hash;
 using Rudzoft.ChessLib.MoveGeneration;
 using Rudzoft.ChessLib.ObjectPoolPolicies;
 using Rudzoft.ChessLib.Types;
@@ -25,10 +26,12 @@ public class FenBenchmark
         var pieceValue = new Values();
         var fp = new FenData(F);
         var state = new State();
-        var validator = new PositionValidator();
+        var zobrist = new Zobrist();
+        var cuckoo = new Cuckoo(zobrist);
+        var validator = new PositionValidator(zobrist);
         var moveListObjectPool = new DefaultObjectPool<IMoveList>(new MoveListPolicy());
-        _pos = new Position(board, pieceValue, validator, moveListObjectPool);
-        _pos.Set(in fp, ChessMode.Normal, state);
+        _pos = new Position(board, pieceValue, zobrist, cuckoo, validator, moveListObjectPool);
+        _pos.Set(in fp, ChessMode.Normal, in state);
     }
 
     [Benchmark(Description = "StringBuilder - NOT PRESENT")]

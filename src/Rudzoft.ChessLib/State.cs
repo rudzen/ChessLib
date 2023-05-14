@@ -196,8 +196,8 @@ public sealed class State : IEquatable<State>
         hashCode.Add(Checkers);
         hashCode.Add(Previous);
         hashCode.Add(CapturedPiece);
-        hashCode.Add(Pinners.Where(static p => p.IsNotEmpty));
-        hashCode.Add(CheckedSquares.Where(static csq => csq.IsNotEmpty));
+        hashCode.Add(Pinners);
+        hashCode.Add(CheckedSquares);
         return hashCode.ToHashCode();
     }
 }

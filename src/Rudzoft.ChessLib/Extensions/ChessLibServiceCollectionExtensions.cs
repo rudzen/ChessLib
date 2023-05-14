@@ -32,6 +32,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.ObjectPool;
 using Rudzoft.ChessLib.Evaluation;
 using Rudzoft.ChessLib.Factories;
+using Rudzoft.ChessLib.Hash;
 using Rudzoft.ChessLib.Hash.Tables.Transposition;
 using Rudzoft.ChessLib.ObjectPoolPolicies;
 using Rudzoft.ChessLib.Polyglot;
@@ -86,6 +87,8 @@ public static class ChessLibServiceCollectionExtensions
                 uci.Initialize();
                 return uci;
             })
+            .AddSingleton<ICuckoo, Cuckoo>()
+            .AddSingleton<IZobrist, Zobrist>()
             .AddTransient<IKillerMovesFactory, KillerMovesFactory>()
             .AddSingleton<ISearchParameters, SearchParameters>()
             .AddSingleton<IValues, Values>()

@@ -25,7 +25,9 @@ SOFTWARE.
 */
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using Microsoft.Extensions.ObjectPool;
@@ -39,7 +41,7 @@ namespace Rudzoft.ChessLib.Protocol.UCI;
 
 public class Uci : IUci
 {
-    private static readonly OptionComparer OptionComparer = new();
+    private static readonly IComparer<IOption> OptionComparer = new OptionComparer();
 
     private static readonly string[] OptionTypeStrings = Enum.GetNames(typeof(UciOptionType));
 
@@ -63,6 +65,7 @@ public class Uci : IUci
 
     public void Initialize(int maxThreads = 128)
     {
+        _options.Clear();
         _options["Write Debug Log"] = new Option("Write Debug Log", _options.Count, false, OnLogger);
         _options["Write Search Log"] = new Option("Write Search Log", _options.Count, false);
         _options["Search Log Filename"] = new Option("Search Log Filename", _options.Count);
@@ -113,9 +116,8 @@ public class Uci : IUci
 
     public IEnumerable<Move> MovesFromUci(IPosition pos, Stack<State> states, IEnumerable<string> moves)
     {
-        foreach (var uciMove in moves)
+        foreach (var move in moves.Select(x => MoveFromUci(pos, x)))
         {
-            var move = MoveFromUci(pos, uciMove);
             if (move.IsNullMove())
                 continue;
             
@@ -224,18 +226,13 @@ public class Uci : IUci
     /// <returns>the current UCI options as string</returns>
     public new string ToString()
     {
-        var list = new List<IOption>(_options.Values);
-        list.Sort(OptionComparer);
         var sb = _pvPool.Get();
 
-        var listSpan = CollectionsMarshal.AsSpan(list);
-        ref var listSpace = ref MemoryMarshal.GetReference(listSpan);
-
-        for (var i = 0; i < list.Count; ++i)
+        foreach (var opt in _options.Values.Order(OptionComparer))
         {
-            var opt = Unsafe.Add(ref listSpace, i);
             sb.AppendLine();
             sb.Append("option name ").Append(opt.Name).Append(" type ").Append(OptionTypeStrings[(int)opt.Type]);
+            
             if (opt.Type != UciOptionType.Button)
                 sb.Append(" default ").Append(opt.DefaultValue);
 

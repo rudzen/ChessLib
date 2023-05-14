@@ -27,7 +27,6 @@ SOFTWARE.
 using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using Rudzoft.ChessLib.Hash;
 
 namespace Rudzoft.ChessLib.Types;
 
@@ -83,13 +82,6 @@ public readonly struct HashKey : IEquatable<HashKey>
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static HashKey operator ^(HashKey left, ulong right) => new(left.Key ^ right);
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static HashKey operator ^(HashKey left, CastleRights right)
-        => new(left.Key ^ right.GetZobristCastleling().Key);
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static HashKey operator ^(HashKey left, File right) => new(left.Key ^ right.GetZobristEnPassant().Key);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Equals(HashKey other) => Key == other.Key;

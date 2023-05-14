@@ -24,9 +24,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using System;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.ObjectPool;
 using Rudzoft.ChessLib.Enums;
 using Rudzoft.ChessLib.Fen;
+using Rudzoft.ChessLib.Hash;
 using Rudzoft.ChessLib.MoveGeneration;
 using Rudzoft.ChessLib.ObjectPoolPolicies;
 using Rudzoft.ChessLib.Types;
@@ -36,17 +39,34 @@ namespace Rudzoft.ChessLib.Test.MoveTests;
 
 public sealed class MoveGen_49
 {
+    private readonly IServiceProvider _serviceProvider;
+
+    public MoveGen_49()
+    {
+        _serviceProvider = new ServiceCollection()
+            .AddTransient<IBoard, Board>()
+            .AddSingleton<IValues, Values>()
+            .AddSingleton<ICuckoo, Cuckoo>()
+            .AddSingleton<IZobrist, Zobrist>()
+            .AddSingleton<IPositionValidator, PositionValidator>()
+            .AddTransient<IPosition, Position>()
+            .AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>()
+            .AddSingleton(static serviceProvider =>
+            {
+                var provider = serviceProvider.GetRequiredService<ObjectPoolProvider>();
+                var policy = new MoveListPolicy();
+                return provider.Create(policy);
+            })
+            .BuildServiceProvider();
+    }
+    
     [Fact]
     public void MoveListContainsMismatchedElement()
     {
         const string fen = "r3kb1r/p3pppp/p1n2n2/2pp1Q2/3P1B2/2P1PN2/Pq3PPP/RN2K2R w KQkq - 0 9";
 
-        var board = new Board();
-        var pieceValue = new Values();
-        var moveListObjectPool = new DefaultObjectPool<IMoveList>(new MoveListPolicy());
-        var validator = new PositionValidator();
-
-        var pos = new Position(board, pieceValue, validator, moveListObjectPool);
+        var pos = _serviceProvider.GetRequiredService<IPosition>();
+        
         var fd = new FenData(fen);
         var state = new State();
 

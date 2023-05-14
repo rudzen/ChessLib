@@ -29,6 +29,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.ObjectPool;
 using Microsoft.Extensions.Options;
+using Rudzoft.ChessLib.Hash;
 using Rudzoft.ChessLib.Hash.Tables.Transposition;
 using Rudzoft.ChessLib.MoveGeneration;
 using Rudzoft.ChessLib.ObjectPoolPolicies;
@@ -80,9 +81,11 @@ public class PerftBench
         
         var board = new Board();
         var values = new Values();
-        var validator = new PositionValidator();
+        var zobrist = new Zobrist();
+        var cuckoo = new Cuckoo(zobrist);
+        var validator = new PositionValidator(zobrist);
 
-        var pos = new Position(board, values, validator, moveListObjectPool);
+        var pos = new Position(board, values, zobrist, cuckoo, validator, moveListObjectPool);
         
         var game = new Game(tt, uci, cpu, sp, pos, moveListObjectPool);
         _perft = new Perft.Perft(game, new []{ pp });

@@ -45,6 +45,7 @@ public sealed class Game : IGame
 {
     private readonly ObjectPool<IMoveList> _moveListPool;
     private readonly IPosition _pos;
+    private readonly PerftTable _perftTable;
 
     public Game(
         ITranspositionTable transpositionTable,
@@ -56,7 +57,8 @@ public sealed class Game : IGame
     {
         _moveListPool = moveListPool;
         _pos = pos;
-        
+        _perftTable = new PerftTable();
+
         Table = transpositionTable;
         SearchParameters = searchParameters;
         Uci = uci;
@@ -139,7 +141,7 @@ public sealed class Game : IGame
         //
         // entry.Count = ulong.MinValue;
         // entry.Depth = depth;
-        // entry.Key = _pos.State.Key;
+        // entry.Key = _pos.State.PositionKey;
 
         var tot = ulong.MinValue;
 
@@ -180,8 +182,8 @@ public sealed class Game : IGame
         }
 
         // if (!root)
-        //     _perftTable.Store(_pos.State.Key, depth, tot);
-        
+        //     _perftTable.Store(_pos.State.PositionKey, depth, tot);
+
         _moveListPool.Return(ml);
 
         return tot;

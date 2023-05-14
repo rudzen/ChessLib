@@ -24,8 +24,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using System;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.ObjectPool;
-using Rudzoft.ChessLib.MoveGeneration;
+using Rudzoft.ChessLib.Hash;
 using Rudzoft.ChessLib.ObjectPoolPolicies;
 using Rudzoft.ChessLib.Types;
 using Rudzoft.ChessLib.Validation;
@@ -34,6 +36,27 @@ namespace Rudzoft.ChessLib.Test.PiecesTests;
 
 public sealed class PieceAttacksRookTests : PieceAttacks
 {
+    private readonly IServiceProvider _serviceProvider;
+
+    public PieceAttacksRookTests()
+    {
+        _serviceProvider = new ServiceCollection()
+            .AddTransient<IBoard, Board>()
+            .AddSingleton<IValues, Values>()
+            .AddSingleton<ICuckoo, Cuckoo>()
+            .AddSingleton<IZobrist, Zobrist>()
+            .AddSingleton<IPositionValidator, PositionValidator>()
+            .AddTransient<IPosition, Position>()
+            .AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>()
+            .AddSingleton(static serviceProvider =>
+            {
+                var provider = serviceProvider.GetRequiredService<ObjectPoolProvider>();
+                var policy = new MoveListPolicy();
+                return provider.Create(policy);
+            })
+            .BuildServiceProvider();
+    }
+    
     /// <summary>
     /// Testing results of blocked rook attacks, they should always return 7 on the sides, and 14 in
     /// the corner
@@ -66,12 +89,7 @@ public sealed class PieceAttacksRookTests : PieceAttacks
          */
 
         // just to get the attacks
-        var board = new Board();
-        var pieceValue = new Values();
-        var moveListObjectPool = new DefaultObjectPool<IMoveList>(new MoveListPolicy());
-        var validator = new PositionValidator();
-
-        var pos = new Position(board, pieceValue, validator, moveListObjectPool);
+        var pos = _serviceProvider.GetRequiredService<IPosition>();
 
         while (border)
         {

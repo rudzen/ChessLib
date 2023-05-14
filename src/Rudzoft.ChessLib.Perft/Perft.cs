@@ -81,10 +81,11 @@ public sealed class Perft : IPerft
         if (Positions.Count == 0)
             yield break;
 
+        var state = new State();
+        
         foreach (var fd in Positions.Select(static p => new FenData(p.Fen)))
         {
-            var state = new State();
-            Game.Pos.Set(in fd, ChessMode.Normal, state);
+            Game.Pos.Set(in fd, ChessMode.Normal, in state);
             var result = Game.Perft(depth);
             yield return result;
         }
@@ -101,7 +102,7 @@ public sealed class Perft : IPerft
     {
         var fp = new FenData(pp.Fen);
         var state = new State();
-        Game.Pos.Set(in fp, ChessMode.Normal, state);
+        Game.Pos.Set(in fp, ChessMode.Normal, in state);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

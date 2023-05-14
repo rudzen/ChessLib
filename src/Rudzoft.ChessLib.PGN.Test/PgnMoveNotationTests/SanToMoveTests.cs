@@ -28,6 +28,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.ObjectPool;
 using Rudzoft.ChessLib.Enums;
 using Rudzoft.ChessLib.Fen;
+using Rudzoft.ChessLib.Hash;
 using Rudzoft.ChessLib.Notation;
 using Rudzoft.ChessLib.Notation.Notations;
 using Rudzoft.ChessLib.ObjectPoolPolicies;
@@ -48,6 +49,8 @@ public sealed class SanToMoveTests
         _serviceProvider = new ServiceCollection()
             .AddTransient<IBoard, Board>()
             .AddSingleton<IValues, Values>()
+            .AddSingleton<IZobrist, Zobrist>()
+            .AddSingleton<ICuckoo, Cuckoo>()
             .AddSingleton<IPositionValidator, PositionValidator>()
             .AddTransient<IPosition, Position>()
             .AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>()
@@ -68,7 +71,7 @@ public sealed class SanToMoveTests
         var pos = _serviceProvider.GetRequiredService<IPosition>();
         var fenData = new FenData(Fen.Fen.StartPositionFen);
         var state = new State();
-        pos.Set(in fenData, ChessMode.Normal, state);
+        pos.Set(in fenData, ChessMode.Normal, in state);
         
         var games = new List<PgnGame>();
         var parser = _serviceProvider.GetRequiredService<IPgnParser>();
@@ -94,7 +97,7 @@ public sealed class SanToMoveTests
             .TakeWhile(static move => move != Move.EmptyMove);
 
         foreach (var move in chessMoves)
-            pos.MakeMove(move, state);
+            pos.MakeMove(move, in state);
         
         Assert.Equal(ExpectedGameCount, games.Count);
         Assert.NotEmpty(games);
@@ -107,7 +110,7 @@ public sealed class SanToMoveTests
         var pos = _serviceProvider.GetRequiredService<IPosition>();
         var fenData = new FenData(Fen.Fen.StartPositionFen);
         var state = new State();
-        pos.Set(in fenData, ChessMode.Normal, state);
+        pos.Set(in fenData, ChessMode.Normal, in state);
         
         var games = new List<PgnGame>();
         var parser = _serviceProvider.GetRequiredService<IPgnParser>();
