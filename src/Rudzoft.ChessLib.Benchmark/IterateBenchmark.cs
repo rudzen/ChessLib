@@ -1,6 +1,4 @@
-﻿using System;
-using System.Runtime.CompilerServices;
-using Rudzoft.ChessLib.Types;
+﻿using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Benchmark;
 

@@ -1,6 +1,4 @@
-using System.Collections.Generic;
-using System.Linq;
-using Rudzoft.ChessLib.Types;
+using File = Rudzoft.ChessLib.Types.File;
 
 namespace Rudzoft.ChessLib.Benchmark;
 

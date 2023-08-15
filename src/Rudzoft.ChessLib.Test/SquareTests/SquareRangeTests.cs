@@ -1,5 +1,4 @@
-﻿using System;
-using Rudzoft.ChessLib.Types;
+﻿using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Test.SquareTests;
 

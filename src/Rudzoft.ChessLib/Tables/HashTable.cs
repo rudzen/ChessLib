@@ -24,8 +24,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System;
-using Rudzoft.ChessLib.Hash;
 using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Tables;

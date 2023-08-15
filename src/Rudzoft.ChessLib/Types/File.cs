@@ -25,7 +25,6 @@ SOFTWARE.
 */
 
 using Rudzoft.ChessLib.Extensions;
-using System;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 

@@ -25,7 +25,6 @@ SOFTWARE.
 */
 
 using Rudzoft.ChessLib.Types;
-using System;
 using System.Runtime.CompilerServices;
 
 namespace Rudzoft.ChessLib.Perft;

@@ -24,8 +24,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System;
-using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.ObjectPool;
 using Rudzoft.ChessLib.Enums;
@@ -33,6 +31,7 @@ using Rudzoft.ChessLib.Hash;
 using Rudzoft.ChessLib.ObjectPoolPolicies;
 using Rudzoft.ChessLib.Types;
 using Rudzoft.ChessLib.Validation;
+using File = Rudzoft.ChessLib.Types.File;
 
 namespace Rudzoft.ChessLib.Test.ZobristTests;
 

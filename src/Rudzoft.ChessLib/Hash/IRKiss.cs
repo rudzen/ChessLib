@@ -27,8 +27,6 @@
 
  */
 
-using System.Collections.Generic;
-
 namespace Rudzoft.ChessLib.Hash;
 
 public interface IRKiss

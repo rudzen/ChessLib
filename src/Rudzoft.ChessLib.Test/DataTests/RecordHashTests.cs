@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Rudzoft.ChessLib.Test.DataTests;
+﻿namespace Rudzoft.ChessLib.Test.DataTests;
 
 public sealed class RecordHashTests
 {

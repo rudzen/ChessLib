@@ -24,10 +24,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Rudzoft.ChessLib.Types;
+using File = Rudzoft.ChessLib.Types.File;
 
 [assembly: InternalsVisibleTo("Chess.Test")]
 

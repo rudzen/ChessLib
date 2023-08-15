@@ -1,0 +1,10 @@
+<Project>
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+        <LangVersion>latest</LangVersion>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>warnings</Nullable>
+        <IsPackable>false</IsPackable>
+        <TieredPGO>true</TieredPGO>
+    </PropertyGroup>
+</Project>

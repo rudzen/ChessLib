@@ -26,6 +26,7 @@ SOFTWARE.
 
 using System.Runtime.CompilerServices;
 using Rudzoft.ChessLib.Types;
+using File = Rudzoft.ChessLib.Types.File;
 
 namespace Rudzoft.ChessLib.Test.SizesTests;
 

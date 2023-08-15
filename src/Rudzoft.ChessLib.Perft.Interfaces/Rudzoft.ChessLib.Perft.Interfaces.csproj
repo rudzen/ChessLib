@@ -1,13 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
-    <TieredPGO>true</TieredPGO>
-    <LangVersion>default</LangVersion>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Rudzoft.ChessLib\Rudzoft.ChessLib.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\Rudzoft.ChessLib\Rudzoft.ChessLib.csproj"/>
+    </ItemGroup>
 
 </Project>

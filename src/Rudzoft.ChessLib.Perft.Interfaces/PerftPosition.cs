@@ -24,8 +24,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System.Collections.Generic;
-
 namespace Rudzoft.ChessLib.Perft.Interfaces;
 
 public record struct PerftPositionValue(int Depth, ulong MoveCount);

@@ -25,6 +25,7 @@ SOFTWARE.
 */
 
 using Rudzoft.ChessLib.Types;
+using File = Rudzoft.ChessLib.Types.File;
 
 namespace Rudzoft.ChessLib.Test.SquareTests;
 

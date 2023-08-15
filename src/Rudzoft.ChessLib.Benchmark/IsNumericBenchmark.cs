@@ -1,6 +1,4 @@
 ﻿using Rudzoft.ChessLib.Extensions;
-using System;
-using System.Linq;
 
 namespace Rudzoft.ChessLib.Benchmark;
 

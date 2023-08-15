@@ -1,5 +1,4 @@
-﻿using Rudzoft.ChessLib.Fen;
-using Rudzoft.ChessLib.MoveGeneration;
+﻿using Rudzoft.ChessLib.MoveGeneration;
 using Rudzoft.ChessLib.WebApi.Queries;
 
 namespace Rudzoft.ChessLib.WebApi.Services;

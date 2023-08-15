@@ -1,10 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
-    <TieredPGO>true</TieredPGO>
     <RootNamespace>Perft</RootNamespace>
-    <LangVersion>default</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
