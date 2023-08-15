@@ -38,9 +38,6 @@ namespace Rudzoft.ChessLib.Polyglot;
 
 public sealed class PolyglotBook : IPolyglotBook
 {
-    // PolyGlot pieces are: BP = 0, WP = 1, BN = 2, ... BK = 10, WK = 11
-    private static readonly int[] PieceMapping = { -1, 1, 3, 5, 7, 9, 11, -1, -1, 0, 2, 4, 6, 8, 10 };
-
     private static readonly CastleRight[] CastleRights =
     {
         CastleRight.WhiteKing,
@@ -215,8 +212,7 @@ public sealed class PolyglotBook : IPolyglotBook
         {
             var s = BitBoards.PopLsb(ref b);
             var pc = pos.GetPiece(s);
-            var p = PieceMapping[pc.AsInt()];
-            k ^= PolyglotBookZobrist.Psq(p, s);
+            k ^= PolyglotBookZobrist.Psq(pc, s);
         }
 
         var crSpan = CastleRights.AsSpan();

@@ -88,6 +88,7 @@ public static class ChessLibServiceCollectionExtensions
                 return uci;
             })
             .AddSingleton<ICuckoo, Cuckoo>()
+            .AddSingleton<IRKiss, RKiss>()
             .AddSingleton<IZobrist, Zobrist>()
             .AddTransient<IKillerMovesFactory, KillerMovesFactory>()
             .AddSingleton<ISearchParameters, SearchParameters>()

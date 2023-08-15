@@ -45,6 +45,7 @@ public sealed class MoveGen_49
     {
         _serviceProvider = new ServiceCollection()
             .AddTransient<IBoard, Board>()
+            .AddSingleton<IRKiss, RKiss>()
             .AddSingleton<IValues, Values>()
             .AddSingleton<ICuckoo, Cuckoo>()
             .AddSingleton<IZobrist, Zobrist>()

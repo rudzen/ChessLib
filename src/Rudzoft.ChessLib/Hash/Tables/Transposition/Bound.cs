@@ -29,7 +29,7 @@ using System;
 namespace Rudzoft.ChessLib.Hash.Tables.Transposition;
 
 [Flags]
-public enum Bound : sbyte
+public enum Bound : byte
 {
     Void = 0,
     Alpha = 1,

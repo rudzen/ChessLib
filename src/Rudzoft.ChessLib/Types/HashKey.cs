@@ -51,6 +51,8 @@ public readonly struct HashKey : IEquatable<HashKey>
 
     [field: FieldOffset(4)] public uint UpperKey { get; }
 
+    public bool IsEmpty => Key == 0;
+    
     public static HashKey Empty => new();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

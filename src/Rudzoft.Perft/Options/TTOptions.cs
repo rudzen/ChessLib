@@ -35,5 +35,5 @@ public class TTOptions : IPerftOptions
     public bool Use { get; set; }
 
     [Option('s', "size", Required = false, Default = 32, HelpText = "Set the size of the transposition table in mb")]
-    public int Size { get; set; }
+    public uint Size { get; set; }
 }

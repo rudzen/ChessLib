@@ -53,7 +53,6 @@ public class PerftBench
     [GlobalSetup]
     public void Setup()
     {
-        
         var pp = PerftPositionFactory.Create(
             Guid.NewGuid().ToString(),
             Fen.Fen.StartPositionFen,
@@ -66,7 +65,7 @@ public class PerftBench
                 new(5, 4865609),
                 new(6, 119060324)
             });
-        
+
         var ttConfig = new TranspositionTableConfiguration { DefaultSize = 1 };
         var options = Options.Create(ttConfig);
         var tt = new TranspositionTable(options);
@@ -76,19 +75,20 @@ public class PerftBench
         var cpu = new Cpu();
 
         var moveListObjectPool = new DefaultObjectPool<IMoveList>(new MoveListPolicy());
-        
+
         var sp = new SearchParameters();
-        
+
         var board = new Board();
         var values = new Values();
-        var zobrist = new Zobrist();
+        var rKiss = new RKiss();
+        var zobrist = new Zobrist(rKiss);
         var cuckoo = new Cuckoo(zobrist);
         var validator = new PositionValidator(zobrist);
 
         var pos = new Position(board, values, zobrist, cuckoo, validator, moveListObjectPool);
-        
+
         var game = new Game(tt, uci, cpu, sp, pos, moveListObjectPool);
-        _perft = new Perft.Perft(game, new []{ pp });
+        _perft = new Perft.Perft(game, new[] { pp });
     }
 
     [Benchmark]

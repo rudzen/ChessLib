@@ -47,6 +47,7 @@ public sealed class MoveGeneratorTests
             .AddTransient<IBoard, Board>()
             .AddSingleton<IValues, Values>()
             .AddSingleton<ICuckoo, Cuckoo>()
+            .AddSingleton<IRKiss, RKiss>()
             .AddSingleton<IZobrist, Zobrist>()
             .AddSingleton<IPositionValidator, PositionValidator>()
             .AddTransient<IPosition, Position>()

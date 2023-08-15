@@ -29,17 +29,22 @@ using System.Runtime.CompilerServices;
 
 namespace Rudzoft.ChessLib.Hash;
 
+/// <summary>
+/// ------------ |----------:|----------:|----------:|
+///       Method |      Mean |     Error |    StdDev |
+/// ------------ |----------:|----------:|----------:|
+///     ULongRnd | 77.335 ns | 1.0416 ns | 0.9743 ns |
+///  RKissRandom |  4.369 ns | 0.0665 ns | 0.0622 ns |
+/// ------------ |----------:|----------:|----------:|
+/// </summary>
 public sealed class RKiss : IRKiss
 {
-    private ulong _s;
+    /// <summary>
+    /// The default value for random seed for improved consistency
+    /// </summary>
+    private const ulong DefaultRandomSeed = 1070372;
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private RKiss(in ulong s)
-    {
-        _s = s;
-    }
-
-    public static IRKiss Create(in ulong seed) => new RKiss(seed);
+    private ulong _s = DefaultRandomSeed;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public IEnumerable<ulong> Get(int count)

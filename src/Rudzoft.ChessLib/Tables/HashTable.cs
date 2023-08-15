@@ -25,6 +25,7 @@ SOFTWARE.
 */
 
 using System;
+using Rudzoft.ChessLib.Hash;
 using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Tables;
@@ -35,7 +36,7 @@ public abstract class HashTable<T> : IHashTable<T> where T : ITableEntry
 
     public int Count => _table.Length;
 
-    public ref T this[HashKey key] => ref _table[key.Key & (ulong)(_table.Length - 1)];
+    public ref T this[HashKey key] => ref _table[key.Key & (ulong)_table.Length - 1];
 
     /// <summary>
     /// Initialized the table array. In case the table array is initialized with a different
@@ -50,7 +51,7 @@ public abstract class HashTable<T> : IHashTable<T> where T : ITableEntry
     /// <param name="elementSize">The size of <see cref="T"/></param>
     /// <param name="tableSizeMb">The number of elements to store in the array</param>
     /// <param name="initializer">Initializer function to initialize a single entry object</param>
-    public void Initialize(int elementSize, int tableSizeMb, Func<T> initializer)
+    public void Initialize(int elementSize, int tableSizeMb, Func<HashKey, T> initializer)
     {
         var arraySize = tableSizeMb * 1024 * 1024 / elementSize;
         if (_table.Length != 0)
@@ -66,13 +67,13 @@ public abstract class HashTable<T> : IHashTable<T> where T : ITableEntry
                 return;
 
             for (var i = currentLength; i < arraySize; ++i)
-                _table[i] = initializer();
+                _table[i] = initializer(ulong.MinValue);
         }
         else
         {
             _table = new T[arraySize];
             for (var i = 0; i < _table.Length; ++i)
-                _table[i] = initializer();
+                _table[i] = initializer(ulong.MinValue);
         }
     }
 }

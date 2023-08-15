@@ -40,12 +40,13 @@ namespace Rudzoft.ChessLib;
 /// </summary>
 public sealed class Cuckoo : ICuckoo
 {
-    private readonly HashKey[] CuckooKeys = new HashKey[8192];
-    private readonly Move[] CuckooMoves = new Move[8192];
+    private readonly HashKey[] _cuckooKeys;
+    private readonly Move[] _cuckooMoves;
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Minor Code Smell", "S3963:\"static\" fields should be initialized inline", Justification = "Multiple arrays in one go")]
     public Cuckoo(IZobrist zobrist)
     {
+        _cuckooKeys = new HashKey[8192];
+        _cuckooMoves = new Move[8192];
         var count = 0;
         
         foreach (var pc in Piece.All.AsSpan())
@@ -60,12 +61,12 @@ public sealed class Cuckoo : ICuckoo
                         continue;
 
                     var move = Move.Create(sq1, sq2);
-                    var key = zobrist.GetZobristPst(sq1, pc) ^ zobrist.GetZobristPst(sq2, pc) ^ zobrist.GetZobristSide();
+                    var key = zobrist.Psq(sq1, pc) ^ zobrist.Psq(sq2, pc) ^ zobrist.Side();
                     var j = CuckooHashOne(in key);
                     do
                     {
-                        (CuckooKeys[j], key) = (key, CuckooKeys[j]);
-                        (CuckooMoves[j], move) = (move, CuckooMoves[j]);
+                        (_cuckooKeys[j], key) = (key, _cuckooKeys[j]);
+                        (_cuckooMoves[j], move) = (move, _cuckooMoves[j]);
 
                         // check for empty slot
                         if (move.IsNullMove())
@@ -100,18 +101,18 @@ public sealed class Cuckoo : ICuckoo
             var moveKey = originalKey ^ statePrevious.PositionKey;
 
             var j = CuckooHashOne(in moveKey);
-            var found = CuckooKeys[j] == moveKey;
+            var found = _cuckooKeys[j] == moveKey;
 
             if (!found)
             {
                 j = CuckooHashTwo(in moveKey);
-                found = CuckooKeys[j] == moveKey;
+                found = _cuckooKeys[j] == moveKey;
             }
 
             if (!found)
                 continue;
 
-            var (s1, s2) = CuckooMoves[j];
+            var (s1, s2) = _cuckooMoves[j];
 
             if ((s1.BitboardBetween(s2) & pos.Board.Pieces()).IsEmpty)
                 continue;

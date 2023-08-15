@@ -42,7 +42,7 @@ namespace Rudzoft.ChessLib.Types;
 public static class BitBoards
 {
     internal const ulong One = 0x1ul;
-
+    
     public static readonly BitBoard WhiteArea = new(0x00000000FFFFFFFFUL);
 
     public static readonly BitBoard BlackArea = ~WhiteArea;
@@ -231,8 +231,6 @@ public static class BitBoards
             ForwardRanksBB[0][rank] = ~(ForwardRanksBB[1][rank + 1] = ForwardRanksBB[1][rank] | r.BitBoardRank());
         }
 
-        BitBoard bb;
-
         foreach (var player in Player.AllPlayers.AsSpan())
         {
             foreach (var square in Square.All.AsSpan())
@@ -251,7 +249,7 @@ public static class BitBoards
 
         Span<PieceTypes> validMagicPieces = stackalloc PieceTypes[] { PieceTypes.Bishop, PieceTypes.Rook };
 
-        bb = AllSquares;
+        var bb = AllSquares;
         // Pseudo attacks for all pieces
         while (bb)
         {
@@ -300,7 +298,7 @@ public static class BitBoards
         {
             FileEBB | FileFBB | FileGBB | FileHBB, // King
             FileABB | FileBBB | FileCBB | FileDBB, // Queen
-            FileCBB | FileDBB | FileEBB | FileFBB // Center
+            FileCBB | FileDBB | FileEBB | FileFBB  // Center
         };
     }
 
@@ -513,9 +511,8 @@ public static class BitBoards
         const string line   = "+---+---+---+---+---+---+---+---+---+";
         const string bottom = "|   | A | B | C | D | E | F | G | H |";
         Span<char> span = stackalloc char[768];
-        var idx = 0;
-        foreach (var c in line)
-            span[idx++] = c;
+        line.CopyTo(span);
+        var idx = line.Length;
         span[idx++] = '\n';
         foreach (var c in title.Length > 64 ? title.AsSpan()[..64] : title.AsSpan())
             span[idx++] = c;

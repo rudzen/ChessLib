@@ -25,7 +25,7 @@ SOFTWARE.
 */
 
 using System;
-using System.Diagnostics.Contracts;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Microsoft.Extensions.DependencyInjection;
@@ -48,6 +48,7 @@ public sealed class BoardTests
         _serviceProvider = new ServiceCollection()
             .AddTransient<IBoard, Board>()
             .AddSingleton<IValues, Values>()
+            .AddSingleton<IRKiss, RKiss>()
             .AddSingleton<IZobrist, Zobrist>()
             .AddSingleton<ICuckoo, Cuckoo>()
             .AddSingleton<IPositionValidator, PositionValidator>()
@@ -66,13 +67,13 @@ public sealed class BoardTests
     {
         public BoardTestsTheoryData(string[] fens, PieceTypes[] pts, Player[] players, int[] expectedCounts)
         {
-            Contract.Assert(fens != null);
-            Contract.Assert(pts != null);
-            Contract.Assert(players != null);
-            Contract.Assert(expectedCounts != null);
-            Contract.Assert(fens.Length == pts.Length);
-            Contract.Assert(fens.Length == players.Length);
-            Contract.Assert(fens.Length == expectedCounts.Length);
+            Debug.Assert(fens != null);
+            Debug.Assert(pts != null);
+            Debug.Assert(players != null);
+            Debug.Assert(expectedCounts != null);
+            Debug.Assert(fens.Length == pts.Length);
+            Debug.Assert(fens.Length == players.Length);
+            Debug.Assert(fens.Length == expectedCounts.Length);
 
             var fensSpan = fens.AsSpan();
             var ptsSpan = pts.AsSpan();

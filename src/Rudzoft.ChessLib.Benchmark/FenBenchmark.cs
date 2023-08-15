@@ -26,7 +26,8 @@ public class FenBenchmark
         var pieceValue = new Values();
         var fp = new FenData(F);
         var state = new State();
-        var zobrist = new Zobrist();
+        var rKiss = new RKiss();
+        var zobrist = new Zobrist(rKiss);
         var cuckoo = new Cuckoo(zobrist);
         var validator = new PositionValidator(zobrist);
         var moveListObjectPool = new DefaultObjectPool<IMoveList>(new MoveListPolicy());

@@ -24,63 +24,60 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System;
 using System.Runtime.InteropServices;
 using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Hash.Tables.Transposition;
 
+/// The TTEntry is the class of transposition table entries
+///
+/// A TTEntry needs 128 bits to be stored
+///
+/// bit  0-31: key
+/// bit 32-63: data
+/// bit 64-79: value
+/// bit 80-95: depth
+/// bit 96-111: static value
+/// bit 112-127: margin of static value
+///
+/// the 32 bits of the data field are so defined
+///
+/// bit  0-15: move
+/// bit 16-20: not used
+/// bit 21-22: value type
+/// bit 23-31: generation
 [StructLayout(LayoutKind.Sequential, Pack = 2)]
-public struct TranspositionTableEntry
+public struct TTEntry
 {
-    public uint Key32;
-    public Move Move;
-    public int Value;
-    public int StaticValue;
-    public Bound Type;
-    public sbyte Depth;
-    public sbyte Generation;
+    internal uint key;
+    internal Move move16;
+    internal Bound bound;
+    internal byte generation8;
+    internal short value16;
+    internal short depth16;
+    internal short staticValue;
+    internal short staticMargin;
 
-    public TranspositionTableEntry(uint k, Move m, sbyte d, sbyte g, int v, int sv, Bound b)
+    internal void save(uint k, Value v, Bound t, Depth d, Move m, int g, Value statV, Value statM)
     {
-        Key32 = k;
-        Move = m;
-        Depth = d;
-        Generation = g;
-        Value = v;
-        StaticValue = sv;
-        Type = b;
+        key = k;
+        move16 = m;
+        bound = t;
+        generation8 = (byte)g;
+        value16 = (short)v.Raw;
+        depth16 = (short)d.Value;
+        staticValue = (short)statV.Raw;
+        staticMargin = (short)statM.Raw;
     }
 
-    public TranspositionTableEntry(in TranspositionTableEntry tte)
-    {
-        this = tte;
-    }
+    internal void set_generation(int g) { generation8 = (byte)g; }
 
-    public static bool operator ==(TranspositionTableEntry left, TranspositionTableEntry right)
-        => left.Equals(right);
-
-    public static bool operator !=(TranspositionTableEntry left, TranspositionTableEntry right)
-        => !(left == right);
-
-    public void Save(in TranspositionTableEntry tte)
-    {
-        Key32 = tte.Key32;
-        if (!tte.Move.IsNullMove())
-            Move = tte.Move;
-        Depth = tte.Depth;
-        Generation = tte.Generation;
-        Value = tte.Value;
-        StaticValue = tte.StaticValue;
-        Type = tte.Type;
-    }
-
-    private readonly bool Equals(TranspositionTableEntry other)
-        => Key32 == other.Key32 && Generation == other.Generation;
-
-    public readonly override bool Equals(object obj)
-        => obj is TranspositionTableEntry other && Equals(other);
-
-    public readonly override int GetHashCode()
-        => HashCode.Combine(Key32, Move, Depth, Generation, Value, StaticValue, Type);
-}
+    //internal UInt32 key() { return key32; }
+    internal Depth depth() { return depth16; }
+    internal Move move() { return move16; }
+    internal Value value() { return value16; }
+    internal Bound type() { return bound; }
+    internal int generation() { return generation8; }
+    internal Value static_value() { return staticValue; }
+    internal Value static_value_margin() { return staticMargin; }
+};

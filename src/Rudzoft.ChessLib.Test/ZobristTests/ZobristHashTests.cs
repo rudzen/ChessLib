@@ -45,6 +45,7 @@ public sealed class ZobristHashTests
         _serviceProvider = new ServiceCollection()
             .AddTransient<IBoard, Board>()
             .AddSingleton<IValues, Values>()
+            .AddSingleton<IRKiss, RKiss>()
             .AddSingleton<IZobrist, Zobrist>()
             .AddSingleton<ICuckoo, Cuckoo>()
             .AddSingleton<IPositionValidator, PositionValidator>()
@@ -63,7 +64,7 @@ public sealed class ZobristHashTests
     [InlineData(Fen.Fen.StartPositionFen, Squares.a2, Squares.a4)]
     [InlineData(Fen.Fen.StartPositionFen, Squares.a2, Squares.a3)]
     [InlineData(Fen.Fen.StartPositionFen, Squares.b1, Squares.c3)]
-    public void BackAndForth(string fen, Squares from, Squares to)
+    public void BackAndForthBasicMoves(string fen, Squares from, Squares to)
     {
         var pos = _serviceProvider.GetRequiredService<IPosition>();
 
@@ -93,33 +94,66 @@ public sealed class ZobristHashTests
         Assert.Equal(startKey, finalKey);
     }
 
+    [Theory]
+    [InlineData("rnbqkb1r/pppp1ppp/7n/3Pp3/8/8/PPP1PPPP/RNBQKBNR w KQkq e6 0 1", Squares.d5, Squares.e6, MoveTypes.Enpassant)]
+    [InlineData("r3kb1r/p1pp1p1p/bpn2qpn/3Pp3/1P6/2P1BNP1/P3PPBP/RN1QK2R w KQkq - 0 1", Squares.e1, Squares.h1, MoveTypes.Castling)]
+    [InlineData("r3kb1r/p1pp1p1p/bpn2qpn/3Pp3/1P6/2P1BNP1/P3PPBP/RN1QK2R b KQkq - 0 1", Squares.e8, Squares.a8, MoveTypes.Castling)]
+    public void AdvancedMoves(string fen, Squares from, Squares to, MoveTypes moveType)
+    {
+        var pos = _serviceProvider.GetRequiredService<IPosition>();
+
+        var stateIndex = 0;
+        var states = new List<State> { new() };
+
+        pos.Set(fen, ChessMode.Normal, states[stateIndex]);
+        
+        var startKey = pos.State.PositionKey;
+
+        var move = new Move(from, to, moveType);
+
+        stateIndex++;
+        states.Add(new State());
+
+        pos.MakeMove(move, states[stateIndex]);
+
+        var moveKey = pos.State.PositionKey;
+
+        pos.TakeMove(move);
+
+        var finalKey = pos.State.PositionKey;
+
+        Assert.NotEqual(startKey, moveKey);
+        Assert.Equal(startKey, states[0].PositionKey);
+        Assert.NotEqual(startKey, states[1].PositionKey);
+        Assert.Equal(startKey, finalKey);
+    }
+
     [Fact]
     public void OnlyUniqueZobristHashKeys()
     {
-        var zobrist = new Zobrist();
+        var zobrist = _serviceProvider.GetRequiredService<IZobrist>();
 
         var set = new HashSet<HashKey> { HashKey.Empty };
 
-        var added = false;
+        bool added;
 
         foreach (var sq in Square.All.AsSpan())
         {
             foreach (var pc in Piece.All.AsSpan())
             {
-                added = set.Add(zobrist.GetZobristPst(sq, pc));
+                added = set.Add(zobrist.Psq(sq, pc));
                 Assert.True(added);
             }
         }
 
         foreach (var f in File.AllFiles.AsSpan())
         {
-            added = set.Add(zobrist.GetZobristEnPassant(f));
+            added = set.Add(zobrist.EnPassant(f));
             Assert.True(added);
         }
 
         var castleRights = new[]
         {
-            CastleRight.None,
             CastleRight.WhiteKing,
             CastleRight.BlackKing,
             CastleRight.WhiteQueen,
@@ -133,11 +167,11 @@ public sealed class ZobristHashTests
 
         foreach (var cr in castleRights)
         {
-            added = set.Add(zobrist.GetZobristCastleling(cr));
+            added = set.Add(zobrist.Castleling(cr));
             Assert.True(added);
         }
 
-        added = set.Add(zobrist.GetZobristSide());
+        added = set.Add(zobrist.Side());
         Assert.True(added);
     }
 }

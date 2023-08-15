@@ -344,6 +344,14 @@ internal static class PolyglotBookZobrist
 
     private const ulong TurnKey = 0xF8D626AAAF278509UL;
 
+    // PolyGlot pieces are: BP = 0, WP = 1, BN = 2, ... BK = 10, WK = 11
+    private static readonly int[] PieceMapping = { -1, 1, 3, 5, 7, 9, 11, -1, -1, 0, 2, 4, 6, 8, 10 };
+
+    internal static ulong Psq(Piece pc, Square sq)
+    {
+        return Psq(PieceMapping[pc.AsInt()], sq);
+    }
+    
     internal static ulong Psq(int piece, Square sq)
         => PsqKeys[piece, sq.AsInt()];
 

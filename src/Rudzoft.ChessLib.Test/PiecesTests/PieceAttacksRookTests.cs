@@ -44,6 +44,7 @@ public sealed class PieceAttacksRookTests : PieceAttacks
             .AddTransient<IBoard, Board>()
             .AddSingleton<IValues, Values>()
             .AddSingleton<ICuckoo, Cuckoo>()
+            .AddSingleton<IRKiss, RKiss>()
             .AddSingleton<IZobrist, Zobrist>()
             .AddSingleton<IPositionValidator, PositionValidator>()
             .AddTransient<IPosition, Position>()
@@ -58,7 +59,7 @@ public sealed class PieceAttacksRookTests : PieceAttacks
     }
     
     /// <summary>
-    /// Testing results of blocked rook attacks, they should always return 7 on the sides, and 14 in
+    /// Testing results of blocked rook attacks, they should always return 8 on the sides, and 14 in
     /// the corner
     /// </summary>
     [Fact]

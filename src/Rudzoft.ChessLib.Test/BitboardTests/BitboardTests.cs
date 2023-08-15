@@ -129,8 +129,8 @@ public sealed class BitboardTests
     public void EmptyCount()
     {
         const int expected = 0;
-        var actual = BitBoards.EmptyBitBoard.Count;
-        Assert.Equal(expected, actual);
+        var actual = BitBoards.EmptyBitBoard;
+        Assert.Equal(expected, actual.Count);
         Assert.True(BitBoards.EmptyBitBoard.IsEmpty);
     }
 

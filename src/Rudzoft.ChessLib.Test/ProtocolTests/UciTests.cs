@@ -51,6 +51,7 @@ public sealed class UciTests
         _serviceProvider = new ServiceCollection()
             .AddSingleton(options)
             .AddSingleton<IValues, Values>()
+            .AddSingleton<IRKiss, RKiss>()
             .AddSingleton<IZobrist, Zobrist>()
             .AddSingleton<ICuckoo, Cuckoo>()
             .AddSingleton<IPositionValidator, PositionValidator>()

@@ -58,6 +58,7 @@ public sealed class PolyglotTests : IClassFixture<BookFixture>
             .AddSingleton(polyOptions)
             .AddTransient<IBoard, Board>()
             .AddSingleton<IValues, Values>()
+            .AddSingleton<IRKiss, RKiss>()
             .AddSingleton<IZobrist, Zobrist>()
             .AddSingleton<ICuckoo, Cuckoo>()
             .AddSingleton<IPositionValidator, PositionValidator>()

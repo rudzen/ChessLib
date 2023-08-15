@@ -89,7 +89,7 @@ public sealed class PerftRunner : IPerftRunner
         _log = log;
         _buildTimeStamp = buildTimeStamp;
         _perft = perft;
-        _perft.BoardPrintCallback ??= s => _log.Information("Board:\n{0}", s);
+        _perft.BoardPrintCallback ??= s => _log.Information("Board:\n{Board}", s);
         _transpositionTable = transpositionTable;
         _resultPool = resultPool;
         _uci = uci;
@@ -134,7 +134,7 @@ public sealed class PerftRunner : IPerftRunner
                 var result = await ComputePerft(cancellationToken).ConfigureAwait(false);
                 Interlocked.Add(ref errors, result.Errors);
                 if (errors != 0)
-                    _log.Error("Parsing failed for Id={0}", position.Id);
+                    _log.Error("Parsing failed for Id={Id}", position.Id);
                 _resultPool.Return(result);
             }
             catch (AggregateException e)
@@ -171,9 +171,10 @@ public sealed class PerftRunner : IPerftRunner
 
         sw.Stop();
         var elapsedMs = sw.ElapsedMilliseconds;
-        _log.Information("Parsed {0} epd entries in {1} ms", parsedCount, elapsedMs);
+        _log.Information("Parsed {Parsed} epd entries in {Elapsed} ms", parsedCount, elapsedMs);
 
-        var perftPositions = _epdParser.Sets.Select(static set => PerftPositionFactory.Create(set.Id, set.Epd, set.Perft));
+        var perftPositions =
+            _epdParser.Sets.Select(static set => PerftPositionFactory.Create(set.Id, set.Epd, set.Perft));
 
         foreach (var perftPosition in perftPositions)
             yield return perftPosition;
@@ -205,7 +206,7 @@ public sealed class PerftRunner : IPerftRunner
         var result = _resultPool.Get();
         result.Clear();
 
-        var pp = _perft.Positions.Last();
+        var pp = _perft.Positions[^1];
         var baseFileName = SaveResults
             ? Path.Combine(CurrentDirectory.Value, $"{FixFileName(pp.Fen)}[")
             : string.Empty;
@@ -215,24 +216,21 @@ public sealed class PerftRunner : IPerftRunner
         result.Fen = pp.Fen;
         _perft.SetGamePosition(pp);
         _perft.BoardPrintCallback(_perft.GetBoard());
-        _log.Information("Fen         : {0}", pp.Fen);
+        _log.Information("Fen         : {Fen}", pp.Fen);
         _log.Information(Line);
-
-        var sw = new Stopwatch();
 
         foreach (var (depth, expected) in pp.Value)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            _log.Information("Depth       : {0}", depth);
-            sw.Restart();
+            _log.Information("Depth       : {Depth}", depth);
+
+            var start = Stopwatch.GetTimestamp();
 
             var perftResult = await _perft.DoPerftAsync(depth).ConfigureAwait(false);
-            sw.Stop();
+            var elapsedMs = Stopwatch.GetElapsedTime(start);
 
-            var elapsedMs = sw.ElapsedMilliseconds;
-
-            ComputeResults(perftResult, depth, expected, elapsedMs, result);
+            ComputeResults(in perftResult, depth, in expected, in elapsedMs, result);
 
             errors += LogResults(result);
 
@@ -242,14 +240,17 @@ public sealed class PerftRunner : IPerftRunner
             await WriteOutput(result, baseFileName, cancellationToken);
         }
 
-        _log.Information("{0} parsing complete. Encountered {1} errors.", _usingEpd ? "EPD" : "FEN", errors);
+        _log.Information("{Info} parsing complete. Encountered {Errors} errors", _usingEpd ? "EPD" : "FEN", errors);
 
         result.Errors = errors;
 
         return result;
     }
 
-    private static async ValueTask WriteOutput(IPerftResult result, string baseFileName, CancellationToken cancellationToken)
+    private static async ValueTask WriteOutput(
+        IPerftResult result,
+        string baseFileName,
+        CancellationToken cancellationToken)
     {
         // ReSharper disable once MethodHasAsyncOverload
         var contents = JsonSerializer.Serialize(result);
@@ -261,13 +262,13 @@ public sealed class PerftRunner : IPerftRunner
             .ConfigureAwait(false);
     }
 
-    private void ComputeResults(ulong result, int depth, ulong expected, long elapsedMs, IPerftResult results)
+    private void ComputeResults(in ulong result, int depth, in ulong expected, in TimeSpan elapsedMs, IPerftResult results)
     {
         // compute results
         results.Result = result;
         results.Depth = depth;
         // add 1 to avoid potential dbz
-        results.Elapsed = TimeSpan.FromMilliseconds(elapsedMs + 1);
+        results.Elapsed = elapsedMs.Add(TimeSpan.FromMicroseconds(1));
         results.Nps = _uci.Nps(in result, results.Elapsed);
         results.CorrectResult = expected;
         results.Passed = expected == result;
@@ -276,28 +277,28 @@ public sealed class PerftRunner : IPerftRunner
 
     private void LogInfoHeader()
     {
-        _log.Information("ChessLib Perft test program {0} ({1})", Version, _buildTimeStamp.TimeStamp);
-        _log.Information("High timer resolution : {0}", Stopwatch.IsHighResolution);
+        _log.Information("ChessLib Perft test program {Version} ({Time})", Version, _buildTimeStamp.TimeStamp);
+        _log.Information("High timer resolution : {HighRes}", Stopwatch.IsHighResolution);
         _log.Information("Initializing..");
     }
 
     private int LogResults(IPerftResult result)
     {
-        _log.Information("Time passed : {0}", result.Elapsed);
-        _log.Information("Nps         : {0}", result.Nps);
+        _log.Information("Time passed : {Elapsed}", result.Elapsed);
+        _log.Information("Nps         : {Nps}", result.Nps);
         if (_usingEpd)
         {
-            _log.Information("Result      : {0} - should be {1}", result.Result, result.CorrectResult);
+            _log.Information("Result      : {Result} - should be {Expected}", result.Result, result.CorrectResult);
             if (result.Result != result.CorrectResult)
             {
                 var difference = (long)(result.CorrectResult - result.Result);
-                _log.Information("Difference  : {0}", Math.Abs(difference));
+                _log.Information("Difference  : {Diff}", Math.Abs(difference));
             }
         }
         else
-            _log.Information("Result      : {0}", result.Result);
+            _log.Information("Result      : {Result}", result.Result);
 
-        _log.Information("TT hits     : {0}", _transpositionTable.Hits);
+        _log.Information("TT hits     : {Hits}", _transpositionTable.Hits);
 
         var error = 0;
 
@@ -308,7 +309,7 @@ public sealed class PerftRunner : IPerftRunner
             _log.Information("Move count matches!");
         else
         {
-            _log.Error("Failed for position: {0}", _perft.Game.Pos.GenerateFen());
+            _log.Error("Failed for position: {Fen}", _perft.Game.Pos.GenerateFen());
             error = 1;
         }
 

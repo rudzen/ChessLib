@@ -12,10 +12,10 @@ public interface IZobrist
     HashKey ComputeMaterialKey(IPosition pos);
     HashKey ComputePawnKey(IPosition pos);
     HashKey ComputePositionKey(IPosition pos);
-    ref HashKey GetZobristPst(Square square, Piece piece);
-    ref HashKey GetZobristCastleling(CastleRights index);
-    ref HashKey GetZobristCastleling(CastleRight index);
-    HashKey GetZobristSide();
-    ref HashKey GetZobristEnPassant(File file);
-    HashKey GetZobristEnPassant(Square sq);
+    ref HashKey Psq(Square square, Piece piece);
+    ref HashKey Castleling(CastleRights index);
+    ref HashKey Castleling(CastleRight index);
+    HashKey Side();
+    ref HashKey EnPassant(File file);
+    HashKey EnPassant(Square sq);
 }

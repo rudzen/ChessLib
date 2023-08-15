@@ -34,7 +34,8 @@ public class MoveGeneratorBenchmark
         var board = new Board();
         var pieceValue = new Values();
         var state = new State();
-        var zobrist = new Zobrist();
+        var rKiss = new RKiss();
+        var zobrist = new Zobrist(rKiss);
         var cuckoo = new Cuckoo(zobrist);
         var validator = new PositionValidator(zobrist);
         _objectPool = new DefaultObjectPool<IMoveList>(new MoveListPolicy());

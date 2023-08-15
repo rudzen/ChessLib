@@ -45,6 +45,7 @@ public sealed class ValidationTests
         _serviceProvider = new ServiceCollection()
             .AddTransient<IBoard, Board>()
             .AddSingleton<IValues, Values>()
+            .AddSingleton<IRKiss, RKiss>()
             .AddSingleton<IZobrist, Zobrist>()
             .AddSingleton<ICuckoo, Cuckoo>()
             .AddSingleton<IPositionValidator, PositionValidator>()

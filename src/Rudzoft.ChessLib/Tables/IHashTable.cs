@@ -35,5 +35,5 @@ public interface IHashTable<T> where T : ITableEntry
 
     ref T this[HashKey key] { get; }
 
-    void Initialize(int elementSize, int tableSizeMb, Func<T> initializer);
+    void Initialize(int elementSize, int tableSizeMb, Func<HashKey, T> initializer);
 }
