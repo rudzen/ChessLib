@@ -106,7 +106,7 @@ public sealed class Option : IOption
         return Type switch
         {
             UciOptionType.Spin => Convert.ToInt32(_currentValue),
-            _ => bool.Parse(_currentValue).AsByte()
+            var _ => bool.Parse(_currentValue).AsByte()
         };
     }
 
@@ -134,7 +134,7 @@ public sealed class Option : IOption
     {
         var isButton = Type == UciOptionType.Button;
         if (((!isButton && v.IsNullOrEmpty())
-             || (Type == UciOptionType.Check && !bool.TryParse(v, out _))
+             || (Type == UciOptionType.Check && !bool.TryParse(v, out var _))
              || Type == UciOptionType.Spin) && Maths.ToIntegral(v, out int val) && val < Min && val > Max)
             return this;
 

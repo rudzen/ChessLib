@@ -70,8 +70,8 @@ public sealed partial class RegexPgnParser : IPgnParser
                 if (IsPgnGameResult(line))
                 {
                     yield return new(currentGameTags, currentGameMoves);
-                    currentGameTags = new Dictionary<string, string>(DefaultTagCapacity);
-                    currentGameMoves = new List<PgnMove>(DefaultMoveListCapacity);
+                    currentGameTags = new(DefaultTagCapacity);
+                    currentGameMoves = new(DefaultMoveListCapacity);
                     inMoveSection = false;
                 }
             }

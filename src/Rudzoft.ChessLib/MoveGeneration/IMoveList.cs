@@ -34,7 +34,7 @@ public interface IMoveList : IReadOnlyCollection<ValMove>
     ValMove this[int index] { get; set; }
 
     int Length { get; }
-    Move CurrentMove { get; }
+    ref ValMove CurrentMove { get; }
     void Add(in ValMove item);
     void Add(Move item);
 

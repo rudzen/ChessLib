@@ -80,7 +80,7 @@ public sealed class Cpu : ICpu
         return percentage switch
         {
             <= 0 => 0,
-            _ => Math.Round(percentage * 1000, MidpointRounding.ToEven)
+            var _ => Math.Round(percentage * 1000, MidpointRounding.ToEven)
         };
     }
 }

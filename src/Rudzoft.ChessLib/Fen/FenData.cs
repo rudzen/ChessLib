@@ -45,7 +45,7 @@ public sealed class FenData : EventArgs, IFenData
 
     private FenData()
     {
-        _splitPoints = new Queue<SplitPoint>(6);
+        _splitPoints = new(6);
     }
 
     public FenData(ReadOnlyMemory<char> fen) : this()

@@ -79,7 +79,7 @@ public readonly record struct Move(ushort Data) : ISpanFormattable
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator Move(string value)
-        => new(new Square(value[1] - '1', value[0] - 'a'), new Square(value[3] - '1', value[2] - 'a'));
+        => new(new(value[1] - '1', value[0] - 'a'), new(value[3] - '1', value[2] - 'a'));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator Move(ValMove valMove) => valMove.Move;
@@ -155,7 +155,7 @@ public readonly record struct Move(ushort Data) : ISpanFormattable
 
         Span<char> s = stackalloc char[MaxMoveStringSize];
         return TryFormat(s, out var size)
-            ? new string(s[..size])
+            ? new(s[..size])
             : "(error)";
     }
 

@@ -83,7 +83,7 @@ public sealed class Position : IPosition
         Values = values;
         _zobrist = zobrist;
         _cuckoo = cuckoo;
-        State = new State();
+        State = new();
         Clear();
     }
 
@@ -181,7 +181,7 @@ public sealed class Position : IPosition
         return mt switch
         {
             MoveTypes.Normal => Board.Pieces(~SideToMove).Contains(m.ToSquare()),
-            _ => mt != MoveTypes.Castling
+            var _ => mt != MoveTypes.Castling
         };
     }
 
@@ -294,14 +294,14 @@ public sealed class Position : IPosition
             for (var file = Files.FileA; file <= Files.FileH; file++)
             {
                 var empty = 0;
-                for (; file <= Files.FileH && Board.IsEmpty(new Square(rank, file)); ++file)
+                for (; file <= Files.FileH && Board.IsEmpty(new(rank, file)); ++file)
                     ++empty;
 
                 if (empty != 0)
                     fen[length++] = (char)(zero + empty);
 
                 if (file <= Files.FileH)
-                    fen[length++] = Board.PieceAt(new Square(rank, file)).GetPieceChar();
+                    fen[length++] = Board.PieceAt(new(rank, file)).GetPieceChar();
             }
 
             if (rank > Ranks.Rank1)
@@ -362,7 +362,7 @@ public sealed class Position : IPosition
         fen[length++] = space;
         length = fen.Append(1 + (Ply - _sideToMove.IsBlack.AsByte() / 2), length);
 
-        return new FenData(new string(fen[..length]));
+        return new(new string(fen[..length]));
     }
 
     public BitBoard GetAttacks(Square sq, PieceTypes pt, in BitBoard occ)
@@ -376,7 +376,7 @@ public sealed class Position : IPosition
             PieceTypes.Bishop => sq.BishopAttacks(in occ),
             PieceTypes.Rook => sq.RookAttacks(in occ),
             PieceTypes.Queen => sq.QueenAttacks(in occ),
-            _ => BitBoard.Empty
+            var _ => BitBoard.Empty
         };
     }
 
@@ -519,7 +519,7 @@ public sealed class Position : IPosition
         => State.Rule50 switch
         {
             > 99 when State.Checkers.IsEmpty || HasMoves() => true,
-            _ => State.Repetition > 0 && State.Repetition < ply
+            var _ => State.Repetition > 0 && State.Repetition < ply
         };
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -884,7 +884,7 @@ public sealed class Position : IPosition
         if (type == MoveTypes.Castling && ChessMode == ChessMode.Normal)
         {
             var file = to > from ? Files.FileG : Files.FileC;
-            to = new Square(from.Rank, file);
+            to = new(from.Rank, file);
         }
 
         Span<char> s = stackalloc char[5];
@@ -1140,7 +1140,7 @@ public sealed class Position : IPosition
 
         if (enPassant)
         {
-            State.EnPassantSquare = new Square(fenChunk[1] - '1', fenChunk[0] - 'a');
+            State.EnPassantSquare = new(fenChunk[1] - '1', fenChunk[0] - 'a');
 
             var otherSide = ~_sideToMove;
 
@@ -1340,7 +1340,7 @@ public sealed class Position : IPosition
 
             for (var file = Files.FileA; file <= Files.FileH; file++)
             {
-                var piece = GetPiece(new Square(rank, file));
+                var piece = GetPiece(new(rank, file));
                 row[rowIndex++] = splitter;
                 row[rowIndex++] = space;
                 row[rowIndex++] = piece.GetPieceChar();
@@ -1545,8 +1545,8 @@ public sealed class Position : IPosition
             {
                 'K' => RookSquare(Square.H1.Relative(c), rook),
                 'Q' => RookSquare(Square.A1.Relative(c), rook),
-                _ => char.IsBetween(token, 'A', 'H')
-                    ? new Square(Rank.Rank1.Relative(c), new File(token - 'A'))
+                var _ => char.IsBetween(token, 'A', 'H')
+                    ? new(Rank.Rank1.Relative(c), new(token - 'A'))
                     : Square.None
             };
 

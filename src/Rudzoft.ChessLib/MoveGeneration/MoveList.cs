@@ -39,16 +39,20 @@ namespace Rudzoft.ChessLib.MoveGeneration;
  */
 public sealed class MoveList : IMoveList
 {
-    private readonly ValMove[] _moves;
+    private readonly ValMove[] _moves = new ValMove[218];
     private int _cur;
 
-    public MoveList() => _moves = new ValMove[218];
-
-    int IReadOnlyCollection<ValMove>.Count => Length;
+    int IReadOnlyCollection<ValMove>.Count
+    {
+        get => Length;
+    }
 
     public int Length { get; private set; }
 
-    public Move CurrentMove => _moves[_cur].Move;
+    public ref ValMove CurrentMove
+    {
+        get => ref _moves[_cur];
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static MoveList operator ++(MoveList moveList)

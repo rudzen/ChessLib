@@ -51,6 +51,7 @@ public sealed class SanToMoveTests
             .AddSingleton<IValues, Values>()
             .AddSingleton<IZobrist, Zobrist>()
             .AddSingleton<ICuckoo, Cuckoo>()
+            .AddSingleton<IRKiss, RKiss>()
             .AddSingleton<IPositionValidator, PositionValidator>()
             .AddTransient<IPosition, Position>()
             .AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>()

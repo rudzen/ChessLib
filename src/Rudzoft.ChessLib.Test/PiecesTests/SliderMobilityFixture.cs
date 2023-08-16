@@ -43,7 +43,7 @@ public sealed class SliderMobilityFixture
         {
             0 => sq.BishopAttacks(in occ),
             1 => sq.RookAttacks(in occ),
-            _ => sq.QueenAttacks(in occ)
+            var _ => sq.QueenAttacks(in occ)
         };
     }
 

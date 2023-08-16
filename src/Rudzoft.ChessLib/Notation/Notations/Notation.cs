@@ -44,7 +44,7 @@ public abstract class Notation : INotation
         Pos.GenerateMoves().Length switch
         {
             0 => '+',
-            _ => '#'
+            var _ => '#'
         };
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -123,7 +123,7 @@ public abstract class Notation : INotation
         return pt switch
         {
             PieceTypes.Pawn or PieceTypes.King => BitBoard.Empty,
-            _ => Pos.GetAttacks(move.ToSquare(), pt, Pos.Pieces()) ^ from
+            var _ => Pos.GetAttacks(move.ToSquare(), pt, Pos.Pieces()) ^ from
         };
     }
 }

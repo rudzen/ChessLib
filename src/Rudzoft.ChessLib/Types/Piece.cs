@@ -197,24 +197,14 @@ public readonly record struct Piece(Pieces Value)
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override string ToString() => this.GetPieceString();
 
-    public static Piece GetPiece(char character)
+    public static Piece GetPiece(char c)
     {
-        return character switch
-        {
-            'P' => WhitePawn,
-            'p' => BlackPawn,
-            'N' => WhiteKnight,
-            'B' => WhiteBishop,
-            'R' => WhiteRook,
-            'Q' => WhiteQueen,
-            'K' => WhiteKing,
-            'n' => BlackKnight,
-            'b' => BlackBishop,
-            'r' => BlackRook,
-            'q' => BlackQueen,
-            'k' => BlackKing,
-            _ => EmptyPiece
-        };
+        var pcIndex = PieceExtensions.PieceChars.IndexOf(c);
+        if (pcIndex == -1)
+            return EmptyPiece;
+
+        Player p = new(char.IsLower(PieceExtensions.PieceChars[pcIndex]));
+        return ((PieceTypes)pcIndex).MakePiece(p);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

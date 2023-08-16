@@ -544,7 +544,7 @@ public static class BitBoards
 
         span[idx] = '\n';
 
-        return new string(span[..idx]);
+        return new(span[..idx]);
     }
 
     /// <summary>
@@ -762,7 +762,7 @@ public static class BitBoards
             PieceTypes.Bishop => sq.BishopAttacks(in occ),
             PieceTypes.Rook => sq.RookAttacks(in occ),
             PieceTypes.Queen => sq.QueenAttacks(in occ),
-            _ => EmptyBitBoard
+            var _ => EmptyBitBoard
         };
     }
 

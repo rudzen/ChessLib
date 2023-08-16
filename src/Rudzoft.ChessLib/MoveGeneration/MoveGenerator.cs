@@ -128,7 +128,7 @@ public static class MoveGenerator
             MoveGenerationTypes.Captures => pos.Pieces(~us),
             MoveGenerationTypes.Quiets => ~pos.Pieces(),
             MoveGenerationTypes.NonEvasions => ~pos.Pieces(us),
-            _ => BitBoard.Empty
+            var _ => BitBoard.Empty
         };
 
         return GenerateAll(in pos, moves, index, in target, us, types);
@@ -288,7 +288,7 @@ public static class MoveGenerator
         {
             MoveGenerationTypes.Evasions => pos.Pieces(them) & target,
             MoveGenerationTypes.Captures => target,
-            _ => pos.Pieces(them)
+            var _ => pos.Pieces(them)
         };
 
         var ksq = pos.GetKingSquare(them);

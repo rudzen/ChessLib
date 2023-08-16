@@ -59,12 +59,12 @@ public sealed class IccfNotation : Notation
                 PieceTypes.Rook => 2,
                 PieceTypes.Bishop => 3,
                 PieceTypes.Knight => 4,
-                _ => throw new NotImplementedException()
+                var _ => throw new NotImplementedException()
             };
 
             re[i++] = (char)('0' + c);
         }
 
-        return new string(re[..i]);
+        return new(re[..i]);
     }
 }

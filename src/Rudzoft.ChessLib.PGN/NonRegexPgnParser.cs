@@ -61,7 +61,7 @@ public sealed class NonRegexPgnParser : IPgnParser
                     else if (char.IsLetter(word[0]))
                     {
                         if (currentGameMoves.Count == 0 || !string.IsNullOrEmpty(currentGameMoves[^1].BlackMove))
-                            currentGameMoves.Add(new PgnMove(currentMoveNumber, word, string.Empty));
+                            currentGameMoves.Add(new(currentMoveNumber, word, string.Empty));
                         else
                         {
                             var lastMove = currentGameMoves[^1];
@@ -71,35 +71,36 @@ public sealed class NonRegexPgnParser : IPgnParser
                     else if (word.Contains("1-0") || word.Contains("0-1") || word.Contains("1/2-1/2") ||
                              word.Contains('*'))
                     {
-                        yield return new PgnGame(currentGameTags, currentGameMoves);
-                        currentGameTags = new Dictionary<string, string>();
-                        currentGameMoves = new List<PgnMove>();
+                        yield return new(currentGameTags, currentGameMoves);
+                        currentGameTags = new();
+                        currentGameMoves = new();
                         inMoveSection = false;
                     }
                 }
             }
             else
             {
-                if (line.StartsWith("[") && line.EndsWith("]") && line.Contains("\""))
-                {
-                    var firstSpaceIndex = line.IndexOf(' ');
-                    var firstQuoteIndex = line.IndexOf('"');
-                    var lastQuoteIndex = line.LastIndexOf('"');
+                if (!line.StartsWith("[") || !line.EndsWith("]") || !line.Contains('"'))
+                    continue;
+                
+                var firstSpaceIndex = line.IndexOf(' ');
+                var firstQuoteIndex = line.IndexOf('"');
+                var lastQuoteIndex = line.LastIndexOf('"');
 
-                    if (firstSpaceIndex <= 0 || firstQuoteIndex <= firstSpaceIndex
-                                             || lastQuoteIndex <= firstQuoteIndex)
-                        continue;
+                if (firstSpaceIndex <= 0 || firstQuoteIndex <= firstSpaceIndex
+                                         || lastQuoteIndex <= firstQuoteIndex)
+                    continue;
                     
-                    var tagName = line.Substring(1, firstSpaceIndex - 1).Trim();
-                    var tagValue = line.Substring(firstQuoteIndex + 1, lastQuoteIndex - firstQuoteIndex - 1)
-                        .Trim();
+                var tagName = line.Substring(1, firstSpaceIndex - 1).Trim();
+                var tagValue = line
+                    .Substring(firstQuoteIndex + 1, lastQuoteIndex - firstQuoteIndex - 1)
+                    .Trim();
 
-                    currentGameTags[tagName] = tagValue;
-                }
+                currentGameTags[tagName] = tagValue;
             }
         }
 
         if (currentGameTags.Count > 0 && currentGameMoves.Count > 0)
-            yield return new PgnGame(currentGameTags, currentGameMoves);
+            yield return new(currentGameTags, currentGameMoves);
     }
 }
