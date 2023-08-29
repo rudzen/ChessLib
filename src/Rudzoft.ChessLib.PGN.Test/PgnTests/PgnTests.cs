@@ -24,13 +24,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Rudzoft.ChessLib.PGN.Test.PgnTests;
 
 public sealed class PgnTests
 {
-    private const string SampleFilePath = @"samples/sample.pgn";
+    private const string SampleFilePath = "samples/sample.pgn";
     private const int ExpectedGameCount = 2;
 
     private readonly IServiceProvider _serviceProvider;
@@ -51,16 +52,19 @@ public sealed class PgnTests
 
         await foreach (var game in parser.ParseFile(SampleFilePath))
             games.Add(game);
-        
-        Assert.Equal(ExpectedGameCount, games.Count);
 
         var game1 = games[0];
+        var game2 = games[1];
+
+        var g = JsonSerializer.Serialize(game1);
+
+        Assert.Equal(ExpectedGameCount, games.Count);
+        
         Assert.Equal("Test event", game1.Tags["Event"]);
         Assert.Equal(3, game1.Moves.Count);
         Assert.Equal("e4", game1.Moves[0].WhiteMove);
         Assert.Equal("e5", game1.Moves[0].BlackMove);
 
-        var game2 = games[1];
         Assert.Equal("Test event 2", game2.Tags["Event"]);
         Assert.Equal(3, game2.Moves.Count);
         Assert.Equal("d4", game2.Moves[0].WhiteMove);

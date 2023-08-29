@@ -77,7 +77,7 @@ public sealed class ZobristHashTests
         var move = new Move(from, to);
 
         stateIndex++;
-        states.Add(new State());
+        states.Add(new());
 
         pos.MakeMove(move, states[stateIndex]);
 
@@ -111,7 +111,7 @@ public sealed class ZobristHashTests
         var move = new Move(from, to, moveType);
 
         stateIndex++;
-        states.Add(new State());
+        states.Add(new());
 
         pos.MakeMove(move, states[stateIndex]);
 
@@ -119,7 +119,8 @@ public sealed class ZobristHashTests
 
         pos.TakeMove(move);
 
-        var finalKey = pos.State.PositionKey;
+        var finalState = pos.State;
+        var finalKey = finalState.PositionKey;
 
         Assert.NotEqual(startKey, moveKey);
         Assert.Equal(startKey, states[0].PositionKey);

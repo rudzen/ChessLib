@@ -24,15 +24,27 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using Rudzoft.Perft.Options;
+namespace Rudzoft.Perft.Models;
 
-namespace Rudzoft.Perft.Perft;
-
-public interface IPerftRunner
+public sealed class PerftResult : IPerftResult
 {
-    bool SaveResults { get; set; }
-    IPerftOptions Options { get; set; }
-    IPerftOptions TranspositionTableOptions { get; set; }
+    public string Id { get; set; }
+    public string Fen { get; set; }
+    public int Depth { get; set; }
+    public ulong Result { get; set; }
+    public ulong CorrectResult { get; set; }
+    public TimeSpan Elapsed { get; set; }
+    public ulong Nps { get; set; }
+    public ulong TableHits { get; set; }
+    public bool Passed { get; set; }
+    public int Errors { get; set; }
 
-    Task<int> Run(CancellationToken cancellationToken = default);
+    public void Clear()
+    {
+        Fen = string.Empty;
+        Depth = Errors = 0;
+        Result = CorrectResult = Nps = TableHits = ulong.MinValue;
+        Elapsed = TimeSpan.Zero;
+        Passed = false;
+    }
 }

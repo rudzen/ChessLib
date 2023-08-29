@@ -8,7 +8,7 @@ public interface ITranspositionTable
     
     /// TranspositionTable::set_size() sets the size of the transposition table,
     /// measured in megabytes.
-    void SetSize(uint mbSize);
+    void SetSize(int mbSize);
 
     /// TranspositionTable::clear() overwrites the entire transposition table
     /// with zeroes. It is called whenever the table is resized, or when the

@@ -1,9 +1,9 @@
 ﻿/*
-Perft, a chess perft test library
+Perft, a chess perft testing application
 
 MIT License
 
-Copyright (c) 2017-2023 Rudy Alex Kohn
+Copyright (c) 2019-2023 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,14 +24,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using Microsoft.Extensions.Configuration;
+using Rudzoft.Perft.Options;
 
-namespace Perft.Factories;
+namespace Rudzoft.Perft.Services;
 
-public static class ConfigurationFactory
+public interface IPerftRunner
 {
-    public static IConfiguration CreateConfiguration(IConfigurationBuilder configurationBuilder)
-    {
-        return configurationBuilder.Build();
-    }
+    bool SaveResults { get; set; }
+    IPerftOptions Options { get; set; }
+    IPerftOptions TranspositionTableOptions { get; set; }
+
+    Task<int> Run(CancellationToken cancellationToken = default);
 }

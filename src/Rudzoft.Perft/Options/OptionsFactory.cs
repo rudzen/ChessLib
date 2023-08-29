@@ -25,20 +25,17 @@ SOFTWARE.
 */
 
 using CommandLine;
-using Rudzoft.Perft.Host;
-using Serilog;
+using Rudzoft.Perft.Models;
 
 namespace Rudzoft.Perft.Options;
 
 public sealed class OptionsFactory : IOptionsFactory
 {
     private readonly string[] _args;
-    private readonly ILogger _logger;
 
-    public OptionsFactory(CommandLineArgs args, ILogger logger)
+    public OptionsFactory(CommandLineArgs args)
     {
         _args = args.Args;
-        _logger = logger;
     }
     
     public IEnumerable<PerftOption> Parse()
@@ -82,13 +79,11 @@ public sealed class OptionsFactory : IOptionsFactory
             yield break;
 
         if (optionsUsed.HasFlagFast(OptionType.EdpOptions))
-            yield return new PerftOption(OptionType.EdpOptions, options);
+            yield return new(OptionType.EdpOptions, options!);
         else
-            yield return new PerftOption(OptionType.FenOptions, options);
+            yield return new(OptionType.FenOptions, options!);
 
         if (optionsUsed.HasFlagFast(OptionType.TTOptions))
-            yield return new PerftOption(OptionType.TTOptions, ttOptions);
-
-
+            yield return new(OptionType.TTOptions, ttOptions!);
     }
 }

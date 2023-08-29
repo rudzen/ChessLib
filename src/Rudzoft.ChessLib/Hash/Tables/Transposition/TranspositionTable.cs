@@ -44,7 +44,7 @@ public sealed class TranspositionTable : ITranspositionTable
     public TranspositionTable(IOptions<TranspositionTableConfiguration> options)
     {
         var config = options.Value;
-        SetSize((uint)config.DefaultSize);
+        SetSize(config.DefaultSize);
     }
 
     public ulong Hits { get; private set; }
@@ -54,7 +54,7 @@ public sealed class TranspositionTable : ITranspositionTable
     /// measured in megabytes.
     /// </summary>
     /// <param name="mbSize"></param>
-    public void SetSize(uint mbSize)
+    public void SetSize(int mbSize)
     {
         var newSize = 1024u;
 
@@ -62,7 +62,7 @@ public sealed class TranspositionTable : ITranspositionTable
         // of ClusterSize number of TTEntries. Each non-empty entry contains
         // information of exactly one position and newSize is the number of
         // clusters we are going to allocate.
-        while (2UL * newSize * 64 <= mbSize << 20)
+        while (2UL * newSize * 64 <= (ulong)(mbSize << 20))
             newSize *= 2;
 
         if (newSize == _size)

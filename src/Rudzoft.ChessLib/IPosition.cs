@@ -27,6 +27,7 @@ SOFTWARE.
 using System.Text;
 using Rudzoft.ChessLib.Enums;
 using Rudzoft.ChessLib.Fen;
+using Rudzoft.ChessLib.Hash;
 using Rudzoft.ChessLib.Types;
 using Rudzoft.ChessLib.Validation;
 
@@ -48,6 +49,8 @@ public interface IPosition : IEnumerable<Piece>
 
     IBoard Board { get; }
 
+    IZobrist Zobrist { get; }
+    
     IValues Values { get; }
 
     BitBoard Checkers { get; }

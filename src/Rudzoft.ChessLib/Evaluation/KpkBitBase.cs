@@ -122,7 +122,7 @@ public sealed class KpkBitBase : IKpkBitBase
             Results results;
             var stm = new Player((idx >> 12) & 0x01);
             var ksq = new Square[] { (idx >> 0) & 0x3F, (idx >> 6) & 0x3F };
-            var psq = Square.Create(new Rank(Ranks.Rank7.AsInt() - ((idx >> 15) & 0x7)), new File((idx >> 13) & 0x3));
+            var psq = Square.Create(new(Ranks.Rank7.AsInt() - ((idx >> 15) & 0x7)), new((idx >> 13) & 0x3));
 
             // Invalid if two pieces are on the same square or if a king can be captured
             if (ksq[Player.White.Side].Distance(ksq[Player.Black.Side]) <= 1
@@ -152,11 +152,11 @@ public sealed class KpkBitBase : IKpkBitBase
             else
                 results = Results.Unknown;
 
-            return new KpkPosition(
-                results,
-                stm,
-                ksq,
-                psq);
+            return new(
+                Result: results,
+                Stm: stm,
+                KingSquares: ksq,
+                PawnSquare: psq);
         }
 
         /// <summary>
@@ -253,9 +253,9 @@ public sealed class KpkBitBase : IKpkBitBase
     public bool IsDraw(IPosition pos)
     {
         return !Probe(
-            pos.GetPieceSquare(PieceTypes.King, Player.White),
-            pos.Pieces(PieceTypes.Pawn).Lsb(),
-            pos.GetPieceSquare(PieceTypes.King, Player.Black),
-            pos.SideToMove);
+            strongKsq: pos.GetPieceSquare(PieceTypes.King, Player.White),
+            strongPawnSq: pos.Pieces(PieceTypes.Pawn).Lsb(),
+            weakKsq: pos.GetPieceSquare(PieceTypes.King, Player.Black),
+            stm: pos.SideToMove);
     }
 }

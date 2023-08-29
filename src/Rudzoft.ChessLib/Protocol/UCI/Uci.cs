@@ -49,7 +49,7 @@ public class Uci : IUci
     {
         var policy = new StringBuilderPooledObjectPolicy();
         _pvPool = new DefaultObjectPool<StringBuilder>(policy, 128);
-        _options = new Dictionary<string, IOption>();
+        _options = new();
     }
 
     public int MaxThreads { get; set; }

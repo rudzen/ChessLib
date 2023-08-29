@@ -1,9 +1,9 @@
 ﻿/*
-Perft, a chess perft test library
+Perft, a chess perft testing application
 
 MIT License
 
-Copyright (c) 2017-2023 Rudy Alex Kohn
+Copyright (c) 2019-2023 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,20 +24,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Perft.Extensions;
+namespace Rudzoft.Perft.Services;
 
-using System.Collections.Generic;
-using System.Linq;
-
-public static class ArrayExtensions
+public interface IBuildTimeStamp
 {
-    public static bool IsEmpty<T>(T[] arr)
-    {
-        return arr == null || arr.Length == 0;
-    }
-
-    public static IEnumerable<T> Append<T>(this IEnumerable<T> @this, T toAppend)
-    {
-        return @this.Concat(new[] { toAppend });
-    }
+    string TimeStamp { get; }
 }

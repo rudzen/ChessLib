@@ -24,24 +24,20 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System.Reflection;
+namespace Rudzoft.Perft.Models;
 
-namespace Rudzoft.Perft.TimeStamp;
-
-internal sealed class BuildTimeStamp : IBuildTimeStamp
+public interface IPerftResult
 {
-    private const string AttributeName = "TimestampAttribute";
+    string Id { get; set; }
+    string Fen { get; set; }
+    int Depth { get; set; }
+    ulong Result { get; set; }
+    ulong CorrectResult { get; set; }
+    TimeSpan Elapsed { get; set; }
+    ulong Nps { get; set; }
+    ulong TableHits { get; set; }
+    bool Passed { get; set; }
+    int Errors { get; set; }
 
-    private static readonly Lazy<string> LazyTimeStamp = new(GetTimestamp);
-
-    public string TimeStamp => LazyTimeStamp.Value;
-
-    private static string GetTimestamp()
-    {
-        var attribute = Assembly.GetExecutingAssembly()
-            .GetCustomAttributesData()
-            .First(static x => x.AttributeType.Name == AttributeName);
-
-        return (string)attribute.ConstructorArguments.First().Value;
-    }
+    void Clear();
 }

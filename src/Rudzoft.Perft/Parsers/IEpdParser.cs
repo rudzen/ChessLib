@@ -28,8 +28,5 @@ namespace Rudzoft.Perft.Parsers;
 
 public interface IEpdParser
 {
-    List<IEpdSet> Sets { get; set; }
-    IEpdParserSettings Settings { get; set; }
-    Task<ulong> ParseAsync();
-    ulong Parse();
+    IAsyncEnumerable<IEpdSet> Parse(string epdFile);
 }

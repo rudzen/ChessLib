@@ -35,12 +35,12 @@ using Rudzoft.ChessLib.Hash.Tables.Transposition;
 using Rudzoft.ChessLib.Perft;
 using Rudzoft.ChessLib.Perft.Interfaces;
 using Rudzoft.ChessLib.Protocol.UCI;
+using Rudzoft.Perft.Models;
 using Rudzoft.Perft.Options;
 using Rudzoft.Perft.Parsers;
-using Rudzoft.Perft.TimeStamp;
 using Serilog;
 
-namespace Rudzoft.Perft.Perft;
+namespace Rudzoft.Perft.Services;
 
 public sealed class PerftRunner : IPerftRunner
 {
@@ -92,7 +92,7 @@ public sealed class PerftRunner : IPerftRunner
 
         configuration.Bind("TranspositionTable", TranspositionTableOptions);
 
-        _cpu = new Cpu();
+        _cpu = new();
     }
 
     public bool SaveResults { get; set; }
@@ -110,7 +110,7 @@ public sealed class PerftRunner : IPerftRunner
         InternalRunArgumentCheck(Options);
 
         if (TranspositionTableOptions is TTOptions { Use: true } ttOptions)
-            _transpositionTable.SetSize(ttOptions.Size);
+            _transpositionTable.SetSize((int)ttOptions.Size);
 
         var errors = 0;
         var runnerIndex = (Options is FenOptions).AsByte();
@@ -159,20 +159,25 @@ public sealed class PerftRunner : IPerftRunner
 
     private async IAsyncEnumerable<PerftPosition> ParseEpd(EpdOptions options)
     {
-        _epdParser.Settings.Filename = options.Epds.First();
-        var sw = Stopwatch.StartNew();
+        foreach (var epd in options.Epds)
+        {
+            var sw = Stopwatch.StartNew();
 
-        var parsedCount = await _epdParser.ParseAsync().ConfigureAwait(false);
+            var parsedCount = 0L;
+            
+            await foreach(var epdPos in _epdParser.Parse(epd))
+            {
+                parsedCount++;
 
-        sw.Stop();
-        var elapsedMs = sw.ElapsedMilliseconds;
-        _log.Information("Parsed {Parsed} epd entries in {Elapsed} ms", parsedCount, elapsedMs);
+                var perftPosition = PerftPositionFactory.Create(epdPos.Id, epdPos.Epd, epdPos.Perft);
 
-        var perftPositions =
-            _epdParser.Sets.Select(static set => PerftPositionFactory.Create(set.Id, set.Epd, set.Perft));
+                yield return perftPosition;
+            }
 
-        foreach (var perftPosition in perftPositions)
-            yield return perftPosition;
+            sw.Stop();
+            var elapsedMs = sw.ElapsedMilliseconds;
+            _log.Information("Processed {Parsed} epd entries in {Elapsed} ms", parsedCount, elapsedMs);
+        }
     }
 
     private IAsyncEnumerable<PerftPosition> ParseFen(CancellationToken cancellationToken)

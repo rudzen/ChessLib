@@ -24,27 +24,28 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudzoft.Perft.Perft;
+using System.Reflection;
 
-public sealed class PerftResult : IPerftResult
+namespace Rudzoft.Perft.Services;
+
+internal sealed class BuildTimeStamp : IBuildTimeStamp
 {
-    public string Id { get; set; }
-    public string Fen { get; set; }
-    public int Depth { get; set; }
-    public ulong Result { get; set; }
-    public ulong CorrectResult { get; set; }
-    public TimeSpan Elapsed { get; set; }
-    public ulong Nps { get; set; }
-    public ulong TableHits { get; set; }
-    public bool Passed { get; set; }
-    public int Errors { get; set; }
+    private const string AttributeName = "TimestampAttribute";
 
-    public void Clear()
+    private static readonly Lazy<string> LazyTimeStamp = new(GetTimestamp);
+
+    public string TimeStamp => LazyTimeStamp.Value;
+
+    private static string GetTimestamp()
     {
-        Fen = string.Empty;
-        Depth = Errors = 0;
-        Result = CorrectResult = Nps = TableHits = ulong.MinValue;
-        Elapsed = TimeSpan.Zero;
-        Passed = false;
+        var attribute = Assembly.GetExecutingAssembly()
+            .GetCustomAttributesData()
+            .First(static x => x.AttributeType.Name == AttributeName);
+
+        var first = attribute.ConstructorArguments.FirstOrDefault();
+
+        var value = first.Value as string;
+
+        return string.IsNullOrWhiteSpace(value) ? string.Empty : value;
     }
 }
