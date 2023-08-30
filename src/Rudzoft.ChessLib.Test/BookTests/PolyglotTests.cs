@@ -32,6 +32,7 @@ using Rudzoft.ChessLib.Enums;
 using Rudzoft.ChessLib.Factories;
 using Rudzoft.ChessLib.Fen;
 using Rudzoft.ChessLib.Hash;
+using Rudzoft.ChessLib.MoveGeneration;
 using Rudzoft.ChessLib.ObjectPoolPolicies;
 using Rudzoft.ChessLib.Polyglot;
 using Rudzoft.ChessLib.Protocol.UCI;
@@ -68,9 +69,10 @@ public sealed class PolyglotTests : IClassFixture<BookFixture>
                 var policy = new MoveListPolicy();
                 return provider.Create(policy);
             })
-            .AddSingleton(static _ =>
+            .AddSingleton(static sp =>
             {
-                IUci uci = new Uci();
+                var mlPool = sp.GetRequiredService<ObjectPool<IMoveList>>();
+                IUci uci = new Uci(mlPool);
                 uci.Initialize();
                 return uci;
             })

@@ -43,13 +43,15 @@ public class Uci : IUci
     private static readonly string[] OptionTypeStrings = Enum.GetNames(typeof(UciOptionType));
 
     private readonly ObjectPool<StringBuilder> _pvPool;
+    private readonly ObjectPool<IMoveList> _moveListPool;
     private readonly Dictionary<string, IOption> _options;
 
-    public Uci()
+    public Uci(ObjectPool<IMoveList> moveListPool)
     {
         var policy = new StringBuilderPooledObjectPolicy();
         _pvPool = new DefaultObjectPool<StringBuilder>(policy, 128);
         _options = new();
+        _moveListPool = moveListPool;
     }
 
     public int MaxThreads { get; set; }
@@ -98,17 +100,26 @@ public class Uci : IUci
 
     public Move MoveFromUci(IPosition pos, ReadOnlySpan<char> uciMove)
     {
-        var moveList = pos.GenerateMoves();
+        var ml = _moveListPool.Get();
+        
+        ml.Generate(in pos);
 
-        var moves = moveList.Get();
+        var moves = ml.Get();
 
+        var m = Move.EmptyMove;
+        
         foreach (var move in moves)
         {
             if (uciMove.Equals(move.Move.ToString(), StringComparison.InvariantCultureIgnoreCase))
-                return move.Move;
+            {
+                m = move.Move;
+                break;
+            }
         }
         
-        return Move.EmptyMove;
+        _moveListPool.Return(ml);
+
+        return m;
     }
 
     public IEnumerable<Move> MovesFromUci(IPosition pos, Stack<State> states, IEnumerable<string> moves)

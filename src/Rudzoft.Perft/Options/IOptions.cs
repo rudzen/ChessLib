@@ -26,7 +26,7 @@ SOFTWARE.
 
 namespace Rudzoft.Perft.Options;
 
-public record PerftOption(OptionType Type, IPerftOptions PerftOptions);
+public sealed record PerftOption(OptionType Type, IPerftOptions PerftOptions);
 
 public interface IPerftOptions
 {

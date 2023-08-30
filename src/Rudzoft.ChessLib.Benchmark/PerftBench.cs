@@ -53,7 +53,7 @@ public class PerftBench
         var pp = PerftPositionFactory.Create(
             Guid.NewGuid().ToString(),
             Fen.Fen.StartPositionFen,
-            new List<PerftPositionValue>(6)
+            new(6)
             {
                 new(1, 20),
                 new(2, 400),
@@ -67,11 +67,11 @@ public class PerftBench
         var options = Options.Create(ttConfig);
         var tt = new TranspositionTable(options);
 
-        var uci = new Uci();
+        var moveListObjectPool = new DefaultObjectPool<IMoveList>(new MoveListPolicy());
+        
+        var uci = new Uci(moveListObjectPool);
         uci.Initialize();
         var cpu = new Cpu();
-
-        var moveListObjectPool = new DefaultObjectPool<IMoveList>(new MoveListPolicy());
 
         var sp = new SearchParameters();
 

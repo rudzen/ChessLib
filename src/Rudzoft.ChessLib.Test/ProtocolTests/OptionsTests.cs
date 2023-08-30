@@ -24,6 +24,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using Microsoft.Extensions.ObjectPool;
+using Rudzoft.ChessLib.MoveGeneration;
+using Rudzoft.ChessLib.ObjectPoolPolicies;
 using Rudzoft.ChessLib.Protocol.UCI;
 
 namespace Rudzoft.ChessLib.Test.ProtocolTests;
@@ -35,7 +38,10 @@ public sealed class OptionsTests
     [InlineData("Boolean Test", false, false, "option name Boolean Test type Check default false")]
     public void Boolean(string name, bool value, bool expected, string uciString)
     {
-        IUci uci = new Uci();
+        var policy = new MoveListPolicy();
+        var provider = new DefaultObjectPool<IMoveList>(policy);
+
+        IUci uci = new Uci(provider);
         
         uci.Initialize();
         

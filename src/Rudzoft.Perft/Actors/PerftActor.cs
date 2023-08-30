@@ -1,31 +1,29 @@
-﻿using Akka.Actor;
+﻿using System.Collections.Immutable;
+using Akka.Actor;
 using Microsoft.Extensions.DependencyInjection;
 using Rudzoft.Perft.Options;
-using Rudzoft.Perft.Services;
 
 namespace Rudzoft.Perft.Actors;
 
+// ReSharper disable once ClassNeverInstantiated.Global
 public sealed class PerftActor : ReceiveActor
 {
     public sealed record StartPerft;
     
     private readonly IServiceProvider _sp;
-    private readonly IPerftRunner _perftRunner;
     
     public PerftActor(IServiceProvider sp)
     {
         _sp = sp;
-        _perftRunner = _sp.GetRequiredService<IPerftRunner>();
         var optionsFactory = _sp.GetRequiredService<IOptionsFactory>();
-        foreach (var option in optionsFactory.Parse())
-        {
-            if (option.Type == OptionType.TTOptions)
-                _perftRunner.TranspositionTableOptions = option.PerftOptions;
-            else
-                _perftRunner.Options = option.PerftOptions;
-        }
+        var options = optionsFactory.Parse().ToImmutableArray();
         
-        ReceiveAsync<StartPerft>(_ => _perftRunner.Run());
+        Receive<StartPerft>(_ =>
+        {
+            var runner = Context.ActorOf(PerftRunnerActor.Prop(_sp), "runner-actor");
+            runner.Tell(new PerftRunnerActor.RunOptions(options));
+            runner.Tell(new PerftRunnerActor.Run());
+        });
     }
 
     public static Props Prop(IServiceProvider sp)

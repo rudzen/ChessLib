@@ -32,6 +32,7 @@ using Rudzoft.ChessLib.Evaluation;
 using Rudzoft.ChessLib.Factories;
 using Rudzoft.ChessLib.Hash;
 using Rudzoft.ChessLib.Hash.Tables.Transposition;
+using Rudzoft.ChessLib.MoveGeneration;
 using Rudzoft.ChessLib.ObjectPoolPolicies;
 using Rudzoft.ChessLib.Polyglot;
 using Rudzoft.ChessLib.Protocol.UCI;
@@ -79,9 +80,10 @@ public static class ChessLibServiceCollectionExtensions
             return provider.Create(policy);
         });
 
-        return serviceCollection.AddSingleton(static _ =>
+        return serviceCollection.AddSingleton(static sp =>
             {
-                IUci uci = new Uci();
+                var pool = sp.GetRequiredService<ObjectPool<IMoveList>>();
+                IUci uci = new Uci(pool);
                 uci.Initialize();
                 return uci;
             })
