@@ -30,7 +30,6 @@ public sealed class ProgressActor : ReceiveActor, IWithTimers, IWithStash
             {
                 existing = new();
                 existing.CurrentDepth = progress.Depth;
-                
             }
             else
             {

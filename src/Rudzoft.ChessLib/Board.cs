@@ -90,6 +90,8 @@ public sealed class Board : IBoard
 
     public void RemovePiece(Square sq)
     {
+        Debug.Assert(sq.IsOk);
+        
         // WARNING: This is not a reversible operation. If we remove a piece in MakeMove() and
         // then replace it in TakeMove() we will put it at the end of the list and not in its
         // original place, it means index[] and pieceList[] are not invariant to a MakeMove() +
@@ -113,15 +115,18 @@ public sealed class Board : IBoard
     {
         // _index[from] is not updated and becomes stale. This works as long as _index[] is
         // accessed just by known occupied squares.
-        var pc = _pieces[from.AsInt()];
+        var f = from.AsInt();
+        var t = to.AsInt();
+        
+        var pc = _pieces[f];
         var fromTo = from | to;
         _byType[PieceTypes.AllPieces.AsInt()] ^= fromTo;
         _byType[pc.Type().AsInt()] ^= fromTo;
         _bySide[pc.ColorOf().Side] ^= fromTo;
-        _pieces[from.AsInt()] = Piece.EmptyPiece;
-        _pieces[to.AsInt()] = pc;
-        _index[to.AsInt()] = _index[from.AsInt()];
-        _pieceList[pc.AsInt()][_index[to.AsInt()]] = to;
+        _pieces[f] = Piece.EmptyPiece;
+        _pieces[t] = pc;
+        _index[t] = _index[f];
+        _pieceList[pc.AsInt()][_index[t]] = to;
     }
 
     public Piece MovedPiece(Move m) => PieceAt(m.FromSquare());

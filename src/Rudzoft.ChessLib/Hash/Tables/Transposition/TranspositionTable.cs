@@ -24,6 +24,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using System.Buffers;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using Microsoft.Extensions.Options;
 using Rudzoft.ChessLib.Types;
 
@@ -110,9 +113,12 @@ public sealed class TranspositionTable : ITranspositionTable
         var replacePos = (posKey.LowerKey & _sizeMask) << 2;
         var ttePos = replacePos;
 
+        var entriesSpan = _entries.AsSpan();
+        ref var entries = ref MemoryMarshal.GetReference(entriesSpan);
+
         for (uint i = 0; i < ClusterSize; i++)
         {
-            ref var tte = ref _entries[ttePos];
+            ref var tte = ref Unsafe.Add(ref entries, ttePos);
 
             if (tte.key == 0 || tte.key == posKey32) // Empty or overwrite old
             {
@@ -120,9 +126,11 @@ public sealed class TranspositionTable : ITranspositionTable
                 if (m == Move.EmptyMove)
                     m = tte.move16;
 
-                _entries[ttePos].save(posKey32, v, t, d, m, _generation, statV, kingD);
+                tte.save(posKey32, v, t, d, m, _generation, statV, kingD);
                 return;
             }
+
+            ref var replaceTte = ref Unsafe.Add(ref entries, replacePos);
 
             // Implement replace strategy
             //if ((entries[replacePos].generation8 == generation ? 2 : 0) + (tte.generation8 == generation || tte.bound == 3/*Bound.BOUND_EXACT*/ ? -2 : 0) + (tte.depth16 < entries[replacePos].depth16 ? 1 : 0) > 0)
@@ -130,26 +138,26 @@ public sealed class TranspositionTable : ITranspositionTable
             //    replacePos = ttePos;
             //}
 
-            if (_entries[replacePos].generation8 == _generation)
+            if (replaceTte.generation8 == _generation)
             {
                 if (tte.generation8 == _generation || tte.bound == Bound.Exact)
                 {
                     // +2 
-                    if (tte.depth16 < _entries[replacePos].depth16) // +1
+                    if (tte.depth16 < replaceTte.depth16) // +1
                         replacePos = ttePos;
                 }
                 else // +2
                     replacePos = ttePos;
             }
-            else // 0
-            if (!(tte.generation8 == _generation || tte.bound == Bound.Exact) &&
-                tte.depth16 < _entries[replacePos].depth16) // +1
+            // 0
+            else if (!(tte.generation8 == _generation || tte.bound == Bound.Exact) &&
+                     tte.depth16 < replaceTte.depth16) // +1
                 replacePos = ttePos;
 
             ttePos++;
         }
 
-        _entries[replacePos].save(posKey32, v, t, d, m, _generation, statV, kingD);
+        Unsafe.Add(ref entries, replacePos).save(posKey32, v, t, d, m, _generation, statV, kingD);
     }
 
     /// <summary>
@@ -166,15 +174,20 @@ public sealed class TranspositionTable : ITranspositionTable
         var posKey32 = posKey.UpperKey;
         var offset = (posKey.LowerKey & _sizeMask) << 2;
 
+        var entries = _entries.AsSpan();
+        ref var entriesRef = ref MemoryMarshal.GetReference(entries);
+
         for (var i = offset; i < ClusterSize + offset; i++)
         {
-            if (_entries[i].key == posKey32)
-            {
-                ttePos = i;
-                entry = _entries[i];
-                Hits++;
-                return true;
-            }
+            ref var tte = ref Unsafe.Add(ref entriesRef, i);
+
+            if (tte.key != posKey32)
+                continue;
+
+            ttePos = i;
+            entry = tte;
+            Hits++;
+            return true;
         }
 
         entry = StaticEntry;

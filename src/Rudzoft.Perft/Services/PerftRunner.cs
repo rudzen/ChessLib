@@ -151,7 +151,7 @@ public sealed class PerftRunner : IPerftRunner
     {
         foreach (var epd in options.Epds)
         {
-            var sw = Stopwatch.StartNew();
+            var start = Stopwatch.GetTimestamp();
 
             var parsedCount = 0L;
             
@@ -164,9 +164,8 @@ public sealed class PerftRunner : IPerftRunner
                 yield return perftPosition;
             }
 
-            sw.Stop();
-            var elapsedMs = sw.ElapsedMilliseconds;
-            Log.Information("Processed {Parsed} epd entries in {Elapsed} ms", parsedCount, elapsedMs);
+            var elapsed = Stopwatch.GetElapsedTime(start);
+            Log.Information("EPD processing completed. parsed={Parsed},time={Elapsed}", parsedCount, elapsed);
         }
     }
 

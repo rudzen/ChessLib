@@ -42,8 +42,9 @@ public class Uci : IUci
 
     private static readonly string[] OptionTypeStrings = Enum.GetNames(typeof(UciOptionType));
 
+    protected readonly ObjectPool<IMoveList> MoveListPool;
+    
     private readonly ObjectPool<StringBuilder> _pvPool;
-    private readonly ObjectPool<IMoveList> _moveListPool;
     private readonly Dictionary<string, IOption> _options;
 
     public Uci(ObjectPool<IMoveList> moveListPool)
@@ -51,7 +52,7 @@ public class Uci : IUci
         var policy = new StringBuilderPooledObjectPolicy();
         _pvPool = new DefaultObjectPool<StringBuilder>(policy, 128);
         _options = new();
-        _moveListPool = moveListPool;
+        MoveListPool = moveListPool;
     }
 
     public int MaxThreads { get; set; }
@@ -84,15 +85,9 @@ public class Uci : IUci
     public bool TryGetOption(string name, out IOption option)
     {
         ref var opt = ref CollectionsMarshal.GetValueRefOrNullRef(_options, name);
-        
-        if (Unsafe.IsNullRef(ref opt))
-        {
-            option = default;
-            return false;
-        }
-        
-        option = opt;
-        return true;
+        var result = !Unsafe.IsNullRef(ref opt);
+        option = result ? opt : default;
+        return result;
     }
 
     public ulong Nps(in ulong nodes, in TimeSpan time)
@@ -100,7 +95,7 @@ public class Uci : IUci
 
     public Move MoveFromUci(IPosition pos, ReadOnlySpan<char> uciMove)
     {
-        var ml = _moveListPool.Get();
+        var ml = MoveListPool.Get();
         
         ml.Generate(in pos);
 
@@ -110,14 +105,14 @@ public class Uci : IUci
         
         foreach (var move in moves)
         {
-            if (uciMove.Equals(move.Move.ToString(), StringComparison.InvariantCultureIgnoreCase))
-            {
-                m = move.Move;
-                break;
-            }
+            if (!uciMove.Equals(move.Move.ToString(), StringComparison.InvariantCultureIgnoreCase))
+                continue;
+            
+            m = move.Move;
+            break;
         }
         
-        _moveListPool.Return(ml);
+        MoveListPool.Return(ml);
 
         return m;
     }
@@ -224,7 +219,7 @@ public class Uci : IUci
         if (type == MoveTypes.Promotion)
             s[index++] = m.PromotedPieceType().GetPieceChar();
 
-        return new string(s[..index]);
+        return new(s[..index]);
     }
 
     /// <summary>
