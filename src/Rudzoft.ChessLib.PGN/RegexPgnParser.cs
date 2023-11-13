@@ -34,7 +34,7 @@ public sealed partial class RegexPgnParser : IPgnParser
     private const int DefaultTagCapacity = 7;
     private const int DefaultMoveListCapacity = 24;
 
-    [GeneratedRegex(@"\[(?<tagName>\w+)\s+""(?<tagValue>[^""]+)""\]",  RegexOptions.NonBacktracking)]
+    [GeneratedRegex("""\[(?<tagName>\w+)\s+"(?<tagValue>[^"]+)"\]""",  RegexOptions.NonBacktracking)]
     private static partial Regex TagPairRegex();
 
     [GeneratedRegex(@"(?<moveNumber>\d+)\.\s*(?<whiteMove>\S+)(\s+(?<blackMove>\S+))?",  RegexOptions.NonBacktracking)]
