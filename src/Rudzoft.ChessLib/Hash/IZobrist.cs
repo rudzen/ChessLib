@@ -14,6 +14,7 @@ public interface IZobrist
     HashKey ComputePawnKey(IPosition pos);
     HashKey ComputePositionKey(IPosition pos);
     ref HashKey Psq(Square square, Piece piece);
+    ref HashKey Psq(int pieceCount, Piece piece);
     ref HashKey Castleling(CastleRights index);
     ref HashKey Castleling(CastleRight index);
     HashKey Side();

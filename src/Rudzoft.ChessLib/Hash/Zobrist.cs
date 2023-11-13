@@ -154,6 +154,9 @@ public sealed class Zobrist : IZobrist
     public ref HashKey Psq(Square square, Piece piece) => ref _zobristPst[square.AsInt()][piece.AsInt()];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public ref HashKey Psq(int pieceCount, Piece piece) => ref _zobristPst[pieceCount][piece.AsInt()];
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public ref HashKey Castleling(CastleRights index) => ref _zobristCastling[index.AsInt()];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
