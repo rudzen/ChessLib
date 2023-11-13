@@ -1487,15 +1487,19 @@ public sealed class Position : IPosition
         state.PositionKey = GetKey();
         state.PawnKey     = GetPawnKey();
 
-        for (var b = Pieces(PieceTypes.Pawn); b.IsNotEmpty;)
+        var b = Pieces(PieceTypes.Pawn);
+        while (b.IsNotEmpty)
         {
             var sq = BitBoards.PopLsb(ref b);
             var pc = Board.PieceAt(sq);
             state.MaterialKey ^= Zobrist.Psq(sq, pc);
         }
 
-        foreach (var pc in Piece.All.AsSpan())
+        ref var pieces = ref MemoryMarshal.GetArrayDataReference(Piece.All);
+
+        for (var i = 0; i < Piece.All.Length; i++)
         {
+            ref var pc = ref Unsafe.Add(ref pieces, i);
             if (pc.Type() != PieceTypes.Pawn && pc.Type() != PieceTypes.King)
             {
                 var val = Values.GetPieceValue(pc.Type(), Phases.Mg).AsInt() * Board.PieceCount(pc);
