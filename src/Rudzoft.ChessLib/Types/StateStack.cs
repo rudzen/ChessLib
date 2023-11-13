@@ -24,8 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using Cysharp.Text;
 using System.Collections;
+using System.Text;
 
 namespace Rudzoft.ChessLib.Types;
 
@@ -143,13 +143,13 @@ public sealed class StateStack : IEnumerable<State>
 
     public override string ToString()
     {
-        using var sb = ZString.CreateStringBuilder();
+        var       sb = new StringBuilder();
         for (var i = Size; i > 0; i--)
         {
             var o = _stack[i];
             sb.Append(' ');
             if (o != null)
-                sb.Append(o.ToString()!);
+                sb.Append(o);
             else
                 sb.Append(' ');
             sb.Append(' ');
