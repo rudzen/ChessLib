@@ -66,7 +66,7 @@ public sealed class KpkBitBase : IKpkBitBase
             repeat = 1;
             for (var i = 0; i < db.Length; ++i)
             {
-                var kpkPosition = Unsafe.Add(ref dbSpace, i);
+                ref var kpkPosition = ref Unsafe.Add(ref dbSpace, i);
                 repeat = (kpkPosition.Result == Results.Unknown
                           && kpkPosition.Classify(db) != Results.Unknown).AsByte();
             }
@@ -75,7 +75,7 @@ public sealed class KpkBitBase : IKpkBitBase
         // Fill the bitbase with the decisive results
         for (var i = 0; i < db.Length; ++i)
         {
-            var kpkPosition = Unsafe.Add(ref dbSpace, i);
+            ref var kpkPosition = ref Unsafe.Add(ref dbSpace, i);
             if (kpkPosition.Result == Results.Win)
                 _kpKbb.Set(i, true);
         }
