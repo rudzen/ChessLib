@@ -85,7 +85,7 @@ public sealed class PolyglotBook : IPolyglotBook
             _bookFilePath = value;
             _fileStream = new FileStream(value, FileMode.Open, FileAccess.Read);
             _binaryReader = BitConverter.IsLittleEndian
-                ? new LittleEndianBinaryStreamReader(_fileStream)
+                ? new ReverseEndianBinaryStreamReader(_fileStream)
                 : new BinaryReader(_fileStream);
         }
     }
