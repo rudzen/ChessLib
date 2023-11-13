@@ -48,7 +48,7 @@ public sealed class PerftRunner : IPerftRunner
 
     private static readonly string Line = new('-', 65);
 
-    private static readonly Lazy<string> CurrentDirectory = new(static () => Environment.CurrentDirectory);
+    private static string CurrentDirectory => Environment.CurrentDirectory;
 
     private readonly Func<CancellationToken, IAsyncEnumerable<PerftPosition>>[] _runners;
 
@@ -197,7 +197,7 @@ public sealed class PerftRunner : IPerftRunner
 
         var pp = _perft.Positions[^1];
         var baseFileName = SaveResults
-            ? Path.Combine(CurrentDirectory.Value, $"{FixFileName(pp.Fen)}[")
+            ? Path.Combine(CurrentDirectory, $"{FixFileName(pp.Fen)}[")
             : string.Empty;
 
         var errors = 0;
