@@ -34,6 +34,7 @@ using Rudzoft.ChessLib.Fen;
 using Rudzoft.ChessLib.Hash.Tables.Transposition;
 using Rudzoft.ChessLib.MoveGeneration;
 using Rudzoft.ChessLib.Protocol.UCI;
+using Rudzoft.ChessLib.Tables.Perft;
 using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib;
@@ -41,7 +42,8 @@ namespace Rudzoft.ChessLib;
 public sealed class Game : IGame
 {
     private readonly ObjectPool<IMoveList> _moveListPool;
-    private readonly IPosition _pos;
+    private readonly IPosition             _pos;
+    private readonly PerftTable            _perftTable;
 
     public Game(
         ITranspositionTable transpositionTable,
@@ -54,10 +56,11 @@ public sealed class Game : IGame
         _moveListPool = moveListPool;
         _pos = pos;
 
-        Table = transpositionTable;
+        Table            = transpositionTable;
         SearchParameters = searchParameters;
-        Uci = uci;
-        Cpu = cpu;
+        Uci              = uci;
+        Cpu              = cpu;
+        _perftTable      = new PerftTable();
     }
 
     public Action<IPieceSquare> PieceUpdated => _pos.PieceUpdated;

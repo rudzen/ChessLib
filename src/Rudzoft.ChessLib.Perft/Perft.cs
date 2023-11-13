@@ -119,7 +119,7 @@ public sealed class Perft : IPerft
         if (pos.Value.Count == 0)
             return false;
 
-        var depthValue = pos.Value.FirstOrDefault(v => v.Depth == depth && v.MoveCount > 0);
+        var depthValue = pos.Value.Find(v => v.Depth == depth && v.MoveCount > 0);
 
         return !depthValue.Equals(default);
     }
