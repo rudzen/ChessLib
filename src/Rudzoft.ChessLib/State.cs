@@ -24,6 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Rudzoft.ChessLib.Extensions;
 using Rudzoft.ChessLib.Types;
@@ -33,18 +34,21 @@ namespace Rudzoft.ChessLib;
 
 public sealed class State : IEquatable<State>
 {
+    [Description("Hash key for material")]
     public HashKey MaterialKey { get; set; }
 
+    [Description("Hash key for pawns")]
     public HashKey PawnKey { get; set; }
 
-    public int Rule50 { get; set; }
+    [Description("Number of half moves clock since the last pawn advance or any capture")]
+    public int ClockPly { get; set; }
 
-    public int PliesFromNull { get; set; }
+    public int NullPly { get; set; }
 
     public CastleRight CastlelingRights { get; set; }
 
+    [Description("En-passant -> 'in-passing' square")]
     public Square EnPassantSquare { get; set; }
-
 
     // -----------------------------
     // Properties below this point are not copied from other state
@@ -81,8 +85,8 @@ public sealed class State : IEquatable<State>
         PawnKey = other.PawnKey;
         MaterialKey = other.MaterialKey;
         CastlelingRights = other.CastlelingRights;
-        Rule50 = other.Rule50;
-        PliesFromNull = other.PliesFromNull;
+        ClockPly = other.ClockPly;
+        NullPly = other.NullPly;
         EnPassantSquare = other.EnPassantSquare;
         Previous = other;
 
@@ -112,8 +116,8 @@ public sealed class State : IEquatable<State>
         // copy over preserved values
         other.MaterialKey = MaterialKey;
         other.PawnKey = PawnKey;
-        other.Rule50 = Rule50;
-        other.PliesFromNull = PliesFromNull;
+        other.ClockPly = ClockPly;
+        other.NullPly = NullPly;
         other.CastlelingRights = CastlelingRights;
         other.EnPassantSquare = EnPassantSquare;
         other.Previous = this;
@@ -128,7 +132,7 @@ public sealed class State : IEquatable<State>
     {
         LastMove = Move.EmptyMove;
         PawnKey = PositionKey = MaterialKey = HashKey.Empty;
-        PliesFromNull = 0;
+        NullPly = 0;
         Repetition = 0;
         CastlelingRights = CastleRight.None;
         EnPassantSquare = Square.None;
@@ -160,7 +164,7 @@ public sealed class State : IEquatable<State>
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public int End() => Math.Min(Rule50, PliesFromNull);
+    public int End() => Math.Min(ClockPly, NullPly);
 
     public bool Equals(State other)
     {
@@ -170,8 +174,8 @@ public sealed class State : IEquatable<State>
                && PawnKey.Equals(other.PawnKey)
                && EnPassantSquare.Equals(other.EnPassantSquare)
                && CastlelingRights == other.CastlelingRights
-               && PliesFromNull == other.PliesFromNull
-               && Rule50 == other.Rule50
+               && NullPly == other.NullPly
+               && ClockPly == other.ClockPly
                && Pinners.Equals(other.Pinners)
                && Checkers.Equals(other.Checkers)
                && CapturedPiece == other.CapturedPiece
@@ -186,8 +190,8 @@ public sealed class State : IEquatable<State>
         hashCode.Add(LastMove);
         hashCode.Add(PawnKey);
         hashCode.Add(MaterialKey);
-        hashCode.Add(PliesFromNull);
-        hashCode.Add(Rule50);
+        hashCode.Add(NullPly);
+        hashCode.Add(ClockPly);
         hashCode.Add(PositionKey);
         hashCode.Add(CastlelingRights.Rights.AsInt());
         hashCode.Add(EnPassantSquare);

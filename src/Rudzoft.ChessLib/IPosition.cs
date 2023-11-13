@@ -197,7 +197,7 @@ public interface IPosition : IEnumerable<Piece>
 
     IPosition Set(ReadOnlySpan<char> code, Player p, in State state);
     
-    HashKey GetPiecesKey();
+    HashKey GetKey();
 
     HashKey GetPawnKey();
 

@@ -198,8 +198,8 @@ public sealed class PositionValidator : IPositionValidator
         if (state.Repetition < 0)
             yield return $"{nameof(state.Repetition)} is negative";
 
-        if (state.Rule50 < 0)
-            yield return $"{nameof(state.Rule50)} is negative";
+        if (state.ClockPly < 0)
+            yield return $"{nameof(state.ClockPly)} is negative";
 
         if (state.Equals(state.Previous))
             yield return "state has itself as previous state";
