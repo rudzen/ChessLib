@@ -39,7 +39,7 @@ namespace Rudzoft.ChessLib.PGN.Test.PgnMoveNotationTests;
 
 public sealed class SanToMoveTests
 {
-    private const string SampleFilePath = @"samples/sample.pgn";
+    private const string SampleFilePath = "samples/sample.pgn";
     private const int ExpectedGameCount = 2;
 
     private readonly IServiceProvider _serviceProvider;

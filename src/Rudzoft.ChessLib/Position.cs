@@ -38,7 +38,6 @@ using Rudzoft.ChessLib.Hash;
 using Rudzoft.ChessLib.MoveGeneration;
 using Rudzoft.ChessLib.Types;
 using Rudzoft.ChessLib.Validation;
-using File = Rudzoft.ChessLib.Types.File;
 
 namespace Rudzoft.ChessLib;
 

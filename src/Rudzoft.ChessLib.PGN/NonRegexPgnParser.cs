@@ -24,11 +24,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using System.Runtime.CompilerServices;
+
 namespace Rudzoft.ChessLib.PGN;
 
 public sealed class NonRegexPgnParser : IPgnParser
 {
-    public async IAsyncEnumerable<PgnGame> ParseFile(string pgnFile, CancellationToken cancellationToken = default)
+    private static readonly char[] Separators = { ' ', '\t' };
+
+    public async IAsyncEnumerable<PgnGame> ParseFile(
+        string pgnFile,
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         await using var fileStream = new FileStream(pgnFile, FileMode.Open, FileAccess.Read);
         using var streamReader = new StreamReader(fileStream);
@@ -47,7 +53,7 @@ public sealed class NonRegexPgnParser : IPgnParser
 
             if (inMoveSection)
             {
-                var words = line.Split(new[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
+                var words = line.Split(Separators, StringSplitOptions.RemoveEmptyEntries);
 
                 var currentMoveNumber = 0;
 
@@ -80,7 +86,7 @@ public sealed class NonRegexPgnParser : IPgnParser
             }
             else
             {
-                if (!line.StartsWith("[") || !line.EndsWith("]") || !line.Contains('"'))
+                if (!line.StartsWith('[') || !line.EndsWith(']') || !line.Contains('"'))
                     continue;
                 
                 var firstSpaceIndex = line.IndexOf(' ');

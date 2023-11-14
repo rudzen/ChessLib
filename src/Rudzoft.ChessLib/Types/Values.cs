@@ -40,8 +40,8 @@ public enum DefaultPieceValues
     ValueMinusInfinite = -32001,
     ValueNone = 32002,
 
-    ValueMateInMaxPly = ValueMate - 2 * Values.MAX_PLY,
-    ValueMatedInMaxPly = -ValueMate + 2 * Values.MAX_PLY,
+    ValueMateInMaxPly = ValueMate - 2 * Values.MaxPly,
+    ValueMatedInMaxPly = -ValueMate + 2 * Values.MaxPly,
 
     PawnValueMg = 128,
     PawnValueEg = 213,
@@ -66,7 +66,7 @@ public static class PieceValuesExtensions
 
 public sealed class Values : IValues
 {
-    public const int MAX_PLY = 246;
+    public const int MaxPly = 246;
 
     private readonly DefaultPieceValues[][] _defaults;
 
@@ -127,8 +127,8 @@ public sealed class Values : IValues
                 return;
 
             _valueMate = value;
-            _valueMateInMaxPly = value - 2 * MAX_PLY;
-            _valueMatedInMaxPly = value + 2 * MAX_PLY;
+            _valueMateInMaxPly = value - 2 * MaxPly;
+            _valueMatedInMaxPly = value + 2 * MaxPly;
         }
     }
 
