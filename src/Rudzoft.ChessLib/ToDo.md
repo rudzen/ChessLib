@@ -22,13 +22,8 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-
-Add:
-- CastlelingRights type
-
-Improve:
+# Improve
 - Move notation functionality (add more notaion variation, including humanoid readable)
 
-
-Unit Tests:
+# Unit Tests
 - Cuckoo
