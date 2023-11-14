@@ -1,7 +1,7 @@
 <Project>
     <PropertyGroup>
-        <TargetFramework>net7.0</TargetFramework>
-        <LangVersion>latest</LangVersion>
+        <TargetFramework>net8.0</TargetFramework>
+        <LangVersion>12</LangVersion>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>warnings</Nullable>
         <IsPackable>false</IsPackable>
