@@ -1,5 +1,4 @@
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
+using System.Collections.Frozen;
 using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Benchmark;
@@ -8,9 +7,10 @@ namespace Rudzoft.ChessLib.Benchmark;
 // ReSharper disable once ClassCanBeSealed.Global
 public class ShiftFuncBench
 {
-    private static readonly Dictionary<Direction, Func<BitBoard, BitBoard>> ShiftFuncs = MakeShiftFuncs();
+    private static readonly FrozenDictionary<Direction, Func<BitBoard, BitBoard>> ShiftFuncs = MakeShiftFuncs();
 
-    private static readonly Direction[] AllDirections = {
+    private static readonly Direction[] AllDirections =
+    {
         Direction.North, Direction.South, Direction.East, Direction.West,
         Direction.NorthEast, Direction.NorthWest, Direction.SouthEast, Direction.SouthWest,
         Direction.NorthDouble, Direction.SouthDouble, Direction.SouthFill, Direction.NorthFill,
@@ -57,47 +57,44 @@ public class ShiftFuncBench
 
     private static BitBoard ShiftF2(in BitBoard bb, Direction direction)
     {
-        ref var func = ref CollectionsMarshal.GetValueRefOrNullRef(ShiftFuncs, direction);
+        if (ShiftFuncs.TryGetValue(direction, out var func))
+            return func(bb);
         
-        if (Unsafe.IsNullRef(ref func))
-            throw new ArgumentException("Invalid shift argument.", nameof(direction));
-            
-        return func(bb);
+        throw new ArgumentException("Invalid shift argument.", nameof(direction));
     }
 
     private static BitBoard Shift(in BitBoard bb, Direction direction)
     {
         if (direction == Direction.North)
             return bb.NorthOne();
-        else if (direction == Direction.South)
+        if (direction == Direction.South)
             return bb.SouthOne();
-        else if (direction == Direction.SouthEast)
+        if (direction == Direction.SouthEast)
             return bb.SouthEastOne();
-        else if (direction == Direction.SouthWest)
+        if (direction == Direction.SouthWest)
             return bb.SouthWestOne();
-        else if (direction == Direction.NorthEast)
+        if (direction == Direction.NorthEast)
             return bb.NorthEastOne();
-        else if (direction == Direction.NorthWest)
+        if (direction == Direction.NorthWest)
             return bb.NorthWestOne();
-        else if (direction == Direction.NorthDouble)
+        if (direction == Direction.NorthDouble)
             return bb.NorthOne().NorthOne();
-        else if (direction == Direction.SouthDouble)
+        if (direction == Direction.SouthDouble)
             return bb.SouthOne().SouthOne();
-        else if (direction == Direction.East)
+        if (direction == Direction.East)
             return bb.EastOne();
-        else if (direction == Direction.West)
+        if (direction == Direction.West)
             return bb.WestOne();
-        else if (direction == Direction.NorthFill)
+        if (direction == Direction.NorthFill)
             return bb.NorthFill();
-        else if (direction == Direction.SouthFill)
+        if (direction == Direction.SouthFill)
             return bb.SouthFill();
-        else if (direction == Direction.None)
+        if (direction == Direction.None)
             return bb;
-        else
-            throw new ArgumentException("Invalid shift argument.", nameof(direction));
+        throw new ArgumentException("Invalid shift argument.", nameof(direction));
     }
 
-    private static Dictionary<Direction, Func<BitBoard, BitBoard>> MakeShiftFuncs()
+    private static FrozenDictionary<Direction, Func<BitBoard, BitBoard>> MakeShiftFuncs()
     {
         return new Dictionary<Direction, Func<BitBoard, BitBoard>>(13)
         {
@@ -114,6 +111,6 @@ public class ShiftFuncBench
             { Direction.SouthFill, static board => board.SouthFill() },
             { Direction.East, static board => board.EastOne() },
             { Direction.West, static board => board.WestOne() }
-        };
+        }.ToFrozenDictionary();
     }
 }

@@ -82,7 +82,7 @@ public sealed class SanToMoveTests
 
         var sanMoves = new List<string>();
 
-        foreach (var pgnMove in games.First().Moves)
+        foreach (var pgnMove in games[0].Moves)
         {
             sanMoves.Add(pgnMove.WhiteMove);
             if (!string.IsNullOrWhiteSpace(pgnMove.BlackMove))

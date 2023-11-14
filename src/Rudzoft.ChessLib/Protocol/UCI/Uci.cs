@@ -81,7 +81,7 @@ public class Uci : IUci
     }
 
     public void AddOption(string name, IOption option) => _options[name] = option;
-    
+
     public bool TryGetOption(string name, out IOption option)
     {
         ref var opt = ref CollectionsMarshal.GetValueRefOrNullRef(_options, name);

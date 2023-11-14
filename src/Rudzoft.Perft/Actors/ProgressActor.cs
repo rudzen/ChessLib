@@ -28,14 +28,13 @@ public sealed class ProgressActor : ReceiveActor, IWithTimers, IWithStash
 
             if (!exists)
             {
-                existing = new();
-                existing.CurrentDepth = progress.Depth;
+                existing = new()
+                {
+                    CurrentDepth = progress.Depth
+                };
             }
             else
-            {
-                existing = new ProgressInternal();
-            }
-            
+                existing = new();
         });
     }
 }
