@@ -44,7 +44,7 @@ public enum PlayerTypes
 }
 
 public readonly record struct Player(byte Side) : ISpanFormattable
-#if NET7_0
+#if NET7_0_OR_GREATER
     , IMinMaxValue<Player>
 #endif
 {

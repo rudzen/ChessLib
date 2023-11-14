@@ -45,10 +45,10 @@ public sealed class State : IEquatable<State>
 
     public int NullPly { get; set; }
 
-    public CastleRight CastlelingRights { get; set; }
+    public CastleRight CastlelingRights { get; set; } = CastleRight.None;
 
     [Description("En-passant -> 'in-passing' square")]
-    public Square EnPassantSquare { get; set; }
+    public Square EnPassantSquare { get; set; } = Square.None;
 
     // -----------------------------
     // Properties below this point are not copied from other state
@@ -60,58 +60,25 @@ public sealed class State : IEquatable<State>
     /// <summary>
     /// Represents checked squares for side to move
     /// </summary>
-    public BitBoard Checkers { get; set; }
+    public BitBoard Checkers { get; set; } = BitBoard.Empty;
 
-    public BitBoard[] BlockersForKing { get; }
+    public BitBoard[] BlockersForKing { get; } = { BitBoard.Empty, BitBoard.Empty };
 
-    public BitBoard[] Pinners { get; }
+    public BitBoard[] Pinners { get; } = { BitBoard.Empty, BitBoard.Empty };
 
-    public BitBoard[] CheckedSquares { get; private set; }
+    public BitBoard[] CheckedSquares { get; private set; } = new BitBoard[PieceTypes.PieceTypeNb.AsInt()];
 
-    public PieceTypes CapturedPiece { get; set; }
+    public PieceTypes CapturedPiece { get; set; } = PieceTypes.NoPieceType;
 
-    public Move LastMove { get; set; }
+    public Move LastMove { get; set; } = Move.EmptyMove;
 
     public int Repetition { get; set; }
 
     public State Previous { get; private set; }
 
-    /// <summary>
-    /// Partial copy from existing state The properties not copied are re-calculated
-    /// </summary>
-    /// <param name="other">The current state</param>
-    public State(State other)
-    {
-        PawnKey = other.PawnKey;
-        MaterialKey = other.MaterialKey;
-        CastlelingRights = other.CastlelingRights;
-        ClockPly = other.ClockPly;
-        NullPly = other.NullPly;
-        EnPassantSquare = other.EnPassantSquare;
-        Previous = other;
-
-        Checkers = BitBoard.Empty;
-        BlockersForKing = new[] { BitBoard.Empty, BitBoard.Empty };
-        Pinners = new[] { BitBoard.Empty, BitBoard.Empty };
-        CheckedSquares = new BitBoard[PieceTypes.PieceTypeNb.AsInt()];
-        CapturedPiece = PieceTypes.NoPieceType;
-    }
-
-    public State()
-    {
-        LastMove = Move.EmptyMove;
-        CastlelingRights = CastleRight.None;
-        EnPassantSquare = Square.None;
-        Checkers = BitBoard.Empty;
-        CheckedSquares = new BitBoard[PieceTypes.PieceTypeNb.AsInt()];
-        Pinners = new[] { BitBoard.Empty, BitBoard.Empty };
-        BlockersForKing = new[] { BitBoard.Empty, BitBoard.Empty };
-        CapturedPiece = PieceTypes.NoPieceType;
-    }
-
     public State CopyTo(State other)
     {
-        other ??= new State();
+        other ??= new();
 
         // copy over preserved values
         other.MaterialKey = MaterialKey;

@@ -45,11 +45,6 @@ public static class MathExtensions
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsBetween(this uint v, int min, int max) => v - (uint)min <= (uint)max - (uint)min;
 
-#if !NET7_0_OR_GREATER
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool IsAsciiDigit(this char c) => IsBetween(c, '0', '9');
-#endif
-
     /// <summary>
     /// Converts a bool to a byte (0 or 1)
     ///

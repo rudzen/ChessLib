@@ -54,9 +54,13 @@ public sealed class Board : IBoard
         _pieceList = new Square[Types.Square.Count][];
         for (var i = 0; i < _pieceList.Length; i++)
         {
-            var arr = new Square[Piece.Count];
-            arr.Fill(Types.Square.None);
-            _pieceList[i] = arr;
+            _pieceList[i] = new[]
+            {
+                Types.Square.None, Types.Square.None, Types.Square.None, Types.Square.None,
+                Types.Square.None, Types.Square.None, Types.Square.None, Types.Square.None,
+                Types.Square.None, Types.Square.None, Types.Square.None, Types.Square.None,
+                Types.Square.None, Types.Square.None, Types.Square.None, Types.Square.None
+            };
         }
 
         _index = new int[Types.Square.Count];

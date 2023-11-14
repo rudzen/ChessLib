@@ -24,6 +24,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+#if NET7_0_OR_GREATER
+using System.Numerics;
+#endif
 using System.Runtime.CompilerServices;
 using Rudzoft.ChessLib.Extensions;
 
@@ -80,7 +83,7 @@ public static class PieceTypesExtensions
 /// Piece. Contains the piece type which indicate what type and color the piece is
 /// </summary>
 public readonly record struct Piece(Pieces Value)
-#if net7_0
+#if NET7_0_OR_GREATER
     : IMinMaxValue<Piece>
 #endif
 {
