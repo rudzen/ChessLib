@@ -40,8 +40,8 @@ public sealed class MoveNotation : IMoveNotation
 
     private MoveNotation(IPosition pos)
     {
-        _notations = new INotation[]
-        {
+        _notations =
+        [
             new SanNotation(pos),
             new FanNotation(pos),
             new LanNotation(pos),
@@ -52,7 +52,7 @@ public sealed class MoveNotation : IMoveNotation
             new CoordinateNotation(pos),
             new IccfNotation(pos),
             new UciNotation(pos)
-        };
+        ];
     }
 
     public static IMoveNotation Create(IPosition pos)

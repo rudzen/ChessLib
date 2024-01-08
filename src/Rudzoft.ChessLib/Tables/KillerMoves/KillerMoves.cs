@@ -33,7 +33,7 @@ namespace Rudzoft.ChessLib.Tables.KillerMoves;
 public sealed class KillerMoves : IKillerMoves
 {
     private static readonly PieceSquare EmptyPieceSquare = new(Piece.EmptyPiece, Square.None);
-    
+
     private readonly PieceSquare[][] _killerMoves;
     private readonly int _maxDepth;
 
@@ -44,7 +44,7 @@ public sealed class KillerMoves : IKillerMoves
         _maxDepth = maxDepth + 1;
         _killerMoves = new PieceSquare[_maxDepth][];
         for (var i = 0; i < _killerMoves.Length; ++i)
-            _killerMoves[i] = new[] { EmptyPieceSquare, EmptyPieceSquare };
+            _killerMoves[i] = [EmptyPieceSquare, EmptyPieceSquare];
     }
 
     private IKillerMoves Initialize()
@@ -72,7 +72,7 @@ public sealed class KillerMoves : IKillerMoves
         // Shift killer move.
         _killerMoves[depth][1] = _killerMoves[depth][0];
         // Update killer move.
-        _killerMoves[depth][0] = new PieceSquare(fromPc, m.ToSquare());
+        _killerMoves[depth][0] = new(fromPc, m.ToSquare());
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

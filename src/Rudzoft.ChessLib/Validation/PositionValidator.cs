@@ -106,7 +106,7 @@ public sealed class PositionValidator : IPositionValidator
             yield return $"{nameof(pos.EnPassantSquare)} square is not on relative rank 6";
     }
 
-    private IEnumerable<string> ValidateCastleling(IPosition pos)
+    private static IEnumerable<string> ValidateCastleling(IPosition pos)
     {
         var crs = new[] { CastleRight.None, CastleRight.None };
 

@@ -53,24 +53,21 @@ public static class FilesExtensions
 }
 
 public readonly record struct File(Files Value)
-    : IComparable<File>, ISpanFormattable, IValidationType
-#if NET7_0_OR_GREATER 
-        , IMinMaxValue<File>
-#endif
+    : IComparable<File>, ISpanFormattable, IValidationType , IMinMaxValue<File>
 {
-    private static readonly string[] FileStrings = { "a", "b", "c", "d", "e", "f", "g", "h" };
+    private static readonly string[] FileStrings = ["a", "b", "c", "d", "e", "f", "g", "h"];
 
-    public static File FileA { get; } = new(Files.FileA);
-    public static File FileB { get; } = new(Files.FileB);
-    public static File FileC { get; } = new(Files.FileC);
-    public static File FileD { get; } = new(Files.FileD);
-    public static File FileE { get; } = new(Files.FileE);
-    public static File FileF { get; } = new(Files.FileF);
-    public static File FileG { get; } = new(Files.FileG);
-    public static File FileH { get; } = new(Files.FileH);
-    public static File[] AllFiles { get; } = { FileA, FileB, FileC, FileD, FileE, FileF, FileG, FileH };
-    public static File MaxValue => FileH;
-    public static File MinValue => FileA;
+    public static File   FileA    { get; } = new(Files.FileA);
+    public static File   FileB    { get; } = new(Files.FileB);
+    public static File   FileC    { get; } = new(Files.FileC);
+    public static File   FileD    { get; } = new(Files.FileD);
+    public static File   FileE    { get; } = new(Files.FileE);
+    public static File   FileF    { get; } = new(Files.FileF);
+    public static File   FileG    { get; } = new(Files.FileG);
+    public static File   FileH    { get; } = new(Files.FileH);
+    public static File[] AllFiles { get; } = [FileA, FileB, FileC, FileD, FileE, FileF, FileG, FileH];
+    public static File   MaxValue => FileH;
+    public static File   MinValue => FileA;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public File(int file) : this((Files)file)

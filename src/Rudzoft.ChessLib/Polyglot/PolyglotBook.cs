@@ -37,12 +37,12 @@ namespace Rudzoft.ChessLib.Polyglot;
 public sealed class PolyglotBook : IPolyglotBook
 {
     private static readonly CastleRight[] CastleRights =
-    {
+    [
         CastleRight.WhiteKing,
         CastleRight.WhiteQueen,
         CastleRight.BlackKing,
         CastleRight.BlackQueen
-    };
+    ];
 
     private readonly FileStream _fileStream;
     private readonly BinaryReader _binaryReader;
@@ -53,21 +53,21 @@ public sealed class PolyglotBook : IPolyglotBook
 
     private PolyglotBook(ObjectPool<IMoveList> pool)
     {
-        _entrySize = Unsafe.SizeOf<PolyglotBookEntry>();
-        _rnd = new Random(DateTime.Now.Millisecond);
+        _entrySize    = Unsafe.SizeOf<PolyglotBookEntry>();
+        _rnd          = new(DateTime.Now.Millisecond);
         _moveListPool = pool;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static PolyglotBook Create(ObjectPool<IMoveList> pool)
     {
-        return new PolyglotBook(pool);
+        return new(pool);
     }
-    
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static PolyglotBook Create(ObjectPool<IMoveList> pool, string path, string file)
     {
-        return new PolyglotBook(pool)
+        return new(pool)
         {
             BookFile = Path.Combine(path, file)
         };
@@ -83,7 +83,7 @@ public sealed class PolyglotBook : IPolyglotBook
             if (_bookFilePath == value)
                 return;
             _bookFilePath = value;
-            _fileStream = new FileStream(value, FileMode.Open, FileAccess.Read);
+            _fileStream = new(value, FileMode.Open, FileAccess.Read);
             _binaryReader = BitConverter.IsLittleEndian
                 ? new ReverseEndianBinaryStreamReader(_fileStream)
                 : new BinaryReader(_fileStream);
@@ -160,7 +160,7 @@ public sealed class PolyglotBook : IPolyglotBook
         var moves = ml.Get();
 
         var mm = SelectMove(in pos, from, to, move.MoveType(), moves);
-        
+
         _moveListPool.Return(ml);
 
         return mm;
@@ -179,14 +179,14 @@ public sealed class PolyglotBook : IPolyglotBook
             var promotionMatches = m.IsPromotionMove()
                 ? polyType == MoveTypes.Promotion
                 : polyType != MoveTypes.Promotion;
-            
+
             if (promotionMatches && !IsInCheck(pos, m))
                 return m;
         }
 
         return Move.EmptyMove;
     }
-    
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static bool IsInCheck(IPosition pos, Move m)
     {

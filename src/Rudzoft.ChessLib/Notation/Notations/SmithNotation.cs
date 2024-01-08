@@ -57,6 +57,6 @@ public sealed class SmithNotation : Notation
         else if (move.IsCastleMove())
             re[i++] = 'c';
 
-        return new string(re[..i]);
+        return new(re[..i]);
     }
 }

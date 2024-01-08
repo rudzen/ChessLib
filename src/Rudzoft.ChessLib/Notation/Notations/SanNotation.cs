@@ -89,6 +89,6 @@ public sealed class SanNotation : Notation
         if (GivesCheck(move))
             re[i++] = '+';
 
-        return new string(re[..i]);
+        return new(re[..i]);
     }
 }

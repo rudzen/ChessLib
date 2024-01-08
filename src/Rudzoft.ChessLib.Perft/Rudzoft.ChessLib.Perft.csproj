@@ -3,6 +3,8 @@
     <PropertyGroup>
         <Nullable>enable</Nullable>
         <PublishAot>true</PublishAot>
+        <ServerGarbageCollection>true</ServerGarbageCollection>
+        <GarbageCollectionAdaptationMode>1</GarbageCollectionAdaptationMode>
     </PropertyGroup>
 
     <ItemGroup>

@@ -43,26 +43,23 @@ public enum PlayerTypes
     Human = 1
 }
 
-public readonly record struct Player(byte Side) : ISpanFormattable
-#if NET7_0_OR_GREATER
-    , IMinMaxValue<Player>
-#endif
+public readonly record struct Player(byte Side) : ISpanFormattable, IMinMaxValue<Player>
 {
-    private static readonly Direction[] PawnPushDist = { Direction.North, Direction.South };
+    private static readonly Direction[] PawnPushDist = [Direction.North, Direction.South];
 
-    private static readonly Direction[] PawnDoublePushDist = { Direction.NorthDouble, Direction.SouthDouble };
+    private static readonly Direction[] PawnDoublePushDist = [Direction.NorthDouble, Direction.SouthDouble];
 
-    private static readonly Direction[] PawnWestAttackDist = { Direction.NorthEast, Direction.SouthEast };
+    private static readonly Direction[] PawnWestAttackDist = [Direction.NorthEast, Direction.SouthEast];
 
-    private static readonly Direction[] PawnEastAttackDist = { Direction.NorthWest, Direction.SouthWest };
+    private static readonly Direction[] PawnEastAttackDist = [Direction.NorthWest, Direction.SouthWest];
 
-    private static readonly string[] PlayerColors = { "White", "Black" };
+    private static readonly string[] PlayerColors = ["White", "Black"];
 
-    private static readonly char[] PlayerFen = { 'w', 'b' };
+    private static readonly char[] PlayerFen = ['w', 'b'];
 
-    private static readonly Func<BitBoard, BitBoard>[] PawnPushModifiers = { BitBoards.NorthOne, BitBoards.SouthOne };
+    private static readonly Func<BitBoard, BitBoard>[] PawnPushModifiers = [BitBoards.NorthOne, BitBoards.SouthOne];
 
-    private static readonly int[] ScoreSign = { 1, -1 };
+    private static readonly int[] ScoreSign = [1, -1];
 
     public Player(Player p)
         : this(p.Side) { }
@@ -73,15 +70,15 @@ public readonly record struct Player(byte Side) : ISpanFormattable
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Deconstruct(out byte side) => side = Side;
     
-    public bool IsWhite => Side == byte.MinValue;
-    public bool IsBlack => Side != byte.MinValue;
-    public int Sign => ScoreSign[Side];
-    public char Fen => PlayerFen[Side];
-    public static Player White { get; } = new(Players.White);
-    public static Player Black { get; } = new(Players.Black);
-    public static Player[] AllPlayers { get; } = { White, Black };
-    public static Player MaxValue => White;
-    public static Player MinValue => Black;
+    public        bool     IsWhite    => Side == byte.MinValue;
+    public        bool     IsBlack    => Side != byte.MinValue;
+    public        int      Sign       => ScoreSign[Side];
+    public        char     Fen        => PlayerFen[Side];
+    public static Player   White      { get; } = new(Players.White);
+    public static Player   Black      { get; } = new(Players.Black);
+    public static Player[] AllPlayers { get; } = [White, Black];
+    public static Player   MaxValue   => White;
+    public static Player   MinValue   => Black;
 
     public const int Count = (int)Players.PlayerNb;
 

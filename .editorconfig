@@ -5,7 +5,7 @@ indent_style = space
 insert_final_newline = false
 max_line_length = 120
 tab_width = 4
-trim_trailing_whitespace = false
+trim_trailing_whitespace = true
 ij_continuation_indent_size = 8
 ij_formatter_off_tag = @formatter:off
 ij_formatter_on_tag = @formatter:on
@@ -13,7 +13,7 @@ ij_formatter_tags_enabled = true
 ij_smart_tabs = false
 ij_visual_guides = 
 ij_wrap_on_typing = false
-charset = utf-8-bom
+charset = utf-8
 
 # Microsoft .NET properties
 csharp_new_line_before_members_in_object_initializers = false
@@ -45,7 +45,7 @@ dotnet_style_qualification_for_property = false:suggestion
 dotnet_style_require_accessibility_modifiers = for_non_interface_members:suggestion
 
 # ReSharper properties
-resharper_accessor_owner_body = accessors_with_expression_body
+resharper_accessor_owner_body = expression_body
 resharper_autodetect_indent_settings = true
 resharper_braces_for_dowhile = required_for_multiline
 resharper_braces_for_fixed = required_for_multiline
@@ -129,7 +129,7 @@ ij_xml_space_inside_empty_tag = false
 ij_xml_text_wrap = normal
 ij_xml_use_custom_settings = false
 
-[{*.har,*.jsb2,*.jsb3,*.json,.babelrc,.eslintrc,.prettierrc,.stylelintrc,bowerrc,jest.config}]
+[*.json]
 indent_size = 2
 ij_json_array_wrapping = split_into_lines
 ij_json_keep_blank_lines_in_code = 0

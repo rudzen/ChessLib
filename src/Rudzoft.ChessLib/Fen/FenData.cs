@@ -40,15 +40,10 @@ namespace Rudzoft.ChessLib.Fen;
 public sealed class FenData : EventArgs, IFenData
 {
     private record struct SplitPoint(int Begin, int End);
-    
-    private readonly Queue<SplitPoint> _splitPoints;
 
-    private FenData()
-    {
-        _splitPoints = new(6);
-    }
+    private readonly Queue<SplitPoint> _splitPoints = new(6);
 
-    public FenData(ReadOnlyMemory<char> fen) : this()
+    public FenData(ReadOnlyMemory<char> fen)
     {
         Fen = fen;
         var start = 0;
@@ -71,7 +66,7 @@ public sealed class FenData : EventArgs, IFenData
         _splitPoints.Enqueue(new(start, s.Length));
     }
 
-    public FenData(ReadOnlySpan<string> fen) : this()
+    public FenData(ReadOnlySpan<string> fen)
     {
         var sb = new StringBuilder(128);
 

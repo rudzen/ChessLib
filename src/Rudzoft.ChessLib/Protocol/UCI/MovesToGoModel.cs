@@ -35,7 +35,7 @@ public sealed class MovesToGoModel : EventArgs, IMovesToGoModel
 
     public MovesToGoModel(ISearchParameters original)
     {
-        _time = new[] { original.WhiteTimeMilliseconds, original.BlackTimeMilliseconds };
+        _time     = [original.WhiteTimeMilliseconds, original.BlackTimeMilliseconds];
         MovesToGo = original.MovesToGo;
     }
 

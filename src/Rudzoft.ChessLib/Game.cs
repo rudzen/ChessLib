@@ -60,7 +60,7 @@ public sealed class Game : IGame
         SearchParameters = searchParameters;
         Uci              = uci;
         Cpu              = cpu;
-        _perftTable      = new PerftTable();
+        _perftTable      = new();
     }
 
     public Action<IPieceSquare> PieceUpdated => _pos.PieceUpdated;

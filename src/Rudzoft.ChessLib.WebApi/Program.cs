@@ -11,7 +11,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddChessLib(null)
+builder.Services.AddChessLib()
     .AddTransient<IMoveGeneratorService, MoveGeneratorService>();
 
 var app = builder.Build();

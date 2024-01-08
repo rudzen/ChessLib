@@ -31,9 +31,9 @@ namespace Rudzoft.ChessLib.Test.PiecesTests;
 // ReSharper disable once ClassNeverInstantiated.Global
 public sealed class SliderMobilityFixture
 {
-    public int[] BishopExpected { get; } = { 7, 9, 11, 13 };
+    public int[] BishopExpected { get; } = [7, 9, 11, 13];
 
-    public int[] RookExpected { get; } = { 14, 14, 14, 14 };
+    public int[] RookExpected { get; } = [14, 14, 14, 14];
 
     public BitBoard SliderAttacks(PieceTypes pt, Square sq, in BitBoard occ)
     {

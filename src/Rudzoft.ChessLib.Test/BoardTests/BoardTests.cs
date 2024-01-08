@@ -95,7 +95,8 @@ public sealed class BoardTests
         }
     }
 
-    private static readonly string[] Fens = {
+    private static readonly string[] Fens =
+    [
         "rnbqkbnr/1ppQpppp/p2p4/8/8/2P5/PP1PPPPP/RNB1KBNR b KQkq - 1 6",
         "rnbqkbnr/1ppQpppp/p2p4/8/8/2P5/PP1PPPPP/RNB1KBNR b KQkq - 1 6",
         "rnbqkbnr/1ppQpppp/p2p4/8/8/2P5/PP1PPPPP/RNB1KBNR b KQkq - 1 6",
@@ -119,27 +120,30 @@ public sealed class BoardTests
         "5r1k/p6p/4r1n1/3NPp2/8/8/PP4RP/4R1K1 w - - 3 53",
         "5r1k/p6p/4r1n1/3NPp2/8/8/PP4RP/4R1K1 w - - 3 53",
         "5r1k/p6p/4r1n1/3NPp2/8/8/PP4RP/4R1K1 w - - 3 53",
-        "5r1k/p6p/4r1n1/3NPp2/8/8/PP4RP/4R1K1 w - - 3 53",
-    };
+        "5r1k/p6p/4r1n1/3NPp2/8/8/PP4RP/4R1K1 w - - 3 53"
+    ];
 
-    private static readonly PieceTypes[] PieceType = {
+    private static readonly PieceTypes[] PieceType =
+    [
         PieceTypes.Pawn, PieceTypes.Pawn, PieceTypes.Knight, PieceTypes.Knight, PieceTypes.Bishop, PieceTypes.Bishop,
         PieceTypes.Rook, PieceTypes.Rook, PieceTypes.Queen, PieceTypes.Queen, PieceTypes.King, PieceTypes.King,
         PieceTypes.Pawn, PieceTypes.Pawn, PieceTypes.Knight, PieceTypes.Knight, PieceTypes.Bishop, PieceTypes.Bishop,
-        PieceTypes.Rook, PieceTypes.Rook, PieceTypes.Queen, PieceTypes.Queen, PieceTypes.King, PieceTypes.King,
-    };
+        PieceTypes.Rook, PieceTypes.Rook, PieceTypes.Queen, PieceTypes.Queen, PieceTypes.King, PieceTypes.King
+    ];
 
-    private static readonly Player[] Player = {
+    private static readonly Player[] Player =
+    [
         Types.Player.White, Types.Player.Black, Types.Player.White, Types.Player.Black, Types.Player.White, Types.Player.Black,
         Types.Player.White, Types.Player.Black, Types.Player.White, Types.Player.Black, Types.Player.White, Types.Player.Black,
         Types.Player.White, Types.Player.Black, Types.Player.White, Types.Player.Black, Types.Player.White, Types.Player.Black,
-        Types.Player.White, Types.Player.Black, Types.Player.White, Types.Player.Black, Types.Player.White, Types.Player.Black,
-    };
+        Types.Player.White, Types.Player.Black, Types.Player.White, Types.Player.Black, Types.Player.White, Types.Player.Black
+    ];
 
-    private static readonly int[] ExpectedCount = {
+    private static readonly int[] ExpectedCount =
+    [
         8, 8, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1,
         4, 3, 1, 1, 0, 0, 2, 2, 0, 0, 1, 1
-    };
+    ];
 
     public static readonly BoardTestsTheoryData TheoryData = new(Fens, PieceType, Player, ExpectedCount);
 

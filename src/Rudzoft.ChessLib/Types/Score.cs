@@ -41,16 +41,16 @@ public struct Score : IEquatable<Score>
     private Score(Vector2 value) => _data = value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private Score(int value) => _data = new Vector2(value, 0);
+    private Score(int value) => _data = new(value, 0);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Score(float mg, float eg) => _data = new Vector2(mg, eg);
+    public Score(float mg, float eg) => _data = new(mg, eg);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Score(int mg, int eg) => _data = new Vector2(mg, eg);
+    public Score(int mg, int eg) => _data = new(mg, eg);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Score(Value mg, Value eg) => _data = new Vector2((int)mg.Raw, (int)eg.Raw);
+    public Score(Value mg, Value eg) => _data = new((int)mg.Raw, (int)eg.Raw);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Score(Score s) => _data = s._data;
@@ -82,7 +82,7 @@ public struct Score : IEquatable<Score>
     public static Score operator -(Score s1, Score s2) => new(Vector2.Subtract(s1._data, s2._data));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Score operator +(Score s, int v) => new(Vector2.Add(s._data, new Vector2(v, v)));
+    public static Score operator +(Score s, int v) => new(Vector2.Add(s._data, new(v, v)));
 
     public static readonly Score Zero = new();
 

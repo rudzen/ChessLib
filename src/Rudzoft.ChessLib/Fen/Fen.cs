@@ -39,9 +39,9 @@ public static class Fen
 
     public const int MaxFenLen = 128;
 
-    private const string FenRankRegexSnippet = @"[1-8KkQqRrBbNnPp]{1,8}";
+    private const string FenRankRegexSnippet = "[1-8KkQqRrBbNnPp]{1,8}";
 
-    private const string ValidChars = @"012345678pPnNbBrRqQkK/ w-abcdefgh";
+    private const string ValidChars = "012345678pPnNbBrRqQkK/ w-abcdefgh";
 
     private const char Space = ' ';
 
@@ -51,9 +51,12 @@ public static class Fen
 
     private const int SeparatorCount = 7;
 
-    private static readonly Lazy<Regex> ValidFenRegex = new(static () => new Regex(
-       string.Format(@"^ \s* {0}/{0}/{0}/{0}/{0}/{0}/{0}/{0} \s+ (?:w|b) \s+ (?:[KkQq]+|\-) \s+ (?:[a-h][1-8]|\-) \s+ \d+ \s+ \d+ \s* $", FenRankRegexSnippet),
-       RegexOptions.Compiled | RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.NonBacktracking | RegexOptions.ExplicitCapture));
+    private static readonly Regex ValidFenRegex = new(
+        string.Format(
+            """^ \s* {0}/{0}/{0}/{0}/{0}/{0}/{0}/{0} \s+ (?:w|b) \s+ (?:[KkQq]+|\-) \s+ (?:[a-h][1-8]|\-) \s+ \d+ \s+ \d+ \s* $""",
+            FenRankRegexSnippet),
+        RegexOptions.Compiled | RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline |
+        RegexOptions.NonBacktracking | RegexOptions.ExplicitCapture);
 
     /// <summary>
     /// Performs basic validation of FEN string.
@@ -80,7 +83,7 @@ public static class Fen
         if (f.Length >= MaxFenLen)
             throw new InvalidFenException($"Invalid length for fen {fen}.");
 
-        if (!ValidFenRegex.Value.IsMatch(fen))
+        if (!ValidFenRegex.IsMatch(fen))
             throw new InvalidFenException($"Invalid format for fen {fen}.");
 
         CountValidity(f);
@@ -116,6 +119,7 @@ public static class Fen
             {
                 if (++pieceCount[0] > SeparatorCount)
                     throw new InvalidFenException($"Invalid fen (too many separators) {s.ToString()}");
+
                 continue;
             }
 
@@ -123,6 +127,7 @@ public static class Fen
             {
                 if (!char.IsBetween(t, '1', '8'))
                     throw new InvalidFenException($"Invalid fen (not a valid square jump) {s.ToString()}");
+
                 continue;
             }
 
@@ -141,18 +146,6 @@ public static class Fen
             if (pieceCount[pc.AsInt()] > limit)
                 throw new InvalidFenException(
                     $"Invalid fen (piece limit exceeded for {pc}. index={i},limit={limit},count={pieceCount[pc.AsInt()]}) {s.ToString()}");
-        }
-
-        // check for summed up values
-        static bool GetSpanSum(ReadOnlySpan<int> span, int limit)
-        {
-            var sum = 0;
-
-            ref var spanSpace = ref MemoryMarshal.GetReference(span);
-            for (var i = 0; i < span.Length; ++i)
-                sum += Unsafe.Add(ref spanSpace, i);
-
-            return sum <= limit;
         }
 
         var whitePieces = pieceCount.Slice(1, 5);
@@ -176,6 +169,18 @@ public static class Fen
             throw new InvalidFenException($"Invalid half move count for fen {s.ToString()}");
 
         return true;
+
+        // check for summed up values
+        static bool GetSpanSum(ReadOnlySpan<int> span, int limit)
+        {
+            var sum = 0;
+
+            ref var spanSpace = ref MemoryMarshal.GetReference(span);
+            for (var i = 0; i < span.Length; ++i)
+                sum += Unsafe.Add(ref spanSpace, i);
+
+            return sum <= limit;
+        }
     }
 
     /// <summary>

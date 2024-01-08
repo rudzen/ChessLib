@@ -24,6 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using System.Buffers;
 using System.Collections;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
@@ -72,16 +73,16 @@ public sealed class Position : IPosition
         _castlingRightsMask = new CastleRight[Square.Count];
         _castlingRightsMask.Fill(CastleRight.None);
         _castlingRookSquare = new Square[CastleRight.Count];
-        _nonPawnMaterial = new[] { Value.ValueZero, Value.ValueZero };
-        _outputObjectPool = new DefaultObjectPool<StringBuilder>(new StringBuilderPooledObjectPolicy());
-        _moveListPool = moveListPool;
-        _positionValidator = positionValidator;
-        Board = board;
-        IsProbing = true;
-        Values = values;
-        Zobrist = zobrist;
-        _cuckoo = cuckoo;
-        State = new();
+        _nonPawnMaterial    = [Value.ValueZero, Value.ValueZero];
+        _outputObjectPool   = new DefaultObjectPool<StringBuilder>(new StringBuilderPooledObjectPolicy());
+        _moveListPool       = moveListPool;
+        _positionValidator  = positionValidator;
+        Board               = board;
+        IsProbing           = true;
+        Values              = values;
+        Zobrist             = zobrist;
+        _cuckoo             = cuckoo;
+        State               = new();
         Clear();
     }
 
@@ -422,10 +423,10 @@ public sealed class Position : IPosition
 
         if (State.EnPassantSquare != Square.None)
             result ^= Zobrist.EnPassant(State.EnPassantSquare);
-        
+
         if (_sideToMove == Player.Black)
             result ^= Zobrist.Side();
-        
+
         return result;
     }
 
@@ -998,12 +999,12 @@ public sealed class Position : IPosition
         var (from, to) = m;
 
         var swap = Values.GetPieceValue(GetPiece(to), Phases.Mg) - threshold;
-        
+
         if (swap < Value.ValueZero)
             return false;
 
         swap = Values.GetPieceValue(GetPiece(from), Phases.Mg) - swap;
-        
+
         if (swap <= Value.ValueZero)
             return true;
 
@@ -1159,12 +1160,12 @@ public sealed class Position : IPosition
             State.EnPassantSquare = Square.None;
     }
 
-    private void SetupMoveNumber(IFenData fenData)
+    private void SetupMoveNumber(ReadOnlySpan<char> fen, in Range halfMove, in Range moveNumber)
     {
         var moveNum = 0;
         var halfMoveNum = 0;
 
-        var chunk = fenData.Chunk();
+        var chunk = fen[halfMove];
 
         if (!chunk.IsEmpty)
         {
@@ -1172,7 +1173,7 @@ public sealed class Position : IPosition
                 halfMoveNum = 0;
 
             // half move number
-            chunk = fenData.Chunk();
+            chunk = fen[moveNumber];
 
             Maths.ToIntegral(chunk, out moveNum);
 
@@ -1186,7 +1187,7 @@ public sealed class Position : IPosition
 
     /// <summary>
     /// Apply FEN to this position.
-    /// 
+    ///
     /// </summary>
     /// <param name="fenData">The fen data to set</param>
     /// <param name="chessMode">The chess mode to apply</param>
@@ -1205,11 +1206,20 @@ public sealed class Position : IPosition
 
         CopyState(in state);
 
-        SetupPieces(fenData.Chunk());
-        SetupPlayer(fenData.Chunk());
-        SetupCastle(fenData.Chunk());
-        SetupEnPassant(fenData.Chunk());
-        SetupMoveNumber(fenData);
+        const StringSplitOptions splitOptions = StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries;
+
+        var         fen        = fenData.Fen.Span;
+        Span<Range> ranges     = stackalloc Range[7];
+        var         splitCount = fen.Split(ranges, ' ', splitOptions);
+
+        if (splitCount < 4)
+            throw new InvalidFenException("Invalid FEN string");
+
+        SetupPieces(fen[ranges[0]]);
+        SetupPlayer(fen[ranges[1]]);
+        SetupCastle(fen[ranges[2]]);
+        SetupEnPassant(fen[ranges[3]]);
+        SetupMoveNumber(fen, in ranges[4], in ranges[5]);
 
         SetState(State);
 
@@ -1343,7 +1353,7 @@ public sealed class Position : IPosition
 
             for (var file = Files.FileA; file <= Files.FileH; file++)
             {
-                var piece = GetPiece(new(rank, file));
+                var piece      = GetPiece(new(rank, file));
                 row[rowIndex++] = splitter;
                 row[rowIndex++] = space;
                 row[rowIndex++] = piece.GetPieceChar();
@@ -1473,7 +1483,7 @@ public sealed class Position : IPosition
     {
         State = State.CopyTo(newState);
     }
-    
+
     private void SetState(State state)
     {
         state.MaterialKey = HashKey.Empty;
@@ -1504,7 +1514,7 @@ public sealed class Position : IPosition
                 var val = Values.GetPieceValue(pc.Type(), Phases.Mg).AsInt() * Board.PieceCount(pc);
                 _nonPawnMaterial[pc.ColorOf().Side] += val;
             }
-            
+
             for (var cnt = 0; cnt < Board.PieceCount(pc); ++cnt)
                 state.MaterialKey ^= Zobrist.Psq(cnt, pc);
         }
@@ -1611,9 +1621,9 @@ public sealed class Position : IPosition
 
         // En-passant attackers
         var attackers = Pieces(PieceTypes.Pawn, us) & epSquare.PawnAttack(them);
-        
+
         Debug.Assert(attackers.Count <= 2);
-        
+
         if (attackers.IsEmpty)
             return false;
 
@@ -1623,9 +1633,9 @@ public sealed class Position : IPosition
         var ksq = Board.Square(PieceTypes.King, us);
         var bq = Pieces(PieceTypes.Bishop, PieceTypes.Queen, them) & GetAttacks(ksq, PieceTypes.Bishop);
         var rq = Pieces(PieceTypes.Rook, PieceTypes.Queen, them) & GetAttacks(ksq, PieceTypes.Rook);
-        
+
         var mocc = (Pieces() ^ cap) | epSquare;
-        
+
         while (attackers) {
             var sq = BitBoards.PopLsb(ref attackers);
             var amocc =  mocc ^ sq;
@@ -1635,7 +1645,7 @@ public sealed class Position : IPosition
                 (rq.IsEmpty || (rq & GetAttacks(ksq, PieceTypes.Rook, in amocc)).IsEmpty))
                 return true;
         }
-        
+
         return false;
     }
 }

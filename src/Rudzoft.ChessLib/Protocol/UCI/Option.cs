@@ -31,8 +31,8 @@ namespace Rudzoft.ChessLib.Protocol.UCI;
 
 public sealed class Option : IOption
 {
-    private static readonly string[] BoolStrings = { "false", "true" };
-    
+    private static readonly string[] BoolStrings = ["false", "true"];
+
     private string _currentValue;
 
     public Option()

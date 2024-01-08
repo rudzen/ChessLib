@@ -50,7 +50,7 @@ public static class StringExtensions
             if (i == command.Length - 1)
             {
                 // return last token.
-                q.Enqueue(new string(command.Slice(startIndex, i - startIndex + 1).TrimEnd(tokenizer)));
+                q.Enqueue(new(command.Slice(startIndex, i - startIndex + 1).TrimEnd(tokenizer)));
                 break;
             }
 
@@ -63,7 +63,7 @@ public static class StringExtensions
                     continue;
 
                 // return token
-                q.Enqueue(new string(command[startIndex..i].TrimEnd(tokenizer)));
+                q.Enqueue(new(command[startIndex..i].TrimEnd(tokenizer)));
                 startIndex = i + 1;
             }
             else if (character == tokenizer)

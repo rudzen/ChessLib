@@ -33,20 +33,14 @@ namespace Rudzoft.ChessLib.Protocol.UCI;
 /// <summary>
 /// Contains the information related to search parameters for a UCI chess engine.
 /// </summary>
-public sealed class SearchParameters : ISearchParameters
+[method: MethodImpl(MethodImplOptions.AggressiveInlining)]
+public sealed class SearchParameters() : ISearchParameters
 {
     private static readonly Clock ZeroClock = new(0UL, 0UL);
-    
-    private readonly Clock[] _clock;
-    private ulong _movesToGo;
-    private ulong _moveTime;
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public SearchParameters()
-    {
-        _clock = new Clock[Player.Count];
-        SearchMoves = new List<Move>();
-    }
+    private readonly Clock[] _clock = new Clock[Player.Count];
+    private          ulong   _movesToGo;
+    private          ulong   _moveTime;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public SearchParameters(bool infinite)
@@ -78,7 +72,7 @@ public sealed class SearchParameters : ISearchParameters
         MoveTime = moveTime;
     }
 
-    public List<Move> SearchMoves { get; }
+    public List<Move> SearchMoves { get; } = [];
 
     public bool Infinite { get; set; }
 
@@ -135,7 +129,7 @@ public sealed class SearchParameters : ISearchParameters
     {
         return _clock[Player.White.Side].Time != 0 && _clock[Player.Black.Side].Time != 0;
     }
-    
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public ulong Time(Player p) => _clock[p.Side].Time;
 
@@ -155,7 +149,7 @@ public sealed class SearchParameters : ISearchParameters
     {
         Span<char> s = stackalloc char[128];
         TryFormat(s, out var written);
-        return new string(s[..written]);
+        return new(s[..written]);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

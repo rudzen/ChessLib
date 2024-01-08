@@ -30,7 +30,7 @@ namespace Rudzoft.ChessLib.PGN;
 
 public sealed class NonRegexPgnParser : IPgnParser
 {
-    private static readonly char[] Separators = { ' ', '\t' };
+    private static readonly char[] Separators = [' ', '\t'];
 
     public async IAsyncEnumerable<PgnGame> ParseFile(
         string pgnFile,
@@ -78,9 +78,9 @@ public sealed class NonRegexPgnParser : IPgnParser
                              word.Contains('*'))
                     {
                         yield return new(currentGameTags, currentGameMoves);
-                        currentGameTags = new();
-                        currentGameMoves = new();
-                        inMoveSection = false;
+                        currentGameTags  = new();
+                        currentGameMoves = [];
+                        inMoveSection    = false;
                     }
                 }
             }
@@ -88,15 +88,15 @@ public sealed class NonRegexPgnParser : IPgnParser
             {
                 if (!line.StartsWith('[') || !line.EndsWith(']') || !line.Contains('"'))
                     continue;
-                
+
                 var firstSpaceIndex = line.IndexOf(' ');
                 var firstQuoteIndex = line.IndexOf('"');
-                var lastQuoteIndex = line.LastIndexOf('"');
+                var lastQuoteIndex  = line.LastIndexOf('"');
 
                 if (firstSpaceIndex <= 0 || firstQuoteIndex <= firstSpaceIndex
                                          || lastQuoteIndex <= firstQuoteIndex)
                     continue;
-                    
+
                 var tagName = line.Substring(1, firstSpaceIndex - 1).Trim();
                 var tagValue = line
                     .Substring(firstQuoteIndex + 1, lastQuoteIndex - firstQuoteIndex - 1)

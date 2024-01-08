@@ -8,7 +8,7 @@ public sealed class MoveGeneratorService : IMoveGeneratorService
     private readonly ILogger<IMoveGeneratorService> _logger;
     private readonly IPosition _position;
 
-    public MoveGeneratorService(ILogger<IMoveGeneratorService> logger, IPosition pos)
+    public MoveGeneratorService(ILogger<MoveGeneratorService> logger, IPosition pos)
     {
         _logger = logger;
         _position = pos;

@@ -48,8 +48,7 @@ public static class ChessLibServiceCollectionExtensions
         IConfiguration configuration = null,
         string configurationFile = null)
     {
-        if (serviceCollection == null)
-            throw new ArgumentNullException(nameof(serviceCollection));
+        ArgumentNullException.ThrowIfNull(serviceCollection);
 
         if (configuration == null)
         {

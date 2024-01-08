@@ -31,21 +31,20 @@ SOFTWARE.
 using System.Diagnostics;
 using System.Numerics;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 
 namespace Rudzoft.ChessLib.Types;
 
 public static class BitBoards
 {
     internal const ulong One = 0x1ul;
-    
+
     public static readonly BitBoard WhiteArea = new(0x00000000FFFFFFFFUL);
 
     public static readonly BitBoard BlackArea = ~WhiteArea;
 
     private static readonly BitBoard LightSquares = new(0x55AA55AA55AA55AAUL);
 
-    private static readonly BitBoard[] ColorsBB = { LightSquares, ~LightSquares };
+    private static readonly BitBoard[] ColorsBB = [LightSquares, ~LightSquares];
 
     private static readonly BitBoard FileABB = new(0x0101010101010101UL);
 
@@ -64,10 +63,10 @@ public static class BitBoards
     private static readonly BitBoard FileHBB = new(0x8080808080808080UL);
 
     private static readonly BitBoard[] FilesBB =
-    {
+    [
         FileABB, FileBBB, FileCBB, FileDBB,
         FileEBB, FileFBB, FileGBB, FileHBB
-    };
+    ];
 
     private static readonly BitBoard Rank1BB = new(0x00000000000000ffUL);
 
@@ -86,10 +85,10 @@ public static class BitBoards
     private static readonly BitBoard Rank8BB = new(0xff00000000000000UL);
 
     private static readonly BitBoard[] RanksBB =
-    {
+    [
         Rank1BB, Rank2BB, Rank3BB, Rank4BB,
         Rank5BB, Rank6BB, Rank7BB, Rank8BB
-    };
+    ];
 
     public static readonly BitBoard EmptyBitBoard = new(ulong.MinValue);
 
@@ -108,12 +107,12 @@ public static class BitBoards
     // A1..H8 | H1..A8
     public static readonly BitBoard DiagonalBB = new(0x8142241818244281UL);
 
-    private static readonly BitBoard[] PromotionRanks = { Rank8BB, Rank1BB };
+    private static readonly BitBoard[] PromotionRanks = [Rank8BB, Rank1BB];
 
     public static readonly BitBoard PromotionRanksBB = Rank1BB | Rank8BB;
 
     internal static readonly BitBoard[] BbSquares =
-    {
+    [
         0x1, 0x2, 0x4, 0x8, 0x10, 0x20, 0x40, 0x80, 0x100, 0x200, 0x400, 0x800, 0x1000, 0x2000, 0x4000, 0x8000, 0x10000,
         0x20000, 0x40000, 0x80000, 0x100000, 0x200000, 0x400000, 0x800000, 0x1000000, 0x2000000, 0x4000000, 0x8000000,
         0x10000000, 0x20000000, 0x40000000, 0x80000000, 0x100000000, 0x200000000, 0x400000000, 0x800000000,
@@ -124,7 +123,7 @@ public static class BitBoards
         0x100000000000000,
         0x200000000000000, 0x400000000000000, 0x800000000000000, 0x1000000000000000, 0x2000000000000000,
         0x4000000000000000, 0x8000000000000000
-    };
+    ];
 
     public static readonly BitBoard CornerA1 = Square.A1 | Square.B1 | Square.A2 | Square.B2;
 
@@ -134,15 +133,15 @@ public static class BitBoards
 
     public static readonly BitBoard CornerH8 = Square.H8 | Square.G8 | Square.H7 | Square.G7;
 
-    private static readonly BitBoard[] Ranks1 = { Rank1BB, Rank8BB };
+    private static readonly BitBoard[] Ranks1 = [Rank1BB, Rank8BB];
 
-    private static readonly BitBoard[] Ranks6And7BB = { Rank6BB | Rank7BB, Rank2BB | Rank3BB };
+    private static readonly BitBoard[] Ranks6And7BB = [Rank6BB | Rank7BB, Rank2BB | Rank3BB];
 
-    private static readonly BitBoard[] Ranks7And8BB = { Rank7BB | Rank8BB, Rank1BB | Rank2BB };
+    private static readonly BitBoard[] Ranks7And8BB = [Rank7BB | Rank8BB, Rank1BB | Rank2BB];
 
-    private static readonly BitBoard[] Ranks3BB = { Rank3BB, Rank6BB };
+    private static readonly BitBoard[] Ranks3BB = [Rank3BB, Rank6BB];
 
-    private static readonly BitBoard[] Ranks7BB = { Rank7BB, Rank2BB };
+    private static readonly BitBoard[] Ranks7BB = [Rank7BB, Rank2BB];
 
     /// <summary>
     /// PseudoAttacks are just that, full attack range for all squares for all pieces. The pawns
@@ -166,10 +165,10 @@ public static class BitBoards
     private static readonly BitBoard[][] LineBB = new BitBoard[Square.Count][];
 
     private static readonly BitBoard[] AdjacentFilesBB =
-    {
+    [
         FileBBB, FileABB | FileCBB, FileBBB | FileDBB, FileCBB | FileEBB, FileDBB | FileFBB, FileEBB | FileGBB,
         FileFBB | FileHBB, FileGBB
-    };
+    ];
 
     private static readonly int[][] SquareDistance = new int[Square.Count][]; // chebyshev distance
 
@@ -177,9 +176,7 @@ public static class BitBoards
 
     private static readonly BitBoard[] SlotFileBB;
 
-    private static readonly Direction[] PawnPushDirections = { Direction.North, Direction.South };
-
-    private static readonly Dictionary<Direction, Func<BitBoard, BitBoard>> ShiftFuncs = MakeShiftFuncs();
+    private static readonly Direction[] PawnPushDirections = [Direction.North, Direction.South];
 
     private static readonly Func<BitBoard, BitBoard>[] FillFuncs = MakeFillFuncs();
 
@@ -214,11 +211,6 @@ public static class BitBoards
 
         for (var i = 0; i < SquareDistance.Length; i++)
             DistanceRingBB[i] = new BitBoard[8];
-
-        // local helper functions to calculate distance
-        static int distance(int x, int y) => Math.Abs(x - y);
-        static int distanceFile(Square x, Square y) => distance(x.File.AsInt(), y.File.AsInt());
-        static int distanceRank(Square x, Square y) => distance(x.Rank.AsInt(), y.Rank.AsInt());
 
         // ForwardRanksBB population loop idea from sf
         for (var r = Rank.Rank1; r <= Rank.Rank8; r++)
@@ -285,17 +277,24 @@ public static class BitBoards
                                          GetAttacks(s2, validMagicPiece, BbSquares[sq]);
                 }
             }
-            
+
             // Compute KingRings
             InitializeKingRing(s1, sq, file);
         }
 
-        SlotFileBB = new[]
-        {
+        SlotFileBB =
+        [
             FileEBB | FileFBB | FileGBB | FileHBB, // King
             FileABB | FileBBB | FileCBB | FileDBB, // Queen
             FileCBB | FileDBB | FileEBB | FileFBB  // Center
-        };
+        ];
+
+        return;
+
+        static int distanceRank(Square x, Square y) => distance(x.Rank.AsInt(), y.Rank.AsInt());
+        static int distanceFile(Square x, Square y) => distance(x.File.AsInt(), y.File.AsInt());
+        // local helper functions to calculate distance
+        static int distance(int x, int y) => Math.Abs(x - y);
     }
 
     private static BitBoard ComputeKnightAttack(in BitBoard bb)
@@ -506,41 +505,43 @@ public static class BitBoards
     {
         const string line   = "+---+---+---+---+---+---+---+---+---+";
         const string bottom = "|   | A | B | C | D | E | F | G | H |";
+
         Span<char> span = stackalloc char[768];
+
         line.CopyTo(span);
         var idx = line.Length;
         span[idx++] = '\n';
-        foreach (var c in title.Length > 64 ? title.AsSpan()[..64] : title.AsSpan())
-            span[idx++] = c;
 
+        var t = title.Length > 64 ? title.AsSpan()[..64] : title.AsSpan();
+        t.CopyTo(span[idx..]);
+
+        Span<char> rank = stackalloc char[4] { '|', ' ', ' ', ' ' };
         for (var r = Ranks.Rank8; r >= Ranks.Rank1; --r)
         {
-            span[idx++] = '|';
-            span[idx++] = ' ';
-            span[idx++] = (char)('0' + (int)r + 1);
-            span[idx++] = ' ';
+            rank[2]     = (char)('0' + (int)r + 1);
+            rank.CopyTo(span[idx..]);
+            idx += rank.Length;
             for (var f = Files.FileA; f <= Files.FileH; ++f)
             {
-                span[idx++] = '|';
-                span[idx++] = ' ';
-                span[idx++] = (bb & new Square(r, f)).IsEmpty ? ' ' : 'X';
-                span[idx++] = ' ';
+                rank[2]     = (bb & new Square(r, f)).IsEmpty ? ' ' : 'X';
+                rank.CopyTo(span[idx..]);
+                idx += rank.Length;
             }
 
             span[idx++] = '|';
             span[idx++] = '\n';
-            foreach (var c in line)
-                span[idx++] = c;
+            line.CopyTo(span[idx..]);
+            idx += line.Length;
             span[idx++] = '\n';
         }
 
-        foreach (var c in bottom)
-            span[idx++] = c;
+        bottom.CopyTo(span[idx..]);
+        idx += bottom.Length;
 
         span[idx++] = '\n';
 
-        foreach (var c in line)
-            span[idx++] = c;
+        line.CopyTo(span[idx..]);
+        idx += line.Length;
 
         span[idx] = '\n';
 
@@ -623,12 +624,33 @@ public static class BitBoards
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public static BitBoard Shift(this in BitBoard bb, Direction d)
     {
-        ref var func = ref CollectionsMarshal.GetValueRefOrNullRef(ShiftFuncs, d);
-
-        if (Unsafe.IsNullRef(ref func))
-            throw new ArgumentException("Invalid shift argument.", nameof(d));
-
-        return func(bb);
+        if (d == Direction.North)
+            return bb.NorthOne();
+        if (d == Direction.South)
+            return bb.SouthOne();
+        if (d == Direction.SouthEast)
+            return bb.SouthEastOne();
+        if (d == Direction.SouthWest)
+            return bb.SouthWestOne();
+        if (d == Direction.NorthEast)
+            return bb.NorthEastOne();
+        if (d == Direction.NorthWest)
+            return bb.NorthWestOne();
+        if (d == Direction.NorthDouble)
+            return bb.NorthOne().NorthOne();
+        if (d == Direction.SouthDouble)
+            return bb.SouthOne().SouthOne();
+        if (d == Direction.East)
+            return bb.EastOne();
+        if (d == Direction.West)
+            return bb.WestOne();
+        if (d == Direction.NorthFill)
+            return bb.NorthFill();
+        if (d == Direction.SouthFill)
+            return bb.SouthFill();
+        if (d == Direction.None)
+            return bb;
+        throw new ArgumentException("Invalid shift argument.", nameof(d));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -729,29 +751,7 @@ public static class BitBoards
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool MoreThanOne(in BitBoard bb) => (bb.Value & (bb.Value - 1)) != 0;
 
-    /// <summary>
-    /// Helper method to generate shift function dictionary for all directions.
-    /// </summary>
-    /// <returns>The generated shift dictionary</returns>
-    private static Dictionary<Direction, Func<BitBoard, BitBoard>> MakeShiftFuncs()
-        => new(13)
-        {
-            { Direction.None, static board => board },
-            { Direction.North, static board => board.NorthOne() },
-            { Direction.NorthDouble, static board => board.NorthOne().NorthOne() },
-            { Direction.NorthEast, static board => board.NorthEastOne() },
-            { Direction.NorthWest, static board => board.NorthWestOne() },
-            { Direction.NorthFill, static board => board.NorthFill() },
-            { Direction.South, static board => board.SouthOne() },
-            { Direction.SouthDouble, static board => board.SouthOne().SouthOne() },
-            { Direction.SouthEast, static board => board.SouthEastOne() },
-            { Direction.SouthWest, static board => board.SouthWestOne() },
-            { Direction.SouthFill, static board => board.SouthFill() },
-            { Direction.East, static board => board.EastOne() },
-            { Direction.West, static board => board.WestOne() }
-        };
-
-    private static Func<BitBoard, BitBoard>[] MakeFillFuncs() => new[] { NorthFill, SouthFill };
+    private static Func<BitBoard, BitBoard>[] MakeFillFuncs() => [NorthFill, SouthFill];
 
     private static BitBoard GetAttacks(this in Square sq, PieceTypes pt, in BitBoard occ = default)
     {

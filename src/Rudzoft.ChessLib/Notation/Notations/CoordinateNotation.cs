@@ -61,6 +61,6 @@ public sealed class CoordinateNotation : Notation
             re[i++] = ')';
         }
 
-        return new string(re[..i]);
+        return new(re[..i]);
     }
 }

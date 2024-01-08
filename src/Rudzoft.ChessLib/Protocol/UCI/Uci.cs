@@ -93,6 +93,7 @@ public class Uci : IUci
     public ulong Nps(in ulong nodes, in TimeSpan time)
         => (ulong)(nodes * 1000.0 / time.Milliseconds);
 
+    [SkipLocalsInit]
     public Move MoveFromUci(IPosition pos, ReadOnlySpan<char> uciMove)
     {
         var ml = MoveListPool.Get();
@@ -102,12 +103,14 @@ public class Uci : IUci
         var moves = ml.Get();
 
         var m = Move.EmptyMove;
-        
+
+        Span<char> s = stackalloc char[5];
         foreach (var move in moves)
         {
-            if (!uciMove.Equals(move.Move.ToString(), StringComparison.InvariantCultureIgnoreCase))
+            if (move.Move.TryFormat(s, out var written)
+                && !uciMove.Equals(s[..written] ,StringComparison.Ordinal))
                 continue;
-            
+
             m = move.Move;
             break;
         }

@@ -325,7 +325,7 @@ internal static class PolyglotBookZobrist
     };
 
     private static readonly ulong[] CastleKeys =
-    {
+    [
         0UL,
         0x31D71DCE64B2C310UL, // white short
         0xF165B587DF898190UL, // white long
@@ -335,18 +335,18 @@ internal static class PolyglotBookZobrist
         0UL,
         0UL,
         0x1EF6E6DBB1961EC9UL // black long
-    };
+    ];
 
     private static readonly ulong[] EnPassantKeys =
-    {
+    [
         0x70CC73D90BC26E24UL, 0xE21A6B35DF0C3AD7UL, 0x003A93D8B2806962UL, 0x1C99DED33CB890A1UL,
         0xCF3145DE0ADD4289UL, 0xD0E4427A5514FB72UL, 0x77C621CC9FB3A483UL, 0x67A34DAC4356550BUL
-    };
+    ];
 
     private const ulong TurnKey = 0xF8D626AAAF278509UL;
 
     // PolyGlot pieces are: BP = 0, WP = 1, BN = 2, ... BK = 10, WK = 11
-    private static readonly int[] PieceMapping = { -1, 1, 3, 5, 7, 9, 11, -1, -1, 0, 2, 4, 6, 8, 10 };
+    private static readonly int[] PieceMapping = [-1, 1, 3, 5, 7, 9, 11, -1, -1, 0, 2, 4, 6, 8, 10];
 
     internal static ulong Psq(Piece pc, Square sq)
     {

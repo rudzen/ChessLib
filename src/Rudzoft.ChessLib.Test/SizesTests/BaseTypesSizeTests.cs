@@ -49,7 +49,7 @@ public sealed class BaseTypesSizeTests
     }
 
     [Fact]
-    public unsafe void SquareSize()
+    public void SquareSize()
     {
         const int expected = 1;
         var actual = Unsafe.SizeOf<Square>();
@@ -57,7 +57,7 @@ public sealed class BaseTypesSizeTests
     }
 
     [Fact]
-    public unsafe void RankSize()
+    public void RankSize()
     {
         const int expected = 4;
         var actual = Unsafe.SizeOf<Rank>();

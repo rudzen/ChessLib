@@ -31,14 +31,14 @@ public sealed class PerftOneTest : PerftVerify
     private static readonly string[] Fens = Enumerable.Repeat(Fen.Fen.StartPositionFen, 6).ToArray();
 
     private static readonly int[] Depths =
-    {
+    [
         1, 2, 3, 4, 5, 6
-    };
+    ];
 
     private static readonly ulong[] Results =
-    {
+    [
         20UL, 400UL, 8_902UL, 197_281UL, 4_865_609UL, 119_060_324UL
-    };
+    ];
 
     public static readonly PerftTheoryData PerftTheoryData = new(Fens, Depths, Results);
 
@@ -55,14 +55,14 @@ public sealed class PerftTwoTest : PerftVerify
     private static readonly string[] Fens = Enumerable.Repeat(Fen, 5).ToArray();
 
     private static readonly int[] Depths =
-    {
+    [
         1, 2, 3, 4, 5
-    };
+    ];
 
     private static readonly ulong[] Results =
-    {
+    [
         48UL, 2_039UL, 97_862UL, 4_085_603UL, 193_690_690UL
-    };
+    ];
 
     public static readonly PerftTheoryData PerftTheoryData = new(Fens, Depths, Results);
 
@@ -79,14 +79,14 @@ public sealed class PerftThreeTest : PerftVerify
     private static readonly string[] Fens = Enumerable.Repeat(Fen, 7).ToArray();
 
     private static readonly int[] Depths =
-    {
+    [
         1, 2, 3, 4, 5, 6, 7
-    };
+    ];
 
     private static readonly ulong[] Results =
-    {
+    [
         14UL, 191UL, 2_812UL, 43_238UL, 674_624UL, 11_030_083UL, 178_633_661UL
-    };
+    ];
 
     public static readonly PerftTheoryData PerftTheoryData = new(Fens, Depths, Results);
 
@@ -103,14 +103,14 @@ public sealed class PerftFourTest : PerftVerify
     private static readonly string[] Fens = Enumerable.Repeat(Fen, 5).ToArray();
 
     private static readonly int[] Depths =
-    {
+    [
         1, 2, 3, 4, 5
-    };
+    ];
 
     private static readonly ulong[] Results =
-    {
+    [
         6UL, 264UL, 9_467UL, 422_333UL, 15_833_292UL
-    };
+    ];
 
     public static readonly PerftTheoryData PerftTheoryData = new(Fens, Depths, Results);
 
@@ -127,14 +127,14 @@ public sealed class PerftFiveTest : PerftVerify
     private static readonly string[] Fens = Enumerable.Repeat(Fen, 5).ToArray();
 
     private static readonly int[] Depths =
-    {
+    [
         1, 2, 3, 4, 5
-    };
+    ];
 
     private static readonly ulong[] Results =
-    {
+    [
         46UL, 2_079UL, 89_890UL, 3_894_594UL, 164_075_551UL
-    };
+    ];
 
     public static readonly PerftTheoryData PerftTheoryData = new(Fens, Depths, Results);
 
@@ -147,7 +147,7 @@ public sealed class PerftFiveTest : PerftVerify
 public sealed class TalkChessPerftTests : PerftVerify
 {
     private static readonly string[] Fens =
-    {
+    [
         "3k4/3p4/8/K1P4r/8/8/8/8 b - - 0 1",         //--Illegal ep move #1
         "8/8/4k3/8/2p5/8/B2P2K1/8 w - - 0 1",        //--Illegal ep move #2
         "8/8/1k6/2b5/2pP4/8/5K2/8 b - d3 0 1",       //--EP Capture Checks Opponent
@@ -161,22 +161,22 @@ public sealed class TalkChessPerftTests : PerftVerify
         "8/P1k5/K7/8/8/8/8/8 w - - 0 1",             //--Under Promote to give check
         "K1k5/8/P7/8/8/8/8/8 w - - 0 1",             //--Self Stalemate
         "8/k1P5/8/1K6/8/8/8/8 w - - 0 1",            //--Stalemate & Checkmate
-        "8/8/2k5/5q2/5n2/8/5K2/8 b - - 0 1",         //--Stalemate & Checkmate
-    };
+        "8/8/2k5/5q2/5n2/8/5K2/8 b - - 0 1"          //--Stalemate & Checkmate
+    ];
 
     private static readonly int[] Depths =
-    {
+    [
         6, 6, 6, 6, 6,
         4, 4, 6, 5, 6,
         6, 6, 7, 4
-    };
+    ];
 
     private static readonly ulong[] Results =
-    {
+    [
         1_134_888UL, 1_015_133UL, 1_440_467UL, 661_072UL, 803_711UL,
         1_274_206UL, 1_720_476UL, 3_821_001UL, 1_004_658UL, 217_342UL,
         92_683UL, 2_217UL, 567_584UL, 23_527UL
-    };
+    ];
 
     public static readonly PerftTheoryData PerftTheoryData = new(Fens, Depths, Results);
 

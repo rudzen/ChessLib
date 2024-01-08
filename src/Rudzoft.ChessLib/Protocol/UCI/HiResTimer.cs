@@ -39,7 +39,7 @@ public sealed class HiResTimer : IHiResTimer, IEquatable<HiResTimer>
     public static readonly double Frequency = Stopwatch.Frequency;
 
     private static readonly TimeSpan RestartThreshold = TimeSpan.FromHours(1);
-    
+
     private readonly object _intervalLock;
 
     private float _interval;
@@ -48,17 +48,17 @@ public sealed class HiResTimer : IHiResTimer, IEquatable<HiResTimer>
 
     private Task _executer;
 
-    public HiResTimer() => _intervalLock = new object();
+    public HiResTimer() => _intervalLock = new();
 
     public HiResTimer(int id)
         : this(1f, id, null) { }
 
     public HiResTimer(float interval, int id, Action<HiResTimerArgs> elapsed)
     {
-        _intervalLock = new object();
-        Interval = interval;
-        Elapsed = elapsed;
-        Id = id;
+        _intervalLock = new();
+        Interval      = interval;
+        Elapsed       = elapsed;
+        Id            = id;
     }
 
     /// <summary>
@@ -112,7 +112,7 @@ public sealed class HiResTimer : IHiResTimer, IEquatable<HiResTimer>
 
         Debug.Print($"Timer Start on thread {Environment.CurrentManagedThreadId}");
 
-        _cancellationTokenSource = new CancellationTokenSource();
+        _cancellationTokenSource = new();
         _cancellationTokenSource.Token.ThrowIfCancellationRequested();
         _executer = Task.Run(() => ExecuteTimer(_cancellationTokenSource.Token), _cancellationTokenSource.Token);
     }
@@ -200,7 +200,7 @@ public sealed class HiResTimer : IHiResTimer, IEquatable<HiResTimer>
             if (Elapsed != null)
             {
                 var delay = elapsed - nextTrigger;
-                Elapsed(new HiResTimerArgs(delay, Id));
+                Elapsed(new(delay, Id));
             }
 
             if (cancellationToken.IsCancellationRequested)

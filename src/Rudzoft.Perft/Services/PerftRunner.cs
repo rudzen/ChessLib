@@ -74,13 +74,13 @@ public sealed class PerftRunner : IPerftRunner
         ObjectPool<PerftResult> resultPool,
         IUci uci)
     {
-        _epdParser = parser;
-        _perft = perft;
+        _epdParser                =   parser;
+        _perft                    =   perft;
         _perft.BoardPrintCallback ??= s => Log.Information("Board:\n{Board}", s);
-        _transpositionTable = transpositionTable;
-        _resultPool = resultPool;
-        _uci = uci;
-        _runners = new Func<CancellationToken, IAsyncEnumerable<PerftPosition>>[] { ParseEpd, ParseFen };
+        _transpositionTable       =   transpositionTable;
+        _resultPool               =   resultPool;
+        _uci                      =   uci;
+        _runners                  =   [ParseEpd, ParseFen];
 
         configuration.Bind("TranspositionTable", TranspositionTableOptions);
 
@@ -102,12 +102,12 @@ public sealed class PerftRunner : IPerftRunner
         if (TranspositionTableOptions is TTOptions { Use: true } ttOptions)
             _transpositionTable.SetSize(ttOptions.Size);
 
-        var errors = 0;
+        var errors      = 0;
         var runnerIndex = (Options is FenOptions).AsByte();
         _usingEpd = runnerIndex == 0;
         var positions = _runners[runnerIndex].Invoke(cancellationToken);
 
-        _perft.Positions = new();
+        _perft.Positions = [];
 
         GCSettings.LatencyMode = GCLatencyMode.SustainedLowLatency;
 
@@ -124,7 +124,7 @@ public sealed class PerftRunner : IPerftRunner
             }
             catch (AggregateException e)
             {
-                Log.Error(e.GetBaseException(), "Cancel requested.");
+                Log.Error(e.GetBaseException(), "Cancel requested");
                 Interlocked.Increment(ref errors);
                 break;
             }
@@ -144,19 +144,24 @@ public sealed class PerftRunner : IPerftRunner
     private IAsyncEnumerable<PerftPosition> ParseEpd(CancellationToken cancellationToken)
     {
         var options = Options as EpdOptions;
-        return ParseEpd(options);
+        return ParseEpd(options, cancellationToken);
     }
 
-    private async IAsyncEnumerable<PerftPosition> ParseEpd(EpdOptions options)
+    private async IAsyncEnumerable<PerftPosition> ParseEpd(
+        EpdOptions options,
+        [EnumeratorCancellation] CancellationToken cancellationToken)
     {
         foreach (var epd in options.Epds)
         {
             var start = Stopwatch.GetTimestamp();
 
             var parsedCount = 0L;
-            
-            await foreach(var epdPos in _epdParser.Parse(epd))
+
+            await foreach (var epdPos in _epdParser.Parse(epd).WithCancellation(cancellationToken))
             {
+                if (cancellationToken.IsCancellationRequested)
+                    yield break;
+
                 parsedCount++;
 
                 var perftPosition = PerftPositionFactory.Create(epdPos.Id, epdPos.Epd, epdPos.Perft);
@@ -172,11 +177,13 @@ public sealed class PerftRunner : IPerftRunner
     private IAsyncEnumerable<PerftPosition> ParseFen(CancellationToken cancellationToken)
     {
         var options = Options as FenOptions;
-        return ParseFen(options);
+        return ParseFen(options, cancellationToken);
     }
 
 #pragma warning disable 1998
-    private static async IAsyncEnumerable<PerftPosition> ParseFen(FenOptions options)
+    private static async IAsyncEnumerable<PerftPosition> ParseFen(
+        FenOptions options,
+        [EnumeratorCancellation] CancellationToken cancellationToken)
 #pragma warning restore 1998
     {
         const ulong zero = ulong.MinValue;
@@ -187,7 +194,11 @@ public sealed class PerftRunner : IPerftRunner
             options.Fens.Select(f => PerftPositionFactory.Create(Guid.NewGuid().ToString(), f, depths));
 
         foreach (var perftPosition in perftPositions)
+        {
+            if (cancellationToken.IsCancellationRequested)
+                yield break;
             yield return perftPosition;
+        }
     }
 
     private async Task<PerftResult> ComputePerft(CancellationToken cancellationToken)
@@ -217,7 +228,7 @@ public sealed class PerftRunner : IPerftRunner
             var start = Stopwatch.GetTimestamp();
 
             var perftResult = await _perft.DoPerftAsync(depth).ConfigureAwait(false);
-            var elapsedMs = Stopwatch.GetElapsedTime(start);
+            var elapsedMs   = Stopwatch.GetElapsedTime(start);
 
             ComputeResults(in perftResult, depth, in expected, in elapsedMs, result);
 
@@ -226,7 +237,7 @@ public sealed class PerftRunner : IPerftRunner
             if (baseFileName.IsNullOrEmpty())
                 continue;
 
-            await WriteOutput(result, baseFileName, cancellationToken);
+            await WriteOutput(result, baseFileName, cancellationToken).ConfigureAwait(ConfigureAwaitOptions.None);
         }
 
         Log.Information("{Info} parsing complete. Encountered {Errors} errors", _usingEpd ? "EPD" : "FEN", errors);
@@ -236,32 +247,32 @@ public sealed class PerftRunner : IPerftRunner
         return result;
     }
 
-    private static async ValueTask WriteOutput(
+    private static async Task WriteOutput(
         IPerftResult result,
         string baseFileName,
         CancellationToken cancellationToken)
     {
-        // ReSharper disable once MethodHasAsyncOverload
-        var contents = JsonSerializer.Serialize(result);
-        var outputFileName = $"{baseFileName}{result.Depth}].json";
-        await File.WriteAllTextAsync(
-                outputFileName,
-                contents,
-                cancellationToken)
-            .ConfigureAwait(false);
+        var outputFileName = Path.Combine(Environment.CurrentDirectory, $"{baseFileName}{result.Depth}].json");
+        await using var outStream = File.OpenWrite(outputFileName);
+        await JsonSerializer.SerializeAsync(outStream, result, cancellationToken: cancellationToken);
     }
 
-    private void ComputeResults(in ulong result, int depth, in ulong expected, in TimeSpan elapsedMs, IPerftResult results)
+    private void ComputeResults(
+        in ulong result,
+        int depth,
+        in ulong expected,
+        in TimeSpan elapsedMs,
+        IPerftResult results)
     {
         // compute results
         results.Result = result;
-        results.Depth = depth;
+        results.Depth  = depth;
         // add 1 to avoid potential dbz
-        results.Elapsed = elapsedMs.Add(TimeSpan.FromMicroseconds(1));
-        results.Nps = _uci.Nps(in result, results.Elapsed);
+        results.Elapsed       = elapsedMs.Add(TimeSpan.FromMicroseconds(1));
+        results.Nps           = _uci.Nps(in result, results.Elapsed);
         results.CorrectResult = expected;
-        results.Passed = expected == result;
-        results.TableHits = _transpositionTable.Hits;
+        results.Passed        = expected == result;
+        results.TableHits     = _transpositionTable.Hits;
     }
 
     private int LogResults(IPerftResult result)

@@ -66,7 +66,7 @@ public class KeyBenchmarks
         finalBytes[14] = s2Bytes[6];
         finalBytes[15] = s2Bytes[7];
 
-        return new(new Guid(finalBytes), dateOnly);
+        return new(new(finalBytes), dateOnly);
         
         //var h = MemoryMarshal.TryRead(finalBytes, out ulong v);
     }

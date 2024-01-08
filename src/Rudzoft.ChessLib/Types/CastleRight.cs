@@ -86,14 +86,14 @@ public static class CastleExtensions
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static CastleRights MakeCastleRights(this CastleRights cs, Player p)
     {
+        var isQueen = cs == CastleRights.Queen;
         if (p.IsWhite)
-            return cs == CastleRights.Queen
+            return isQueen
                 ? CastleRights.WhiteQueen
                 : CastleRights.WhiteKing;
-        else
-            return cs == CastleRights.Queen
-                ? CastleRights.BlackQueen
-                : CastleRights.BlackKing;
+        return isQueen
+            ? CastleRights.BlackQueen
+            : CastleRights.BlackKing;
     }
 }
 

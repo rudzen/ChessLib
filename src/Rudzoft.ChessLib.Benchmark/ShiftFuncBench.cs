@@ -10,12 +10,12 @@ public class ShiftFuncBench
     private static readonly FrozenDictionary<Direction, Func<BitBoard, BitBoard>> ShiftFuncs = MakeShiftFuncs();
 
     private static readonly Direction[] AllDirections =
-    {
+    [
         Direction.North, Direction.South, Direction.East, Direction.West,
         Direction.NorthEast, Direction.NorthWest, Direction.SouthEast, Direction.SouthWest,
         Direction.NorthDouble, Direction.SouthDouble, Direction.SouthFill, Direction.NorthFill,
         Direction.None
-    };
+    ];
 
     [Benchmark]
     public BitBoard ShiftFuncLookup()
@@ -28,7 +28,7 @@ public class ShiftFuncBench
     }
 
     [Benchmark]
-    public BitBoard ShiftFunc2Lookup()
+    public BitBoard ShiftFunc2RefLookup()
     {
         var bb = BitBoards.EmptyBitBoard;
         foreach (var direction in AllDirections)
@@ -47,6 +47,18 @@ public class ShiftFuncBench
         return bb;
     }
 
+    [Benchmark]
+    public BitBoard NorthFillRegular()
+    {
+        return BitBoards.PawnSquares.NorthFill();
+    }
+
+    [Benchmark]
+    public BitBoard SouthFillRegular()
+    {
+        return BitBoards.PawnSquares.SouthFill();
+    }
+
     private static BitBoard ShiftF(in BitBoard bb, Direction direction)
     {
         if (ShiftFuncs.TryGetValue(direction, out var func))
@@ -57,10 +69,7 @@ public class ShiftFuncBench
 
     private static BitBoard ShiftF2(in BitBoard bb, Direction direction)
     {
-        if (ShiftFuncs.TryGetValue(direction, out var func))
-            return func(bb);
-        
-        throw new ArgumentException("Invalid shift argument.", nameof(direction));
+        return bb.Shift(direction);
     }
 
     private static BitBoard Shift(in BitBoard bb, Direction direction)

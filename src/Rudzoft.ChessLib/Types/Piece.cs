@@ -24,9 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#if NET7_0_OR_GREATER
 using System.Numerics;
-#endif
 using System.Runtime.CompilerServices;
 using Rudzoft.ChessLib.Extensions;
 
@@ -82,10 +80,7 @@ public static class PieceTypesExtensions
 /// <summary>
 /// Piece. Contains the piece type which indicate what type and color the piece is
 /// </summary>
-public readonly record struct Piece(Pieces Value)
-#if NET7_0_OR_GREATER
-    : IMinMaxValue<Piece>
-#endif
+public readonly record struct Piece(Pieces Value) : IMinMaxValue<Piece>
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private Piece(int pc) : this((Pieces)pc) { }
@@ -114,10 +109,10 @@ public readonly record struct Piece(Pieces Value)
     public static Piece BlackKing { get; } = new(Pieces.BlackKing);
 
     public static Piece[] All { get; } =
-    {
+    [
         WhitePawn, WhiteKnight, WhiteBishop, WhiteRook, WhiteQueen, WhiteKing,
         BlackPawn, BlackKnight, BlackBishop, BlackRook, BlackQueen, BlackKing
-    };
+    ];
 
     public static Piece MaxValue => WhitePawn;
 
@@ -128,14 +123,14 @@ public readonly record struct Piece(Pieces Value)
     public static Range BlackPieces => new(6, 11);
     
     public static PieceTypes[] AllTypes { get; } =
-    {
+    [
         PieceTypes.Pawn,
         PieceTypes.Knight,
         PieceTypes.Bishop,
         PieceTypes.Rook,
         PieceTypes.Queen,
         PieceTypes.King
-    };
+    ];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator Piece(char value) => new(GetPiece(value));

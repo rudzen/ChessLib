@@ -53,15 +53,14 @@ public class PerftBench
         var pp = PerftPositionFactory.Create(
             Guid.NewGuid().ToString(),
             Fen.Fen.StartPositionFen,
-            new(6)
-            {
+            [
                 new(1, 20),
                 new(2, 400),
                 new(3, 8902),
                 new(4, 197281),
                 new(5, 4865609),
                 new(6, 119060324)
-            });
+            ]);
 
         var ttConfig = new TranspositionTableConfiguration { DefaultSize = 1 };
         var options = Options.Create(ttConfig);

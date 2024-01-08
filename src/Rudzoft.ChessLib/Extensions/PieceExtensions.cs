@@ -39,12 +39,13 @@ public static class PieceExtensions
 
     public const string BookPieceNames = "pPnNbBrRqQkK";
 
-    private static readonly string[] PieceStrings = { " ", "P", "N", "B", "R", "Q", "K", " ", " ", "p", "n", "b", "r", "q", "k" };
+    private static readonly string[] PieceStrings = [" ", "P", "N", "B", "R", "Q", "K", " ", " ", "p", "n", "b", "r", "q", "k"
+    ];
 
-    private static readonly string[] PieceNames = { "None", "Pawn", "Knight", "Bishop", "Rook", "Queen", "King" };
+    private static readonly string[] PieceNames = ["None", "Pawn", "Knight", "Bishop", "Rook", "Queen", "King"];
 
     private static readonly char[] PieceUnicodeChar =
-    {
+    [
         ' ',
         '\u2659',   //  ♙   U+2659  &#9817;
         '\u2658',   //  ♘   U+2658  &#9816;
@@ -61,7 +62,7 @@ public static class PieceExtensions
         '\u265B',   //  ♛   U+265B  &#9819;
         '\u265A',   //  ♚   U+265A  &#9818;
         ' '
-    };
+    ];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static char GetPieceChar(this Piece p) => PieceChars[p.AsInt()];

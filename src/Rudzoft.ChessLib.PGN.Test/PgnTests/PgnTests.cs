@@ -42,12 +42,12 @@ public sealed class PgnTests
                 .AddPgnParser(static () => false)
                 .BuildServiceProvider();
     }
-    
+
     [Fact]
     public async Task ParseFile_WithTestContent_ReturnsCorrectGamesAndMoves()
     {
         var parser = _serviceProvider.GetRequiredService<IPgnParser>();
-        
+
         var games = new List<PgnGame>();
 
         await foreach (var game in parser.ParseFile(SampleFilePath))
@@ -58,8 +58,9 @@ public sealed class PgnTests
 
         var g = JsonSerializer.Serialize(game1);
 
+        Assert.NotEmpty(g);
         Assert.Equal(ExpectedGameCount, games.Count);
-        
+
         Assert.Equal("Test event", game1.Tags["Event"]);
         Assert.Equal(3, game1.Moves.Count);
         Assert.Equal("e4", game1.Moves[0].WhiteMove);

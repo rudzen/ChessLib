@@ -62,9 +62,9 @@ public sealed class State : IEquatable<State>
     /// </summary>
     public BitBoard Checkers { get; set; } = BitBoard.Empty;
 
-    public BitBoard[] BlockersForKing { get; } = { BitBoard.Empty, BitBoard.Empty };
+    public BitBoard[] BlockersForKing { get; } = [BitBoard.Empty, BitBoard.Empty];
 
-    public BitBoard[] Pinners { get; } = { BitBoard.Empty, BitBoard.Empty };
+    public BitBoard[] Pinners { get; } = [BitBoard.Empty, BitBoard.Empty];
 
     public BitBoard[] CheckedSquares { get; private set; } = new BitBoard[PieceTypes.PieceTypeNb.AsInt()];
 

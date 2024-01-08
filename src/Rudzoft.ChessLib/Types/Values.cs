@@ -80,8 +80,10 @@ public sealed class Values : IValues
         for (var index = 0; index < _defaults.Length; index++)
             _defaults[index] = new DefaultPieceValues[6];
 
-        _defaults[0] = new[] { DefaultPieceValues.ValueZero, DefaultPieceValues.PawnValueMg, DefaultPieceValues.KnightValueMg, DefaultPieceValues.BishopValueMg, DefaultPieceValues.RookValueMg, DefaultPieceValues.QueenValueMg };
-        _defaults[1] = new[] { DefaultPieceValues.ValueZero, DefaultPieceValues.PawnValueEg, DefaultPieceValues.KnightValueEg, DefaultPieceValues.BishopValueEg, DefaultPieceValues.RookValueEg, DefaultPieceValues.QueenValueEg };
+        _defaults[0] = [DefaultPieceValues.ValueZero, DefaultPieceValues.PawnValueMg, DefaultPieceValues.KnightValueMg, DefaultPieceValues.BishopValueMg, DefaultPieceValues.RookValueMg, DefaultPieceValues.QueenValueMg
+        ];
+        _defaults[1] = [DefaultPieceValues.ValueZero, DefaultPieceValues.PawnValueEg, DefaultPieceValues.KnightValueEg, DefaultPieceValues.BishopValueEg, DefaultPieceValues.RookValueEg, DefaultPieceValues.QueenValueEg
+        ];
 
         SetDefaults();
     }

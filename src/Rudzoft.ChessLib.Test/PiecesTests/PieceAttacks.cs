@@ -83,8 +83,8 @@ public abstract class PieceAttacks
 
     protected const ulong PawnDelta = 0x18181818181800;
 
-    protected static readonly BitBoard[] Bands = { Alpha, Beta, Gamma, Delta };
+    protected static readonly BitBoard[] Bands = [Alpha, Beta, Gamma, Delta];
 
     protected static readonly BitBoard[] EEBands =
-        { 0xff818181818181ff, 0x7e424242427e00, 0x3c24243c0000, 0x1818000000 };
+        [0xff818181818181ff, 0x7e424242427e00, 0x3c24243c0000, 0x1818000000];
 }

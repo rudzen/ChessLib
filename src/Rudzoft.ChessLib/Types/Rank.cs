@@ -53,7 +53,7 @@ public static class RanksExtensions
 
 public readonly record struct Rank(Ranks Value) : ISpanFormattable, IValidationType
 {
-    private static readonly string[] RankStrings = { "1", "2", "3", "4", "5", "6", "7", "8" };
+    private static readonly string[] RankStrings = ["1", "2", "3", "4", "5", "6", "7", "8"];
 
     public static Rank Rank1 { get; } = new(Ranks.Rank1);
     public static Rank Rank2 { get; } = new(Ranks.Rank2);
@@ -64,9 +64,9 @@ public readonly record struct Rank(Ranks Value) : ISpanFormattable, IValidationT
     public static Rank Rank7 { get; } = new(Ranks.Rank7);
     public static Rank Rank8 { get; } = new(Ranks.Rank8);
 
-    public static Rank[] PawnRanks { get; } = { Rank2, Rank3, Rank4, Rank5, Rank6, Rank7 };
+    public static Rank[] PawnRanks { get; } = [Rank2, Rank3, Rank4, Rank5, Rank6, Rank7];
 
-    public static Rank[] All { get; } = { Rank1, Rank2, Rank3, Rank4, Rank5, Rank6, Rank7, Rank8 };
+    public static Rank[] All { get; } = [Rank1, Rank2, Rank3, Rank4, Rank5, Rank6, Rank7, Rank8];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Rank(int rank) : this((Ranks)rank) { }

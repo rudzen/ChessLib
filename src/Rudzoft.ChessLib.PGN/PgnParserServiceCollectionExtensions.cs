@@ -28,7 +28,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Rudzoft.ChessLib.PGN;
 
-public static class PgnParserFactory
+public static class PgnParserServiceCollectionExtensions
 {
     public static IServiceCollection AddPgnParser(this IServiceCollection services, Func<bool>? useRegex = null)
     {

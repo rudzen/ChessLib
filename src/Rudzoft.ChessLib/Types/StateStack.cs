@@ -42,7 +42,7 @@ public sealed class StateStack : IEnumerable<State>
         Count = 0;
         _stack = new State[size];
         for (var i = 0; i < _stack.Length; i++)
-            Push(new State());
+            Push(new());
     }
 
     /// <summary>

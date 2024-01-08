@@ -94,6 +94,6 @@ public sealed class RanNotation : Notation
         if (Pos.InCheck)
             re[i++] = GetCheckChar();
 
-        return new string(re[..i]);
+        return new(re[..i]);
     }
 }

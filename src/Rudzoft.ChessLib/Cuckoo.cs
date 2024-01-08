@@ -38,14 +38,14 @@ namespace Rudzoft.ChessLib;
 public sealed class Cuckoo : ICuckoo
 {
     private readonly HashKey[] _cuckooKeys;
-    private readonly Move[] _cuckooMoves;
+    private readonly Move[]    _cuckooMoves;
 
     public Cuckoo(IZobrist zobrist)
     {
-        _cuckooKeys = new HashKey[8192];
+        _cuckooKeys  = new HashKey[8192];
         _cuckooMoves = new Move[8192];
         var count = 0;
-        
+
         foreach (var pc in Piece.All.AsSpan())
         {
             var bb = BitBoards.AllSquares;
@@ -58,11 +58,11 @@ public sealed class Cuckoo : ICuckoo
                         continue;
 
                     var move = Move.Create(sq1, sq2);
-                    var key = zobrist.Psq(sq1, pc) ^ zobrist.Psq(sq2, pc) ^ zobrist.Side();
-                    var j = CuckooHashOne(in key);
+                    var key  = zobrist.Psq(sq1, pc) ^ zobrist.Psq(sq2, pc) ^ zobrist.Side();
+                    var j    = CuckooHashOne(in key);
                     do
                     {
-                        (_cuckooKeys[j], key) = (key, _cuckooKeys[j]);
+                        (_cuckooKeys[j], key)   = (key, _cuckooKeys[j]);
                         (_cuckooMoves[j], move) = (move, _cuckooMoves[j]);
 
                         // check for empty slot
@@ -88,8 +88,8 @@ public sealed class Cuckoo : ICuckoo
         if (end < 3)
             return false;
 
-        var state = pos.State;
-        var originalKey = state.PositionKey;
+        var state         = pos.State;
+        var originalKey   = state.PositionKey;
         var statePrevious = state.Previous;
 
         for (var i = 3; i <= end; i += 2)
@@ -97,12 +97,12 @@ public sealed class Cuckoo : ICuckoo
             statePrevious = statePrevious.Previous.Previous;
             var moveKey = originalKey ^ statePrevious.PositionKey;
 
-            var j = CuckooHashOne(in moveKey);
+            var j     = CuckooHashOne(in moveKey);
             var found = _cuckooKeys[j] == moveKey;
 
             if (!found)
             {
-                j = CuckooHashTwo(in moveKey);
+                j     = CuckooHashTwo(in moveKey);
                 found = _cuckooKeys[j] == moveKey;
             }
 

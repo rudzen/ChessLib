@@ -62,6 +62,9 @@ public sealed class BitboardDataTests
                     actual += s1.Aligned(s2, s3).AsByte();
                 }
             }
+
+            var s = bb.ToString();
+            Assert.NotNull(s);
         }
 
         Assert.Equal(expected, actual);

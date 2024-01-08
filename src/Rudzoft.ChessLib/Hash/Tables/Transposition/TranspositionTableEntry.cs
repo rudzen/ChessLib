@@ -80,4 +80,4 @@ public struct TTEntry
     internal int generation() { return generation8; }
     internal Value static_value() { return staticValue; }
     internal Value static_value_margin() { return staticMargin; }
-};
+}
