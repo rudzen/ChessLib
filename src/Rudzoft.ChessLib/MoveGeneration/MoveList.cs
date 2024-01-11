@@ -42,17 +42,11 @@ public sealed class MoveList : IMoveList
     private readonly ValMove[] _moves = new ValMove[218];
     private int _cur;
 
-    int IReadOnlyCollection<ValMove>.Count
-    {
-        get => Length;
-    }
+    int IReadOnlyCollection<ValMove>.Count => Length;
 
     public int Length { get; private set; }
 
-    public ref ValMove CurrentMove
-    {
-        get => ref _moves[_cur];
-    }
+    public ref ValMove CurrentMove => ref _moves[_cur];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static MoveList operator ++(MoveList moveList)
