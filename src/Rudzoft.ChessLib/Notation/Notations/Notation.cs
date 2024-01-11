@@ -25,37 +25,40 @@ SOFTWARE.
 */
 
 using System.Runtime.CompilerServices;
+using Microsoft.Extensions.ObjectPool;
 using Rudzoft.ChessLib.Enums;
 using Rudzoft.ChessLib.MoveGeneration;
 using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Notation.Notations;
 
-public abstract class Notation : INotation
+public abstract class Notation(ObjectPool<IMoveList> moveLists) : INotation
 {
-    protected readonly IPosition Pos;
+    protected readonly ObjectPool<IMoveList> MoveLists = moveLists;
 
-    protected Notation(IPosition pos) => Pos = pos;
-
-    public abstract string Convert(Move move);
+    public abstract string Convert(IPosition pos, Move move);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    protected char GetCheckChar() =>
-        Pos.GenerateMoves().Length switch
+    protected char GetCheckChar(IPosition pos)
+    {
+        var ml = MoveLists.Get();
+        ml.Generate(pos);
+        var count = ml.Get().Length;
+        MoveLists.Return(ml);
+
+        return count switch
         {
-            0 => '+',
+            0     => '+',
             var _ => '#'
         };
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    protected bool GivesCheck(Move move) => Pos.GivesCheck(move);
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private MoveAmbiguities Ambiguity(Square from, BitBoard similarTypeAttacks)
+    private static MoveAmbiguities Ambiguity(IPosition pos, Square from, BitBoard similarTypeAttacks)
     {
         var ambiguity = MoveAmbiguities.None;
-        var c = Pos.SideToMove;
-        var pinned = Pos.PinnedPieces(c);
+        var c         = pos.SideToMove;
+        var pinned    = pos.PinnedPieces(c);
 
         while (similarTypeAttacks)
         {
@@ -64,11 +67,11 @@ public abstract class Notation : INotation
             if (pinned & square)
                 continue;
 
-            if (Pos.GetPieceType(from) != Pos.GetPieceType(square))
+            if (pos.GetPieceType(from) != pos.GetPieceType(square))
                 continue;
 
             // ReSharper disable once InvertIf
-            if (Pos.Pieces(c) & square)
+            if (pos.Pieces(c) & square)
             {
                 if (square.File == from.File)
                     ambiguity |= MoveAmbiguities.File;
@@ -90,10 +93,10 @@ public abstract class Notation : INotation
     /// <param name="move">The move to check</param>
     /// <param name="from">The from square</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    protected IEnumerable<char> Disambiguation(Move move, Square from)
+    protected static IEnumerable<char> Disambiguation(IPosition pos, Move move, Square from)
     {
-        var similarAttacks = GetSimilarAttacks(move);
-        var ambiguity = Ambiguity(from, similarAttacks);
+        var similarAttacks = GetSimilarAttacks(pos, move);
+        var ambiguity = Ambiguity(pos, from, similarAttacks);
 
         if (!ambiguity.HasFlagFast(MoveAmbiguities.Move))
             yield break;
@@ -115,15 +118,15 @@ public abstract class Notation : INotation
     /// <param name="move">The move to get similar attacks from</param>
     /// <returns>Squares for all similar attacks without the moves from square</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private BitBoard GetSimilarAttacks(Move move)
+    private static BitBoard GetSimilarAttacks(IPosition pos, Move move)
     {
         var from = move.FromSquare();
-        var pt = Pos.GetPieceType(from);
+        var pt = pos.GetPieceType(from);
 
         return pt switch
         {
             PieceTypes.Pawn or PieceTypes.King => BitBoard.Empty,
-            var _ => Pos.GetAttacks(move.ToSquare(), pt, Pos.Pieces()) ^ from
+            var _ => pos.GetAttacks(move.ToSquare(), pt, pos.Pieces()) ^ from
         };
     }
 }

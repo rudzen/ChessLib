@@ -25,17 +25,15 @@ SOFTWARE.
 */
 
 using System.Runtime.CompilerServices;
+using Microsoft.Extensions.ObjectPool;
 using Rudzoft.ChessLib.Extensions;
+using Rudzoft.ChessLib.MoveGeneration;
 using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Notation.Notations;
 
-public sealed class FanNotation : Notation
+public sealed class FanNotation(ObjectPool<IMoveList> moveLists) : Notation(moveLists)
 {
-    public FanNotation(IPosition pos) : base(pos)
-    {
-    }
-
     /// <summary>
     /// <para>Converts a move to FAN notation.</para>
     /// </summary>
@@ -43,14 +41,14 @@ public sealed class FanNotation : Notation
     /// <returns>FAN move string</returns>
     [SkipLocalsInit]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override string Convert(Move move)
+    public override string Convert(IPosition pos, Move move)
     {
         var (from, to, type) = move;
 
         if (move.IsCastleMove())
             return CastleExtensions.GetCastleString(to, from);
 
-        var pc = Pos.MovedPiece(move);
+        var pc = pos.MovedPiece(move);
         var pt = pc.Type();
 
         Span<char> re = stackalloc char[6];
@@ -59,7 +57,7 @@ public sealed class FanNotation : Notation
         if (pt != PieceTypes.Pawn)
         {
             re[i++] = pc.GetUnicodeChar();
-            foreach (var c in Disambiguation(move, from))
+            foreach (var c in Disambiguation(pos, move, from))
                 re[i++] = c;
         }
 
@@ -71,7 +69,7 @@ public sealed class FanNotation : Notation
         }
         else
         {
-            if (Pos.GetPiece(to) != Piece.EmptyPiece)
+            if (pos.GetPiece(to) != Piece.EmptyPiece)
             {
                 if (pt == PieceTypes.Pawn)
                     re[i++] = from.FileChar;
@@ -85,11 +83,11 @@ public sealed class FanNotation : Notation
         if (type == MoveTypes.Promotion)
         {
             re[i++] = '=';
-            re[i++] = move.PromotedPieceType().MakePiece(Pos.SideToMove).GetUnicodeChar();
+            re[i++] = move.PromotedPieceType().MakePiece(pos.SideToMove).GetUnicodeChar();
         }
 
-        if (Pos.InCheck)
-            re[i++] = GetCheckChar();
+        if (pos.InCheck)
+            re[i++] = GetCheckChar(pos);
 
         return new(re[..i]);
     }

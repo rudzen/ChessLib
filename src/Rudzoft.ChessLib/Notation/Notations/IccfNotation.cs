@@ -25,24 +25,28 @@ SOFTWARE.
 */
 
 using System.Runtime.CompilerServices;
+using Microsoft.Extensions.ObjectPool;
+using Rudzoft.ChessLib.MoveGeneration;
 using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Notation.Notations;
 
-public sealed class IccfNotation : Notation
+public sealed class IccfNotation(ObjectPool<IMoveList> moveLists) : Notation(moveLists)
 {
-    public IccfNotation(IPosition pos) : base(pos)
-    {
-    }
-
+    /// <summary>
+    /// <para>Converts a move to ICCF notation.</para>
+    /// </summary>
+    /// <param name="pos">The current position</param>
+    /// <param name="move">The move to convert</param>
+    /// <returns>ICCF move string</returns>
     [SkipLocalsInit]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override string Convert(Move move)
+    public override string Convert(IPosition pos, Move move)
     {
         var (from, to) = move;
 
         Span<char> re = stackalloc char[5];
-        var i = 0;
+        var        i  = 0;
 
         re[i++] = (char)('1' + from.File.AsInt());
         re[i++] = (char)('1' + from.Rank.AsInt());
@@ -55,11 +59,11 @@ public sealed class IccfNotation : Notation
             // ReSharper disable once SwitchExpressionHandlesSomeKnownEnumValuesWithExceptionInDefault
             var c = move.PromotedPieceType() switch
             {
-                PieceTypes.Queen => 1,
-                PieceTypes.Rook => 2,
+                PieceTypes.Queen  => 1,
+                PieceTypes.Rook   => 2,
                 PieceTypes.Bishop => 3,
                 PieceTypes.Knight => 4,
-                var _ => throw new NotImplementedException()
+                var _             => throw new NotImplementedException()
             };
 
             re[i++] = (char)('0' + c);

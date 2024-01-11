@@ -25,15 +25,12 @@ SOFTWARE.
 */
 
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.ObjectPool;
 using Rudzoft.ChessLib.Enums;
+using Rudzoft.ChessLib.Extensions;
 using Rudzoft.ChessLib.Fen;
-using Rudzoft.ChessLib.Hash;
 using Rudzoft.ChessLib.Notation;
 using Rudzoft.ChessLib.Notation.Notations;
-using Rudzoft.ChessLib.ObjectPoolPolicies;
 using Rudzoft.ChessLib.Types;
-using Rudzoft.ChessLib.Validation;
 
 namespace Rudzoft.ChessLib.PGN.Test.PgnMoveNotationTests;
 
@@ -47,21 +44,7 @@ public sealed class SanToMoveTests
     public SanToMoveTests()
     {
         _serviceProvider = new ServiceCollection()
-            .AddTransient<IBoard, Board>()
-            .AddSingleton<IValues, Values>()
-            .AddSingleton<IZobrist, Zobrist>()
-            .AddSingleton<ICuckoo, Cuckoo>()
-            .AddSingleton<IRKiss, RKiss>()
-            .AddSingleton<IPositionValidator, PositionValidator>()
-            .AddTransient<IPosition, Position>()
-            .AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>()
-            .AddSingleton<INotationToMove, NotationToMove>()
-            .AddSingleton(static serviceProvider =>
-            {
-                var provider = serviceProvider.GetRequiredService<ObjectPoolProvider>();
-                var policy = new MoveListPolicy();
-                return provider.Create(policy);
-            })
+            .AddChessLib()
             .AddPgnParser()
             .BuildServiceProvider();
     }
@@ -73,7 +56,7 @@ public sealed class SanToMoveTests
         var fenData = new FenData(Fen.Fen.StartPositionFen);
         var state = new State();
         pos.Set(in fenData, ChessMode.Normal, in state);
-        
+
         var games = new List<PgnGame>();
         var parser = _serviceProvider.GetRequiredService<IPgnParser>();
 
@@ -89,8 +72,8 @@ public sealed class SanToMoveTests
                 sanMoves.Add(pgnMove.BlackMove);
         }
 
-        var moveNotation = MoveNotation.Create(pos);
-        var notation = moveNotation.ToNotation(MoveNotations.San);
+        var moveNotation = _serviceProvider.GetRequiredService<IMoveNotation>();
+        var notation     = moveNotation.ToNotation(MoveNotations.San);
         var converter = _serviceProvider.GetRequiredService<INotationToMove>();
 
         var chessMoves = sanMoves
@@ -99,7 +82,7 @@ public sealed class SanToMoveTests
 
         foreach (var move in chessMoves)
             pos.MakeMove(move, in state);
-        
+
         Assert.Equal(ExpectedGameCount, games.Count);
         Assert.NotEmpty(games);
         Assert.Equal(sanMoves.Count - 1, pos.Ply);
@@ -112,7 +95,7 @@ public sealed class SanToMoveTests
         var fenData = new FenData(Fen.Fen.StartPositionFen);
         var state = new State();
         pos.Set(in fenData, ChessMode.Normal, in state);
-        
+
         var games = new List<PgnGame>();
         var parser = _serviceProvider.GetRequiredService<IPgnParser>();
 
@@ -128,9 +111,9 @@ public sealed class SanToMoveTests
                 sanMoves.Add(pgnMove.BlackMove);
         }
 
-        var moveNotation = MoveNotation.Create(pos);
-        var notation = moveNotation.ToNotation(MoveNotations.San);
-        var converter = _serviceProvider.GetRequiredService<INotationToMove>();
+        var moveNotation = _serviceProvider.GetRequiredService<IMoveNotation>();
+        var notation     = moveNotation.ToNotation(MoveNotations.San);
+        var converter    = _serviceProvider.GetRequiredService<INotationToMove>();
 
         var actualMoves = converter.FromNotation(pos, sanMoves, notation);
 

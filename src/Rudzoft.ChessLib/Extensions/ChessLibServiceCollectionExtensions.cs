@@ -33,6 +33,8 @@ using Rudzoft.ChessLib.Factories;
 using Rudzoft.ChessLib.Hash;
 using Rudzoft.ChessLib.Hash.Tables.Transposition;
 using Rudzoft.ChessLib.MoveGeneration;
+using Rudzoft.ChessLib.Notation;
+using Rudzoft.ChessLib.Notation.Notations;
 using Rudzoft.ChessLib.ObjectPoolPolicies;
 using Rudzoft.ChessLib.Polyglot;
 using Rudzoft.ChessLib.Protocol.UCI;
@@ -60,55 +62,57 @@ public static class ChessLibServiceCollectionExtensions
         serviceCollection.AddOptions<TranspositionTableConfiguration>().Configure<IConfiguration>(
             static (settings, configuration)
                 => configuration
-                    .GetSection(TranspositionTableConfiguration.Section)
-                    .Bind(settings));
+                   .GetSection(TranspositionTableConfiguration.Section)
+                   .Bind(settings));
 
         // TODO : Add configuration "manually" to avoid IL2026 warning
         serviceCollection.AddOptions<PolyglotBookConfiguration>().Configure<IConfiguration>(
             static (settings, configuration)
                 => configuration
-                    .GetSection(PolyglotBookConfiguration.Section)
-                    .Bind(settings));
+                   .GetSection(PolyglotBookConfiguration.Section)
+                   .Bind(settings));
 
         serviceCollection.TryAddSingleton<ITranspositionTable, TranspositionTable>();
         serviceCollection.TryAddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>();
         serviceCollection.TryAddSingleton(static serviceProvider =>
         {
             var provider = serviceProvider.GetRequiredService<ObjectPoolProvider>();
-            var policy = new MoveListPolicy();
+            var policy   = new MoveListPolicy();
             return provider.Create(policy);
         });
 
-        return serviceCollection.AddSingleton(static sp =>
-            {
-                var pool = sp.GetRequiredService<ObjectPool<IMoveList>>();
-                IUci uci = new Uci(pool);
-                uci.Initialize();
-                return uci;
-            })
-            .AddSingleton<ICuckoo, Cuckoo>()
-            .AddSingleton<IRKiss, RKiss>()
-            .AddSingleton<IZobrist, Zobrist>()
-            .AddTransient<IKillerMovesFactory, KillerMovesFactory>()
-            .AddSingleton<ISearchParameters, SearchParameters>()
-            .AddSingleton<IValues, Values>()
-            .AddSingleton<IKpkBitBase, KpkBitBase>()
-            .AddTransient<IBoard, Board>()
-            .AddSingleton<IPositionValidator, PositionValidator>()
-            .AddTransient<IPosition, Position>()
-            .AddTransient<IGame, Game>()
-            .AddSingleton<IPolyglotBookFactory, PolyglotBookFactory>()
-            .AddSingleton<ICpu, Cpu>();
+        return serviceCollection
+               .AddSingleton(static sp =>
+               {
+                   var  pool = sp.GetRequiredService<ObjectPool<IMoveList>>();
+                   IUci uci  = new Uci(pool);
+                   uci.Initialize();
+                   return uci;
+               })
+               .AddSingleton<ICuckoo, Cuckoo>()
+               .AddSingleton<IRKiss, RKiss>()
+               .AddSingleton<IZobrist, Zobrist>()
+               .AddTransient<IKillerMovesFactory, KillerMovesFactory>()
+               .AddSingleton<ISearchParameters, SearchParameters>()
+               .AddSingleton<IValues, Values>()
+               .AddSingleton<IKpkBitBase, KpkBitBase>()
+               .AddTransient<IBoard, Board>()
+               .AddSingleton<IPositionValidator, PositionValidator>()
+               .AddTransient<IPosition, Position>()
+               .AddTransient<IGame, Game>()
+               .AddSingleton<IPolyglotBookFactory, PolyglotBookFactory>()
+               .AddSingleton<ICpu, Cpu>()
+               .AddNotationServices();
     }
 
     private static IConfigurationRoot LoadConfiguration(string file)
     {
-        var configurationFile = string.IsNullOrWhiteSpace(file) ? "chesslib.json" : file;
+        var configurationFile     = string.IsNullOrWhiteSpace(file) ? "chesslib.json" : file;
         var configurationFilePath = Path.Combine(AppContext.BaseDirectory, configurationFile);
         return new ConfigurationBuilder()
-            .AddJsonFile(configurationFilePath, optional: true, reloadOnChange: true)
-            .AddEnvironmentVariables()
-            .Build();
+               .AddJsonFile(configurationFilePath, optional: true, reloadOnChange: true)
+               .AddEnvironmentVariables()
+               .Build();
     }
 
     public static void AddFactory<TService, TImplementation>(this IServiceCollection services)
@@ -118,5 +122,20 @@ public static class ChessLibServiceCollectionExtensions
         services.AddTransient<TService, TImplementation>();
         services.AddSingleton<Func<TService>>(static x => () => x.GetService<TService>()!);
         services.AddSingleton<IServiceFactory<TService>, ServiceFactory<TService>>();
+    }
+
+    private static IServiceCollection AddNotationServices(this IServiceCollection services)
+    {
+        return services
+               .AddSingleton<INotationToMove, NotationToMove>()
+               .AddSingleton<IMoveNotation, MoveNotation>()
+               .AddKeyedSingleton<INotation, CoordinateNotation>(MoveNotations.Coordinate)
+               .AddKeyedSingleton<INotation, FanNotation>(MoveNotations.Fan)
+               .AddKeyedSingleton<INotation, IccfNotation>(MoveNotations.ICCF)
+               .AddKeyedSingleton<INotation, LanNotation>(MoveNotations.Lan)
+               .AddKeyedSingleton<INotation, RanNotation>(MoveNotations.Ran)
+               .AddKeyedSingleton<INotation, SanNotation>(MoveNotations.San)
+               .AddKeyedSingleton<INotation, SmithNotation>(MoveNotations.Smith)
+               .AddKeyedSingleton<INotation, UciNotation>(MoveNotations.Uci);
     }
 }

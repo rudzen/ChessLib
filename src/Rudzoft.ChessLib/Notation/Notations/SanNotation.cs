@@ -25,26 +25,24 @@ SOFTWARE.
 */
 
 using System.Runtime.CompilerServices;
+using Microsoft.Extensions.ObjectPool;
 using Rudzoft.ChessLib.Extensions;
 using Rudzoft.ChessLib.MoveGeneration;
 using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Notation.Notations;
 
-public sealed class SanNotation : Notation
+public sealed class SanNotation(ObjectPool<IMoveList> moveLists) : Notation(moveLists)
 {
-    public SanNotation(IPosition pos) : base(pos)
-    {
-    }
-
     /// <summary>
     /// <para>Converts a move to SAN notation.</para>
     /// </summary>
+    /// <param name="pos">The current position</param>
     /// <param name="move">The move to convert</param>
     /// <returns>SAN move string</returns>
     [SkipLocalsInit]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override string Convert(Move move)
+    public override string Convert(IPosition pos, Move move)
     {
         var (from, to) = move;
 
@@ -52,14 +50,14 @@ public sealed class SanNotation : Notation
             return CastleExtensions.GetCastleString(to, from);
 
         Span<char> re = stackalloc char[6];
-        var i = 0;
+        var        i  = 0;
 
-        var pt = Pos.GetPieceType(from);
+        var pt = pos.GetPieceType(from);
 
         if (pt != PieceTypes.Pawn)
         {
-            re[i++] = Pos.GetPiece(from).GetPgnChar();
-            foreach (var amb in Disambiguation(move, from))
+            re[i++] = pos.GetPiece(from).GetPgnChar();
+            foreach (var amb in Disambiguation(pos, move, from))
                 re[i++] = amb;
         }
 
@@ -69,7 +67,7 @@ public sealed class SanNotation : Notation
             re[i++] = 'p';
             re[i++] = from.FileChar;
         }
-        else if (Pos.GetPiece(to) != Piece.EmptyPiece)
+        else if (pos.GetPiece(to) != Piece.EmptyPiece)
         {
             if (pt == PieceTypes.Pawn)
                 re[i++] = from.FileChar;
@@ -82,11 +80,19 @@ public sealed class SanNotation : Notation
         if (move.IsPromotionMove())
         {
             re[i++] = '=';
-            re[i++] = move.PromotedPieceType().MakePiece(Pos.SideToMove).GetPgnChar();
-        } else if (Pos.InCheck && Pos.GenerateMoves().Get().IsEmpty)
-            re[i++] = '#';
+            re[i++] = move.PromotedPieceType().MakePiece(pos.SideToMove).GetPgnChar();
+        }
+        else if (pos.InCheck)
+        {
+            var ml = MoveLists.Get();
+            ml.Generate(pos);
+            var count = ml.Get().Length;
+            MoveLists.Return(ml);
+            if (count == 0)
+                re[i++] = '#';
+        }
 
-        if (GivesCheck(move))
+        if (pos.GivesCheck(move))
             re[i++] = '+';
 
         return new(re[..i]);

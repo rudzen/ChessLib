@@ -31,18 +31,11 @@ using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Notation;
 
-public sealed class NotationToMove : INotationToMove
+public sealed class NotationToMove(ObjectPool<IMoveList> moveListPool) : INotationToMove
 {
-    private readonly ObjectPool<IMoveList> _moveListPool;
-
-    public NotationToMove(ObjectPool<IMoveList> moveListPool)
-    {
-        _moveListPool = moveListPool;
-    }
-
     public IReadOnlyList<Move> FromNotation(IPosition pos, IEnumerable<string> notationalMoves, INotation notation)
     {
-        var moveList = _moveListPool.Get();
+        var moveList = moveListPool.Get();
         var result = new List<Move>();
 
         var validNotationalMoves = notationalMoves
@@ -53,28 +46,28 @@ public sealed class NotationToMove : INotationToMove
         foreach (var notationalMove in validNotationalMoves)
         {
             moveList.Generate(pos);
-            
+
             var moves = moveList.Get();
-            
+
             if (moves.IsEmpty)
                 break;
 
             foreach (var move in moves)
             {
-                var notatedMove = notation.Convert(move);
+                var notatedMove = notation.Convert(pos, move);
                 if (string.IsNullOrWhiteSpace(notatedMove))
                     continue;
 
                 if (!notationalMove.Equals(notatedMove))
                     continue;
-                
+
                 pos.MakeMove(move.Move, in state);
                 result.Add(move);
                 break;
             }
         }
 
-        _moveListPool.Return(moveList);
+        moveListPool.Return(moveList);
 
         return result;
     }
@@ -84,27 +77,27 @@ public sealed class NotationToMove : INotationToMove
         if (notatedMove.IsEmpty || notatedMove[0] == '*')
             return Move.EmptyMove;
 
-        var moveList = _moveListPool.Get();
+        var moveList = moveListPool.Get();
         moveList.Generate(in pos);
         var moves = moveList.Get();
 
         var m = Move.EmptyMove;
-        
+
         foreach (var move in moves)
         {
-            var san = notation.Convert(move);
+            var san = notation.Convert(pos, move);
 
             if (string.IsNullOrWhiteSpace(san))
                 continue;
-            
+
             if (!notatedMove.Equals(san.AsSpan(), StringComparison.InvariantCulture))
                 continue;
-            
+
             m = move;
             break;
         }
 
-        _moveListPool.Return(moveList);
+        moveListPool.Return(moveList);
 
         return m;
     }

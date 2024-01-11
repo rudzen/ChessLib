@@ -85,5 +85,5 @@ public enum MoveNotations
 
 public interface INotation
 {
-    string Convert(Move move);
+    string Convert(IPosition pos, Move move);
 }

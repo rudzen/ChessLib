@@ -25,25 +25,23 @@ SOFTWARE.
 */
 
 using System.Runtime.CompilerServices;
+using Microsoft.Extensions.ObjectPool;
 using Rudzoft.ChessLib.Extensions;
+using Rudzoft.ChessLib.MoveGeneration;
 using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Notation.Notations;
 
-public sealed class CoordinateNotation : Notation
+public sealed class CoordinateNotation(ObjectPool<IMoveList> moveLists) : Notation(moveLists)
 {
-    public CoordinateNotation(IPosition pos) : base(pos)
-    {
-    }
-
     [SkipLocalsInit]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override string Convert(Move move)
+    public override string Convert(IPosition pos, Move move)
     {
         var (from, to) = move;
 
         Span<char> re = stackalloc char[8];
-        var i = 0;
+        var        i  = 0;
 
         re[i++] = char.ToUpper(from.FileChar);
         re[i++] = from.RankChar;
@@ -51,7 +49,7 @@ public sealed class CoordinateNotation : Notation
         re[i++] = char.ToUpper(to.FileChar);
         re[i++] = to.RankChar;
 
-        var captured = Pos.GetPiece(to);
+        var captured = pos.GetPiece(to);
 
         // ReSharper disable once InvertIf
         if (captured != Piece.EmptyPiece)
