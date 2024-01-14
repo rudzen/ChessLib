@@ -51,7 +51,7 @@ public interface IGame : IEnumerable<Piece>
 
     FenData GetFen();
 
-    void UpdateDrawTypes();
+    void UpdateGameEndTypes();
 
     string ToString();
 
