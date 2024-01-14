@@ -75,6 +75,8 @@ public sealed class Game : IGame
 
     public bool IsRepetition => _pos.IsRepetition;
 
+    public bool IsRule50 => _pos.Rule50 >= 100;
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void NewGame(string fen = Fen.Fen.StartPositionFen)
     {
@@ -91,7 +93,7 @@ public sealed class Game : IGame
         var gameEndType = GameEndTypes.None;
         if (IsRepetition)
             gameEndType |= GameEndTypes.Repetition;
-        if (Pos.Rule50 >= 100)
+        if (IsRule50)
             gameEndType |= GameEndTypes.FiftyMove;
 
         var moveList = _moveLists.Get();
