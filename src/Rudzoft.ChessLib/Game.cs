@@ -77,6 +77,8 @@ public sealed class Game : IGame
 
     public bool IsRule50 => _pos.Rule50 >= 100;
 
+    public bool IsMated => _pos.IsMate;
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void NewGame(string fen = Fen.Fen.StartPositionFen)
     {
@@ -88,14 +90,16 @@ public sealed class Game : IGame
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public FenData GetFen() => _pos.GenerateFen();
 
-    public void UpdateDrawTypes()
+    public void UpdateGameEndTypes()
     {
         var gameEndType = GameEndTypes.None;
         if (IsRepetition)
             gameEndType |= GameEndTypes.Repetition;
         if (IsRule50)
             gameEndType |= GameEndTypes.FiftyMove;
-
+        if (IsMated)
+            gameEndType |= GameEndTypes.CheckMate;
+        
         var moveList = _moveLists.Get();
         moveList.Generate(in _pos);
         // ReSharper disable once LoopCanBeConvertedToQuery
