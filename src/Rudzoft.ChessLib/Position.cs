@@ -24,7 +24,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System.Buffers;
 using System.Collections;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
@@ -359,9 +358,18 @@ public sealed class Position : IPosition
         }
 
         fen[length++] = space;
-        length = fen.Append(State.ClockPly, length);
-        fen[length++] = space;
-        length = fen.Append(1 + (Ply - _sideToMove.IsBlack.AsByte() / 2), length);
+
+        Span<char> format = stackalloc char[1] { 'D' };
+
+        State.ClockPly.TryFormat(fen[length..], out var written, format);
+
+        length        += written;
+        fen[length++] =  space;
+
+        var ply = 1 + (Ply - _sideToMove.IsBlack.AsByte() / 2);
+        ply.TryFormat(fen[length..], out written, format);
+
+        length += written;
 
         return new(new string(fen[..length]));
     }
