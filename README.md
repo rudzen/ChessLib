@@ -7,7 +7,7 @@ A C# chess data library with complete move generation and all needed custom type
 
 ## Requirements
 
-* .NET 7.0+
+* .NET 8.0+
 
 ## What is this for?
 
@@ -81,7 +81,7 @@ Yes you can, it is designed with that in mind.
 Perft console test program approximate timings to depth 6 for normal start position
 
 * AMD-FX 8350 = ~12.5 seconds. (without TT) (earlier version)
-* Intel i7-8086k = ~2.3 seconds
+* Intel i7-8086k = ~1.7 seconds
 
 ### Transposition Table
 
