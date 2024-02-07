@@ -206,12 +206,6 @@ public static class BitBoards
         for (var i = 0; i < LineBB.Length; i++)
             LineBB[i] = new BitBoard[Square.Count];
 
-        for (var i = 0; i < SquareDistance.Length; i++)
-            SquareDistance[i] = new int[Square.Count];
-
-        for (var i = 0; i < SquareDistance.Length; i++)
-            DistanceRingBB[i] = new BitBoard[8];
-
         // ForwardRanksBB population loop idea from sf
         for (var r = Rank.Rank1; r <= Rank.Rank8; r++)
         {
@@ -233,6 +227,19 @@ public static class BitBoards
             }
         }
 
+        // have to compute here before we access the BitBoards
+        for (var s1 = Squares.a1; s1 <= Squares.h8; s1++)
+        {
+            SquareDistance[s1.AsInt()] = new int[64];
+            DistanceRingBB[s1.AsInt()] = new BitBoard[8];
+            for (var s2 = Squares.a1; s2 <= Squares.h8; s2++)
+            {
+                var dist = Math.Max(distanceFile(s1, s2), distanceRank(s1, s2));
+                SquareDistance[s1.AsInt()][s2.AsInt()] = dist;
+                DistanceRingBB[s1.AsInt()][dist] |= s2;
+            }
+        }
+
         // mini local helpers
 
         Span<PieceTypes> validMagicPieces = stackalloc PieceTypes[] { PieceTypes.Bishop, PieceTypes.Rook };
@@ -245,16 +252,6 @@ public static class BitBoards
             var sq = s1.AsInt();
 
             var file = s1.File;
-
-            var bb2 = AllSquares & ~s1;
-            // distance computation
-            while (bb2)
-            {
-                var s2 = PopLsb(ref bb2);
-                var dist = Math.Max(distanceFile(s1, s2), distanceRank(s1, s2));
-                SquareDistance[sq][s2.AsInt()] = dist;
-                DistanceRingBB[sq][dist] |= s2;
-            }
 
             InitializePseudoAttacks(s1);
 
@@ -281,6 +278,7 @@ public static class BitBoards
             // Compute KingRings
             InitializeKingRing(s1, sq, file);
         }
+
 
         SlotFileBB =
         [
@@ -352,6 +350,15 @@ public static class BitBoards
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static BitBoard FileBB(this File f) => FilesBB[f.AsInt()];
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static BitBoard FileBB(File first, File last)
+    {
+        var b = EmptyBitBoard;
+        for (var f = first; f <= last; ++f)
+            b |= f.BitBoardFile();
+        return b;
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static BitBoard RankBB(this Rank r) => RanksBB[r.AsInt()];
