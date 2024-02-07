@@ -157,16 +157,6 @@ public sealed class SearchParameters() : ISearchParameters
 
     public void AddSearchMove(Move move) => SearchMoves.Add(move);
 
-    [SkipLocalsInit]
-    private static int ParseValue(int index, in ulong value, Span<char> target)
-    {
-        Span<char> number = stackalloc char[32];
-        value.TryFormat(number, out var numericWritten);
-        for (var i = 0; i < numericWritten; ++i)
-            target[index++] = number[i];
-        return index;
-    }
-
     public string ToString(string format, IFormatProvider formatProvider)
         => string.Format(formatProvider, format, ToString());
 
@@ -202,7 +192,9 @@ public sealed class SearchParameters() : ISearchParameters
         destination[index++] = 'm';
         destination[index++] = 'e';
         destination[index++] = ' ';
-        index = ParseValue(index, _clock[Player.White.Side].Time, destination);
+
+        _clock[Player.White.Side].Time.TryFormat(destination[index..], out var written);
+        index += written;
 
         destination[index++] = ' ';
         destination[index++] = 'b';
@@ -211,20 +203,18 @@ public sealed class SearchParameters() : ISearchParameters
         destination[index++] = 'm';
         destination[index++] = 'e';
         destination[index++] = ' ';
-        index = ParseValue(index, _clock[Player.Black.Side].Time, destination);
+
+        _clock[Player.Black.Side].Time.TryFormat(destination[index..], out written);
+        index += written;
 
         if (MoveTime > ulong.MinValue)
         {
-            destination[index++] = ' ';
-            destination[index++] = 'm';
-            destination[index++] = 'o';
-            destination[index++] = 'v';
-            destination[index++] = 'e';
-            destination[index++] = 't';
-            destination[index++] = 'i';
-            destination[index++] = 'm';
-            destination[index++] = 'e';
-            destination[index++] = ' ';
+            Span<char> moveTimeText = stackalloc char[]
+            {
+                ' ', 'm', 'o', 'v', 'e', 't', 'i', 'm', 'e', ' '
+            };
+            moveTimeText.TryCopyTo(destination[index..]);
+            index += moveTimeText.Length;
             index = destination.Append(in _moveTime, index);
         }
 
@@ -234,7 +224,9 @@ public sealed class SearchParameters() : ISearchParameters
         destination[index++] = 'n';
         destination[index++] = 'c';
         destination[index++] = ' ';
-        index = ParseValue(index, _clock[Player.White.Side].Inc, destination);
+
+        _clock[Player.White.Side].Inc.TryFormat(destination[index..], out written);
+        index += written;
 
         destination[index++] = ' ';
         destination[index++] = 'b';
@@ -243,7 +235,8 @@ public sealed class SearchParameters() : ISearchParameters
         destination[index++] = 'c';
         destination[index++] = ' ';
 
-        index = ParseValue(index, _clock[Player.Black.Side].Inc, destination);
+        _clock[Player.Black.Side].Inc.TryFormat(destination[index..], out written);
+        index += written;
 
         if (_movesToGo == ulong.MinValue)
         {

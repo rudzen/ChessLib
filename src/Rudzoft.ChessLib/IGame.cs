@@ -46,7 +46,7 @@ public interface IGame : IEnumerable<Piece>
     bool IsRepetition { get; }
 
     public IUci Uci { get; }
-    
+
     public ICpu Cpu { get; }
 
     void NewGame(string fen = Fen.Fen.StartPositionFen);
@@ -61,5 +61,5 @@ public interface IGame : IEnumerable<Piece>
 
     Player CurrentPlayer();
 
-    ulong Perft(int depth, bool root = true);
+    UInt128 Perft(int depth, bool root = true);
 }

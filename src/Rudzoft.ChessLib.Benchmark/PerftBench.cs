@@ -67,7 +67,7 @@ public class PerftBench
         var tt = new TranspositionTable(options);
 
         var moveListObjectPool = new DefaultObjectPool<IMoveList>(new MoveListPolicy());
-        
+
         var uci = new Uci(moveListObjectPool);
         uci.Initialize();
         var cpu = new Cpu();
@@ -88,9 +88,9 @@ public class PerftBench
     }
 
     [Benchmark]
-    public async Task<ulong> PerftIAsync()
+    public async Task<UInt128> PerftIAsync()
     {
-        var total = ulong.MinValue;
+        var total = UInt128.MinValue;
         for (var i = 0; i < N; i++)
             await foreach (var res in _perft.DoPerft(N).ConfigureAwait(false))
                 total += res;
@@ -98,9 +98,9 @@ public class PerftBench
     }
 
     [Benchmark]
-    public async Task<ulong> Perft()
+    public async Task<UInt128> Perft()
     {
-        var total = ulong.MinValue;
+        var total = UInt128.MinValue;
         for (var i = 0; i < N; ++i)
             total += await _perft.DoPerftAsync(N);
 

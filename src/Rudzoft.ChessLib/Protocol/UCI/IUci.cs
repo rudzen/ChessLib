@@ -43,8 +43,10 @@ public interface IUci
     void AddOption(string name, IOption option);
 
     bool TryGetOption(string name, out IOption option);
-    
+
     ulong Nps(in ulong nodes, in TimeSpan time);
+
+    ulong Nps(in UInt128 nodes, in TimeSpan time);
 
     Move MoveFromUci(IPosition pos, ReadOnlySpan<char> uciMove);
 

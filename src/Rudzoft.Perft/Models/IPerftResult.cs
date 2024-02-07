@@ -28,16 +28,16 @@ namespace Rudzoft.Perft.Models;
 
 public interface IPerftResult
 {
-    string Id { get; set; }
-    string Fen { get; set; }
-    int Depth { get; set; }
-    ulong Result { get; set; }
-    ulong CorrectResult { get; set; }
-    TimeSpan Elapsed { get; set; }
-    ulong Nps { get; set; }
-    ulong TableHits { get; set; }
-    bool Passed { get; set; }
-    int Errors { get; set; }
+    string   Id            { get; set; }
+    string   Fen           { get; set; }
+    int      Depth         { get; set; }
+    UInt128  Result        { get; set; }
+    UInt128  CorrectResult { get; set; }
+    TimeSpan Elapsed       { get; set; }
+    ulong    Nps           { get; set; }
+    ulong    TableHits     { get; set; }
+    bool     Passed        { get; set; }
+    int      Errors        { get; set; }
 
     void Clear();
 }

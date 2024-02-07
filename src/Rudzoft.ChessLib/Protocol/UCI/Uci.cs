@@ -43,7 +43,7 @@ public class Uci : IUci
     private static readonly string[] OptionTypeStrings = Enum.GetNames(typeof(UciOptionType));
 
     protected readonly ObjectPool<IMoveList> MoveListPool;
-    
+
     private readonly ObjectPool<StringBuilder> _pvPool;
     private readonly Dictionary<string, IOption> _options;
 
@@ -80,8 +80,10 @@ public class Uci : IUci
         _options["UCI_Chess960"] = new Option("UCI_Chess960", _options.Count, false);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AddOption(string name, IOption option) => _options[name] = option;
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool TryGetOption(string name, out IOption option)
     {
         ref var opt = ref CollectionsMarshal.GetValueRefOrNullRef(_options, name);
@@ -90,14 +92,23 @@ public class Uci : IUci
         return result;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public ulong Nps(in ulong nodes, in TimeSpan time)
         => (ulong)(nodes * 1000.0 / time.Milliseconds);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public ulong Nps(in UInt128 nodes, in TimeSpan time)
+    {
+        var t    = nodes * 1000;
+        var d = new UInt128(ulong.MinValue, (ulong)time.Milliseconds + 1);
+        return (ulong)(t / d);
+    }
 
     [SkipLocalsInit]
     public Move MoveFromUci(IPosition pos, ReadOnlySpan<char> uciMove)
     {
         var ml = MoveListPool.Get();
-        
+
         ml.Generate(in pos);
 
         var moves = ml.Get();
@@ -114,7 +125,7 @@ public class Uci : IUci
             m = move.Move;
             break;
         }
-        
+
         MoveListPool.Return(ml);
 
         return m;
@@ -126,7 +137,7 @@ public class Uci : IUci
         {
             if (move.IsNullMove())
                 continue;
-            
+
             var state = new State();
             states.Push(state);
             pos.MakeMove(move, in state);
@@ -134,21 +145,27 @@ public class Uci : IUci
         }
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public string UciOk() => "uciok";
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public string ReadyOk() => "readyok";
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public string CopyProtection(CopyProtections copyProtections)
         => $"copyprotection {copyProtections}";
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public string BestMove(Move move, Move ponderMove)
         => !ponderMove.IsNullMove()
             ? $"bestmove {move} ponder {ponderMove}"
             : $"bestmove {move}";
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public string CurrentMoveNum(int moveNumber, Move move, in ulong visitedNodes, in TimeSpan time)
         => $"info currmovenumber {moveNumber} currmove {move} nodes {visitedNodes} time {time.Milliseconds}";
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public string Score(int value, int mateInMaxPly, int valueMate)
     {
         if (Math.Abs(value) >= mateInMaxPly)
@@ -160,12 +177,15 @@ public class Uci : IUci
         return $"cp {ToCenti(value)}";
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public string ScoreCp(int value)
         => $"info score cp {ToCenti(value)}";
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public string Depth(int depth)
         => $"info depth {depth}";
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public string Pv(
         int count,
         int score,
@@ -196,6 +216,7 @@ public class Uci : IUci
         return result;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public string Fullness(int fullNess, in ulong tbHits, in ulong nodes, in TimeSpan time)
         =>
             $"info hashfull {fullNess} tbhits {tbHits} nodes {nodes} time {time.Milliseconds} nps {Nps(in nodes, in time)}";
@@ -237,13 +258,22 @@ public class Uci : IUci
         foreach (var opt in _options.Values.Order(OptionComparer))
         {
             sb.AppendLine();
-            sb.Append("option name ").Append(opt.Name).Append(" type ").Append(OptionTypeStrings[(int)opt.Type]);
-            
+
+            var optionType = OptionTypeStrings[(int)opt.Type];
+
+            sb.Append("option name ")
+              .Append(opt.Name)
+              .Append(" type ")
+              .Append(optionType);
+
             if (opt.Type != UciOptionType.Button)
                 sb.Append(" default ").Append(opt.DefaultValue);
 
             if (opt.Type == UciOptionType.Spin)
-                sb.Append(" min ").Append(opt.Min).Append(" max ").Append(opt.Max);
+                sb.Append(" min ")
+                  .Append(opt.Min)
+                  .Append(" max ")
+                  .Append(opt.Max);
         }
 
         var result = sb.ToString();
@@ -251,5 +281,6 @@ public class Uci : IUci
         return result;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static int ToCenti(int v) => v / 100;
 }

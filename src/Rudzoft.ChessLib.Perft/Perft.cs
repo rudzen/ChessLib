@@ -50,35 +50,29 @@ Result	5	64,921.2 us	1,310.703 us	1,402.437 us
 Result	6	1,912,300.6 us	3,551.167 us	3,148.017 us
      */
 
-public sealed class Perft : IPerft
+public sealed class Perft(IGame game, IEnumerable<PerftPosition> positions) : IPerft
 {
-    public Perft(IGame game, IEnumerable<PerftPosition> positions)
-    {
-        Positions = positions.ToList();
-        Game = game;
-    }
-
     public Action<string>? BoardPrintCallback { get; set; }
 
     /// <summary>
     /// The positional data for the run
     /// </summary>
-    public List<PerftPosition> Positions { get; set; }
+    public List<PerftPosition> Positions { get; set; } = positions.ToList();
 
-    public IGame Game { get; set; }
-    public int Depth { get; set; }
-    public ulong Expected { get; set; }
+    public IGame   Game     { get; set; } = game;
+    public int     Depth    { get; set; }
+    public UInt128 Expected { get; set; }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-    public async IAsyncEnumerable<ulong> DoPerft(int depth)
+    public async IAsyncEnumerable<UInt128> DoPerft(int depth)
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
     {
         if (Positions.Count == 0)
             yield break;
 
         var state = new State();
-        
+
         foreach (var fd in Positions.Select(static p => new FenData(p.Fen)))
         {
             Game.Pos.Set(in fd, ChessMode.Normal, in state);
@@ -87,7 +81,7 @@ public sealed class Perft : IPerft
         }
     }
 
-    public Task<ulong> DoPerftAsync(int depth)
+    public Task<UInt128> DoPerftAsync(int depth)
         => Task.Run(()
             => Game.Perft(depth));
 

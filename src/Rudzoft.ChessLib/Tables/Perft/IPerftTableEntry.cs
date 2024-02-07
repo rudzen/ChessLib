@@ -2,6 +2,6 @@
 
 public interface IPerftTableEntry : ITableEntry
 {
-    public ulong Count { get; set; }
+    public UInt128 Count { get; set; }
     public int Depth { get; set; }
 }

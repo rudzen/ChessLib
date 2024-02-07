@@ -111,7 +111,7 @@ public readonly record struct Square(Squares Value) : ISpanFormattable, ICompara
     public bool IsPromotionRank => (BitBoards.PromotionRanksBB & this).IsNotEmpty;
 
     public bool IsDark => (Player.Black.ColorBB() & this).IsNotEmpty;
-    
+
     public static Square None { get; } = new(Squares.none);
 
     public static Square A1 { get; } = new(Squares.a1);

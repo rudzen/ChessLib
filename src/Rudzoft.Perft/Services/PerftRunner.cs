@@ -258,7 +258,7 @@ public sealed class PerftRunner : IPerftRunner
     }
 
     private void ComputeResults(
-        in ulong result,
+        in UInt128 result,
         int depth,
         in ulong expected,
         in TimeSpan elapsedMs,

@@ -33,10 +33,10 @@ public struct PerftTableEntry : IPerftTableEntry
 {
     public HashKey Key { get; set; }
     
-    public ulong Count { get; set; }
-    
+    public UInt128 Count { get; set; }
+
     public int Depth { get; set; }
-    
+
     public Score Evaluate(IPosition pos)
     {
         throw new NotImplementedException();
@@ -55,7 +55,7 @@ public sealed class PerftTable : HashTable<IPerftTableEntry>
         Initialize(ElementSize, HashMemory, static key => new PerftTableEntry { Key = key, Count = ulong.MinValue, Depth = -1 });
         _mask = Count - 1;
     }
-    
+
     public ref IPerftTableEntry TryGet(in IPosition pos, int depth, out bool found)
     {
         var posKey = pos.State.PositionKey;

@@ -31,24 +31,6 @@ namespace Rudzoft.ChessLib.Extensions;
 public static class SpanExtensions
 {
     /// <summary>
-    /// Appends an int to a span of char
-    /// </summary>
-    /// <param name="target">The target span</param>
-    /// <param name="v">The value to append</param>
-    /// <param name="targetIndex">The current index for target span</param>
-    /// <param name="capacity">Max size of "value".ToString(), defaults to 3</param>
-    /// <returns>New index after append</returns>
-    [SkipLocalsInit]
-    public static int Append(this Span<char> target, int v, int targetIndex, int capacity = 3)
-    {
-        Span<char> s = stackalloc char[capacity];
-        v.TryFormat(s, out var written);
-        for (var i = 0; i < written; ++i)
-            target[targetIndex++] = s[i];
-        return targetIndex;
-    }
-
-    /// <summary>
     /// Appends an ulong to a span of char
     /// </summary>
     /// <param name="target">The target span</param>

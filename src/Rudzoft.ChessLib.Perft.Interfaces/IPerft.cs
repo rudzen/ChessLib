@@ -34,13 +34,13 @@ public interface IPerft
 
     int Depth { get; set; }
 
-    ulong Expected { get; set; }
+    UInt128 Expected { get; set; }
 
     public IGame Game { get; set; }
 
-    IAsyncEnumerable<ulong> DoPerft(int depth);
+    IAsyncEnumerable<UInt128> DoPerft(int depth);
 
-    Task<ulong> DoPerftAsync(int depth);
+    Task<UInt128> DoPerftAsync(int depth);
 
     void ClearPositions();
 
