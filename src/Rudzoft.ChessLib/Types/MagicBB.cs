@@ -2,7 +2,10 @@
  * Adapted from PortFish.
  * Minor modernizations by Rudy Alex Kohn
  */
+
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using Rudzoft.ChessLib.Hash;
 
 namespace Rudzoft.ChessLib.Types;
@@ -30,6 +33,8 @@ public static class MagicBB
     [SkipLocalsInit]
     static MagicBB()
     {
+        var start = Stopwatch.GetTimestamp();
+
         for (ulong b = 0; b <= byte.MaxValue; b++)
             BitCount8Bit[b] = (byte)PopCountMax15(b);
 
@@ -43,6 +48,9 @@ public static class MagicBB
         var reference = new BitBoard[4096];
         var rk = new RKiss();
 
+        ref var occupancyRef = ref MemoryMarshal.GetArrayDataReference(occupancy);
+        ref var referenceRef = ref MemoryMarshal.GetArrayDataReference(reference);
+
         InitMagics(
             pt: PieceTypes.Rook,
             attacks: RAttacks,
@@ -50,9 +58,8 @@ public static class MagicBB
             masks: RMasks,
             shifts: RShifts,
             deltas: rookDeltas,
-            index: MagicIndex,
-            occupancy: occupancy,
-            reference: reference,
+            occupancyRef: ref occupancyRef,
+            referenceRef: ref referenceRef,
             rk: rk
         );
 
@@ -63,11 +70,13 @@ public static class MagicBB
             masks: BMasks,
             shifts: BShifts,
             deltas: bishopDeltas,
-            index: MagicIndex,
-            occupancy: occupancy,
-            reference: reference,
+            occupancyRef: ref occupancyRef,
+            referenceRef: ref referenceRef,
             rk: rk
         );
+
+        var end = Stopwatch.GetElapsedTime(start);
+        Console.WriteLine($"MagicBB init took: {end}");
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -96,7 +105,8 @@ public static class MagicBB
         return RookAttacks(s, in occ) | BishopAttacks(s, in occ);
     }
 
-    private static uint MagicIndex(PieceTypes pt, Square s, BitBoard occ)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static uint MagicIndex(PieceTypes pt, Square s, in BitBoard occ)
     {
         return pt == PieceTypes.Rook
             ? (uint)(((occ & RMasks[s.AsInt()]).Value * RMagics[s.AsInt()].Value) >> RShifts[s.AsInt()])
@@ -115,9 +125,8 @@ public static class MagicBB
         BitBoard[] masks,
         int[] shifts,
         ReadOnlySpan<Direction> deltas,
-        Func<PieceTypes, Square, BitBoard, uint> index,
-        BitBoard[] occupancy,
-        BitBoard[] reference,
+        ref BitBoard occupancyRef,
+        ref BitBoard referenceRef,
         IRKiss rk)
     {
         var rankMask = Rank.Rank1.RankBB() | Rank.Rank8.RankBB();
@@ -143,8 +152,9 @@ public static class MagicBB
             var size = 0;
             do
             {
-                occupancy[size] = b;
-                reference[size++] = SlidingAttack(deltas, sq, b);
+                Unsafe.Add(ref occupancyRef, size) = b;
+                Unsafe.Add(ref referenceRef, size) = SlidingAttack(deltas, sq, b);
+                size++;
                 b = (b.Value - masks[s.AsInt()].Value) & masks[s.AsInt()];
             } while (b.IsNotEmpty);
 
@@ -168,13 +178,14 @@ public static class MagicBB
                 // effect of verifying the magic.
                 for (i = 0; i < size; i++)
                 {
-                    var idx = index(pt, s, occupancy[i]);
+                    var idx = MagicIndex(pt, s, in Unsafe.Add(ref occupancyRef, i));
                     var attack = attacks[s.AsInt()][idx];
+                    ref var reference = ref Unsafe.Add(ref referenceRef, i);
 
-                    if (attack.IsNotEmpty && attack != reference[i])
+                    if (attack.IsNotEmpty && attack != reference)
                         break;
 
-                    attacks[s.AsInt()][idx] = reference[i];
+                    attacks[s.AsInt()][idx] = reference;
                 }
             } while (i != size);
         }
@@ -184,9 +195,9 @@ public static class MagicBB
     {
         var attack = BitBoard.Empty;
 
-        for (var i = 0; i < 4; i++)
+        foreach (var delta in deltas)
         {
-            for (var s = sq + deltas[i]; s.IsOk && s.Distance(s - deltas[i]) == 1; s += deltas[i])
+            for (var s = sq + delta; s.IsOk && s.Distance(s - delta) == 1; s += delta)
             {
                 attack |= s;
 
@@ -202,12 +213,12 @@ public static class MagicBB
     {
         // Values s1 and s2 are used to rotate the candidate magic of a
         // quantity known to be the optimal to quickly find the magics.
-        int s1 = booster        & 63;
+        var s1 = booster & 63;
         var s2 = (booster >> 6) & 63;
 
         while (true)
         {
-            var magic = rk.Rand();
+            ulong magic = rk.Rand();
             magic = (magic >> s1) | (magic << (64 - s1));
             magic &= rk.Rand();
             magic = (magic >> s2) | (magic << (64 - s2));
