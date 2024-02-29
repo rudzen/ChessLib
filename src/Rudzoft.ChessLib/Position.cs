@@ -38,6 +38,7 @@ using Rudzoft.ChessLib.Hash;
 using Rudzoft.ChessLib.MoveGeneration;
 using Rudzoft.ChessLib.Types;
 using Rudzoft.ChessLib.Validation;
+using File = Rudzoft.ChessLib.Types.File;
 
 namespace Rudzoft.ChessLib;
 
@@ -1179,7 +1180,9 @@ public sealed class Position : IPosition
 
         if (enPassant)
         {
-            State.EnPassantSquare = new(fenChunk[1] - '1', fenChunk[0] - 'a');
+            Rank r = new(fenChunk[1] - '1');
+            File f = new(fenChunk[0] - 'a');
+            State.EnPassantSquare = new(r, f);
 
             var otherSide = ~_sideToMove;
 
@@ -1564,7 +1567,7 @@ public sealed class Position : IPosition
                 'K' => RookSquare(Square.H1.Relative(c), rook),
                 'Q' => RookSquare(Square.A1.Relative(c), rook),
                 var _ => char.IsBetween(token, 'A', 'H')
-                    ? new(Rank.Rank1.Relative(c), new(token - 'A'))
+                    ? new(Rank.Rank1.Relative(c).AsInt(), new File(token - 'A'))
                     : Square.None
             };
 

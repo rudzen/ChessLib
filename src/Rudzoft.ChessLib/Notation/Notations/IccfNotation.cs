@@ -51,9 +51,9 @@ public sealed class IccfNotation : Notation
         var        i  = 0;
 
         re[i++] = (char)('1' + from.File.AsInt());
-        re[i++] = (char)('1' + from.Rank.AsInt());
+        re[i++] = (char)('1' + from.Rank);
         re[i++] = (char)('1' + to.File.AsInt());
-        re[i++] = (char)('1' + to.Rank.AsInt());
+        re[i++] = (char)('1' + to.Rank);
 
         // ReSharper disable once InvertIf
         if (move.IsPromotionMove())

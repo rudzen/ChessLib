@@ -177,7 +177,7 @@ public static class MagicBB
             if (Bmi2.X64.IsSupported)
                 continue;
 
-            rk.Seed = Seeds[rank.AsInt()];
+            rk.Seed = Seeds[rank];
 
             // Find a magic for square 's' picking up an (almost) random number
             // until we find the one that passes the verification test.

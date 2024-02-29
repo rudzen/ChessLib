@@ -209,8 +209,7 @@ public static class BitBoards
         // ForwardRanksBB population loop idea from sf
         for (var r = Rank.Rank1; r <= Rank.Rank8; r++)
         {
-            var rank = r.AsInt();
-            ForwardRanksBB[0][rank] = ~(ForwardRanksBB[1][rank + 1] = ForwardRanksBB[1][rank] | r.BitBoardRank());
+            ForwardRanksBB[0][r] = ~(ForwardRanksBB[1][r + 1] = ForwardRanksBB[1][r] | r.BitBoardRank());
         }
 
         foreach (var p in Player.AllPlayers.AsSpan())
@@ -218,9 +217,8 @@ public static class BitBoards
             foreach (var sq in Square.All.AsSpan())
             {
                 var file = sq.File;
-                var rank = sq.Rank.AsInt();
-                ForwardFileBB[p][sq] = ForwardRanksBB[p][rank] & file.BitBoardFile();
-                PawnAttackSpanBB[p][sq] = ForwardRanksBB[p][rank] & AdjacentFilesBB[file.AsInt()];
+                ForwardFileBB[p][sq] = ForwardRanksBB[p][sq.Rank] & file.BitBoardFile();
+                PawnAttackSpanBB[p][sq] = ForwardRanksBB[p][sq.Rank] & AdjacentFilesBB[file.AsInt()];
                 PassedPawnMaskBB[p][sq] = ForwardFileBB[p][sq] | PawnAttackSpanBB[p][sq];
             }
         }
@@ -282,7 +280,7 @@ public static class BitBoards
 
         return;
 
-        static int distanceRank(Square x, Square y) => distance(x.Rank.AsInt(), y.Rank.AsInt());
+        static int distanceRank(Square x, Square y) => distance(x.Rank, y.Rank);
         static int distanceFile(Square x, Square y) => distance(x.File.AsInt(), y.File.AsInt());
         // local helper functions to calculate distance
         static int distance(int x, int y) => Math.Abs(x - y);
@@ -354,7 +352,7 @@ public static class BitBoards
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard RankBB(this Rank r) => RanksBB[r.AsInt()];
+    public static BitBoard RankBB(this Rank r) => RanksBB[r];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static BitBoard ColorBB(this Player p) => ColorsBB[p];
@@ -406,7 +404,7 @@ public static class BitBoards
     /// <param name="r">The rank</param>
     /// <returns>The bitboard of square rank</returns>
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-    public static BitBoard BitBoardRank(this Rank r) => Rank1BB << (8 * r.AsInt());
+    public static BitBoard BitBoardRank(this Rank r) => Rank1BB << (8 * r);
 
     /// <summary>
     /// Returns the bitboard representation of the file of which the square is located.

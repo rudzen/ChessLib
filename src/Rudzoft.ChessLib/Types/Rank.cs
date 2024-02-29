@@ -99,7 +99,7 @@ public readonly record struct Rank(Ranks Value) : ISpanFormattable, IValidationT
     public static bool operator !=(Rank left, int right) => left.Value != (Ranks)right;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Rank operator +(Rank left, Rank right) => new(left.AsInt() + right.AsInt());
+    public static Rank operator +(Rank left, Rank right) => new(left.Value + (int)right.Value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Rank operator +(Rank left, int right) => new(left.AsInt() + right);
@@ -166,6 +166,9 @@ public readonly record struct Rank(Ranks Value) : ISpanFormattable, IValidationT
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool operator false(Rank r) => !r.IsOk;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static implicit operator int(Rank r) => (int)r.Value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public int AsInt() => (int)Value;

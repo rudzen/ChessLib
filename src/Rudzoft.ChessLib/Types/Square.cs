@@ -82,7 +82,7 @@ public readonly record struct Square(Squares Value) : ISpanFormattable, ICompara
     public Square(int rank, int file) : this((Squares)(rank << 3) + (byte)file) { }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Square(Ranks r, Files f) : this((int)r, (int)f) { }
+    public Square(Ranks r, Files f) : this(new(r), new File(f)) { }
 
     public Square(Rank r, File f) : this(r.AsInt(), f.AsInt()) { }
 
@@ -360,5 +360,5 @@ public readonly record struct Square(Squares Value) : ISpanFormattable, ICompara
     /// <returns>Flipped square by Rank</returns>
     public Square FlipRank() => AsInt() ^ Squares.a8.AsInt();
 
-    public Player Color() => ((AsInt() + Rank.AsInt()) ^ 1) & 1;
+    public Player Color() => ((AsInt() + Rank) ^ 1) & 1;
 }

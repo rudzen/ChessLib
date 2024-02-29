@@ -322,7 +322,7 @@ public sealed class Blockage : IBlockage
     }
 
     private static Square NextFenceRankSquare(Span<Rank> fenceRank, File f, Player them)
-        => new Square(fenceRank[f.AsInt()].AsInt() * 8 + f.AsInt()) + them.PawnPushDistance();
+        => new Square(fenceRank[f.AsInt()] * 8 + f.AsInt()) + them.PawnPushDistance();
 
     private static bool FormFence(in BitBoard marked, ref BitBoard fence, ref BitBoard processed, Player us)
     {
@@ -364,7 +364,7 @@ public sealed class Blockage : IBlockage
                     result |= sq;
             }
         }
-        
+
         return result;
     }
 
