@@ -52,7 +52,7 @@ public static class SquaresExtensions
     public static BitBoard BitBoardSquare(this Squares sq) => BitBoards.BbSquares[sq.AsInt()];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Square RelativeSquare(this Squares sq, Player p) => sq.AsInt() ^ (p.Side * 56);
+    public static Square RelativeSquare(this Squares sq, Player p) => sq.AsInt() ^ (p * 56);
 
     public static int AsInt(this Squares sq) => (int)sq;
 }

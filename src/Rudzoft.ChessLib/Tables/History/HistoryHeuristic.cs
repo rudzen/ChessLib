@@ -47,21 +47,21 @@ public sealed class HistoryHeuristic : IHistoryHeuristic
     }
 
     public void Set(Player p, Square from, Square to, int value)
-        => _table[p.Side][from][to] = value;
+        => _table[p][from][to] = value;
 
     public int Retrieve(Player p, Square from, Square to)
-        => _table[p.Side][from][to];
+        => _table[p][from][to];
 
     private void Initialize(Player p)
     {
-        _table[p.Side] = new int[Square.Count][];
-        for (var i = 0; i < _table[p.Side].Length; ++i)
-            _table[p.Side][i] = new int[Square.Count];
+        _table[p] = new int[Square.Count][];
+        for (var i = 0; i < _table[p].Length; ++i)
+            _table[p][i] = new int[Square.Count];
     }
 
     private void ClearTable(Player p)
     {
-        for (var i = 0; i < _table[p.Side].Length; i++)
-            _table[p.Side][i].Clear();
+        for (var i = 0; i < _table[p].Length; i++)
+            _table[p][i].Clear();
     }
 }

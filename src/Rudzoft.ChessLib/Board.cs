@@ -86,7 +86,7 @@ public sealed class Board : IBoard
         _pieces[sq] = pc;
         _byType[PieceTypes.AllPieces.AsInt()] |= sq;
         _byType[pc.Type().AsInt()] |= sq;
-        _bySide[pc.ColorOf().Side] |= sq;
+        _bySide[pc.ColorOf()] |= sq;
         _index[sq] = _pieceCount[pc]++;
         _pieceList[pc][_index[sq]] = sq;
         _pieceCount[PieceTypes.AllPieces.MakePiece(pc.ColorOf())]++;
@@ -103,7 +103,7 @@ public sealed class Board : IBoard
         var pc = _pieces[sq];
         _byType[PieceTypes.AllPieces.AsInt()] ^= sq;
         _byType[pc.Type().AsInt()] ^= sq;
-        _bySide[pc.ColorOf().Side] ^= sq;
+        _bySide[pc.ColorOf()] ^= sq;
         /* board[s] = NO_PIECE;  Not needed, overwritten by the capturing one */
         var lastSquare = _pieceList[pc][--_pieceCount[pc]];
         _index[lastSquare] = _index[sq];
@@ -124,7 +124,7 @@ public sealed class Board : IBoard
         var fromTo = from | to;
         _byType[PieceTypes.AllPieces.AsInt()] ^= fromTo;
         _byType[pc.Type().AsInt()] ^= fromTo;
-        _bySide[pc.ColorOf().Side] ^= fromTo;
+        _bySide[pc.ColorOf()] ^= fromTo;
         _pieces[from] = Piece.EmptyPiece;
         _pieces[to] = pc;
         _index[to] = _index[from];
@@ -139,12 +139,12 @@ public sealed class Board : IBoard
 
     public BitBoard Pieces(PieceTypes pt1, PieceTypes pt2) => _byType[pt1.AsInt()] | _byType[pt2.AsInt()];
 
-    public BitBoard Pieces(Player p) => _bySide[p.Side];
+    public BitBoard Pieces(Player p) => _bySide[p];
 
-    public BitBoard Pieces(Player p, PieceTypes pt) => _bySide[p.Side] & _byType[pt.AsInt()];
+    public BitBoard Pieces(Player p, PieceTypes pt) => _bySide[p] & _byType[pt.AsInt()];
 
     public BitBoard Pieces(Player p, PieceTypes pt1, PieceTypes pt2)
-        => _bySide[p.Side] & (_byType[pt1.AsInt()] | _byType[pt2.AsInt()]);
+        => _bySide[p] & (_byType[pt1.AsInt()] | _byType[pt2.AsInt()]);
 
     public Square Square(PieceTypes pt, Player p)
     {

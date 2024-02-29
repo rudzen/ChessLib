@@ -205,7 +205,7 @@ public sealed class Position : IPosition
 
     public BitBoard AttacksTo(Square sq) => AttacksTo(sq, Board.Pieces());
 
-    public BitBoard KingBlockers(Player p) => State.BlockersForKing[p.Side];
+    public BitBoard KingBlockers(Player p) => State.BlockersForKing[p];
 
     public bool IsKingBlocker(Player p, Square sq) => KingBlockers(p).Contains(sq);
 
@@ -461,7 +461,7 @@ public sealed class Position : IPosition
         var them = ~us;
 
         // Is there a discovered check?
-        if ((State.BlockersForKing[them.Side] & from).IsNotEmpty
+        if ((State.BlockersForKing[them] & from).IsNotEmpty
             && !from.Aligned(to, GetKingSquare(them)))
             return true;
 
@@ -781,7 +781,7 @@ public sealed class Position : IPosition
                 state.PawnKey ^= Zobrist.Psq(captureSquare, capturedPiece);
             }
             else
-                _nonPawnMaterial[them.Side] -= Values.GetPieceValue(capturedPiece, Phases.Mg);
+                _nonPawnMaterial[them] -= Values.GetPieceValue(capturedPiece, Phases.Mg);
 
             // Update board and piece lists
             RemovePiece(captureSquare);
@@ -844,7 +844,7 @@ public sealed class Position : IPosition
                 posKey ^= Zobrist.Psq(to, pc) ^ Zobrist.Psq(to, promotionPiece);
                 state.PawnKey ^= Zobrist.Psq(to, pc);
 
-                _nonPawnMaterial[us.Side] += Values.GetPieceValue(promotionPiece, Phases.Mg);
+                _nonPawnMaterial[us] += Values.GetPieceValue(promotionPiece, Phases.Mg);
             }
 
             // Update pawn hash key
@@ -1011,7 +1011,7 @@ public sealed class Position : IPosition
     public BitBoard PinnedPieces(Player p)
     {
         Debug.Assert(State != null);
-        return State.Pinners[p.Side];
+        return State.Pinners[p];
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1060,7 +1060,7 @@ public sealed class Position : IPosition
             // Don't allow pinned pieces to attack (except the king) as long as there are
             // pinners on their original square.
             if (PinnedPieces(~stm) & occupied)
-                stmAttackers &= ~State.BlockersForKing[stm.Side];
+                stmAttackers &= ~State.BlockersForKing[stm];
 
             if (stmAttackers.IsEmpty)
                 break;
@@ -1128,7 +1128,7 @@ public sealed class Position : IPosition
         return res > 0;
     }
 
-    public Value NonPawnMaterial(Player p) => _nonPawnMaterial[p.Side];
+    public Value NonPawnMaterial(Player p) => _nonPawnMaterial[p];
 
     public Value NonPawnMaterial() => _nonPawnMaterial[0] - _nonPawnMaterial[1];
 
@@ -1272,7 +1272,7 @@ public sealed class Position : IPosition
         var kingPos = code.LastIndexOf('K');
         var sides = new[] { code[kingPos..].ToString(), code[..kingPos].ToString() };
 
-        sides[p.Side] = sides[p.Side].ToLower();
+        sides[p] = sides[p].ToLower();
 
         var fenStr = $"{sides[0]}{8 - sides[0].Length}/8/8/8/8/8/8/{sides[1]}{8 - sides[1].Length} w - - 0 10";
 
@@ -1304,7 +1304,7 @@ public sealed class Position : IPosition
             RemovePiece(to);
             var pc = PieceTypes.Pawn.MakePiece(us);
             AddPiece(pc, to);
-            _nonPawnMaterial[_sideToMove.Side] -= Values.GetPieceValue(pc, Phases.Mg);
+            _nonPawnMaterial[_sideToMove] -= Values.GetPieceValue(pc, Phases.Mg);
         }
 
         if (type == MoveTypes.Castling)
@@ -1336,7 +1336,7 @@ public sealed class Position : IPosition
                 if (State.CapturedPiece != PieceTypes.Pawn)
                 {
                     var them = ~_sideToMove;
-                    _nonPawnMaterial[them.Side] += Values.GetPieceValue(State.CapturedPiece, Phases.Mg);
+                    _nonPawnMaterial[them] += Values.GetPieceValue(State.CapturedPiece, Phases.Mg);
                 }
             }
         }
@@ -1429,7 +1429,7 @@ public sealed class Position : IPosition
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static CastleRights OrCastlingRight(Player c, bool isKingSide)
-        => (CastleRights)((int)CastleRights.WhiteKing << ((!isKingSide).AsByte() + 2 * c.Side));
+        => (CastleRights)((int)CastleRights.WhiteKing << ((!isKingSide).AsByte() + 2 * c));
 
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     private void DoCastle(
@@ -1494,9 +1494,9 @@ public sealed class Position : IPosition
 
     private void SetCheckInfo(in State state)
     {
-        (state.BlockersForKing[Player.White.Side], state.Pinners[Player.Black.Side]) =
+        (state.BlockersForKing[Player.White], state.Pinners[Player.Black]) =
             SliderBlockers(Board.Pieces(Player.Black), GetKingSquare(Player.White));
-        (state.BlockersForKing[Player.Black.Side], state.Pinners[Player.White.Side]) =
+        (state.BlockersForKing[Player.Black], state.Pinners[Player.White]) =
             SliderBlockers(Board.Pieces(Player.White), GetKingSquare(Player.Black));
 
         var ksq = GetKingSquare(~_sideToMove);
@@ -1519,7 +1519,7 @@ public sealed class Position : IPosition
     {
         state.MaterialKey = HashKey.Empty;
 
-        _nonPawnMaterial[Player.White.Side] = _nonPawnMaterial[Player.Black.Side] = Value.ValueZero;
+        _nonPawnMaterial[Player.White] = _nonPawnMaterial[Player.Black] = Value.ValueZero;
         State.Checkers = AttacksTo(GetKingSquare(_sideToMove)) & Board.Pieces(~_sideToMove);
 
         SetCheckInfo(State);
@@ -1543,7 +1543,7 @@ public sealed class Position : IPosition
             if (pc.Type() != PieceTypes.Pawn && pc.Type() != PieceTypes.King)
             {
                 var val = Values.GetPieceValue(pc.Type(), Phases.Mg).AsInt() * Board.PieceCount(pc);
-                _nonPawnMaterial[pc.ColorOf().Side] += val;
+                _nonPawnMaterial[pc.ColorOf()] += val;
             }
 
             for (var cnt = 0; cnt < Board.PieceCount(pc); ++cnt)

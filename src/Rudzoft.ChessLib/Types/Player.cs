@@ -69,7 +69,7 @@ public readonly record struct Player(byte Side) : ISpanFormattable, IMinMaxValue
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Deconstruct(out byte side) => side = Side;
-    
+
     public        bool     IsWhite    => Side == byte.MinValue;
     public        bool     IsBlack    => Side != byte.MinValue;
     public        int      Sign       => ScoreSign[Side];
@@ -101,7 +101,7 @@ public readonly record struct Player(byte Side) : ISpanFormattable, IMinMaxValue
     public static Player Create(Players p) => new(p);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Player operator ~(Player p) => new(p.Side ^ 1);
+    public static Player operator ~(Player p) => new(p ^ 1);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int operator <<(Player left, int right) => left.Side << right;
@@ -110,7 +110,10 @@ public readonly record struct Player(byte Side) : ISpanFormattable, IMinMaxValue
     public static int operator >>(Player left, int right) => left.Side >> right;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Pieces operator +(PieceTypes pieceType, Player side) => (Pieces)pieceType + (byte)(side.Side << 3);
+    public static Pieces operator +(PieceTypes pieceType, Player side) => (Pieces)pieceType + (byte)(side << 3);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static implicit operator byte(Player p) => p.Side;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Equals(Player other) => Side == other.Side;

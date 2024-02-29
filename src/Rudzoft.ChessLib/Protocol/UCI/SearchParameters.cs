@@ -98,43 +98,43 @@ public sealed class SearchParameters() : ISearchParameters
 
     public ulong WhiteTimeMilliseconds
     {
-        get => _clock[Player.White.Side].Time;
-        set => _clock[Player.White.Side].Time = value;
+        get => _clock[Player.White].Time;
+        set => _clock[Player.White].Time = value;
     }
 
     public ulong BlackTimeMilliseconds
     {
-        get => _clock[Player.Black.Side].Time;
-        set => _clock[Player.Black.Side].Time = value;
+        get => _clock[Player.Black].Time;
+        set => _clock[Player.Black].Time = value;
     }
 
     public ulong WhiteIncrementTimeMilliseconds
     {
-        get => _clock[Player.White.Side].Inc;
-        set => _clock[Player.White.Side].Inc = value;
+        get => _clock[Player.White].Inc;
+        set => _clock[Player.White].Inc = value;
     }
 
     public ulong BlackIncrementTimeMilliseconds
     {
-        get => _clock[Player.Black.Side].Inc;
-        set => _clock[Player.Black.Side].Inc = value;
+        get => _clock[Player.Black].Inc;
+        set => _clock[Player.Black].Inc = value;
     }
 
     public ref Clock Clock(Player p)
     {
-        return ref _clock[p.Side];
+        return ref _clock[p];
     }
 
     public bool UseTimeManagement()
     {
-        return _clock[Player.White.Side].Time != 0 && _clock[Player.Black.Side].Time != 0;
+        return _clock[Player.White].Time != 0 && _clock[Player.Black].Time != 0;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public ulong Time(Player p) => _clock[p.Side].Time;
+    public ulong Time(Player p) => _clock[p].Time;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public ulong Inc(Player p) => _clock[p.Side].Inc;
+    public ulong Inc(Player p) => _clock[p].Inc;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Clear()
@@ -193,7 +193,7 @@ public sealed class SearchParameters() : ISearchParameters
         destination[index++] = 'e';
         destination[index++] = ' ';
 
-        _clock[Player.White.Side].Time.TryFormat(destination[index..], out var written);
+        _clock[Player.White].Time.TryFormat(destination[index..], out var written);
         index += written;
 
         destination[index++] = ' ';
@@ -204,7 +204,7 @@ public sealed class SearchParameters() : ISearchParameters
         destination[index++] = 'e';
         destination[index++] = ' ';
 
-        _clock[Player.Black.Side].Time.TryFormat(destination[index..], out written);
+        _clock[Player.Black].Time.TryFormat(destination[index..], out written);
         index += written;
 
         if (MoveTime > ulong.MinValue)
@@ -225,7 +225,7 @@ public sealed class SearchParameters() : ISearchParameters
         destination[index++] = 'c';
         destination[index++] = ' ';
 
-        _clock[Player.White.Side].Inc.TryFormat(destination[index..], out written);
+        _clock[Player.White].Inc.TryFormat(destination[index..], out written);
         index += written;
 
         destination[index++] = ' ';
@@ -235,7 +235,7 @@ public sealed class SearchParameters() : ISearchParameters
         destination[index++] = 'c';
         destination[index++] = ' ';
 
-        _clock[Player.Black.Side].Inc.TryFormat(destination[index..], out written);
+        _clock[Player.Black].Inc.TryFormat(destination[index..], out written);
         index += written;
 
         if (_movesToGo == ulong.MinValue)

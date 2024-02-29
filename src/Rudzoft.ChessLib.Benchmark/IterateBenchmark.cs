@@ -15,7 +15,7 @@ public class IterateBenchmark
         var res = 0;
         for (var i = 0; i < N; ++i)
             foreach (var player in players)
-                res += player.Side;
+                res += player;
 
         N = res;
     }

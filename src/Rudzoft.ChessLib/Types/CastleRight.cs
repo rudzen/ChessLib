@@ -123,7 +123,7 @@ public readonly record struct CastleRight(CastleRights Rights)
     public static implicit operator CastleRight(Player p) => Create(p);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static CastleRight Create(Player p) => new((CastleRights)((int)CastleRights.White << (p.Side << 1)));
+    public static CastleRight Create(Player p) => new((CastleRights)((int)CastleRights.White << (p << 1)));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Equals(CastleRight other) => Rights == other.Rights;

@@ -97,13 +97,13 @@ public sealed class HiResTimer : IHiResTimer, IEquatable<HiResTimer>
 
     public static bool operator ==(HiResTimer left, int right) => left != null && left.Id == right;
 
-    public static bool operator ==(HiResTimer left, Player right) => left != null && left.Id == right.Side;
+    public static bool operator ==(HiResTimer left, Player right) => left != null && left.Id == right;
 
     public static bool operator !=(HiResTimer left, HiResTimer right) => !Equals(left, right);
 
     public static bool operator !=(HiResTimer left, int right) => left != null && left.Id != right;
 
-    public static bool operator !=(HiResTimer left, Player right) => left != null && left.Id != right.Side;
+    public static bool operator !=(HiResTimer left, Player right) => left != null && left.Id != right;
 
     public void Start()
     {

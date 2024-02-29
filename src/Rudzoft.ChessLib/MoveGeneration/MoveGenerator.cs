@@ -93,7 +93,7 @@ public static class MoveGenerator
         if (types == MoveGenerationTypes.Captures || !pos.CanCastle(pos.SideToMove))
             return index;
 
-        var (kingSide, queenSide) = CastleSideRights[us.Side];
+        var (kingSide, queenSide) = CastleSideRights[us];
 
         if (pos.CanCastle(kingSide) && !pos.CastlingImpeded(kingSide))
             moves[index++].Move = Move.Create(ksq, pos.CastlingRookSquare(kingSide), MoveTypes.Castling);

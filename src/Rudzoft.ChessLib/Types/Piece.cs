@@ -67,7 +67,7 @@ public static class PieceTypesExtensions
     public static int AsInt(this PieceTypes p) => (int)p;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Piece MakePiece(this PieceTypes @this, Player side) => (int)@this | (side.Side << 3);
+    public static Piece MakePiece(this PieceTypes @this, Player side) => (int)@this | (side << 3);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsSlider(this PieceTypes @this) => @this.InBetween(PieceTypes.Bishop, PieceTypes.Queen);

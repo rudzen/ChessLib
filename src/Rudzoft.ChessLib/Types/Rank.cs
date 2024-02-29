@@ -46,7 +46,7 @@ public enum Ranks
 public static class RanksExtensions
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Rank RelativeRank(this Ranks r, Player p) => new((Ranks)(r.AsInt() ^ (p.Side * 7)));
+    public static Rank RelativeRank(this Ranks r, Player p) => new((Ranks)(r.AsInt() ^ (p * 7)));
 
     public static int AsInt(this Ranks r) => (int)r;
 }
@@ -192,7 +192,7 @@ public readonly record struct Rank(Ranks Value) : ISpanFormattable, IValidationT
     public override int GetHashCode() => AsInt();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Rank Relative(Player p) => new(AsInt() ^ (p.Side * 7));
+    public Rank Relative(Player p) => new(AsInt() ^ (p * 7));
 
     /// <summary>
     /// Fold rank [12345678] to rank [12344321]
@@ -203,7 +203,7 @@ public readonly record struct Rank(Ranks Value) : ISpanFormattable, IValidationT
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Rank Clamp(Rank min, Rank max) => new(Math.Clamp(Value.AsInt(), min.AsInt(), max.AsInt()));
-    
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public int Distance(Rank other) => Math.Abs(AsInt() - other.AsInt());
 }

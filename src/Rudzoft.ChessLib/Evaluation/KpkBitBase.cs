@@ -125,27 +125,27 @@ public sealed class KpkBitBase : IKpkBitBase
             var psq = Square.Create(new(Ranks.Rank7.AsInt() - ((idx >> 15) & 0x7)), new((idx >> 13) & 0x3));
 
             // Invalid if two pieces are on the same square or if a king can be captured
-            if (ksq[Player.White.Side].Distance(ksq[Player.Black.Side]) <= 1
-                || ksq[Player.White.Side] == psq
-                || ksq[Player.Black.Side] == psq
-                || (stm.IsWhite && (psq.PawnAttack(Player.White) & ksq[Player.Black.Side]).IsNotEmpty))
+            if (ksq[Player.White].Distance(ksq[Player.Black]) <= 1
+                || ksq[Player.White] == psq
+                || ksq[Player.Black] == psq
+                || (stm.IsWhite && (psq.PawnAttack(Player.White) & ksq[Player.Black]).IsNotEmpty))
                 results = Results.None;
 
             // Win if the pawn can be promoted without getting captured
             else if (stm.IsWhite
                      && psq.Rank == Ranks.Rank7
-                     && ksq[Player.White.Side] != psq + Directions.North
-                     && (ksq[Player.Black.Side].Distance(psq + Directions.North) > 1
-                         || ksq[Player.White.Side].Distance(psq + Directions.North) == 1))
+                     && ksq[Player.White] != psq + Directions.North
+                     && (ksq[Player.Black].Distance(psq + Directions.North) > 1
+                         || ksq[Player.White].Distance(psq + Directions.North) == 1))
                 results = Results.Win;
 
             // Draw if it is stalemate or the black king can capture the pawn
             else if (stm.IsBlack
-                     && ((PieceTypes.King.PseudoAttacks(ksq[Player.Black.Side]) &
-                          ~(PieceTypes.King.PseudoAttacks(ksq[Player.White.Side]) | psq.PawnAttack(Player.White)))
+                     && ((PieceTypes.King.PseudoAttacks(ksq[Player.Black]) &
+                          ~(PieceTypes.King.PseudoAttacks(ksq[Player.White]) | psq.PawnAttack(Player.White)))
                          .IsEmpty
-                         || !(PieceTypes.King.PseudoAttacks(ksq[Player.Black.Side]) &
-                              ~PieceTypes.King.PseudoAttacks(ksq[Player.White.Side]) & psq).IsEmpty))
+                         || !(PieceTypes.King.PseudoAttacks(ksq[Player.Black]) &
+                              ~PieceTypes.King.PseudoAttacks(ksq[Player.White]) & psq).IsEmpty))
                 results = Results.Draw;
 
             // Position will be classified later in initialization
@@ -182,15 +182,15 @@ public sealed class KpkBitBase : IKpkBitBase
                 // Single push
                 if (PawnSquare.Rank < Rank.Rank7)
                     r |= db[
-                        Index(Player.Black, KingSquares[Player.Black.Side], KingSquares[Player.White.Side],
+                        Index(Player.Black, KingSquares[Player.Black], KingSquares[Player.White],
                             PawnSquare + Directions.North)].Result;
 
                 // Double push
                 if (PawnSquare.Rank == Rank.Rank2
-                    && PawnSquare + Directions.North != KingSquares[Player.White.Side]
-                    && PawnSquare + Directions.North != KingSquares[Player.Black.Side])
+                    && PawnSquare + Directions.North != KingSquares[Player.White]
+                    && PawnSquare + Directions.North != KingSquares[Player.Black])
                     r |= db[
-                        Index(Player.Black, KingSquares[Player.Black.Side], KingSquares[Player.White.Side],
+                        Index(Player.Black, KingSquares[Player.Black], KingSquares[Player.White],
                             PawnSquare + Directions.NorthDouble)].Result;
             }
 
@@ -212,13 +212,13 @@ public sealed class KpkBitBase : IKpkBitBase
         private Results GetInitialKingResults(ReadOnlySpan<KpkPosition> db)
         {
             var r = Results.None;
-            var b = PieceTypes.King.PseudoAttacks(KingSquares[Stm.Side]);
+            var b = PieceTypes.King.PseudoAttacks(KingSquares[Stm]);
 
             while (b)
             {
                 var (bkSq, wkSq) = Stm.IsWhite
-                    ? (KingSquares[Player.Black.Side], BitBoards.PopLsb(ref b))
-                    : (BitBoards.PopLsb(ref b), KingSquares[Player.White.Side]);
+                    ? (KingSquares[Player.Black], BitBoards.PopLsb(ref b))
+                    : (BitBoards.PopLsb(ref b), KingSquares[Player.White]);
                 r |= db[Index(~Stm, bkSq, wkSq, PawnSquare)].Result;
             }
 
