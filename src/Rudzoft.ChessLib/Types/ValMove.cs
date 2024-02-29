@@ -35,9 +35,9 @@ public struct ValMove : IEquatable<ValMove>, IComparable<ValMove>
 {
     public static readonly ValMove Empty = new();
 
-    public Move Move { get; set; }
+    public int Score;
 
-    public int Score { get; set; }
+    public Move Move;
 
     private ValMove(Move m, int s)
     {
@@ -60,8 +60,8 @@ public struct ValMove : IEquatable<ValMove>, IComparable<ValMove>
     public bool Equals(ValMove other) => Move.Equals(other.Move);
 
     public readonly int CompareTo(ValMove other) => other.Score.CompareTo(Score);
-    
+
     public readonly override int GetHashCode() => Move.GetHashCode();
 
-    public readonly override string ToString()=> $"{Move}, {Score}";
+    public readonly override string ToString() => $"{Move}, {Score}";
 }
