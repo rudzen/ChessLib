@@ -91,13 +91,13 @@ public static class MagicBB
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static BitBoard RookAttacks(this Square s, in BitBoard occ)
     {
-        return RookMagics[s.AsInt()].Attacks[RookMagics[s.AsInt()].Index(in occ)];
+        return RookMagics[s].Attacks[RookMagics[s].Index(in occ)];
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static BitBoard BishopAttacks(this Square s, in BitBoard occ)
     {
-        return BishopMagics[s.AsInt()].Attacks[BishopMagics[s.AsInt()].Index(in occ)];
+        return BishopMagics[s].Attacks[BishopMagics[s].Index(in occ)];
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -107,10 +107,10 @@ public static class MagicBB
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static BitBoard SafeDistance(Square sq, Direction step)
+    private static BitBoard SafeDistance(Square s, Direction step)
     {
-        var to = sq + step;
-        return to.IsOk && sq.Distance(to) <= 2 ? to.AsBb() : BitBoard.Empty;
+        var to = s + step;
+        return to.IsOk && s.Distance(to) <= 2 ? to.AsBb() : BitBoard.Empty;
     }
 
     // InitMagics() computes all rook and bishop attacks at startup. Magic

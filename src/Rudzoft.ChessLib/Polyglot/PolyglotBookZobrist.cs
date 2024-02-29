@@ -354,7 +354,7 @@ internal static class PolyglotBookZobrist
     }
 
     internal static ulong Psq(int piece, Square sq)
-        => PsqKeys[piece, sq.AsInt()];
+        => PsqKeys[piece, sq];
 
     internal static ulong Castle(CastleRight rights)
         => CastleKeys[rights.AsInt()];

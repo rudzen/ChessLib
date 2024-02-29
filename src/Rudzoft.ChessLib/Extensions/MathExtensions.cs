@@ -67,7 +67,7 @@ public static class MathExtensions
     public static int ModPow2(int input, int ceil) => input & (ceil - 1);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static int Pow2(this int value) => 1 << BitBoards.Msb(value).AsInt();
+    public static int Pow2(this int value) => 1 << BitBoards.Msb(value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsEven(this int value) => (value & 1) == 0;
@@ -77,7 +77,7 @@ public static class MathExtensions
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static long MidPoint(this long @this, long that) => (@this + that) >> 1;
-    
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Value Min(this Value @this, Value other) => @this < other ? @this : other;
 }

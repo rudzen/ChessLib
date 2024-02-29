@@ -391,7 +391,7 @@ public sealed class Position : IPosition
 
     public BitBoard GetAttacks(Square sq, PieceTypes pt) => GetAttacks(sq, pt, Pieces());
 
-    public CastleRight GetCastleRightsMask(Square sq) => _castlingRightsMask[sq.AsInt()];
+    public CastleRight GetCastleRightsMask(Square sq) => _castlingRightsMask[sq];
 
     public IEnumerator<Piece> GetEnumerator() => Board.GetEnumerator();
 
@@ -809,10 +809,10 @@ public sealed class Position : IPosition
 
         // Update castling rights if needed
         if (state.CastlelingRights != CastleRight.None &&
-            (_castlingRightsMask[from.AsInt()] | _castlingRightsMask[to.AsInt()]) != CastleRight.None)
+            (_castlingRightsMask[from] | _castlingRightsMask[to]) != CastleRight.None)
         {
             posKey ^= Zobrist.Castleling(state.CastlelingRights);
-            state.CastlelingRights &= ~(_castlingRightsMask[from.AsInt()] | _castlingRightsMask[to.AsInt()]);
+            state.CastlelingRights &= ~(_castlingRightsMask[from] | _castlingRightsMask[to]);
             //posKey ^= Zobrist.Castleling(state.CastlelingRights);
         }
 
@@ -1480,8 +1480,8 @@ public sealed class Position : IPosition
         var cr = OrCastlingRight(stm, isKingSide);
 
         State.CastlelingRights |= cr;
-        _castlingRightsMask[kingFrom.AsInt()] |= cr;
-        _castlingRightsMask[rookFrom.AsInt()] |= cr;
+        _castlingRightsMask[kingFrom] |= cr;
+        _castlingRightsMask[rookFrom] |= cr;
         _castlingRookSquare[cr.AsInt()] = rookFrom;
 
         var kingTo = (isKingSide ? Square.G1 : Square.C1).Relative(stm);

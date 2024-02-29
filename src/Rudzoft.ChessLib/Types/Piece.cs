@@ -184,7 +184,7 @@ public readonly record struct Piece(Pieces Value) : IMinMaxValue<Piece>
     public static bool operator false(Piece pc) => pc == EmptyPiece;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator int(Piece p) => (int)p.Value;
+    public static implicit operator int(Piece pc) => (int)pc.Value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Player ColorOf() => new((int)Value >> 3);

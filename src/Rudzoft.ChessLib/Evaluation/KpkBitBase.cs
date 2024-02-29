@@ -99,8 +99,8 @@ public sealed class KpkBitBase : IKpkBitBase
     /// <returns></returns>
     private static int Index(Player stm, Square weakKingSq, Square strongKsq, Square strongPawnSq)
     {
-        return strongKsq.AsInt()
-               | (weakKingSq.AsInt() << 6)
+        return strongKsq
+               | (weakKingSq << 6)
                | (stm << 12)
                | (strongPawnSq.File.AsInt() << 13)
                | ((Ranks.Rank7.AsInt() - strongPawnSq.Rank.AsInt()) << 15);

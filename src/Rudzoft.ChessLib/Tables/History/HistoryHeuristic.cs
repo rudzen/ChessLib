@@ -47,10 +47,10 @@ public sealed class HistoryHeuristic : IHistoryHeuristic
     }
 
     public void Set(Player p, Square from, Square to, int value)
-        => _table[p.Side][from.AsInt()][to.AsInt()] = value;
+        => _table[p.Side][from][to] = value;
 
     public int Retrieve(Player p, Square from, Square to)
-        => _table[p.Side][from.AsInt()][to.AsInt()];
+        => _table[p.Side][from][to];
 
     private void Initialize(Player p)
     {

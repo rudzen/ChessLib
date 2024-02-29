@@ -222,7 +222,7 @@ public readonly record struct Square(Squares Value) : ISpanFormattable, ICompara
     public static bool operator !=(Square left, Squares right) => left.Value != right;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Square operator +(Square left, Square right) => new(left.Value + (byte)right.AsInt());
+    public static Square operator +(Square left, Square right) => new(left.Value + (byte)right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Square operator +(Square left, int right) => new(left.Value + (byte)right);
@@ -289,6 +289,9 @@ public readonly record struct Square(Squares Value) : ISpanFormattable, ICompara
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool operator false(Square sq) => !sq.IsOk;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static implicit operator int(Square sq) => (int)sq.Value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Square Relative(Player p) => (int)Value ^ (p.Side * 56);

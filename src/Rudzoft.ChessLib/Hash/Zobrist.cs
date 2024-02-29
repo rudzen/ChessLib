@@ -90,7 +90,7 @@ public sealed class Zobrist : IZobrist
             var bb = BitBoard.Create((uint)v);
             while (bb)
             {
-                var key = _zobristCastling[1UL << BitBoards.PopLsb(ref bb).AsInt()];
+                var key = _zobristCastling[1UL << BitBoards.PopLsb(ref bb)];
                 _zobristCastling[v] ^= !key.IsEmpty? key : rKiss.Rand();
             }
         }
@@ -151,7 +151,7 @@ public sealed class Zobrist : IZobrist
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public ref HashKey Psq(Square square, Piece pc) => ref _zobristPst[square.AsInt()][pc];
+    public ref HashKey Psq(Square square, Piece pc) => ref _zobristPst[square][pc];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public ref HashKey Psq(int pieceCount, Piece pc) => ref _zobristPst[pieceCount][pc];

@@ -77,18 +77,18 @@ public sealed class Board : IBoard
         Array.Fill(_index, 0);
     }
 
-    public Piece PieceAt(Square sq) => _pieces[sq.AsInt()];
+    public Piece PieceAt(Square sq) => _pieces[sq];
 
-    public bool IsEmpty(Square sq) => _pieces[sq.AsInt()] == Piece.EmptyPiece;
+    public bool IsEmpty(Square sq) => _pieces[sq] == Piece.EmptyPiece;
 
     public void AddPiece(Piece pc, Square sq)
     {
-        _pieces[sq.AsInt()] = pc;
+        _pieces[sq] = pc;
         _byType[PieceTypes.AllPieces.AsInt()] |= sq;
         _byType[pc.Type().AsInt()] |= sq;
         _bySide[pc.ColorOf().Side] |= sq;
-        _index[sq.AsInt()] = _pieceCount[pc]++;
-        _pieceList[pc][_index[sq.AsInt()]] = sq;
+        _index[sq] = _pieceCount[pc]++;
+        _pieceList[pc][_index[sq]] = sq;
         _pieceCount[PieceTypes.AllPieces.MakePiece(pc.ColorOf())]++;
     }
 
@@ -100,37 +100,35 @@ public sealed class Board : IBoard
         // then replace it in TakeMove() we will put it at the end of the list and not in its
         // original place, it means index[] and pieceList[] are not invariant to a MakeMove() +
         // TakeMove() sequence.
-        var pc = _pieces[sq.AsInt()];
+        var pc = _pieces[sq];
         _byType[PieceTypes.AllPieces.AsInt()] ^= sq;
         _byType[pc.Type().AsInt()] ^= sq;
         _bySide[pc.ColorOf().Side] ^= sq;
         /* board[s] = NO_PIECE;  Not needed, overwritten by the capturing one */
         var lastSquare = _pieceList[pc][--_pieceCount[pc]];
-        _index[lastSquare.AsInt()] = _index[sq.AsInt()];
-        _pieceList[pc][_index[lastSquare.AsInt()]] = lastSquare;
+        _index[lastSquare] = _index[sq];
+        _pieceList[pc][_index[lastSquare]] = lastSquare;
         _pieceList[pc][_pieceCount[pc]] = Types.Square.None;
         _pieceCount[PieceTypes.AllPieces.MakePiece(pc.ColorOf())]--;
     }
 
     public void ClearPiece(Square sq)
-        => _pieces[sq.AsInt()] = Piece.EmptyPiece;
+        => _pieces[sq] = Piece.EmptyPiece;
 
     public void MovePiece(Square from, Square to)
     {
         // _index[from] is not updated and becomes stale. This works as long as _index[] is
         // accessed just by known occupied squares.
-        var f = from.AsInt();
-        var t = to.AsInt();
 
-        var pc = _pieces[f];
+        var pc = _pieces[from];
         var fromTo = from | to;
         _byType[PieceTypes.AllPieces.AsInt()] ^= fromTo;
         _byType[pc.Type().AsInt()] ^= fromTo;
         _bySide[pc.ColorOf().Side] ^= fromTo;
-        _pieces[f] = Piece.EmptyPiece;
-        _pieces[t] = pc;
-        _index[t] = _index[f];
-        _pieceList[pc][_index[t]] = to;
+        _pieces[from] = Piece.EmptyPiece;
+        _pieces[to] = pc;
+        _index[to] = _index[from];
+        _pieceList[pc][_index[to]] = to;
     }
 
     public Piece MovedPiece(Move m) => PieceAt(m.FromSquare());

@@ -51,12 +51,12 @@ public readonly record struct Move(ushort Data) : ISpanFormattable
 {
     private const int MaxMoveStringSize = 5;
 
-    public Move(Square from, Square to) : this((ushort)(to | (from.AsInt() << 6)))
+    public Move(Square from, Square to) : this((ushort)(to | (from << 6)))
     {
     }
 
     public Move(Square from, Square to, MoveTypes moveType, PieceTypes promoPt = PieceTypes.Knight)
-        : this((ushort)(to | (from.AsInt() << 6) | moveType.AsInt() | ((promoPt - PieceTypes.Knight) << 12)))
+        : this((ushort)(to | (from << 6) | moveType.AsInt() | ((promoPt - PieceTypes.Knight) << 12)))
     {
     }
 
