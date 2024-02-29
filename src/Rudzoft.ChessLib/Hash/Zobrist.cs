@@ -72,17 +72,17 @@ public sealed class Zobrist : IZobrist
     public Zobrist(IRKiss rKiss)
     {
         _zobristPst = new HashKey[Square.Count][];
-        
+
         for (var sq = Squares.a1; sq <= Squares.h8; sq++)
         {
             var s = sq.AsInt();
             _zobristPst[s] = new HashKey[Piece.Count];
             foreach (var pc in Piece.All.AsSpan())
-                _zobristPst[s][pc.AsInt()] = rKiss.Rand();
+                _zobristPst[s][pc] = rKiss.Rand();
         }
 
         _zobristCastling = new HashKey[CastleRight.Count];
-        
+
         for (var cr = CastleRights.None; cr <= CastleRights.Any; cr++)
         {
             var v = cr.AsInt();
@@ -98,7 +98,7 @@ public sealed class Zobrist : IZobrist
         _zobristEpFile = new HashKey[File.Count];
         for (var i = 0; i < _zobristEpFile.Length; i++)
             _zobristEpFile[i] = rKiss.Rand();
-        
+
         _zobristSide = rKiss.Rand();
         ZobristNoPawn = rKiss.Rand();
     }
@@ -151,10 +151,10 @@ public sealed class Zobrist : IZobrist
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public ref HashKey Psq(Square square, Piece piece) => ref _zobristPst[square.AsInt()][piece.AsInt()];
+    public ref HashKey Psq(Square square, Piece pc) => ref _zobristPst[square.AsInt()][pc];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public ref HashKey Psq(int pieceCount, Piece piece) => ref _zobristPst[pieceCount][piece.AsInt()];
+    public ref HashKey Psq(int pieceCount, Piece pc) => ref _zobristPst[pieceCount][pc];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public ref HashKey Castleling(CastleRights index) => ref _zobristCastling[index.AsInt()];

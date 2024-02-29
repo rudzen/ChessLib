@@ -87,15 +87,15 @@ public sealed class Board : IBoard
         _byType[PieceTypes.AllPieces.AsInt()] |= sq;
         _byType[pc.Type().AsInt()] |= sq;
         _bySide[pc.ColorOf().Side] |= sq;
-        _index[sq.AsInt()] = _pieceCount[pc.AsInt()]++;
-        _pieceList[pc.AsInt()][_index[sq.AsInt()]] = sq;
-        _pieceCount[PieceTypes.AllPieces.MakePiece(pc.ColorOf()).AsInt()]++;
+        _index[sq.AsInt()] = _pieceCount[pc]++;
+        _pieceList[pc][_index[sq.AsInt()]] = sq;
+        _pieceCount[PieceTypes.AllPieces.MakePiece(pc.ColorOf())]++;
     }
 
     public void RemovePiece(Square sq)
     {
         Debug.Assert(sq.IsOk);
-        
+
         // WARNING: This is not a reversible operation. If we remove a piece in MakeMove() and
         // then replace it in TakeMove() we will put it at the end of the list and not in its
         // original place, it means index[] and pieceList[] are not invariant to a MakeMove() +
@@ -105,11 +105,11 @@ public sealed class Board : IBoard
         _byType[pc.Type().AsInt()] ^= sq;
         _bySide[pc.ColorOf().Side] ^= sq;
         /* board[s] = NO_PIECE;  Not needed, overwritten by the capturing one */
-        var lastSquare = _pieceList[pc.AsInt()][--_pieceCount[pc.AsInt()]];
+        var lastSquare = _pieceList[pc][--_pieceCount[pc]];
         _index[lastSquare.AsInt()] = _index[sq.AsInt()];
-        _pieceList[pc.AsInt()][_index[lastSquare.AsInt()]] = lastSquare;
-        _pieceList[pc.AsInt()][_pieceCount[pc.AsInt()]] = Types.Square.None;
-        _pieceCount[PieceTypes.AllPieces.MakePiece(pc.ColorOf()).AsInt()]--;
+        _pieceList[pc][_index[lastSquare.AsInt()]] = lastSquare;
+        _pieceList[pc][_pieceCount[pc]] = Types.Square.None;
+        _pieceCount[PieceTypes.AllPieces.MakePiece(pc.ColorOf())]--;
     }
 
     public void ClearPiece(Square sq)
@@ -121,7 +121,7 @@ public sealed class Board : IBoard
         // accessed just by known occupied squares.
         var f = from.AsInt();
         var t = to.AsInt();
-        
+
         var pc = _pieces[f];
         var fromTo = from | to;
         _byType[PieceTypes.AllPieces.AsInt()] ^= fromTo;
@@ -130,7 +130,7 @@ public sealed class Board : IBoard
         _pieces[f] = Piece.EmptyPiece;
         _pieces[t] = pc;
         _index[t] = _index[f];
-        _pieceList[pc.AsInt()][_index[t]] = to;
+        _pieceList[pc][_index[t]] = to;
     }
 
     public Piece MovedPiece(Move m) => PieceAt(m.FromSquare());
@@ -150,13 +150,13 @@ public sealed class Board : IBoard
 
     public Square Square(PieceTypes pt, Player p)
     {
-        Debug.Assert(_pieceCount[pt.MakePiece(p).AsInt()] == 1);
-        return _pieceList[pt.MakePiece(p).AsInt()][0];
+        Debug.Assert(_pieceCount[pt.MakePiece(p)] == 1);
+        return _pieceList[pt.MakePiece(p)][0];
     }
 
-    public ReadOnlySpan<Square> Squares(PieceTypes pt, Player c)
+    public ReadOnlySpan<Square> Squares(PieceTypes pt, Player p)
     {
-        var pcIndex = pt.MakePiece(c).AsInt();
+        var pcIndex = pt.MakePiece(p);
         var pcCount = _pieceCount[pcIndex];
 
         return pcCount == 0
@@ -164,12 +164,12 @@ public sealed class Board : IBoard
             : _pieceList[pcIndex].AsSpan()[..pcCount];
     }
 
-    public int PieceCount(Piece pc) => _pieceCount[pc.AsInt()];
+    public int PieceCount(Piece pc) => _pieceCount[pc];
 
     public int PieceCount(PieceTypes pt, Player p) => PieceCount(pt.MakePiece(p));
 
     public int PieceCount(PieceTypes pt)
-        => _pieceCount[pt.MakePiece(Player.White).AsInt()] + _pieceCount[pt.MakePiece(Player.Black).AsInt()];
+        => _pieceCount[pt.MakePiece(Player.White)] + _pieceCount[pt.MakePiece(Player.Black)];
 
     public int PieceCount() => PieceCount(PieceTypes.AllPieces);
 

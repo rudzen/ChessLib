@@ -80,12 +80,22 @@ public struct Score : IEquatable<Score>
     public static Score operator *(Score s, bool b) => b ? s : Zero;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Score operator +(Score s1, Score s2) => new(Vector2.Add(s1._data, s2._data));
+    public static Score operator +(Score s, Score s2) => new(Vector2.Add(s._data, s2._data));
 
-    public static Score operator -(Score s1, Score s2) => new(Vector2.Subtract(s1._data, s2._data));
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Score operator +(Score s, Vector2 v) => new(Vector2.Subtract(s._data, v));
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Score operator +(Vector2 v, Score s) => new(Vector2.Subtract(v, s._data));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Score operator +(Score s, int v) => new(Vector2.Add(s._data, new(v, v)));
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Score operator -(Score s1, Score s2) => new(Vector2.Subtract(s1._data, s2._data));
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Score operator -(Score s1, Vector2 s2) => new(Vector2.Subtract(s1._data, s2));
 
     public static readonly Score Zero = new();
 

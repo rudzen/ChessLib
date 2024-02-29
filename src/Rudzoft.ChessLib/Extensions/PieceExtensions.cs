@@ -65,13 +65,13 @@ public static class PieceExtensions
     ];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static char GetPieceChar(this Piece p) => PieceChars[p.AsInt()];
+    public static char GetPieceChar(this Piece p) => PieceChars[p];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static char GetPieceChar(this PieceTypes p) => PieceChars[(int)p];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static string GetPieceString(this Piece p) => PieceStrings[p.AsInt()];
+    public static string GetPieceString(this Piece p) => PieceStrings[p];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string GetName(this Piece p) => PieceNames[p.Type().AsInt()];
@@ -83,7 +83,7 @@ public static class PieceExtensions
     public static char GetPgnChar(this Piece p) => PgnPieceChars[(int)p.Type()];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static char GetUnicodeChar(this Piece p) => PieceUnicodeChar[p.AsInt()];
+    public static char GetUnicodeChar(this Piece p) => PieceUnicodeChar[p];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int AsInt(this Pieces piece) => (int)piece;

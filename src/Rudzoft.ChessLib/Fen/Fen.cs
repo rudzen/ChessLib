@@ -139,13 +139,13 @@ public static class Fen
             var pc = new Piece((Pieces)pieceIndex);
             var pt = pc.Type();
 
-            pieceCount[pc.AsInt()]++;
+            pieceCount[pc]++;
 
             var limit = limits[pt.AsInt()];
 
-            if (pieceCount[pc.AsInt()] > limit)
+            if (pieceCount[pc] > limit)
                 throw new InvalidFenException(
-                    $"Invalid fen (piece limit exceeded for {pc}. index={i},limit={limit},count={pieceCount[pc.AsInt()]}) {s.ToString()}");
+                    $"Invalid fen (piece limit exceeded for {pc}. index={i},limit={limit},count={pieceCount[pc]}) {s.ToString()}");
         }
 
         var whitePieces = pieceCount.Slice(1, 5);

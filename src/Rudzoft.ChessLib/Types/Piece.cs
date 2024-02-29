@@ -119,9 +119,9 @@ public readonly record struct Piece(Pieces Value) : IMinMaxValue<Piece>
     public static Piece MinValue => BlackKing;
 
     public static Range WhitePieces => new(0, 5);
-    
+
     public static Range BlackPieces => new(6, 11);
-    
+
     public static PieceTypes[] AllTypes { get; } =
     [
         PieceTypes.Pawn,
@@ -142,7 +142,7 @@ public readonly record struct Piece(Pieces Value) : IMinMaxValue<Piece>
     public static implicit operator Piece(Pieces pc) => new(pc);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Piece operator ~(Piece pc) => new(pc.AsInt() ^ 8);
+    public static Piece operator ~(Piece pc) => new(pc ^ 8);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Piece operator +(Piece left, Player right) => new(left.Value + (byte)(right << 3));
@@ -178,10 +178,13 @@ public readonly record struct Piece(Pieces Value) : IMinMaxValue<Piece>
     public static Piece operator --(Piece left) => new(left.Value - 1);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator true(Piece pc) => pc.Value.AsInt() != EmptyPiece.AsInt();
+    public static bool operator true(Piece pc) => pc != EmptyPiece;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator false(Piece pc) => pc.Value.AsInt() == EmptyPiece.AsInt();
+    public static bool operator false(Piece pc) => pc == EmptyPiece;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static implicit operator int(Piece p) => (int)p.Value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Player ColorOf() => new((int)Value >> 3);

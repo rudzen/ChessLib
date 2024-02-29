@@ -350,9 +350,9 @@ internal static class PolyglotBookZobrist
 
     internal static ulong Psq(Piece pc, Square sq)
     {
-        return Psq(PieceMapping[pc.AsInt()], sq);
+        return Psq(PieceMapping[pc], sq);
     }
-    
+
     internal static ulong Psq(int piece, Square sq)
         => PsqKeys[piece, sq.AsInt()];
 
