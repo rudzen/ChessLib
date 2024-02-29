@@ -42,15 +42,10 @@ public static class MagicBB
         728UL, 10316UL, 55013UL, 32803UL, 12281UL, 15100UL, 16645UL, 255UL
     ];
 
-    private static readonly byte[] BitCount8Bit = new byte[256];
-
     [SkipLocalsInit]
     static MagicBB()
     {
         var start = Stopwatch.GetTimestamp();
-
-        for (ulong b = 0; b <= byte.MaxValue; b++)
-            BitCount8Bit[b] = (byte)PopCountMax15(b);
 
         Span<Direction> rookDeltas = stackalloc Direction[]
             { Direction.North, Direction.East, Direction.South, Direction.West };
@@ -60,7 +55,6 @@ public static class MagicBB
 
         var rookTable = new BitBoard[0x19000]; // To store rook attacks
         var bishopTable = new BitBoard[0x1480]; // To store bishop attacks
-
         var epochs = new int[0x1000];
         var occupancy = new BitBoard[0x1000];
         var reference = new BitBoard[0x1000];
@@ -92,14 +86,6 @@ public static class MagicBB
 
         var end = Stopwatch.GetElapsedTime(start);
         Console.WriteLine($"MagicBB init took: {end}");
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static int PopCountMax15(ulong b)
-    {
-        b -= (b >> 1) & 0x5555555555555555UL;
-        b = ((b >> 2) & 0x3333333333333333UL) + (b & 0x3333333333333333UL);
-        return (int)((b * 0x1111111111111111UL) >> 60);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
