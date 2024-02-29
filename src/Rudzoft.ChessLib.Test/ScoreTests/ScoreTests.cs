@@ -24,6 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using System.Numerics;
 using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Test.ScoreTests;
@@ -35,26 +36,26 @@ public sealed class ScoreTests
     static ScoreTests()
     {
         TestValues = new Score[20];
-        TestValues[0] = new Score(35, 23);
-        TestValues[1] = new Score(-35, 23);
-        TestValues[2] = new Score(35, -23);
-        TestValues[3] = new Score(-35, -23);
-        TestValues[4] = new Score(350, 230);
-        TestValues[5] = new Score(3542, 234);
-        TestValues[6] = new Score(35, -223);
-        TestValues[7] = new Score(0, 0);
-        TestValues[8] = new Score(56, 23);
-        TestValues[9] = new Score(15423, -23);
-        TestValues[10] = new Score(2, 1);
-        TestValues[11] = new Score(425, 23);
-        TestValues[12] = new Score(35, 4223);
-        TestValues[13] = new Score(-35231, -24223);
-        TestValues[14] = new Score(-1, 1);
-        TestValues[15] = new Score(1, -1);
-        TestValues[16] = new Score(2, 23);
-        TestValues[17] = new Score(55, 23);
-        TestValues[18] = new Score(0, 23);
-        TestValues[19] = new Score(650, -2323);
+        TestValues[0] = new(35, 23);
+        TestValues[1] = new(-35, 23);
+        TestValues[2] = new(35, -23);
+        TestValues[3] = new(-35, -23);
+        TestValues[4] = new(350, 230);
+        TestValues[5] = new(3542, 234);
+        TestValues[6] = new(35, -223);
+        TestValues[7] = new(0, 0);
+        TestValues[8] = new(56, 23);
+        TestValues[9] = new(15423, -23);
+        TestValues[10] = new(2, 1);
+        TestValues[11] = new(425, 23);
+        TestValues[12] = new(35, 4223);
+        TestValues[13] = new(-35231, -24223);
+        TestValues[14] = new(-1, 1);
+        TestValues[15] = new(1, -1);
+        TestValues[16] = new(2, 23);
+        TestValues[17] = new(55, 23);
+        TestValues[18] = new(0, 23);
+        TestValues[19] = new(650, -2323);
     }
 
     [Fact]
@@ -65,8 +66,8 @@ public sealed class ScoreTests
         var result = TestValues
             .Aggregate(Score.Zero, static (current, expected) => current + expected);
 
-        Assert.Equal( expectedMg, result.Mg());
-        Assert.Equal( expectedEg, result.Eg());
+        Assert.Equal(expectedMg, result.Mg());
+        Assert.Equal(expectedEg, result.Eg());
     }
 
     [Theory]

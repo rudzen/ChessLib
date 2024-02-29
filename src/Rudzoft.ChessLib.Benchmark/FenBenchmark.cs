@@ -3,7 +3,6 @@ using Rudzoft.ChessLib.Enums;
 using Rudzoft.ChessLib.Fen;
 using Rudzoft.ChessLib.Hash;
 using Rudzoft.ChessLib.MoveGeneration;
-using Rudzoft.ChessLib.ObjectPoolPolicies;
 using Rudzoft.ChessLib.Types;
 using Rudzoft.ChessLib.Validation;
 
@@ -30,7 +29,9 @@ public class FenBenchmark
         var zobrist = new Zobrist(rKiss);
         var cuckoo = new Cuckoo(zobrist);
         var validator = new PositionValidator(zobrist);
-        var moveListObjectPool = new DefaultObjectPool<IMoveList>(new MoveListPolicy());
+        var provider = new DefaultObjectPoolProvider();
+        var policy = new DefaultPooledObjectPolicy<MoveList>();
+        var moveListObjectPool = provider.Create(policy);
         _pos = new Position(board, pieceValue, zobrist, cuckoo, validator, moveListObjectPool);
         _pos.Set(in fp, ChessMode.Normal, in state);
     }

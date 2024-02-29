@@ -42,7 +42,7 @@ public sealed class RKiss : IRKiss
     /// </summary>
     private const ulong DefaultRandomSeed = 1070372;
 
-    private ulong _s = DefaultRandomSeed;
+    public ulong Seed { get; set; } = DefaultRandomSeed;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public IEnumerable<ulong> Get(int count)
@@ -64,9 +64,11 @@ public sealed class RKiss : IRKiss
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private ulong Rand64()
     {
-        _s ^= _s >> 12;
-        _s ^= _s << 25;
-        _s ^= _s >> 27;
-        return _s * 2685821657736338717L;
+        var s = Seed;
+        s ^= s >> 12;
+        s ^= s << 25;
+        s ^= s >> 27;
+        Seed = s;
+        return s * 2685821657736338717L;
     }
 }

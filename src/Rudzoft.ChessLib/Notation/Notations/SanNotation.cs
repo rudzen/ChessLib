@@ -32,8 +32,10 @@ using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Notation.Notations;
 
-public sealed class SanNotation(ObjectPool<IMoveList> moveLists) : Notation(moveLists)
+public sealed class SanNotation : Notation
 {
+    public SanNotation(ObjectPool<MoveList> moveLists) : base(moveLists) { }
+
     /// <summary>
     /// <para>Converts a move to SAN notation.</para>
     /// </summary>
@@ -50,7 +52,7 @@ public sealed class SanNotation(ObjectPool<IMoveList> moveLists) : Notation(move
             return CastleExtensions.GetCastleString(to, from);
 
         Span<char> re = stackalloc char[6];
-        var        i  = 0;
+        var i = 0;
 
         var pt = pos.GetPieceType(from);
 

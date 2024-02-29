@@ -35,9 +35,9 @@ namespace Rudzoft.ChessLib.Factories;
 public sealed class PolyglotBookFactory : IPolyglotBookFactory
 {
     private readonly string _path;
-    private readonly ObjectPool<IMoveList> _objectPool;
+    private readonly ObjectPool<MoveList> _objectPool;
 
-    public PolyglotBookFactory(IOptions<PolyglotBookConfiguration> options, ObjectPool<IMoveList> objectPool)
+    public PolyglotBookFactory(IOptions<PolyglotBookConfiguration> options, ObjectPool<MoveList> objectPool)
     {
         var config = options.Value;
         _path = string.IsNullOrWhiteSpace(config.BookPath) ? string.Empty : config.BookPath;

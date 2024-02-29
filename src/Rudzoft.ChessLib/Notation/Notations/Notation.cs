@@ -32,9 +32,14 @@ using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Notation.Notations;
 
-public abstract class Notation(ObjectPool<IMoveList> moveLists) : INotation
+public abstract class Notation : INotation
 {
-    protected readonly ObjectPool<IMoveList> MoveLists = moveLists;
+    protected readonly ObjectPool<MoveList> MoveLists;
+
+    protected Notation(ObjectPool<MoveList> moveLists)
+    {
+        MoveLists = moveLists;
+    }
 
     public abstract string Convert(IPosition pos, Move move);
 

@@ -29,7 +29,7 @@ using Microsoft.Extensions.ObjectPool;
 using Rudzoft.ChessLib.Enums;
 using Rudzoft.ChessLib.Fen;
 using Rudzoft.ChessLib.Hash;
-using Rudzoft.ChessLib.ObjectPoolPolicies;
+using Rudzoft.ChessLib.MoveGeneration;
 using Rudzoft.ChessLib.Types;
 using Rudzoft.ChessLib.Validation;
 
@@ -54,7 +54,7 @@ public sealed class FenceTests
             .AddSingleton(static serviceProvider =>
             {
                 var provider = serviceProvider.GetRequiredService<ObjectPoolProvider>();
-                var policy = new MoveListPolicy();
+                var policy = new DefaultPooledObjectPolicy<MoveList>();
                 return provider.Create(policy);
             })
             .BuildServiceProvider();

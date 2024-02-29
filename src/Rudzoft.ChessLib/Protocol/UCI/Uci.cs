@@ -42,12 +42,12 @@ public class Uci : IUci
 
     private static readonly string[] OptionTypeStrings = Enum.GetNames(typeof(UciOptionType));
 
-    protected readonly ObjectPool<IMoveList> MoveListPool;
+    protected readonly ObjectPool<MoveList> MoveListPool;
 
     private readonly ObjectPool<StringBuilder> _pvPool;
     private readonly Dictionary<string, IOption> _options;
 
-    public Uci(ObjectPool<IMoveList> moveListPool)
+    public Uci(ObjectPool<MoveList> moveListPool)
     {
         var policy = new StringBuilderPooledObjectPolicy();
         _pvPool = new DefaultObjectPool<StringBuilder>(policy, 128);

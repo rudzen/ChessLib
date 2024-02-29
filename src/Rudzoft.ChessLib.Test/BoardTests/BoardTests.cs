@@ -32,7 +32,7 @@ using Microsoft.Extensions.ObjectPool;
 using Rudzoft.ChessLib.Enums;
 using Rudzoft.ChessLib.Fen;
 using Rudzoft.ChessLib.Hash;
-using Rudzoft.ChessLib.ObjectPoolPolicies;
+using Rudzoft.ChessLib.MoveGeneration;
 using Rudzoft.ChessLib.Types;
 using Rudzoft.ChessLib.Validation;
 
@@ -56,7 +56,7 @@ public sealed class BoardTests
             .AddSingleton(static serviceProvider =>
             {
                 var provider = serviceProvider.GetRequiredService<ObjectPoolProvider>();
-                var policy = new MoveListPolicy();
+                var policy = new DefaultPooledObjectPolicy<MoveList>();
                 return provider.Create(policy);
             })
             .BuildServiceProvider();
@@ -78,12 +78,12 @@ public sealed class BoardTests
             var ptsSpan = pts.AsSpan();
             var playersSpan = players.AsSpan();
             var expectedCountSpan = expectedCounts.AsSpan();
-            
+
             ref var fenSpace = ref MemoryMarshal.GetReference(fensSpan);
             ref var ptsSpace = ref MemoryMarshal.GetReference(ptsSpan);
             ref var playersSpace = ref MemoryMarshal.GetReference(playersSpan);
             ref var expectedCountSpace = ref MemoryMarshal.GetReference(expectedCountSpan);
-            
+
             for (var i = 0; i < fens.Length; ++i)
             {
                 var fen = Unsafe.Add(ref fenSpace, i);

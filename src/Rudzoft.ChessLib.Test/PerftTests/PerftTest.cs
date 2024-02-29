@@ -185,3 +185,28 @@ public sealed class TalkChessPerftTests : PerftVerify
     public void Perft(string fen, int depth, ulong expected)
         => AssertPerft(fen, depth, in expected);
 }
+
+public sealed class WeirdErrorFenTest : PerftVerify
+{
+    private static readonly string[] Fens =
+    [
+        "rnkq1bnr/p3ppp1/1ppp3p/3B4/6b1/2PQ3P/PP1PPP2/RNB1K1NR w KQkq - 0 1"
+    ];
+
+    private static readonly int[] Depths =
+    [
+        6
+    ];
+
+    private static readonly ulong[] Results =
+    [
+        840484313UL
+    ];
+
+    public static readonly PerftTheoryData PerftTheoryData = new(Fens, Depths, Results);
+
+    [Theory]
+    [MemberData(nameof(PerftTheoryData))]
+    public void Perft(string fen, int depth, ulong expected)
+        => AssertPerft(fen, depth, in expected);
+}

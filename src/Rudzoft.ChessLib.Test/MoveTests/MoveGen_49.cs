@@ -30,7 +30,6 @@ using Rudzoft.ChessLib.Enums;
 using Rudzoft.ChessLib.Fen;
 using Rudzoft.ChessLib.Hash;
 using Rudzoft.ChessLib.MoveGeneration;
-using Rudzoft.ChessLib.ObjectPoolPolicies;
 using Rudzoft.ChessLib.Types;
 using Rudzoft.ChessLib.Validation;
 
@@ -54,19 +53,19 @@ public sealed class MoveGen_49
             .AddSingleton(static serviceProvider =>
             {
                 var provider = serviceProvider.GetRequiredService<ObjectPoolProvider>();
-                var policy = new MoveListPolicy();
+                var policy = new DefaultPooledObjectPolicy<MoveList>();
                 return provider.Create(policy);
             })
             .BuildServiceProvider();
     }
-    
+
     [Fact]
     public void MoveListContainsMismatchedElement()
     {
         const string fen = "r3kb1r/p3pppp/p1n2n2/2pp1Q2/3P1B2/2P1PN2/Pq3PPP/RN2K2R w KQkq - 0 9";
 
         var pos = _serviceProvider.GetRequiredService<IPosition>();
-        
+
         var fd = new FenData(fen);
         var state = new State();
 

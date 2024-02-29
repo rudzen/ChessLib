@@ -29,7 +29,7 @@ using Microsoft.Extensions.ObjectPool;
 using Rudzoft.ChessLib.Enums;
 using Rudzoft.ChessLib.Fen;
 using Rudzoft.ChessLib.Hash;
-using Rudzoft.ChessLib.ObjectPoolPolicies;
+using Rudzoft.ChessLib.MoveGeneration;
 using Rudzoft.ChessLib.Types;
 using Rudzoft.ChessLib.Validation;
 
@@ -53,7 +53,7 @@ public sealed class ValidationTests
             .AddSingleton(static serviceProvider =>
             {
                 var provider = serviceProvider.GetRequiredService<ObjectPoolProvider>();
-                var policy = new MoveListPolicy();
+                var policy = new DefaultPooledObjectPolicy<MoveList>();
                 return provider.Create(policy);
             })
             .BuildServiceProvider();
@@ -90,7 +90,7 @@ public sealed class ValidationTests
         // position only has pawns, rooks and kings
         const string fen = "r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 1";
         const PositionValidationTypes validationType = PositionValidationTypes.Castle;
-        
+
         var pos = _serviceProvider.GetRequiredService<IPosition>();
 
         var fenData = new FenData(fen);

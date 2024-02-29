@@ -32,8 +32,10 @@ using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Notation.Notations;
 
-public sealed class RanNotation(ObjectPool<IMoveList> moveLists) : Notation(moveLists)
+public sealed class RanNotation : Notation
 {
+    public RanNotation(ObjectPool<MoveList> moveLists) : base(moveLists) { }
+
     /// <summary>
     /// <para>Converts a move to RAN notation.</para>
     /// </summary>

@@ -34,14 +34,9 @@ public sealed class PgnTests
     private const string SampleFilePath = "samples/sample.pgn";
     private const int ExpectedGameCount = 2;
 
-    private readonly IServiceProvider _serviceProvider;
-
-    public PgnTests()
-    {
-        _serviceProvider = new ServiceCollection()
-                .AddPgnParser(static () => false)
-                .BuildServiceProvider();
-    }
+    private readonly IServiceProvider _serviceProvider = new ServiceCollection()
+                                                         .AddPgnParser(static () => true)
+                                                         .BuildServiceProvider();
 
     [Fact]
     public async Task ParseFile_WithTestContent_ReturnsCorrectGamesAndMoves()

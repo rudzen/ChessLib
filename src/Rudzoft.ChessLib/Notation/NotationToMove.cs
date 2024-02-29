@@ -31,7 +31,7 @@ using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Notation;
 
-public sealed class NotationToMove(ObjectPool<IMoveList> moveListPool) : INotationToMove
+public sealed class NotationToMove(ObjectPool<MoveList> moveListPool) : INotationToMove
 {
     public IReadOnlyList<Move> FromNotation(IPosition pos, IEnumerable<string> notationalMoves, INotation notation)
     {

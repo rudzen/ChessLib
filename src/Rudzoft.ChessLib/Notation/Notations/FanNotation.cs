@@ -32,8 +32,10 @@ using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Notation.Notations;
 
-public sealed class FanNotation(ObjectPool<IMoveList> moveLists) : Notation(moveLists)
+public sealed class FanNotation : Notation
 {
+    public FanNotation(ObjectPool<MoveList> moveLists) : base(moveLists) { }
+
     /// <summary>
     /// <para>Converts a move to FAN notation.</para>
     /// </summary>

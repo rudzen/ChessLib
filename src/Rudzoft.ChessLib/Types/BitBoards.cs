@@ -241,7 +241,6 @@ public static class BitBoards
         }
 
         // mini local helpers
-
         Span<PieceTypes> validMagicPieces = stackalloc PieceTypes[] { PieceTypes.Bishop, PieceTypes.Rook };
 
         var bb = AllSquares;
@@ -278,7 +277,6 @@ public static class BitBoards
             // Compute KingRings
             InitializeKingRing(s1, sq, file);
         }
-
 
         SlotFileBB =
         [

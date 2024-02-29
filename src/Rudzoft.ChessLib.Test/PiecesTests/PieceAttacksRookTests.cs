@@ -27,7 +27,7 @@ SOFTWARE.
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.ObjectPool;
 using Rudzoft.ChessLib.Hash;
-using Rudzoft.ChessLib.ObjectPoolPolicies;
+using Rudzoft.ChessLib.MoveGeneration;
 using Rudzoft.ChessLib.Types;
 using Rudzoft.ChessLib.Validation;
 
@@ -50,13 +50,13 @@ public sealed class PieceAttacksRookTests : PieceAttacks
             .AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>()
             .AddSingleton(static serviceProvider =>
             {
-                var provider = serviceProvider.GetRequiredService<ObjectPoolProvider>();
-                var policy = new MoveListPolicy();
-                return provider.Create(policy);
+            var provider = serviceProvider.GetRequiredService<ObjectPoolProvider>();
+            var policy = new DefaultPooledObjectPolicy<MoveList>();
+            return provider.Create(policy);
             })
             .BuildServiceProvider();
     }
-    
+
     /// <summary>
     /// Testing results of blocked rook attacks, they should always return 8 on the sides, and 14 in
     /// the corner

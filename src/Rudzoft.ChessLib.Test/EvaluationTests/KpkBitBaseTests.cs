@@ -30,7 +30,7 @@ using Rudzoft.ChessLib.Enums;
 using Rudzoft.ChessLib.Evaluation;
 using Rudzoft.ChessLib.Fen;
 using Rudzoft.ChessLib.Hash;
-using Rudzoft.ChessLib.ObjectPoolPolicies;
+using Rudzoft.ChessLib.MoveGeneration;
 using Rudzoft.ChessLib.Types;
 using Rudzoft.ChessLib.Validation;
 
@@ -55,7 +55,7 @@ public sealed class KpkBitBaseTests
             .AddSingleton(static serviceProvider =>
             {
                 var provider = serviceProvider.GetRequiredService<ObjectPoolProvider>();
-                var policy = new MoveListPolicy();
+                var policy = new DefaultPooledObjectPolicy<MoveList>();
                 return provider.Create(policy);
             })
             .BuildServiceProvider();
@@ -79,7 +79,7 @@ public sealed class KpkBitBaseTests
         var weakSide = ~strongSide;
 
         var kpkBitBase = _serviceProvider.GetRequiredService<IKpkBitBase>();
-        
+
         var strongKing = kpkBitBase.Normalize(pos, strongSide,  pos.GetPieceSquare(PieceTypes.King, strongSide));
         var strongPawn = kpkBitBase.Normalize(pos, strongSide, pos.GetPieceSquare(PieceTypes.Pawn, strongSide));
         var weakKing = kpkBitBase.Normalize(pos, strongSide, pos.GetPieceSquare(PieceTypes.King, weakSide));

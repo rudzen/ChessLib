@@ -31,8 +31,10 @@ using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Notation.Notations;
 
-public sealed class IccfNotation(ObjectPool<IMoveList> moveLists) : Notation(moveLists)
+public sealed class IccfNotation : Notation
 {
+    public IccfNotation(ObjectPool<MoveList> moveLists) : base(moveLists) { }
+
     /// <summary>
     /// <para>Converts a move to ICCF notation.</para>
     /// </summary>

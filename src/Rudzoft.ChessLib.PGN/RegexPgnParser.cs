@@ -34,10 +34,10 @@ public sealed partial class RegexPgnParser : IPgnParser
     private const int DefaultTagCapacity = 7;
     private const int DefaultMoveListCapacity = 24;
 
-    [GeneratedRegex("""\[(?<tagName>\w+)\s+"(?<tagValue>[^"]+)"\]""",  RegexOptions.NonBacktracking)]
+    [GeneratedRegex("""\[(?<tagName>\w+)\s+"(?<tagValue>[^"]+)"\]""", RegexOptions.NonBacktracking)]
     private static partial Regex TagPairRegex();
 
-    [GeneratedRegex(@"(?<moveNumber>\d+)\.\s*(?<whiteMove>\S+)(\s+(?<blackMove>\S+))?",  RegexOptions.NonBacktracking)]
+    [GeneratedRegex(@"(?<moveNumber>\d+)\.\s*(?<whiteMove>\S+)(\s+(?<blackMove>\S+))?", RegexOptions.NonBacktracking)]
     private static partial Regex MoveTextRegex();
 
     private static readonly PgnMove EmptyPgnMove = new(0, string.Empty, string.Empty);
@@ -57,7 +57,7 @@ public sealed partial class RegexPgnParser : IPgnParser
 
         var line = await streamReader.ReadLineAsync(cancellationToken);
 
-        while (line != null)
+        while (line is not null)
         {
             if (line.AsSpan().IsWhiteSpace())
                 inMoveSection = currentGameTags.Count > 0;
@@ -88,7 +88,7 @@ public sealed partial class RegexPgnParser : IPgnParser
     private static bool IsPgnGameResult(ReadOnlySpan<char> line)
     {
         var trimmedLine = line.TrimEnd();
-        
+
         if (trimmedLine.EndsWith(stackalloc char[] { '*' }, StringComparison.InvariantCultureIgnoreCase))
             return true;
 

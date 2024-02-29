@@ -32,8 +32,10 @@ using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Notation.Notations;
 
-public sealed class CoordinateNotation(ObjectPool<IMoveList> moveLists) : Notation(moveLists)
+public sealed class CoordinateNotation : Notation
 {
+    public CoordinateNotation(ObjectPool<MoveList> moveLists) : base(moveLists) { }
+
     [SkipLocalsInit]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override string Convert(IPosition pos, Move move)
@@ -41,7 +43,7 @@ public sealed class CoordinateNotation(ObjectPool<IMoveList> moveLists) : Notati
         var (from, to) = move;
 
         Span<char> re = stackalloc char[8];
-        var        i  = 0;
+        var i = 0;
 
         re[i++] = char.ToUpper(from.FileChar);
         re[i++] = from.RankChar;

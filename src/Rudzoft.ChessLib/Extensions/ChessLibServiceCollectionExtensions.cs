@@ -35,7 +35,6 @@ using Rudzoft.ChessLib.Hash.Tables.Transposition;
 using Rudzoft.ChessLib.MoveGeneration;
 using Rudzoft.ChessLib.Notation;
 using Rudzoft.ChessLib.Notation.Notations;
-using Rudzoft.ChessLib.ObjectPoolPolicies;
 using Rudzoft.ChessLib.Polyglot;
 using Rudzoft.ChessLib.Protocol.UCI;
 using Rudzoft.ChessLib.Types;
@@ -77,14 +76,14 @@ public static class ChessLibServiceCollectionExtensions
         serviceCollection.TryAddSingleton(static serviceProvider =>
         {
             var provider = serviceProvider.GetRequiredService<ObjectPoolProvider>();
-            var policy   = new MoveListPolicy();
+            var policy = new DefaultPooledObjectPolicy<MoveList>();
             return provider.Create(policy);
         });
 
         return serviceCollection
                .AddSingleton(static sp =>
                {
-                   var  pool = sp.GetRequiredService<ObjectPool<IMoveList>>();
+                   var  pool = sp.GetRequiredService<ObjectPool<MoveList>>();
                    IUci uci  = new Uci(pool);
                    uci.Initialize();
                    return uci;

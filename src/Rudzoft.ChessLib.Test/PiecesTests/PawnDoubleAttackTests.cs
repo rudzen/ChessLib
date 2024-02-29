@@ -29,7 +29,7 @@ using Microsoft.Extensions.ObjectPool;
 using Rudzoft.ChessLib.Enums;
 using Rudzoft.ChessLib.Fen;
 using Rudzoft.ChessLib.Hash;
-using Rudzoft.ChessLib.ObjectPoolPolicies;
+using Rudzoft.ChessLib.MoveGeneration;
 using Rudzoft.ChessLib.Types;
 using Rudzoft.ChessLib.Validation;
 
@@ -53,12 +53,12 @@ public sealed class PawnDoubleAttackTests
             .AddSingleton(static serviceProvider =>
             {
                 var provider = serviceProvider.GetRequiredService<ObjectPoolProvider>();
-                var policy = new MoveListPolicy();
+                var policy = new DefaultPooledObjectPolicy<MoveList>();
                 return provider.Create(policy);
             })
             .BuildServiceProvider();
     }
-    
+
     [Fact]
     public void WhitePlayerPawnDoubleAttacksAttackSpan()
     {
@@ -66,9 +66,9 @@ public sealed class PawnDoubleAttackTests
 
         var fenData = new FenData(Fen.Fen.StartPositionFen);
         var state = new State();
-        
+
         pos.Set(in fenData, ChessMode.Normal, state);
-        
+
         var whitePawns = pos.Pieces(PieceTypes.Pawn, Player.White);
 
         var attackSpan = whitePawns.PawnDoubleAttacks(Player.White);

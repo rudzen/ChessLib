@@ -33,7 +33,6 @@ using Rudzoft.ChessLib.Factories;
 using Rudzoft.ChessLib.Fen;
 using Rudzoft.ChessLib.Hash;
 using Rudzoft.ChessLib.MoveGeneration;
-using Rudzoft.ChessLib.ObjectPoolPolicies;
 using Rudzoft.ChessLib.Polyglot;
 using Rudzoft.ChessLib.Protocol.UCI;
 using Rudzoft.ChessLib.Types;
@@ -50,7 +49,7 @@ public sealed class PolyglotTests : IClassFixture<BookFixture>
     {
         var polyConfig = new PolyglotBookConfiguration { BookPath = string.Empty };
         var polyOptions = Options.Create(polyConfig);
-        
+
         _fixture = fixture;
         _serviceProvider = new ServiceCollection()
             .AddSingleton(polyOptions)
@@ -66,12 +65,12 @@ public sealed class PolyglotTests : IClassFixture<BookFixture>
             .AddSingleton(static serviceProvider =>
             {
                 var provider = serviceProvider.GetRequiredService<ObjectPoolProvider>();
-                var policy = new MoveListPolicy();
+                var policy = new DefaultPooledObjectPolicy<MoveList>();
                 return provider.Create(policy);
             })
             .AddSingleton(static sp =>
             {
-                var mlPool = sp.GetRequiredService<ObjectPool<IMoveList>>();
+                var mlPool = sp.GetRequiredService<ObjectPool<MoveList>>();
                 IUci uci = new Uci(mlPool);
                 uci.Initialize();
                 return uci;
@@ -108,12 +107,12 @@ public sealed class PolyglotTests : IClassFixture<BookFixture>
         const string fen = Fen.Fen.StartPositionFen;
 
         var bookPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-        
+
         Assert.NotNull(bookPath);
         Assert.NotEmpty(bookPath);
-        
+
         var path = Path.Combine(bookPath, _fixture.BookFile);
-        
+
         var pos = _serviceProvider.GetRequiredService<IPosition>();
 
         var fenData = new FenData(fen);
@@ -178,7 +177,7 @@ public sealed class PolyglotTests : IClassFixture<BookFixture>
         pos.Set(in fenData, ChessMode.Normal, state);
 
         var uci = _serviceProvider.GetRequiredService<IUci>();
-        
+
         var book = _serviceProvider
             .GetRequiredService<IPolyglotBookFactory>()
             .Create();

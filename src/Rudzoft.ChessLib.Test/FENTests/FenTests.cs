@@ -30,7 +30,7 @@ using Rudzoft.ChessLib.Enums;
 using Rudzoft.ChessLib.Exceptions;
 using Rudzoft.ChessLib.Fen;
 using Rudzoft.ChessLib.Hash;
-using Rudzoft.ChessLib.ObjectPoolPolicies;
+using Rudzoft.ChessLib.MoveGeneration;
 using Rudzoft.ChessLib.Types;
 using Rudzoft.ChessLib.Validation;
 
@@ -54,7 +54,7 @@ public sealed class FenTests
             .AddSingleton(static serviceProvider =>
             {
                 var provider = serviceProvider.GetRequiredService<ObjectPoolProvider>();
-                var policy = new MoveListPolicy();
+                var policy = new DefaultPooledObjectPolicy<MoveList>();
                 return provider.Create(policy);
             })
             .BuildServiceProvider();
@@ -74,7 +74,7 @@ public sealed class FenTests
         var fenData = new FenData(fen);
         var state = new State();
         pos.Set(in fenData, ChessMode.Normal, state);
-        
+
         var actualFen = pos.GenerateFen().ToString();
         Assert.Equal(fen, actualFen);
     }

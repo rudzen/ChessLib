@@ -49,23 +49,23 @@ public sealed class PolyglotBook : IPolyglotBook
     private readonly string _bookFilePath;
     private readonly int _entrySize;
     private readonly Random _rnd;
-    private readonly ObjectPool<IMoveList> _moveListPool;
+    private readonly ObjectPool<MoveList> _moveListPool;
 
-    private PolyglotBook(ObjectPool<IMoveList> pool)
+    private PolyglotBook(ObjectPool<MoveList> pool)
     {
-        _entrySize    = Unsafe.SizeOf<PolyglotBookEntry>();
-        _rnd          = new(DateTime.Now.Millisecond);
+        _entrySize = Unsafe.SizeOf<PolyglotBookEntry>();
+        _rnd = new(DateTime.Now.Millisecond);
         _moveListPool = pool;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static PolyglotBook Create(ObjectPool<IMoveList> pool)
+    internal static PolyglotBook Create(ObjectPool<MoveList> pool)
     {
         return new(pool);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static PolyglotBook Create(ObjectPool<IMoveList> pool, string path, string file)
+    internal static PolyglotBook Create(ObjectPool<MoveList> pool, string path, string file)
     {
         return new(pool)
         {
@@ -92,7 +92,7 @@ public sealed class PolyglotBook : IPolyglotBook
 
     public Move Probe(IPosition pos, bool pickBest = true)
     {
-        if (_bookFilePath.IsNullOrEmpty() || _fileStream == null ||_binaryReader == null)
+        if (_bookFilePath.IsNullOrEmpty() || _fileStream == null || _binaryReader == null)
             return Move.EmptyMove;
 
         var polyMove = ushort.MinValue;
@@ -166,7 +166,8 @@ public sealed class PolyglotBook : IPolyglotBook
         return mm;
     }
 
-    private static Move SelectMove(in IPosition pos, Square polyFrom, Square polyTo, MoveTypes polyType, ReadOnlySpan<ValMove> moves)
+    private static Move SelectMove(
+        in IPosition pos, Square polyFrom, Square polyTo, MoveTypes polyType, ReadOnlySpan<ValMove> moves)
     {
         // Iterate all known moves for current position to find a match.
         foreach (var valMove in moves)

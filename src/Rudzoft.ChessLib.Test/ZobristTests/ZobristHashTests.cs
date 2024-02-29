@@ -28,7 +28,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.ObjectPool;
 using Rudzoft.ChessLib.Enums;
 using Rudzoft.ChessLib.Hash;
-using Rudzoft.ChessLib.ObjectPoolPolicies;
+using Rudzoft.ChessLib.MoveGeneration;
 using Rudzoft.ChessLib.Types;
 using Rudzoft.ChessLib.Validation;
 using File = Rudzoft.ChessLib.Types.File;
@@ -53,7 +53,7 @@ public sealed class ZobristHashTests
             .AddSingleton(static serviceProvider =>
             {
                 var provider = serviceProvider.GetRequiredService<ObjectPoolProvider>();
-                var policy = new MoveListPolicy();
+                var policy = new DefaultPooledObjectPolicy<MoveList>();
                 return provider.Create(policy);
             })
             .BuildServiceProvider();
@@ -105,7 +105,7 @@ public sealed class ZobristHashTests
         var states = new List<State> { new() };
 
         pos.Set(fen, ChessMode.Normal, states[stateIndex]);
-        
+
         var startKey = pos.State.PositionKey;
 
         var move = new Move(from, to, moveType);

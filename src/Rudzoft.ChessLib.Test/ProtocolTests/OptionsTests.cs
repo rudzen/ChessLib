@@ -26,7 +26,6 @@ SOFTWARE.
 
 using Microsoft.Extensions.ObjectPool;
 using Rudzoft.ChessLib.MoveGeneration;
-using Rudzoft.ChessLib.ObjectPoolPolicies;
 using Rudzoft.ChessLib.Protocol.UCI;
 
 namespace Rudzoft.ChessLib.Test.ProtocolTests;
@@ -38,23 +37,23 @@ public sealed class OptionsTests
     [InlineData("Boolean Test", false, false, "option name Boolean Test type Check default false")]
     public void Boolean(string name, bool value, bool expected, string uciString)
     {
-        var policy = new MoveListPolicy();
-        var provider = new DefaultObjectPool<IMoveList>(policy);
+        var provider = new DefaultObjectPoolProvider();
+        var policy = new DefaultPooledObjectPolicy<MoveList>();
 
-        IUci uci = new Uci(provider);
-        
+        IUci uci = new Uci(provider.Create(policy));
+
         uci.Initialize();
-        
+
         var option = new Option(name, 0, value);
         uci.AddOption(name, option);
 
         var actual = option.GetBool();
-        
+
         Assert.Equal(expected, actual);
         Assert.Equal(expected, option);
-        
+
         var t = uci.ToString();
-        
+
         Assert.Contains(uciString, t);
     }
 }

@@ -32,7 +32,6 @@ using Rudzoft.ChessLib.Fen;
 using Rudzoft.ChessLib.Hash;
 using Rudzoft.ChessLib.Hash.Tables.Transposition;
 using Rudzoft.ChessLib.MoveGeneration;
-using Rudzoft.ChessLib.ObjectPoolPolicies;
 using Rudzoft.ChessLib.Protocol.UCI;
 using Rudzoft.ChessLib.Types;
 using Rudzoft.ChessLib.Validation;
@@ -61,12 +60,12 @@ public sealed class UciTests
             .AddSingleton(static serviceProvider =>
             {
                 var provider = serviceProvider.GetRequiredService<ObjectPoolProvider>();
-                var policy = new MoveListPolicy();
+                var policy = new DefaultPooledObjectPolicy<MoveList>();
                 return provider.Create(policy);
             })
             .AddSingleton(static sp =>
             {
-                var pool = sp.GetRequiredService<ObjectPool<IMoveList>>();
+                var pool = sp.GetRequiredService<ObjectPool<MoveList>>();
                 IUci uci = new Uci(pool);
                 uci.Initialize();
                 return uci;

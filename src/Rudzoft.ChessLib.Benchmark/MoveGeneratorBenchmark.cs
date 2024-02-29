@@ -2,7 +2,6 @@
 using Rudzoft.ChessLib.Enums;
 using Rudzoft.ChessLib.Hash;
 using Rudzoft.ChessLib.MoveGeneration;
-using Rudzoft.ChessLib.ObjectPoolPolicies;
 using Rudzoft.ChessLib.Types;
 using Rudzoft.ChessLib.Validation;
 
@@ -23,10 +22,10 @@ public class MoveGeneratorBenchmark
         )
     ]
     public string _fen;
-    
+
     private IPosition _pos;
 
-    private ObjectPool<IMoveList> _objectPool;
+    private ObjectPool<MoveList> _objectPool;
 
     [GlobalSetup]
     public void Setup()
@@ -38,7 +37,10 @@ public class MoveGeneratorBenchmark
         var zobrist = new Zobrist(rKiss);
         var cuckoo = new Cuckoo(zobrist);
         var validator = new PositionValidator(zobrist);
-        _objectPool = new DefaultObjectPool<IMoveList>(new MoveListPolicy());
+        var provider = new DefaultObjectPoolProvider();
+        var policy = new DefaultPooledObjectPolicy<MoveList>();
+
+        _objectPool = provider.Create(policy);
         _pos = new Position(board, pieceValue, zobrist, cuckoo, validator, _objectPool);
         _pos.Set(_fen, ChessMode.Normal, state);
     }
@@ -49,7 +51,7 @@ public class MoveGeneratorBenchmark
         var moves = _pos.GenerateMoves();
         return moves.Length;
     }
-    
+
     [Benchmark]
     public int GenerateMovesWithPool()
     {

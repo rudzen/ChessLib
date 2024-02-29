@@ -29,7 +29,6 @@ using Microsoft.Extensions.Options;
 using Rudzoft.ChessLib.Hash;
 using Rudzoft.ChessLib.Hash.Tables.Transposition;
 using Rudzoft.ChessLib.MoveGeneration;
-using Rudzoft.ChessLib.ObjectPoolPolicies;
 using Rudzoft.ChessLib.Perft;
 using Rudzoft.ChessLib.Perft.Interfaces;
 using Rudzoft.ChessLib.Protocol.UCI;
@@ -66,7 +65,9 @@ public class PerftBench
         var options = Options.Create(ttConfig);
         var tt = new TranspositionTable(options);
 
-        var moveListObjectPool = new DefaultObjectPool<IMoveList>(new MoveListPolicy());
+        var provider = new DefaultObjectPoolProvider();
+        var policy = new DefaultPooledObjectPolicy<MoveList>();
+        var moveListObjectPool = provider.Create(policy);
 
         var uci = new Uci(moveListObjectPool);
         uci.Initialize();

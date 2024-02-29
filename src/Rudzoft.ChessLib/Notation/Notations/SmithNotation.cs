@@ -32,8 +32,10 @@ using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Notation.Notations;
 
-public sealed class SmithNotation(ObjectPool<IMoveList> moveLists) : Notation(moveLists)
+public sealed class SmithNotation : Notation
 {
+    public SmithNotation(ObjectPool<MoveList> moveLists) : base(moveLists) { }
+
     /// <summary>
     /// <para>Converts a move to Smith notation.</para>
     /// </summary>

@@ -31,7 +31,7 @@ using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Notation.Notations;
 
-public sealed class UciNotation(ObjectPool<IMoveList> moveLists) : Notation(moveLists)
+public sealed class UciNotation(ObjectPool<MoveList> moveLists) : Notation(moveLists)
 {
     /// <summary>
     /// <para>Converts a move to UCI notation.</para>

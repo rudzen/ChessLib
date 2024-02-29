@@ -3,7 +3,7 @@ using Microsoft.Extensions.ObjectPool;
 using Microsoft.Extensions.Options;
 using Rudzoft.ChessLib.Hash;
 using Rudzoft.ChessLib.Hash.Tables.Transposition;
-using Rudzoft.ChessLib.ObjectPoolPolicies;
+using Rudzoft.ChessLib.MoveGeneration;
 using Rudzoft.ChessLib.Protocol.UCI;
 using Rudzoft.ChessLib.Types;
 using Rudzoft.ChessLib.Validation;
@@ -36,7 +36,7 @@ public abstract class PerftVerify
             .AddSingleton(static serviceProvider =>
             {
                 var provider = serviceProvider.GetRequiredService<ObjectPoolProvider>();
-                var policy = new MoveListPolicy();
+                var policy = new DefaultPooledObjectPolicy<MoveList>();
                 return provider.Create(policy);
             })
             .AddSingleton<ITranspositionTable, TranspositionTable>()
@@ -49,11 +49,11 @@ public abstract class PerftVerify
         g.NewGame(fen);
 
         var initialZobrist = g.Pos.State.PositionKey;
-        
+
         var actual = g.Perft(depth);
 
         var afterZobrist = g.Pos.State.PositionKey;
-        
+
         Assert.Equal(expected, actual);
         Assert.Equal(initialZobrist, afterZobrist);
     }

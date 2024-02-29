@@ -27,6 +27,7 @@ SOFTWARE.
 using System.Collections;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Microsoft.Extensions.ObjectPool;
 using Rudzoft.ChessLib.Enums;
 using Rudzoft.ChessLib.Types;
 
@@ -37,7 +38,7 @@ namespace Rudzoft.ChessLib.MoveGeneration;
  * It works through an index pointer,
  * which means that re-use is never actually clearing any data, just resetting the index.
  */
-public sealed class MoveList : IMoveList
+public sealed class MoveList : IReadOnlyCollection<ValMove>, IResettable
 {
     private readonly ValMove[] _moves = new ValMove[218];
     private int _cur;
@@ -137,4 +138,11 @@ public sealed class MoveList : IMoveList
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     IEnumerator IEnumerable.GetEnumerator()
         => GetEnumerator();
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool TryReset()
+    {
+        Clear();
+        return true;
+    }
 }

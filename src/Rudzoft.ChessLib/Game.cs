@@ -34,7 +34,6 @@ using Rudzoft.ChessLib.Fen;
 using Rudzoft.ChessLib.Hash.Tables.Transposition;
 using Rudzoft.ChessLib.MoveGeneration;
 using Rudzoft.ChessLib.Protocol.UCI;
-using Rudzoft.ChessLib.Tables.Perft;
 using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib;
@@ -45,10 +44,10 @@ public sealed class Game(
     ICpu cpu,
     ISearchParameters searchParameters,
     IPosition pos,
-    ObjectPool<IMoveList> moveListPool)
+    ObjectPool<MoveList> moveListPool)
     : IGame
 {
-    private readonly PerftTable            _perftTable   = new();
+    private readonly PertT            _perftTable   = new(8);
 
     public Action<IPieceSquare> PieceUpdated => pos.PieceUpdated;
 
@@ -119,30 +118,23 @@ public sealed class Game(
 
     public UInt128 Perft(int depth, bool root = true)
     {
-        ref var table = ref _perftTable.TryGet(pos, depth, out var found);
-
-        if (found)
-        {
-            Console.WriteLine($"Found table: {depth} = {table.Count}");
-            return table.Count;
-        }
-
         var tot = UInt128.MinValue;
         var ml  = moveListPool.Get();
         ml.Generate(in pos);
-
         var state = new State();
 
         var moves = ml.Get();
         ref var movesSpace = ref MemoryMarshal.GetReference(moves);
+
+        if (root && depth <= 1)
+        {
+            tot = (ulong)ml.Length;
+            moveListPool.Return(ml);
+            return tot;
+        }
+
         for (var i = 0; i < moves.Length; ++i)
         {
-            if (root && depth <= 1)
-            {
-                tot++;
-                continue;
-            }
-
             var valMove = Unsafe.Add(ref movesSpace, i);
             var m = valMove.Move;
 
@@ -163,10 +155,6 @@ public sealed class Game(
 
             pos.TakeMove(m);
         }
-
-        table.Key = pos.State.PositionKey;
-        table.Depth = depth;
-        table.Count = tot;
 
         moveListPool.Return(ml);
 

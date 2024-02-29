@@ -498,11 +498,11 @@ public static class MoveGenerator
                 moves[index++].Move = Move.Create(from, to, MoveTypes.Promotion);
         }
 
-        const MoveGenerationTypes noneQueenPromotion = MoveGenerationTypes.Quiets
+        const MoveGenerationTypes nonQueenPromotion = MoveGenerationTypes.Quiets
                                                        | MoveGenerationTypes.Evasions
                                                        | MoveGenerationTypes.NonEvasions;
 
-        if (!types.HasFlagFast(noneQueenPromotion))
+        if (!types.HasFlagFast(nonQueenPromotion))
             return index;
 
         moves[index++].Move = Move.Create(from, to, MoveTypes.Promotion, PieceTypes.Rook);

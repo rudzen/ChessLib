@@ -55,7 +55,7 @@ public sealed class Position : IPosition
     private readonly Value[] _nonPawnMaterial;
     private readonly ICuckoo _cuckoo;
     private readonly ObjectPool<StringBuilder> _outputObjectPool;
-    private readonly ObjectPool<IMoveList> _moveListPool;
+    private readonly ObjectPool<MoveList> _moveListPool;
     private readonly IPositionValidator _positionValidator;
     private Player _sideToMove;
 
@@ -65,7 +65,7 @@ public sealed class Position : IPosition
         IZobrist zobrist,
         ICuckoo cuckoo,
         IPositionValidator positionValidator,
-        ObjectPool<IMoveList> moveListPool)
+        ObjectPool<MoveList> moveListPool)
     {
         _castleKingPath = new BitBoard[CastleRight.Count];
         _castleRookPath = new BitBoard[CastleRight.Count];
@@ -567,7 +567,7 @@ public sealed class Position : IPosition
         // If the moving piece is a king, check whether the destination square is attacked by
         // the opponent.
         if (MovedPiece(m).Type() == PieceTypes.King)
-            return m.IsCastleMove() || (AttacksTo(to) & Board.Pieces(~us)).IsEmpty;
+            return (AttacksTo(to) & Board.Pieces(~us)).IsEmpty;
 
         // A non-king move is legal if and only if it is not pinned or it is moving along the
         // ray towards or away from the king.
@@ -579,22 +579,47 @@ public sealed class Position : IPosition
         // After castling, the rook and king final positions are the same in Chess960 as
         // they would be in standard chess.
 
+        var them = ~us;
         var isKingSide = to > from;
-        to = (isKingSide ? Square.G1 : Square.C1).Relative(us);
-        var step = isKingSide ? Direction.West : Direction.East;
+        Direction step;
+
+        if (isKingSide)
+        {
+            to = Square.G1.Relative(us);
+            step = Directions.West;
+        }
+        else
+        {
+            to = Square.C1.Relative(us);
+            step = Directions.East;
+        }
 
         for (var s = to; s != from; s += step)
-            if (AttacksTo(s) & Board.Pieces(~us))
+            if (AttacksTo(s) & Board.Pieces(them))
                 return false;
 
         // In case of Chess960, verify that when moving the castling rook we do not discover
         // some hidden checker. For instance an enemy queen in SQ_A1 when castling rook is
         // in SQ_B1.
-        return ChessMode == ChessMode.Normal || (GetAttacks(
-                    to,
-                    PieceTypes.Rook,
-                    Board.Pieces() ^ m.ToSquare()) & Board.Pieces(~us, PieceTypes.Rook, PieceTypes.Queen)
-            ).IsEmpty;
+        if (ChessMode == ChessMode.Normal)
+            return true;
+
+        var attacks = GetAttacks(
+            sq: to,
+            pt: PieceTypes.Rook,
+            occ: Board.Pieces() ^ m.ToSquare()
+        );
+
+        var occupied = Board.Pieces(them, PieceTypes.Rook, PieceTypes.Queen);
+
+        return (attacks & occupied).IsEmpty;
+
+        static (Square, Direction) GetRookSquareAndDirection(Square toSq, Square fromSq, Player us)
+        {
+            return toSq > fromSq
+                ? (Square.G1.Relative(us), Direction.West)
+                : (Square.C1.Relative(us), Direction.East);
+        }
     }
 
     private bool IsEnPassantMoveLegal(Square to, Player us, Square from, Square ksq)
@@ -727,7 +752,8 @@ public sealed class Position : IPosition
             Debug.Assert(pc == PieceTypes.King.MakePiece(us));
             Debug.Assert(capturedPiece == PieceTypes.Rook.MakePiece(us));
 
-            var (rookFrom, rookTo) = DoCastle(us, from, ref to, CastlePerform.Do);
+            DoCastle(us, from, ref to, out var rookFrom, out var rookTo, CastlePerform.Do);
+            // var (rookFrom, rookTo) = DoCastle(us, from, ref to, CastlePerform.Do);
 
             posKey ^= Zobrist.Psq(rookFrom, capturedPiece) ^ Zobrist.Psq(rookTo, capturedPiece);
 
@@ -787,7 +813,7 @@ public sealed class Position : IPosition
         {
             posKey ^= Zobrist.Castleling(state.CastlelingRights);
             state.CastlelingRights &= ~(_castlingRightsMask[from.AsInt()] | _castlingRightsMask[to.AsInt()]);
-            posKey ^= Zobrist.Castleling(state.CastlelingRights);
+            //posKey ^= Zobrist.Castleling(state.CastlelingRights);
         }
 
         // Move the piece. The tricky Chess960 castle is handled earlier
@@ -1282,7 +1308,7 @@ public sealed class Position : IPosition
         }
 
         if (type == MoveTypes.Castling)
-            DoCastle(us, from, ref to, CastlePerform.Undo);
+            DoCastle(us, from, ref to, out var _, out var _, CastlePerform.Undo);
         else
         {
             // Note: The parameters are reversed, since we move the piece "back"
@@ -1299,7 +1325,7 @@ public sealed class Position : IPosition
                 {
                     captureSquare -= us.PawnPushDistance();
 
-                    Debug.Assert(GetPiece(to).Type() == PieceTypes.Pawn);
+                    // Debug.Assert(GetPiece(to).Type() == PieceTypes.Pawn);
                     Debug.Assert(to == State.Previous.EnPassantSquare);
                     Debug.Assert(to.RelativeRank(us) == Ranks.Rank6);
                     Debug.Assert(!IsOccupied(captureSquare));
@@ -1406,31 +1432,28 @@ public sealed class Position : IPosition
         => (CastleRights)((int)CastleRights.WhiteKing << ((!isKingSide).AsByte() + 2 * c.Side));
 
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-    private (Square, Square) DoCastle(Player us, Square from, ref Square to, CastlePerform castlePerform)
+    private void DoCastle(
+        Player us,
+        Square from,
+        ref Square to,
+        out Square rookFrom,
+        out Square rookTo,
+        CastlePerform castlePerform)
     {
         var kingSide = to > from;
+        var doCastleling = castlePerform == CastlePerform.Do;
 
-        // Castling is encoded as "king captures friendly rook"
-        var rookFromTo = (rookFrom: to, rookTo: (kingSide ? Square.F1 : Square.D1).Relative(us));
-
+        rookFrom = to; // Castling is encoded as "king captures friendly rook"
+        rookTo = (kingSide ? Square.F1 : Square.D1).Relative(us);
         to = (kingSide ? Square.G1 : Square.C1).Relative(us);
 
-        // If we are performing castle move, just swap the squares
-        if (castlePerform == CastlePerform.Do)
-        {
-            (to, from) = (from, to);
-            (rookFromTo.rookFrom, rookFromTo.rookTo) = (rookFromTo.rookTo, rookFromTo.rookFrom);
-        }
-
         // Remove both pieces first since squares could overlap in Chess960
-        RemovePiece(to);
-        RemovePiece(rookFromTo.rookTo);
-        Board.ClearPiece(to);
-        Board.ClearPiece(rookFromTo.rookTo);
-        AddPiece(PieceTypes.King.MakePiece(us), from);
-        AddPiece(PieceTypes.Rook.MakePiece(us), rookFromTo.rookFrom);
-
-        return rookFromTo;
+        RemovePiece(doCastleling ? from : to);
+        RemovePiece(doCastleling ? rookFrom : rookTo);
+        Board.ClearPiece(doCastleling ? from : to);
+        Board.ClearPiece(doCastleling ? rookFrom : rookTo);
+        AddPiece(PieceTypes.King.MakePiece(us), doCastleling ? to : from);
+        AddPiece(PieceTypes.Rook.MakePiece(us), doCastleling ? rookTo : rookFrom);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

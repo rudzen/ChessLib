@@ -29,7 +29,7 @@ using Microsoft.Extensions.ObjectPool;
 using Rudzoft.ChessLib.Enums;
 using Rudzoft.ChessLib.Fen;
 using Rudzoft.ChessLib.Hash;
-using Rudzoft.ChessLib.ObjectPoolPolicies;
+using Rudzoft.ChessLib.MoveGeneration;
 using Rudzoft.ChessLib.Types;
 using Rudzoft.ChessLib.Validation;
 
@@ -53,7 +53,7 @@ public sealed class PositionTests
             .AddSingleton(static serviceProvider =>
             {
                 var provider = serviceProvider.GetRequiredService<ObjectPoolProvider>();
-                var policy = new MoveListPolicy();
+                var policy = new DefaultPooledObjectPolicy<MoveList>();
                 return provider.Create(policy);
             })
             .BuildServiceProvider();
@@ -74,9 +74,9 @@ public sealed class PositionTests
         pos.AddPiece(Piece.WhitePawn, square);
 
         var actualFen = pos.FenNotation;
-        
+
         Assert.Equal(expectedFen, actualFen);
-        
+
         var piece = pos.GetPiece(square);
         Assert.Equal(Piece.WhitePawn, piece);
     }
@@ -109,7 +109,7 @@ public sealed class PositionTests
 
         Assert.Equal(expectedSquare, actual);
     }
-    
+
     [Theory]
     [InlineData("KPK", "k7/8/8/8/8/8/8/KP6 w - - 0 10")]
     [InlineData("KNNK", "k7/8/8/8/8/8/8/KNN5 w - - 0 10")]
@@ -127,7 +127,7 @@ public sealed class PositionTests
 
         var posCode = pos.Set(code, Player.White, in state);
         var codeMaterialKey = posCode.State.MaterialKey;
-        
+
         Assert.Equal(materialKey, codeMaterialKey);
 
         var codeFen = pos.GenerateFen().ToString();

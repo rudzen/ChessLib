@@ -32,8 +32,10 @@ using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Notation.Notations;
 
-public sealed class LanNotation(ObjectPool<IMoveList> moveLists) : Notation(moveLists)
+public sealed class LanNotation : Notation
 {
+    public LanNotation(ObjectPool<MoveList> moveLists) : base(moveLists) { }
+
     /// <summary>
     /// <para>Converts a move to LAN notation.</para>
     /// </summary>

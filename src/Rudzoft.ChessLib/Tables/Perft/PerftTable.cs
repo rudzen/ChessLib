@@ -32,7 +32,7 @@ namespace Rudzoft.ChessLib.Tables.Perft;
 public struct PerftTableEntry : IPerftTableEntry
 {
     public HashKey Key { get; set; }
-    
+
     public UInt128 Count { get; set; }
 
     public int Depth { get; set; }
@@ -52,18 +52,16 @@ public sealed class PerftTable : HashTable<IPerftTableEntry>
 
     public PerftTable()
     {
-        Initialize(ElementSize, HashMemory, static key => new PerftTableEntry { Key = key, Count = ulong.MinValue, Depth = -1 });
+        Initialize(ElementSize, HashMemory, static key => new PerftTableEntry { Key = key, Count = UInt128.MinValue, Depth = -1 });
         _mask = Count - 1;
     }
 
-    public ref IPerftTableEntry TryGet(in IPosition pos, int depth, out bool found)
+    public ref IPerftTableEntry TryGet(in HashKey key, int depth, out bool found)
     {
-        var posKey = pos.State.PositionKey;
-        var entryKey = posKey & _mask ^ depth;
+        var entryKey = key.Key % (ulong)Count;
+
         ref var entry = ref this[entryKey];
-        found = entry.Key == entryKey && entry.Depth == depth;
-        // if (!found)
-        //     entry.Key = entryKey;
+        found = entry.Key == key && entry.Depth == depth;
         return ref entry;
     }
 

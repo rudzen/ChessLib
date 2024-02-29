@@ -48,7 +48,6 @@ public sealed class NonRegexPgnParser : IPgnParser
             if (string.IsNullOrWhiteSpace(line))
             {
                 inMoveSection = currentGameTags.Count > 0;
-                continue;
             }
 
             if (inMoveSection)
