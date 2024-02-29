@@ -68,6 +68,9 @@ public struct Score : IEquatable<Score>
     public static implicit operator Score(Vector2 v) => new(v);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static implicit operator Vector2(Score v) => v._data;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Score operator *(Score s, int v) => new(Vector2.Multiply(s._data, v));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -92,16 +95,16 @@ public struct Score : IEquatable<Score>
         mg = _data.X;
         eg = _data.Y;
     }
-    
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AddMg(int v) => _data.X += v;
-    
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AddEg(int v) => _data.Y += v;
-    
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void SubtractMg(int v) => _data.X -= v;
-    
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void SubtractEg(int v) => _data.Y -= v;
 
