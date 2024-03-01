@@ -64,9 +64,9 @@ public readonly record struct BitBoard(ulong Value) : IEnumerable<Square>, IMinM
 
     public static BitBoard Empty => BitBoards.EmptyBitBoard;
 
-    public static BitBoard MaxValue => BitBoards.EmptyBitBoard;
+    public static BitBoard MaxValue => BitBoards.AllSquares;
 
-    public static BitBoard MinValue => BitBoards.AllSquares;
+    public static BitBoard MinValue => BitBoards.EmptyBitBoard;
 
     public string String => Convert.ToString((long)Value, 2).PadLeft(64, '0');
 

@@ -167,6 +167,9 @@ public readonly record struct File(Files Value)
     public static bool operator false(File f) => !f.IsOk;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static implicit operator int(File f) => (int)f.Value;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public int AsInt() => (int)Value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -198,10 +201,10 @@ public readonly record struct File(Files Value)
     /// </summary>
     /// <returns>The distance to the edge file</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public int EdgeDistance() => Math.Min(AsInt() - FileA.AsInt(), FileH.AsInt() - AsInt());
+    public int EdgeDistance() => Math.Min(AsInt() - FileA, FileH - AsInt());
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public File Clamp(File min, File max) => new(Math.Clamp(Value.AsInt(), min.AsInt(), max.AsInt()));
+    public File Clamp(File min, File max) => new(Math.Clamp(Value.AsInt(), min, max));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public int Distance(File other) => Math.Abs(AsInt() - other.AsInt());

@@ -81,7 +81,7 @@ public sealed class Blockage : IBlockage
 
         var ourKsq = pos.GetKingSquare(us);
 
-        if (ourKsq.RelativeRank(us) > fenceRank[ourKsq.File.AsInt()].Relative(us))
+        if (ourKsq.RelativeRank(us) > fenceRank[ourKsq.File].Relative(us))
             return false;
 
         var theirKsq = pos.GetKingSquare(them);
@@ -94,7 +94,7 @@ public sealed class Blockage : IBlockage
             var (r, f) = sq;
             var rr = r.Relative(us);
 
-            if (r > fenceRank[f.AsInt()])
+            if (r > fenceRank[f])
             {
                 if ((theirPawns & sq.PassedPawnFrontAttackSpan(us)).IsEmpty &&
                     (theirKsq.File != f || theirKsq.Rank.Relative(us) < rr))
@@ -136,7 +136,7 @@ public sealed class Blockage : IBlockage
                 if (BitBoards.MoreThanOne(ourPawns & f))
                     return false;
             }
-            else if (r < fenceRank[f.AsInt()])
+            else if (r < fenceRank[f])
             {
                 sq += up;
                 r = sq.Rank;
@@ -237,7 +237,7 @@ public sealed class Blockage : IBlockage
         {
             var sq = BitBoards.PopLsb(ref covered);
             var (r, f) = sq;
-            fenceRank[f.AsInt()] = r;
+            fenceRank[f] = r;
         }
     }
 
@@ -322,7 +322,7 @@ public sealed class Blockage : IBlockage
     }
 
     private static Square NextFenceRankSquare(Span<Rank> fenceRank, File f, Player them)
-        => new Square(fenceRank[f.AsInt()] * 8 + f.AsInt()) + them.PawnPushDistance();
+        => new Square(fenceRank[f] * 8 + f.AsInt()) + them.PawnPushDistance();
 
     private static bool FormFence(in BitBoard marked, ref BitBoard fence, ref BitBoard processed, Player us)
     {

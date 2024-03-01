@@ -74,13 +74,13 @@ public sealed class PerftRunner : IPerftRunner
         ObjectPool<PerftResult> resultPool,
         IUci uci)
     {
-        _epdParser                =   parser;
-        _perft                    =   perft;
+        _epdParser = parser;
+        _perft = perft;
         _perft.BoardPrintCallback ??= s => Log.Information("Board:\n{Board}", s);
-        _transpositionTable       =   transpositionTable;
-        _resultPool               =   resultPool;
-        _uci                      =   uci;
-        _runners                  =   [ParseEpd, ParseFen];
+        _transpositionTable = transpositionTable;
+        _resultPool = resultPool;
+        _uci = uci;
+        _runners = [ParseEpd, ParseFen];
 
         configuration.Bind("TranspositionTable", TranspositionTableOptions);
 
@@ -102,7 +102,7 @@ public sealed class PerftRunner : IPerftRunner
         if (TranspositionTableOptions is TTOptions { Use: true } ttOptions)
             _transpositionTable.SetSize(ttOptions.Size);
 
-        var errors      = 0;
+        var errors = 0;
         var runnerIndex = (Options is FenOptions).AsByte();
         _usingEpd = runnerIndex == 0;
         var positions = _runners[runnerIndex].Invoke(cancellationToken);
@@ -204,7 +204,6 @@ public sealed class PerftRunner : IPerftRunner
     private async Task<PerftResult> ComputePerft(CancellationToken cancellationToken)
     {
         var result = _resultPool.Get();
-        result.Clear();
 
         var pp = _perft.Positions[^1];
         var baseFileName = SaveResults
@@ -228,7 +227,7 @@ public sealed class PerftRunner : IPerftRunner
             var start = Stopwatch.GetTimestamp();
 
             var perftResult = await _perft.DoPerftAsync(depth).ConfigureAwait(false);
-            var elapsedMs   = Stopwatch.GetElapsedTime(start);
+            var elapsedMs = Stopwatch.GetElapsedTime(start);
 
             ComputeResults(in perftResult, depth, in expected, in elapsedMs, result);
 
@@ -248,7 +247,7 @@ public sealed class PerftRunner : IPerftRunner
     }
 
     private static async Task WriteOutput(
-        IPerftResult result,
+        PerftResult result,
         string baseFileName,
         CancellationToken cancellationToken)
     {
@@ -262,20 +261,20 @@ public sealed class PerftRunner : IPerftRunner
         int depth,
         in ulong expected,
         in TimeSpan elapsedMs,
-        IPerftResult results)
+        PerftResult results)
     {
         // compute results
         results.Result = result;
-        results.Depth  = depth;
+        results.Depth = depth;
         // add 1 to avoid potential dbz
-        results.Elapsed       = elapsedMs.Add(TimeSpan.FromMicroseconds(1));
-        results.Nps           = _uci.Nps(in result, results.Elapsed);
+        results.Elapsed = elapsedMs.Add(TimeSpan.FromMicroseconds(1));
+        results.Nps = _uci.Nps(in result, results.Elapsed);
         results.CorrectResult = expected;
-        results.Passed        = expected == result;
-        results.TableHits     = _transpositionTable.Hits;
+        results.Passed = expected == result;
+        results.TableHits = _transpositionTable.Hits;
     }
 
-    private int LogResults(IPerftResult result)
+    private int LogResults(PerftResult result)
     {
         Log.Information("Time passed : {Elapsed}", result.Elapsed);
         Log.Information("Nps         : {Nps}", result.Nps);

@@ -102,7 +102,7 @@ public sealed class KpkBitBase : IKpkBitBase
         return strongKsq
                | (weakKingSq << 6)
                | (stm << 12)
-               | (strongPawnSq.File.AsInt() << 13)
+               | (strongPawnSq.File << 13)
                | ((Rank.Rank7 - strongPawnSq.Rank) << 15);
     }
 

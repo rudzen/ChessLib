@@ -218,7 +218,7 @@ public static class BitBoards
             {
                 var file = sq.File;
                 ForwardFileBB[p][sq] = ForwardRanksBB[p][sq.Rank] & file.BitBoardFile();
-                PawnAttackSpanBB[p][sq] = ForwardRanksBB[p][sq.Rank] & AdjacentFilesBB[file.AsInt()];
+                PawnAttackSpanBB[p][sq] = ForwardRanksBB[p][sq.Rank] & AdjacentFilesBB[file];
                 PassedPawnMaskBB[p][sq] = ForwardFileBB[p][sq] | PawnAttackSpanBB[p][sq];
             }
         }
@@ -281,7 +281,7 @@ public static class BitBoards
         return;
 
         static int distanceRank(Square x, Square y) => distance(x.Rank, y.Rank);
-        static int distanceFile(Square x, Square y) => distance(x.File.AsInt(), y.File.AsInt());
+        static int distanceFile(Square x, Square y) => distance(x.File, y.File);
         // local helper functions to calculate distance
         static int distance(int x, int y) => Math.Abs(x - y);
     }
@@ -420,7 +420,7 @@ public static class BitBoards
     /// <param name="f">The file</param>
     /// <returns>The bitboard of file</returns>
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-    public static BitBoard BitBoardFile(this File f) => FileABB << f.AsInt();
+    public static BitBoard BitBoardFile(this File f) => FileABB << f;
 
     /// <summary>
     /// Returns all squares in front of the square in the same file as bitboard
@@ -475,7 +475,7 @@ public static class BitBoards
     public static BitBoard SlotFile(CastleSides cs) => SlotFileBB[cs.AsInt()];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard AdjacentFiles(File f) => AdjacentFilesBB[f.AsInt()];
+    public static BitBoard AdjacentFiles(File f) => AdjacentFilesBB[f];
 
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public static bool Aligned(this Square sq1, Square sq2, Square sq3) => (Line(sq1, sq2) & sq3).IsNotEmpty;

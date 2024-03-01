@@ -166,7 +166,7 @@ public sealed class Zobrist : IZobrist
     public HashKey Side() => _zobristSide;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public ref HashKey EnPassant(File file) => ref _zobristEpFile[file.AsInt()];
+    public ref HashKey EnPassant(File f) => ref _zobristEpFile[f];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public HashKey EnPassant(Square sq)

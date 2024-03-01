@@ -1567,7 +1567,7 @@ public sealed class Position : IPosition
                 'K' => RookSquare(Square.H1.Relative(c), rook),
                 'Q' => RookSquare(Square.A1.Relative(c), rook),
                 var _ => char.IsBetween(token, 'A', 'H')
-                    ? new(Rank.Rank1.Relative(c).AsInt(), new File(token - 'A'))
+                    ? new(Rank.Rank1.Relative(c), new File(token - 'A'))
                     : Square.None
             };
 

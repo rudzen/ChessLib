@@ -18,6 +18,6 @@ public interface IZobrist
     ref HashKey Castleling(CastleRights index);
     ref HashKey Castleling(CastleRight index);
     HashKey Side();
-    ref HashKey EnPassant(File file);
+    ref HashKey EnPassant(File f);
     HashKey EnPassant(Square sq);
 }

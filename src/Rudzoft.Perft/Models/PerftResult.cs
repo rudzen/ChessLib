@@ -24,27 +24,30 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using Microsoft.Extensions.ObjectPool;
+
 namespace Rudzoft.Perft.Models;
 
-public sealed class PerftResult : IPerftResult
+public sealed class PerftResult : IResettable
 {
-    public string   Id            { get; set; }
-    public string   Fen           { get; set; }
-    public int      Depth         { get; set; }
-    public UInt128  Result        { get; set; }
-    public UInt128  CorrectResult { get; set; }
-    public TimeSpan Elapsed       { get; set; }
-    public ulong    Nps           { get; set; }
-    public ulong    TableHits     { get; set; }
-    public bool     Passed        { get; set; }
-    public int      Errors        { get; set; }
+    public string Id { get; set; }
+    public string Fen { get; set; }
+    public int Depth { get; set; }
+    public UInt128 Result { get; set; }
+    public UInt128 CorrectResult { get; set; }
+    public TimeSpan Elapsed { get; set; }
+    public ulong Nps { get; set; }
+    public ulong TableHits { get; set; }
+    public bool Passed { get; set; }
+    public int Errors { get; set; }
 
-    public void Clear()
+    public bool TryReset()
     {
         Fen = string.Empty;
         Depth = Errors = 0;
         Result = CorrectResult = Nps = TableHits = ulong.MinValue;
         Elapsed = TimeSpan.Zero;
         Passed = false;
+        return true;
     }
 }

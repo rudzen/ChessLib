@@ -345,7 +345,7 @@ public readonly record struct Square(Squares Value) : ISpanFormattable, ICompara
     {
         if (Value < other.Value)
             return -1;
-        return Value > other.Value ? 1 : 0;
+        return (Value > other.Value).AsByte();
     }
 
     /// <summary>

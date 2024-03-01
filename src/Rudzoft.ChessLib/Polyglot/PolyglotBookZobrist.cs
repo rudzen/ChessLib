@@ -360,7 +360,7 @@ internal static class PolyglotBookZobrist
         => CastleKeys[rights.AsInt()];
 
     internal static ulong EnPassant(File f)
-        => EnPassantKeys[f.AsInt()];
+        => EnPassantKeys[f];
 
     internal static ulong Turn()
         => TurnKey;
