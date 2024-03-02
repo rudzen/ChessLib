@@ -1180,20 +1180,19 @@ public sealed class Position : IPosition
 
         if (enPassant)
         {
-            Rank r = new(fenChunk[1] - '1');
-            File f = new(fenChunk[0] - 'a');
-            State.EnPassantSquare = new(r, f);
+            var r = new Rank(fenChunk[1] - '1');
+            var f = new File(fenChunk[0] - 'a');
+            var epSquare = new Square(r, f);
 
-            var otherSide = ~_sideToMove;
+            var us = _sideToMove;
+            var them = ~us;
 
-            enPassant = !(State.EnPassantSquare.PawnAttack(otherSide) & Pieces(PieceTypes.Pawn, _sideToMove)).IsEmpty
-                        && !(Pieces(PieceTypes.Pawn, otherSide) &
-                             (State.EnPassantSquare + otherSide.PawnPushDistance())).IsEmpty
-                        && (Pieces() &
-                            (State.EnPassantSquare | (State.EnPassantSquare + _sideToMove.PawnPushDistance()))).IsEmpty;
+            if (!(epSquare.PawnAttack(them) & Pieces(PieceTypes.Pawn, us)).IsEmpty
+                && !(Pieces(PieceTypes.Pawn, them) & (epSquare + them.PawnPushDistance())).IsEmpty
+                && (Pieces() & (epSquare | (epSquare + us.PawnPushDistance()))).IsEmpty)
+                State.EnPassantSquare = epSquare;
         }
-
-        if (!enPassant)
+        else
             State.EnPassantSquare = Square.None;
     }
 
