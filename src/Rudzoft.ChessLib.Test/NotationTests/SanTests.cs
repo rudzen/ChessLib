@@ -149,12 +149,13 @@ public sealed class SanTests
         var moveNotation = _serviceProvider.GetRequiredService<IMoveNotation>();
         var notation     = moveNotation.ToNotation(moveNotations);
 
-        var sanMoves = pos
-                       .GenerateMoves()
-                       .Select(static em => em.Move)
-                       .Where(m => pos.GetPiece(m.FromSquare()) == targetPiece)
-                       .Select(m => notation.Convert(pos, m))
-                       .ToArray();
+        var ml = pos.GenerateMoves();
+        ml.Generate(in pos);
+
+        var sanMoves = ml
+            .GetMoves(move => pos.GetPiece(move.FromSquare()) == targetPiece)
+            .Select(m => notation.Convert(pos, m))
+            .ToArray();
 
         foreach (var notationResult in expectedNotations)
             Assert.Contains(sanMoves, s => s == notationResult);

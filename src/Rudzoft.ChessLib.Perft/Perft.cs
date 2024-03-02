@@ -76,14 +76,17 @@ public sealed class Perft(IGame game, IEnumerable<PerftPosition> positions) : IP
         foreach (var fd in Positions.Select(static p => new FenData(p.Fen)))
         {
             Game.Pos.Set(in fd, ChessMode.Normal, in state);
-            var result = Game.Perft(depth);
+            var baseKey = game.Pos.State.PositionKey;
+            var result = Game.Perft(in baseKey, depth);
             yield return result;
         }
     }
 
-    public Task<UInt128> DoPerftAsync(int depth)
-        => Task.Run(()
-            => Game.Perft(depth));
+    public UInt128 DoPerftSimple(int depth)
+    {
+        var baseKey = game.Pos.State.PositionKey;
+        return Game.Perft(in baseKey, depth);
+    }
 
     public string GetBoard()
         => Game.ToString();
@@ -92,7 +95,7 @@ public sealed class Perft(IGame game, IEnumerable<PerftPosition> positions) : IP
     {
         var fp = new FenData(pp.Fen);
         var state = new State();
-        Game.Pos.Set(in fp, ChessMode.Normal, in state);
+        game.Pos.Set(in fp, ChessMode.Normal, in state);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

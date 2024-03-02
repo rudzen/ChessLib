@@ -24,7 +24,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System.Collections;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Microsoft.Extensions.ObjectPool;
@@ -38,12 +37,10 @@ namespace Rudzoft.ChessLib.MoveGeneration;
  * It works through an index pointer,
  * which means that re-use is never actually clearing any data, just resetting the index.
  */
-public sealed class MoveList : IReadOnlyCollection<ValMove>, IResettable
+public sealed class MoveList : IResettable
 {
     private readonly ValMove[] _moves = new ValMove[218];
     private int _cur;
-
-    int IReadOnlyCollection<ValMove>.Count => Length;
 
     public int Length { get; private set; }
 
@@ -66,7 +63,10 @@ public sealed class MoveList : IReadOnlyCollection<ValMove>, IResettable
     public void Add(in ValMove item) => _moves[Length++] = item;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void Add(Move item) => _moves[Length++].Move = item;
+    public void Add(Move item)
+    {
+        _moves[Length++].Move = item;
+    }
 
     /// <inheritdoc />
     /// <summary>
@@ -111,10 +111,29 @@ public sealed class MoveList : IReadOnlyCollection<ValMove>, IResettable
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public IEnumerable<Move> GetMoves(Predicate<Move> predicate)
+    {
+        for (var i = 0; i < Length; i++)
+        {
+            var m = this[i];
+            if (predicate(m.Move))
+                yield return m.Move;
+        }
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public IEnumerable<Move> GetMoves()
+    {
+        for (var i = 0; i < Length; i++)
+            yield return this[i].Move;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Generate(in IPosition pos, MoveGenerationTypes types = MoveGenerationTypes.Legal)
     {
         _cur = 0;
-        Length = MoveGenerator.Generate(in pos, _moves.AsSpan(), 0, pos.SideToMove, types);
+        ref var movesSpace = ref MemoryMarshal.GetReference(_moves.AsSpan());
+        Length = MoveGenerator.Generate(in pos, ref movesSpace, 0, pos.SideToMove, types);
         _moves[Length] = ValMove.Empty;
     }
 
@@ -122,7 +141,8 @@ public sealed class MoveList : IReadOnlyCollection<ValMove>, IResettable
     public static int GenerateMoveCount(in IPosition pos, MoveGenerationTypes types = MoveGenerationTypes.Legal)
     {
         Span<ValMove> moves = stackalloc ValMove[218];
-        return MoveGenerator.Generate(in pos, moves, 0, pos.SideToMove, types);
+        ref var movesSpace = ref MemoryMarshal.GetReference(moves);
+        return MoveGenerator.Generate(in pos, ref movesSpace, 0, pos.SideToMove, types);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -130,14 +150,6 @@ public sealed class MoveList : IReadOnlyCollection<ValMove>, IResettable
         Length == 0
             ? ReadOnlySpan<ValMove>.Empty
             : _moves.AsSpan()[..Length];
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public IEnumerator<ValMove> GetEnumerator()
-        => _moves.Take(Length).GetEnumerator();
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    IEnumerator IEnumerable.GetEnumerator()
-        => GetEnumerator();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool TryReset()

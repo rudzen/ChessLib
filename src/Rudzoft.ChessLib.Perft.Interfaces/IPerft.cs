@@ -40,7 +40,7 @@ public interface IPerft
 
     IAsyncEnumerable<UInt128> DoPerft(int depth);
 
-    Task<UInt128> DoPerftAsync(int depth);
+    UInt128 DoPerftSimple(int depth);
 
     void ClearPositions();
 

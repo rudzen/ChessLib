@@ -99,6 +99,15 @@ public readonly record struct Move(ushort Data) : ISpanFormattable
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static int Create(ref ValMove moves, int index, Square from, ref BitBoard to)
+    {
+        while (to)
+            Unsafe.Add(ref moves, index++).Move = Create(from, BitBoards.PopLsb(ref to));
+        return index;
+    }
+
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Move Create(Square from, Square to, MoveTypes moveType, PieceTypes promoPt = PieceTypes.Knight)
         => new(from, to, moveType, promoPt);
 

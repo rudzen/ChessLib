@@ -226,7 +226,7 @@ public sealed class PerftRunner : IPerftRunner
 
             var start = Stopwatch.GetTimestamp();
 
-            var perftResult = await _perft.DoPerftAsync(depth).ConfigureAwait(false);
+            var perftResult = _perft.DoPerftSimple(depth);
             var elapsedMs = Stopwatch.GetElapsedTime(start);
 
             ComputeResults(in perftResult, depth, in expected, in elapsedMs, result);

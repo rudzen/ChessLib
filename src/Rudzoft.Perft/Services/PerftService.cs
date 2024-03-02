@@ -16,7 +16,7 @@ public sealed class PerftService : IHostedService
     private readonly IServiceProvider _serviceProvider;
     private readonly IHostApplicationLifetime _applicationLifetime;
     private readonly IBuildTimeStamp _buildTimeStamp;
-    
+
     private ActorSystem _actorSystem;
     private IActorRef _perftActor;
 
@@ -47,13 +47,11 @@ public sealed class PerftService : IHostedService
         // start ActorSystem
         _actorSystem = ActorSystem.Create("perft", actorSystemSetup);
         _perftActor = _actorSystem.ActorOf(PerftActor.Prop(_serviceProvider));
-        
+
         _perftActor.Tell(new PerftActor.StartPerft());
-        
+
         // add a continuation task that will guarantee shutdown of application if ActorSystem terminates
-        _actorSystem.WhenTerminated.ContinueWith(_ => {
-            _applicationLifetime.StopApplication();
-        }, cancellationToken);
+        _actorSystem.WhenTerminated.ContinueWith(_ => { _applicationLifetime.StopApplication(); }, cancellationToken);
         return Task.CompletedTask;
     }
 

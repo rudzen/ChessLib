@@ -825,7 +825,7 @@ public sealed class Position : IPosition
         if (pc.Type() == PieceTypes.Pawn)
         {
             // Set en-passant square, only if moved pawn can be captured
-            if ((to.Value.AsInt() ^ from.Value.AsInt()) == 16
+            if ((to.AsInt() ^ from.AsInt()) == 16
                 && CanEnPassant(them, from + us.PawnPushDistance()))
             {
                 state.EnPassantSquare = from + us.PawnPushDistance();

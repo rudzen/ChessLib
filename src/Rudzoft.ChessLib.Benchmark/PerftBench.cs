@@ -99,11 +99,11 @@ public class PerftBench
     }
 
     [Benchmark]
-    public async Task<UInt128> Perft()
+    public UInt128 Perft()
     {
         var total = UInt128.MinValue;
         for (var i = 0; i < N; ++i)
-            total += await _perft.DoPerftAsync(N);
+            total += _perft.DoPerftSimple(N);
 
         return total;
     }
