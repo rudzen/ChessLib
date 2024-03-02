@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2022 Rudy Alex Kohn
+Copyright (c) 2017-2023 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,8 +24,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System.Linq;
-using FluentAssertions;
 using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Test.PiecesTests;
@@ -52,7 +50,7 @@ public sealed class PieceAttacksKingTests : PieceAttacks, IClassFixture<RegularM
         {
             var sq = BitBoards.PopLsb(ref bb);
             var attacks = _fixture.RegAttacks[attackIndex](sq);
-            var isCorner = !(_fixture.BoardCorners & sq).IsEmpty;
+            var isCorner = (_fixture.BoardCorners & sq).IsNotEmpty;
             var expected = _fixture.KingExpected[index];
             if (isCorner)
                 expected -= 2; /* for corners */
@@ -65,10 +63,12 @@ public sealed class PieceAttacksKingTests : PieceAttacks, IClassFixture<RegularM
     {
         const int index = (int)EBands.Beta;
         const int attackIndex = 2;
-        var expected = _fixture.KingExpected[index];
-        var actuals = Bands[index].Select(x => _fixture.RegAttacks[attackIndex](x).Count);
-
-        actuals.Should().AllBeEquivalentTo(expected);
+        var bands = Bands[index];
+        var expected = _fixture.KingExpected[index] * bands.Count;
+        var actuals = bands.Select(x => _fixture.RegAttacks[attackIndex](x).Count);
+        var actual = actuals.Sum();
+        
+        Assert.Equal(expected, actual);
     }
 
     [Fact]
@@ -76,10 +76,12 @@ public sealed class PieceAttacksKingTests : PieceAttacks, IClassFixture<RegularM
     {
         const int index = (int)EBands.Gamma;
         const int attackIndex = 2;
-        var expected = _fixture.KingExpected[index];
-        var actuals = Bands[index].Select(x => _fixture.RegAttacks[attackIndex](x).Count);
+        var band = Bands[index];
+        var expected = _fixture.KingExpected[index] * band.Count;
+        var actuals = band.Select(x => _fixture.RegAttacks[attackIndex](x).Count);
+        var actual = actuals.Sum();
 
-        actuals.Should().AllBeEquivalentTo(expected);
+        Assert.Equal(expected, actual);
     }
 
     [Fact]
@@ -87,9 +89,11 @@ public sealed class PieceAttacksKingTests : PieceAttacks, IClassFixture<RegularM
     {
         const int index = (int)EBands.Delta;
         const int attackIndex = 2;
-        var expected = _fixture.KingExpected[index];
-        var actuals = Bands[index].Select(x => _fixture.RegAttacks[attackIndex](x).Count);
-
-        actuals.Should().AllBeEquivalentTo(expected);
+        var band = Bands[index];
+        var expected = _fixture.KingExpected[index] * band.Count;
+        var actuals = band.Select(x => _fixture.RegAttacks[attackIndex](x).Count);
+        var actual = actuals.Sum();
+        
+        Assert.Equal(expected, actual);
     }
 }

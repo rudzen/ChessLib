@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2022 Rudy Alex Kohn
+Copyright (c) 2017-2023 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System;
 using System.Runtime.CompilerServices;
 using Rudzoft.ChessLib.Extensions;
 
@@ -48,16 +47,16 @@ public static class MoveTypesExtensions
 /// Move struct. Contains a single ushort for move related information. Also includes set and
 /// get functions for the relevant data stored in the bits.
 /// </summary>
-public record struct Move(ushort Data) : ISpanFormattable
+public readonly record struct Move(ushort Data) : ISpanFormattable
 {
     private const int MaxMoveStringSize = 5;
 
-    public Move(Square from, Square to) : this((ushort)(to | (from.AsInt() << 6)))
+    public Move(Square from, Square to) : this((ushort)(to | (from << 6)))
     {
     }
 
     public Move(Square from, Square to, MoveTypes moveType, PieceTypes promoPt = PieceTypes.Knight)
-        : this((ushort)(to | (from.AsInt() << 6) | moveType.AsInt() | ((promoPt - PieceTypes.Knight) << 12)))
+        : this((ushort)(to | (from << 6) | moveType.AsInt() | ((promoPt - PieceTypes.Knight) << 12)))
     {
     }
 
@@ -80,22 +79,19 @@ public record struct Move(ushort Data) : ISpanFormattable
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator Move(string value)
-        => new(new Square(value[1] - '1', value[0] - 'a'), new Square(value[3] - '1', value[2] - 'a'));
+        => new(new(value[1] - '1', value[0] - 'a'), new(value[3] - '1', value[2] - 'a'));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator Move(ExtMove extMove)
-        => extMove.Move;
+    public static implicit operator Move(ValMove valMove) => valMove.Move;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator Move(ushort value)
-        => new(value);
+    public static implicit operator Move(ushort value) => new(value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Move Create(Square from, Square to)
-        => new(from, to);
+    public static Move Create(Square from, Square to) => new(from, to);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static int Create(Span<ExtMove> moves, int index, Square from, ref BitBoard to)
+    public static int Create(Span<ValMove> moves, int index, Square from, ref BitBoard to)
     {
         while (to)
             moves[index++].Move = Create(from, BitBoards.PopLsb(ref to));
@@ -103,48 +99,47 @@ public record struct Move(ushort Data) : ISpanFormattable
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static int Create(ref ValMove moves, int index, Square from, ref BitBoard to)
+    {
+        while (to)
+            Unsafe.Add(ref moves, index++).Move = Create(from, BitBoards.PopLsb(ref to));
+        return index;
+    }
+
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Move Create(Square from, Square to, MoveTypes moveType, PieceTypes promoPt = PieceTypes.Knight)
         => new(from, to, moveType, promoPt);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Square FromSquare()
-        => new((Data >> 6) & 0x3F);
+    public Square FromSquare() => new((Data >> 6) & 0x3F);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Square ToSquare()
-        => new(Data & 0x3F);
+    public Square ToSquare() => new(Data & 0x3F);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public PieceTypes PromotedPieceType()
-        => (PieceTypes)(((Data >> 12) & 3) + 2);
+    public PieceTypes PromotedPieceType() => (PieceTypes)(((Data >> 12) & 3) + 2);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool IsQueenPromotion()
-        => PromotedPieceType() == PieceTypes.Queen;
+    public bool IsQueenPromotion() => PromotedPieceType() == PieceTypes.Queen;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public MoveTypes MoveType()
-        => (MoveTypes)(Data & (3 << 14));
+    public MoveTypes MoveType() => (MoveTypes)(Data & (3 << 14));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool IsType(MoveTypes moveType)
-        => MoveType() == moveType;
+    public bool IsType(MoveTypes moveType) => MoveType() == moveType;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool IsEnPassantMove()
-        => MoveType() == MoveTypes.Enpassant;
+    public bool IsEnPassantMove() => MoveType() == MoveTypes.Enpassant;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool IsCastleMove()
-        => MoveType() == MoveTypes.Castling;
+    public bool IsCastleMove() => MoveType() == MoveTypes.Castling;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool IsPromotionMove()
-        => MoveType() == MoveTypes.Promotion;
+    public bool IsPromotionMove() => MoveType() == MoveTypes.Promotion;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool IsNullMove()
-        => Data == 0;
+    public bool IsNullMove() => Data == 0;
 
     /// <summary>
     /// Makes no assumption of the legality of the move,
@@ -152,17 +147,15 @@ public record struct Move(ushort Data) : ISpanFormattable
     /// </summary>
     /// <returns>true if not the same from and to square</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool IsValidMove()
-        => FromSquare() != ToSquare();
+    public bool IsValidMove() => FromSquare() != ToSquare();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool Equals(Move other)
-        => Data == other.Data;
+    public bool Equals(Move other) => Data == other.Data;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override int GetHashCode()
-        => Data;
+    public override int GetHashCode() => Data;
 
+    [SkipLocalsInit]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override string ToString()
     {
@@ -171,7 +164,7 @@ public record struct Move(ushort Data) : ISpanFormattable
 
         Span<char> s = stackalloc char[MaxMoveStringSize];
         return TryFormat(s, out var size)
-            ? new string(s[..size])
+            ? new(s[..size])
             : "(error)";
     }
 

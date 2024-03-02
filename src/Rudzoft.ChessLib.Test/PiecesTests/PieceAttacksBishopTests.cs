@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2022 Rudy Alex Kohn
+Copyright (c) 2017-2023 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -62,7 +62,7 @@ public sealed class PieceAttacksBishopTests : PieceAttacks
         while (border)
         {
             var sq = BitBoards.PopLsb(ref border);
-            var attacks = sq.BishopAttacks(borderInner);
+            var attacks = sq.BishopAttacks(in borderInner);
             Assert.False(attacks.IsEmpty);
             var expected = corners & sq ? expectedCorner : expectedSide;
             var actual = attacks.Count;

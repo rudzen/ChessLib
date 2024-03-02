@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2022 Rudy Alex Kohn
+Copyright (c) 2017-2023 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,39 +24,45 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System;
 using System.Runtime.CompilerServices;
+using Microsoft.Extensions.ObjectPool;
 using Rudzoft.ChessLib.Extensions;
+using Rudzoft.ChessLib.MoveGeneration;
 using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Notation.Notations;
 
 public sealed class SmithNotation : Notation
 {
-    public SmithNotation(IPosition pos) : base(pos)
-    {
-    }
+    public SmithNotation(ObjectPool<MoveList> moveLists) : base(moveLists) { }
 
+    /// <summary>
+    /// <para>Converts a move to Smith notation.</para>
+    /// </summary>
+    /// <param name="pos">The current position</param>
+    /// <param name="move">The move to convert</param>
+    /// <returns>Smith move string</returns>
+    [SkipLocalsInit]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override string Convert(Move move)
+    public override string Convert(IPosition pos, Move move)
     {
         var (from, to) = move;
 
         Span<char> re = stackalloc char[5];
-        var i = 0;
+        var        i  = 0;
 
         re[i++] = from.FileChar;
         re[i++] = from.RankChar;
         re[i++] = to.FileChar;
         re[i++] = to.RankChar;
 
-        var captured = Pos.GetPiece(to);
+        var captured = pos.GetPiece(to);
 
         if (captured != Piece.EmptyPiece)
             re[i++] = captured.GetPieceChar();
         else if (move.IsCastleMove())
             re[i++] = 'c';
 
-        return new string(re[..i]);
+        return new(re[..i]);
     }
 }

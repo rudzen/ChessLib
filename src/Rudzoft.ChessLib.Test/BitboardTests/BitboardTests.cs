@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2022 Rudy Alex Kohn
+Copyright (c) 2017-2023 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,8 +24,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System;
+using System.Runtime.CompilerServices;
 using Rudzoft.ChessLib.Types;
+using File = Rudzoft.ChessLib.Types.File;
 
 namespace Rudzoft.ChessLib.Test.BitboardTests;
 
@@ -46,6 +47,7 @@ public sealed class BitboardTests
     }
 
     [Fact]
+    [SkipLocalsInit]
     public void BitBoardOrAll()
     {
         Span<Square> baseSquares = stackalloc Square[8]
@@ -127,8 +129,8 @@ public sealed class BitboardTests
     public void EmptyCount()
     {
         const int expected = 0;
-        var actual = BitBoards.EmptyBitBoard.Count;
-        Assert.Equal(expected, actual);
+        var actual = BitBoards.EmptyBitBoard;
+        Assert.Equal(expected, actual.Count);
         Assert.True(BitBoards.EmptyBitBoard.IsEmpty);
     }
 

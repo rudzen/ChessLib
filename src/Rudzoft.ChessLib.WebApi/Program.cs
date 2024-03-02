@@ -1,21 +1,18 @@
-using Rudzoft.ChessLib;
-using Rudzoft.ChessLib.Types;
+using Rudzoft.ChessLib.Extensions;
 using Rudzoft.ChessLib.WebApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
+builder.Services.AddHealthChecks();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddTransient<IMoveGeneratorService, MoveGeneratorService>();
-builder.Services.AddTransient<IPosition, Position>();
-builder.Services.AddTransient<IBoard, Board>();
-builder.Services.AddSingleton<IPieceValue, PieceValue>();
-builder.Services.AddTransient<IGame, Game>();
+builder.Services.AddChessLib()
+    .AddTransient<IMoveGeneratorService, MoveGeneratorService>();
 
 var app = builder.Build();
 

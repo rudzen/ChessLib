@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2022 Rudy Alex Kohn
+Copyright (c) 2017-2023 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -25,6 +25,7 @@ SOFTWARE.
 */
 
 using System.Runtime.CompilerServices;
+using Microsoft.Extensions.DependencyInjection;
 using Rudzoft.ChessLib.Exceptions;
 using Rudzoft.ChessLib.Notation.Notations;
 
@@ -34,29 +35,21 @@ namespace Rudzoft.ChessLib.Notation;
 /// Constructs string representation of a move based on specified move notation type.
 /// See https://en.wikipedia.org/wiki/Chess_notation
 /// </summary>
-public sealed class MoveNotation : IMoveNotation
+public sealed class MoveNotation(IServiceProvider sp) : IMoveNotation
 {
-    private readonly INotation[] _notations;
-
-    private MoveNotation(IPosition pos)
-    {
-        _notations = new INotation[]
-        {
-            new SanNotation(pos),
-            new FanNotation(pos),
-            new LanNotation(pos),
-            new RanNotation(pos),
-            null, // Cran
-            new SmithNotation(pos),
-            null, // Descriptive
-            new CoordinateNotation(pos),
-            new IccfNotation(pos),
-            new UciNotation(pos)
-        };
-    }
-
-    public static IMoveNotation Create(IPosition pos)
-        => new MoveNotation(pos);
+    private readonly INotation[] _notations =
+    [
+        sp.GetKeyedService<INotation>(MoveNotations.San),
+        sp.GetKeyedService<INotation>(MoveNotations.Fan),
+        sp.GetKeyedService<INotation>(MoveNotations.Lan),
+        sp.GetKeyedService<INotation>(MoveNotations.Ran),
+        null, // Cran
+        sp.GetKeyedService<INotation>(MoveNotations.Smith),
+        null, // Descriptive
+        sp.GetKeyedService<INotation>(MoveNotations.Coordinate),
+        sp.GetKeyedService<INotation>(MoveNotations.ICCF),
+        sp.GetKeyedService<INotation>(MoveNotations.Uci)
+    ];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public INotation ToNotation(MoveNotations moveNotation = MoveNotations.Fan)

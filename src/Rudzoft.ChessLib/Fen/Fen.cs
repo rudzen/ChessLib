@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2022 Rudy Alex Kohn
+Copyright (c) 2017-2023 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,8 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using Rudzoft.ChessLib.Exceptions;
 using Rudzoft.ChessLib.Extensions;
@@ -39,7 +39,9 @@ public static class Fen
 
     public const int MaxFenLen = 128;
 
-    private const string FenRankRegexSnippet = @"[1-8KkQqRrBbNnPp]{1,8}";
+    private const string FenRankRegexSnippet = "[1-8KkQqRrBbNnPp]{1,8}";
+
+    private const string ValidChars = "012345678pPnNbBrRqQkK/ w-abcdefgh";
 
     private const char Space = ' ';
 
@@ -49,9 +51,12 @@ public static class Fen
 
     private const int SeparatorCount = 7;
 
-    private static readonly Lazy<Regex> ValidFenRegex = new(static () => new Regex(
-       string.Format(@"^ \s* {0}/{0}/{0}/{0}/{0}/{0}/{0}/{0} \s+ (?:w|b) \s+ (?:[KkQq]+|\-) \s+ (?:[a-h][1-8]|\-) \s+ \d+ \s+ \d+ \s* $", FenRankRegexSnippet),
-       RegexOptions.Compiled | RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline));
+    private static readonly Regex ValidFenRegex = new(
+        string.Format(
+            """^ \s* {0}/{0}/{0}/{0}/{0}/{0}/{0}/{0} \s+ (?:w|b) \s+ (?:[KkQq]+|\-) \s+ (?:[a-h][1-8]|\-) \s+ \d+ \s+ \d+ \s* $""",
+            FenRankRegexSnippet),
+        RegexOptions.Compiled | RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline |
+        RegexOptions.NonBacktracking | RegexOptions.ExplicitCapture);
 
     /// <summary>
     /// Performs basic validation of FEN string.
@@ -65,28 +70,37 @@ public static class Fen
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void Validate(string fen)
     {
-        var f = fen.Trim().AsSpan();
+        var f = fen.AsSpan().Trim();
+
+        if (f.IsEmpty)
+            throw new InvalidFenException("Fen is empty.");
+
+        var invalidCharIndex = f.IndexOfAnyExcept(ValidChars.AsSpan());
+
+        if (invalidCharIndex > -1)
+            throw new InvalidFenException($"Invalid char detected in fen. fen={f}, pos={invalidCharIndex}");
 
         if (f.Length >= MaxFenLen)
-            throw new InvalidFen($"Invalid length for fen {fen}.");
+            throw new InvalidFenException($"Invalid length for fen {fen}.");
 
-        if (!ValidFenRegex.Value.IsMatch(fen))
-            throw new InvalidFen($"Invalid format for fen {fen}.");
+        if (!ValidFenRegex.IsMatch(fen))
+            throw new InvalidFenException($"Invalid format for fen {fen}.");
 
         CountValidity(f);
         if (!CountPieceValidity(f))
-            throw new InvalidFen($"Invalid piece validity for fen {fen}");
+            throw new InvalidFenException($"Invalid piece validity for fen {fen}");
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsDelimiter(char c) => c == Space;
 
+    [SkipLocalsInit]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static bool CountPieceValidity(ReadOnlySpan<char> s)
     {
         var spaceIndex = s.IndexOf(Space);
         if (spaceIndex == -1)
-            throw new InvalidFen($"Invalid fen {s.ToString()}");
+            throw new InvalidFenException($"Invalid fen {s.ToString()}");
 
         var mainSection = s[..spaceIndex];
 
@@ -94,47 +108,44 @@ public static class Fen
 
         // piece count storage, using index 0 = '/' count
         Span<int> pieceCount = stackalloc int[Pieces.PieceNb.AsInt()];
+        pieceCount.Clear();
 
-        foreach (var t in mainSection)
+        ref var mainSectionSpace = ref MemoryMarshal.GetReference(mainSection);
+
+        for (var i = 0; i < mainSection.Length; ++i)
         {
+            var t = Unsafe.Add(ref mainSectionSpace, i);
             if (t == '/')
             {
                 if (++pieceCount[0] > SeparatorCount)
-                    throw new InvalidFen($"Invalid fen (too many separators) {s.ToString()}");
+                    throw new InvalidFenException($"Invalid fen (too many separators) {s.ToString()}");
+
                 continue;
             }
 
             if (char.IsNumber(t))
             {
-                if (!t.InBetween('1', '8'))
-                    throw new InvalidFen($"Invalid fen (not a valid square jump) {s.ToString()}");
+                if (!char.IsBetween(t, '1', '8'))
+                    throw new InvalidFenException($"Invalid fen (not a valid square jump) {s.ToString()}");
+
                 continue;
             }
 
             var pieceIndex = PieceExtensions.PieceChars.IndexOf(t);
 
             if (pieceIndex == -1)
-                throw new InvalidFen($"Invalid fen (unknown piece) {s.ToString()}");
+                throw new InvalidFenException($"Invalid fen (unknown piece) {s.ToString()}");
 
             var pc = new Piece((Pieces)pieceIndex);
             var pt = pc.Type();
 
-            pieceCount[pc.AsInt()]++;
+            pieceCount[pc]++;
 
             var limit = limits[pt.AsInt()];
 
-            if (pieceCount[pc.AsInt()] > limit)
-                throw new InvalidFen($"Invalid fen (piece limit exceeded for {pc}) {s.ToString()}");
-        }
-
-        // check for summed up values
-        static bool GetSpanSum(ReadOnlySpan<int> span, int limit)
-        {
-            var sum = 0;
-            foreach (var v in span)
-                sum += v;
-
-            return sum <= limit;
+            if (pieceCount[pc] > limit)
+                throw new InvalidFenException(
+                    $"Invalid fen (piece limit exceeded for {pc}. index={i},limit={limit},count={pieceCount[pc]}) {s.ToString()}");
         }
 
         var whitePieces = pieceCount.Slice(1, 5);
@@ -142,22 +153,34 @@ public static class Fen
         var valid = GetSpanSum(whitePieces, 15);
 
         if (!valid)
-            throw new InvalidFen($"Invalid fen (white piece count exceeds limit) {s.ToString()}");
+            throw new InvalidFenException($"Invalid fen (white piece count exceeds limit) {s.ToString()}");
 
         var blackPieces = pieceCount.Slice(9, 5);
 
         valid = GetSpanSum(blackPieces, 15);
 
         if (!valid)
-            throw new InvalidFen($"Invalid fen (black piece count exceeds limit) {s.ToString()}");
+            throw new InvalidFenException($"Invalid fen (black piece count exceeds limit) {s.ToString()}");
 
         spaceIndex = s.LastIndexOf(' ');
         var endSection = s[spaceIndex..];
 
         if (Maths.ToIntegral(endSection) >= 2048)
-            throw new InvalidFen($"Invalid half move count for fen {s.ToString()}");
+            throw new InvalidFenException($"Invalid half move count for fen {s.ToString()}");
 
         return true;
+
+        // check for summed up values
+        static bool GetSpanSum(ReadOnlySpan<int> span, int limit)
+        {
+            var sum = 0;
+
+            ref var spanSpace = ref MemoryMarshal.GetReference(span);
+            for (var i = 0; i < span.Length; ++i)
+                sum += Unsafe.Add(ref spanSpace, i);
+
+            return sum <= limit;
+        }
     }
 
     /// <summary>
@@ -174,19 +197,22 @@ public static class Fen
         var valid = spaceCount >= SpaceCount;
 
         if (!valid)
-            throw new InvalidFen($"Invalid space character count in fen {str.ToString()}");
+            throw new InvalidFenException($"Invalid space character count in fen {str.ToString()}");
 
         valid = separatorCount == SeparatorCount;
 
         if (!valid)
-            throw new InvalidFen($"Invalid separator count in fen {str.ToString()}");
+            throw new InvalidFenException($"Invalid separator count in fen {str.ToString()}");
     }
 
     private static (int, int) CountSpacesAndSeparators(ReadOnlySpan<char> str)
     {
         var result = (spaceCount: 0, separatorCount: 0);
 
-        foreach (var c in str)
+        ref var strSpace = ref MemoryMarshal.GetReference(str);
+        for (var i = 0; i < str.Length; ++i)
+        {
+            var c = Unsafe.Add(ref strSpace, i);
             switch (c)
             {
                 case Separator:
@@ -197,6 +223,7 @@ public static class Fen
                     result.spaceCount++;
                     break;
             }
+        }
 
         return result;
     }

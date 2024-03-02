@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2022 Rudy Alex Kohn
+Copyright (c) 2017-2023 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System;
 using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Test.PiecesTests;
@@ -32,12 +31,22 @@ namespace Rudzoft.ChessLib.Test.PiecesTests;
 // ReSharper disable once ClassNeverInstantiated.Global
 public sealed class SliderMobilityFixture
 {
-    public int[] BishopExpected { get; } = { 7, 9, 11, 13 };
+    public int[] BishopExpected { get; } = [7, 9, 11, 13];
 
-    public int[] RookExpected { get; } = { 14, 14, 14, 14 };
+    public int[] RookExpected { get; } = [14, 14, 14, 14];
 
-    public Func<Square, BitBoard, BitBoard>[] SliderAttacks { get; } = { MagicBB.BishopAttacks, MagicBB.RookAttacks, MagicBB.QueenAttacks };
+    public BitBoard SliderAttacks(PieceTypes pt, Square sq, in BitBoard occ)
+    {
+        var index = SliderIndex(pt);
+        return index switch
 
-    public int SliderIndex(PieceTypes pt)
+        {
+            0 => sq.BishopAttacks(in occ),
+            1 => sq.RookAttacks(in occ),
+            var _ => sq.QueenAttacks(in occ)
+        };
+    }
+
+    private static int SliderIndex(PieceTypes pt)
         => pt.AsInt() - 3;
 }

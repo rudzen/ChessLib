@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2022 Rudy Alex Kohn
+Copyright (c) 2017-2023 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -62,6 +62,9 @@ public sealed class BitboardDataTests
                     actual += s1.Aligned(s2, s3).AsByte();
                 }
             }
+
+            var s = bb.ToString();
+            Assert.NotNull(s);
         }
 
         Assert.Equal(expected, actual);

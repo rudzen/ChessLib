@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2022 Rudy Alex Kohn
+Copyright (c) 2017-2023 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -83,8 +83,8 @@ public abstract class PieceAttacks
 
     protected const ulong PawnDelta = 0x18181818181800;
 
-    protected static readonly BitBoard[] Bands = { Alpha, Beta, Gamma, Delta };
+    protected static readonly BitBoard[] Bands = [Alpha, Beta, Gamma, Delta];
 
     protected static readonly BitBoard[] EEBands =
-        { 0xff818181818181ff, 0x7e424242427e00, 0x3c24243c0000, 0x1818000000 };
+        [0xff818181818181ff, 0x7e424242427e00, 0x3c24243c0000, 0x1818000000];
 }

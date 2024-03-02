@@ -3,7 +3,7 @@ Perft, a chess perft testing application
 
 MIT License
 
-Copyright (c) 2019-2022 Rudy Alex Kohn
+Copyright (c) 2019-2023 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,7 @@ using CommandLine;
 namespace Rudzoft.Perft.Options;
 
 [Verb("tt", HelpText = "Configuration for transposition table")]
-public class TTOptions : IOptions
+public class TTOptions : IPerftOptions
 {
     [Option('u', "use", Required = false, Default = true, HelpText = "Dis/En-able use of transposition table")]
     public bool Use { get; set; }

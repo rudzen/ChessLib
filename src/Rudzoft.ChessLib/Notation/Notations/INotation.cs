@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2022 Rudy Alex Kohn
+Copyright (c) 2017-2023 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -85,5 +85,5 @@ public enum MoveNotations
 
 public interface INotation
 {
-    string Convert(Move move);
+    string Convert(IPosition pos, Move move);
 }

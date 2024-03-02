@@ -1,7 +1,10 @@
-﻿using BenchmarkDotNet.Attributes;
+﻿using Microsoft.Extensions.ObjectPool;
 using Rudzoft.ChessLib.Enums;
 using Rudzoft.ChessLib.Fen;
+using Rudzoft.ChessLib.Hash;
+using Rudzoft.ChessLib.MoveGeneration;
 using Rudzoft.ChessLib.Types;
+using Rudzoft.ChessLib.Validation;
 
 namespace Rudzoft.ChessLib.Benchmark;
 
@@ -10,7 +13,7 @@ public class FenBenchmark
 {
     private const string F = "rnkq1bnr/p3ppp1/1ppp3p/3B4/6b1/2PQ3P/PP1PPP2/RNB1K1NR w KQ 4 10";
 
-    private IGame _game;
+    private IPosition _pos;
 
     [Params(10000, 50000)]
     public int N;
@@ -19,12 +22,18 @@ public class FenBenchmark
     public void Setup()
     {
         var board = new Board();
-        var pieceValue = new PieceValue();
-        var pos = new Position(board, pieceValue);
-        _game = new Game(pos);
+        var pieceValue = new Values();
         var fp = new FenData(F);
         var state = new State();
-        _game.Pos.Set(in fp, ChessMode.Normal, state);
+        var rKiss = new RKiss();
+        var zobrist = new Zobrist(rKiss);
+        var cuckoo = new Cuckoo(zobrist);
+        var validator = new PositionValidator(zobrist);
+        var provider = new DefaultObjectPoolProvider();
+        var policy = new DefaultPooledObjectPolicy<MoveList>();
+        var moveListObjectPool = provider.Create(policy);
+        _pos = new Position(board, pieceValue, zobrist, cuckoo, validator, moveListObjectPool);
+        _pos.Set(in fp, ChessMode.Normal, in state);
     }
 
     [Benchmark(Description = "StringBuilder - NOT PRESENT")]
@@ -32,7 +41,7 @@ public class FenBenchmark
     {
         for (var i = 0; i < N; ++i)
         {
-            var fd = _game.Pos.GenerateFen();
+            var fd = _pos.GenerateFen();
         }
     }
 
@@ -41,7 +50,7 @@ public class FenBenchmark
     {
         for (var i = 0; i < N; ++i)
         {
-            var fd = _game.Pos.GenerateFen();
+            var fd = _pos.GenerateFen();
         }
     }
 }

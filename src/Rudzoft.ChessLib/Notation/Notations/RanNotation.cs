@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2022 Rudy Alex Kohn
+Copyright (c) 2017-2023 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,26 +24,27 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System;
 using System.Runtime.CompilerServices;
+using Microsoft.Extensions.ObjectPool;
 using Rudzoft.ChessLib.Extensions;
+using Rudzoft.ChessLib.MoveGeneration;
 using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Notation.Notations;
 
 public sealed class RanNotation : Notation
 {
-    public RanNotation(IPosition pos) : base(pos)
-    {
-    }
+    public RanNotation(ObjectPool<MoveList> moveLists) : base(moveLists) { }
 
     /// <summary>
     /// <para>Converts a move to RAN notation.</para>
     /// </summary>
+    /// <param name="pos">The current position</param>
     /// <param name="move">The move to convert</param>
     /// <returns>RAN move string</returns>
+    [SkipLocalsInit]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override string Convert(Move move)
+    public override string Convert(IPosition pos, Move move)
     {
         var (from, to) = move;
 
@@ -53,7 +54,7 @@ public sealed class RanNotation : Notation
         Span<char> re = stackalloc char[6];
         var i = 0;
 
-        var pt = Pos.GetPieceType(from);
+        var pt = pos.GetPieceType(from);
 
         if (pt != PieceTypes.Pawn)
             re[i++] = pt.GetPieceChar();
@@ -69,7 +70,7 @@ public sealed class RanNotation : Notation
         }
         else
         {
-            var capturedPiece = Pos.GetPiece(to);
+            var capturedPiece = pos.GetPiece(to);
             if (capturedPiece != Piece.EmptyPiece)
             {
                 if (pt == PieceTypes.Pawn)
@@ -88,12 +89,12 @@ public sealed class RanNotation : Notation
         if (move.IsPromotionMove())
         {
             re[i++] = '=';
-            re[i++] = move.PromotedPieceType().MakePiece(Pos.SideToMove).GetUnicodeChar();
+            re[i++] = move.PromotedPieceType().MakePiece(pos.SideToMove).GetUnicodeChar();
         }
 
-        if (Pos.InCheck)
-            re[i++] = GetCheckChar();
+        if (pos.InCheck)
+            re[i++] = GetCheckChar(pos);
 
-        return new string(re[..i]);
+        return new(re[..i]);
     }
 }

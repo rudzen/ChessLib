@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2022 Rudy Alex Kohn
+Copyright (c) 2017-2023 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,8 +24,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using Rudzoft.ChessLib.Extensions;
 
@@ -51,15 +49,12 @@ public enum Squares : byte
 public static class SquaresExtensions
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard BitBoardSquare(this Squares sq)
-        => BitBoards.BbSquares[sq.AsInt()];
+    public static BitBoard BitBoardSquare(this Squares sq) => BitBoards.BbSquares[sq.AsInt()];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Square RelativeSquare(this Squares sq, Player p)
-        => sq.AsInt() ^ (p.Side * 56);
+    public static Square RelativeSquare(this Squares sq, Player p) => sq.AsInt() ^ (p * 56);
 
-    public static int AsInt(this Squares sq)
-        => (int)sq;
+    public static int AsInt(this Squares sq) => (int)sq;
 }
 
 /// <summary>
@@ -84,22 +79,17 @@ public readonly record struct Square(Squares Value) : ISpanFormattable, ICompara
     public Square(Square sq) : this(sq.Value) { }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Square(int rank, int file)
-        : this((Squares)(rank << 3) + (byte)file) { }
+    public Square(int rank, int file) : this((Squares)(rank << 3) + (byte)file) { }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Square(Ranks r, Files f)
-        : this((int)r, (int)f) { }
+    public Square(Ranks r, Files f) : this(new(r), new File(f)) { }
 
-    public Square(Rank r, File f)
-        : this(r.AsInt(), f.AsInt()) { }
+    public Square(Rank r, File f) : this(r.AsInt(), f.AsInt()) { }
 
-    public Square((Rank, File) rankFile)
-        : this(rankFile.Item1, rankFile.Item2) { }
+    public Square((Rank, File) rankFile) : this(rankFile.Item1, rankFile.Item2) { }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator Square(string value)
-        => new(new Square(value[1] - '1', value[0] - 'a'));
+    public static implicit operator Square(string value) => new(new Square(value[1] - '1', value[0] - 'a'));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Deconstruct(out Rank r, out File f)
@@ -108,26 +98,19 @@ public readonly record struct Square(Squares Value) : ISpanFormattable, ICompara
         f = File;
     }
 
-    public Rank Rank
-        => new(AsInt() >> 3);
+    public Rank Rank => new(AsInt() >> 3);
 
-    public char RankChar
-        => Rank.Char;
+    public char RankChar => Rank.Char;
 
-    public File File
-        => new(AsInt() & 7);
+    public File File => new(AsInt() & 7);
 
-    public char FileChar
-        => File.Char;
+    public char FileChar => File.Char;
 
-    public bool IsOk
-        => ((int)Value).InBetween((int)Squares.a1, (int)Squares.h8);
+    public bool IsOk => ((int)Value).IsBetween((int)Squares.a1, (int)Squares.h8);
 
-    public bool IsPromotionRank
-        => !(BitBoards.PromotionRanksBB & this).IsEmpty;
+    public bool IsPromotionRank => (BitBoards.PromotionRanksBB & this).IsNotEmpty;
 
-    public bool IsDark
-        => !(Player.Black.ColorBB() & this).IsEmpty;
+    public bool IsDark => (Player.Black.ColorBB() & this).IsNotEmpty;
 
     public static Square None { get; } = new(Squares.none);
 
@@ -205,136 +188,122 @@ public readonly record struct Square(Squares Value) : ISpanFormattable, ICompara
 
     public const int Count = 64;
 
-    public static Square Create(Rank r, File f)
-        => new(r, f);
+    public static Square[] All =>
+    [
+        A1, A2, A3, A4, A5, A6, A7, A8,
+        B1, B2, B3, B4, B5, B6, B7, B8,
+        C1, C2, C3, C4, C5, C6, C7, C8,
+        D1, D2, D3, D4, D5, D6, D7, D8,
+        E1, E2, E3, E4, E5, E6, E7, E8,
+        F1, F2, F3, F4, F5, F6, F7, F8,
+        G1, G2, G3, G4, G5, G6, G7, G8,
+        H1, H2, H3, H4, H5, H6, H7, H8
+    ];
+
+    public static readonly Range WhiteSide = new(0, 32);
+
+    public static readonly Range BlackSide = new(32, 64);
+
+    public static Square Create(Rank r, File f) => new(r, f);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator Square(int value)
-        => new(value);
+    public static implicit operator Square(int value) => new(value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator Square(Squares sq)
-        => new(sq);
+    public static implicit operator Square(Squares sq) => new(sq);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator Square((Rank, File) value)
-        => new(value);
+    public static implicit operator Square((Rank, File) value) => new(value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator ==(Square left, Squares right)
-        => left.Value == right;
+    public static bool operator ==(Square left, Squares right) => left.Value == right;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator !=(Square left, Squares right)
-        => left.Value != right;
+    public static bool operator !=(Square left, Squares right) => left.Value != right;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Square operator +(Square left, Square right)
-        => new(left.Value + (byte)right.AsInt());
+    public static Square operator +(Square left, Square right) => new(left.Value + (byte)right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Square operator +(Square left, int right)
-        => new(left.Value + (byte)right);
+    public static Square operator +(Square left, int right) => new(left.Value + (byte)right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Square operator +(Square left, Direction right)
-        => new(left.Value + (byte)right.Value);
+    public static Square operator +(Square left, Direction right) => new(left.Value + (byte)right.Value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Square operator +(Square left, Directions right)
-        => new(left.Value + (byte)right);
+    public static Square operator +(Square left, Directions right) => new(left.Value + (byte)right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Square operator -(Square left, Square right)
-        => new(left.Value - right.Value);
+    public static Square operator -(Square left, Square right) => new(left.Value - right.Value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Square operator -(Square left, int right)
-        => new(left.Value - (byte)right);
+    public static Square operator -(Square left, int right) => new(left.Value - (byte)right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Square operator -(Square left, Direction right)
-        => new(left.Value - (byte)right.Value);
+    public static Square operator -(Square left, Direction right) => new(left.Value - (byte)right.Value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Square operator -(Square left, Directions right)
-        => new(left.Value - (byte)right);
+    public static Square operator -(Square left, Directions right) => new(left.Value - (byte)right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Square operator ++(Square sq)
-        => new(sq.Value + 1);
+    public static Square operator ++(Square sq) => new(sq.Value + 1);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Square operator --(Square sq)
-        => new(sq.Value - 1);
+    public static Square operator --(Square sq) => new(sq.Value - 1);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard operator &(Square left, ulong right)
-        => new(left.AsBb().Value & right);
+    public static BitBoard operator &(Square left, ulong right) => new(left.AsBb().Value & right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard operator &(ulong left, Square right)
-        => left & right.AsBb();
+    public static BitBoard operator &(ulong left, Square right) => left & right.AsBb();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard operator |(Square left, Square right)
-        => new(left.AsBb().Value | right.AsBb().Value);
+    public static BitBoard operator |(Square left, Square right) => new(left.AsBb().Value | right.AsBb().Value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard operator |(ulong left, Square right)
-        => new(left | right.AsBb().Value);
+    public static BitBoard operator |(ulong left, Square right) => new(left | right.AsBb().Value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static int operator |(Square left, int right)
-        => left.AsInt() | right;
+    public static int operator |(Square left, int right) => left.AsInt() | right;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard operator ~(Square left)
-        => ~left.AsBb();
+    public static BitBoard operator ~(Square left) => ~left.AsBb();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static int operator >> (Square left, int right)
-        => left.AsInt() >> right;
+    public static int operator >> (Square left, int right) => left.AsInt() >> right;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator >(Square left, Square right)
-        => left.Value > right.Value;
+    public static bool operator >(Square left, Square right) => left.Value > right.Value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator <(Square left, Square right)
-        => left.Value < right.Value;
+    public static bool operator <(Square left, Square right) => left.Value < right.Value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator <=(Square left, Square right)
-        => left.Value <= right.Value;
+    public static bool operator <=(Square left, Square right) => left.Value <= right.Value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator >=(Square left, Square right)
-        => left.Value >= right.Value;
+    public static bool operator >=(Square left, Square right) => left.Value >= right.Value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator true(Square sq)
-        => sq.IsOk;
+    public static bool operator true(Square sq) => sq.IsOk;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator false(Square sq)
-        => !sq.IsOk;
+    public static bool operator false(Square sq) => !sq.IsOk;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Square Relative(Player p)
-        => (int)Value ^ (p.Side * 56);
+    public static implicit operator int(Square sq) => (int)sq.Value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Square Max(Square other)
-        => Value > other.Value ? this : other;
+    public Square Relative(Player p) => (int)Value ^ (p.Side * 56);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Square Min(Square other)
-        => Value <= other.Value ? this : other;
+    public Square Max(Square other) => Value > other.Value ? this : other;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override string ToString()
-        => SquareStrings[AsInt()];
+    public Square Min(Square other) => Value <= other.Value ? this : other;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public override string ToString() => SquareStrings[AsInt()];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public string ToString(string format, IFormatProvider formatProvider)
@@ -353,24 +322,19 @@ public readonly record struct Square(Squares Value) : ISpanFormattable, ICompara
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool Equals(Square other)
-        => Value == other.Value;
+    public bool Equals(Square other) => Value == other.Value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override int GetHashCode()
-        => AsInt();
+    public override int GetHashCode() => AsInt();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public int AsInt()
-        => (int)Value;
+    public int AsInt() => (int)Value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public BitBoard AsBb()
-        => BitBoards.BbSquares[AsInt()];
+    public BitBoard AsBb() => BitBoards.BbSquares[AsInt()];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Rank RelativeRank(Player p)
-        => Rank.Relative(p);
+    public Rank RelativeRank(Player p) => Rank.Relative(p);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool IsOppositeColor(Square other)
@@ -381,23 +345,20 @@ public readonly record struct Square(Squares Value) : ISpanFormattable, ICompara
     {
         if (Value < other.Value)
             return -1;
-        return Value > other.Value ? 1 : 0;
+        return (Value > other.Value).AsByte();
     }
 
     /// <summary>
-    /// Swap A1 <-> H1
+    /// Swap A1 &lt;-&gt; H1
     /// </summary>
     /// <returns>Flipped square by File</returns>
-    public Square FlipFile()
-        => AsInt() ^ Squares.h1.AsInt();
+    public Square FlipFile() => AsInt() ^ Squares.h1.AsInt();
 
     /// <summary>
-    /// Swap A1 <-> A8
+    /// Swap A1 &lt;-&gt; A8
     /// </summary>
-    /// <returns>Flipped square by Fank</returns>
-    public Square FlipRank()
-        => AsInt() ^ Squares.a8.AsInt();
+    /// <returns>Flipped square by Rank</returns>
+    public Square FlipRank() => AsInt() ^ Squares.a8.AsInt();
 
-    public Player Color()
-        => ((AsInt() + Rank.AsInt()) ^ 1) & 1;
+    public Player Color() => ((AsInt() + Rank) ^ 1) & 1;
 }

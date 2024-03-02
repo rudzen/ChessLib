@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2022 Rudy Alex Kohn
+Copyright (c) 2017-2023 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -28,7 +28,5 @@ namespace Rudzoft.ChessLib.Validation;
 
 public interface IPositionValidator
 {
-    string ErrorMsg { get; }
-    bool IsOk { get; }
-    IPositionValidator Validate(PositionValidationTypes type = PositionValidationTypes.All);
+    PositionValidationResult Validate(in IPosition pos, PositionValidationTypes type = PositionValidationTypes.All);
 }

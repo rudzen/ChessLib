@@ -3,7 +3,7 @@ Perft, a chess perft test library
 
 MIT License
 
-Copyright (c) 2017-2022 Rudy Alex Kohn
+Copyright (c) 2017-2023 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,11 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
 using Rudzoft.ChessLib.Enums;
 using Rudzoft.ChessLib.Fen;
 using Rudzoft.ChessLib.Perft.Interfaces;
@@ -54,62 +50,52 @@ Result	5	64,921.2 us	1,310.703 us	1,402.437 us
 Result	6	1,912,300.6 us	3,551.167 us	3,148.017 us
      */
 
-public sealed class Perft : IPerft
+public sealed class Perft(IGame game, IEnumerable<PerftPosition> positions) : IPerft
 {
-    public Perft(IGame game, IEnumerable<PerftPosition> positions)
-    {
-        Positions = positions.ToList();
-        CurrentGame = game;
-    }
-
-    public Action<string> BoardPrintCallback { get; set; }
+    public Action<string>? BoardPrintCallback { get; set; }
 
     /// <summary>
     /// The positional data for the run
     /// </summary>
-    public IList<PerftPosition> Positions { get; set; }
+    public List<PerftPosition> Positions { get; set; } = positions.ToList();
 
-    public IGame CurrentGame { get; set; }
-    public int Depth { get; set; }
-    public ulong Expected { get; set; }
+    public IGame   Game     { get; set; } = game;
+    public int     Depth    { get; set; }
+    public UInt128 Expected { get; set; }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-    public async IAsyncEnumerable<ulong> DoPerft(int depth)
+    public async IAsyncEnumerable<UInt128> DoPerft(int depth)
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
     {
         if (Positions.Count == 0)
             yield break;
 
+        var state = new State();
+
         foreach (var fd in Positions.Select(static p => new FenData(p.Fen)))
         {
-            Game.Table.NewSearch();
-            var state = new State();
-            CurrentGame.Pos.Set(in fd, ChessMode.Normal, state);
-
-            if (PerftTable.Retrieve(CurrentGame.Pos.State.Key, depth, out var result))
-                yield return result;
-            else
-            {
-                result = CurrentGame.Perft(depth);
-                PerftTable.Store(CurrentGame.Pos.State.Key, depth, result);
-                yield return result;
-            }
+            Game.Pos.Set(in fd, ChessMode.Normal, in state);
+            var baseKey = game.Pos.State.PositionKey;
+            var result = Game.Perft(in baseKey, depth);
+            yield return result;
         }
     }
 
-    public Task<ulong> DoPerftAsync(int depth)
-        => Task.Run(()
-            => CurrentGame.Perft(depth));
+    public UInt128 DoPerftSimple(int depth)
+    {
+        var baseKey = game.Pos.State.PositionKey;
+        return Game.Perft(in baseKey, depth);
+    }
 
     public string GetBoard()
-        => CurrentGame.ToString();
+        => Game.ToString();
 
     public void SetGamePosition(PerftPosition pp)
     {
         var fp = new FenData(pp.Fen);
         var state = new State();
-        CurrentGame.Pos.Set(in fp, ChessMode.Normal, state);
+        game.Pos.Set(in fp, ChessMode.Normal, in state);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -130,7 +116,7 @@ public sealed class Perft : IPerft
         if (pos.Value.Count == 0)
             return false;
 
-        var depthValue = pos.Value.FirstOrDefault(v => v.Depth == depth && v.MoveCount > 0);
+        var depthValue = pos.Value.Find(v => v.Depth == depth && v.MoveCount > 0);
 
         return !depthValue.Equals(default);
     }

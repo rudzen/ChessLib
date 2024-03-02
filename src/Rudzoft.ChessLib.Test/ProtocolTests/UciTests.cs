@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2022 Rudy Alex Kohn
+Copyright (c) 2017-2023 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,16 +24,55 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System;
-using System.Runtime.CompilerServices;
-using Rudzoft.ChessLib.Factories;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.ObjectPool;
+using Microsoft.Extensions.Options;
+using Rudzoft.ChessLib.Enums;
+using Rudzoft.ChessLib.Fen;
+using Rudzoft.ChessLib.Hash;
+using Rudzoft.ChessLib.Hash.Tables.Transposition;
+using Rudzoft.ChessLib.MoveGeneration;
 using Rudzoft.ChessLib.Protocol.UCI;
 using Rudzoft.ChessLib.Types;
+using Rudzoft.ChessLib.Validation;
 
 namespace Rudzoft.ChessLib.Test.ProtocolTests;
 
 public sealed class UciTests
 {
+    private readonly IServiceProvider _serviceProvider;
+
+    public UciTests()
+    {
+        var transpositionTableConfiguration = new TranspositionTableConfiguration { DefaultSize = 1 };
+        var options = Options.Create(transpositionTableConfiguration);
+
+        _serviceProvider = new ServiceCollection()
+            .AddSingleton(options)
+            .AddSingleton<IValues, Values>()
+            .AddSingleton<IRKiss, RKiss>()
+            .AddSingleton<IZobrist, Zobrist>()
+            .AddSingleton<ICuckoo, Cuckoo>()
+            .AddSingleton<IPositionValidator, PositionValidator>()
+            .AddTransient<IBoard, Board>()
+            .AddTransient<IPosition, Position>()
+            .AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>()
+            .AddSingleton(static serviceProvider =>
+            {
+                var provider = serviceProvider.GetRequiredService<ObjectPoolProvider>();
+                var policy = new DefaultPooledObjectPolicy<MoveList>();
+                return provider.Create(policy);
+            })
+            .AddSingleton(static sp =>
+            {
+                var pool = sp.GetRequiredService<ObjectPool<MoveList>>();
+                IUci uci = new Uci(pool);
+                uci.Initialize();
+                return uci;
+            })
+            .BuildServiceProvider();
+    }
+
     [Fact]
     public void NpsSimple()
     {
@@ -43,7 +82,7 @@ public sealed class UciTests
 
         var ts = TimeSpan.FromSeconds(1);
 
-        var uci = new Uci();
+        var uci = _serviceProvider.GetRequiredService<IUci>();
 
         var actual = uci.Nps(nodes, in ts);
 
@@ -55,12 +94,16 @@ public sealed class UciTests
     {
         const string uciMove = "a2a3";
         var expected = Move.Create(Square.A2, Square.A3);
-        var uci = new Uci();
 
-        var game = GameFactory.Create();
-        game.NewGame();
+        var uci = _serviceProvider.GetRequiredService<IUci>();
+        var pos = _serviceProvider.GetRequiredService<IPosition>();
 
-        var actual = uci.MoveFromUci(game.Pos, uciMove);
+        var fenData = new FenData(Fen.Fen.StartPositionFen);
+        var state = new State();
+
+        pos.Set(in fenData, ChessMode.Normal, state);
+
+        var actual = uci.MoveFromUci(pos, uciMove);
 
         Assert.Equal(expected, actual);
     }

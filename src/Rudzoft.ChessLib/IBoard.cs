@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2022 Rudy Alex Kohn
+Copyright (c) 2017-2023 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,8 +24,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System;
-using System.Collections.Generic;
 using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib;
@@ -47,7 +45,7 @@ public interface IBoard : IEnumerable<Piece>
     BitBoard Pieces(Player p, PieceTypes pt);
     BitBoard Pieces(Player p, PieceTypes pt1, PieceTypes pt2);
     Square Square(PieceTypes pt, Player p);
-    ReadOnlySpan<Square> Squares(PieceTypes pt, Player c);
+    ReadOnlySpan<Square> Squares(PieceTypes pt, Player p);
     int PieceCount(Piece pc);
     int PieceCount(PieceTypes pt, Player p);
     int PieceCount(PieceTypes pt);

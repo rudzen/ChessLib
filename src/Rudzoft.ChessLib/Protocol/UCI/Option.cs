@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2022 Rudy Alex Kohn
+Copyright (c) 2017-2023 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System;
 using System.Diagnostics;
 using Rudzoft.ChessLib.Extensions;
 
@@ -32,6 +31,8 @@ namespace Rudzoft.ChessLib.Protocol.UCI;
 
 public sealed class Option : IOption
 {
+    private static readonly string[] BoolStrings = ["false", "true"];
+
     private string _currentValue;
 
     public Option()
@@ -56,7 +57,7 @@ public sealed class Option : IOption
         Min = Max = 0;
         Idx = indices;
         OnChange = func;
-        DefaultValue = _currentValue = v.ToString();
+        DefaultValue = _currentValue = BoolStrings[v.AsByte()];
     }
 
     public Option(string name, int indices, string v, Action<IOption> func = null)
@@ -82,9 +83,7 @@ public sealed class Option : IOption
 
     public static implicit operator bool(Option o)
     {
-        if (o.Type == UciOptionType.Check)
-            return bool.Parse(o._currentValue);
-        return false;
+        return o.Type == UciOptionType.Check && o.GetBool();
     }
 
     public string Name { get; set; }
@@ -107,7 +106,7 @@ public sealed class Option : IOption
         return Type switch
         {
             UciOptionType.Spin => Convert.ToInt32(_currentValue),
-            _ => bool.Parse(_currentValue).AsByte()
+            var _ => bool.Parse(_currentValue).AsByte()
         };
     }
 
@@ -121,7 +120,7 @@ public sealed class Option : IOption
     public bool GetBool()
     {
         var b = bool.TryParse(_currentValue, out var r);
-        return b ? r : b;
+        return b && r;
     }
 
     /// <summary>
@@ -135,7 +134,7 @@ public sealed class Option : IOption
     {
         var isButton = Type == UciOptionType.Button;
         if (((!isButton && v.IsNullOrEmpty())
-             || (Type == UciOptionType.Check && !bool.TryParse(v, out _))
+             || (Type == UciOptionType.Check && !bool.TryParse(v, out var _))
              || Type == UciOptionType.Spin) && Maths.ToIntegral(v, out int val) && val < Min && val > Max)
             return this;
 

@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2022 Rudy Alex Kohn
+Copyright (c) 2017-2023 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,13 +24,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Rudzoft.ChessLib.Extensions;
 using Rudzoft.ChessLib.Types;
+using File = Rudzoft.ChessLib.Types.File;
 
 namespace Rudzoft.ChessLib.Evaluation;
 
@@ -38,47 +38,51 @@ namespace Rudzoft.ChessLib.Evaluation;
 /// Based on bit base in Stockfish.
 /// However, some modifications are done to be slightly less confusing.
 /// </summary>
-public static class KpkBitBase
+public sealed class KpkBitBase : IKpkBitBase
 {
     // There are 24 possible pawn squares: files A to D and ranks from 2 to 7.
     // Positions with the pawn on files E to H will be mirrored before probing.
     private const int MaxIndex = 2 * 24 * 64 * 64; // stm * psq * wksq * bksq = 196608
 
-    private static readonly BitArray KpKbb = new(MaxIndex);
+    private readonly BitArray _kpKbb = new(MaxIndex);
 
-    static KpkBitBase()
+    public KpkBitBase()
     {
-        List<KpkPosition> db = new(MaxIndex);
-        int idx;
-
         // Initialize db with known win / draw positions
-        for (idx = 0; idx < MaxIndex; ++idx)
-            db.Add(KpkPosition.Create(idx));
+        var db = Enumerable
+            .Range(0, MaxIndex)
+            .Select(KpkPosition.Create)
+            .ToArray()
+            .AsSpan();
 
         // Iterate through the positions until none of the unknown positions can be
         // changed to either wins or draws (15 cycles needed).
-        var repeat = 1;
+        int repeat;
 
-        var dbs = CollectionsMarshal.AsSpan(db);
-        while (repeat != 0)
+        ref var dbSpace = ref MemoryMarshal.GetReference(db);
+
+        do
         {
             repeat = 1;
-            foreach (var kpkPosition in dbs)
-                repeat = (kpkPosition.Result == Result.Unknown && kpkPosition.Classify(db) != Result.Unknown).AsByte();
-        }
+            for (var i = 0; i < db.Length; ++i)
+            {
+                ref var kpkPosition = ref Unsafe.Add(ref dbSpace, i);
+                repeat = (kpkPosition.Result == Results.Unknown
+                          && kpkPosition.Classify(db) != Results.Unknown).AsByte();
+            }
+        } while (repeat != 0);
 
         // Fill the bitbase with the decisive results
-        idx = 0;
-        foreach (var kpkPosition in dbs)
+        for (var i = 0; i < db.Length; ++i)
         {
-            if (kpkPosition.Result == Result.Win)
-                KpKbb.Set(idx, true);
-            idx++;
+            ref var kpkPosition = ref Unsafe.Add(ref dbSpace, i);
+            if (kpkPosition.Result == Results.Win)
+                _kpKbb.Set(i, true);
         }
     }
 
     /// <summary>
-    /// A KPK bitbase index is an integer in [0, IndexMax] range
+    /// A KPK bitbase index is an integer in [0,IndexMax] range
     ///
     /// Information is mapped in a way that minimizes the number of iterations:
     ///
@@ -89,88 +93,71 @@ public static class KpkBitBase
     /// bit 15-17: white pawn RANK_7 - rank (from RANK_7 - RANK_7 to RANK_7 - RANK_2)
     /// </summary>
     /// <param name="stm"></param>
-    /// <param name="blackKsq"></param>
-    /// <param name="whiteKsq"></param>
-    /// <param name="pawnSq"></param>
+    /// <param name="weakKingSq"></param>
+    /// <param name="strongKsq"></param>
+    /// <param name="strongPawnSq"></param>
     /// <returns></returns>
-    private static int Index(Player stm, Square blackKsq, Square whiteKsq, Square pawnSq)
+    private static int Index(Player stm, Square weakKingSq, Square strongKsq, Square strongPawnSq)
     {
-        return whiteKsq.AsInt()
-               | (blackKsq.AsInt() << 6)
+        return strongKsq
+               | (weakKingSq << 6)
                | (stm << 12)
-               | (pawnSq.File.AsInt() << 13)
-               | ((Ranks.Rank7.AsInt() - pawnSq.Rank.AsInt()) << 15);
+               | (strongPawnSq.File << 13)
+               | ((Rank.Rank7 - strongPawnSq.Rank) << 15);
     }
 
     [Flags]
-    private enum Result
+    private enum Results
     {
         None = 0,
-        Unknown = 1 << 0,
-        Draw = 1 << 1,
-        Win = 1 << 2
+        Unknown = 1,
+        Draw = 2,
+        Win = 4
     }
 
-    private struct KpkPosition
+    private readonly record struct KpkPosition(Results Result, Player Stm, Square[] KingSquares, Square PawnSquare)
     {
-        private KpkPosition(
-            Result result,
-            Player stm,
-            Square[] kingSquares,
-            Square pawnSquare)
-        {
-            Result = result;
-            Stm = stm;
-            KingSquares = kingSquares;
-            PawnSquare = pawnSquare;
-        }
-
         public static KpkPosition Create(int idx)
         {
-            Result result;
+            Results results;
             var stm = new Player((idx >> 12) & 0x01);
             var ksq = new Square[] { (idx >> 0) & 0x3F, (idx >> 6) & 0x3F };
-            var psq = Square.Create(new Rank(Ranks.Rank7.AsInt() - ((idx >> 15) & 0x7)), new File((idx >> 13) & 0x3));
+            var psq = Square.Create(new(Ranks.Rank7.AsInt() - ((idx >> 15) & 0x7)), new((idx >> 13) & 0x3));
 
             // Invalid if two pieces are on the same square or if a king can be captured
-            if (ksq[Player.White.Side].Distance(ksq[Player.Black.Side]) <= 1
-                || ksq[Player.White.Side] == psq
-                || ksq[Player.Black.Side] == psq
-                || (stm.IsWhite && !(psq.PawnAttack(Player.White) & ksq[Player.Black.Side]).IsEmpty))
-                result = Result.None;
+            if (ksq[Player.White].Distance(ksq[Player.Black]) <= 1
+                || ksq[Player.White] == psq
+                || ksq[Player.Black] == psq
+                || (stm.IsWhite && (psq.PawnAttack(Player.White) & ksq[Player.Black]).IsNotEmpty))
+                results = Results.None;
 
             // Win if the pawn can be promoted without getting captured
             else if (stm.IsWhite
                      && psq.Rank == Ranks.Rank7
-                     && ksq[Player.White.Side] != psq + Directions.North
-                     && (ksq[Player.Black.Side].Distance(psq + Directions.North) > 1
-                         || ksq[Player.White.Side].Distance(psq + Directions.North) == 1))
-                result = Result.Win;
+                     && ksq[Player.White] != psq + Directions.North
+                     && (ksq[Player.Black].Distance(psq + Directions.North) > 1
+                         || ksq[Player.White].Distance(psq + Directions.North) == 1))
+                results = Results.Win;
 
             // Draw if it is stalemate or the black king can capture the pawn
             else if (stm.IsBlack
-                     && ((PieceTypes.King.PseudoAttacks(ksq[Player.Black.Side]) &
-                          ~(PieceTypes.King.PseudoAttacks(ksq[Player.White.Side]) | psq.PawnAttack(Player.White)))
+                     && ((PieceTypes.King.PseudoAttacks(ksq[Player.Black]) &
+                          ~(PieceTypes.King.PseudoAttacks(ksq[Player.White]) | psq.PawnAttack(Player.White)))
                          .IsEmpty
-                         || !(PieceTypes.King.PseudoAttacks(ksq[Player.Black.Side]) &
-                              ~PieceTypes.King.PseudoAttacks(ksq[Player.White.Side]) & psq).IsEmpty))
-                result = Result.Draw;
+                         || !(PieceTypes.King.PseudoAttacks(ksq[Player.Black]) &
+                              ~PieceTypes.King.PseudoAttacks(ksq[Player.White]) & psq).IsEmpty))
+                results = Results.Draw;
 
             // Position will be classified later in initialization
             else
-                result = Result.Unknown;
+                results = Results.Unknown;
 
-            return new KpkPosition(
-                result,
-                stm,
-                ksq,
-                psq);
+            return new(
+                Result: results,
+                Stm: stm,
+                KingSquares: ksq,
+                PawnSquare: psq);
         }
-
-        public Result Result { get; private set; }
-        private Player Stm { get; }
-        private Square[] KingSquares { get; }
-        private Square PawnSquare { get; }
 
         /// <summary>
         /// White to move: If one move leads to a position classified as WIN, the result
@@ -185,88 +172,90 @@ public static class KpkBitBase
         /// </summary>
         /// <param name="db">Current KpkPositions as list</param>
         /// <returns>Result after classification</returns>
-        public Result Classify(IList<KpkPosition> db)
+        public Results Classify(ReadOnlySpan<KpkPosition> db)
         {
-            var (good, bad) = Stm.IsWhite
-                ? (Result.Win, Result.Draw)
-                : (Result.Draw, Result.Win);
-
-            var r = Result.None;
-            var b = PieceTypes.King.PseudoAttacks(KingSquares[Stm.Side]);
-
-            while (b)
-            {
-                var (bksq, wksq) = Stm.IsWhite
-                    ? (KingSquares[Player.Black.Side], BitBoards.PopLsb(ref b))
-                    : (BitBoards.PopLsb(ref b), KingSquares[Player.White.Side]);
-                r |= db[Index(~Stm, bksq, wksq, PawnSquare)].Result;
-            }
+            var (good, bad) = InitResults();
+            var r = GetInitialKingResults(db);
 
             if (Stm.IsWhite)
             {
                 // Single push
-                if (PawnSquare.Rank < Ranks.Rank7)
+                if (PawnSquare.Rank < Rank.Rank7)
                     r |= db[
-                        Index(Player.Black, KingSquares[Player.Black.Side], KingSquares[Player.White.Side],
+                        Index(Player.Black, KingSquares[Player.Black], KingSquares[Player.White],
                             PawnSquare + Directions.North)].Result;
 
                 // Double push
-                if (PawnSquare.Rank == Ranks.Rank2
-                    && PawnSquare + Directions.North != KingSquares[Player.White.Side]
-                    && PawnSquare + Directions.North != KingSquares[Player.Black.Side])
+                if (PawnSquare.Rank == Rank.Rank2
+                    && PawnSquare + Directions.North != KingSquares[Player.White]
+                    && PawnSquare + Directions.North != KingSquares[Player.Black])
                     r |= db[
-                        Index(Player.Black, KingSquares[Player.Black.Side], KingSquares[Player.White.Side],
+                        Index(Player.Black, KingSquares[Player.Black], KingSquares[Player.White],
                             PawnSquare + Directions.NorthDouble)].Result;
             }
 
             if ((r & good) != 0)
                 return good;
 
-            return (r & Result.Unknown) != 0
-                    ? Result.Unknown
-                    : bad;
+            return (r & Results.Unknown) != 0
+                ? Results.Unknown
+                : bad;
+        }
+
+        private (Results, Results) InitResults()
+        {
+            return Stm.IsWhite
+                ? (Results.Win, Results.Draw)
+                : (Results.Draw, Results.Win);
+        }
+
+        private Results GetInitialKingResults(ReadOnlySpan<KpkPosition> db)
+        {
+            var r = Results.None;
+            var b = PieceTypes.King.PseudoAttacks(KingSquares[Stm]);
+
+            while (b)
+            {
+                var (bkSq, wkSq) = Stm.IsWhite
+                    ? (KingSquares[Player.Black], BitBoards.PopLsb(ref b))
+                    : (BitBoards.PopLsb(ref b), KingSquares[Player.White]);
+                r |= db[Index(~Stm, bkSq, wkSq, PawnSquare)].Result;
+            }
+
+            return r;
         }
     }
 
-    /// <summary>
-    /// Normalizes a square in accordance with the data.
-    /// Kpk bit-base is only used for king pawn king positions!
-    /// </summary>
-    /// <param name="pos">Current position</param>
-    /// <param name="strongSide">The strong side (the one with the pawn)</param>
-    /// <param name="sq">The square that needs to be normalized</param>
-    /// <returns>Normalized square to be used with probing</returns>
-    public static Square Normalize(IPosition pos, Player strongSide, Square sq)
+    /// <inheritdoc />
+    public Square Normalize(IPosition pos, Player strongSide, Square sq)
     {
         Debug.Assert(pos.Board.PieceCount(PieceTypes.Pawn, strongSide) == 1);
 
-        if (pos.GetPieceSquare(PieceTypes.Pawn, strongSide).File >= Files.FileE)
+        if (pos.GetPieceSquare(PieceTypes.Pawn, strongSide).File >= File.FileE)
             sq = sq.FlipFile();
 
         return strongSide.IsWhite ? sq : sq.FlipRank();
     }
 
-    /// <summary>
-    /// Probe with normalized squares and strong player
-    /// </summary>
-    /// <param name="whiteKsq">"Strong" side king square</param>
-    /// <param name="pawnSq">"Strong" side pawn square</param>
-    /// <param name="blackKsq">"Weak" side king square</param>
-    /// <param name="stm">strong side. fx strongSide == pos.SideToMove ? Player.White : Player.Black</param>
-    /// <returns>true if strong side "won"</returns>
-    public static bool Probe(Square whiteKsq, Square pawnSq, Square blackKsq, Player stm)
+    /// <inheritdoc />
+    public bool Probe(Square strongKsq, Square strongPawnSq, Square weakKsq, Player stm)
     {
-        Debug.Assert(pawnSq.File <= File.FileD);
-
-        return KpKbb[Index(stm, blackKsq, whiteKsq, pawnSq)];
+        Debug.Assert(strongPawnSq.File <= File.FileD);
+        return _kpKbb[Index(stm, weakKsq, strongKsq, strongPawnSq)];
     }
 
-    public static bool IsDraw(IPosition pos)
+    /// <inheritdoc />
+    public bool Probe(bool stngActive, Square skSq, Square wkSq, Square spSq)
+    {
+        return _kpKbb[Index(stngActive, skSq, wkSq, spSq)];
+    }
+
+    public bool IsDraw(IPosition pos)
     {
         return !Probe(
-            pos.GetPieceSquare(PieceTypes.King, Player.White),
-            pos.Pieces(PieceTypes.Pawn).Lsb(),
-            pos.GetPieceSquare(PieceTypes.King, Player.Black),
-            pos.SideToMove);
+            strongKsq: pos.GetPieceSquare(PieceTypes.King, Player.White),
+            strongPawnSq: pos.Pieces(PieceTypes.Pawn).Lsb(),
+            weakKsq: pos.GetPieceSquare(PieceTypes.King, Player.Black),
+            stm: pos.SideToMove);
     }
 }

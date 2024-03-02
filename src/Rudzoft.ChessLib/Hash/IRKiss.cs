@@ -27,12 +27,12 @@
 
  */
 
-using System.Collections.Generic;
-
 namespace Rudzoft.ChessLib.Hash;
 
 public interface IRKiss
 {
+    ulong Seed { get; set; }
+
     IEnumerable<ulong> Get(int count);
 
     ulong Rand();

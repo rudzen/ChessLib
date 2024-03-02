@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2022 Rudy Alex Kohn
+Copyright (c) 2017-2023 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,9 +24,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System;
-using System.Collections.Generic;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace Rudzoft.ChessLib.Fen;
@@ -36,40 +36,44 @@ namespace Rudzoft.ChessLib.Fen;
 /// For more information about the format, see
 /// https://chessprogramming.wikispaces.com/Forsyth-Edwards+Notation
 /// </summary>
+[DebuggerDisplay("Fen='{Fen.ToString()}', Chunks={_splitPoints.Count}")]
 public sealed class FenData : EventArgs, IFenData
 {
-    private readonly Queue<(int, int)> _splitPoints;
+    private record struct SplitPoint(int Begin, int End);
+
+    private readonly Queue<SplitPoint> _splitPoints = new(6);
 
     public FenData(ReadOnlyMemory<char> fen)
     {
-        _splitPoints = new Queue<(int, int)>(6);
         Fen = fen;
         var start = 0;
 
         var s = fen.Span;
 
         // determine split points
+        ref var splitPointsSpace = ref MemoryMarshal.GetReference(s);
         for (var i = 0; i < s.Length; i++)
         {
-            if (s[i] != ' ')
+            var splitPoint = Unsafe.Add(ref splitPointsSpace, i);
+            if (splitPoint != ' ')
                 continue;
 
-            _splitPoints.Enqueue((start, i));
+            _splitPoints.Enqueue(new(start, i));
             start = i + 1;
         }
 
         // add last
-        _splitPoints.Enqueue((start, s.Length));
+        _splitPoints.Enqueue(new(start, s.Length));
     }
 
     public FenData(ReadOnlySpan<string> fen)
     {
-        _splitPoints = new Queue<(int, int)>(6);
         var sb = new StringBuilder(128);
 
+        ref var fenSpace = ref MemoryMarshal.GetReference(fen);
         for (var i = 0; i < fen.Length; ++i)
         {
-            sb.Append(fen[i]);
+            sb.Append(Unsafe.Add(ref fenSpace, i));
             if (i < fen.Length - 1)
                 sb.Append(' ');
         }
@@ -80,17 +84,19 @@ public sealed class FenData : EventArgs, IFenData
         var s = Fen.Span;
 
         // determine split points
+        ref var splitPointsSpace = ref MemoryMarshal.GetReference(s);
         for (var i = 0; i < s.Length; i++)
         {
-            if (s[i] != ' ')
+            var splitPoint = Unsafe.Add(ref splitPointsSpace, i);
+            if (splitPoint != ' ')
                 continue;
 
-            _splitPoints.Enqueue((start, i));
+            _splitPoints.Enqueue(new(start, i));
             start = i + 1;
         }
 
         // add last
-        _splitPoints.Enqueue((start, s.Length));
+        _splitPoints.Enqueue(new(start, s.Length));
     }
 
     public FenData(char[] fen) : this(fen.AsMemory())
@@ -114,8 +120,8 @@ public sealed class FenData : EventArgs, IFenData
     {
         // ReSharper disable once InlineOutVariableDeclaration
         Index++;
-        return _splitPoints.TryDequeue(out (int start, int end) result)
-            ? Fen.Span[result.start..result.end]
+        return _splitPoints.TryDequeue(out var splitPoint)
+            ? Fen.Span[splitPoint.Begin..splitPoint.End]
             : ReadOnlySpan<char>.Empty;
     }
 

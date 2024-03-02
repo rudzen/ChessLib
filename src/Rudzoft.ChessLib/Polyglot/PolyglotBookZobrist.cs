@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2022 Rudy Alex Kohn
+Copyright (c) 2017-2023 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -25,12 +25,14 @@ SOFTWARE.
 */
 
 using Rudzoft.ChessLib.Types;
+using File = Rudzoft.ChessLib.Types.File;
 
 namespace Rudzoft.ChessLib.Polyglot;
 
 internal static class PolyglotBookZobrist
 {
-    private static readonly ulong[,] psq =
+    // TODO : re-write to jagged array
+    private static readonly ulong[,] PsqKeys =
     {
         {
             0x9D39247E33776D41UL, 0x2AF7398005AAA5C7UL, 0x44DB015024623547UL,
@@ -322,8 +324,8 @@ internal static class PolyglotBookZobrist
         }
     };
 
-    private static readonly ulong[] castle =
-    {
+    private static readonly ulong[] CastleKeys =
+    [
         0UL,
         0x31D71DCE64B2C310UL, // white short
         0xF165B587DF898190UL, // white long
@@ -333,25 +335,33 @@ internal static class PolyglotBookZobrist
         0UL,
         0UL,
         0x1EF6E6DBB1961EC9UL // black long
-    };
+    ];
 
-    private static readonly ulong[] enpassant =
-    {
+    private static readonly ulong[] EnPassantKeys =
+    [
         0x70CC73D90BC26E24UL, 0xE21A6B35DF0C3AD7UL, 0x003A93D8B2806962UL, 0x1C99DED33CB890A1UL,
         0xCF3145DE0ADD4289UL, 0xD0E4427A5514FB72UL, 0x77C621CC9FB3A483UL, 0x67A34DAC4356550BUL
-    };
+    ];
 
-    private const ulong turn = 0xF8D626AAAF278509UL;
+    private const ulong TurnKey = 0xF8D626AAAF278509UL;
+
+    // PolyGlot pieces are: BP = 0, WP = 1, BN = 2, ... BK = 10, WK = 11
+    private static readonly int[] PieceMapping = [-1, 1, 3, 5, 7, 9, 11, -1, -1, 0, 2, 4, 6, 8, 10];
+
+    internal static ulong Psq(Piece pc, Square sq)
+    {
+        return Psq(PieceMapping[pc], sq);
+    }
 
     internal static ulong Psq(int piece, Square sq)
-        => psq[piece, sq.AsInt()];
+        => PsqKeys[piece, sq];
 
     internal static ulong Castle(CastleRight rights)
-        => castle[rights.AsInt()];
+        => CastleKeys[rights.AsInt()];
 
     internal static ulong EnPassant(File f)
-        => enpassant[f.AsInt()];
+        => EnPassantKeys[f];
 
     internal static ulong Turn()
-        => turn;
+        => TurnKey;
 }

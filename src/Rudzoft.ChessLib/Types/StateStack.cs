@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2022 Rudy Alex Kohn
+Copyright (c) 2017-2023 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,11 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using Cysharp.Text;
-using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 namespace Rudzoft.ChessLib.Types;
@@ -46,7 +42,7 @@ public sealed class StateStack : IEnumerable<State>
         Count = 0;
         _stack = new State[size];
         for (var i = 0; i < _stack.Length; i++)
-            Push(new State());
+            Push(new());
     }
 
     /// <summary>
@@ -147,13 +143,13 @@ public sealed class StateStack : IEnumerable<State>
 
     public override string ToString()
     {
-        using var sb = ZString.CreateStringBuilder();
+        var       sb = new StringBuilder();
         for (var i = Size; i > 0; i--)
         {
             var o = _stack[i];
             sb.Append(' ');
             if (o != null)
-                sb.Append(o.ToString());
+                sb.Append(o);
             else
                 sb.Append(' ');
             sb.Append(' ');

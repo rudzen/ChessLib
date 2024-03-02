@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2022 Rudy Alex Kohn
+Copyright (c) 2017-2023 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -41,8 +41,8 @@ public sealed class RankEdgeDistanceTests
     [InlineData(Ranks.Rank8, 0)]
     public void RankEdgeDistanceFolding(Ranks rs, int expected)
     {
-        var f = new Rank(rs);
-        var actual = f.EdgeDistance();
+        var r = new Rank(rs);
+        var actual = r.EdgeDistance();
         Assert.Equal(expected, actual);
     }
 }

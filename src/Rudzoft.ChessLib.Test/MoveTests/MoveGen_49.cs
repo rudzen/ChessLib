@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2022 Rudy Alex Kohn
+Copyright (c) 2017-2023 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,23 +24,48 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.ObjectPool;
 using Rudzoft.ChessLib.Enums;
 using Rudzoft.ChessLib.Fen;
+using Rudzoft.ChessLib.Hash;
 using Rudzoft.ChessLib.MoveGeneration;
 using Rudzoft.ChessLib.Types;
+using Rudzoft.ChessLib.Validation;
 
 namespace Rudzoft.ChessLib.Test.MoveTests;
 
 public sealed class MoveGen_49
 {
+    private readonly IServiceProvider _serviceProvider;
+
+    public MoveGen_49()
+    {
+        _serviceProvider = new ServiceCollection()
+            .AddTransient<IBoard, Board>()
+            .AddSingleton<IRKiss, RKiss>()
+            .AddSingleton<IValues, Values>()
+            .AddSingleton<ICuckoo, Cuckoo>()
+            .AddSingleton<IZobrist, Zobrist>()
+            .AddSingleton<IPositionValidator, PositionValidator>()
+            .AddTransient<IPosition, Position>()
+            .AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>()
+            .AddSingleton(static serviceProvider =>
+            {
+                var provider = serviceProvider.GetRequiredService<ObjectPoolProvider>();
+                var policy = new DefaultPooledObjectPolicy<MoveList>();
+                return provider.Create(policy);
+            })
+            .BuildServiceProvider();
+    }
+
     [Fact]
     public void MoveListContainsMismatchedElement()
     {
         const string fen = "r3kb1r/p3pppp/p1n2n2/2pp1Q2/3P1B2/2P1PN2/Pq3PPP/RN2K2R w KQkq - 0 9";
 
-        var board = new Board();
-        var pieceValue = new PieceValue();
-        var pos = new Position(board, pieceValue);
+        var pos = _serviceProvider.GetRequiredService<IPosition>();
+
         var fd = new FenData(fen);
         var state = new State();
 

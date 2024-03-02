@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2022 Rudy Alex Kohn
+Copyright (c) 2017-2023 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,8 +24,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System;
-using System.Collections.Generic;
 using Rudzoft.ChessLib.Enums;
 using Rudzoft.ChessLib.Fen;
 using Rudzoft.ChessLib.Protocol.UCI;
@@ -43,9 +41,13 @@ public interface IGame : IEnumerable<Piece>
 
     GameEndTypes GameEndType { get; set; }
 
-    SearchParameters SearchParameters { get; }
+    ISearchParameters SearchParameters { get; }
 
     bool IsRepetition { get; }
+
+    public IUci Uci { get; }
+
+    public ICpu Cpu { get; }
 
     void NewGame(string fen = Fen.Fen.StartPositionFen);
 
@@ -59,5 +61,5 @@ public interface IGame : IEnumerable<Piece>
 
     Player CurrentPlayer();
 
-    ulong Perft(int depth, bool root = true);
+    UInt128 Perft(int depth, bool root = true);
 }

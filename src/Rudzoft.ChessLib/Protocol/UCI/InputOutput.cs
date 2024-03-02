@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2022 Rudy Alex Kohn
+Copyright (c) 2017-2023 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,16 +24,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
-
 namespace Rudzoft.ChessLib.Protocol.UCI;
 
 public sealed class InputOutput : IInputOutput
 {
-    private static readonly char[] SplitChar = { ' ' };
+    private static readonly char[] SplitChar = [' '];
 
     private readonly Mutex _mutex;
 
@@ -42,9 +37,9 @@ public sealed class InputOutput : IInputOutput
 
     public InputOutput()
     {
-        _mutex = new Mutex();
+        _mutex       = new();
         LastLineRead = string.Empty;
-        _words = Array.Empty<string>();
+        _words       = Array.Empty<string>();
     }
 
     public TextReader Input { get; set; }

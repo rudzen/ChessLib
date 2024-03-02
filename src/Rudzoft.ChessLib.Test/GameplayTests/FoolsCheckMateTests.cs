@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2022 Rudy Alex Kohn
+Copyright (c) 2017-2023 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,15 +24,41 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using Rudzoft.ChessLib.Factories;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.ObjectPool;
+using Rudzoft.ChessLib.Enums;
 using Rudzoft.ChessLib.Fen;
+using Rudzoft.ChessLib.Hash;
 using Rudzoft.ChessLib.MoveGeneration;
 using Rudzoft.ChessLib.Types;
+using Rudzoft.ChessLib.Validation;
 
 namespace Rudzoft.ChessLib.Test.GameplayTests;
 
 public sealed class FoolsCheckMateTests
 {
+    private readonly IServiceProvider _serviceProvider;
+
+    public FoolsCheckMateTests()
+    {
+        _serviceProvider = new ServiceCollection()
+            .AddTransient<IBoard, Board>()
+            .AddSingleton<IValues, Values>()
+            .AddSingleton<IRKiss, RKiss>()
+            .AddSingleton<IZobrist, Zobrist>()
+            .AddSingleton<ICuckoo, Cuckoo>()
+            .AddSingleton<IPositionValidator, PositionValidator>()
+            .AddTransient<IPosition, Position>()
+            .AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>()
+            .AddSingleton(static serviceProvider =>
+            {
+                var provider = serviceProvider.GetRequiredService<ObjectPoolProvider>();
+                var policy = new DefaultPooledObjectPolicy<MoveList>();
+                return provider.Create(policy);
+            })
+            .BuildServiceProvider();
+    }
+
     [Fact]
     public void FoolsCheckMate()
     {
@@ -45,21 +71,20 @@ public sealed class FoolsCheckMateTests
             Move.Create(Square.D8, Square.H4)
         };
 
-        // construct game and start a new game
-        var game = GameFactory.Create(Fen.Fen.StartPositionFen);
-        var position = game.Pos;
+        var pos = _serviceProvider.GetRequiredService<IPosition>();
+        var fenData = new FenData(Fen.Fen.StartPositionFen);
         var state = new State();
+        pos.Set(in fenData, ChessMode.Normal, state);
 
         // make the moves necessary to create a mate
         foreach (var move in moves)
-            position.MakeMove(move, state);
+            pos.MakeMove(move, in state);
 
         // verify in check is actually true
-        Assert.True(position.InCheck);
+        Assert.True(pos.InCheck);
 
-        var resultingMoves = position.GenerateMoves();
+        var isMate = pos.IsMate;
 
-        // verify that no legal moves actually exists.
-        Assert.True(resultingMoves.Length == 0);
+        Assert.True(isMate);
     }
 }

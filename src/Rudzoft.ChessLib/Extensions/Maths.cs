@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2022 Rudy Alex Kohn
+Copyright (c) 2017-2023 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System;
 using System.Runtime.CompilerServices;
 
 namespace Rudzoft.ChessLib.Extensions;
@@ -53,7 +52,7 @@ public static class Maths
             pos++;
         }
 
-        while (pos <= max && str[pos].InBetween('0', '9'))
+        while (pos <= max && char.IsAsciiDigit(str[pos]))
         {
             x = x * 10 + (str[pos] - '0');
             pos++;
@@ -74,7 +73,7 @@ public static class Maths
         var x = ulong.MinValue;
         var pos = 0;
         var max = str.Length - 1;
-        while (pos <= max && str[pos].InBetween('0', '9'))
+        while (pos <= max && char.IsAsciiDigit(str[pos]))
         {
             x = x * 10 + (ulong)(str[pos] - '0');
             pos++;
@@ -96,7 +95,7 @@ public static class Maths
         var x = 0;
         var pos = 0;
         var max = str.Length - 1;
-        while (pos <= max && str[pos].InBetween('0', '9'))
+        while (pos <= max && char.IsAsciiDigit(str[pos]))
         {
             x = x * 10 + (str[pos] - '0');
             pos++;
@@ -105,5 +104,5 @@ public static class Maths
         result = x;
         return true;
     }
-
+    
 }

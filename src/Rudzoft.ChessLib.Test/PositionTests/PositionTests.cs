@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2022 Rudy Alex Kohn
+Copyright (c) 2017-2023 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,44 +24,61 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using Rudzoft.ChessLib.Factories;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.ObjectPool;
+using Rudzoft.ChessLib.Enums;
+using Rudzoft.ChessLib.Fen;
+using Rudzoft.ChessLib.Hash;
+using Rudzoft.ChessLib.MoveGeneration;
 using Rudzoft.ChessLib.Types;
+using Rudzoft.ChessLib.Validation;
 
 namespace Rudzoft.ChessLib.Test.PositionTests;
 
 public sealed class PositionTests
 {
+    private readonly IServiceProvider _serviceProvider;
+
+    public PositionTests()
+    {
+        _serviceProvider = new ServiceCollection()
+            .AddTransient<IBoard, Board>()
+            .AddSingleton<IValues, Values>()
+            .AddSingleton<IRKiss, RKiss>()
+            .AddSingleton<IZobrist, Zobrist>()
+            .AddSingleton<ICuckoo, Cuckoo>()
+            .AddSingleton<IPositionValidator, PositionValidator>()
+            .AddTransient<IPosition, Position>()
+            .AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>()
+            .AddSingleton(static serviceProvider =>
+            {
+                var provider = serviceProvider.GetRequiredService<ObjectPoolProvider>();
+                var policy = new DefaultPooledObjectPolicy<MoveList>();
+                return provider.Create(policy);
+            })
+            .BuildServiceProvider();
+    }
+
     [Fact]
     public void AddPieceTest()
     {
-        var pieceValue = new PieceValue();
-        var board = new Board();
-        var position = new Position(board, pieceValue);
+        const string expectedFen = "rnbqkbnr/Pppppppp/8/8/8/8/PPP1PPPP/RNBQKBNR w KQkq - 0 1";
+        var pos = _serviceProvider.GetRequiredService<IPosition>();
 
-        position.AddPiece(Pieces.WhiteKing, Square.A7);
-        var pieces = position.Pieces();
-        var square = pieces.Lsb();
-        Assert.Equal(square, Square.A7);
+        var fenData = new FenData("rnbqkbnr/pppppppp/8/8/8/8/PPP1PPPP/RNBQKBNR w KQkq - 0 1");
+        var state = new State();
 
-        var piece = position.GetPiece(square);
-        Assert.Equal(Pieces.WhiteKing, piece.Value);
+        pos.Set(in fenData, ChessMode.Normal, state);
 
-        // test overload
-        pieces = position.Pieces(piece);
-        Assert.False((pieces & square).IsEmpty);
+        var square = Square.A7;
+        pos.AddPiece(Piece.WhitePawn, square);
 
-        // Test piece type overload
+        var actualFen = pos.FenNotation;
 
-        board = new Board();
-        position = new Position(board, pieceValue);
+        Assert.Equal(expectedFen, actualFen);
 
-        position.AddPiece(PieceTypes.Knight.MakePiece(Player.Black), Square.D5);
-        pieces = position.Pieces();
-        square = pieces.Lsb();
-        Assert.Equal(Square.D5, square.Value);
-
-        piece = position.GetPiece(square);
-        Assert.Equal(Pieces.BlackKnight, piece.Value);
+        var piece = pos.GetPiece(square);
+        Assert.Equal(Piece.WhitePawn, piece);
     }
 
     [Fact]
@@ -73,8 +90,12 @@ public sealed class PositionTests
         const int expected = 1;
         var expectedSquare = new Square(Ranks.Rank6, Files.FileE);
 
-        var game = GameFactory.Create(fen);
-        var pos = game.Pos;
+        var pos = _serviceProvider.GetRequiredService<IPosition>();
+
+        var fenData = new FenData(fen);
+        var state = new State();
+
+        pos.Set(in fenData, ChessMode.Normal, state);
 
         var b = pos.KingBlockers(Player.Black);
 
@@ -87,5 +108,30 @@ public sealed class PositionTests
         var actual = b.Lsb();
 
         Assert.Equal(expectedSquare, actual);
+    }
+
+    [Theory]
+    [InlineData("KPK", "k7/8/8/8/8/8/8/KP6 w - - 0 10")]
+    [InlineData("KNNK", "k7/8/8/8/8/8/8/KNN5 w - - 0 10")]
+    [InlineData("KBNK", "k7/8/8/8/8/8/8/KBN5 w - - 0 10")]
+    public void SetByCodeCreatesSameMaterialKey(string code, string fen)
+    {
+        var pos = _serviceProvider.GetRequiredService<IPosition>();
+
+        var fenData = new FenData(fen);
+        var state = new State();
+
+        pos.Set(in fenData, ChessMode.Normal, state);
+
+        var materialKey = pos.State.MaterialKey;
+
+        var posCode = pos.Set(code, Player.White, in state);
+        var codeMaterialKey = posCode.State.MaterialKey;
+
+        Assert.Equal(materialKey, codeMaterialKey);
+
+        var codeFen = pos.GenerateFen().ToString();
+
+        Assert.Equal(fen, codeFen);
     }
 }

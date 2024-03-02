@@ -1,5 +1,4 @@
 using System.Runtime.CompilerServices;
-using BenchmarkDotNet.Attributes;
 
 namespace Rudzoft.ChessLib.Benchmark;
 
@@ -38,6 +37,16 @@ public class InBetweenBenchmark
         }
     }
 
+    [Benchmark(Description = ".NET 7 IsAsciiDigit")]
+    public void IsAsciiDigit()
+    {
+        var half = N / 2;
+        for (var i = 0; i < N; ++i)
+        {
+            var inBetween = InBetween(i, 0, half);
+        }
+    }
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static bool InBetweenOr(int v, int min, int max) => ((v - min) | (max - v)) >= 0;
 
@@ -58,5 +67,4 @@ public class InBetweenBenchmark
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static bool InBetweenTrad(int v, int min, int max) => v >= min && v <= max;
-
 }

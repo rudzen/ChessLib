@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2022 Rudy Alex Kohn
+Copyright (c) 2017-2023 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -28,7 +28,7 @@ using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Protocol.UCI;
 
-public interface ISearchParameters
+public interface ISearchParameters : ISpanFormattable
 {
     ulong BlackIncrementTimeMilliseconds { get; set; }
 
@@ -42,7 +42,7 @@ public interface ISearchParameters
 
     ulong MoveTime { get; set; }
 
-    ulong Depth { get; set; }
+    int Depth { get; set; }
 
     ulong Nodes { get; set; }
 
@@ -52,6 +52,8 @@ public interface ISearchParameters
 
     ulong WhiteTimeMilliseconds { get; set; }
 
+    ref Clock Clock(Player p);
+    
     void Clear();
 
     ulong Inc(Player p);
@@ -59,4 +61,6 @@ public interface ISearchParameters
     ulong Time(Player p);
 
     bool DecreaseMovesToGo();
+
+    bool UseTimeManagement();
 }

@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2022 Rudy Alex Kohn
+Copyright (c) 2017-2023 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,8 +24,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System;
-using System.Collections.Generic;
 using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Protocol.UCI;
@@ -33,7 +31,6 @@ namespace Rudzoft.ChessLib.Protocol.UCI;
 public interface IUci
 {
     public int MaxThreads { get; set; }
-    public IDictionary<string, IOption> O { get; set; }
     Action<IOption> OnLogger { get; set; }
     Action<IOption> OnEval { get; set; }
     Action<IOption> OnThreads { get; set; }
@@ -45,7 +42,11 @@ public interface IUci
 
     void AddOption(string name, IOption option);
 
+    bool TryGetOption(string name, out IOption option);
+
     ulong Nps(in ulong nodes, in TimeSpan time);
+
+    ulong Nps(in UInt128 nodes, in TimeSpan time);
 
     Move MoveFromUci(IPosition pos, ReadOnlySpan<char> uciMove);
 
@@ -67,9 +68,19 @@ public interface IUci
 
     string Depth(int depth);
 
-    string Pv(int count, int score, int depth, int selectiveDepth, int alpha, int beta, in TimeSpan time, IEnumerable<Move> pvLine, in ulong nodes);
+    string Pv(
+        int count,
+        int score,
+        int depth,
+        int selectiveDepth,
+        int alpha,
+        int beta,
+        in TimeSpan time,
+        IEnumerable<Move> pvLine,
+        in ulong nodes,
+        in ulong tableHits);
 
-    string Fullness(in ulong tbHits, in ulong nodes, in TimeSpan time);
+    string Fullness(int fullNess, in ulong tbHits, in ulong nodes, in TimeSpan time);
 
     string ToString();
 }

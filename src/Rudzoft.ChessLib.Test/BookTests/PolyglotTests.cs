@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2022 Rudy Alex Kohn
+Copyright (c) 2017-2023 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,23 +24,58 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System.IO;
-using System.Linq;
 using System.Reflection;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.ObjectPool;
+using Microsoft.Extensions.Options;
+using Rudzoft.ChessLib.Enums;
 using Rudzoft.ChessLib.Factories;
+using Rudzoft.ChessLib.Fen;
+using Rudzoft.ChessLib.Hash;
+using Rudzoft.ChessLib.MoveGeneration;
 using Rudzoft.ChessLib.Polyglot;
 using Rudzoft.ChessLib.Protocol.UCI;
 using Rudzoft.ChessLib.Types;
+using Rudzoft.ChessLib.Validation;
 
 namespace Rudzoft.ChessLib.Test.BookTests;
 
 public sealed class PolyglotTests : IClassFixture<BookFixture>
 {
     private readonly BookFixture _fixture;
+    private readonly IServiceProvider _serviceProvider;
 
     public PolyglotTests(BookFixture fixture)
     {
+        var polyConfig = new PolyglotBookConfiguration { BookPath = string.Empty };
+        var polyOptions = Options.Create(polyConfig);
+
         _fixture = fixture;
+        _serviceProvider = new ServiceCollection()
+            .AddSingleton(polyOptions)
+            .AddTransient<IBoard, Board>()
+            .AddSingleton<IValues, Values>()
+            .AddSingleton<IRKiss, RKiss>()
+            .AddSingleton<IZobrist, Zobrist>()
+            .AddSingleton<ICuckoo, Cuckoo>()
+            .AddSingleton<IPositionValidator, PositionValidator>()
+            .AddTransient<IPosition, Position>()
+            .AddSingleton<IPolyglotBookFactory, PolyglotBookFactory>()
+            .AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>()
+            .AddSingleton(static serviceProvider =>
+            {
+                var provider = serviceProvider.GetRequiredService<ObjectPoolProvider>();
+                var policy = new DefaultPooledObjectPolicy<MoveList>();
+                return provider.Create(policy);
+            })
+            .AddSingleton(static sp =>
+            {
+                var mlPool = sp.GetRequiredService<ObjectPool<MoveList>>();
+                IUci uci = new Uci(mlPool);
+                uci.Initialize();
+                return uci;
+            })
+            .BuildServiceProvider();
     }
 
     [Fact]
@@ -48,10 +83,18 @@ public sealed class PolyglotTests : IClassFixture<BookFixture>
     {
         const string fen = Fen.Fen.StartPositionFen;
 
-        var game = GameFactory.Create(fen);
-        var book = new PolyglotBook(game.Pos);
+        var pos = _serviceProvider.GetRequiredService<IPosition>();
 
-        var bookMove = book.Probe(game.Pos);
+        var fenData = new FenData(fen);
+        var state = new State();
+
+        pos.Set(in fenData, ChessMode.Normal, in state);
+
+        var book = _serviceProvider
+            .GetRequiredService<IPolyglotBookFactory>()
+            .Create();
+
+        var bookMove = book.Probe(pos);
 
         var m = Move.EmptyMove;
 
@@ -63,17 +106,28 @@ public sealed class PolyglotTests : IClassFixture<BookFixture>
     {
         const string fen = Fen.Fen.StartPositionFen;
 
-        var game = GameFactory.Create(fen);
-        var path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), _fixture.BookFile);
-        var book = new PolyglotBook(game.Pos)
-        {
-            FileName = path
-        };
+        var bookPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
-        Assert.NotNull(book.FileName);
+        Assert.NotNull(bookPath);
+        Assert.NotEmpty(bookPath);
+
+        var path = Path.Combine(bookPath, _fixture.BookFile);
+
+        var pos = _serviceProvider.GetRequiredService<IPosition>();
+
+        var fenData = new FenData(fen);
+        var state = new State();
+
+        pos.Set(in fenData, ChessMode.Normal, state);
+
+        var book = _serviceProvider
+            .GetRequiredService<IPolyglotBookFactory>()
+            .Create(path);
+
+        Assert.NotNull(book.BookFile);
 
         var expected = Move.Create(Square.D2, Square.D4);
-        var actual = book.Probe(game.Pos);
+        var actual = book.Probe(pos);
 
         Assert.False(actual.IsNullMove());
         Assert.Equal(expected, actual);
@@ -85,10 +139,18 @@ public sealed class PolyglotTests : IClassFixture<BookFixture>
         const ulong expected = 5060803636482931868UL;
         const string fen = Fen.Fen.StartPositionFen;
 
-        var game = GameFactory.Create(fen);
-        var book = new PolyglotBook(game.Pos);
+        var pos = _serviceProvider.GetRequiredService<IPosition>();
 
-        var actual = book.ComputePolyglotKey().Key;
+        var fenData = new FenData(fen);
+        var state = new State();
+
+        pos.Set(in fenData, ChessMode.Normal, state);
+
+        var book = _serviceProvider
+            .GetRequiredService<IPolyglotBookFactory>()
+            .Create();
+
+        var actual = book.ComputePolyglotKey(pos).Key;
 
         Assert.Equal(expected, actual);
     }
@@ -97,7 +159,7 @@ public sealed class PolyglotTests : IClassFixture<BookFixture>
     [InlineData(new string[] { }, 5060803636482931868UL)]
     [InlineData(new[] { "e2e4" }, 9384546495678726550UL)]
     [InlineData(new[] { "e2e4", "d7d5" }, 528813709611831216UL)]
-    [InlineData(new[] { "e2e4", "d7d5", "e4e5", }, 7363297126586722772UL)]
+    [InlineData(new[] { "e2e4", "d7d5", "e4e5" }, 7363297126586722772UL)]
     [InlineData(new[] { "e2e4", "d7d5", "e4e5", "f7f5" }, 2496273314520498040UL)]
     [InlineData(new[] { "e2e4", "d7d5", "e4e5", "f7f5", "e1e2" }, 7289745035295343297UL)]
     [InlineData(new[] { "e2e4", "d7d5", "e4e5", "f7f5", "e1e2", "e8f7" }, 71445182323015129UL)]
@@ -107,18 +169,26 @@ public sealed class PolyglotTests : IClassFixture<BookFixture>
     {
         const string fen = Fen.Fen.StartPositionFen;
 
-        var uci = new Uci();
-        var game = GameFactory.Create(fen);
-        var book = new PolyglotBook(game.Pos);
+        var pos = _serviceProvider.GetRequiredService<IPosition>();
+
+        var fenData = new FenData(fen);
         var state = new State();
 
-        foreach (var m in uciMoves.Select(uciMove => uci.MoveFromUci(game.Pos, uciMove)))
+        pos.Set(in fenData, ChessMode.Normal, state);
+
+        var uci = _serviceProvider.GetRequiredService<IUci>();
+
+        var book = _serviceProvider
+            .GetRequiredService<IPolyglotBookFactory>()
+            .Create();
+
+        foreach (var m in uciMoves.Select(uciMove => uci.MoveFromUci(pos, uciMove)))
         {
             Assert.False(m.IsNullMove());
-            game.Pos.MakeMove(m, state);
+            pos.MakeMove(m, in state);
         }
 
-        var actualKey = book.ComputePolyglotKey().Key;
+        var actualKey = book.ComputePolyglotKey(pos).Key;
 
         Assert.Equal(expected, actualKey);
     }

@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2022 Rudy Alex Kohn
+Copyright (c) 2017-2023 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -25,17 +25,21 @@ SOFTWARE.
 */
 
 using System.Runtime.CompilerServices;
+using Microsoft.Extensions.ObjectPool;
+using Rudzoft.ChessLib.MoveGeneration;
 using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Notation.Notations;
 
-public sealed class UciNotation : Notation
+public sealed class UciNotation(ObjectPool<MoveList> moveLists) : Notation(moveLists)
 {
-    public UciNotation(IPosition pos) : base(pos)
-    {
-    }
-
+    /// <summary>
+    /// <para>Converts a move to UCI notation.</para>
+    /// </summary>
+    /// <param name="pos">The current position</param>
+    /// <param name="move">The move to convert</param>
+    /// <returns>UCI move string</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override string Convert(Move move)
+    public override string Convert(IPosition pos, Move move)
         => move.ToString();
 }

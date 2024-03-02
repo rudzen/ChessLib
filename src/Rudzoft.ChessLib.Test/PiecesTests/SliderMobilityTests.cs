@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2022 Rudy Alex Kohn
+Copyright (c) 2017-2023 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System.Linq;
 using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Test.PiecesTests;
@@ -53,11 +52,11 @@ public sealed class SliderMobilityTests : PieceAttacks, IClassFixture<SliderMobi
     [InlineData(Delta, PieceTypes.Queen, 27)]
     public void BishopMobility(ulong pattern, PieceTypes pt, int expectedMobility)
     {
-        var sliderIndex = _fixture.SliderIndex(pt);
+        var empty = BitBoard.Empty;
         var bb = new BitBoard(pattern);
 
         var expected = bb.Count * expectedMobility;
-        var actual = bb.Select(x => _fixture.SliderAttacks[sliderIndex](x, BitBoard.Empty).Count).Sum();
+        var actual = bb.Select(x => _fixture.SliderAttacks(pt, x, in empty).Count).Sum();
 
         Assert.Equal(expected, actual);
     }

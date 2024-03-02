@@ -1,14 +1,11 @@
-using System.Collections.Generic;
-using System.Linq;
-using BenchmarkDotNet.Attributes;
-using Rudzoft.ChessLib.Types;
+using File = Rudzoft.ChessLib.Types.File;
 
 namespace Rudzoft.ChessLib.Benchmark;
 
 [MemoryDiagnoser]
 public class CharConvertBenchmark
 {
-    private static readonly char[] FileChars = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' };
+    private static readonly char[] FileChars = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
 
     private static readonly string[] FileStrings = FileChars.Select(static x => x.ToString()).ToArray();
 

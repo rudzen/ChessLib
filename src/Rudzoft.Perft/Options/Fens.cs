@@ -3,7 +3,7 @@ Perft, a chess perft testing application
 
 MIT License
 
-Copyright (c) 2019-2022 Rudy Alex Kohn
+Copyright (c) 2019-2023 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,13 +24,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System.Collections.Generic;
 using CommandLine;
 
 namespace Rudzoft.Perft.Options;
 
 [Verb("fens", HelpText = "Add fens to run")]
-public class FenOptions : IOptions
+public class FenOptions : IPerftOptions
 {
     [Option('f', "fen", Required = true, HelpText = "Set the FEN string to perform perft test on.")]
     public IEnumerable<string> Fens { get; set; }

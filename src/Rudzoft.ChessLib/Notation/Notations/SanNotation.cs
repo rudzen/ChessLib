@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2022 Rudy Alex Kohn
+Copyright (c) 2017-2023 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,8 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System;
 using System.Runtime.CompilerServices;
+using Microsoft.Extensions.ObjectPool;
 using Rudzoft.ChessLib.Extensions;
 using Rudzoft.ChessLib.MoveGeneration;
 using Rudzoft.ChessLib.Types;
@@ -34,17 +34,17 @@ namespace Rudzoft.ChessLib.Notation.Notations;
 
 public sealed class SanNotation : Notation
 {
-    public SanNotation(IPosition pos) : base(pos)
-    {
-    }
+    public SanNotation(ObjectPool<MoveList> moveLists) : base(moveLists) { }
 
     /// <summary>
     /// <para>Converts a move to SAN notation.</para>
     /// </summary>
+    /// <param name="pos">The current position</param>
     /// <param name="move">The move to convert</param>
     /// <returns>SAN move string</returns>
+    [SkipLocalsInit]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override string Convert(Move move)
+    public override string Convert(IPosition pos, Move move)
     {
         var (from, to) = move;
 
@@ -54,12 +54,12 @@ public sealed class SanNotation : Notation
         Span<char> re = stackalloc char[6];
         var i = 0;
 
-        var pt = Pos.GetPieceType(from);
+        var pt = pos.GetPieceType(from);
 
         if (pt != PieceTypes.Pawn)
         {
-            re[i++] = Pos.GetPiece(from).GetPgnChar();
-            foreach (var amb in Disambiguation(move, from))
+            re[i++] = pos.GetPiece(from).GetPgnChar();
+            foreach (var amb in Disambiguation(pos, move, from))
                 re[i++] = amb;
         }
 
@@ -69,14 +69,11 @@ public sealed class SanNotation : Notation
             re[i++] = 'p';
             re[i++] = from.FileChar;
         }
-        else
+        else if (pos.GetPiece(to) != Piece.EmptyPiece)
         {
-            if (Pos.GetPiece(to) != Piece.EmptyPiece)
-            {
-                if (pt == PieceTypes.Pawn)
-                    re[i++] = from.FileChar;
-                re[i++] = 'x';
-            }
+            if (pt == PieceTypes.Pawn)
+                re[i++] = from.FileChar;
+            re[i++] = 'x';
         }
 
         re[i++] = to.FileChar;
@@ -85,16 +82,21 @@ public sealed class SanNotation : Notation
         if (move.IsPromotionMove())
         {
             re[i++] = '=';
-            re[i++] = move.PromotedPieceType().MakePiece(Pos.SideToMove).GetPgnChar();
+            re[i++] = move.PromotedPieceType().MakePiece(pos.SideToMove).GetPgnChar();
+        }
+        else if (pos.InCheck)
+        {
+            var ml = MoveLists.Get();
+            ml.Generate(pos);
+            var count = ml.Get().Length;
+            MoveLists.Return(ml);
+            if (count == 0)
+                re[i++] = '#';
         }
 
-        if (Pos.InCheck)
-        {
-            if (Pos.GenerateMoves().Get().IsEmpty)
-                re[i++] = '#';
-        } else if (GivesCheck(move))
+        if (pos.GivesCheck(move))
             re[i++] = '+';
 
-        return new string(re[..i]);
+        return new(re[..i]);
     }
 }

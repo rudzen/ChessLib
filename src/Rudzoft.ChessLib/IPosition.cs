@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2022 Rudy Alex Kohn
+Copyright (c) 2017-2023 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,11 +24,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System;
-using System.Collections.Generic;
 using System.Text;
 using Rudzoft.ChessLib.Enums;
 using Rudzoft.ChessLib.Fen;
+using Rudzoft.ChessLib.Hash;
 using Rudzoft.ChessLib.Types;
 using Rudzoft.ChessLib.Validation;
 
@@ -50,7 +49,9 @@ public interface IPosition : IEnumerable<Piece>
 
     IBoard Board { get; }
 
-    IPieceValue PieceValue { get; }
+    IZobrist Zobrist { get; }
+    
+    IValues Values { get; }
 
     BitBoard Checkers { get; }
 
@@ -117,6 +118,14 @@ public interface IPosition : IEnumerable<Piece>
     BitBoard Pieces(PieceTypes pt, Player p);
 
     BitBoard Pieces(PieceTypes pt1, PieceTypes pt2, Player p);
+    
+    int PieceCount();
+
+    int PieceCount(Piece pc);
+
+    int PieceCount(PieceTypes pt);
+
+    int PieceCount(PieceTypes pt, Player p);
 
     BitBoard PawnsOnColor(Player p, Square sq);
 
@@ -162,6 +171,8 @@ public interface IPosition : IEnumerable<Piece>
 
     bool IsPawnPassedAt(Player p, Square sq);
 
+    BitBoard PawnPassSpan(Player p, Square sq);
+    
     bool CanCastle(CastleRight cr);
 
     bool CanCastle(Player p);
@@ -180,9 +191,13 @@ public interface IPosition : IEnumerable<Piece>
 
     FenData GenerateFen();
 
-    void Set(in FenData fenData, ChessMode chessMode, State state, bool validate = false, int searcher = 0);
+    IPosition Set(in FenData fenData, ChessMode chessMode, in State state, bool validate = false, int searcher = 0);
 
-    HashKey GetPiecesKey();
+    IPosition Set(string fen, ChessMode chessMode, in State state, bool validate = false, int searcher = 0);
+
+    IPosition Set(ReadOnlySpan<char> code, Player p, in State state);
+    
+    HashKey GetKey();
 
     HashKey GetPawnKey();
 
@@ -200,5 +215,11 @@ public interface IPosition : IEnumerable<Piece>
 
     bool SeeGe(Move m, Value threshold);
 
-    IPositionValidator Validate(PositionValidationTypes type = PositionValidationTypes.Basic);
+    Value NonPawnMaterial(Player p);
+    
+    Value NonPawnMaterial();
+
+    HashKey MovePositionKey(Move m);
+    
+    PositionValidationResult Validate(PositionValidationTypes type = PositionValidationTypes.Basic);
 }

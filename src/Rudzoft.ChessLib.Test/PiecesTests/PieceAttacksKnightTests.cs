@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2022 Rudy Alex Kohn
+Copyright (c) 2017-2023 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -50,9 +50,9 @@ public sealed class PieceAttacksKnightTests : PieceAttacks, IClassFixture<Regula
         {
             var sq = BitBoards.PopLsb(ref bb);
             var attacks = _fixture.RegAttacks[attackIndex](sq);
-            var expected = !(_fixture.BoardCorners & sq).IsEmpty
+            var expected = (_fixture.BoardCorners & sq).IsNotEmpty
                 ? _fixture.KnightExpected[index] >> 1 /* for corners */
-                : !(narrowLocations & sq).IsEmpty
+                : (narrowLocations & sq).IsNotEmpty
                     ? _fixture.KnightExpected[index] - 1 /* narrowLocations */
                     : _fixture.KnightExpected[index];
             var actual = attacks.Count;
@@ -73,7 +73,7 @@ public sealed class PieceAttacksKnightTests : PieceAttacks, IClassFixture<Regula
         {
             var sq = BitBoards.PopLsb(ref bb);
             var attacks = _fixture.RegAttacks[attackIndex](sq);
-            var expected = !(narrowLocations & sq).IsEmpty
+            var expected = (narrowLocations & sq).IsNotEmpty
                 ? _fixture.KnightExpected[index] - 2
                 : _fixture.KnightExpected[index];
             var actual = attacks.Count;

@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2022 Rudy Alex Kohn
+Copyright (c) 2017-2023 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,19 +24,50 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using Rudzoft.ChessLib.Factories;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.ObjectPool;
+using Rudzoft.ChessLib.Enums;
+using Rudzoft.ChessLib.Fen;
+using Rudzoft.ChessLib.Hash;
+using Rudzoft.ChessLib.MoveGeneration;
 using Rudzoft.ChessLib.Types;
+using Rudzoft.ChessLib.Validation;
 
 namespace Rudzoft.ChessLib.Test.PiecesTests;
 
 public sealed class PawnDoubleAttackTests
 {
-    [Fact]
-    public void b()
-    {
-        var g = GameFactory.Create(Fen.Fen.StartPositionFen);
+    private readonly IServiceProvider _serviceProvider;
 
-        var pos = g.Pos;
+    public PawnDoubleAttackTests()
+    {
+        _serviceProvider = new ServiceCollection()
+            .AddTransient<IBoard, Board>()
+            .AddSingleton<IValues, Values>()
+            .AddSingleton<IRKiss, RKiss>()
+            .AddSingleton<IZobrist, Zobrist>()
+            .AddSingleton<ICuckoo, Cuckoo>()
+            .AddSingleton<IPositionValidator, PositionValidator>()
+            .AddTransient<IPosition, Position>()
+            .AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>()
+            .AddSingleton(static serviceProvider =>
+            {
+                var provider = serviceProvider.GetRequiredService<ObjectPoolProvider>();
+                var policy = new DefaultPooledObjectPolicy<MoveList>();
+                return provider.Create(policy);
+            })
+            .BuildServiceProvider();
+    }
+
+    [Fact]
+    public void WhitePlayerPawnDoubleAttacksAttackSpan()
+    {
+        var pos = _serviceProvider.GetRequiredService<IPosition>();
+
+        var fenData = new FenData(Fen.Fen.StartPositionFen);
+        var state = new State();
+
+        pos.Set(in fenData, ChessMode.Normal, state);
 
         var whitePawns = pos.Pieces(PieceTypes.Pawn, Player.White);
 

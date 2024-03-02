@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2022 Rudy Alex Kohn
+Copyright (c) 2017-2023 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System;
 using System.Diagnostics;
 using Rudzoft.ChessLib.Hash;
 using Rudzoft.ChessLib.Types;
@@ -36,16 +35,18 @@ namespace Rudzoft.ChessLib;
 /// situations. https://marcelk.net/2013-04-06/paper/upcoming-rep-v2.pdf
 /// TODO : Unit tests
 /// </summary>
-public static class Cuckoo
+public sealed class Cuckoo : ICuckoo
 {
-    private static readonly HashKey[] CuckooKeys = new HashKey[8192];
-    private static readonly Move[] CuckooMoves = new Move[8192];
+    private readonly HashKey[] _cuckooKeys;
+    private readonly Move[]    _cuckooMoves;
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Minor Code Smell", "S3963:\"static\" fields should be initialized inline", Justification = "Multiple arrays in one go")]
-    static Cuckoo()
+    public Cuckoo(IZobrist zobrist)
     {
+        _cuckooKeys  = new HashKey[8192];
+        _cuckooMoves = new Move[8192];
         var count = 0;
-        foreach (var pc in Piece.AllPieces)
+
+        foreach (var pc in Piece.All.AsSpan())
         {
             var bb = BitBoards.AllSquares;
             while (bb)
@@ -57,19 +58,19 @@ public static class Cuckoo
                         continue;
 
                     var move = Move.Create(sq1, sq2);
-                    var key = pc.GetZobristPst(sq1) ^ pc.GetZobristPst(sq2) ^ Zobrist.GetZobristSide();
-                    var i = CuckooHashOne(in key);
+                    var key  = zobrist.Psq(sq1, pc) ^ zobrist.Psq(sq2, pc) ^ zobrist.Side();
+                    var j    = CuckooHashOne(in key);
                     do
                     {
-                        (CuckooKeys[i], key) = (key, CuckooKeys[i]);
-                        (CuckooMoves[i], move) = (move, CuckooMoves[i]);
+                        (_cuckooKeys[j], key)   = (key, _cuckooKeys[j]);
+                        (_cuckooMoves[j], move) = (move, _cuckooMoves[j]);
 
                         // check for empty slot
                         if (move.IsNullMove())
                             break;
 
                         // Push victim to alternative slot
-                        i = i == CuckooHashOne(in key)
+                        j = j == CuckooHashOne(in key)
                             ? CuckooHashTwo(in key)
                             : CuckooHashOne(in key);
                     } while (true);
@@ -82,33 +83,33 @@ public static class Cuckoo
         Debug.Assert(count == 3668);
     }
 
-    public static bool HashCuckooCycle(in IPosition pos, int end, int ply)
+    public bool HashCuckooCycle(in IPosition pos, int end, int ply)
     {
         if (end < 3)
             return false;
 
-        var state = pos.State;
-        var originalKey = state.Key;
+        var state         = pos.State;
+        var originalKey   = state.PositionKey;
         var statePrevious = state.Previous;
 
         for (var i = 3; i <= end; i += 2)
         {
             statePrevious = statePrevious.Previous.Previous;
-            var moveKey = originalKey ^ statePrevious.Key;
+            var moveKey = originalKey ^ statePrevious.PositionKey;
 
-            var j = CuckooHashOne(in moveKey);
-            var found = CuckooKeys[j] == moveKey;
+            var j     = CuckooHashOne(in moveKey);
+            var found = _cuckooKeys[j] == moveKey;
 
             if (!found)
             {
-                j = CuckooHashTwo(in moveKey);
-                found = CuckooKeys[j] == moveKey;
+                j     = CuckooHashTwo(in moveKey);
+                found = _cuckooKeys[j] == moveKey;
             }
 
             if (!found)
                 continue;
 
-            var (s1, s2) = CuckooMoves[j];
+            var (s1, s2) = _cuckooMoves[j];
 
             if ((s1.BitboardBetween(s2) & pos.Board.Pieces()).IsEmpty)
                 continue;
@@ -130,9 +131,7 @@ public static class Cuckoo
         return false;
     }
 
-    private static int CuckooHashOne(in HashKey key)
-        => (int)(key.Key & 0x1FFF);
+    private static int CuckooHashOne(in HashKey key) => (int)(key.Key & 0x1FFF);
 
-    private static int CuckooHashTwo(in HashKey key)
-        => (int)((key.Key >> 16) & 0x1FFF);
+    private static int CuckooHashTwo(in HashKey key) => (int)((key.Key >> 16) & 0x1FFF);
 }

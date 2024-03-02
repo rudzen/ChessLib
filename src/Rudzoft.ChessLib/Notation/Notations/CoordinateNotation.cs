@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2022 Rudy Alex Kohn
+Copyright (c) 2017-2023 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,21 +24,21 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System;
 using System.Runtime.CompilerServices;
+using Microsoft.Extensions.ObjectPool;
 using Rudzoft.ChessLib.Extensions;
+using Rudzoft.ChessLib.MoveGeneration;
 using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Notation.Notations;
 
 public sealed class CoordinateNotation : Notation
 {
-    public CoordinateNotation(IPosition pos) : base(pos)
-    {
-    }
+    public CoordinateNotation(ObjectPool<MoveList> moveLists) : base(moveLists) { }
 
+    [SkipLocalsInit]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override string Convert(Move move)
+    public override string Convert(IPosition pos, Move move)
     {
         var (from, to) = move;
 
@@ -51,7 +51,7 @@ public sealed class CoordinateNotation : Notation
         re[i++] = char.ToUpper(to.FileChar);
         re[i++] = to.RankChar;
 
-        var captured = Pos.GetPiece(to);
+        var captured = pos.GetPiece(to);
 
         // ReSharper disable once InvertIf
         if (captured != Piece.EmptyPiece)
@@ -61,6 +61,6 @@ public sealed class CoordinateNotation : Notation
             re[i++] = ')';
         }
 
-        return new string(re[..i]);
+        return new(re[..i]);
     }
 }

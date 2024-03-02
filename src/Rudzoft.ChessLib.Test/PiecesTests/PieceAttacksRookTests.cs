@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2022 Rudy Alex Kohn
+Copyright (c) 2017-2023 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,14 +24,41 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.ObjectPool;
+using Rudzoft.ChessLib.Hash;
+using Rudzoft.ChessLib.MoveGeneration;
 using Rudzoft.ChessLib.Types;
+using Rudzoft.ChessLib.Validation;
 
 namespace Rudzoft.ChessLib.Test.PiecesTests;
 
 public sealed class PieceAttacksRookTests : PieceAttacks
 {
+    private readonly IServiceProvider _serviceProvider;
+
+    public PieceAttacksRookTests()
+    {
+        _serviceProvider = new ServiceCollection()
+            .AddTransient<IBoard, Board>()
+            .AddSingleton<IValues, Values>()
+            .AddSingleton<ICuckoo, Cuckoo>()
+            .AddSingleton<IRKiss, RKiss>()
+            .AddSingleton<IZobrist, Zobrist>()
+            .AddSingleton<IPositionValidator, PositionValidator>()
+            .AddTransient<IPosition, Position>()
+            .AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>()
+            .AddSingleton(static serviceProvider =>
+            {
+            var provider = serviceProvider.GetRequiredService<ObjectPoolProvider>();
+            var policy = new DefaultPooledObjectPolicy<MoveList>();
+            return provider.Create(policy);
+            })
+            .BuildServiceProvider();
+    }
+
     /// <summary>
-    /// Testing results of blocked rook attacks, they should always return 7 on the sides, and 14 in
+    /// Testing results of blocked rook attacks, they should always return 8 on the sides, and 14 in
     /// the corner
     /// </summary>
     [Fact]
@@ -62,9 +89,7 @@ public sealed class PieceAttacksRookTests : PieceAttacks
          */
 
         // just to get the attacks
-        var board = new Board();
-        var pieceValue = new PieceValue();
-        var pos = new Position(board, pieceValue);
+        var pos = _serviceProvider.GetRequiredService<IPosition>();
 
         while (border)
         {

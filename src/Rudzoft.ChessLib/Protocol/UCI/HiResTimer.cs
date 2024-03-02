@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2022 Rudy Alex Kohn
+Copyright (c) 2017-2023 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,10 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System;
 using System.Diagnostics;
-using System.Threading;
-using System.Threading.Tasks;
 using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Protocol.UCI;
@@ -41,6 +38,8 @@ public sealed class HiResTimer : IHiResTimer, IEquatable<HiResTimer>
 
     public static readonly double Frequency = Stopwatch.Frequency;
 
+    private static readonly TimeSpan RestartThreshold = TimeSpan.FromHours(1);
+
     private readonly object _intervalLock;
 
     private float _interval;
@@ -49,17 +48,17 @@ public sealed class HiResTimer : IHiResTimer, IEquatable<HiResTimer>
 
     private Task _executer;
 
-    public HiResTimer() => _intervalLock = new object();
+    public HiResTimer() => _intervalLock = new();
 
     public HiResTimer(int id)
         : this(1f, id, null) { }
 
     public HiResTimer(float interval, int id, Action<HiResTimerArgs> elapsed)
     {
-        _intervalLock = new object();
-        Interval = interval;
-        Elapsed = elapsed;
-        Id = id;
+        _intervalLock = new();
+        Interval      = interval;
+        Elapsed       = elapsed;
+        Id            = id;
     }
 
     /// <summary>
@@ -81,14 +80,14 @@ public sealed class HiResTimer : IHiResTimer, IEquatable<HiResTimer>
 
         set
         {
-            if (value < 0f || float.IsNaN(value))
+            if (value is < 0f or float.NaN)
                 throw new ArgumentOutOfRangeException(nameof(value));
             lock (_intervalLock)
                 _interval = value;
         }
     }
 
-    public bool IsRunning => _cancellationTokenSource != null && !_cancellationTokenSource.Token.IsCancellationRequested && _cancellationTokenSource.Token.CanBeCanceled;
+    public bool IsRunning => _cancellationTokenSource is { Token: { IsCancellationRequested: false, CanBeCanceled: true } };
 
     public bool UseHighPriorityThread { get; set; } = true;
 
@@ -98,13 +97,13 @@ public sealed class HiResTimer : IHiResTimer, IEquatable<HiResTimer>
 
     public static bool operator ==(HiResTimer left, int right) => left != null && left.Id == right;
 
-    public static bool operator ==(HiResTimer left, Player right) => left != null && left.Id == right.Side;
+    public static bool operator ==(HiResTimer left, Player right) => left != null && left.Id == right;
 
     public static bool operator !=(HiResTimer left, HiResTimer right) => !Equals(left, right);
 
     public static bool operator !=(HiResTimer left, int right) => left != null && left.Id != right;
 
-    public static bool operator !=(HiResTimer left, Player right) => left != null && left.Id != right.Side;
+    public static bool operator !=(HiResTimer left, Player right) => left != null && left.Id != right;
 
     public void Start()
     {
@@ -113,7 +112,7 @@ public sealed class HiResTimer : IHiResTimer, IEquatable<HiResTimer>
 
         Debug.Print($"Timer Start on thread {Environment.CurrentManagedThreadId}");
 
-        _cancellationTokenSource = new CancellationTokenSource();
+        _cancellationTokenSource = new();
         _cancellationTokenSource.Token.ThrowIfCancellationRequested();
         _executer = Task.Run(() => ExecuteTimer(_cancellationTokenSource.Token), _cancellationTokenSource.Token);
     }
@@ -155,18 +154,16 @@ public sealed class HiResTimer : IHiResTimer, IEquatable<HiResTimer>
         return obj.GetType() == GetType() && Equals((HiResTimer)obj);
     }
 
-    public bool Equals(HiResTimer other) => Id == other.Id;
+    public bool Equals(HiResTimer other) => Id == other?.Id;
 
-    private static double ElapsedHiRes(Stopwatch stopwatch) => stopwatch.ElapsedTicks * TickLength;
+    private static double ElapsedHiRes(in long timeStamp) => Stopwatch.GetElapsedTime(timeStamp).Ticks * TickLength;
 
     private void ExecuteTimer(CancellationToken cancellationToken)
     {
         Debug.Print($"Timer ExecuteTimer on thread {Environment.CurrentManagedThreadId}");
 
         var nextTrigger = 0f;
-
-        var stopwatch = new Stopwatch();
-        stopwatch.Start();
+        var timeStamp = Stopwatch.GetTimestamp();
 
         while (!cancellationToken.IsCancellationRequested)
         {
@@ -175,7 +172,7 @@ public sealed class HiResTimer : IHiResTimer, IEquatable<HiResTimer>
 
             do
             {
-                elapsed = ElapsedHiRes(stopwatch);
+                elapsed = ElapsedHiRes(in timeStamp);
                 var diff = nextTrigger - elapsed;
                 if (diff <= 0f)
                     break;
@@ -200,19 +197,20 @@ public sealed class HiResTimer : IHiResTimer, IEquatable<HiResTimer>
                     return;
             } while (true);
 
-            var delay = elapsed - nextTrigger;
-            Elapsed?.Invoke(new HiResTimerArgs(delay, Id));
+            if (Elapsed != null)
+            {
+                var delay = elapsed - nextTrigger;
+                Elapsed(new(delay, Id));
+            }
 
             if (cancellationToken.IsCancellationRequested)
                 return;
 
-            // restarting the timer in every hour to prevent precision problems
-            if (stopwatch.Elapsed.TotalHours < 1d)
+            // restarting the timer in every day to hour precision problems
+            if (Stopwatch.GetElapsedTime(timeStamp) < RestartThreshold)
                 continue;
-            stopwatch.Restart();
+            timeStamp = Stopwatch.GetTimestamp();
             nextTrigger = 0f;
         }
-
-        stopwatch.Stop();
     }
 }

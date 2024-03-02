@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2022 Rudy Alex Kohn
+Copyright (c) 2017-2023 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,67 +24,61 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using Microsoft.Extensions.ObjectPool;
 using Rudzoft.ChessLib.Enums;
+using Rudzoft.ChessLib.Extensions;
 using Rudzoft.ChessLib.Fen;
 using Rudzoft.ChessLib.Hash.Tables.Transposition;
 using Rudzoft.ChessLib.MoveGeneration;
-using Rudzoft.ChessLib.ObjectPoolPolicies;
 using Rudzoft.ChessLib.Protocol.UCI;
 using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib;
 
-public sealed class Game : IGame
+public sealed class Game(
+    ITranspositionTable transpositionTable,
+    IUci uci,
+    ICpu cpu,
+    ISearchParameters searchParameters,
+    IPosition pos,
+    ObjectPool<MoveList> moveListPool)
+    : IGame
 {
-    private readonly ObjectPool<IMoveList> _moveLists;
-    private readonly IPosition _pos;
+    private readonly PertT            _perftTable   = new(8);
 
-    public Game(IPosition pos)
-    {
-        _pos = pos;
-        _moveLists = new DefaultObjectPool<IMoveList>(new MoveListPolicy());
-        SearchParameters = new SearchParameters();
-    }
+    public Action<IPieceSquare> PieceUpdated => pos.PieceUpdated;
 
-    static Game()
-    {
-        Table = new TranspositionTable(256);
-        Uci = new Uci();
-    }
-
-    public Action<IPieceSquare> PieceUpdated => _pos.PieceUpdated;
-
-    public int MoveNumber => 0; //(PositionIndex - 1) / 2 + 1;
+    public int MoveNumber => 1 + (Pos.Ply - Pos.SideToMove.IsBlack.AsByte() / 2);
 
     public BitBoard Occupied => Pos.Pieces();
 
-    public IPosition Pos => _pos;
+    public IPosition Pos => pos;
 
     public GameEndTypes GameEndType { get; set; }
 
-    public static TranspositionTable Table { get; }
+    public ITranspositionTable Table { get; } = transpositionTable;
 
-    public SearchParameters SearchParameters { get; }
+    public ISearchParameters SearchParameters { get; } = searchParameters;
 
-    public static IUci Uci { get; }
+    public IUci Uci { get; } = uci;
 
-    public bool IsRepetition => _pos.IsRepetition;
+    public ICpu Cpu { get; } = cpu;
+
+    public bool IsRepetition => pos.IsRepetition;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void NewGame(string fen = Fen.Fen.StartPositionFen)
     {
         var fenData = new FenData(fen);
         var state = new State();
-        _pos.Set(in fenData, ChessMode.Normal, state, true);
+        pos.Set(in fenData, ChessMode.Normal, state, true);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public FenData GetFen() => _pos.GenerateFen();
+    public FenData GetFen() => pos.GenerateFen();
 
     public void UpdateDrawTypes()
     {
@@ -94,65 +88,75 @@ public sealed class Game : IGame
         if (Pos.Rule50 >= 100)
             gameEndType |= GameEndTypes.FiftyMove;
 
-        var moveList = _moveLists.Get();
-        moveList.Generate(in _pos);
-        // ReSharper disable once LoopCanBeConvertedToQuery
-        foreach (var em in moveList.Get())
-            if (!Pos.IsLegal(em.Move))
-            {
-                gameEndType |= GameEndTypes.Pat;
-                break;
-            }
+        var moveList = moveListPool.Get();
+        moveList.Generate(in pos);
+
+        var moves = moveList.Get();
+
+        if (moves.IsEmpty)
+            gameEndType |= GameEndTypes.Pat;
+
+        moveListPool.Return(moveList);
 
         GameEndType = gameEndType;
     }
 
     public override string ToString()
-        => _pos.ToString();
-
-    IEnumerator IEnumerable.GetEnumerator()
-        => GetEnumerator();
-
-    public IEnumerator<Piece> GetEnumerator()
-        => _pos.GetEnumerator();
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public BitBoard OccupiedBySide(Player p)
-        => _pos.Pieces(p);
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Player CurrentPlayer() => _pos.SideToMove;
-
-    public ulong Perft(int depth, bool root = true)
     {
-        var tot = ulong.MinValue;
+        return pos.ToString() ?? string.Empty;
+    }
 
-        var ml = _moveLists.Get();
-        ml.Generate(in _pos);
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+    public IEnumerator<Piece> GetEnumerator() => pos.GetEnumerator();
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public BitBoard OccupiedBySide(Player p) => pos.Pieces(p);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Player CurrentPlayer() => pos.SideToMove;
+
+    public UInt128 Perft(int depth, bool root = true)
+    {
+        var tot = UInt128.MinValue;
+        var ml  = moveListPool.Get();
+        ml.Generate(in pos);
         var state = new State();
 
-        foreach (var em in ml.Get())
-            if (root && depth <= 1)
-                tot++;
+        var moves = ml.Get();
+        ref var movesSpace = ref MemoryMarshal.GetReference(moves);
+
+        if (root && depth <= 1)
+        {
+            tot = (ulong)ml.Length;
+            moveListPool.Return(ml);
+            return tot;
+        }
+
+        for (var i = 0; i < moves.Length; ++i)
+        {
+            var valMove = Unsafe.Add(ref movesSpace, i);
+            var m = valMove.Move;
+
+            pos.MakeMove(m, in state);
+
+            if (depth <= 2)
+            {
+                var ml2 = moveListPool.Get();
+                ml2.Generate(in pos);
+                tot += (ulong)ml2.Length;
+                moveListPool.Return(ml2);
+            }
             else
             {
-                var m = em.Move;
-                _pos.MakeMove(m, in state);
-
-                if (depth <= 2)
-                {
-                    var ml2 = _moveLists.Get();
-                    ml2.Generate(in _pos);
-                    tot += (ulong)ml2.Length;
-                    _moveLists.Return(ml2);
-                }
-                else
-                    tot += Perft(depth - 1, false);
-
-                _pos.TakeMove(m);
+                var next = Perft(depth - 1, false);
+                tot += next;
             }
 
-        _moveLists.Return(ml);
+            pos.TakeMove(m);
+        }
+
+        moveListPool.Return(ml);
 
         return tot;
     }

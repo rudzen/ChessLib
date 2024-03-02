@@ -1,0 +1,19 @@
+[Event "Test event"]
+[Site "Test site"]
+[Date "2021.09.01"]
+[Round "1"]
+[White "Player 1"]
+[Black "Player 2"]
+[Result "1-0"]
+
+1. e4 e5 2. Nf3 Nc6 3. Bb5 1-0
+
+[Event "Test event 2"]
+[Site "Test site 2"]
+[Date "2021.09.02"]
+[Round "2"]
+[White "Player 3"]
+[Black "Player 4"]
+[Result "0-1"]
+
+1. d4 d5 2. c4 c6 3. Nf3 Nf6 0-1
