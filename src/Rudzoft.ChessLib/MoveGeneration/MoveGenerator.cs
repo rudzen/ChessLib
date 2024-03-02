@@ -47,25 +47,20 @@ public static class MoveGenerator
         Player us,
         MoveGenerationTypes types)
     {
-        if (types == MoveGenerationTypes.Legal)
+        if (types.HasFlagFast(MoveGenerationTypes.Legal))
             return GenerateLegal(index, in pos, ref moves, us);
 
-        const MoveGenerationTypes capturesQuietsNonEvasions =
-            MoveGenerationTypes.Captures | MoveGenerationTypes.Quiets | MoveGenerationTypes.NonEvasions;
-
-        if (capturesQuietsNonEvasions.HasFlagFast(types))
+        if (MoveGenerationTypes.CapturesQuietsNonEvasions.HasFlagFast(types))
             return GenerateCapturesQuietsNonEvasions(in pos, ref moves, index, us, types);
 
-        switch (types)
-        {
-            case MoveGenerationTypes.Evasions:
-                return GenerateEvasions(index, in pos, ref moves, us);
-            case MoveGenerationTypes.QuietChecks:
-                return GenerateQuietChecks(index, in pos, ref moves, us);
-            default:
-                Debug.Assert(false);
-                throw new ArgumentOutOfRangeException(nameof(types), types, null);
-        }
+        if (types.HasFlagFast(MoveGenerationTypes.Evasions))
+            return GenerateEvasions(index, in pos, ref moves, us);
+
+        if (types.HasFlagFast(MoveGenerationTypes.QuietChecks))
+            return GenerateQuietChecks(index, in pos, ref moves, us);
+
+        Debug.Assert(false);
+        throw new ArgumentOutOfRangeException(nameof(types), types, null);
     }
 
     private static int GenerateAll(
@@ -96,10 +91,12 @@ public static class MoveGenerator
         var (kingSide, queenSide) = CastleSideRights[us];
 
         if (pos.CanCastle(kingSide) && !pos.CastlingImpeded(kingSide))
-            Unsafe.Add(ref moves, index++).Move = Move.Create(ksq, pos.CastlingRookSquare(kingSide), MoveTypes.Castling);
+            Unsafe.Add(ref moves, index++).Move
+                = Move.Create(ksq, pos.CastlingRookSquare(kingSide), MoveTypes.Castling);
 
         if (pos.CanCastle(queenSide) && !pos.CastlingImpeded(queenSide))
-            Unsafe.Add(ref moves, index++).Move = Move.Create(ksq, pos.CastlingRookSquare(queenSide), MoveTypes.Castling);
+            Unsafe.Add(ref moves, index++).Move
+                = Move.Create(ksq, pos.CastlingRookSquare(queenSide), MoveTypes.Castling);
 
         return index;
     }
@@ -125,10 +122,10 @@ public static class MoveGenerator
         Debug.Assert(!pos.InCheck);
         var target = types switch
         {
-            MoveGenerationTypes.Captures => pos.Pieces(~us),
-            MoveGenerationTypes.Quiets => ~pos.Pieces(),
+            MoveGenerationTypes.Captures    => pos.Pieces(~us),
+            MoveGenerationTypes.Quiets      => ~pos.Pieces(),
             MoveGenerationTypes.NonEvasions => ~pos.Pieces(us),
-            var _ => BitBoard.Empty
+            var _                           => BitBoard.Empty
         };
 
         return GenerateAll(in pos, ref moves, index, in target, us, types);
@@ -291,7 +288,7 @@ public static class MoveGenerator
         {
             MoveGenerationTypes.Evasions => pos.Pieces(them) & target,
             MoveGenerationTypes.Captures => target,
-            var _ => pos.Pieces(them)
+            var _                        => pos.Pieces(them)
         };
 
         var ksq = pos.GetKingSquare(them);
@@ -304,9 +301,7 @@ public static class MoveGenerator
         // Single and double pawn pushes, no promotions
         if (types != MoveGenerationTypes.Captures)
         {
-            const MoveGenerationTypes quiets = MoveGenerationTypes.Quiets | MoveGenerationTypes.QuietChecks;
-
-            emptySquares = quiets.HasFlagFast(types)
+            emptySquares = types.HasFlagFast(MoveGenerationTypes.AllQuiets)
                 ? target
                 : ~pos.Pieces();
 
@@ -389,11 +384,8 @@ public static class MoveGenerator
                 index = MakePromotions(index, ref moves, BitBoards.PopLsb(ref pawnPromoUp), ksq, up, types);
         }
 
-        const MoveGenerationTypes capturesEnPassant = MoveGenerationTypes.Captures | MoveGenerationTypes.Evasions |
-                                                      MoveGenerationTypes.NonEvasions;
-
         // Standard and en-passant captures
-        if (!types.HasFlagFast(capturesEnPassant))
+        if (!types.HasFlagFast(MoveGenerationTypes.CapturesEnPassant))
             return index;
 
         pawnOne = pawnsNotOn7.Shift(right) & enemies;
@@ -425,7 +417,8 @@ public static class MoveGenerator
         pawnOne = pawnsNotOn7 & pos.EnPassantSquare.PawnAttack(them);
         Debug.Assert(!pawnOne.IsEmpty);
         while (pawnOne)
-            Unsafe.Add(ref moves, index++).Move = Move.Create(BitBoards.PopLsb(ref pawnOne), pos.EnPassantSquare, MoveTypes.Enpassant);
+            Unsafe.Add(ref moves, index++).Move
+                = Move.Create(BitBoards.PopLsb(ref pawnOne), pos.EnPassantSquare, MoveTypes.Enpassant);
 
         return index;
     }
@@ -490,22 +483,14 @@ public static class MoveGenerator
     {
         var from = to - direction;
 
-        const MoveGenerationTypes queenPromotion = MoveGenerationTypes.Captures
-                                                   | MoveGenerationTypes.Evasions
-                                                   | MoveGenerationTypes.NonEvasions;
-
-        if (types.HasFlagFast(queenPromotion))
+        if (types.HasFlagFast(MoveGenerationTypes.QueenPromotion))
         {
             Unsafe.Add(ref moves, index++).Move = Move.Create(from, to, MoveTypes.Promotion, PieceTypes.Queen);
             if (PieceTypes.Knight.PseudoAttacks(to) & ksq)
                 Unsafe.Add(ref moves, index++).Move = Move.Create(from, to, MoveTypes.Promotion);
         }
 
-        const MoveGenerationTypes nonQueenPromotion = MoveGenerationTypes.Quiets
-                                                       | MoveGenerationTypes.Evasions
-                                                       | MoveGenerationTypes.NonEvasions;
-
-        if (!types.HasFlagFast(nonQueenPromotion))
+        if (!types.HasFlagFast(MoveGenerationTypes.NonQueenPromotion))
             return index;
 
         Unsafe.Add(ref moves, index++).Move = Move.Create(from, to, MoveTypes.Promotion, PieceTypes.Rook);

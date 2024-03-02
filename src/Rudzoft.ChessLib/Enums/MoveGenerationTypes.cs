@@ -35,7 +35,7 @@ namespace Rudzoft.ChessLib.Enums;
 public enum MoveGenerationTypes
 {
     None = 0,
-    
+
     /// <summary>
     /// Generate all legal moves
     /// </summary>
@@ -65,8 +65,13 @@ public enum MoveGenerationTypes
     /// Generate only moves which are not captures and gives check
     /// </summary>
     QuietChecks = 32,
-    
-    All = Legal | Captures | Quiets | NonEvasions | Evasions | QuietChecks
+
+    All = Legal | Captures | Quiets | NonEvasions | Evasions | QuietChecks,
+    CapturesQuietsNonEvasions = Captures | Quiets | NonEvasions,
+    AllQuiets = Quiets | QuietChecks,
+    CapturesEnPassant = Captures | Evasions | NonEvasions,
+    NonQueenPromotion = Quiets | Evasions | NonEvasions,
+    QueenPromotion = Captures | Evasions | NonEvasions
 }
 
 public static class MoveGenerationTypesExtensions
