@@ -33,7 +33,7 @@ namespace Rudzoft.ChessLib;
 
 public sealed class Board : IBoard
 {
-    private readonly Piece[] _pieces;
+    private readonly Piece[] _board;
 
     private readonly BitBoard[] _bySide;
 
@@ -41,94 +41,68 @@ public sealed class Board : IBoard
 
     private readonly int[] _pieceCount;
 
-    private readonly Square[][] _pieceList;
-
-    private readonly int[] _index;
-
     public Board()
     {
-        _pieces = new Piece[Types.Square.Count];
+        _board = new Piece[Types.Square.Count];
         _bySide = new BitBoard[Player.Count];
         _byType = new BitBoard[PieceTypes.PieceTypeNb.AsInt()];
         _pieceCount = new int[Piece.Count];
-        _pieceList = new Square[Types.Square.Count][];
-        for (var i = 0; i < _pieceList.Length; i++)
-        {
-            _pieceList[i] =
-            [
-                Types.Square.None, Types.Square.None, Types.Square.None, Types.Square.None,
-                Types.Square.None, Types.Square.None, Types.Square.None, Types.Square.None,
-                Types.Square.None, Types.Square.None, Types.Square.None, Types.Square.None,
-                Types.Square.None, Types.Square.None, Types.Square.None, Types.Square.None
-            ];
-        }
-
-        _index = new int[Types.Square.Count];
     }
 
     public void Clear()
     {
-        Array.Fill(_pieces, Piece.EmptyPiece);
+        Array.Fill(_board, Piece.EmptyPiece);
         _bySide[0] = _bySide[1] = BitBoard.Empty;
-        _byType.Fill(in _bySide[0]);
+        Array.Fill(_byType, BitBoard.Empty);
         Array.Fill(_pieceCount, 0);
-        foreach (var s in _pieceList)
-            Array.Fill(s, Types.Square.None);
-        Array.Fill(_index, 0);
     }
 
-    public Piece PieceAt(Square sq) => _pieces[sq];
+    public Piece PieceAt(Square sq) => _board[sq];
 
-    public bool IsEmpty(Square sq) => _pieces[sq] == Piece.EmptyPiece;
+    public bool IsEmpty(Square sq) => _board[sq] == Piece.EmptyPiece;
 
     public void AddPiece(Piece pc, Square sq)
     {
-        _pieces[sq] = pc;
+        Debug.Assert(sq.IsOk);
+
+        var color = pc.ColorOf();
+        var type = pc.Type();
+
+        _board[sq] = pc;
         _byType[PieceTypes.AllPieces.AsInt()] |= sq;
-        _byType[pc.Type().AsInt()] |= sq;
-        _bySide[pc.ColorOf()] |= sq;
-        _index[sq] = _pieceCount[pc]++;
-        _pieceList[pc][_index[sq]] = sq;
-        _pieceCount[PieceTypes.AllPieces.MakePiece(pc.ColorOf())]++;
+        _byType[type.AsInt()] |= sq;
+        _bySide[color] |= sq;
+        _pieceCount[pc]++;
+        _pieceCount[PieceTypes.AllPieces.MakePiece(color)]++;
     }
 
     public void RemovePiece(Square sq)
     {
         Debug.Assert(sq.IsOk);
 
-        // WARNING: This is not a reversible operation. If we remove a piece in MakeMove() and
-        // then replace it in TakeMove() we will put it at the end of the list and not in its
-        // original place, it means index[] and pieceList[] are not invariant to a MakeMove() +
-        // TakeMove() sequence.
-        var pc = _pieces[sq];
+        var pc = _board[sq];
         _byType[PieceTypes.AllPieces.AsInt()] ^= sq;
         _byType[pc.Type().AsInt()] ^= sq;
         _bySide[pc.ColorOf()] ^= sq;
-        /* board[s] = NO_PIECE;  Not needed, overwritten by the capturing one */
-        var lastSquare = _pieceList[pc][--_pieceCount[pc]];
-        _index[lastSquare] = _index[sq];
-        _pieceList[pc][_index[lastSquare]] = lastSquare;
-        _pieceList[pc][_pieceCount[pc]] = Types.Square.None;
+        _board[sq] = Piece.EmptyPiece;
+        _pieceCount[pc]--;
         _pieceCount[PieceTypes.AllPieces.MakePiece(pc.ColorOf())]--;
     }
 
     public void ClearPiece(Square sq)
-        => _pieces[sq] = Piece.EmptyPiece;
+        => _board[sq] = Piece.EmptyPiece;
 
     public void MovePiece(Square from, Square to)
     {
-        // _index[from] is not updated and becomes stale. This works as long as _index[] is
-        // accessed just by known occupied squares.
+        Debug.Assert(from.IsOk && to.IsOk);
 
-        var pc = _pieces[from];
+        var pc = _board[from];
         var fromTo = from | to;
         _byType[PieceTypes.AllPieces.AsInt()] ^= fromTo;
         _byType[pc.Type().AsInt()] ^= fromTo;
         _bySide[pc.ColorOf()] ^= fromTo;
-        _pieces[from] = Piece.EmptyPiece;
-        _pieces[to] = pc;
-        _index[to] = _index[from];
-        _pieceList[pc][_index[to]] = to;
+        _board[from] = Piece.EmptyPiece;
+        _board[to] = pc;
     }
 
     public Piece MovedPiece(Move m) => PieceAt(m.FromSquare());
@@ -149,17 +123,7 @@ public sealed class Board : IBoard
     public Square Square(PieceTypes pt, Player p)
     {
         Debug.Assert(_pieceCount[pt.MakePiece(p)] == 1);
-        return _pieceList[pt.MakePiece(p)][0];
-    }
-
-    public ReadOnlySpan<Square> Squares(PieceTypes pt, Player p)
-    {
-        var pcIndex = pt.MakePiece(p);
-        var pcCount = _pieceCount[pcIndex];
-
-        return pcCount == 0
-            ? ReadOnlySpan<Square>.Empty
-            : _pieceList[pcIndex].AsSpan()[..pcCount];
+        return Pieces(p, pt).Lsb();
     }
 
     public int PieceCount(Piece pc) => _pieceCount[pc];
@@ -172,7 +136,7 @@ public sealed class Board : IBoard
     public int PieceCount() => PieceCount(PieceTypes.AllPieces);
 
     public IEnumerator<Piece> GetEnumerator()
-        => _pieces.Where(static pc => pc != Piece.EmptyPiece).GetEnumerator();
+        => _board.Where(static pc => pc != Piece.EmptyPiece).GetEnumerator();
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }

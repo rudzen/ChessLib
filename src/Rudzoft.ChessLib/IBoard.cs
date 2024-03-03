@@ -45,7 +45,6 @@ public interface IBoard : IEnumerable<Piece>
     BitBoard Pieces(Player p, PieceTypes pt);
     BitBoard Pieces(Player p, PieceTypes pt1, PieceTypes pt2);
     Square Square(PieceTypes pt, Player p);
-    ReadOnlySpan<Square> Squares(PieceTypes pt, Player p);
     int PieceCount(Piece pc);
     int PieceCount(PieceTypes pt, Player p);
     int PieceCount(PieceTypes pt);

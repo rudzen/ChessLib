@@ -26,7 +26,6 @@ SOFTWARE.
 
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 using Rudzoft.ChessLib.Enums;
 using Rudzoft.ChessLib.Types;
 
@@ -237,12 +236,11 @@ public static class MoveGenerator
     {
         Debug.Assert(pt != PieceTypes.King && pt != PieceTypes.Pawn);
 
-        var squares = pos.Squares(pt, us);
+        var pieces = pos.Pieces(pt, us);
 
-        ref var squaresSpace = ref MemoryMarshal.GetReference(squares);
-        for (var i = 0; i < squares.Length; ++i)
+        while (pieces.IsNotEmpty)
         {
-            var from = Unsafe.Add(ref squaresSpace, i);
+            var from = BitBoards.PopLsb(ref pieces);
             if (checks
                 && ((pos.KingBlockers(~us) & from).IsNotEmpty ||
                     (pt.PseudoAttacks(from) & target & pos.CheckedSquares(pt)).IsNotEmpty))

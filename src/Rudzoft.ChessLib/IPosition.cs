@@ -50,7 +50,7 @@ public interface IPosition : IEnumerable<Piece>
     IBoard Board { get; }
 
     IZobrist Zobrist { get; }
-    
+
     IValues Values { get; }
 
     BitBoard Checkers { get; }
@@ -118,7 +118,7 @@ public interface IPosition : IEnumerable<Piece>
     BitBoard Pieces(PieceTypes pt, Player p);
 
     BitBoard Pieces(PieceTypes pt1, PieceTypes pt2, Player p);
-    
+
     int PieceCount();
 
     int PieceCount(Piece pc);
@@ -134,8 +134,6 @@ public interface IPosition : IEnumerable<Piece>
     bool BishopPaired(Player p);
 
     bool BishopOpposed();
-
-    ReadOnlySpan<Square> Squares(PieceTypes pt, Player p);
 
     Square GetPieceSquare(PieceTypes pt, Player p);
 
@@ -172,7 +170,7 @@ public interface IPosition : IEnumerable<Piece>
     bool IsPawnPassedAt(Player p, Square sq);
 
     BitBoard PawnPassSpan(Player p, Square sq);
-    
+
     bool CanCastle(CastleRight cr);
 
     bool CanCastle(Player p);
@@ -196,7 +194,7 @@ public interface IPosition : IEnumerable<Piece>
     IPosition Set(string fen, ChessMode chessMode, in State state, bool validate = false, int searcher = 0);
 
     IPosition Set(ReadOnlySpan<char> code, Player p, in State state);
-    
+
     HashKey GetKey();
 
     HashKey GetPawnKey();
@@ -216,10 +214,10 @@ public interface IPosition : IEnumerable<Piece>
     bool SeeGe(Move m, Value threshold);
 
     Value NonPawnMaterial(Player p);
-    
+
     Value NonPawnMaterial();
 
     HashKey MovePositionKey(Move m);
-    
+
     PositionValidationResult Validate(PositionValidationTypes type = PositionValidationTypes.Basic);
 }
