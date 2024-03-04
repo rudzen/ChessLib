@@ -118,7 +118,7 @@ public readonly record struct Move(ushort Data) : ISpanFormattable
     public Square ToSquare() => new(Data & 0x3F);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public PieceTypes PromotedPieceType() => (PieceTypes)(((Data >> 12) & 3) + 2);
+    public PieceType PromotedPieceType() => (PieceTypes)(((Data >> 12) & 3) + 2);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool IsQueenPromotion() => PromotedPieceType() == PieceTypes.Queen;

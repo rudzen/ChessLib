@@ -24,7 +24,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System.Numerics;
 using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Test.ScoreTests;

@@ -172,7 +172,7 @@ public static class MagicBB
 
                 size++;
                 b = (b.Value - m.Mask.Value) & m.Mask;
-            } while (b.IsNotEmpty);
+            } while (b);
 
             if (Bmi2.X64.IsSupported)
                 continue;

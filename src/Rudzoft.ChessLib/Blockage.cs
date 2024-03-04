@@ -51,15 +51,15 @@ public sealed class Blockage : IBlockage
     {
         // Quick check if there is only pawns and kings on the board
         // It might be possible to have a minor piece and exchange it into a passing pawn
-        if (pos.PieceCount(PieceTypes.AllPieces) > pos.PieceCount(PieceTypes.Pawn) + 2)
+        if (pos.PieceCount(PieceType.AllPieces) > pos.PieceCount(PieceType.Pawn) + 2)
             return false;
 
         var us = pos.SideToMove;
         var them = ~us;
 
-        var ourPawns = pos.Pieces(PieceTypes.Pawn, us);
-        var theirPawns = pos.Pieces(PieceTypes.Pawn, them);
-        var ourPawn = PieceTypes.Pawn.MakePiece(us);
+        var ourPawns = pos.Pieces(PieceType.Pawn, us);
+        var theirPawns = pos.Pieces(PieceType.Pawn, them);
+        var ourPawn = PieceType.Pawn.MakePiece(us);
 
         var up = us.PawnPushDistance();
 
@@ -253,8 +253,8 @@ public sealed class Blockage : IBlockage
         var us = pos.SideToMove;
         var them = ~us;
         var up = us.PawnPushDistance();
-        var ourPawns = pos.Pieces(PieceTypes.Pawn, us);
-        var theirPawn = PieceTypes.Pawn.MakePiece(them);
+        var ourPawns = pos.Pieces(PieceType.Pawn, us);
+        var theirPawn = PieceType.Pawn.MakePiece(them);
 
         while (ourPawns)
         {
@@ -350,7 +350,7 @@ public sealed class Blockage : IBlockage
         var down = us.PawnPushDistance();
 
         var them = ~us;
-        var ourPawn = PieceTypes.Pawn.MakePiece(us);
+        var ourPawn = PieceType.Pawn.MakePiece(us);
         var result = BitBoard.Empty;
 
         foreach (var f in File.AllFiles.AsSpan())

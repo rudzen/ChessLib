@@ -39,14 +39,14 @@ public interface IBoard : IEnumerable<Piece>
     void MovePiece(Square from, Square to);
     Piece MovedPiece(Move m);
     BitBoard Pieces();
-    BitBoard Pieces(PieceTypes pt);
-    BitBoard Pieces(PieceTypes pt1, PieceTypes pt2);
+    BitBoard Pieces(PieceType pt);
+    BitBoard Pieces(PieceType pt1, PieceType pt2);
     BitBoard Pieces(Player p);
-    BitBoard Pieces(Player p, PieceTypes pt);
-    BitBoard Pieces(Player p, PieceTypes pt1, PieceTypes pt2);
-    Square Square(PieceTypes pt, Player p);
+    BitBoard Pieces(Player p, PieceType pt);
+    BitBoard Pieces(Player p, PieceType pt1, PieceType pt2);
+    Square Square(PieceType pt, Player p);
     int PieceCount(Piece pc);
-    int PieceCount(PieceTypes pt, Player p);
-    int PieceCount(PieceTypes pt);
+    int PieceCount(PieceType pt, Player p);
+    int PieceCount(PieceType pt);
     int PieceCount();
 }

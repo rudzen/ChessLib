@@ -4,12 +4,7 @@
         <OutputType>Exe</OutputType>
         <Platforms>AnyCPU</Platforms>
         <LangVersion>default</LangVersion>
-        <Configurations>Debug;Release</Configurations>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-        <PlatformTarget>x64</PlatformTarget>
     </PropertyGroup>
 
     <ItemGroup>

@@ -47,7 +47,7 @@ public sealed class Game(
     ObjectPool<MoveList> moveListPool)
     : IGame
 {
-    private readonly PertT            _perftTable   = new(8);
+    private readonly PertT _perftTable = new(8);
 
     public Action<IPieceSquare> PieceUpdated => pos.PieceUpdated;
 
@@ -116,27 +116,26 @@ public sealed class Game(
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Player CurrentPlayer() => pos.SideToMove;
 
-    public UInt128 Perft(int depth, bool root = true)
+    public UInt128 Perft(in HashKey baseKey, int depth, bool root = true)
     {
         var tot = UInt128.MinValue;
-        var ml  = moveListPool.Get();
+        var ml = moveListPool.Get();
         ml.Generate(in pos);
-        var state = new State();
-
         var moves = ml.Get();
-        ref var movesSpace = ref MemoryMarshal.GetReference(moves);
 
         if (root && depth <= 1)
         {
-            tot = (ulong)ml.Length;
+            tot = (ulong)moves.Length;
             moveListPool.Return(ml);
             return tot;
         }
 
+        ref var movesSpace = ref MemoryMarshal.GetReference(moves);
+
         for (var i = 0; i < moves.Length; ++i)
         {
-            var valMove = Unsafe.Add(ref movesSpace, i);
-            var m = valMove.Move;
+            var m = Unsafe.Add(ref movesSpace, i).Move;
+            var state = new State();
 
             pos.MakeMove(m, in state);
 
@@ -149,7 +148,7 @@ public sealed class Game(
             }
             else
             {
-                var next = Perft(depth - 1, false);
+                var next = Perft(in baseKey, depth - 1, false);
                 tot += next;
             }
 

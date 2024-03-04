@@ -231,14 +231,14 @@ public static class MoveGenerator
         ref ValMove moves,
         Player us,
         in BitBoard target,
-        PieceTypes pt,
+        PieceType pt,
         bool checks)
     {
         Debug.Assert(pt != PieceTypes.King && pt != PieceTypes.Pawn);
 
         var pieces = pos.Pieces(pt, us);
 
-        while (pieces.IsNotEmpty)
+        while (pieces)
         {
             var from = BitBoards.PopLsb(ref pieces);
             if (checks
@@ -447,13 +447,13 @@ public static class MoveGenerator
 
             // No need to generate pawn quiet checks,
             // as these will be generated together with direct checks
-            if (pt == PieceTypes.Pawn)
+            if (pt == PieceType.Pawn)
                 continue;
 
             var b = pos.GetAttacks(from, pt) & emptySquares;
 
-            if (pt == PieceTypes.King)
-                b &= ~PieceTypes.Queen.PseudoAttacks(pos.GetKingSquare(~us));
+            if (pt == PieceType.King)
+                b &= ~PieceType.Queen.PseudoAttacks(pos.GetKingSquare(~us));
 
             index = Move.Create(ref moves, index, from, ref b);
         }
@@ -483,18 +483,18 @@ public static class MoveGenerator
 
         if (types.HasFlagFast(MoveGenerationTypes.QueenPromotion))
         {
-            Unsafe.Add(ref moves, index++).Move = Move.Create(from, to, MoveTypes.Promotion, PieceTypes.Queen);
-            if (PieceTypes.Knight.PseudoAttacks(to) & ksq)
+            Unsafe.Add(ref moves, index++).Move = Move.Create(from, to, MoveTypes.Promotion, PieceType.Queen.Value);
+            if (PieceType.Knight.PseudoAttacks(to) & ksq)
                 Unsafe.Add(ref moves, index++).Move = Move.Create(from, to, MoveTypes.Promotion);
         }
 
         if (!types.HasFlagFast(MoveGenerationTypes.NonQueenPromotion))
             return index;
 
-        Unsafe.Add(ref moves, index++).Move = Move.Create(from, to, MoveTypes.Promotion, PieceTypes.Rook);
-        Unsafe.Add(ref moves, index++).Move = Move.Create(from, to, MoveTypes.Promotion, PieceTypes.Bishop);
+        Unsafe.Add(ref moves, index++).Move = Move.Create(from, to, MoveTypes.Promotion, PieceType.Rook.Value);
+        Unsafe.Add(ref moves, index++).Move = Move.Create(from, to, MoveTypes.Promotion, PieceType.Bishop.Value);
 
-        if (!(PieceTypes.Knight.PseudoAttacks(to) & ksq))
+        if (!(PieceType.Knight.PseudoAttacks(to) & ksq))
             Unsafe.Add(ref moves, index++).Move = Move.Create(from, to, MoveTypes.Promotion);
 
         return index;

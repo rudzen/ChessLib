@@ -204,7 +204,11 @@ public readonly record struct Square(Squares Value) : ISpanFormattable, ICompara
 
     public static readonly Range BlackSide = new(32, 64);
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Square Create(Rank r, File f) => new(r, f);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Square Create(byte b) => new((Squares)b);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator Square(int value) => new(value);

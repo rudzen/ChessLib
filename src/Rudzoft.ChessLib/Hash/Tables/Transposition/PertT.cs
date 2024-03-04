@@ -33,7 +33,7 @@ public sealed class PertT
         Resize(in size, Unsafe.SizeOf<PerftEntry>());
     }
 
-    public (UInt128, bool) Get(in HashKey hash, byte depth) {
+    public (UInt128, bool) Get(in HashKey hash, int depth) {
         ref var entry = ref Probe(hash);
         if (entry.Hash == hash && entry.Depth == depth) {
             return (entry.Nodes, true);
@@ -41,7 +41,7 @@ public sealed class PertT
         return (default, false);
     }
 
-    public void Set(in HashKey hash, byte depth, in ulong nodes)
+    public void Set(in HashKey hash, byte depth, in UInt128 nodes)
     {
         ref var entry = ref Probe(in hash);
         entry.Hash = hash.Key;

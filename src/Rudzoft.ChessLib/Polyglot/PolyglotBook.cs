@@ -128,12 +128,6 @@ public sealed class PolyglotBook : IPolyglotBook
             : ConvertMove(pos, polyMove);
     }
 
-    public void Dispose()
-    {
-        _fileStream?.Dispose();
-        _binaryReader?.Dispose();
-    }
-
     private Move ConvertMove(IPosition pos, ushort polyMove)
     {
         // A PolyGlot book move is encoded as follows:
@@ -150,10 +144,7 @@ public sealed class PolyglotBook : IPolyglotBook
         var polyPt = (polyMove >> 12) & 7;
 
         if (polyPt > 0)
-        {
-            static PieceTypes PolyToPt(int pt) => (PieceTypes)(3 - pt);
             move = Move.Create(from, to, MoveTypes.Promotion, PolyToPt(polyPt));
-        }
 
         var ml = _moveListPool.Get();
         ml.Generate(in pos);
@@ -164,15 +155,22 @@ public sealed class PolyglotBook : IPolyglotBook
         _moveListPool.Return(ml);
 
         return mm;
+
+        static PieceTypes PolyToPt(int pt) => (PieceTypes)(3 - pt);
     }
 
     private static Move SelectMove(
-        in IPosition pos, Square polyFrom, Square polyTo, MoveTypes polyType, ReadOnlySpan<ValMove> moves)
+        in IPosition pos,
+        Square polyFrom,
+        Square polyTo,
+        MoveTypes polyType,
+        ReadOnlySpan<ValMove> moves)
     {
+        ref var valMoveRef = ref MemoryMarshal.GetReference(moves);
         // Iterate all known moves for current position to find a match.
-        foreach (var valMove in moves)
+        for (var i = 0; i < moves.Length; i++)
         {
-            var m = valMove.Move;
+            var m = Unsafe.Add(ref valMoveRef, i).Move;
 
             if (polyFrom != m.FromSquare() || polyTo != m.ToSquare())
                 continue;
@@ -219,7 +217,7 @@ public sealed class PolyglotBook : IPolyglotBook
         for (var i = 0; i < CastleRights.Length; ++i)
         {
             var cr = Unsafe.Add(ref crSpace, i);
-            if (pos.State.CastlelingRights.Has(cr))
+            if (pos.State.CastleRights.Has(cr))
                 k ^= PolyglotBookZobrist.Castle(cr);
         }
 
@@ -257,5 +255,12 @@ public sealed class PolyglotBook : IPolyglotBook
         Debug.Assert(low == high);
 
         return low;
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_fileStream is not null)
+            await _fileStream.DisposeAsync();
+        _binaryReader?.Dispose();
     }
 }

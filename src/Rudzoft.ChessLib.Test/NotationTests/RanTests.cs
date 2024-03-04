@@ -64,7 +64,8 @@ public sealed class RanTests
 
         pos.Set(in fenData, ChessMode.Normal, state);
 
-        var pc = movingPt.MakePiece(pos.SideToMove);
+        var pt = new PieceType(movingPt);
+        var pc = pt.MakePiece(pos.SideToMove);
 
         var fromOne = new Square(fromSqOne);
         var fromTwo = new Square(fromSqTwo);

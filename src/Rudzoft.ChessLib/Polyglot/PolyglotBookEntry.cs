@@ -26,18 +26,4 @@ SOFTWARE.
 
 namespace Rudzoft.ChessLib.Polyglot;
 
-public struct PolyglotBookEntry
-{
-    public readonly ulong Key;
-    public readonly ushort Move;
-    public readonly ushort Count;
-    public uint Learn;
-
-    public PolyglotBookEntry(ulong key, ushort move, ushort count, uint learn)
-    {
-        Key = key;
-        Move = move;
-        Count = count;
-        Learn = learn;
-    }
-}
+internal record struct PolyglotBookEntry(ulong Key, ushort Move, ushort Count, uint Learn);

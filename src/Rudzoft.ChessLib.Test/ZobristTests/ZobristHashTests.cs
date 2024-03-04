@@ -167,7 +167,7 @@ public sealed class ZobristHashTests
 
         foreach (var cr in castleRights)
         {
-            added = set.Add(zobrist.Castleling(cr));
+            added = set.Add(zobrist.Castle(cr));
             Assert.True(added);
         }
 

@@ -62,8 +62,8 @@ public abstract class Notation : INotation
     private static MoveAmbiguities Ambiguity(IPosition pos, Square from, BitBoard similarTypeAttacks)
     {
         var ambiguity = MoveAmbiguities.None;
-        var c         = pos.SideToMove;
-        var pinned    = pos.PinnedPieces(c);
+        var c = pos.SideToMove;
+        var pinned = pos.PinnedPieces(c);
 
         while (similarTypeAttacks)
         {
@@ -128,10 +128,8 @@ public abstract class Notation : INotation
         var from = move.FromSquare();
         var pt = pos.GetPieceType(from);
 
-        return pt switch
-        {
-            PieceTypes.Pawn or PieceTypes.King => BitBoard.Empty,
-            var _ => pos.GetAttacks(move.ToSquare(), pt, pos.Pieces()) ^ from
-        };
+        return pt == PieceTypes.Pawn || pt == PieceTypes.King
+            ? BitBoard.Empty
+            : pos.GetAttacks(move.ToSquare(), pt, pos.Pieces()) ^ from;
     }
 }

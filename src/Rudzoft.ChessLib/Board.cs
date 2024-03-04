@@ -26,28 +26,19 @@ SOFTWARE.
 
 using System.Collections;
 using System.Diagnostics;
-using Rudzoft.ChessLib.Extensions;
 using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib;
 
 public sealed class Board : IBoard
 {
-    private readonly Piece[] _board;
+    private readonly Piece[] _board = new Piece[Types.Square.Count];
 
-    private readonly BitBoard[] _bySide;
+    private readonly BitBoard[] _bySide = new BitBoard[Player.Count];
 
-    private readonly BitBoard[] _byType;
+    private readonly BitBoard[] _byType = new BitBoard[PieceType.Count];
 
-    private readonly int[] _pieceCount;
-
-    public Board()
-    {
-        _board = new Piece[Types.Square.Count];
-        _bySide = new BitBoard[Player.Count];
-        _byType = new BitBoard[PieceTypes.PieceTypeNb.AsInt()];
-        _pieceCount = new int[Piece.Count];
-    }
+    private readonly int[] _pieceCount = new int[Piece.Count];
 
     public void Clear()
     {
@@ -69,11 +60,11 @@ public sealed class Board : IBoard
         var type = pc.Type();
 
         _board[sq] = pc;
-        _byType[PieceTypes.AllPieces.AsInt()] |= sq;
-        _byType[type.AsInt()] |= sq;
+        _byType[PieceType.AllPieces] |= sq;
+        _byType[type] |= sq;
         _bySide[color] |= sq;
         _pieceCount[pc]++;
-        _pieceCount[PieceTypes.AllPieces.MakePiece(color)]++;
+        _pieceCount[PieceType.AllPieces.MakePiece(color)]++;
     }
 
     public void RemovePiece(Square sq)
@@ -81,12 +72,12 @@ public sealed class Board : IBoard
         Debug.Assert(sq.IsOk);
 
         var pc = _board[sq];
-        _byType[PieceTypes.AllPieces.AsInt()] ^= sq;
-        _byType[pc.Type().AsInt()] ^= sq;
+        _byType[PieceType.AllPieces] ^= sq;
+        _byType[pc.Type()] ^= sq;
         _bySide[pc.ColorOf()] ^= sq;
         _board[sq] = Piece.EmptyPiece;
         _pieceCount[pc]--;
-        _pieceCount[PieceTypes.AllPieces.MakePiece(pc.ColorOf())]--;
+        _pieceCount[PieceType.AllPieces.MakePiece(pc.ColorOf())]--;
     }
 
     public void ClearPiece(Square sq)
@@ -98,8 +89,8 @@ public sealed class Board : IBoard
 
         var pc = _board[from];
         var fromTo = from | to;
-        _byType[PieceTypes.AllPieces.AsInt()] ^= fromTo;
-        _byType[pc.Type().AsInt()] ^= fromTo;
+        _byType[PieceType.AllPieces] ^= fromTo;
+        _byType[pc.Type()] ^= fromTo;
         _bySide[pc.ColorOf()] ^= fromTo;
         _board[from] = Piece.EmptyPiece;
         _board[to] = pc;
@@ -107,20 +98,20 @@ public sealed class Board : IBoard
 
     public Piece MovedPiece(Move m) => PieceAt(m.FromSquare());
 
-    public BitBoard Pieces() => _byType[PieceTypes.AllPieces.AsInt()];
+    public BitBoard Pieces() => _byType[PieceType.AllPieces];
 
-    public BitBoard Pieces(PieceTypes pt) => _byType[pt.AsInt()];
+    public BitBoard Pieces(PieceType pt) => _byType[pt];
 
-    public BitBoard Pieces(PieceTypes pt1, PieceTypes pt2) => _byType[pt1.AsInt()] | _byType[pt2.AsInt()];
+    public BitBoard Pieces(PieceType pt1, PieceType pt2) => _byType[pt1] | _byType[pt2];
 
     public BitBoard Pieces(Player p) => _bySide[p];
 
-    public BitBoard Pieces(Player p, PieceTypes pt) => _bySide[p] & _byType[pt.AsInt()];
+    public BitBoard Pieces(Player p, PieceType pt) => _bySide[p] & _byType[pt];
 
-    public BitBoard Pieces(Player p, PieceTypes pt1, PieceTypes pt2)
-        => _bySide[p] & (_byType[pt1.AsInt()] | _byType[pt2.AsInt()]);
+    public BitBoard Pieces(Player p, PieceType pt1, PieceType pt2)
+        => _bySide[p] & (_byType[pt1] | _byType[pt2]);
 
-    public Square Square(PieceTypes pt, Player p)
+    public Square Square(PieceType pt, Player p)
     {
         Debug.Assert(_pieceCount[pt.MakePiece(p)] == 1);
         return Pieces(p, pt).Lsb();
@@ -128,9 +119,9 @@ public sealed class Board : IBoard
 
     public int PieceCount(Piece pc) => _pieceCount[pc];
 
-    public int PieceCount(PieceTypes pt, Player p) => PieceCount(pt.MakePiece(p));
+    public int PieceCount(PieceType pt, Player p) => PieceCount(pt.MakePiece(p));
 
-    public int PieceCount(PieceTypes pt)
+    public int PieceCount(PieceType pt)
         => _pieceCount[pt.MakePiece(Player.White)] + _pieceCount[pt.MakePiece(Player.Black)];
 
     public int PieceCount() => PieceCount(PieceTypes.AllPieces);

@@ -144,7 +144,7 @@ public sealed class Zobrist : IZobrist
         if (pos.SideToMove.IsWhite)
             key ^= _zobristSide;
 
-        key ^= Castleling(pos.State.CastlelingRights.Rights);
+        key ^= Castle(pos.State.CastleRights.Rights);
         key ^= EnPassant(pos.EnPassantSquare.File);
 
         return key;
@@ -157,10 +157,10 @@ public sealed class Zobrist : IZobrist
     public ref HashKey Psq(int pieceCount, Piece pc) => ref _zobristPst[pieceCount][pc];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public ref HashKey Castleling(CastleRights index) => ref _zobristCastling[index.AsInt()];
+    public ref HashKey Castle(CastleRights index) => ref _zobristCastling[index.AsInt()];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public ref HashKey Castleling(CastleRight index) => ref Castleling(index.Rights);
+    public ref HashKey Castle(CastleRight index) => ref Castle(index.Rights);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public HashKey Side() => _zobristSide;

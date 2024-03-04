@@ -56,7 +56,7 @@ public sealed class LanNotation : Notation
 
         var pt = pos.GetPieceType(from);
 
-        if (pt != PieceTypes.Pawn)
+        if (pt != PieceType.Pawn)
             re[i++] = pt.GetPieceChar();
 
         re[i++] = from.FileChar;

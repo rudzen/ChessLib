@@ -42,19 +42,13 @@ namespace Rudzoft.ChessLib.Types;
 public readonly record struct BitBoard(ulong Value) : IEnumerable<Square>, IMinMaxValue<BitBoard>
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public BitBoard(BitBoard value) : this(value.Value)
-    {
-    }
+    public BitBoard(BitBoard value) : this(value.Value) { }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public BitBoard(Square sq) : this(sq.AsBb())
-    {
-    }
+    public BitBoard(Square sq) : this(sq.AsBb()) { }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private BitBoard(int value) : this((ulong)value)
-    {
-    }
+    private BitBoard(int value) : this((ulong)value) { }
 
     public int Count => BitBoards.PopCount(in this);
 

@@ -37,7 +37,7 @@ public sealed class OptionsFactory : IOptionsFactory
     {
         _args = args.Args;
     }
-    
+
     public IEnumerable<PerftOption> Parse()
     {
         var optionsUsed = OptionType.None;

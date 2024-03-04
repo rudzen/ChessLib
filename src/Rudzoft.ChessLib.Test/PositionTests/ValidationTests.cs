@@ -72,7 +72,7 @@ public sealed class ValidationTests
 
         pos.Set(in fenData, ChessMode.Normal, state);
 
-        var pc = PieceTypes.King.MakePiece(Player.White);
+        var pc = PieceType.King.MakePiece(Player.White);
 
         pos.AddPiece(pc, Square.E4);
 
@@ -85,7 +85,7 @@ public sealed class ValidationTests
     }
 
     [Fact]
-    public void ValidateCastleling()
+    public void ValidateCastle()
     {
         // position only has pawns, rooks and kings
         const string fen = "r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 1";

@@ -85,11 +85,11 @@ public interface IPosition : IEnumerable<Piece>
 
     Piece GetPiece(Square sq);
 
-    PieceTypes GetPieceType(Square sq);
+    PieceType GetPieceType(Square sq);
 
-    bool IsPieceTypeOnSquare(Square sq, PieceTypes pt);
+    bool IsPieceTypeOnSquare(Square sq, PieceType pt);
 
-    BitBoard CheckedSquares(PieceTypes pt);
+    BitBoard CheckedSquares(PieceType pt);
 
     BitBoard PinnedPieces(Player p);
 
@@ -111,21 +111,21 @@ public interface IPosition : IEnumerable<Piece>
 
     BitBoard Pieces(Piece pc);
 
-    BitBoard Pieces(PieceTypes pt);
+    BitBoard Pieces(PieceType pt);
 
-    BitBoard Pieces(PieceTypes pt1, PieceTypes pt2);
+    BitBoard Pieces(PieceType pt1, PieceType pt2);
 
-    BitBoard Pieces(PieceTypes pt, Player p);
+    BitBoard Pieces(PieceType pt, Player p);
 
-    BitBoard Pieces(PieceTypes pt1, PieceTypes pt2, Player p);
+    BitBoard Pieces(PieceType pt1, PieceType pt2, Player p);
 
     int PieceCount();
 
     int PieceCount(Piece pc);
 
-    int PieceCount(PieceTypes pt);
+    int PieceCount(PieceType pt);
 
-    int PieceCount(PieceTypes pt, Player p);
+    int PieceCount(PieceType pt, Player p);
 
     BitBoard PawnsOnColor(Player p, Square sq);
 
@@ -135,13 +135,13 @@ public interface IPosition : IEnumerable<Piece>
 
     bool BishopOpposed();
 
-    Square GetPieceSquare(PieceTypes pt, Player p);
+    Square GetPieceSquare(PieceType pt, Player p);
 
     Square GetKingSquare(Player p);
 
     Piece MovedPiece(Move m);
 
-    bool PieceOnFile(Square sq, Player p, PieceTypes pt);
+    bool PieceOnFile(Square sq, Player p, PieceType pt);
 
     bool PawnIsolated(Square sq, Player p);
 
@@ -161,7 +161,7 @@ public interface IPosition : IEnumerable<Piece>
 
     bool AttackedByKing(Square sq, Player p);
 
-    BitBoard AttacksBy(PieceTypes pt, Player p);
+    BitBoard AttacksBy(PieceType pt, Player p);
 
     bool IsCapture(Move m);
 
@@ -195,13 +195,13 @@ public interface IPosition : IEnumerable<Piece>
 
     IPosition Set(ReadOnlySpan<char> code, Player p, in State state);
 
-    HashKey GetKey();
+    HashKey GetKey(State state);
 
     HashKey GetPawnKey();
 
-    BitBoard GetAttacks(Square sq, PieceTypes pt, in BitBoard occ);
+    BitBoard GetAttacks(Square sq, PieceType pt, in BitBoard occ);
 
-    BitBoard GetAttacks(Square sq, PieceTypes pt);
+    BitBoard GetAttacks(Square sq, PieceType pt);
 
     void MoveToString(Move m, in StringBuilder output);
 

@@ -50,7 +50,7 @@ public abstract class PerftVerify
 
         var initialZobrist = g.Pos.State.PositionKey;
 
-        var actual = g.Perft(depth);
+        var actual = g.Perft(in initialZobrist, depth);
 
         var afterZobrist = g.Pos.State.PositionKey;
 

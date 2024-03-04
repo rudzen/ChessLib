@@ -61,5 +61,5 @@ public interface IGame : IEnumerable<Piece>
 
     Player CurrentPlayer();
 
-    UInt128 Perft(int depth, bool root = true);
+    UInt128 Perft(in HashKey baseKey, int depth, bool root = true);
 }

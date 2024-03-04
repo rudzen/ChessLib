@@ -45,7 +45,7 @@ public sealed class State : IEquatable<State>
 
     public int NullPly { get; set; }
 
-    public CastleRight CastlelingRights { get; set; } = CastleRight.None;
+    public CastleRight CastleRights { get; set; } = CastleRight.None;
 
     [Description("En-passant -> 'in-passing' square")]
     public Square EnPassantSquare { get; set; } = Square.None;
@@ -66,9 +66,9 @@ public sealed class State : IEquatable<State>
 
     public BitBoard[] Pinners { get; } = [BitBoard.Empty, BitBoard.Empty];
 
-    public BitBoard[] CheckedSquares { get; private set; } = new BitBoard[PieceTypes.PieceTypeNb.AsInt()];
+    public BitBoard[] CheckedSquares { get; private set; } = new BitBoard[PieceType.Count];
 
-    public PieceTypes CapturedPiece { get; set; } = PieceTypes.NoPieceType;
+    public PieceType CapturedPiece { get; set; } = PieceType.NoPieceType;
 
     public Move LastMove { get; set; } = Move.EmptyMove;
 
@@ -85,12 +85,12 @@ public sealed class State : IEquatable<State>
         other.PawnKey = PawnKey;
         other.ClockPly = ClockPly;
         other.NullPly = NullPly;
-        other.CastlelingRights = CastlelingRights;
+        other.CastleRights = CastleRights;
         other.EnPassantSquare = EnPassantSquare;
         other.Previous = this;
 
         // initialize the rest of the values
-        other.CheckedSquares ??= new BitBoard[PieceTypes.PieceTypeNb.AsInt()];
+        other.CheckedSquares ??= new BitBoard[PieceType.NoPieceType];
 
         return other;
     }
@@ -101,7 +101,7 @@ public sealed class State : IEquatable<State>
         PawnKey = PositionKey = MaterialKey = HashKey.Empty;
         NullPly = 0;
         Repetition = 0;
-        CastlelingRights = CastleRight.None;
+        CastleRights = CastleRight.None;
         EnPassantSquare = Square.None;
         CheckedSquares.Fill(BitBoard.Empty);
         Pinners[0] = Pinners[1] = BitBoard.Empty;
@@ -140,7 +140,7 @@ public sealed class State : IEquatable<State>
                && PositionKey.Equals(other.PositionKey)
                && PawnKey.Equals(other.PawnKey)
                && EnPassantSquare.Equals(other.EnPassantSquare)
-               && CastlelingRights == other.CastlelingRights
+               && CastleRights == other.CastleRights
                && NullPly == other.NullPly
                && ClockPly == other.ClockPly
                && Pinners.Equals(other.Pinners)
@@ -160,7 +160,7 @@ public sealed class State : IEquatable<State>
         hashCode.Add(NullPly);
         hashCode.Add(ClockPly);
         hashCode.Add(PositionKey);
-        hashCode.Add(CastlelingRights.Rights.AsInt());
+        hashCode.Add(CastleRights.Rights.AsInt());
         hashCode.Add(EnPassantSquare);
         hashCode.Add(Checkers);
         hashCode.Add(Previous);

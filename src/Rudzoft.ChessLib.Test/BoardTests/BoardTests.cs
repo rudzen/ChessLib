@@ -38,6 +38,39 @@ using Rudzoft.ChessLib.Validation;
 
 namespace Rudzoft.ChessLib.Test.BoardTests;
 
+public sealed class BoardTestsTheoryData : TheoryData<string, PieceType, Player, int>
+{
+    public BoardTestsTheoryData(string[] fens, PieceType[] pts, Player[] players, int[] expectedCounts)
+    {
+        Debug.Assert(fens != null);
+        Debug.Assert(pts != null);
+        Debug.Assert(players != null);
+        Debug.Assert(expectedCounts != null);
+        Debug.Assert(fens.Length == pts.Length);
+        Debug.Assert(fens.Length == players.Length);
+        Debug.Assert(fens.Length == expectedCounts.Length);
+
+        var fensSpan = fens.AsSpan();
+        var ptsSpan = pts.AsSpan();
+        var playersSpan = players.AsSpan();
+        var expectedCountSpan = expectedCounts.AsSpan();
+
+        ref var fenSpace = ref MemoryMarshal.GetReference(fensSpan);
+        ref var ptsSpace = ref MemoryMarshal.GetReference(ptsSpan);
+        ref var playersSpace = ref MemoryMarshal.GetReference(playersSpan);
+        ref var expectedCountSpace = ref MemoryMarshal.GetReference(expectedCountSpan);
+
+        for (var i = 0; i < fens.Length; ++i)
+        {
+            var fen = Unsafe.Add(ref fenSpace, i);
+            var pt = Unsafe.Add(ref ptsSpace, i);
+            var player = Unsafe.Add(ref playersSpace, i);
+            var expectedCount = Unsafe.Add(ref expectedCountSpace, i);
+            Add(fen, pt, player, expectedCount);
+        }
+    }
+}
+
 public sealed class BoardTests
 {
     private readonly IServiceProvider _serviceProvider;
@@ -45,54 +78,21 @@ public sealed class BoardTests
     public BoardTests()
     {
         _serviceProvider = new ServiceCollection()
-            .AddTransient<IBoard, Board>()
-            .AddSingleton<IValues, Values>()
-            .AddSingleton<IRKiss, RKiss>()
-            .AddSingleton<IZobrist, Zobrist>()
-            .AddSingleton<ICuckoo, Cuckoo>()
-            .AddSingleton<IPositionValidator, PositionValidator>()
-            .AddTransient<IPosition, Position>()
-            .AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>()
-            .AddSingleton(static serviceProvider =>
-            {
-                var provider = serviceProvider.GetRequiredService<ObjectPoolProvider>();
-                var policy = new DefaultPooledObjectPolicy<MoveList>();
-                return provider.Create(policy);
-            })
-            .BuildServiceProvider();
-    }
-
-    public sealed class BoardTestsTheoryData : TheoryData<string, PieceTypes, Player, int>
-    {
-        public BoardTestsTheoryData(string[] fens, PieceTypes[] pts, Player[] players, int[] expectedCounts)
-        {
-            Debug.Assert(fens != null);
-            Debug.Assert(pts != null);
-            Debug.Assert(players != null);
-            Debug.Assert(expectedCounts != null);
-            Debug.Assert(fens.Length == pts.Length);
-            Debug.Assert(fens.Length == players.Length);
-            Debug.Assert(fens.Length == expectedCounts.Length);
-
-            var fensSpan = fens.AsSpan();
-            var ptsSpan = pts.AsSpan();
-            var playersSpan = players.AsSpan();
-            var expectedCountSpan = expectedCounts.AsSpan();
-
-            ref var fenSpace = ref MemoryMarshal.GetReference(fensSpan);
-            ref var ptsSpace = ref MemoryMarshal.GetReference(ptsSpan);
-            ref var playersSpace = ref MemoryMarshal.GetReference(playersSpan);
-            ref var expectedCountSpace = ref MemoryMarshal.GetReference(expectedCountSpan);
-
-            for (var i = 0; i < fens.Length; ++i)
-            {
-                var fen = Unsafe.Add(ref fenSpace, i);
-                var pt = Unsafe.Add(ref ptsSpace, i);
-                var player = Unsafe.Add(ref playersSpace, i);
-                var expectedCount = Unsafe.Add(ref expectedCountSpace, i);
-                Add(fen, pt, player, expectedCount);
-            }
-        }
+                           .AddTransient<IBoard, Board>()
+                           .AddSingleton<IValues, Values>()
+                           .AddSingleton<IRKiss, RKiss>()
+                           .AddSingleton<IZobrist, Zobrist>()
+                           .AddSingleton<ICuckoo, Cuckoo>()
+                           .AddSingleton<IPositionValidator, PositionValidator>()
+                           .AddTransient<IPosition, Position>()
+                           .AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>()
+                           .AddSingleton(static serviceProvider =>
+                           {
+                               var provider = serviceProvider.GetRequiredService<ObjectPoolProvider>();
+                               var policy = new DefaultPooledObjectPolicy<MoveList>();
+                               return provider.Create(policy);
+                           })
+                           .BuildServiceProvider();
     }
 
     private static readonly string[] Fens =
@@ -123,20 +123,17 @@ public sealed class BoardTests
         "5r1k/p6p/4r1n1/3NPp2/8/8/PP4RP/4R1K1 w - - 3 53"
     ];
 
-    private static readonly PieceTypes[] PieceType =
-    [
-        PieceTypes.Pawn, PieceTypes.Pawn, PieceTypes.Knight, PieceTypes.Knight, PieceTypes.Bishop, PieceTypes.Bishop,
-        PieceTypes.Rook, PieceTypes.Rook, PieceTypes.Queen, PieceTypes.Queen, PieceTypes.King, PieceTypes.King,
-        PieceTypes.Pawn, PieceTypes.Pawn, PieceTypes.Knight, PieceTypes.Knight, PieceTypes.Bishop, PieceTypes.Bishop,
-        PieceTypes.Rook, PieceTypes.Rook, PieceTypes.Queen, PieceTypes.Queen, PieceTypes.King, PieceTypes.King
-    ];
 
     private static readonly Player[] Player =
     [
-        Types.Player.White, Types.Player.Black, Types.Player.White, Types.Player.Black, Types.Player.White, Types.Player.Black,
-        Types.Player.White, Types.Player.Black, Types.Player.White, Types.Player.Black, Types.Player.White, Types.Player.Black,
-        Types.Player.White, Types.Player.Black, Types.Player.White, Types.Player.Black, Types.Player.White, Types.Player.Black,
-        Types.Player.White, Types.Player.Black, Types.Player.White, Types.Player.Black, Types.Player.White, Types.Player.Black
+        Types.Player.White, Types.Player.Black, Types.Player.White, Types.Player.Black, Types.Player.White,
+        Types.Player.Black,
+        Types.Player.White, Types.Player.Black, Types.Player.White, Types.Player.Black, Types.Player.White,
+        Types.Player.Black,
+        Types.Player.White, Types.Player.Black, Types.Player.White, Types.Player.Black, Types.Player.White,
+        Types.Player.Black,
+        Types.Player.White, Types.Player.Black, Types.Player.White, Types.Player.Black, Types.Player.White,
+        Types.Player.Black
     ];
 
     private static readonly int[] ExpectedCount =
@@ -145,11 +142,19 @@ public sealed class BoardTests
         4, 3, 1, 1, 0, 0, 2, 2, 0, 0, 1, 1
     ];
 
-    public static readonly BoardTestsTheoryData TheoryData = new(Fens, PieceType, Player, ExpectedCount);
+    private static readonly PieceType[] PieceTypes =
+    [
+        PieceType.Pawn, PieceType.Pawn, PieceType.Knight, PieceType.Knight, PieceType.Bishop, PieceType.Bishop,
+        PieceType.Rook, PieceType.Rook, PieceType.Queen, PieceType.Queen, PieceType.King, PieceType.King,
+        PieceType.Pawn, PieceType.Pawn, PieceType.Knight, PieceType.Knight, PieceType.Bishop, PieceType.Bishop,
+        PieceType.Rook, PieceType.Rook, PieceType.Queen, PieceType.Queen, PieceType.King, PieceType.King
+    ];
+
+    public static readonly BoardTestsTheoryData TheoryData = new(Fens, PieceTypes, Player, ExpectedCount);
 
     [Theory]
     [MemberData(nameof(TheoryData))]
-    public void BoardPieceCount(string fen, PieceTypes pt, Player p, int expected)
+    public void BoardPieceCount(string fen, PieceType pt, Player p, int expected)
     {
         var pos = _serviceProvider.GetRequiredService<IPosition>();
 

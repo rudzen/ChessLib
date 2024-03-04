@@ -26,12 +26,8 @@ SOFTWARE.
 
 namespace Rudzoft.ChessLib.Polyglot;
 
-internal sealed class ReverseEndianBinaryStreamReader : BinaryReader
+internal sealed class ReverseEndianBinaryStreamReader(Stream stream) : BinaryReader(stream)
 {
-    public ReverseEndianBinaryStreamReader(Stream stream) : base(stream)
-    {
-    }
-
     public override short ReadInt16()
     {
         var data = ReadBytes(2);

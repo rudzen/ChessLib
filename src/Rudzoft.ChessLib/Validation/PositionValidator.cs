@@ -24,6 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using System.Runtime.Intrinsics;
 using Rudzoft.ChessLib.Hash;
 using Rudzoft.ChessLib.Types;
 
@@ -67,7 +68,7 @@ public sealed class PositionValidator : IPositionValidator
             errors.AddRange(ValidateBasic(pos));
 
         if (type.HasFlagFast(PositionValidationTypes.Castle))
-            errors.AddRange(ValidateCastleling(pos));
+            errors.AddRange(ValidateCastle(pos));
 
         if (type.HasFlagFast(PositionValidationTypes.Kings))
             errors.AddRange(ValidateKings(pos));
@@ -106,7 +107,7 @@ public sealed class PositionValidator : IPositionValidator
             yield return $"{nameof(pos.EnPassantSquare)} square is not on relative rank 6";
     }
 
-    private static IEnumerable<string> ValidateCastleling(IPosition pos)
+    private static IEnumerable<string> ValidateCastle(IPosition pos)
     {
         var crs = new[] { CastleRight.None, CastleRight.None };
 
@@ -115,7 +116,7 @@ public sealed class PositionValidator : IPositionValidator
             crs[0] = CastleRights.King.MakeCastleRights(p);
             crs[1] = CastleRights.Queen.MakeCastleRights(p);
 
-            var ourRook = PieceTypes.Rook.MakePiece(p);
+            var ourRook = PieceType.Rook.MakePiece(p);
             foreach (var cr in crs)
             {
                 if (!pos.CanCastle(cr))
@@ -127,10 +128,10 @@ public sealed class PositionValidator : IPositionValidator
                     yield return $"rook does not appear on its position for {p}";
 
                 if (pos.GetCastleRightsMask(rookSq) != cr)
-                    yield return $"castleling rights mask at {rookSq} does not match for player {p}";
+                    yield return $"castle rights mask at {rookSq} does not match for player {p}";
 
                 if ((pos.GetCastleRightsMask(pos.GetKingSquare(p)) & cr) != cr)
-                    yield return $"castleling rights mask at {pos.GetKingSquare(p)} does not match for player {p}";
+                    yield return $"castle rights mask at {pos.GetKingSquare(p)} does not match for player {p}";
             }
         }
     }
@@ -189,7 +190,7 @@ public sealed class PositionValidator : IPositionValidator
     {
         var state = pos.State;
 
-        if (state.PositionKey.Key == 0 && pos.PieceCount() != 0)
+        if (state.PositionKey == HashKey.Empty && pos.PieceCount() != 0)
             yield return "state key is invalid";
 
         if (pos.PieceCount(PieceTypes.Pawn) == 0 && state.PawnKey != _zobrist.ZobristNoPawn)

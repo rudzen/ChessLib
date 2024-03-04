@@ -55,7 +55,8 @@ public sealed class SanTests
 
         pos.Set(in fenData, ChessMode.Normal, state);
 
-        var pc = movingPt.MakePiece(pos.SideToMove);
+        var pt = new PieceType(movingPt);
+        var pc = pt.MakePiece(pos.SideToMove);
 
         var fromOne = new Square(fromSqOne);
         var fromTwo = new Square(fromSqTwo);
@@ -98,7 +99,8 @@ public sealed class SanTests
 
         pos.Set(in fenData, ChessMode.Normal, state);
 
-        var pc = movingPt.MakePiece(pos.SideToMove);
+        var pt = new PieceType(movingPt);
+        var pc = pt.MakePiece(pos.SideToMove);
 
         var fromOne = new Square(fromSqOne);
         var fromTwo = new Square(fromSqTwo);
@@ -144,7 +146,7 @@ public sealed class SanTests
         pos.Set(in fenData, ChessMode.Normal, state);
 
         var sideToMove  = pos.SideToMove;
-        var targetPiece = PieceTypes.Rook.MakePiece(sideToMove);
+        var targetPiece = PieceType.Rook.MakePiece(sideToMove);
 
         var moveNotation = _serviceProvider.GetRequiredService<IMoveNotation>();
         var notation     = moveNotation.ToNotation(moveNotations);

@@ -141,11 +141,11 @@ public sealed class KpkBitBase : IKpkBitBase
 
             // Draw if it is stalemate or the black king can capture the pawn
             else if (stm.IsBlack
-                     && ((PieceTypes.King.PseudoAttacks(ksq[Player.Black]) &
-                          ~(PieceTypes.King.PseudoAttacks(ksq[Player.White]) | psq.PawnAttack(Player.White)))
+                     && ((PieceType.King.PseudoAttacks(ksq[Player.Black]) &
+                          ~(PieceType.King.PseudoAttacks(ksq[Player.White]) | psq.PawnAttack(Player.White)))
                          .IsEmpty
-                         || !(PieceTypes.King.PseudoAttacks(ksq[Player.Black]) &
-                              ~PieceTypes.King.PseudoAttacks(ksq[Player.White]) & psq).IsEmpty))
+                         || !(PieceType.King.PseudoAttacks(ksq[Player.Black]) &
+                              ~PieceType.King.PseudoAttacks(ksq[Player.White]) & psq).IsEmpty))
                 results = Results.Draw;
 
             // Position will be classified later in initialization
@@ -212,7 +212,7 @@ public sealed class KpkBitBase : IKpkBitBase
         private Results GetInitialKingResults(ReadOnlySpan<KpkPosition> db)
         {
             var r = Results.None;
-            var b = PieceTypes.King.PseudoAttacks(KingSquares[Stm]);
+            var b = PieceType.King.PseudoAttacks(KingSquares[Stm]);
 
             while (b)
             {

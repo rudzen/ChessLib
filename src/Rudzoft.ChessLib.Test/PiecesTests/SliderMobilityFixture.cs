@@ -35,7 +35,7 @@ public sealed class SliderMobilityFixture
 
     public int[] RookExpected { get; } = [14, 14, 14, 14];
 
-    public BitBoard SliderAttacks(PieceTypes pt, Square sq, in BitBoard occ)
+    public BitBoard SliderAttacks(PieceType pt, Square sq, in BitBoard occ)
     {
         var index = SliderIndex(pt);
         return index switch
@@ -47,6 +47,6 @@ public sealed class SliderMobilityFixture
         };
     }
 
-    private static int SliderIndex(PieceTypes pt)
-        => pt.AsInt() - 3;
+    private static int SliderIndex(PieceType pt)
+        => pt - 3;
 }

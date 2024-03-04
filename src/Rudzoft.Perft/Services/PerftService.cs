@@ -15,24 +15,21 @@ public sealed class PerftService : IHostedService
 
     private readonly IServiceProvider _serviceProvider;
     private readonly IHostApplicationLifetime _applicationLifetime;
-    private readonly IBuildTimeStamp _buildTimeStamp;
 
     private ActorSystem _actorSystem;
     private IActorRef _perftActor;
 
     public PerftService(
         IServiceProvider serviceProvider,
-        IHostApplicationLifetime applicationLifetime,
-        IBuildTimeStamp buildTimeStamp)
+        IHostApplicationLifetime applicationLifetime)
     {
         _serviceProvider = serviceProvider;
         _applicationLifetime = applicationLifetime;
-        _buildTimeStamp = buildTimeStamp;
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
-        Log.Information("ChessLib Perft test program {Version} ({Time})", Version, _buildTimeStamp.TimeStamp);
+        Log.Information("ChessLib Perft test program {Version}", Version);
         Log.Information("High timer resolution : {HighRes}", Stopwatch.IsHighResolution);
         Log.Information("Initializing..");
 

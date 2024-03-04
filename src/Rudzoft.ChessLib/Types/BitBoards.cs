@@ -148,7 +148,7 @@ public static class BitBoards
     /// are a special case, as index range 0,sq are for White and 1,sq are for Black. This is
     /// possible because index 0 is NoPiece type.
     /// </summary>
-    private static readonly BitBoard[][] PseudoAttacksBB = new BitBoard[PieceTypes.PieceTypeNb.AsInt()][];
+    private static readonly BitBoard[][] PseudoAttacksBB = new BitBoard[PieceType.Count][];
 
     private static readonly BitBoard[][] PawnAttackSpanBB = new BitBoard[Player.Count][];
 
@@ -237,7 +237,7 @@ public static class BitBoards
         }
 
         // mini local helpers
-        Span<PieceTypes> validMagicPieces = stackalloc PieceTypes[] { PieceTypes.Bishop, PieceTypes.Rook };
+        Span<PieceType> validMagicPieces = stackalloc PieceType[] { PieceType.Bishop, PieceType.Rook };
 
         var bb = AllSquares;
         // Pseudo attacks for all pieces
@@ -250,7 +250,7 @@ public static class BitBoards
             // Compute lines and betweens
             foreach (var validMagicPiece in validMagicPieces)
             {
-                var pt = validMagicPiece.AsInt();
+                var pt = validMagicPiece;
                 var bb3 = AllSquares;
                 while (bb3)
                 {
@@ -281,7 +281,9 @@ public static class BitBoards
         return;
 
         static int distanceRank(Square x, Square y) => distance(x.Rank, y.Rank);
+
         static int distanceFile(Square x, Square y) => distance(x.File, y.File);
+
         // local helper functions to calculate distance
         static int distance(int x, int y) => Math.Abs(x - y);
     }
@@ -309,13 +311,13 @@ public static class BitBoards
         PseudoAttacksBB[0][sq] = b.NorthEastOne() | b.NorthWestOne();
         PseudoAttacksBB[1][sq] = b.SouthWestOne() | b.SouthEastOne();
 
-        PseudoAttacksBB[PieceTypes.Knight.AsInt()][sq] = ComputeKnightAttack(in b);
-        PseudoAttacksBB[PieceTypes.Bishop.AsInt()][sq] = bishopAttacks;
-        PseudoAttacksBB[PieceTypes.Rook.AsInt()][sq] = rookAttacks;
-        PseudoAttacksBB[PieceTypes.Queen.AsInt()][sq] = bishopAttacks | rookAttacks;
-        PseudoAttacksBB[PieceTypes.King.AsInt()][sq] = b.NorthOne() | b.SouthOne() | b.EastOne()
-                                                      | b.WestOne() | b.NorthEastOne() | b.NorthWestOne()
-                                                      | b.SouthEastOne() | b.SouthWestOne();
+        PseudoAttacksBB[PieceType.Knight][sq] = ComputeKnightAttack(in b);
+        PseudoAttacksBB[PieceType.Bishop][sq] = bishopAttacks;
+        PseudoAttacksBB[PieceType.Rook][sq] = rookAttacks;
+        PseudoAttacksBB[PieceType.Queen][sq] = bishopAttacks | rookAttacks;
+        PseudoAttacksBB[PieceType.King][sq] = b.NorthOne() | b.SouthOne() | b.EastOne()
+                                              | b.WestOne() | b.NorthEastOne() | b.NorthWestOne()
+                                              | b.SouthEastOne() | b.SouthWestOne();
     }
 
     private static void InitializeKingRing(Square sq)
@@ -373,13 +375,13 @@ public static class BitBoards
     public static BitBoard SeventhAndEightsRank(Player p) => Ranks7And8BB[p];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard PseudoAttacks(this PieceTypes pt, Square sq) => PseudoAttacksBB[pt.AsInt()][sq];
+    public static BitBoard PseudoAttacks(this PieceType pt, Square sq) => PseudoAttacksBB[pt][sq];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard KnightAttacks(this Square sq) => PseudoAttacksBB[PieceTypes.Knight.AsInt()][sq];
+    public static BitBoard KnightAttacks(this Square sq) => PseudoAttacksBB[PieceType.Knight][sq];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard KingAttacks(this Square sq) => PseudoAttacksBB[PieceTypes.King.AsInt()][sq];
+    public static BitBoard KingAttacks(this Square sq) => PseudoAttacksBB[PieceType.King][sq];
 
     /// <summary>
     /// Attack for pawn.
@@ -501,7 +503,7 @@ public static class BitBoards
     [SkipLocalsInit]
     public static string Stringify(in BitBoard bb, string title = "")
     {
-        const string line   = "+---+---+---+---+---+---+---+---+---+";
+        const string line = "+---+---+---+---+---+---+---+---+---+";
         const string bottom = "|   | A | B | C | D | E | F | G | H |";
 
         Span<char> span = stackalloc char[768];
@@ -516,12 +518,12 @@ public static class BitBoards
         Span<char> rank = stackalloc char[4] { '|', ' ', ' ', ' ' };
         for (var r = Ranks.Rank8; r >= Ranks.Rank1; --r)
         {
-            rank[2]     = (char)('0' + (int)r + 1);
+            rank[2] = (char)('0' + (int)r + 1);
             rank.CopyTo(span[idx..]);
             idx += rank.Length;
             for (var f = Files.FileA; f <= Files.FileH; ++f)
             {
-                rank[2]     = (bb & new Square(r, f)).IsEmpty ? ' ' : 'X';
+                rank[2] = (bb & new Square(r, f)).IsEmpty ? ' ' : 'X';
                 rank.CopyTo(span[idx..]);
                 idx += rank.Length;
             }
@@ -751,19 +753,23 @@ public static class BitBoards
 
     private static Func<BitBoard, BitBoard>[] MakeFillFuncs() => [NorthFill, SouthFill];
 
-    private static BitBoard GetAttacks(this in Square sq, PieceTypes pt, in BitBoard occ = default)
+    private static BitBoard GetAttacks(this in Square sq, PieceType pt, in BitBoard occ = default)
     {
-        return pt switch
-        {
-            PieceTypes.Knight => PseudoAttacksBB[pt.AsInt()][sq],
-            PieceTypes.King => PseudoAttacksBB[pt.AsInt()][sq],
-            PieceTypes.Bishop => sq.BishopAttacks(in occ),
-            PieceTypes.Rook => sq.RookAttacks(in occ),
-            PieceTypes.Queen => sq.QueenAttacks(in occ),
-            var _ => EmptyBitBoard
-        };
+        if (pt == PieceType.Knight || pt == PieceType.King)
+            return sq.PseudoAttack(pt);
+
+        if (pt == PieceType.Bishop)
+            return sq.BishopAttacks(in occ);
+
+        if (pt == PieceType.Rook)
+            return sq.RookAttacks(in occ);
+
+        if (pt == PieceType.Queen)
+            return sq.QueenAttacks(in occ);
+
+        return EmptyBitBoard;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static BitBoard PseudoAttack(this in Square sq, PieceTypes pt) => PseudoAttacksBB[pt.AsInt()][sq];
+    private static BitBoard PseudoAttack(this in Square sq, PieceType pt) => PseudoAttacksBB[pt][sq];
 }

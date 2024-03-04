@@ -28,7 +28,7 @@ using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Polyglot;
 
-public interface IPolyglotBook : IDisposable
+public interface IPolyglotBook : IAsyncDisposable
 {
     string BookFile { get; init; }
     Move Probe(IPosition pos, bool pickBest = true);

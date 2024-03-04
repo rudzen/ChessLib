@@ -24,6 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using System.Runtime.CompilerServices;
 using Rudzoft.ChessLib.Types;
 using File = Rudzoft.ChessLib.Types.File;
 
@@ -348,20 +349,23 @@ internal static class PolyglotBookZobrist
     // PolyGlot pieces are: BP = 0, WP = 1, BN = 2, ... BK = 10, WK = 11
     private static readonly int[] PieceMapping = [-1, 1, 3, 5, 7, 9, 11, -1, -1, 0, 2, 4, 6, 8, 10];
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static ulong Psq(Piece pc, Square sq)
-    {
-        return Psq(PieceMapping[pc], sq);
-    }
+        => Psq(PieceMapping[pc], sq);
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static ulong Psq(int piece, Square sq)
         => PsqKeys[piece, sq];
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static ulong Castle(CastleRight rights)
         => CastleKeys[rights.AsInt()];
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static ulong EnPassant(File f)
         => EnPassantKeys[f];
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static ulong Turn()
         => TurnKey;
 }

@@ -48,7 +48,7 @@ public sealed class IccfNotation : Notation
         var (from, to) = move;
 
         Span<char> re = stackalloc char[5];
-        var        i  = 0;
+        var i = 0;
 
         re[i++] = (char)('1' + from.File);
         re[i++] = (char)('1' + from.Rank);
@@ -58,19 +58,23 @@ public sealed class IccfNotation : Notation
         // ReSharper disable once InvertIf
         if (move.IsPromotionMove())
         {
-            // ReSharper disable once SwitchExpressionHandlesSomeKnownEnumValuesWithExceptionInDefault
-            var c = move.PromotedPieceType() switch
-            {
-                PieceTypes.Queen  => 1,
-                PieceTypes.Rook   => 2,
-                PieceTypes.Bishop => 3,
-                PieceTypes.Knight => 4,
-                var _             => throw new NotImplementedException()
-            };
-
+            var c = PieceTypeToValue(move.PromotedPieceType());
             re[i++] = (char)('0' + c);
         }
 
         return new(re[..i]);
+    }
+
+    private static int PieceTypeToValue(PieceType pt)
+    {
+        if (pt == PieceType.Queen)
+            return 1;
+        if (pt == PieceType.Rook)
+            return 2;
+        if (pt == PieceType.Bishop)
+            return 3;
+        if (pt == PieceType.Knight)
+            return 4;
+        throw new NotImplementedException();
     }
 }

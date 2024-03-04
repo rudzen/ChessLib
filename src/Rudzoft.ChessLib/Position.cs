@@ -133,34 +133,34 @@ public sealed class Position : IPosition
     }
 
     public bool AttackedByKing(Square sq, Player p)
-        => (GetAttacks(sq, PieceTypes.King) & GetKingSquare(p)).IsNotEmpty;
+        => (GetAttacks(sq, PieceType.King) & GetKingSquare(p)).IsNotEmpty;
 
     public bool AttackedByKnight(Square sq, Player p)
-        => (Board.Pieces(p, PieceTypes.Knight) & GetAttacks(sq, PieceTypes.Knight)).IsNotEmpty;
+        => (Board.Pieces(p, PieceType.Knight) & GetAttacks(sq, PieceType.Knight)).IsNotEmpty;
 
     public bool AttackedByPawn(Square sq, Player p) =>
-        (Board.Pieces(p, PieceTypes.Pawn) & sq.PawnAttack(~p)).IsNotEmpty;
+        (Board.Pieces(p, PieceType.Pawn) & sq.PawnAttack(~p)).IsNotEmpty;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool AttackedBySlider(Square sq, Player p)
     {
         var occupied = Board.Pieces();
         var rookAttacks = sq.RookAttacks(in occupied);
-        if (Board.Pieces(p, PieceTypes.Rook) & rookAttacks)
+        if (Board.Pieces(p, PieceType.Rook) & rookAttacks)
             return true;
 
         var bishopAttacks = sq.BishopAttacks(in occupied);
-        if (Board.Pieces(p, PieceTypes.Bishop) & bishopAttacks)
+        if (Board.Pieces(p, PieceType.Bishop) & bishopAttacks)
             return true;
 
-        return (Board.Pieces(p, PieceTypes.Queen) & (bishopAttacks | rookAttacks)).IsNotEmpty;
+        return (Board.Pieces(p, PieceType.Queen) & (bishopAttacks | rookAttacks)).IsNotEmpty;
     }
 
-    public BitBoard AttacksBy(PieceTypes pt, Player p)
+    public BitBoard AttacksBy(PieceType pt, Player p)
     {
         var attackers = Pieces(pt, p);
 
-        if (pt == PieceTypes.Pawn)
+        if (pt == PieceType.Pawn)
             return attackers.PawnAttacks(p);
 
         var threats = BitBoard.Empty;
@@ -187,7 +187,7 @@ public sealed class Position : IPosition
     }
 
     public bool IsPawnPassedAt(Player p, Square sq)
-        => (Board.Pieces(~p, PieceTypes.Pawn) & sq.PassedPawnFrontAttackSpan(p)).IsEmpty;
+        => (Board.Pieces(~p, PieceType.Pawn) & sq.PassedPawnFrontAttackSpan(p)).IsEmpty;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public BitBoard PawnPassSpan(Player p, Square sq) => p.FrontSquares(sq) | sq.PawnAttackSpan(p);
@@ -196,12 +196,12 @@ public sealed class Position : IPosition
     {
         Debug.Assert(sq.IsOk);
 
-        return (sq.PawnAttack(Player.White) & Board.Pieces(Player.Black, PieceTypes.Pawn))
-               | (sq.PawnAttack(Player.Black) & Board.Pieces(Player.White, PieceTypes.Pawn))
-               | (GetAttacks(sq, PieceTypes.Knight) & Board.Pieces(PieceTypes.Knight))
-               | (GetAttacks(sq, PieceTypes.Rook, in occ) & Board.Pieces(PieceTypes.Rook, PieceTypes.Queen))
-               | (GetAttacks(sq, PieceTypes.Bishop, in occ) & Board.Pieces(PieceTypes.Bishop, PieceTypes.Queen))
-               | (GetAttacks(sq, PieceTypes.King) & Board.Pieces(PieceTypes.King));
+        return (sq.PawnAttack(Player.White) & Board.Pieces(Player.Black, PieceType.Pawn))
+               | (sq.PawnAttack(Player.Black) & Board.Pieces(Player.White, PieceType.Pawn))
+               | (GetAttacks(sq, PieceType.Knight) & Board.Pieces(PieceType.Knight))
+               | (GetAttacks(sq, PieceType.Rook, in occ) & Board.Pieces(PieceType.Rook, PieceType.Queen))
+               | (GetAttacks(sq, PieceType.Bishop, in occ) & Board.Pieces(PieceType.Bishop, PieceType.Queen))
+               | (GetAttacks(sq, PieceType.King) & Board.Pieces(PieceType.King));
     }
 
     public BitBoard AttacksTo(Square sq) => AttacksTo(sq, Board.Pieces());
@@ -242,9 +242,9 @@ public sealed class Position : IPosition
         return blockers;
     }
 
-    public bool CanCastle(CastleRight cr) => State.CastlelingRights.Has(cr);
+    public bool CanCastle(CastleRight cr) => State.CastleRights.Has(cr);
 
-    public bool CanCastle(Player p) => State.CastlelingRights.Has(p);
+    public bool CanCastle(Player p) => State.CastleRights.Has(p);
 
     public ref BitBoard CastleKingPath(CastleRight cr) => ref _castleKingPath[cr.AsInt()];
 
@@ -262,7 +262,7 @@ public sealed class Position : IPosition
         return _castlingRookSquare[cr.Rights.AsInt()];
     }
 
-    public BitBoard CheckedSquares(PieceTypes pt) => State.CheckedSquares[pt.AsInt()];
+    public BitBoard CheckedSquares(PieceType pt) => State.CheckedSquares[pt];
 
     public void Clear()
     {
@@ -313,7 +313,7 @@ public sealed class Position : IPosition
         fen[length++] = _sideToMove.Fen;
         fen[length++] = space;
 
-        if (State.CastlelingRights == CastleRight.None)
+        if (State.CastleRights == CastleRight.None)
             fen[length++] = dash;
         else
         {
@@ -375,22 +375,26 @@ public sealed class Position : IPosition
         return new(new string(fen[..length]));
     }
 
-    public BitBoard GetAttacks(Square sq, PieceTypes pt, in BitBoard occ)
+    public BitBoard GetAttacks(Square sq, PieceType pt, in BitBoard occ)
     {
         Debug.Assert(pt != PieceTypes.Pawn, "Pawns need player");
 
-        return pt switch
-        {
-            PieceTypes.Knight => pt.PseudoAttacks(sq),
-            PieceTypes.King   => pt.PseudoAttacks(sq),
-            PieceTypes.Bishop => sq.BishopAttacks(in occ),
-            PieceTypes.Rook   => sq.RookAttacks(in occ),
-            PieceTypes.Queen  => sq.QueenAttacks(in occ),
-            var _             => BitBoard.Empty
-        };
+        if (pt == PieceType.Knight || pt == PieceType.King)
+            return pt.PseudoAttacks(sq);
+
+        if (pt == PieceType.Bishop)
+            return sq.BishopAttacks(in occ);
+
+        if (pt == PieceType.Rook)
+            return sq.RookAttacks(in occ);
+
+        if (pt == PieceType.Queen)
+            return sq.QueenAttacks(in occ);
+
+        return BitBoards.EmptyBitBoard;
     }
 
-    public BitBoard GetAttacks(Square sq, PieceTypes pt) => GetAttacks(sq, pt, Pieces());
+    public BitBoard GetAttacks(Square sq, PieceType pt) => GetAttacks(sq, pt, Pieces());
 
     public CastleRight GetCastleRightsMask(Square sq) => _castlingRightsMask[sq];
 
@@ -398,13 +402,13 @@ public sealed class Position : IPosition
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-    public Square GetKingSquare(Player p) => Board.Square(PieceTypes.King, p);
+    public Square GetKingSquare(Player p) => Board.Square(PieceType.King, p);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public HashKey GetPawnKey()
     {
         var result = Zobrist.ZobristNoPawn;
-        var pieces = Board.Pieces(PieceTypes.Pawn);
+        var pieces = Board.Pieces(PieceType.Pawn);
         while (pieces)
         {
             var sq = BitBoards.PopLsb(ref pieces);
@@ -419,7 +423,7 @@ public sealed class Position : IPosition
     public Piece GetPiece(Square sq) => Board.PieceAt(sq);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public HashKey GetKey()
+    public HashKey GetKey(State state)
     {
         var result = HashKey.Empty;
         var pieces = Board.Pieces();
@@ -430,8 +434,8 @@ public sealed class Position : IPosition
             result ^= Zobrist.Psq(sq, pc);
         }
 
-        if (State.EnPassantSquare != Square.None)
-            result ^= Zobrist.EnPassant(State.EnPassantSquare);
+        if (state.EnPassantSquare != Square.None)
+            result ^= Zobrist.EnPassant(state.EnPassantSquare);
 
         if (_sideToMove == Player.Black)
             result ^= Zobrist.Side();
@@ -439,10 +443,10 @@ public sealed class Position : IPosition
         return result;
     }
 
-    public Square GetPieceSquare(PieceTypes pt, Player p) => Board.Square(pt, p);
+    public Square GetPieceSquare(PieceType pt, Player p) => Board.Square(pt, p);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public PieceTypes GetPieceType(Square sq) => Board.PieceAt(sq).Type();
+    public PieceType GetPieceType(Square sq) => Board.PieceAt(sq).Type();
 
     public bool GivesCheck(Move m)
     {
@@ -455,7 +459,7 @@ public sealed class Position : IPosition
         var pt = pc.Type();
 
         // Is there a direct check?
-        if ((State.CheckedSquares[pt.AsInt()] & to).IsNotEmpty)
+        if ((State.CheckedSquares[pt] & to).IsNotEmpty)
             return true;
 
         var us = _sideToMove;
@@ -483,10 +487,10 @@ public sealed class Position : IPosition
                 var b = (Board.Pieces() ^ from ^ captureSquare) | to;
                 var ksq = GetKingSquare(them);
 
-                var attacks = (GetAttacks(ksq, PieceTypes.Rook, in b) &
-                               Board.Pieces(us, PieceTypes.Rook, PieceTypes.Queen))
-                              | (GetAttacks(ksq, PieceTypes.Bishop, in b) &
-                                 Board.Pieces(us, PieceTypes.Bishop, PieceTypes.Queen));
+                var attacks = (GetAttacks(ksq, PieceType.Rook, in b) &
+                               Board.Pieces(us, PieceType.Rook, PieceType.Queen))
+                              | (GetAttacks(ksq, PieceType.Bishop, in b) &
+                                 Board.Pieces(us, PieceType.Bishop, PieceType.Queen));
                 return attacks.IsNotEmpty;
             }
             case MoveTypes.Castling:
@@ -499,8 +503,8 @@ public sealed class Position : IPosition
                 var rookTo = (rookFrom > kingFrom ? Square.F1 : Square.D1).Relative(us);
                 var ksq = GetKingSquare(them);
 
-                return (PieceTypes.Rook.PseudoAttacks(rookTo) & ksq).IsNotEmpty
-                       && (GetAttacks(rookTo, PieceTypes.Rook,
+                return (PieceType.Rook.PseudoAttacks(rookTo) & ksq).IsNotEmpty
+                       && (GetAttacks(rookTo, PieceType.Rook,
                            (Board.Pieces() ^ kingFrom ^ rookFrom) | rookTo | kingTo) & ksq).IsNotEmpty;
             }
             default:
@@ -550,24 +554,24 @@ public sealed class Position : IPosition
         var (from, to, type) = m;
         var ksq = GetKingSquare(us);
 
-        Debug.Assert(GetPiece(GetKingSquare(us)) == PieceTypes.King.MakePiece(us));
+        Debug.Assert(GetPiece(GetKingSquare(us)) == PieceType.King.MakePiece(us));
         Debug.Assert(to != from);
 
         // En passant captures are a tricky special case. Because they are rather uncommon, we
         // do it simply by testing whether the king is attacked after the move is made.
         if (type == MoveTypes.Enpassant)
         {
-            Debug.Assert(MovedPiece(m) == PieceTypes.Pawn.MakePiece(us));
+            Debug.Assert(MovedPiece(m) == PieceType.Pawn.MakePiece(us));
             return IsEnPassantMoveLegal(to, us, from, ksq);
         }
 
         // Check for legal castleling move
         if (type == MoveTypes.Castling)
-            return IsCastlelingMoveLegal(m, to, from, us);
+            return IsCastleMoveLegal(m, to, from, us);
 
         // If the moving piece is a king, check whether the destination square is attacked by
         // the opponent.
-        if (MovedPiece(m).Type() == PieceTypes.King)
+        if (MovedPiece(m).Type() == PieceType.King)
             return (AttacksTo(to) & Board.Pieces(~us)).IsEmpty;
 
         // A non-king move is legal if and only if it is not pinned or it is moving along the
@@ -575,7 +579,7 @@ public sealed class Position : IPosition
         return (KingBlockers(us) & from).IsEmpty || from.Aligned(to, ksq);
     }
 
-    private bool IsCastlelingMoveLegal(Move m, Square to, Square from, Player us)
+    private bool IsCastleMoveLegal(Move m, Square to, Square from, Player us)
     {
         // After castling, the rook and king final positions are the same in Chess960 as
         // they would be in standard chess.
@@ -587,12 +591,12 @@ public sealed class Position : IPosition
         if (isKingSide)
         {
             to = Square.G1.Relative(us);
-            step = Directions.West;
+            step = Direction.West;
         }
         else
         {
             to = Square.C1.Relative(us);
-            step = Directions.East;
+            step = Direction.East;
         }
 
         for (var s = to; s != from; s += step)
@@ -607,11 +611,11 @@ public sealed class Position : IPosition
 
         var attacks = GetAttacks(
             sq: to,
-            pt: PieceTypes.Rook,
+            pt: PieceType.Rook,
             occ: Board.Pieces() ^ m.ToSquare()
         );
 
-        var occupied = Board.Pieces(them, PieceTypes.Rook, PieceTypes.Queen);
+        var occupied = Board.Pieces(them, PieceType.Rook, PieceType.Queen);
 
         return (attacks & occupied).IsEmpty;
 
@@ -629,20 +633,20 @@ public sealed class Position : IPosition
         var occupied = (Board.Pieces() ^ from ^ captureSquare) | to;
 
         Debug.Assert(to == EnPassantSquare);
-        Debug.Assert(GetPiece(captureSquare) == PieceTypes.Pawn.MakePiece(~us));
+        Debug.Assert(GetPiece(captureSquare) == PieceType.Pawn.MakePiece(~us));
         Debug.Assert(GetPiece(to) == Piece.EmptyPiece);
 
-        return (GetAttacks(ksq, PieceTypes.Rook, in occupied) &
-                Board.Pieces(~us, PieceTypes.Rook, PieceTypes.Queen)).IsEmpty
-               && (GetAttacks(ksq, PieceTypes.Bishop, in occupied) &
-                   Board.Pieces(~us, PieceTypes.Bishop, PieceTypes.Queen)).IsEmpty;
+        return (GetAttacks(ksq, PieceType.Rook, in occupied) &
+                Board.Pieces(~us, PieceType.Rook, PieceType.Queen)).IsEmpty
+               && (GetAttacks(ksq, PieceType.Bishop, in occupied) &
+                   Board.Pieces(~us, PieceType.Bishop, PieceType.Queen)).IsEmpty;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool IsOccupied(Square sq) => !Board.IsEmpty(sq);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool IsPieceTypeOnSquare(Square sq, PieceTypes pt) => Board.PieceAt(sq).Type() == pt;
+    public bool IsPieceTypeOnSquare(Square sq, PieceType pt) => Board.PieceAt(sq).Type() == pt;
 
     /// <summary>
     /// <para>
@@ -660,7 +664,7 @@ public sealed class Position : IPosition
             return ContainsMove(m);
 
         // Is not a promotion, so promotion piece must be empty
-        if (m.PromotedPieceType() - 2 != PieceTypes.NoPieceType)
+        if (m.PromotedPieceType() - 2 != PieceType.NoPieceType)
             return false;
 
         var us = _sideToMove;
@@ -677,7 +681,7 @@ public sealed class Position : IPosition
             return false;
 
         // Handle the special case of a pawn move
-        if (pc.Type() == PieceTypes.Pawn)
+        if (pc.Type() == PieceType.Pawn)
         {
             // We have already handled promotion moves, so destination cannot be on the 8th/1st rank.
             if (to.Rank == Rank.Rank8.Relative(us))
@@ -702,7 +706,7 @@ public sealed class Position : IPosition
         // relies on this. We therefore have to take care that the same kind of moves are
         // filtered out here.
 
-        if (pc.Type() != PieceTypes.King)
+        if (pc.Type() != PieceType.King)
         {
             // Double check? In this case a king move is required
             if (Checkers.MoreThanOne())
@@ -740,7 +744,7 @@ public sealed class Position : IPosition
         var (from, to, type) = m;
         var pc = GetPiece(from);
         var capturedPiece = m.IsEnPassantMove()
-            ? PieceTypes.Pawn.MakePiece(them)
+            ? PieceType.Pawn.MakePiece(them)
             : GetPiece(to);
 
         Debug.Assert(pc.ColorOf() == us);
@@ -750,8 +754,8 @@ public sealed class Position : IPosition
 
         if (type == MoveTypes.Castling)
         {
-            Debug.Assert(pc == PieceTypes.King.MakePiece(us));
-            Debug.Assert(capturedPiece == PieceTypes.Rook.MakePiece(us));
+            Debug.Assert(pc == PieceType.King.MakePiece(us));
+            Debug.Assert(capturedPiece == PieceType.Rook.MakePiece(us));
 
             DoCastle(us, from, ref to, out var rookFrom, out var rookTo, CastlePerform.Do);
             // var (rookFrom, rookTo) = DoCastle(us, from, ref to, CastlePerform.Do);
@@ -766,7 +770,7 @@ public sealed class Position : IPosition
         {
             var captureSquare = to;
 
-            if (capturedPiece.Type() == PieceTypes.Pawn)
+            if (capturedPiece.Type() == PieceType.Pawn)
             {
                 if (type == MoveTypes.Enpassant)
                 {
@@ -809,12 +813,12 @@ public sealed class Position : IPosition
         }
 
         // Update castling rights if needed
-        if (state.CastlelingRights != CastleRight.None &&
+        if (state.CastleRights != CastleRight.None &&
             (_castlingRightsMask[from] | _castlingRightsMask[to]) != CastleRight.None)
         {
-            posKey ^= Zobrist.Castleling(state.CastlelingRights);
-            state.CastlelingRights &= ~(_castlingRightsMask[from] | _castlingRightsMask[to]);
-            //posKey ^= Zobrist.Castleling(state.CastlelingRights);
+            posKey ^= Zobrist.Castle(state.CastleRights);
+            state.CastleRights &= ~(_castlingRightsMask[from] | _castlingRightsMask[to]);
+            posKey ^= Zobrist.Castle(state.CastleRights);
         }
 
         // Move the piece. The tricky Chess960 castle is handled earlier
@@ -822,7 +826,7 @@ public sealed class Position : IPosition
             MovePiece(from, to);
 
         // If the moving piece is a pawn do some special extra work
-        if (pc.Type() == PieceTypes.Pawn)
+        if (pc.Type() == PieceType.Pawn)
         {
             // Set en-passant square, only if moved pawn can be captured
             if ((to.AsInt() ^ from.AsInt()) == 16
@@ -951,12 +955,12 @@ public sealed class Position : IPosition
     {
         var pc = Board.PieceAt(sq);
 
-        if (pc.Type() != PieceTypes.Pawn)
+        if (pc.Type() != PieceType.Pawn)
             return false;
 
         var c = pc.ColorOf();
 
-        return (sq.PassedPawnFrontAttackSpan(c) & Board.Pieces(c, PieceTypes.Pawn)).IsEmpty;
+        return (sq.PassedPawnFrontAttackSpan(c) & Board.Pieces(c, PieceType.Pawn)).IsEmpty;
     }
 
     /// <summary>
@@ -967,48 +971,65 @@ public sealed class Position : IPosition
     /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool PawnIsolated(Square sq, Player p)
-        => ((sq.PawnAttackSpan(p) | sq.PawnAttackSpan(~p)) & Board.Pieces(p, PieceTypes.Pawn)).IsEmpty;
+        => ((sq.PawnAttackSpan(p) | sq.PawnAttackSpan(~p)) & Board.Pieces(p, PieceType.Pawn)).IsEmpty;
 
-    public bool PieceOnFile(Square sq, Player p, PieceTypes pt) => (Board.Pieces(p, pt) & sq).IsNotEmpty;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool PieceOnFile(Square sq, Player p, PieceType pt) => (Board.Pieces(p, pt) & sq).IsNotEmpty;
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public BitBoard Pieces() => Board.Pieces();
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public BitBoard Pieces(Player p) => Board.Pieces(p);
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public BitBoard Pieces(Piece pc) => Board.Pieces(pc.ColorOf(), pc.Type());
 
-    public BitBoard Pieces(PieceTypes pt) => Board.Pieces(pt);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public BitBoard Pieces(PieceType pt) => Board.Pieces(pt);
 
-    public BitBoard Pieces(PieceTypes pt1, PieceTypes pt2) => Board.Pieces(pt1, pt2);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public BitBoard Pieces(PieceType pt1, PieceType pt2) => Board.Pieces(pt1, pt2);
 
-    public BitBoard Pieces(PieceTypes pt, Player p) => Board.Pieces(p, pt);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public BitBoard Pieces(PieceType pt, Player p) => Board.Pieces(p, pt);
 
-    public BitBoard Pieces(PieceTypes pt1, PieceTypes pt2, Player p) => Board.Pieces(p, pt1, pt2);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public BitBoard Pieces(PieceType pt1, PieceType pt2, Player p) => Board.Pieces(p, pt1, pt2);
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public int PieceCount() => Board.PieceCount();
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public int PieceCount(Piece pc) => Board.PieceCount(pc.Type(), pc.ColorOf());
 
-    public int PieceCount(PieceTypes pt) => Board.PieceCount(pt);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public int PieceCount(PieceType pt) => Board.PieceCount(pt);
 
-    public int PieceCount(PieceTypes pt, Player p) => Board.PieceCount(pt, p);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public int PieceCount(PieceType pt, Player p) => Board.PieceCount(pt, p);
 
-    public BitBoard PawnsOnColor(Player p, Square sq) => Pieces(PieceTypes.Pawn, p) & sq.Color().ColorBB();
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public BitBoard PawnsOnColor(Player p, Square sq) => Pieces(PieceType.Pawn, p) & sq.Color().ColorBB();
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool SemiOpenFileOn(Player p, Square sq)
-        => (Board.Pieces(p, PieceTypes.Pawn) & sq.File.BitBoardFile()).IsEmpty;
+        => (Board.Pieces(p, PieceType.Pawn) & sq.File.BitBoardFile()).IsEmpty;
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool BishopPaired(Player p) =>
-        Board.PieceCount(PieceTypes.Bishop, p) >= 2
-        && (Board.Pieces(p, PieceTypes.Bishop) & Player.White.ColorBB()).IsNotEmpty
-        && (Board.Pieces(p, PieceTypes.Bishop) & Player.Black.ColorBB()).IsNotEmpty;
+        Board.PieceCount(PieceType.Bishop, p) >= 2
+        && (Board.Pieces(p, PieceType.Bishop) & Player.White.ColorBB()).IsNotEmpty
+        && (Board.Pieces(p, PieceType.Bishop) & Player.Black.ColorBB()).IsNotEmpty;
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool BishopOpposed() =>
         Board.PieceCount(Piece.WhiteBishop) == 1
         && Board.PieceCount(Piece.BlackBishop) == 1
-        && Board.Square(PieceTypes.Bishop, Player.White)
-                .IsOppositeColor(Board.Square(PieceTypes.Bishop, Player.Black));
+        && Board.Square(PieceType.Bishop, Player.White)
+                .IsOppositeColor(Board.Square(PieceType.Bishop, Player.Black));
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public BitBoard PinnedPieces(Player p)
     {
         Debug.Assert(State != null);
@@ -1070,51 +1091,51 @@ public sealed class Position : IPosition
 
             // Locate and remove the next least valuable attacker, and add to the bitboard
             // 'attackers' any X-ray attackers behind it.
-            var bb = stmAttackers & Board.Pieces(PieceTypes.Pawn);
+            var bb = stmAttackers & Board.Pieces(PieceType.Pawn);
             if (bb.IsNotEmpty)
             {
                 if ((swap = Values.PawnValueMg - swap) < res)
                     break;
 
                 occupied ^= bb.Lsb();
-                attackers |= GetAttacks(to, PieceTypes.Bishop, in occupied) &
-                             Board.Pieces(PieceTypes.Bishop, PieceTypes.Queen);
+                attackers |= GetAttacks(to, PieceType.Bishop, in occupied) &
+                             Board.Pieces(PieceType.Bishop, PieceType.Queen);
             }
-            else if ((bb = stmAttackers & Board.Pieces(PieceTypes.Knight)).IsNotEmpty)
+            else if ((bb = stmAttackers & Board.Pieces(PieceType.Knight)).IsNotEmpty)
             {
                 if ((swap = Values.KnightValueMg - swap) < res)
                     break;
 
                 occupied ^= bb.Lsb();
             }
-            else if ((bb = stmAttackers & Board.Pieces(PieceTypes.Bishop)).IsNotEmpty)
+            else if ((bb = stmAttackers & Board.Pieces(PieceType.Bishop)).IsNotEmpty)
             {
                 if ((swap = Values.BishopValueMg - swap) < res)
                     break;
 
                 occupied ^= bb.Lsb();
-                attackers |= GetAttacks(to, PieceTypes.Bishop, in occupied) &
-                             Board.Pieces(PieceTypes.Bishop, PieceTypes.Queen);
+                attackers |= GetAttacks(to, PieceType.Bishop, in occupied) &
+                             Board.Pieces(PieceType.Bishop, PieceType.Queen);
             }
-            else if ((bb = stmAttackers & Board.Pieces(PieceTypes.Rook)).IsNotEmpty)
+            else if ((bb = stmAttackers & Board.Pieces(PieceType.Rook)).IsNotEmpty)
             {
                 if ((swap = Values.RookValueMg - swap) < res)
                     break;
 
                 occupied ^= bb.Lsb();
-                attackers |= GetAttacks(to, PieceTypes.Rook, in occupied) &
-                             Board.Pieces(PieceTypes.Rook, PieceTypes.Queen);
+                attackers |= GetAttacks(to, PieceType.Rook, in occupied) &
+                             Board.Pieces(PieceType.Rook, PieceType.Queen);
             }
-            else if ((bb = stmAttackers & Board.Pieces(PieceTypes.Queen)).IsNotEmpty)
+            else if ((bb = stmAttackers & Board.Pieces(PieceType.Queen)).IsNotEmpty)
             {
                 if ((swap = Values.QueenValueMg - swap) < res)
                     break;
 
                 occupied ^= bb.Lsb();
-                attackers |= (GetAttacks(to, PieceTypes.Bishop, in occupied) &
-                              Board.Pieces(PieceTypes.Bishop, PieceTypes.Queen))
-                             | (GetAttacks(to, PieceTypes.Rook, in occupied) &
-                                Board.Pieces(PieceTypes.Rook, PieceTypes.Queen));
+                attackers |= (GetAttacks(to, PieceType.Bishop, in occupied) &
+                              Board.Pieces(PieceType.Bishop, PieceType.Queen))
+                             | (GetAttacks(to, PieceType.Rook, in occupied) &
+                                Board.Pieces(PieceType.Rook, PieceType.Queen));
             }
             else // KING
                 // If we "capture" with the king but opponent still has attackers, reverse the result.
@@ -1129,8 +1150,10 @@ public sealed class Position : IPosition
         return res > 0;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Value NonPawnMaterial(Player p) => _nonPawnMaterial[p];
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Value NonPawnMaterial() => _nonPawnMaterial[0] - _nonPawnMaterial[1];
 
     private void SetupPieces(ReadOnlySpan<char> fenChunk)
@@ -1160,7 +1183,8 @@ public sealed class Position : IPosition
 
                 var square = new Square(r - 1, f - 1);
 
-                var pc = ((PieceTypes)pieceIndex).MakePiece(p);
+                var pt = new PieceType(pieceIndex);
+                var pc = pt.MakePiece(p);
                 AddPiece(pc, square);
 
                 f++;
@@ -1187,8 +1211,8 @@ public sealed class Position : IPosition
             var us = _sideToMove;
             var them = ~us;
 
-            if (!(epSquare.PawnAttack(them) & Pieces(PieceTypes.Pawn, us)).IsEmpty
-                && !(Pieces(PieceTypes.Pawn, them) & (epSquare + them.PawnPushDistance())).IsEmpty
+            if (!(epSquare.PawnAttack(them) & Pieces(PieceType.Pawn, us)).IsEmpty
+                && !(Pieces(PieceType.Pawn, them) & (epSquare + them.PawnPushDistance())).IsEmpty
                 && (Pieces() & (epSquare | (epSquare + us.PawnPushDistance()))).IsEmpty)
                 State.EnPassantSquare = epSquare;
         }
@@ -1263,6 +1287,7 @@ public sealed class Position : IPosition
         return this;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public IPosition Set(string fen, ChessMode chessMode, in State state, bool validate = false, int searcher = 0)
         => Set(new FenData(fen), chessMode, state, validate, searcher);
 
@@ -1302,7 +1327,7 @@ public sealed class Position : IPosition
             Debug.Assert(m.PromotedPieceType() >= PieceTypes.Knight && m.PromotedPieceType() <= PieceTypes.Queen);
 
             RemovePiece(to);
-            var pc = PieceTypes.Pawn.MakePiece(us);
+            var pc = PieceType.Pawn.MakePiece(us);
             AddPiece(pc, to);
             _nonPawnMaterial[_sideToMove] -= Values.GetPieceValue(pc, Phases.Mg);
         }
@@ -1407,6 +1432,7 @@ public sealed class Position : IPosition
         return result;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public HashKey MovePositionKey(Move m)
     {
         Debug.Assert(m.IsValidMove());
@@ -1441,19 +1467,39 @@ public sealed class Position : IPosition
         CastlePerform castlePerform)
     {
         var kingSide = to > from;
-        var doCastleling = castlePerform == CastlePerform.Do;
+        var doCastle = castlePerform == CastlePerform.Do;
 
         rookFrom = to; // Castling is encoded as "king captures friendly rook"
-        rookTo = (kingSide ? Square.F1 : Square.D1).Relative(us);
-        to = (kingSide ? Square.G1 : Square.C1).Relative(us);
+        if (kingSide)
+        {
+            rookTo = Square.F1.Relative(us);
+            to = Square.G1.Relative(us);
+        }
+        else
+        {
+            rookTo = Square.D1.Relative(us);
+            to = Square.C1.Relative(us);
+        }
 
         // Remove both pieces first since squares could overlap in Chess960
-        RemovePiece(doCastleling ? from : to);
-        RemovePiece(doCastleling ? rookFrom : rookTo);
-        Board.ClearPiece(doCastleling ? from : to);
-        Board.ClearPiece(doCastleling ? rookFrom : rookTo);
-        AddPiece(PieceTypes.King.MakePiece(us), doCastleling ? to : from);
-        AddPiece(PieceTypes.Rook.MakePiece(us), doCastleling ? rookTo : rookFrom);
+        if (doCastle)
+        {
+            RemovePiece(from);
+            RemovePiece(rookFrom);
+            Board.ClearPiece(from);
+            Board.ClearPiece(rookFrom);
+            AddPiece(PieceType.King.MakePiece(us), to);
+            AddPiece(PieceType.Rook.MakePiece(us), rookTo);
+        }
+        else
+        {
+            RemovePiece(to);
+            RemovePiece(rookTo);
+            Board.ClearPiece(to);
+            Board.ClearPiece(rookTo);
+            AddPiece(PieceType.King.MakePiece(us), from);
+            AddPiece(PieceType.Rook.MakePiece(us), rookFrom);
+        }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1479,7 +1525,7 @@ public sealed class Position : IPosition
         var isKingSide = kingFrom < rookFrom;
         var cr = OrCastlingRight(stm, isKingSide);
 
-        State.CastlelingRights |= cr;
+        State.CastleRights |= cr;
         _castlingRightsMask[kingFrom] |= cr;
         _castlingRightsMask[rookFrom] |= cr;
         _castlingRookSquare[cr.AsInt()] = rookFrom;
@@ -1501,19 +1547,18 @@ public sealed class Position : IPosition
 
         var ksq = GetKingSquare(~_sideToMove);
 
-        state.CheckedSquares[PieceTypes.Pawn.AsInt()] = ksq.PawnAttack(~_sideToMove);
-        state.CheckedSquares[PieceTypes.Knight.AsInt()] = GetAttacks(ksq, PieceTypes.Knight);
-        state.CheckedSquares[PieceTypes.Bishop.AsInt()] = GetAttacks(ksq, PieceTypes.Bishop);
-        state.CheckedSquares[PieceTypes.Rook.AsInt()] = GetAttacks(ksq, PieceTypes.Rook);
-        state.CheckedSquares[PieceTypes.Queen.AsInt()] = state.CheckedSquares[PieceTypes.Bishop.AsInt()] |
-                                                         state.CheckedSquares[PieceTypes.Rook.AsInt()];
-        state.CheckedSquares[PieceTypes.King.AsInt()] = BitBoard.Empty;
+        state.CheckedSquares[PieceType.Pawn] = ksq.PawnAttack(~_sideToMove);
+        state.CheckedSquares[PieceType.Knight] = GetAttacks(ksq, PieceType.Knight);
+        state.CheckedSquares[PieceType.Bishop] = GetAttacks(ksq, PieceType.Bishop);
+        state.CheckedSquares[PieceType.Rook] = GetAttacks(ksq, PieceType.Rook);
+        state.CheckedSquares[PieceType.Queen] = state.CheckedSquares[PieceType.Bishop] |
+                                                state.CheckedSquares[PieceType.Rook];
+        state.CheckedSquares[PieceType.King] = BitBoard.Empty;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void CopyState(in State newState)
-    {
-        State = State.CopyTo(newState);
-    }
+        => State = State.CopyTo(newState);
 
     private void SetState(State state)
     {
@@ -1522,17 +1567,16 @@ public sealed class Position : IPosition
         _nonPawnMaterial[Player.White] = _nonPawnMaterial[Player.Black] = Value.ValueZero;
         State.Checkers = AttacksTo(GetKingSquare(_sideToMove)) & Board.Pieces(~_sideToMove);
 
-        SetCheckInfo(State);
+        SetCheckInfo(state);
 
-        state.PositionKey = GetKey();
+        state.PositionKey = GetKey(state);
         state.PawnKey = GetPawnKey();
 
-        var b = Pieces(PieceTypes.Pawn);
-        while (b.IsNotEmpty)
+        var b = Pieces(PieceType.Pawn);
+        while (b)
         {
             var sq = BitBoards.PopLsb(ref b);
-            var pc = Board.PieceAt(sq);
-            state.MaterialKey ^= Zobrist.Psq(sq, pc);
+            state.MaterialKey ^= Zobrist.Psq(sq, Board.PieceAt(sq));
         }
 
         ref var pieces = ref MemoryMarshal.GetArrayDataReference(Piece.All);
@@ -1540,9 +1584,10 @@ public sealed class Position : IPosition
         for (var i = 0; i < Piece.All.Length; i++)
         {
             ref var pc = ref Unsafe.Add(ref pieces, i);
-            if (pc.Type() != PieceTypes.Pawn && pc.Type() != PieceTypes.King)
+            var pt = pc.Type();
+            if (pt != PieceType.Pawn && pt != PieceType.King)
             {
-                var val = Values.GetPieceValue(pc.Type(), Phases.Mg).AsInt() * Board.PieceCount(pc);
+                var val = Values.GetPieceValue(pt, Phases.Mg).AsInt() * Board.PieceCount(pc);
                 _nonPawnMaterial[pc.ColorOf()] += val;
             }
 
@@ -1556,7 +1601,7 @@ public sealed class Position : IPosition
         foreach (var ca in castle)
         {
             Player c = char.IsLower(ca);
-            var rook = PieceTypes.Rook.MakePiece(c);
+            var rook = PieceType.Rook.MakePiece(c);
             var token = char.ToUpper(ca);
 
             var rsq = token switch
@@ -1573,6 +1618,7 @@ public sealed class Position : IPosition
         }
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private Square RookSquare(Square startSq, Piece rook)
     {
         var targetSq = startSq;
@@ -1586,8 +1632,8 @@ public sealed class Position : IPosition
         var result = (blockers: BitBoard.Empty, pinners: BitBoard.Empty);
 
         // Snipers are sliders that attack 's' when a piece and other snipers are removed
-        var snipers = (PieceTypes.Rook.PseudoAttacks(s) & Board.Pieces(PieceTypes.Queen, PieceTypes.Rook)
-                       | (PieceTypes.Bishop.PseudoAttacks(s) & Board.Pieces(PieceTypes.Queen, PieceTypes.Bishop)))
+        var snipers = (PieceType.Rook.PseudoAttacks(s) & Board.Pieces(PieceType.Queen, PieceType.Rook)
+                       | (PieceType.Bishop.PseudoAttacks(s) & Board.Pieces(PieceType.Queen, PieceType.Bishop)))
                       & sliders;
         var occupancy = Board.Pieces() ^ snipers;
 
@@ -1647,12 +1693,12 @@ public sealed class Position : IPosition
 
         var them = ~us;
 
-        if (moved && !(Pieces(PieceTypes.Pawn, ~us).Contains(epSquare + them.PawnPushDistance()) &&
+        if (moved && !(Pieces(PieceType.Pawn, ~us).Contains(epSquare + them.PawnPushDistance()) &&
                        Board.IsEmpty(epSquare) && Board.IsEmpty(epSquare + us.PawnPushDistance())))
             return false;
 
         // En-passant attackers
-        var attackers = Pieces(PieceTypes.Pawn, us) & epSquare.PawnAttack(them);
+        var attackers = Pieces(PieceType.Pawn, us) & epSquare.PawnAttack(them);
 
         Debug.Assert(attackers.Count <= 2);
 
@@ -1660,11 +1706,11 @@ public sealed class Position : IPosition
             return false;
 
         var cap = moved ? epSquare - us.PawnPushDistance() : epSquare + us.PawnPushDistance();
-        Debug.Assert(Board.PieceAt(cap) == PieceTypes.Pawn.MakePiece(them));
+        Debug.Assert(Board.PieceAt(cap) == PieceType.Pawn.MakePiece(them));
 
-        var ksq = Board.Square(PieceTypes.King, us);
-        var bq = Pieces(PieceTypes.Bishop, PieceTypes.Queen, them) & GetAttacks(ksq, PieceTypes.Bishop);
-        var rq = Pieces(PieceTypes.Rook, PieceTypes.Queen, them) & GetAttacks(ksq, PieceTypes.Rook);
+        var ksq = Board.Square(PieceType.King, us);
+        var bq = Pieces(PieceType.Bishop, PieceType.Queen, them) & GetAttacks(ksq, PieceType.Bishop);
+        var rq = Pieces(PieceType.Rook, PieceType.Queen, them) & GetAttacks(ksq, PieceType.Rook);
 
         var mocc = (Pieces() ^ cap) | epSquare;
 
@@ -1674,8 +1720,8 @@ public sealed class Position : IPosition
             var amocc = mocc ^ sq;
             // Check en-passant is legal for the position
             if (
-                (bq.IsEmpty || (bq & GetAttacks(ksq, PieceTypes.Bishop, in amocc)).IsEmpty) &&
-                (rq.IsEmpty || (rq & GetAttacks(ksq, PieceTypes.Rook, in amocc)).IsEmpty))
+                (bq.IsEmpty || (bq & GetAttacks(ksq, PieceType.Bishop, in amocc)).IsEmpty) &&
+                (rq.IsEmpty || (rq & GetAttacks(ksq, PieceType.Rook, in amocc)).IsEmpty))
                 return true;
         }
 

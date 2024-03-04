@@ -23,7 +23,6 @@ var host = new HostBuilder()
 
         services.AddSingleton(ConfigureLogger(configuration));
 
-        services.AddSingleton<IBuildTimeStamp, BuildTimeStamp>();
         services.AddTransient<IPerft, Perft>();
         services.AddTransient<IPerftRunner, PerftRunner>();
         services.AddSingleton<IOptionsFactory, OptionsFactory>();

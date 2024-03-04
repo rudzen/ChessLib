@@ -41,7 +41,7 @@ public static class Fen
 
     private const string FenRankRegexSnippet = "[1-8KkQqRrBbNnPp]{1,8}";
 
-    private const string ValidChars = "012345678pPnNbBrRqQkK/ w-abcdefgh";
+    private const string ValidChars = "0123456789pPnNbBrRqQkK/ w-abcdefgh";
 
     private const char Space = ' ';
 
@@ -141,7 +141,7 @@ public static class Fen
 
             pieceCount[pc]++;
 
-            var limit = limits[pt.AsInt()];
+            var limit = limits[pt];
 
             if (pieceCount[pc] > limit)
                 throw new InvalidFenException(

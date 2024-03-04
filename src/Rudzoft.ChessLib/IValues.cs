@@ -75,6 +75,6 @@ public interface IValues
     void SetPieceValues(DefaultPieceValues[] values, Phases phase);
 
     DefaultPieceValues GetPieceValue(Piece pc, Phases phase);
-    
-    DefaultPieceValues GetPieceValue(PieceTypes pt, Phases phase);
+
+    DefaultPieceValues GetPieceValue(PieceType pt, Phases phase);
 }

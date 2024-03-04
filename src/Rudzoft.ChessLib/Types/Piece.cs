@@ -48,35 +48,6 @@ public enum Pieces : byte
     PieceNb = 15
 }
 
-public enum PieceTypes
-{
-    NoPieceType = 0,
-    Pawn = 1,
-    Knight = 2,
-    Bishop = 3,
-    Rook = 4,
-    Queen = 5,
-    King = 6,
-    PieceTypeNb = 7,
-    AllPieces = NoPieceType
-}
-
-public static class PieceTypesExtensions
-{
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static int AsInt(this PieceTypes p) => (int)p;
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Piece MakePiece(this PieceTypes @this, Player side) => (int)@this | (side << 3);
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool IsSlider(this PieceTypes @this) => @this.InBetween(PieceTypes.Bishop, PieceTypes.Queen);
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool InBetween(this PieceTypes v, PieceTypes min, PieceTypes max) =>
-        (uint)v - (uint)min <= (uint)max - (uint)min;
-}
-
 /// <summary>
 /// Piece. Contains the piece type which indicate what type and color the piece is
 /// </summary>
@@ -205,11 +176,11 @@ public readonly record struct Piece(Pieces Value) : IMinMaxValue<Piece>
             return EmptyPiece;
 
         Player p = new(char.IsLower(PieceExtensions.PieceChars[pcIndex]));
-        return ((PieceTypes)pcIndex).MakePiece(p);
+        return new PieceType(pcIndex).MakePiece(p);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void Deconstruct(out PieceTypes pt, out Player p)
+    public void Deconstruct(out PieceType pt, out Player p)
     {
         pt = Type();
         p = ColorOf();
@@ -219,5 +190,5 @@ public readonly record struct Piece(Pieces Value) : IMinMaxValue<Piece>
     public int AsInt() => (int)Value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public PieceTypes Type() => (PieceTypes)(AsInt() & 0x7);
+    public PieceType Type() => (PieceTypes)(AsInt() & 0x7);
 }
