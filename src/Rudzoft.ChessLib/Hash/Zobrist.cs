@@ -73,12 +73,11 @@ public sealed class Zobrist : IZobrist
     {
         _zobristPst = new HashKey[Square.Count][];
 
-        for (var sq = Squares.a1; sq <= Squares.h8; sq++)
+        foreach (var sq in Square.All)
         {
-            var s = sq.AsInt();
-            _zobristPst[s] = new HashKey[Piece.Count];
+            _zobristPst[sq] = new HashKey[Piece.Count];
             foreach (var pc in Piece.All.AsSpan())
-                _zobristPst[s][pc] = rKiss.Rand();
+                _zobristPst[sq][pc] = rKiss.Rand();
         }
 
         _zobristCastling = new HashKey[CastleRight.Count];
@@ -91,7 +90,8 @@ public sealed class Zobrist : IZobrist
             while (bb)
             {
                 var key = _zobristCastling[1UL << BitBoards.PopLsb(ref bb)];
-                _zobristCastling[v] ^= !key.IsEmpty? key : rKiss.Rand();
+                key = !key.IsEmpty ? key : rKiss.Rand();
+                _zobristCastling[v] ^= key.Key;
             }
         }
 

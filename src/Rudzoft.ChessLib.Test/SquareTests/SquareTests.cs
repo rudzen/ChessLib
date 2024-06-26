@@ -64,7 +64,7 @@ public sealed class SquareTests
 
         var s = new Square(Rank.Rank1, File.FileH);
 
-        var actual = s.Relative(Player.Black);
+        var actual = s.Relative(Color.Black);
 
         Assert.Equal(expected, actual);
     }
@@ -76,7 +76,7 @@ public sealed class SquareTests
 
         var s = new Square(Rank.Rank3,  File.FileC);
 
-        var actual = s.Relative(Player.White);
+        var actual = s.Relative(Color.White);
 
         Assert.Equal(expected, actual);
     }

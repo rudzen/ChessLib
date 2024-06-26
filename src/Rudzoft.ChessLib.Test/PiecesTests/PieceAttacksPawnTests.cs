@@ -65,18 +65,18 @@ public sealed class PieceAttacksPawnTests : PieceAttacks
      */
 
     [Theory]
-    [InlineData(PawnAlpha, Players.White, 1)]
-    [InlineData(PawnAlpha, Players.Black, 1)]
-    [InlineData(PawnBeta, Players.White, 2)]
-    [InlineData(PawnBeta, Players.Black, 2)]
-    [InlineData(PawnGamma, Players.White, 2)]
-    [InlineData(PawnGamma, Players.Black, 2)]
-    [InlineData(PawnDelta, Players.White, 2)]
-    [InlineData(PawnDelta, Players.Black, 2)]
-    public void PawnAttacks(ulong squares, Players side, int expected)
+    [InlineData(PawnAlpha, Colors.White, 1)]
+    [InlineData(PawnAlpha, Colors.Black, 1)]
+    [InlineData(PawnBeta, Colors.White, 2)]
+    [InlineData(PawnBeta, Colors.Black, 2)]
+    [InlineData(PawnGamma, Colors.White, 2)]
+    [InlineData(PawnGamma, Colors.Black, 2)]
+    [InlineData(PawnDelta, Colors.White, 2)]
+    [InlineData(PawnDelta, Colors.Black, 2)]
+    public void PawnAttacks(ulong squares, Colors c, int expected)
     {
         var bb = BitBoard.Create(squares);
-        var us = Player.Create(side);
+        var us = Color.Create(c);
 
         while (bb)
         {

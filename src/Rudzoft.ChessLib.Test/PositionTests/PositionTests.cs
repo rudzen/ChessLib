@@ -97,7 +97,7 @@ public sealed class PositionTests
 
         pos.Set(in fenData, ChessMode.Normal, state);
 
-        var b = pos.KingBlockers(Player.Black);
+        var b = pos.KingBlockers(Color.Black);
 
         // b must contain one square at this point
         var pinnedCount = b.Count;
@@ -125,7 +125,7 @@ public sealed class PositionTests
 
         var materialKey = pos.State.MaterialKey;
 
-        var posCode = pos.Set(code, Player.White, in state);
+        var posCode = pos.Set(code, Color.White, in state);
         var codeMaterialKey = posCode.State.MaterialKey;
 
         Assert.Equal(materialKey, codeMaterialKey);

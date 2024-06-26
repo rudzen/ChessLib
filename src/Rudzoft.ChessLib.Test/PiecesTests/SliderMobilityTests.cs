@@ -25,18 +25,13 @@ SOFTWARE.
 */
 
 using Rudzoft.ChessLib.Types;
+using SimdLinq;
 
 namespace Rudzoft.ChessLib.Test.PiecesTests;
 
-public sealed class SliderMobilityTests : PieceAttacks, IClassFixture<SliderMobilityFixture>
+public sealed class SliderMobilityTests(SliderMobilityFixture fixture) : PieceAttacks,
+    IClassFixture<SliderMobilityFixture>
 {
-    private readonly SliderMobilityFixture _fixture;
-
-    public SliderMobilityTests(SliderMobilityFixture fixture)
-    {
-        _fixture = fixture;
-    }
-
     [Theory]
     [InlineData(Alpha, PieceTypes.Bishop, 7)]
     [InlineData(Beta, PieceTypes.Bishop, 9)]
@@ -56,7 +51,7 @@ public sealed class SliderMobilityTests : PieceAttacks, IClassFixture<SliderMobi
         var bb = new BitBoard(pattern);
 
         var expected = bb.Count * expectedMobility;
-        var actual = bb.Select(x => _fixture.SliderAttacks(pt, x, in empty).Count).Sum();
+        var actual = bb.Select(x => fixture.SliderAttacks(pt, x, in empty).Count).ToArray().Sum();
 
         Assert.Equal(expected, actual);
     }

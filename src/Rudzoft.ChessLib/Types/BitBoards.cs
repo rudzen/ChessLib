@@ -150,15 +150,15 @@ public static class BitBoards
     /// </summary>
     private static readonly BitBoard[][] PseudoAttacksBB = new BitBoard[PieceType.Count][];
 
-    private static readonly BitBoard[][] PawnAttackSpanBB = new BitBoard[Player.Count][];
+    private static readonly BitBoard[][] PawnAttackSpanBB = new BitBoard[Color.Count][];
 
-    private static readonly BitBoard[][] PassedPawnMaskBB = new BitBoard[Player.Count][];
+    private static readonly BitBoard[][] PassedPawnMaskBB = new BitBoard[Color.Count][];
 
-    private static readonly BitBoard[][] ForwardRanksBB = new BitBoard[Player.Count][];
+    private static readonly BitBoard[][] ForwardRanksBB = new BitBoard[Color.Count][];
 
-    private static readonly BitBoard[][] ForwardFileBB = new BitBoard[Player.Count][];
+    private static readonly BitBoard[][] ForwardFileBB = new BitBoard[Color.Count][];
 
-    private static readonly BitBoard[][] KingRingBB = new BitBoard[Player.Count][];
+    private static readonly BitBoard[][] KingRingBB = new BitBoard[Color.Count][];
 
     private static readonly BitBoard[][] BetweenBB = new BitBoard[Square.Count][];
 
@@ -174,7 +174,12 @@ public static class BitBoards
 
     private static readonly BitBoard[][] DistanceRingBB = new BitBoard[Square.Count][];
 
-    private static readonly BitBoard[] SlotFileBB;
+    private static readonly BitBoard[] SlotFileBB =
+    [
+        FileEBB | FileFBB | FileGBB | FileHBB, // King
+        FileABB | FileBBB | FileCBB | FileDBB, // Queen
+        FileCBB | FileDBB | FileEBB | FileFBB  // Center
+    ];
 
     private static readonly Direction[] PawnPushDirections = [Direction.North, Direction.South];
 
@@ -201,87 +206,69 @@ public static class BitBoards
         KingRingBB[1] = new BitBoard[Square.Count];
 
         for (var i = 0; i < BetweenBB.Length; i++)
-            BetweenBB[i] = new BitBoard[Square.Count];
-
-        for (var i = 0; i < LineBB.Length; i++)
-            LineBB[i] = new BitBoard[Square.Count];
-
-        // ForwardRanksBB population loop idea from sf
-        for (var r = Rank.Rank1; r <= Rank.Rank8; r++)
         {
-            ForwardRanksBB[0][r] = ~(ForwardRanksBB[1][r + 1] = ForwardRanksBB[1][r] | r.BitBoardRank());
+            BetweenBB[i] = new BitBoard[Square.Count];
+            LineBB[i] = new BitBoard[Square.Count];
         }
 
-        foreach (var p in Player.AllPlayers.AsSpan())
+        // ForwardRanksBB population loop idea from sf
+        foreach (var r in Rank.All)
+            ForwardRanksBB[0][r] = ~(ForwardRanksBB[1][r + 1] = ForwardRanksBB[1][r] | r.BitBoardRank());
+
+        foreach (var c in Color.AllColors.AsSpan())
         {
             foreach (var sq in Square.All.AsSpan())
             {
                 var file = sq.File;
-                ForwardFileBB[p][sq] = ForwardRanksBB[p][sq.Rank] & file.BitBoardFile();
-                PawnAttackSpanBB[p][sq] = ForwardRanksBB[p][sq.Rank] & AdjacentFilesBB[file];
-                PassedPawnMaskBB[p][sq] = ForwardFileBB[p][sq] | PawnAttackSpanBB[p][sq];
+                ForwardFileBB[c][sq] = ForwardRanksBB[c][sq.Rank] & file.BitBoardFile();
+                PawnAttackSpanBB[c][sq] = ForwardRanksBB[c][sq.Rank] & AdjacentFilesBB[file];
+                PassedPawnMaskBB[c][sq] = ForwardFileBB[c][sq] | PawnAttackSpanBB[c][sq];
             }
         }
 
         // have to compute here before we access the BitBoards
-        for (var s1 = Squares.a1; s1 <= Squares.h8; s1++)
+        foreach (var sq1 in Square.All.AsSpan())
         {
-            SquareDistance[s1.AsInt()] = new int[64];
-            DistanceRingBB[s1.AsInt()] = new BitBoard[8];
-            for (var s2 = Squares.a1; s2 <= Squares.h8; s2++)
+            SquareDistance[sq1] = new int[Square.Count];
+            DistanceRingBB[sq1] = new BitBoard[8];
+            foreach (var sq2 in Square.All.AsSpan())
             {
-                var dist = Math.Max(distanceFile(s1, s2), distanceRank(s1, s2));
-                SquareDistance[s1.AsInt()][s2.AsInt()] = dist;
-                DistanceRingBB[s1.AsInt()][dist] |= s2;
+                var dist = Math.Max(distanceFile(sq1, sq2), distanceRank(sq1, sq2));
+                SquareDistance[sq1][sq2] = dist;
+                DistanceRingBB[sq1][dist] |= sq2;
             }
         }
 
         // mini local helpers
         Span<PieceType> validMagicPieces = stackalloc PieceType[] { PieceType.Bishop, PieceType.Rook };
 
-        var bb = AllSquares;
         // Pseudo attacks for all pieces
-        while (bb)
+        foreach (var sq1 in Square.All)
         {
-            var sq = PopLsb(ref bb);
-
-            InitializePseudoAttacks(sq);
+            InitializePseudoAttacks(sq1);
 
             // Compute lines and betweens
-            foreach (var validMagicPiece in validMagicPieces)
+            foreach (var pt in validMagicPieces)
             {
-                var pt = validMagicPiece;
-                var bb3 = AllSquares;
-                while (bb3)
+                foreach (var sq2 in Square.All)
                 {
-                    var s2 = PopLsb(ref bb3);
-                    if ((PseudoAttacksBB[pt][sq] & s2).IsEmpty)
+                    if ((PseudoAttacksBB[pt][sq1] & sq2).IsEmpty)
                         continue;
 
-                    var sq2 = s2.AsInt();
-
-                    LineBB[sq][sq2] = (GetAttacks(sq, validMagicPiece, EmptyBitBoard) &
-                                       GetAttacks(s2, validMagicPiece, EmptyBitBoard)) | sq | s2;
-                    BetweenBB[sq][sq2] = GetAttacks(sq, validMagicPiece, BbSquares[sq2]) &
-                                         GetAttacks(s2, validMagicPiece, BbSquares[sq]);
+                    LineBB[sq1][sq2] = (GetAttacks(sq1, pt, EmptyBitBoard) &
+                                      GetAttacks(sq2, pt, EmptyBitBoard)) | sq1 | sq2;
+                    BetweenBB[sq1][sq2] = GetAttacks(sq1, pt, BbSquares[sq2]) &
+                                        GetAttacks(sq2, pt, BbSquares[sq1]);
                 }
             }
 
             // Compute KingRings
-            InitializeKingRing(sq);
+            InitializeKingRing(sq1);
         }
-
-        SlotFileBB =
-        [
-            FileEBB | FileFBB | FileGBB | FileHBB, // King
-            FileABB | FileBBB | FileCBB | FileDBB, // Queen
-            FileCBB | FileDBB | FileEBB | FileFBB  // Center
-        ];
 
         return;
 
         static int distanceRank(Square x, Square y) => distance(x.Rank, y.Rank);
-
         static int distanceFile(Square x, Square y) => distance(x.File, y.File);
 
         // local helper functions to calculate distance
@@ -315,29 +302,26 @@ public static class BitBoards
         PseudoAttacksBB[PieceType.Bishop][sq] = bishopAttacks;
         PseudoAttacksBB[PieceType.Rook][sq] = rookAttacks;
         PseudoAttacksBB[PieceType.Queen][sq] = bishopAttacks | rookAttacks;
-        PseudoAttacksBB[PieceType.King][sq] = b.NorthOne() | b.SouthOne() | b.EastOne()
-                                              | b.WestOne() | b.NorthEastOne() | b.NorthWestOne()
-                                              | b.SouthEastOne() | b.SouthWestOne();
+        PseudoAttacksBB[PieceType.King][sq] = b.NorthOne() | b.SouthOne() | b.EastOne() | b.WestOne() |
+                                              PseudoAttacksBB[0][sq] | PseudoAttacksBB[1][sq];
     }
 
     private static void InitializeKingRing(Square sq)
     {
-        const int pt = (int)PieceTypes.King;
         var file = sq.File;
 
-        // TODO : Change to basic for-loop
-        foreach (var p in Player.AllPlayers)
+        foreach (var c in Color.AllColors)
         {
-            KingRingBB[p][sq] = PseudoAttacksBB[pt][sq];
-            if (sq.RelativeRank(p) == Ranks.Rank1)
-                KingRingBB[p][sq] |= KingRingBB[p][sq].Shift(PawnPushDirections[p]);
+            KingRingBB[c][sq] = PseudoAttacksBB[PieceType.King][sq];
+            if (sq.RelativeRank(c) == Ranks.Rank1)
+                KingRingBB[c][sq] |= KingRingBB[c][sq].Shift(PawnPushDirections[c]);
 
             if (file == Files.FileH)
-                KingRingBB[p][sq] |= KingRingBB[p][sq].WestOne();
+                KingRingBB[c][sq] |= KingRingBB[c][sq].WestOne();
             else if (file == Files.FileA)
-                KingRingBB[p][sq] |= KingRingBB[p][sq].EastOne();
+                KingRingBB[c][sq] |= KingRingBB[c][sq].EastOne();
 
-            Debug.Assert(!KingRingBB[p.Side][sq].IsEmpty);
+            Debug.Assert(!KingRingBB[c][sq].IsEmpty);
         }
     }
 
@@ -357,22 +341,22 @@ public static class BitBoards
     public static BitBoard RankBB(this Rank r) => RanksBB[r];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard ColorBB(this Player p) => ColorsBB[p];
+    public static BitBoard ColorBB(this Color c) => ColorsBB[c];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard FirstRank(Player p) => Ranks1[p];
+    public static BitBoard FirstRank(Color c) => Ranks1[c];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard ThirdRank(Player p) => Ranks3BB[p];
+    public static BitBoard ThirdRank(Color c) => Ranks3BB[c];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard SeventhRank(Player p) => Ranks7BB[p];
+    public static BitBoard SeventhRank(Color c) => Ranks7BB[c];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard SixthAndSeventhRank(Player p) => Ranks6And7BB[p];
+    public static BitBoard SixthAndSeventhRank(Color c) => Ranks6And7BB[c];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard SeventhAndEightsRank(Player p) => Ranks7And8BB[p];
+    public static BitBoard SeventhAndEightsRank(Color c) => Ranks7And8BB[c];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static BitBoard PseudoAttacks(this PieceType pt, Square sq) => PseudoAttacksBB[pt][sq];
@@ -387,10 +371,10 @@ public static class BitBoards
     /// Attack for pawn.
     /// </summary>
     /// <param name="sq">The square</param>
-    /// <param name="p">The player side</param>
+    /// <param name="c">The player side</param>
     /// <returns>ref to bitboard of attack</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard PawnAttack(this Square sq, Player p) => PseudoAttacksBB[p][sq];
+    public static BitBoard PawnAttack(this Square sq, Color c) => PseudoAttacksBB[c][sq];
 
     /// <summary>
     /// Returns the bitboard representation of the rank of which the square is located.
@@ -427,36 +411,36 @@ public static class BitBoards
     /// <summary>
     /// Returns all squares in front of the square in the same file as bitboard
     /// </summary>
-    /// <param name="sq">The square</param>
-    /// <param name="p">The side, white is north and black is south</param>
+    /// <param name="s">The square</param>
+    /// <param name="c">The side, white is north and black is south</param>
     /// <returns>The bitboard of all forward file squares</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard ForwardFile(this Square sq, Player p) => ForwardFileBB[p][sq];
+    public static BitBoard ForwardFile(this Square s, Color c) => ForwardFileBB[c][s];
 
     /// <summary>
     /// Returns all squares in pawn attack pattern in front of the square.
     /// </summary>
-    /// <param name="sq">The square</param>
-    /// <param name="p">White = north, Black = south</param>
+    /// <param name="s">The square</param>
+    /// <param name="c">White = north, Black = south</param>
     /// <returns>The bitboard representation</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard PawnAttackSpan(this Square sq, Player p) => PawnAttackSpanBB[p][sq];
+    public static BitBoard PawnAttackSpan(this Square s, Color c) => PawnAttackSpanBB[c][s];
 
     /// <summary>
     /// Returns all square of both file and pawn attack pattern in front of square. This is the
     /// same as ForwardFile() | PawnAttackSpan().
     /// </summary>
-    /// <param name="sq">The square</param>
-    /// <param name="p">White = north, Black = south</param>
+    /// <param name="s">The square</param>
+    /// <param name="c">White = north, Black = south</param>
     /// <returns>The bitboard representation</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard PassedPawnFrontAttackSpan(this Square sq, Player p) => PassedPawnMaskBB[p][sq];
+    public static BitBoard PassedPawnFrontAttackSpan(this Square s, Color c) => PassedPawnMaskBB[c][s];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard ForwardRanks(this Square sq, Player p) => ForwardRanksBB[p][sq];
+    public static BitBoard ForwardRanks(this Square s, Color c) => ForwardRanksBB[c][s];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard BitboardBetween(this Square sq1, Square sq2) => BetweenBB[sq1][sq2];
+    public static BitBoard BitboardBetween(this Square s1, Square s2) => BetweenBB[s1][s2];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Square Get(this in BitBoard bb, int pos) => (int)(bb.Value >> pos) & 0x1;
@@ -474,7 +458,7 @@ public static class BitBoards
     public static BitBoard Line(this Square sq1, Square sq2) => LineBB[sq1][sq2];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard SlotFile(CastleSides cs) => SlotFileBB[cs.AsInt()];
+    public static BitBoard SlotFile(CastleSide cs) => SlotFileBB[cs];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static BitBoard AdjacentFiles(File f) => AdjacentFilesBB[f];
@@ -483,11 +467,11 @@ public static class BitBoards
     public static bool Aligned(this Square sq1, Square sq2, Square sq3) => (Line(sq1, sq2) & sq3).IsNotEmpty;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard FrontSquares(this Player p, Square sq)
-        => ForwardRanksBB[p][sq] & sq.BitBoardFile();
+    public static BitBoard FrontSquares(this Color c, Square sq)
+        => ForwardRanksBB[c][sq] & sq.BitBoardFile();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard KingRing(this Square sq, Player p) => KingRingBB[p][sq];
+    public static BitBoard KingRing(this Square sq, Color c) => KingRingBB[c][sq];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int Distance(this Square sq1, Square sq2) => SquareDistance[sq1][sq2];
@@ -496,7 +480,7 @@ public static class BitBoards
     public static BitBoard DistanceRing(this Square sq, int length) => DistanceRingBB[sq][length];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard PromotionRank(this Player p) => PromotionRanks[p];
+    public static BitBoard PromotionRank(this Color c) => PromotionRanks[c];
 
     public static string StringifyRaw(in ulong bb, string title = "") => Stringify(BitBoard.Create(bb), title);
 
@@ -568,7 +552,7 @@ public static class BitBoards
     public static Square Msb(this in BitBoard bb) => new(63 ^ BitOperations.LeadingZeroCount(bb.Value));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Square FrontMostSquare(in BitBoard bb, Player p) => p.IsWhite ? Lsb(in bb) : Msb(in bb);
+    public static Square FrontMostSquare(in BitBoard bb, Color c) => c.IsWhite ? Lsb(in bb) : Msb(in bb);
 
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public static BitBoard NorthOne(this BitBoard bb) => bb << 8;
@@ -616,10 +600,10 @@ public static class BitBoards
     /// Shorthand method for north or south fill of bitboard depending on color
     /// </summary>
     /// <param name="bb">The bitboard to fill</param>
-    /// <param name="p">The direction to fill in, white = north, black = south</param>
+    /// <param name="c">The direction to fill in, white = north, black = south</param>
     /// <returns>Filled bitboard</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard Fill(this in BitBoard bb, Player p) => FillFuncs[p](bb);
+    public static BitBoard Fill(this in BitBoard bb, Color c) => FillFuncs[c](bb);
 
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public static BitBoard Shift(this in BitBoard bb, Direction d)
@@ -654,24 +638,24 @@ public static class BitBoards
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard PawnEastAttack(this in BitBoard bb, Player p) => Shift(in bb, p.PawnEastAttackDistance());
+    public static BitBoard PawnEastAttack(this in BitBoard bb, Color c) => Shift(in bb, c.PawnEastAttackDistance());
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard PawnWestAttack(this in BitBoard bb, Player p) => Shift(in bb, p.PawnWestAttackDistance());
+    public static BitBoard PawnWestAttack(this in BitBoard bb, Color c) => Shift(in bb, c.PawnWestAttackDistance());
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard PawnAttacks(this in BitBoard bb, Player p)
-        => PawnEastAttack(in bb, p) | PawnWestAttack(in bb, p);
+    public static BitBoard PawnAttacks(this in BitBoard bb, Color c)
+        => PawnEastAttack(in bb, c) | PawnWestAttack(in bb, c);
 
     /// <summary>
     /// Compute all attack squares where two pawns attack the square
     /// </summary>
     /// <param name="bb">The squares to compute attacks from</param>
-    /// <param name="p">The side</param>
+    /// <param name="c">The side</param>
     /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard PawnDoubleAttacks(this in BitBoard bb, Player p)
-        => PawnEastAttack(in bb, p) & PawnWestAttack(in bb, p);
+    public static BitBoard PawnDoubleAttacks(this in BitBoard bb, Color c)
+        => PawnEastAttack(in bb, c) & PawnWestAttack(in bb, c);
 
     /// <summary>
     /// Reset the least significant bit in-place
@@ -712,10 +696,10 @@ public static class BitBoards
     public static int PopCount(in BitBoard bb) => BitOperations.PopCount(bb.Value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard Rank7(this Player p) => Ranks7BB[p];
+    public static BitBoard Rank7(this Color c) => Ranks7BB[c];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard Rank3(this Player p) => Ranks3BB[p];
+    public static BitBoard Rank3(this Color c) => Ranks3BB[c];
 
     /// <summary>
     /// Generate a bitboard based on a square.

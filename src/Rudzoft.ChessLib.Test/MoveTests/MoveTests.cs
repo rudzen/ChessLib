@@ -175,8 +175,8 @@ public sealed class MoveTests
         // generate 256-ish random moves
         for (var i = 0; i < 256; i++)
         {
-            Square rndSquareFrom = (Squares)rngeezuz.Next((int)Squares.a1, (int)Squares.h8);
-            Square rndSquareTo = (Squares)rngeezuz.Next((int)Squares.a1, (int)Squares.h8);
+            Square rndSquareFrom = rngeezuz.Next(Square.A1, Square.H8);
+            Square rndSquareTo = rngeezuz.Next(Square.A1, Square.H8);
 
             // Skip same squares to and from
             if (rndSquareFrom == rndSquareTo)

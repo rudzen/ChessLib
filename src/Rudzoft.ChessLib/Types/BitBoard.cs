@@ -199,8 +199,7 @@ public readonly record struct BitBoard(ulong Value) : IEnumerable<Square>, IMinM
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool MoreThanOne()
     {
-        var v = Value;
-        return (v & (v - 1)) > 0;
+        return (Value & (Value - 1)) > 0;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

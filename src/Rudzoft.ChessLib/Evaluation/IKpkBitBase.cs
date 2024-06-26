@@ -38,26 +38,26 @@ public interface IKpkBitBase
     /// <param name="strongSide">The strong side (the one with the pawn)</param>
     /// <param name="sq">The square that needs to be normalized</param>
     /// <returns>Normalized square to be used with probing</returns>
-    Square Normalize(IPosition pos, Player strongSide, Square sq);
-    
+    Square Normalize(IPosition pos, Color strongSide, Square sq);
+
     /// <summary>
     /// Probe with normalized squares and strong player
     /// </summary>
     /// <param name="strongKsq">"Strong" side king square</param>
     /// <param name="strongPawnSq">"Strong" side pawn square</param>
     /// <param name="weakKsq">"Weak" side king square</param>
-    /// <param name="stm">strong side. fx strongSide == pos.SideToMove ? Player.White : Player.Black</param>
+    /// <param name="stm">strong side. fx strongSide == pos.SideToMove ? Color.White : Color.Black</param>
     /// <returns>true if strong side "won"</returns>
-    bool Probe(Square strongKsq, Square strongPawnSq, Square weakKsq, Player stm);
+    bool Probe(Square strongKsq, Square strongPawnSq, Square weakKsq, Color stm);
 
     /// <summary>
     /// </summary>
-    /// <param name="stngActive"></param>
+    /// <param name="strongActive"></param>
     /// <param name="skSq">White King</param>
     /// <param name="wkSq">Black King</param>
     /// <param name="spSq">White Pawn</param>
     /// <returns></returns>
-    bool Probe(bool stngActive, Square skSq, Square wkSq, Square spSq);
+    bool Probe(bool strongActive, Square skSq, Square wkSq, Square spSq);
 
     bool IsDraw(IPosition pos);
 }

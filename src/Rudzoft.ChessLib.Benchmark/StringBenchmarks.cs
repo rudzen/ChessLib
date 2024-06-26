@@ -18,7 +18,7 @@ public class StringBenchmarks
     {
         return GetNameOf(sq.Value);
     }
-    
+
     public static IEnumerable<object> Squares()
     {
         var sqs = BitBoards.MakeBitboard(Square.A1, Square.H8);

@@ -65,26 +65,26 @@ public static class PieceExtensions
     ];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static char GetPieceChar(this Piece p) => PieceChars[p];
+    public static char GetPieceChar(this Piece pc) => PieceChars[pc];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static char GetPieceChar(this PieceType p) => PieceChars[p];
+    public static char GetPieceChar(this PieceType pt) => PieceChars[pt];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static string GetPieceString(this Piece p) => PieceStrings[p];
+    public static string GetPieceString(this Piece pc) => PieceStrings[pc];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static string GetName(this Piece p) => PieceNames[p.Type()];
+    public static string GetName(this Piece pc) => PieceNames[pc.Type()];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static char GetPromotionChar(this PieceType p) => PromotionPieceNotation[p];
+    public static char GetPromotionChar(this PieceType pt) => PromotionPieceNotation[pt];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static char GetPgnChar(this Piece p) => PgnPieceChars[p.Type()];
+    public static char GetPgnChar(this Piece pc) => PgnPieceChars[pc.Type()];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static char GetUnicodeChar(this Piece p) => PieceUnicodeChar[p];
+    public static char GetUnicodeChar(this Piece pc) => PieceUnicodeChar[pc];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static int AsInt(this Pieces piece) => (int)piece;
+    public static int AsInt(this Pieces pc) => (int)pc;
 }

@@ -54,7 +54,7 @@ public sealed class IccfTests
 
         pos.Set(in fenData, ChessMode.Normal, state);
 
-        var w1 = Move.Create(Squares.d2, Squares.f3);
+        var w1 = Move.Create(Square.D2, Square.F3);
 
         var moveNotation = _serviceProvider.GetRequiredService<IMoveNotation>();
         var notation     = moveNotation.ToNotation(moveNotations);

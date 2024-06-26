@@ -36,8 +36,27 @@ public sealed class NonRegexPgnParser : IPgnParser
         string pgnFile,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
+        if (string.IsNullOrWhiteSpace(pgnFile))
+            yield break;
+
+        var fileInfo = new FileInfo(pgnFile);
+
+        if (!fileInfo.Exists)
+            yield break;
+
         await using var fileStream = new FileStream(pgnFile, FileMode.Open, FileAccess.Read);
-        using var streamReader = new StreamReader(fileStream);
+
+        await foreach (var game in ParseStream(fileStream, cancellationToken))
+            yield return game;
+    }
+
+    public async IAsyncEnumerable<PgnGame> ParseStream(
+        Stream stream,
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(stream);
+
+        using var streamReader = new StreamReader(stream);
 
         var currentGameTags = new Dictionary<string, string>();
         var currentGameMoves = new List<PgnMove>();
@@ -46,9 +65,7 @@ public sealed class NonRegexPgnParser : IPgnParser
         while (await streamReader.ReadLineAsync(cancellationToken) is { } line)
         {
             if (string.IsNullOrWhiteSpace(line))
-            {
                 inMoveSection = currentGameTags.Count > 0;
-            }
 
             if (inMoveSection)
             {
@@ -77,9 +94,9 @@ public sealed class NonRegexPgnParser : IPgnParser
                              word.Contains('*'))
                     {
                         yield return new(currentGameTags, currentGameMoves);
-                        currentGameTags  = new();
+                        currentGameTags = new();
                         currentGameMoves = [];
-                        inMoveSection    = false;
+                        inMoveSection = false;
                     }
                 }
             }
@@ -90,7 +107,7 @@ public sealed class NonRegexPgnParser : IPgnParser
 
                 var firstSpaceIndex = line.IndexOf(' ');
                 var firstQuoteIndex = line.IndexOf('"');
-                var lastQuoteIndex  = line.LastIndexOf('"');
+                var lastQuoteIndex = line.LastIndexOf('"');
 
                 if (firstSpaceIndex <= 0 || firstQuoteIndex <= firstSpaceIndex
                                          || lastQuoteIndex <= firstQuoteIndex)
@@ -98,8 +115,8 @@ public sealed class NonRegexPgnParser : IPgnParser
 
                 var tagName = line.Substring(1, firstSpaceIndex - 1).Trim();
                 var tagValue = line
-                    .Substring(firstQuoteIndex + 1, lastQuoteIndex - firstQuoteIndex - 1)
-                    .Trim();
+                               .Substring(firstQuoteIndex + 1, lastQuoteIndex - firstQuoteIndex - 1)
+                               .Trim();
 
                 currentGameTags[tagName] = tagValue;
             }

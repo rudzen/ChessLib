@@ -57,9 +57,9 @@ public interface IGame : IEnumerable<Piece>
 
     string ToString();
 
-    BitBoard OccupiedBySide(Player p);
+    BitBoard OccupiedBySide(Color c);
 
-    Player CurrentPlayer();
+    Color CurrentPlayer();
 
     UInt128 Perft(in HashKey baseKey, int depth, bool root = true);
 }

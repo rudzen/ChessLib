@@ -73,7 +73,7 @@ public sealed class LanNotation : Notation
             var capturedPiece = pos.GetPiece(to);
             if (capturedPiece != Piece.EmptyPiece)
             {
-                if (pt == PieceTypes.Pawn)
+                if (pt == PieceType.Pawn)
                     re[i++] = from.FileChar;
 
                 re[i++] = 'x';

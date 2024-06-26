@@ -85,10 +85,14 @@ public readonly record struct PieceType(PieceTypes Value) : IMinMaxValue<PieceTy
     // public int AsInt() => (int)Value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Piece MakePiece(Player side) => (int)Value | (side << 3);
+    public Piece MakePiece(Color c) => (int)Value | (c << 3);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool IsSlider() => InBetween(PieceTypes.Bishop, PieceTypes.Queen);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool InBetween(PieceType min, PieceType max) =>
+        (uint)Value - (uint)min.Value <= (uint)max.Value - (uint)min.Value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool InBetween(PieceTypes min, PieceTypes max) =>

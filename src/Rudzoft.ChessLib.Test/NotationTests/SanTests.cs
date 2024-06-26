@@ -45,8 +45,12 @@ public sealed class SanTests
     [InlineData("8/6k1/8/8/8/8/1K1N1N2/8 w - - 0 1", MoveNotations.San, PieceTypes.Knight, Squares.d2, Squares.f2,
         Squares.e4)]
     public void SanRankAmbiguities(
-        string fen, MoveNotations moveNotations, PieceTypes movingPt, Squares fromSqOne,
-        Squares fromSqTwo, Squares toSq)
+        string fen,
+        MoveNotations moveNotations,
+        PieceTypes movingPt,
+        Squares fromSqOne,
+        Squares fromSqTwo,
+        Squares toSq)
     {
         var pos = _serviceProvider.GetRequiredService<IPosition>();
 
@@ -179,7 +183,7 @@ public sealed class SanTests
         var moveNotation = _serviceProvider.GetRequiredService<IMoveNotation>();
         var notation     = moveNotation.ToNotation(MoveNotations.San);
 
-        var move    = Move.Create(Squares.d1, Squares.d8, MoveTypes.Normal);
+        var move    = Move.Create(Square.D1, Square.D8, MoveTypes.Normal);
         var sanMove = notation.Convert(pos, move);
 
         // Capturing a piece with check

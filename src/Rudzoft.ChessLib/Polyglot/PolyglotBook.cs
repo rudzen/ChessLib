@@ -156,7 +156,7 @@ public sealed class PolyglotBook : IPolyglotBook
 
         return mm;
 
-        static PieceTypes PolyToPt(int pt) => (PieceTypes)(3 - pt);
+        static PieceType PolyToPt(int pt) => (PieceTypes)(3 - pt);
     }
 
     private static Move SelectMove(

@@ -69,9 +69,9 @@ public sealed class PawnDoubleAttackTests
 
         pos.Set(in fenData, ChessMode.Normal, state);
 
-        var whitePawns = pos.Pieces(PieceTypes.Pawn, Player.White);
+        var whitePawns = pos.Pieces(PieceType.Pawn, Color.White);
 
-        var attackSpan = whitePawns.PawnDoubleAttacks(Player.White);
+        var attackSpan = whitePawns.PawnDoubleAttacks(Color.White);
 
         const int expected = 6;
         var actual = attackSpan.Count;

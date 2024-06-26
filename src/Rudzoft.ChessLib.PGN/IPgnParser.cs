@@ -29,4 +29,5 @@ namespace Rudzoft.ChessLib.PGN;
 public interface IPgnParser
 {
     IAsyncEnumerable<PgnGame> ParseFile(string pgnFile, CancellationToken cancellationToken = default);
+    IAsyncEnumerable<PgnGame> ParseStream(Stream stream, CancellationToken cancellationToken = default);
 }

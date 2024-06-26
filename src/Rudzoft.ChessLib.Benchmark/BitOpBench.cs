@@ -95,7 +95,7 @@ public class BitOpBench
         yield return BitBoards.Center;
         yield return BitBoards.BlackArea;
         yield return BitBoards.CenterFiles;
-        yield return Player.Black.ColorBB();
+        yield return Color.Black.ColorBB();
         yield return BitBoards.CornerA1;
         yield return BitBoards.CornerA8;
         yield return BitBoards.CornerH1;

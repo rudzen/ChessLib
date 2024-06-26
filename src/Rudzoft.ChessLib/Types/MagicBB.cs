@@ -133,6 +133,7 @@ public static class MagicBB
         var rankMask = Rank.Rank1.RankBB() | Rank.Rank8.RankBB();
         var fileMask = File.FileA.FileBB() | File.FileH.FileBB();
         ref var magicsRef = ref MemoryMarshal.GetArrayDataReference(magics);
+        var seedsSpan = Seeds.AsSpan();
 
         for (var s = 0; s < 64; s++)
         {
@@ -177,7 +178,7 @@ public static class MagicBB
             if (Bmi2.X64.IsSupported)
                 continue;
 
-            rk.Seed = Seeds[rank];
+            rk.Seed = seedsSpan[rank];
 
             // Find a magic for square 's' picking up an (almost) random number
             // until we find the one that passes the verification test.

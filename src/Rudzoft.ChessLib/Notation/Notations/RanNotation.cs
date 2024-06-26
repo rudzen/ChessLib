@@ -56,7 +56,7 @@ public sealed class RanNotation : Notation
 
         var pt = pos.GetPieceType(from);
 
-        if (pt != PieceTypes.Pawn)
+        if (pt != PieceType.Pawn)
             re[i++] = pt.GetPieceChar();
 
         re[i++] = from.FileChar;
@@ -73,7 +73,7 @@ public sealed class RanNotation : Notation
             var capturedPiece = pos.GetPiece(to);
             if (capturedPiece != Piece.EmptyPiece)
             {
-                if (pt == PieceTypes.Pawn)
+                if (pt == PieceType.Pawn)
                     re[i++] = from.FileChar;
 
                 re[i++] = 'x';

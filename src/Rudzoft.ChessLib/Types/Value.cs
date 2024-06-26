@@ -101,7 +101,7 @@ public readonly struct Value : IEquatable<Value>
 
     public static bool operator false(Value value) => value.Raw <= 0;
 
-    public Value ForColor(Player p) => p.IsWhite ? this : new(-(int)Raw);
+    public Value ForColor(Color c) => c.IsWhite ? this : new(-(int)Raw);
 
     public bool Equals(Value other) => Raw == other.Raw;
 

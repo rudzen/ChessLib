@@ -56,7 +56,7 @@ public sealed class SanNotation : Notation
 
         var pt = pos.GetPieceType(from);
 
-        if (pt != PieceTypes.Pawn)
+        if (pt != PieceType.Pawn)
         {
             re[i++] = pos.GetPiece(from).GetPgnChar();
             foreach (var amb in Disambiguation(pos, move, from))
@@ -71,7 +71,7 @@ public sealed class SanNotation : Notation
         }
         else if (pos.GetPiece(to) != Piece.EmptyPiece)
         {
-            if (pt == PieceTypes.Pawn)
+            if (pt == PieceType.Pawn)
                 re[i++] = from.FileChar;
             re[i++] = 'x';
         }

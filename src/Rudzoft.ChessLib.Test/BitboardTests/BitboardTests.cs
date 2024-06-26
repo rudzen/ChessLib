@@ -81,7 +81,7 @@ public sealed class BitboardTests
     public void LightSquaresCount()
     {
         const int expected = 32;
-        var actual = Player.White.ColorBB().Count;
+        var actual = Color.White.ColorBB().Count;
         Assert.Equal(expected, actual);
     }
 
@@ -89,7 +89,7 @@ public sealed class BitboardTests
     public void DarkSquaresCount()
     {
         const int expected = 32;
-        var actual = Player.Black.ColorBB().Count;
+        var actual = Color.Black.ColorBB().Count;
         Assert.Equal(expected, actual);
     }
 

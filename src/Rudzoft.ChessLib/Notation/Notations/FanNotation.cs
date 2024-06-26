@@ -56,7 +56,7 @@ public sealed class FanNotation : Notation
         Span<char> re = stackalloc char[6];
         var i = 0;
 
-        if (pt != PieceTypes.Pawn)
+        if (pt != PieceType.Pawn)
         {
             re[i++] = pc.GetUnicodeChar();
             foreach (var c in Disambiguation(pos, move, from))
@@ -73,7 +73,7 @@ public sealed class FanNotation : Notation
         {
             if (pos.GetPiece(to) != Piece.EmptyPiece)
             {
-                if (pt == PieceTypes.Pawn)
+                if (pt == PieceType.Pawn)
                     re[i++] = from.FileChar;
                 re[i++] = 'x';
             }

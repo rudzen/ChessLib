@@ -41,7 +41,7 @@ public interface IPosition : IEnumerable<Piece>
 
     ChessMode ChessMode { get; set; }
 
-    Player SideToMove { get; }
+    Color SideToMove { get; }
 
     Square EnPassantSquare { get; }
 
@@ -91,23 +91,23 @@ public interface IPosition : IEnumerable<Piece>
 
     BitBoard CheckedSquares(PieceType pt);
 
-    BitBoard PinnedPieces(Player p);
+    BitBoard PinnedPieces(Color c);
 
-    BitBoard KingBlockers(Player p);
+    BitBoard KingBlockers(Color c);
 
-    bool IsKingBlocker(Player p, Square sq);
+    bool IsKingBlocker(Color c, Square sq);
 
     BitBoard SliderBlockerOn(Square sq, BitBoard attackers, ref BitBoard pinners, ref BitBoard hidders);
 
     bool IsOccupied(Square sq);
 
-    bool IsAttacked(Square sq, Player p);
+    bool IsAttacked(Square sq, Color c);
 
     bool GivesCheck(Move m);
 
     BitBoard Pieces();
 
-    BitBoard Pieces(Player p);
+    BitBoard Pieces(Color c);
 
     BitBoard Pieces(Piece pc);
 
@@ -115,9 +115,9 @@ public interface IPosition : IEnumerable<Piece>
 
     BitBoard Pieces(PieceType pt1, PieceType pt2);
 
-    BitBoard Pieces(PieceType pt, Player p);
+    BitBoard Pieces(PieceType pt, Color c);
 
-    BitBoard Pieces(PieceType pt1, PieceType pt2, Player p);
+    BitBoard Pieces(PieceType pt1, PieceType pt2, Color c);
 
     int PieceCount();
 
@@ -125,25 +125,25 @@ public interface IPosition : IEnumerable<Piece>
 
     int PieceCount(PieceType pt);
 
-    int PieceCount(PieceType pt, Player p);
+    int PieceCount(PieceType pt, Color c);
 
-    BitBoard PawnsOnColor(Player p, Square sq);
+    BitBoard PawnsOnColor(Color c, Square sq);
 
-    bool SemiOpenFileOn(Player p, Square sq);
+    bool SemiOpenFileOn(Color c, Square sq);
 
-    bool BishopPaired(Player p);
+    bool BishopPaired(Color c);
 
     bool BishopOpposed();
 
-    Square GetPieceSquare(PieceType pt, Player p);
+    Square GetPieceSquare(PieceType pt, Color c);
 
-    Square GetKingSquare(Player p);
+    Square GetKingSquare(Color c);
 
     Piece MovedPiece(Move m);
 
-    bool PieceOnFile(Square sq, Player p, PieceType pt);
+    bool PieceOnFile(Square sq, Color c, PieceType pt);
 
-    bool PawnIsolated(Square sq, Player p);
+    bool PawnIsolated(Square sq, Color c);
 
     bool PassedPawn(Square sq);
 
@@ -153,27 +153,27 @@ public interface IPosition : IEnumerable<Piece>
 
     BitBoard AttacksTo(Square sq);
 
-    bool AttackedBySlider(Square sq, Player p);
+    bool AttackedBySlider(Square sq, Color c);
 
-    bool AttackedByKnight(Square sq, Player p);
+    bool AttackedByKnight(Square sq, Color c);
 
-    bool AttackedByPawn(Square sq, Player p);
+    bool AttackedByPawn(Square sq, Color c);
 
-    bool AttackedByKing(Square sq, Player p);
+    bool AttackedByKing(Square sq, Color c);
 
-    BitBoard AttacksBy(PieceType pt, Player p);
+    BitBoard AttacksBy(PieceType pt, Color c);
 
     bool IsCapture(Move m);
 
     bool IsCaptureOrPromotion(Move m);
 
-    bool IsPawnPassedAt(Player p, Square sq);
+    bool IsPawnPassedAt(Color c, Square sq);
 
-    BitBoard PawnPassSpan(Player p, Square sq);
+    BitBoard PawnPassSpan(Color c, Square sq);
 
     bool CanCastle(CastleRight cr);
 
-    bool CanCastle(Player p);
+    bool CanCastle(Color c);
 
     public ref BitBoard CastleKingPath(CastleRight cr);
 
@@ -193,7 +193,7 @@ public interface IPosition : IEnumerable<Piece>
 
     IPosition Set(string fen, ChessMode chessMode, in State state, bool validate = false, int searcher = 0);
 
-    IPosition Set(ReadOnlySpan<char> code, Player p, in State state);
+    IPosition Set(ReadOnlySpan<char> code, Color c, in State state);
 
     HashKey GetKey(State state);
 
@@ -213,7 +213,7 @@ public interface IPosition : IEnumerable<Piece>
 
     bool SeeGe(Move m, Value threshold);
 
-    Value NonPawnMaterial(Player p);
+    Value NonPawnMaterial(Color c);
 
     Value NonPawnMaterial();
 

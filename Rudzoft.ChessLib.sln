@@ -25,12 +25,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rudzoft.ChessLib.PGN", "src
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rudzoft.ChessLib.PGN.Test", "src\Rudzoft.ChessLib.PGN.Test\Rudzoft.ChessLib.PGN.Test.csproj", "{556ADC0D-074D-4B8F-9E45-1275342FCB74}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "solutionitems", "solutionitems", "{5B4D0B75-CE2C-45E2-92D3-987704C20001}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5B4D0B75-CE2C-45E2-92D3-987704C20001}"
 	ProjectSection(SolutionItems) = preProject
 		README.md = README.md
 		Directory.Build.props = Directory.Build.props
 		global.json = global.json
 		.editorconfig = .editorconfig
+		Directory.Packages.props = Directory.Packages.props
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rudzoft.Perft", "src\Rudzoft.Perft\Rudzoft.Perft.csproj", "{5E02C821-DB31-4D63-9E0D-681B08BD22E1}"

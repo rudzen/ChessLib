@@ -37,7 +37,7 @@ public sealed class KillerMovesTests
         var km = KillerMoves.Create(128);
         const int depth = 1;
         var move = Move.Create(Square.A2, Square.A3);
-        var pc = PieceType.Pawn.MakePiece(Player.White);
+        var pc = PieceType.Pawn.MakePiece(Color.White);
 
         km.UpdateValue(depth, move, pc);
 
@@ -52,7 +52,7 @@ public sealed class KillerMovesTests
         var km = KillerMoves.Create(128);
         const int depth = 1;
         var move = Move.Create(Square.A2, Square.A3);
-        var pc = PieceType.Pawn.MakePiece(Player.White);
+        var pc = PieceType.Pawn.MakePiece(Color.White);
 
         km.UpdateValue(depth, move, pc);
 

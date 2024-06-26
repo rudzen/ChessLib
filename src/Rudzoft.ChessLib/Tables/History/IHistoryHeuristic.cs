@@ -32,7 +32,7 @@ public interface IHistoryHeuristic
 {
     void Clear();
 
-    void Set(Player p, Square from, Square to, int value);
+    void Set(Color c, Square from, Square to, int value);
 
-    int Retrieve(Player p, Square from, Square to);
+    int Retrieve(Color c, Square from, Square to);
 }

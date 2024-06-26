@@ -73,7 +73,7 @@ public sealed class Perft(IGame game, IEnumerable<PerftPosition> positions) : IP
 
         var state = new State();
 
-        foreach (var fd in Positions.Select(static p => new FenData(p.Fen)))
+        foreach (var fd in Positions.Select(static perftPosition => new FenData(perftPosition.Fen)))
         {
             Game.Pos.Set(in fd, ChessMode.Normal, in state);
             var baseKey = game.Pos.State.PositionKey;

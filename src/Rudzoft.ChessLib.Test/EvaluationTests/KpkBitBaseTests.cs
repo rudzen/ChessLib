@@ -64,27 +64,27 @@ public sealed class KpkBitBaseTests
     // theory data layout:
     // fen, player, expected win by strong side
     [Theory]
-    [InlineData("2k5/8/8/8/1PK5/8/8/8 w - - 0 1", Players.White, true)]
-    [InlineData("5k2/8/6KP/8/8/8/8/8 b - - 0 1", Players.White, true)]
-    [InlineData("8/8/8/K7/P2k4/8/8/8 w - - 0 1", Players.White, true)]
-    [InlineData("8/8/8/K7/P2k4/8/8/8 b - - 0 1", Players.White, true)]
-    public void KpkWin(string fen, Players rawPlayer, bool expected)
+    [InlineData("2k5/8/8/8/1PK5/8/8/8 w - - 0 1", Colors.White, true)]
+    [InlineData("5k2/8/6KP/8/8/8/8/8 b - - 0 1", Colors.White, true)]
+    [InlineData("8/8/8/K7/P2k4/8/8/8 w - - 0 1", Colors.White, true)]
+    [InlineData("8/8/8/K7/P2k4/8/8/8 b - - 0 1", Colors.White, true)]
+    public void KpkWin(string fen, Colors rawColor, bool expected)
     {
         var pos = _serviceProvider.GetRequiredService<IPosition>();
         var fenData = new FenData(fen);
         var state = new State();
         pos.Set(in fenData, ChessMode.Normal, state);
 
-        Player strongSide = rawPlayer;
+        Color strongSide = rawColor;
         var weakSide = ~strongSide;
 
         var kpkBitBase = _serviceProvider.GetRequiredService<IKpkBitBase>();
 
-        var strongKing = kpkBitBase.Normalize(pos, strongSide,  pos.GetPieceSquare(PieceTypes.King, strongSide));
-        var strongPawn = kpkBitBase.Normalize(pos, strongSide, pos.GetPieceSquare(PieceTypes.Pawn, strongSide));
-        var weakKing = kpkBitBase.Normalize(pos, strongSide, pos.GetPieceSquare(PieceTypes.King, weakSide));
+        var strongKing = kpkBitBase.Normalize(pos, strongSide,  pos.GetPieceSquare(PieceType.King, strongSide));
+        var strongPawn = kpkBitBase.Normalize(pos, strongSide, pos.GetPieceSquare(PieceType.Pawn, strongSide));
+        var weakKing = kpkBitBase.Normalize(pos, strongSide, pos.GetPieceSquare(PieceType.King, weakSide));
 
-        var us = strongSide == pos.SideToMove ? Player.White : Player.Black;
+        var us = strongSide == pos.SideToMove ? Color.White : Color.Black;
 
         var won = !kpkBitBase.Probe(strongKing, strongPawn, weakKing, us);
 

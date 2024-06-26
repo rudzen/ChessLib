@@ -29,38 +29,28 @@ using System.Runtime.CompilerServices;
 namespace Rudzoft.ChessLib.Types;
 
 [Flags]
-public enum CastleRights
+public enum CastleRights : byte
 {
-    None = 0,                           // 0000
-    WhiteKing = 1,                      // 0001
-    WhiteQueen = WhiteKing << 1,        // 0010
-    BlackKing = WhiteKing << 2,         // 0100
-    BlackQueen = WhiteKing << 3,        // 1000
+    None = 0,                    // 0000
+    WhiteKing = 1,               // 0001
+    WhiteQueen = WhiteKing << 1, // 0010
+    BlackKing = WhiteKing << 2,  // 0100
+    BlackQueen = WhiteKing << 3, // 1000
 
-    King = WhiteKing | BlackKing,       // 0101
-    Queen = WhiteQueen | BlackQueen,    // 1010
-    White = WhiteKing | WhiteQueen,     // 0011
-    Black = BlackKing | BlackQueen,     // 1100
-    Any = White | Black,                // 1111
+    King = WhiteKing | BlackKing,    // 0101
+    Queen = WhiteQueen | BlackQueen, // 1010
+    White = WhiteKing | WhiteQueen,  // 0011
+    Black = BlackKing | BlackQueen,  // 1100
+    Any = White | Black,             // 1111
 
     Count = 16
 }
 
-public enum CastleSides
+public enum CastleSides : byte
 {
     King = 0,
     Queen = 1,
-    Center = 2,
-    Count = 3
-}
-
-public static class CastleSidesExtensions
-{
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static int AsInt(this CastleSides cs) => (int)cs;
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard SlotFile(this CastleSides cs) => BitBoards.SlotFile(cs);
+    Center = 2
 }
 
 public enum CastlePerform
@@ -75,19 +65,16 @@ public static class CastleExtensions
     public static string GetCastleString(Square toSquare, Square fromSquare) => toSquare < fromSquare ? "O-O-O" : "O-O";
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool HasFlagFast(this CastleRights value, CastleRights flag) => (value & flag) != 0;
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int AsInt(this CastleRights value) => (int)value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static CastleRights Without(this CastleRights @this, CastleRights remove) => @this & ~remove;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static CastleRights MakeCastleRights(this CastleRights cs, Player p)
+    public static CastleRights MakeCastleRights(this CastleRights cs, Color c)
     {
         var isQueen = cs == CastleRights.Queen;
-        if (p.IsWhite)
+        if (c.IsWhite)
             return isQueen
                 ? CastleRights.WhiteQueen
                 : CastleRights.WhiteKing;
@@ -95,6 +82,31 @@ public static class CastleExtensions
             ? CastleRights.BlackQueen
             : CastleRights.BlackKing;
     }
+}
+
+public readonly record struct CastleSide(CastleSides Sides)
+{
+    public static CastleSide King { get; } = new(CastleSides.King);
+    public static CastleSide Queen { get; } = new(CastleSides.Queen);
+    public static CastleSide Center { get; } = new(CastleSides.Center);
+
+    public static int Count => 3;
+
+    public BitBoard SlotFile() => BitBoards.SlotFile(this);
+
+    public static CastleSide[] AllCastleSides =>
+    [
+        King, Queen, Center
+    ];
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool operator ==(CastleSide left, CastleSides right) => left.Sides == right;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool operator !=(CastleSide left, CastleSides right) => left.Sides != right;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static implicit operator byte(CastleSide r) => (byte)r.Sides;
 }
 
 public readonly record struct CastleRight(CastleRights Rights)
@@ -114,16 +126,21 @@ public readonly record struct CastleRight(CastleRights Rights)
     public static CastleRight Black { get; } = new(CastleRights.Black);
     public static CastleRight Any { get; } = new(CastleRights.Any);
 
+    public static CastleRight[] AllCastleRight =
+    [
+        None, WhiteKing, BlackKing, WhiteQueen, BlackQueen, King, Queen, White, Black, Any
+    ];
+
     public const int Count = (int)CastleRights.Count;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator CastleRight(CastleRights cr) => new(cr);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator CastleRight(Player p) => Create(p);
+    public static implicit operator CastleRight(Color c) => Create(c);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static CastleRight Create(Player p) => new((CastleRights)((int)CastleRights.White << (p << 1)));
+    public static CastleRight Create(Color c) => new((CastleRights)((int)CastleRights.White << (c << 1)));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Equals(CastleRight other) => Rights == other.Rights;
@@ -159,10 +176,10 @@ public readonly record struct CastleRight(CastleRights Rights)
     public static CastleRight operator ~(CastleRight cr) => new(~cr.Rights);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool Has(CastleRights cr) => Rights.HasFlagFast(cr);
+    public bool Has(CastleRights cr) => (Rights & cr) != 0;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool Has(CastleRight cr) => Rights.HasFlagFast(cr.Rights);
+    public bool Has(CastleRight cr) => (Rights & cr.Rights) != 0;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public CastleRight Not(CastleRights cr) => new(Rights & ~cr);

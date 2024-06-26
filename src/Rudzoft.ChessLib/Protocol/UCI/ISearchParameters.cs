@@ -52,13 +52,13 @@ public interface ISearchParameters : ISpanFormattable
 
     ulong WhiteTimeMilliseconds { get; set; }
 
-    ref Clock Clock(Player p);
-    
+    ref Clock Clock(Color c);
+
     void Clear();
 
-    ulong Inc(Player p);
+    ulong Inc(Color c);
 
-    ulong Time(Player p);
+    ulong Time(Color c);
 
     bool DecreaseMovesToGo();
 

@@ -74,8 +74,10 @@ public sealed class MoveGen_49
         var ml = pos.GenerateMoves();
 
         const bool expected = false;
-        var actual = ml.Contains(new Move(new Square(Ranks.Rank1, Files.FileE), new Square(Ranks.Rank1, Files.FileG),
-            MoveTypes.Castling));
+        var from = new Square(Ranks.Rank1, Files.FileE);
+        var to = new Square(Ranks.Rank1, Files.FileG);
+        var move = Move.Create(from, to, MoveTypes.Castling);
+        var actual = ml.Contains(move);
 
         Assert.Equal(expected, actual);
     }

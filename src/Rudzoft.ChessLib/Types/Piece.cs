@@ -93,14 +93,14 @@ public readonly record struct Piece(Pieces Value) : IMinMaxValue<Piece>
 
     public static Range BlackPieces => new(6, 11);
 
-    public static PieceTypes[] AllTypes { get; } =
+    public static PieceType[] AllTypes { get; } =
     [
-        PieceTypes.Pawn,
-        PieceTypes.Knight,
-        PieceTypes.Bishop,
-        PieceTypes.Rook,
-        PieceTypes.Queen,
-        PieceTypes.King
+        PieceType.Pawn,
+        PieceType.Knight,
+        PieceType.Bishop,
+        PieceType.Rook,
+        PieceType.Queen,
+        PieceType.King
     ];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -116,7 +116,7 @@ public readonly record struct Piece(Pieces Value) : IMinMaxValue<Piece>
     public static Piece operator ~(Piece pc) => new(pc ^ 8);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Piece operator +(Piece left, Player right) => new(left.Value + (byte)(right << 3));
+    public static Piece operator +(Piece left, Color right) => new(left.Value + (byte)(right << 3));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Piece operator >> (Piece left, int right) => new((int)left.Value >> right);
@@ -155,10 +155,10 @@ public readonly record struct Piece(Pieces Value) : IMinMaxValue<Piece>
     public static bool operator false(Piece pc) => pc == EmptyPiece;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator int(Piece pc) => (int)pc.Value;
+    public static implicit operator byte(Piece pc) => (byte)pc.Value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Player ColorOf() => new((int)Value >> 3);
+    public Color ColorOf() => new((int)Value >> 3);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Equals(Piece other) => Value == other.Value;
@@ -169,21 +169,21 @@ public readonly record struct Piece(Pieces Value) : IMinMaxValue<Piece>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override string ToString() => this.GetPieceString();
 
-    public static Piece GetPiece(char c)
+    public static Piece GetPiece(char t)
     {
-        var pcIndex = PieceExtensions.PieceChars.IndexOf(c);
+        var pcIndex = PieceExtensions.PieceChars.IndexOf(t);
         if (pcIndex == -1)
             return EmptyPiece;
 
-        Player p = new(char.IsLower(PieceExtensions.PieceChars[pcIndex]));
-        return new PieceType(pcIndex).MakePiece(p);
+        Color c = new(char.IsLower(PieceExtensions.PieceChars[pcIndex]));
+        return new PieceType(pcIndex).MakePiece(c);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void Deconstruct(out PieceType pt, out Player p)
+    public void Deconstruct(out PieceType pt, out Color c)
     {
         pt = Type();
-        p = ColorOf();
+        c = ColorOf();
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

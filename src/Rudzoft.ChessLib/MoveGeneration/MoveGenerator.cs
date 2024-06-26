@@ -43,7 +43,7 @@ public static class MoveGenerator
         in IPosition pos,
         ref ValMove moves,
         int index,
-        Player us,
+        Color us,
         MoveGenerationTypes types)
     {
         if (types.HasFlagFast(MoveGenerationTypes.Legal))
@@ -67,7 +67,7 @@ public static class MoveGenerator
         ref ValMove moves,
         int index,
         in BitBoard target,
-        Player us,
+        Color us,
         MoveGenerationTypes types)
     {
         index = GeneratePawnMoves(index, in pos, ref moves, in target, us, types);
@@ -81,7 +81,7 @@ public static class MoveGenerator
             return index;
 
         var ksq = pos.GetKingSquare(us);
-        var b = pos.GetAttacks(ksq, PieceTypes.King) & target;
+        var b = pos.GetAttacks(ksq, PieceType.King) & target;
         index = Move.Create(ref moves, index, ksq, ref b);
 
         if (types == MoveGenerationTypes.Captures || !pos.CanCastle(pos.SideToMove))
@@ -113,7 +113,7 @@ public static class MoveGenerator
         in IPosition pos,
         ref ValMove moves,
         int index,
-        Player us,
+        Color us,
         MoveGenerationTypes types)
     {
         Debug.Assert(types is MoveGenerationTypes.Captures or MoveGenerationTypes.Quiets
@@ -143,12 +143,12 @@ public static class MoveGenerator
         int index,
         in IPosition pos,
         ref ValMove moves,
-        Player us)
+        Color us)
     {
         Debug.Assert(pos.InCheck);
         var ksq = pos.GetKingSquare(us);
         var sliderAttacks = BitBoard.Empty;
-        var sliders = pos.Checkers & ~pos.Pieces(PieceTypes.Pawn, PieceTypes.Knight);
+        var sliders = pos.Checkers & ~pos.Pieces(PieceType.Pawn, PieceType.Knight);
         Square checkSquare;
 
         // Find all the squares attacked by slider checkers. We will remove them from the king
@@ -164,7 +164,7 @@ public static class MoveGenerator
         }
 
         // Generate evasions for king, capture and non capture moves
-        var b = pos.GetAttacks(ksq, PieceTypes.King) & ~pos.Pieces(us) & ~sliderAttacks;
+        var b = pos.GetAttacks(ksq, PieceType.King) & ~pos.Pieces(us) & ~sliderAttacks;
         index = Move.Create(ref moves, index, ksq, ref b);
 
         if (pos.Checkers.MoreThanOne())
@@ -189,7 +189,7 @@ public static class MoveGenerator
         int index,
         in IPosition pos,
         ref ValMove moves,
-        Player us)
+        Color us)
     {
         var end = pos.InCheck
             ? GenerateEvasions(index, in pos, ref moves, us)
@@ -229,12 +229,12 @@ public static class MoveGenerator
         int index,
         in IPosition pos,
         ref ValMove moves,
-        Player us,
+        Color us,
         in BitBoard target,
         PieceType pt,
         bool checks)
     {
-        Debug.Assert(pt != PieceTypes.King && pt != PieceTypes.Pawn);
+        Debug.Assert(pt != PieceType.King && pt != PieceType.Pawn);
 
         var pieces = pos.Pieces(pt, us);
 
@@ -272,7 +272,7 @@ public static class MoveGenerator
         in IPosition pos,
         ref ValMove moves,
         in BitBoard target,
-        Player us,
+        Color us,
         MoveGenerationTypes types)
     {
         // Compute our parametrized parameters named according to the point of view of white side.
@@ -280,7 +280,7 @@ public static class MoveGenerator
         var them = ~us;
         var rank7Bb = us.Rank7();
 
-        var pawns = pos.Pieces(PieceTypes.Pawn, us);
+        var pawns = pos.Pieces(PieceType.Pawn, us);
 
         var enemies = types switch
         {
@@ -320,12 +320,11 @@ public static class MoveGenerator
                     pawnOne &= ksq.PawnAttack(them);
                     pawnTwo &= ksq.PawnAttack(them);
 
-                    var dcCandidates = pawnsNotOn7 & pos.KingBlockers(them);
-
                     // Add pawn pushes which give discovered check. This is possible only if
                     // the pawn is not on the same file as the enemy king, because we don't
                     // generate captures. Note that a possible discovery check promotion has
                     // been already generated among captures.
+                    var dcCandidates = pawnsNotOn7 & pos.KingBlockers(them);
                     if (dcCandidates)
                     {
                         var dc1 = dcCandidates.Shift(up) & emptySquares & ~ksq;
@@ -434,7 +433,7 @@ public static class MoveGenerator
         int index,
         in IPosition pos,
         ref ValMove moves,
-        Player us)
+        Color us)
     {
         Debug.Assert(!pos.InCheck);
         var dc = pos.KingBlockers(~us) & pos.Pieces(us);

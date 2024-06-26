@@ -106,7 +106,7 @@ public sealed class State : IEquatable<State>
         CheckedSquares.Fill(BitBoard.Empty);
         Pinners[0] = Pinners[1] = BitBoard.Empty;
         BlockersForKing[0] = BlockersForKing[1] = BitBoard.Empty;
-        CapturedPiece = PieceTypes.NoPieceType;
+        CapturedPiece = PieceType.NoPieceType;
         Previous = null;
     }
 
@@ -136,17 +136,17 @@ public sealed class State : IEquatable<State>
     public bool Equals(State other)
     {
         if (other is null) return false;
-        return LastMove.Equals(other.LastMove)
-               && PositionKey.Equals(other.PositionKey)
-               && PawnKey.Equals(other.PawnKey)
-               && EnPassantSquare.Equals(other.EnPassantSquare)
-               && CastleRights == other.CastleRights
-               && NullPly == other.NullPly
-               && ClockPly == other.ClockPly
-               && Pinners.Equals(other.Pinners)
-               && Checkers.Equals(other.Checkers)
-               && CapturedPiece == other.CapturedPiece
-               && Equals(Previous, other.Previous);
+        return LastMove == other.LastMove
+            && PositionKey == other.PositionKey
+            && PawnKey == other.PawnKey
+            && EnPassantSquare == other.EnPassantSquare
+            && CastleRights == other.CastleRights
+            && NullPly == other.NullPly
+            && ClockPly == other.ClockPly
+            && Pinners == other.Pinners
+            && Checkers == other.Checkers
+            && CapturedPiece == other.CapturedPiece
+            && Equals(Previous, other.Previous);
     }
 
     public override bool Equals(object obj) => ReferenceEquals(this, obj) || obj is State other && Equals(other);
@@ -155,16 +155,16 @@ public sealed class State : IEquatable<State>
     {
         var hashCode = new HashCode();
         hashCode.Add(LastMove);
-        hashCode.Add(PawnKey);
-        hashCode.Add(MaterialKey);
+        hashCode.Add(PawnKey.Key);
+        hashCode.Add(MaterialKey.Key);
         hashCode.Add(NullPly);
         hashCode.Add(ClockPly);
-        hashCode.Add(PositionKey);
-        hashCode.Add(CastleRights.Rights.AsInt());
-        hashCode.Add(EnPassantSquare);
-        hashCode.Add(Checkers);
+        hashCode.Add(PositionKey.Key);
+        hashCode.Add(CastleRights.Rights);
+        hashCode.Add(EnPassantSquare.Value);
+        hashCode.Add(Checkers.Value);
         hashCode.Add(Previous);
-        hashCode.Add(CapturedPiece);
+        hashCode.Add(CapturedPiece.Value);
         hashCode.Add(Pinners);
         hashCode.Add(CheckedSquares);
         return hashCode.ToHashCode();

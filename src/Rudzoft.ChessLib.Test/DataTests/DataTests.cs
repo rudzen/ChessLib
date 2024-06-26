@@ -42,7 +42,7 @@ public sealed class DataTests
             var sq = BitBoards.PopLsb(ref all);
             c[0] = sq.FileChar;
             c[1] = sq.RankChar;
-            Assert.Equal(sq.ToString(), new string(c));
+            Assert.Equal(sq.ToString(), new(c));
         }
     }
 }

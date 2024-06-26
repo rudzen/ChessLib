@@ -78,7 +78,7 @@ public sealed class SquareRangeTests
 
         var actualInWhite = whiteSquares.Contains(s);
         var actualInBlack = blackSquares.Contains(s);
-        
+
         Assert.Equal(expectedInWhiteRange, actualInWhite);
         Assert.Equal(expectedInBlackRange, actualInBlack);
     }

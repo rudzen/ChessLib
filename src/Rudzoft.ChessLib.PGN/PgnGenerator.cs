@@ -65,7 +65,7 @@ public sealed class PgnGenerator : IResettable
         var s = CollectionsMarshal.AsSpan(_moves);
         for (var i = 0; i < s.Length; i += 2)
         {
-            var moveNumber = ((i / 2) + 1);
+            var moveNumber = (i / 2) + 1;
             _pgnBuilder.Append($"{moveNumber}. {s[i]} ");
             if (i + 1 < s.Length)
                 _pgnBuilder.Append($"{s[i + 1]} ");

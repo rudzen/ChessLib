@@ -48,12 +48,6 @@ public enum Squares : byte
 
 public static class SquaresExtensions
 {
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard BitBoardSquare(this Squares sq) => BitBoards.BbSquares[sq.AsInt()];
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Square RelativeSquare(this Squares sq, Player p) => sq.AsInt() ^ (p * 56);
-
     public static int AsInt(this Squares sq) => (int)sq;
 }
 
@@ -110,7 +104,7 @@ public readonly record struct Square(Squares Value) : ISpanFormattable, ICompara
 
     public bool IsPromotionRank => (BitBoards.PromotionRanksBB & this).IsNotEmpty;
 
-    public bool IsDark => (Player.Black.ColorBB() & this).IsNotEmpty;
+    public bool IsDark => (Types.Color.Black.ColorBB() & this).IsNotEmpty;
 
     public static Square None { get; } = new(Squares.none);
 
@@ -295,10 +289,10 @@ public readonly record struct Square(Squares Value) : ISpanFormattable, ICompara
     public static bool operator false(Square sq) => !sq.IsOk;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator int(Square sq) => (int)sq.Value;
+    public static implicit operator byte(Square sq) => (byte)sq.Value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Square Relative(Player p) => (int)Value ^ (p.Side * 56);
+    public Square Relative(Color c) => (int)Value ^ (c.Side * 56);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Square Max(Square other) => Value > other.Value ? this : other;
@@ -338,7 +332,7 @@ public readonly record struct Square(Squares Value) : ISpanFormattable, ICompara
     public BitBoard AsBb() => BitBoards.BbSquares[AsInt()];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Rank RelativeRank(Player p) => Rank.Relative(p);
+    public Rank RelativeRank(Color c) => Rank.Relative(c);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool IsOppositeColor(Square other)
@@ -364,5 +358,5 @@ public readonly record struct Square(Squares Value) : ISpanFormattable, ICompara
     /// <returns>Flipped square by Rank</returns>
     public Square FlipRank() => AsInt() ^ Squares.a8.AsInt();
 
-    public Player Color() => ((AsInt() + Rank) ^ 1) & 1;
+    public Color Color() => ((AsInt() + Rank) ^ 1) & 1;
 }

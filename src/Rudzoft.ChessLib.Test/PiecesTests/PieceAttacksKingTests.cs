@@ -25,6 +25,7 @@ SOFTWARE.
 */
 
 using Rudzoft.ChessLib.Types;
+using SimdLinq;
 
 namespace Rudzoft.ChessLib.Test.PiecesTests;
 
@@ -65,9 +66,9 @@ public sealed class PieceAttacksKingTests : PieceAttacks, IClassFixture<RegularM
         const int attackIndex = 2;
         var bands = Bands[index];
         var expected = _fixture.KingExpected[index] * bands.Count;
-        var actuals = bands.Select(x => _fixture.RegAttacks[attackIndex](x).Count);
+        var actuals = bands.Select(x => _fixture.RegAttacks[attackIndex](x).Count).ToArray();
         var actual = actuals.Sum();
-        
+
         Assert.Equal(expected, actual);
     }
 
@@ -78,7 +79,7 @@ public sealed class PieceAttacksKingTests : PieceAttacks, IClassFixture<RegularM
         const int attackIndex = 2;
         var band = Bands[index];
         var expected = _fixture.KingExpected[index] * band.Count;
-        var actuals = band.Select(x => _fixture.RegAttacks[attackIndex](x).Count);
+        var actuals = band.Select(x => _fixture.RegAttacks[attackIndex](x).Count).ToArray();
         var actual = actuals.Sum();
 
         Assert.Equal(expected, actual);
@@ -91,9 +92,9 @@ public sealed class PieceAttacksKingTests : PieceAttacks, IClassFixture<RegularM
         const int attackIndex = 2;
         var band = Bands[index];
         var expected = _fixture.KingExpected[index] * band.Count;
-        var actuals = band.Select(x => _fixture.RegAttacks[attackIndex](x).Count);
+        var actuals = band.Select(x => _fixture.RegAttacks[attackIndex](x).Count).ToArray();
         var actual = actuals.Sum();
-        
+
         Assert.Equal(expected, actual);
     }
 }

@@ -168,7 +168,7 @@ public sealed class Blockage : IBlockage
 
                     if (f != File.FileA
                         && !LowerRankNotFileABelowFenceRankNotBlocked(
-                            in pos, sq, ourPawn, in ourPawns, f, in fixedPawns, r, in fence))
+                            pos.Board, sq, ourPawn, in ourPawns, f, in fixedPawns, r, in fence))
                         return false;
 
                     if (f != File.FileH)
@@ -196,7 +196,7 @@ public sealed class Blockage : IBlockage
     }
 
     private static bool LowerRankNotFileABelowFenceRankNotBlocked(
-        in IPosition pos,
+        in IBoard pos,
         Square sq,
         Piece ourPawn,
         in BitBoard ourPawns,
@@ -205,7 +205,7 @@ public sealed class Blockage : IBlockage
         Rank r,
         in BitBoard fence)
     {
-        return pos.GetPiece(sq + Direction.West) == ourPawn
+        return pos.PieceAt(sq + Direction.West) == ourPawn
                && BitBoards.PopCount(ourPawns & (f - 1)) <= 1
                && (fixedPawns & Square.Create(r, PreviousFile(f))).IsNotEmpty
                && (fence & Square.Create(r, PreviousFile(f))).IsNotEmpty;
@@ -290,7 +290,7 @@ public sealed class Blockage : IBlockage
     /// <param name="marked"></param>
     /// <param name="us"></param>
     /// <returns>true if the square is in the fence</returns>
-    private static bool FormsFence(Square sq, ref BitBoard processed, ref BitBoard fence, in BitBoard marked, Player us)
+    private static bool FormsFence(Square sq, ref BitBoard processed, ref BitBoard fence, in BitBoard marked, Color us)
     {
         processed |= sq;
 
@@ -321,10 +321,10 @@ public sealed class Blockage : IBlockage
         return false;
     }
 
-    private static Square NextFenceRankSquare(Span<Rank> fenceRank, File f, Player them)
+    private static Square NextFenceRankSquare(Span<Rank> fenceRank, File f, Color them)
         => new Square(fenceRank[f] * 8 + f.AsInt()) + them.PawnPushDistance();
 
-    private static bool FormFence(in BitBoard marked, ref BitBoard fence, ref BitBoard processed, Player us)
+    private static bool FormFence(in BitBoard marked, ref BitBoard fence, ref BitBoard processed, Color us)
     {
         var bb = PawnFileASquares;
         while (bb)
@@ -344,7 +344,7 @@ public sealed class Blockage : IBlockage
         in IPosition pos,
         Span<Rank> fenceRank,
         in BitBoard theirPawns,
-        Player us)
+        Color us)
     {
         // reverse order of Down
         var down = us.PawnPushDistance();

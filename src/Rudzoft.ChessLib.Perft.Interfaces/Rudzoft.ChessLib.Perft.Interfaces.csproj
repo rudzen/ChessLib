@@ -1,9 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <IsPackable>false</IsPackable>
-    </PropertyGroup>
-
     <ItemGroup>
         <ProjectReference Include="..\Rudzoft.ChessLib\Rudzoft.ChessLib.csproj"/>
     </ItemGroup>

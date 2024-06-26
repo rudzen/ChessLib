@@ -51,15 +51,8 @@ public static class PositionValidationTypesExtensions
         => (@this & flag) != PositionValidationTypes.None;
 }
 
-public sealed class PositionValidator : IPositionValidator
+public sealed class PositionValidator(IZobrist zobrist) : IPositionValidator
 {
-    private readonly IZobrist _zobrist;
-
-    public PositionValidator(IZobrist zobrist)
-    {
-        _zobrist = zobrist;
-    }
-
     public PositionValidationResult Validate(in IPosition pos, PositionValidationTypes type = PositionValidationTypes.All)
     {
         var errors = new List<string>();
@@ -94,13 +87,13 @@ public sealed class PositionValidator : IPositionValidator
 
     private static IEnumerable<string> ValidateBasic(IPosition pos)
     {
-        if (pos.SideToMove != Player.White && pos.SideToMove != Player.Black)
+        if (pos.SideToMove != Color.White && pos.SideToMove != Color.Black)
             yield return $"{nameof(pos.SideToMove)} is not a valid";
 
-        if (pos.GetPiece(pos.GetKingSquare(Player.White)) != Piece.WhiteKing)
+        if (pos.GetPiece(pos.GetKingSquare(Color.White)) != Piece.WhiteKing)
             yield return "white king position is not a white king";
 
-        if (pos.GetPiece(pos.GetKingSquare(Player.Black)) != Piece.BlackKing)
+        if (pos.GetPiece(pos.GetKingSquare(Color.Black)) != Piece.BlackKing)
             yield return "black king position is not a black king";
 
         if (pos.EnPassantSquare != Square.None && pos.EnPassantSquare.RelativeRank(pos.SideToMove) != Ranks.Rank6)
@@ -111,12 +104,12 @@ public sealed class PositionValidator : IPositionValidator
     {
         var crs = new[] { CastleRight.None, CastleRight.None };
 
-        foreach (var p in Player.AllPlayers)
+        foreach (var c in Color.AllColors)
         {
-            crs[0] = CastleRights.King.MakeCastleRights(p);
-            crs[1] = CastleRights.Queen.MakeCastleRights(p);
+            crs[0] = CastleRights.King.MakeCastleRights(c);
+            crs[1] = CastleRights.Queen.MakeCastleRights(c);
 
-            var ourRook = PieceType.Rook.MakePiece(p);
+            var ourRook = PieceType.Rook.MakePiece(c);
             foreach (var cr in crs)
             {
                 if (!pos.CanCastle(cr))
@@ -125,24 +118,24 @@ public sealed class PositionValidator : IPositionValidator
                 var rookSq = pos.CastlingRookSquare(cr);
 
                 if (pos.GetPiece(rookSq) != ourRook)
-                    yield return $"rook does not appear on its position for {p}";
+                    yield return $"rook does not appear on its position for {c}";
 
                 if (pos.GetCastleRightsMask(rookSq) != cr)
-                    yield return $"castle rights mask at {rookSq} does not match for player {p}";
+                    yield return $"castle rights mask at {rookSq} does not match for player {c}";
 
-                if ((pos.GetCastleRightsMask(pos.GetKingSquare(p)) & cr) != cr)
-                    yield return $"castle rights mask at {pos.GetKingSquare(p)} does not match for player {p}";
+                if ((pos.GetCastleRightsMask(pos.GetKingSquare(c)) & cr) != cr)
+                    yield return $"castle rights mask at {pos.GetKingSquare(c)} does not match for player {c}";
             }
         }
     }
 
     private static IEnumerable<string> ValidateKings(IPosition pos)
     {
-        foreach (var player in Player.AllPlayers)
+        foreach (var c in Color.AllColors)
         {
-            var count = pos.PieceCount(PieceTypes.King, player);
+            var count = pos.PieceCount(PieceType.King, c);
             if (count != 1)
-                yield return $"king count for player {player} was {count}";
+                yield return $"king count for player {c} was {count}";
         }
 
         if ((pos.AttacksTo(pos.GetKingSquare(~pos.SideToMove)) & pos.Pieces(pos.SideToMove)).IsNotEmpty)
@@ -151,28 +144,28 @@ public sealed class PositionValidator : IPositionValidator
 
     private static IEnumerable<string> ValidatePawns(IPosition pos)
     {
-        if ((pos.Pieces(PieceTypes.Pawn) & (Rank.Rank1.RankBB() | Rank.Rank8.RankBB())).IsNotEmpty)
+        if ((pos.Pieces(PieceType.Pawn) & (Rank.Rank1.RankBB() | Rank.Rank8.RankBB())).IsNotEmpty)
             yield return "pawns exists on rank 1 or rank 8";
 
-        if (pos.PieceCount(PieceTypes.Pawn, Player.White) > 8)
+        if (pos.PieceCount(PieceType.Pawn, Color.White) > 8)
             yield return "white side has more than 8 pawns";
 
-        if (pos.PieceCount(PieceTypes.Pawn, Player.Black) > 8)
+        if (pos.PieceCount(PieceType.Pawn, Color.Black) > 8)
             yield return "black side has more than 8 pawns";
     }
 
     private static IEnumerable<string> ValidatePieceConsistency(IPosition pos)
     {
-        if ((pos.Pieces(Player.White) & pos.Pieces(Player.Black)).IsNotEmpty)
+        if ((pos.Pieces(Color.White) & pos.Pieces(Color.Black)).IsNotEmpty)
             yield return "white and black pieces overlap";
 
-        if ((pos.Pieces(Player.White) | pos.Pieces(Player.Black)) != pos.Pieces())
+        if ((pos.Pieces(Color.White) | pos.Pieces(Color.Black)) != pos.Pieces())
             yield return "white and black pieces do not match all pieces";
 
-        if (pos.Pieces(Player.White).Count > 16)
+        if (pos.Pieces(Color.White).Count > 16)
             yield return "white side has more than 16 pieces";
 
-        if (pos.Pieces(Player.Black).Count > 16)
+        if (pos.Pieces(Color.Black).Count > 16)
             yield return "black side has more than 16 pieces";
     }
 
@@ -193,7 +186,7 @@ public sealed class PositionValidator : IPositionValidator
         if (state.PositionKey == HashKey.Empty && pos.PieceCount() != 0)
             yield return "state key is invalid";
 
-        if (pos.PieceCount(PieceTypes.Pawn) == 0 && state.PawnKey != _zobrist.ZobristNoPawn)
+        if (pos.PieceCount(PieceType.Pawn) == 0 && state.PawnKey != zobrist.ZobristNoPawn)
             yield return "empty pawn key is invalid";
 
         if (state.Repetition < 0)

@@ -36,5 +36,5 @@ public interface IMovesToGoModel
 
     ulong WhiteTimeMilliseconds { get; set; }
 
-    ulong Time(Player p);
+    ulong Time(Color c);
 }

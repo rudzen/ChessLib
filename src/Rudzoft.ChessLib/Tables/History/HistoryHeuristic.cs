@@ -35,33 +35,33 @@ public sealed class HistoryHeuristic : IHistoryHeuristic
 
     public HistoryHeuristic()
     {
-        _table = new int[Player.Count][][];
-        Initialize(Player.White);
-        Initialize(Player.Black);
+        _table = new int[Color.Count][][];
+        Initialize(Color.White);
+        Initialize(Color.Black);
     }
 
     public void Clear()
     {
-        ClearTable(Player.White);
-        ClearTable(Player.Black);
+        ClearTable(Color.White);
+        ClearTable(Color.Black);
     }
 
-    public void Set(Player p, Square from, Square to, int value)
-        => _table[p][from][to] = value;
+    public void Set(Color c, Square from, Square to, int value)
+        => _table[c][from][to] = value;
 
-    public int Retrieve(Player p, Square from, Square to)
-        => _table[p][from][to];
+    public int Retrieve(Color c, Square from, Square to)
+        => _table[c][from][to];
 
-    private void Initialize(Player p)
+    private void Initialize(Color c)
     {
-        _table[p] = new int[Square.Count][];
-        for (var i = 0; i < _table[p].Length; ++i)
-            _table[p][i] = new int[Square.Count];
+        _table[c] = new int[Square.Count][];
+        for (var i = 0; i < _table[c].Length; ++i)
+            _table[c][i] = new int[Square.Count];
     }
 
-    private void ClearTable(Player p)
+    private void ClearTable(Color c)
     {
-        for (var i = 0; i < _table[p].Length; i++)
-            _table[p][i].Clear();
+        for (var i = 0; i < _table[c].Length; i++)
+            _table[c][i].Clear();
     }
 }

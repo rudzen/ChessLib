@@ -38,9 +38,9 @@ using Rudzoft.ChessLib.Validation;
 
 namespace Rudzoft.ChessLib.Test.BoardTests;
 
-public sealed class BoardTestsTheoryData : TheoryData<string, PieceType, Player, int>
+public sealed class BoardTestsTheoryData : TheoryData<string, PieceType, Color, int>
 {
-    public BoardTestsTheoryData(string[] fens, PieceType[] pts, Player[] players, int[] expectedCounts)
+    public BoardTestsTheoryData(string[] fens, PieceType[] pts, Color[] players, int[] expectedCounts)
     {
         Debug.Assert(fens != null);
         Debug.Assert(pts != null);
@@ -124,16 +124,16 @@ public sealed class BoardTests
     ];
 
 
-    private static readonly Player[] Player =
+    private static readonly Color[] Player =
     [
-        Types.Player.White, Types.Player.Black, Types.Player.White, Types.Player.Black, Types.Player.White,
-        Types.Player.Black,
-        Types.Player.White, Types.Player.Black, Types.Player.White, Types.Player.Black, Types.Player.White,
-        Types.Player.Black,
-        Types.Player.White, Types.Player.Black, Types.Player.White, Types.Player.Black, Types.Player.White,
-        Types.Player.Black,
-        Types.Player.White, Types.Player.Black, Types.Player.White, Types.Player.Black, Types.Player.White,
-        Types.Player.Black
+        Types.Color.White, Types.Color.Black, Types.Color.White, Types.Color.Black, Types.Color.White,
+        Types.Color.Black,
+        Types.Color.White, Types.Color.Black, Types.Color.White, Types.Color.Black, Types.Color.White,
+        Types.Color.Black,
+        Types.Color.White, Types.Color.Black, Types.Color.White, Types.Color.Black, Types.Color.White,
+        Types.Color.Black,
+        Types.Color.White, Types.Color.Black, Types.Color.White, Types.Color.Black, Types.Color.White,
+        Types.Color.Black
     ];
 
     private static readonly int[] ExpectedCount =
@@ -154,7 +154,7 @@ public sealed class BoardTests
 
     [Theory]
     [MemberData(nameof(TheoryData))]
-    public void BoardPieceCount(string fen, PieceType pt, Player p, int expected)
+    public void BoardPieceCount(string fen, PieceType pt, Color c, int expected)
     {
         var pos = _serviceProvider.GetRequiredService<IPosition>();
 
@@ -165,8 +165,8 @@ public sealed class BoardTests
 
         var board = pos.Board;
 
-        var posCount = pos.Pieces(pt, p).Count;
-        var boardCount = board.PieceCount(pt, p);
+        var posCount = pos.Pieces(pt, c).Count;
+        var boardCount = board.PieceCount(pt, c);
 
         Assert.Equal(posCount, boardCount);
         Assert.Equal(expected, boardCount);

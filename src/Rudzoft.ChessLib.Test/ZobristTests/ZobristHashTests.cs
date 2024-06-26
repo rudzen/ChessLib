@@ -74,7 +74,7 @@ public sealed class ZobristHashTests
 
         var startKey = pos.State.PositionKey;
 
-        var move = new Move(from, to);
+        var move = Move.Create(from, to);
 
         stateIndex++;
         states.Add(new());
@@ -108,7 +108,7 @@ public sealed class ZobristHashTests
 
         var startKey = pos.State.PositionKey;
 
-        var move = new Move(from, to, moveType);
+        var move = Move.Create(from, to, moveType);
 
         stateIndex++;
         states.Add(new());
@@ -174,4 +174,45 @@ public sealed class ZobristHashTests
         added = set.Add(zobrist.Side());
         Assert.True(added);
     }
+
+    [Theory]
+    [InlineData("rnbqkb1r/pppp1ppp/7n/3Pp3/8/8/PPP1PPPP/RNBQKBNR w KQkq e6 0 1", Squares.d5, Squares.e6, MoveTypes.Enpassant)]
+    [InlineData("r3kb1r/p1pp1p1p/bpn2qpn/3Pp3/1P6/2P1BNP1/P3PPBP/RN1QK2R w KQkq - 0 1", Squares.e1, Squares.h1, MoveTypes.Castling)]
+    [InlineData("r3kb1r/p1pp1p1p/bpn2qpn/3Pp3/1P6/2P1BNP1/P3PPBP/RN1QK2R b KQkq - 0 1", Squares.e8, Squares.a8, MoveTypes.Castling)]
+    public void GetKey(string fen, Squares from, Squares to, MoveTypes moveType)
+    {
+        var pos = _serviceProvider.GetRequiredService<IPosition>();
+
+        var stateIndex = 0;
+        var states = new List<State> { new() };
+
+        pos.Set(fen, ChessMode.Normal, states[stateIndex]);
+
+        var startKey = pos.State.PositionKey;
+        var getKey = pos.GetKey(pos.State);
+
+        Assert.Equal(startKey, getKey);
+
+        var move = Move.Create(from, to, moveType);
+
+        stateIndex++;
+        states.Add(new());
+
+        pos.MakeMove(move, states[stateIndex]);
+
+        var moveKey = pos.State.PositionKey;
+
+        pos.TakeMove(move);
+
+        var finalState = pos.State;
+        var finalKey = finalState.PositionKey;
+        var finalGetKey = pos.GetKey(finalState);
+
+        Assert.Equal(finalKey, finalGetKey);
+        Assert.NotEqual(startKey, moveKey);
+        Assert.Equal(startKey, states[0].PositionKey);
+        Assert.NotEqual(startKey, states[1].PositionKey);
+        Assert.Equal(startKey, finalKey);
+    }
+
 }

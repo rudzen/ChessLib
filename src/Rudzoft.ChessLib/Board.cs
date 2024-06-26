@@ -34,7 +34,7 @@ public sealed class Board : IBoard
 {
     private readonly Piece[] _board = new Piece[Types.Square.Count];
 
-    private readonly BitBoard[] _bySide = new BitBoard[Player.Count];
+    private readonly BitBoard[] _bySide = new BitBoard[Color.Count];
 
     private readonly BitBoard[] _byType = new BitBoard[PieceType.Count];
 
@@ -104,27 +104,27 @@ public sealed class Board : IBoard
 
     public BitBoard Pieces(PieceType pt1, PieceType pt2) => _byType[pt1] | _byType[pt2];
 
-    public BitBoard Pieces(Player p) => _bySide[p];
+    public BitBoard Pieces(Color c) => _bySide[c];
 
-    public BitBoard Pieces(Player p, PieceType pt) => _bySide[p] & _byType[pt];
+    public BitBoard Pieces(Color c, PieceType pt) => _bySide[c] & _byType[pt];
 
-    public BitBoard Pieces(Player p, PieceType pt1, PieceType pt2)
-        => _bySide[p] & (_byType[pt1] | _byType[pt2]);
+    public BitBoard Pieces(Color c, PieceType pt1, PieceType pt2)
+        => _bySide[c] & (_byType[pt1] | _byType[pt2]);
 
-    public Square Square(PieceType pt, Player p)
+    public Square Square(PieceType pt, Color c)
     {
-        Debug.Assert(_pieceCount[pt.MakePiece(p)] == 1);
-        return Pieces(p, pt).Lsb();
+        Debug.Assert(_pieceCount[pt.MakePiece(c)] == 1);
+        return Pieces(c, pt).Lsb();
     }
 
     public int PieceCount(Piece pc) => _pieceCount[pc];
 
-    public int PieceCount(PieceType pt, Player p) => PieceCount(pt.MakePiece(p));
+    public int PieceCount(PieceType pt, Color c) => PieceCount(pt.MakePiece(c));
 
     public int PieceCount(PieceType pt)
-        => _pieceCount[pt.MakePiece(Player.White)] + _pieceCount[pt.MakePiece(Player.Black)];
+        => _pieceCount[pt.MakePiece(Color.White)] + _pieceCount[pt.MakePiece(Color.Black)];
 
-    public int PieceCount() => PieceCount(PieceTypes.AllPieces);
+    public int PieceCount() => PieceCount(PieceType.AllPieces);
 
     public IEnumerator<Piece> GetEnumerator()
         => _board.Where(static pc => pc != Piece.EmptyPiece).GetEnumerator();

@@ -41,12 +41,12 @@ public interface IBoard : IEnumerable<Piece>
     BitBoard Pieces();
     BitBoard Pieces(PieceType pt);
     BitBoard Pieces(PieceType pt1, PieceType pt2);
-    BitBoard Pieces(Player p);
-    BitBoard Pieces(Player p, PieceType pt);
-    BitBoard Pieces(Player p, PieceType pt1, PieceType pt2);
-    Square Square(PieceType pt, Player p);
+    BitBoard Pieces(Color c);
+    BitBoard Pieces(Color c, PieceType pt);
+    BitBoard Pieces(Color c, PieceType pt1, PieceType pt2);
+    Square Square(PieceType pt, Color c);
     int PieceCount(Piece pc);
-    int PieceCount(PieceType pt, Player p);
+    int PieceCount(PieceType pt, Color c);
     int PieceCount(PieceType pt);
     int PieceCount();
 }

@@ -33,6 +33,8 @@ namespace Rudzoft.ChessLib.Notation.Notations;
 
 public sealed class IccfNotation : Notation
 {
+    private static readonly int[] PieceTypeToValueIndex = [0, 0, 4, 3, 2, 1];
+
     public IccfNotation(ObjectPool<MoveList> moveLists) : base(moveLists) { }
 
     /// <summary>
@@ -50,31 +52,18 @@ public sealed class IccfNotation : Notation
         Span<char> re = stackalloc char[5];
         var i = 0;
 
-        re[i++] = (char)('1' + from.File);
-        re[i++] = (char)('1' + from.Rank);
-        re[i++] = (char)('1' + to.File);
-        re[i++] = (char)('1' + to.Rank);
+        re[i++] = (char)('1' + from.File.Value);
+        re[i++] = (char)('1' + from.Rank.Value);
+        re[i++] = (char)('1' + to.File.Value);
+        re[i++] = (char)('1' + to.Rank.Value);
 
         // ReSharper disable once InvertIf
         if (move.IsPromotionMove())
         {
-            var c = PieceTypeToValue(move.PromotedPieceType());
+            var c = PieceTypeToValueIndex[move.PromotedPieceType()];
             re[i++] = (char)('0' + c);
         }
 
         return new(re[..i]);
-    }
-
-    private static int PieceTypeToValue(PieceType pt)
-    {
-        if (pt == PieceType.Queen)
-            return 1;
-        if (pt == PieceType.Rook)
-            return 2;
-        if (pt == PieceType.Bishop)
-            return 3;
-        if (pt == PieceType.Knight)
-            return 4;
-        throw new NotImplementedException();
     }
 }

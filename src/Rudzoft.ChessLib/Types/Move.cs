@@ -51,16 +51,17 @@ public readonly record struct Move(ushort Data) : ISpanFormattable
 {
     private const int MaxMoveStringSize = 5;
 
-    public Move(Square from, Square to) : this((ushort)(to | (from << 6)))
+    private Move(Square from, Square to) : this((ushort)(to | (from << 6)))
     {
     }
 
-    public Move(Square from, Square to, MoveTypes moveType, PieceTypes promoPt = PieceTypes.Knight)
-        : this((ushort)(to | (from << 6) | moveType.AsInt() | ((promoPt - PieceTypes.Knight) << 12)))
+    private Move(Square from, Square to, MoveTypes moveType, PieceType promoPt)
+        : this((ushort)(to | (from << 6) | moveType.AsInt() | ((promoPt.Value - PieceType.Knight.Value) << 12)))
     {
     }
 
     public static readonly Move EmptyMove = new();
+    public static readonly Move NullMove = new(65);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Deconstruct(out Square from, out Square to)
@@ -106,9 +107,12 @@ public readonly record struct Move(ushort Data) : ISpanFormattable
         return index;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Move Create(Square from, Square to, MoveTypes moveType)
+        => new(from, to, moveType, PieceType.Knight);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Move Create(Square from, Square to, MoveTypes moveType, PieceTypes promoPt = PieceTypes.Knight)
+    public static Move Create(Square from, Square to, MoveTypes moveType, PieceType promoPt)
         => new(from, to, moveType, promoPt);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -121,7 +125,7 @@ public readonly record struct Move(ushort Data) : ISpanFormattable
     public PieceType PromotedPieceType() => (PieceTypes)(((Data >> 12) & 3) + 2);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool IsQueenPromotion() => PromotedPieceType() == PieceTypes.Queen;
+    public bool IsQueenPromotion() => PromotedPieceType() == PieceType.Queen;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public MoveTypes MoveType() => (MoveTypes)(Data & (3 << 14));

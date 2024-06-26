@@ -167,7 +167,7 @@ public readonly record struct File(Files Value)
     public static bool operator false(File f) => !f.IsOk;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator int(File f) => (int)f.Value;
+    public static implicit operator byte(File f) => (byte)f.Value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public int AsInt() => (int)Value;

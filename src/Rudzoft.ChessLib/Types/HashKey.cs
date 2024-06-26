@@ -51,7 +51,7 @@ public readonly struct HashKey : IEquatable<HashKey>
     [field: FieldOffset(4)] public uint UpperKey { get; }
 
     public bool IsEmpty => Key == 0;
-    
+
     public static HashKey Empty => new();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -76,6 +76,9 @@ public readonly struct HashKey : IEquatable<HashKey>
     public static HashKey operator &(HashKey left, int right) => new(left.Key & (ulong)right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static HashKey operator &(HashKey left, ulong right) => new(left.Key & (ulong)right);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static HashKey operator ^(HashKey left, int right) => new(left.Key ^ (ulong)right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -83,6 +86,9 @@ public readonly struct HashKey : IEquatable<HashKey>
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static HashKey operator ^(HashKey left, ulong right) => new(left.Key ^ right);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static implicit operator ulong(HashKey hk) => hk.Key;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Equals(HashKey other) => Key == other.Key;

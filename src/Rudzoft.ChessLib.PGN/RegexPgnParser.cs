@@ -49,8 +49,24 @@ public sealed partial class RegexPgnParser : IPgnParser
         if (string.IsNullOrWhiteSpace(pgnFile))
             yield break;
 
-        await using var fileStream = new FileStream(pgnFile, FileMode.Open, FileAccess.Read);
-        using var streamReader = new StreamReader(fileStream);
+        var fileInfo = new FileInfo(pgnFile);
+
+        if (!fileInfo.Exists)
+            yield break;
+
+        await using var fileStream = new FileStream(fileInfo.FullName, FileMode.Open, FileAccess.Read);
+
+        await foreach (var game in ParseStream(fileStream, cancellationToken))
+            yield return game;
+    }
+
+    public async IAsyncEnumerable<PgnGame> ParseStream(
+        Stream stream,
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(stream);
+
+        using var streamReader = new StreamReader(stream);
         var currentGameTags = new Dictionary<string, string>(DefaultTagCapacity);
         var currentGameMoves = new List<PgnMove>(DefaultMoveListCapacity);
         var inMoveSection = false;

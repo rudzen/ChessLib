@@ -54,7 +54,7 @@ public class SquareIterateBenchmark
             sum += Unsafe.Add(ref space, i).AsInt();
         return sum;
     }
-    
+
     [Benchmark]
     public int BitBoard_WhileLoop()
     {

@@ -24,6 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using System.Buffers;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
@@ -41,8 +42,6 @@ public static class Fen
 
     private const string FenRankRegexSnippet = "[1-8KkQqRrBbNnPp]{1,8}";
 
-    private const string ValidChars = "0123456789pPnNbBrRqQkK/ w-abcdefgh";
-
     private const char Space = ' ';
 
     private const int SpaceCount = 3;
@@ -50,6 +49,8 @@ public static class Fen
     private const char Separator = '/';
 
     private const int SeparatorCount = 7;
+
+    private static readonly SearchValues<char> ValidChars = SearchValues.Create("0123456789pPnNbBrRqQkK/ w-abcdefgh");
 
     private static readonly Regex ValidFenRegex = new(
         string.Format(
@@ -75,7 +76,7 @@ public static class Fen
         if (f.IsEmpty)
             throw new InvalidFenException("Fen is empty.");
 
-        var invalidCharIndex = f.IndexOfAnyExcept(ValidChars.AsSpan());
+        var invalidCharIndex = f.IndexOfAnyExcept(ValidChars);
 
         if (invalidCharIndex > -1)
             throw new InvalidFenException($"Invalid char detected in fen. fen={f}, pos={invalidCharIndex}");

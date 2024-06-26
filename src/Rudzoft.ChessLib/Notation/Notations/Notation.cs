@@ -128,7 +128,7 @@ public abstract class Notation : INotation
         var from = move.FromSquare();
         var pt = pos.GetPieceType(from);
 
-        return pt == PieceTypes.Pawn || pt == PieceTypes.King
+        return pt == PieceType.Pawn || pt == PieceType.King
             ? BitBoard.Empty
             : pos.GetAttacks(move.ToSquare(), pt, pos.Pieces()) ^ from;
     }

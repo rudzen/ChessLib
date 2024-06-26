@@ -111,10 +111,10 @@ public sealed class Game(
     public IEnumerator<Piece> GetEnumerator() => pos.GetEnumerator();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public BitBoard OccupiedBySide(Player p) => pos.Pieces(p);
+    public BitBoard OccupiedBySide(Color c) => pos.Pieces(c);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Player CurrentPlayer() => pos.SideToMove;
+    public Color CurrentPlayer() => pos.SideToMove;
 
     public UInt128 Perft(in HashKey baseKey, int depth, bool root = true)
     {

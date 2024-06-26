@@ -73,10 +73,10 @@ public struct TTEntry
     internal void set_generation(int g) { generation8 = (byte)g; }
 
     //internal UInt32 key() { return key32; }
-    internal Depth depth() { return depth16; }
+    public Depth depth() { return depth16; }
     internal Move move() { return move16; }
     internal Value value() { return value16; }
-    internal Bound type() { return bound; }
+    public Bound type() { return bound; }
     internal int generation() { return generation8; }
     internal Value static_value() { return staticValue; }
     internal Value static_value_margin() { return staticMargin; }
