@@ -7,6 +7,7 @@
     <ItemGroup>
       <PackageReference Include="Akka"/>
       <PackageReference Include="Akka.DependencyInjection"/>
+      <PackageReference Include="Akka.Hosting" />
       <PackageReference Include="CommandLineParser"/>
       <PackageReference Include="Serilog"/>
       <PackageReference Include="Serilog.Sinks.Console"/>
@@ -17,8 +18,9 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Rudzoft.ChessLib.Perft.Interfaces\Rudzoft.ChessLib.Perft.Interfaces.csproj" />
-      <ProjectReference Include="..\Rudzoft.ChessLib.Perft\Rudzoft.ChessLib.Perft.csproj" />
+      <ProjectReference Include="..\..\Rudzoft.ChessLib.Perft.Interfaces\Rudzoft.ChessLib.Perft.Interfaces.csproj" />
+      <ProjectReference Include="..\..\Rudzoft.ChessLib.Perft\Rudzoft.ChessLib.Perft.csproj" />
+      <ProjectReference Include="..\Rudzoft.Perft.Domain\Rudzoft.Perft.Domain.csproj" />
     </ItemGroup>
 
     <ItemGroup>
