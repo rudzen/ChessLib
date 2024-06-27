@@ -215,9 +215,11 @@ public static class BitBoards
         foreach (var r in Rank.All)
             ForwardRanksBB[0][r] = ~(ForwardRanksBB[1][r + 1] = ForwardRanksBB[1][r] | r.BitBoardRank());
 
+        var squares = Square.All.AsSpan();
+
         foreach (var c in Color.AllColors.AsSpan())
         {
-            foreach (var sq in Square.All.AsSpan())
+            foreach (var sq in squares)
             {
                 var file = sq.File;
                 ForwardFileBB[c][sq] = ForwardRanksBB[c][sq.Rank] & file.BitBoardFile();
@@ -227,7 +229,7 @@ public static class BitBoards
         }
 
         // have to compute here before we access the BitBoards
-        foreach (var sq1 in Square.All.AsSpan())
+        foreach (var sq1 in squares)
         {
             SquareDistance[sq1] = new int[Square.Count];
             DistanceRingBB[sq1] = new BitBoard[8];
@@ -243,14 +245,14 @@ public static class BitBoards
         Span<PieceType> validMagicPieces = stackalloc PieceType[] { PieceType.Bishop, PieceType.Rook };
 
         // Pseudo attacks for all pieces
-        foreach (var sq1 in Square.All)
+        foreach (var sq1 in squares)
         {
             InitializePseudoAttacks(sq1);
 
             // Compute lines and betweens
             foreach (var pt in validMagicPieces)
             {
-                foreach (var sq2 in Square.All)
+                foreach (var sq2 in squares)
                 {
                     if ((PseudoAttacksBB[pt][sq1] & sq2).IsEmpty)
                         continue;
