@@ -33,7 +33,7 @@ using System.Runtime.CompilerServices;
 
 namespace Rudzoft.ChessLib.Types;
 
-public enum Files
+public enum Files : byte
 {
     FileA = 0,
     FileB = 1,
@@ -79,7 +79,7 @@ public readonly record struct File(Files Value)
     {
     }
 
-    public char Char => (char)('a' + Value);
+    public char Char => (char)('a' + (int)Value);
 
     public bool IsOk => Value.AsInt().IsBetween(Files.FileA.AsInt(), Files.FileH.AsInt());
 

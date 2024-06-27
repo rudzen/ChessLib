@@ -26,6 +26,7 @@ SOFTWARE.
 
 using System.Collections;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib;
@@ -40,6 +41,7 @@ public sealed class Board : IBoard
 
     private readonly int[] _pieceCount = new int[Piece.Count];
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Clear()
     {
         Array.Fill(_board, Piece.EmptyPiece);
@@ -48,10 +50,13 @@ public sealed class Board : IBoard
         Array.Fill(_pieceCount, 0);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Piece PieceAt(Square sq) => _board[sq];
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool IsEmpty(Square sq) => _board[sq] == Piece.EmptyPiece;
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AddPiece(Piece pc, Square sq)
     {
         Debug.Assert(sq.IsOk);
@@ -67,6 +72,7 @@ public sealed class Board : IBoard
         _pieceCount[PieceType.AllPieces.MakePiece(color)]++;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void RemovePiece(Square sq)
     {
         Debug.Assert(sq.IsOk);
@@ -80,9 +86,11 @@ public sealed class Board : IBoard
         _pieceCount[PieceType.AllPieces.MakePiece(pc.ColorOf())]--;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void ClearPiece(Square sq)
         => _board[sq] = Piece.EmptyPiece;
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void MovePiece(Square from, Square to)
     {
         Debug.Assert(from.IsOk && to.IsOk);
@@ -96,38 +104,52 @@ public sealed class Board : IBoard
         _board[to] = pc;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Piece MovedPiece(Move m) => PieceAt(m.FromSquare());
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public BitBoard Pieces() => _byType[PieceType.AllPieces];
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public BitBoard Pieces(PieceType pt) => _byType[pt];
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public BitBoard Pieces(PieceType pt1, PieceType pt2) => _byType[pt1] | _byType[pt2];
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public BitBoard Pieces(Color c) => _bySide[c];
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public BitBoard Pieces(Color c, PieceType pt) => _bySide[c] & _byType[pt];
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public BitBoard Pieces(Color c, PieceType pt1, PieceType pt2)
         => _bySide[c] & (_byType[pt1] | _byType[pt2]);
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Square Square(PieceType pt, Color c)
     {
         Debug.Assert(_pieceCount[pt.MakePiece(c)] == 1);
         return Pieces(c, pt).Lsb();
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public int PieceCount(Piece pc) => _pieceCount[pc];
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public int PieceCount(PieceType pt, Color c) => PieceCount(pt.MakePiece(c));
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public int PieceCount(PieceType pt)
         => _pieceCount[pt.MakePiece(Color.White)] + _pieceCount[pt.MakePiece(Color.Black)];
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public int PieceCount() => PieceCount(PieceType.AllPieces);
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public IEnumerator<Piece> GetEnumerator()
         => _board.Where(static pc => pc != Piece.EmptyPiece).GetEnumerator();
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }
