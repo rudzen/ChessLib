@@ -1485,8 +1485,6 @@ public sealed class Position : IPosition
         {
             RemovePiece(from);
             RemovePiece(rookFrom);
-            Board.ClearPiece(from);
-            Board.ClearPiece(rookFrom);
             AddPiece(PieceType.King.MakePiece(us), to);
             AddPiece(PieceType.Rook.MakePiece(us), rookTo);
         }
@@ -1494,8 +1492,6 @@ public sealed class Position : IPosition
         {
             RemovePiece(to);
             RemovePiece(rookTo);
-            Board.ClearPiece(to);
-            Board.ClearPiece(rookTo);
             AddPiece(PieceType.King.MakePiece(us), from);
             AddPiece(PieceType.Rook.MakePiece(us), rookFrom);
         }
