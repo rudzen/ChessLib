@@ -18,8 +18,9 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\Rudzoft.ChessLib.Perft.Interfaces\Rudzoft.ChessLib.Perft.Interfaces.csproj" />
-      <ProjectReference Include="..\..\Rudzoft.ChessLib.Perft\Rudzoft.ChessLib.Perft.csproj" />
+      <ProjectReference Include="..\..\chess-lib\Rudzoft.ChessLib.Perft.Interfaces\Rudzoft.ChessLib.Perft.Interfaces.csproj" />
+      <ProjectReference Include="..\..\chess-lib\Rudzoft.ChessLib.Perft\Rudzoft.ChessLib.Perft.csproj" />
+      <ProjectReference Include="..\..\chess-lib\Rudzoft.ChessLib\Rudzoft.ChessLib.csproj" />
       <ProjectReference Include="..\Rudzoft.Perft.Domain\Rudzoft.Perft.Domain.csproj" />
     </ItemGroup>
 

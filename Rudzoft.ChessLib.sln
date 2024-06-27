@@ -3,27 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.32112.339
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rudzoft.ChessLib", "src\Rudzoft.ChessLib\Rudzoft.ChessLib.csproj", "{44D2509D-D267-4416-92FB-FDE8381A3F46}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rudzoft.ChessLib.Test", "src\Rudzoft.ChessLib.Test\Rudzoft.ChessLib.Test.csproj", "{45A5E2D9-97E5-49FA-8066-9FEA4609A312}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rudzoft.ChessLib.Benchmark", "src\Rudzoft.ChessLib.Benchmark\Rudzoft.ChessLib.Benchmark.csproj", "{BF9E9B6E-947E-40E3-956F-AE6A82D5C237}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rudzoft.ChessLib.Perft", "src\Rudzoft.ChessLib.Perft\Rudzoft.ChessLib.Perft.csproj", "{F253BA49-993B-4119-8226-A6C6DF0B556D}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rudzoft.ChessLib.Perft.Interfaces", "src\Rudzoft.ChessLib.Perft.Interfaces\Rudzoft.ChessLib.Perft.Interfaces.csproj", "{4AD06BC1-F944-41E8-AAF8-3AA02642E18C}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rudzoft.ChessLib.WebApi", "src\Rudzoft.ChessLib.WebApi\Rudzoft.ChessLib.WebApi.csproj", "{CFC3DABB-CC74-4B7E-A434-B0F3DD621DE8}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "chess-lib", "chess-lib", "{9F0623CB-4463-40FE-874F-4A18D1871A91}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "perft", "perft", "{96596E23-0DAC-46B7-AEE2-24F55C837AFF}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "web-api", "web-api", "{F82A6A7E-4551-4667-9E0A-57036E1B5117}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rudzoft.ChessLib.PGN", "src\Rudzoft.ChessLib.PGN\Rudzoft.ChessLib.PGN.csproj", "{07F55E9A-ACF2-4F93-AD03-9E6F41FF78A2}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rudzoft.ChessLib.PGN.Test", "src\Rudzoft.ChessLib.PGN.Test\Rudzoft.ChessLib.PGN.Test.csproj", "{556ADC0D-074D-4B8F-9E45-1275342FCB74}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5B4D0B75-CE2C-45E2-92D3-987704C20001}"
 	ProjectSection(SolutionItems) = preProject
@@ -32,11 +16,34 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		global.json = global.json
 		.editorconfig = .editorconfig
 		Directory.Packages.props = Directory.Packages.props
+		LICENSE = LICENSE
+		.gitignore = .gitignore
+		icon\ChessLib.png = icon\ChessLib.png
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rudzoft.Perft.Domain", "src\perft\Rudzoft.Perft.Domain\Rudzoft.Perft.Domain.csproj", "{374C6338-57B4-44CD-9A40-B13EBC25BCF6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rudzoft.Perft", "src\perft\Rudzoft.Perft\Rudzoft.Perft.csproj", "{279378EB-73AF-450C-909C-7145DBE463E0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "chess-lib.bench", "chess-lib.bench", "{74DC6FDD-D550-4185-9635-1201508E8F22}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "chess-lib.pgn", "chess-lib.pgn", "{CFADCDB7-1278-42ED-A25C-9B3FBB58C520}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rudzoft.ChessLib", "src\chess-lib\Rudzoft.ChessLib\Rudzoft.ChessLib.csproj", "{CD9A0992-9687-41A1-8C02-DE4063F489DF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rudzoft.ChessLib.Test", "src\chess-lib\Rudzoft.ChessLib.Test\Rudzoft.ChessLib.Test.csproj", "{71E13772-CD99-44F7-8F5A-BC7E96300280}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rudzoft.ChessLib.Perft.Interfaces", "src\chess-lib\Rudzoft.ChessLib.Perft.Interfaces\Rudzoft.ChessLib.Perft.Interfaces.csproj", "{9FFDC3AE-B0B2-403E-AA1E-C1CB04A2F5BE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rudzoft.ChessLib.Perft", "src\chess-lib\Rudzoft.ChessLib.Perft\Rudzoft.ChessLib.Perft.csproj", "{D19AFEC7-0EF0-4442-9AB8-2ECFCA2D6246}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rudzoft.ChessLib.Benchmark", "src\chess-lib.bench\Rudzoft.ChessLib.Benchmark\Rudzoft.ChessLib.Benchmark.csproj", "{18BB06F4-F9B5-4999-8FC5-D5D479FEA82B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rudzoft.ChessLib.PGN", "src\chess-lib.pgn\Rudzoft.ChessLib.PGN\Rudzoft.ChessLib.PGN.csproj", "{289BE06C-D071-4620-B7A7-E119F34A40A6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rudzoft.ChessLib.PGN.Test", "src\chess-lib.pgn\Rudzoft.ChessLib.PGN.Test\Rudzoft.ChessLib.PGN.Test.csproj", "{BF3D8F4C-743B-4F9F-A227-2763BF8DA2A6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rudzoft.ChessLib.WebApi", "src\web-api\Rudzoft.ChessLib.WebApi\Rudzoft.ChessLib.WebApi.csproj", "{F283CA88-BE8D-4A89-8402-357B375877B8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -44,38 +51,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{44D2509D-D267-4416-92FB-FDE8381A3F46}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{44D2509D-D267-4416-92FB-FDE8381A3F46}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{44D2509D-D267-4416-92FB-FDE8381A3F46}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{44D2509D-D267-4416-92FB-FDE8381A3F46}.Release|Any CPU.Build.0 = Release|Any CPU
-		{45A5E2D9-97E5-49FA-8066-9FEA4609A312}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{45A5E2D9-97E5-49FA-8066-9FEA4609A312}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{45A5E2D9-97E5-49FA-8066-9FEA4609A312}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{45A5E2D9-97E5-49FA-8066-9FEA4609A312}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BF9E9B6E-947E-40E3-956F-AE6A82D5C237}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BF9E9B6E-947E-40E3-956F-AE6A82D5C237}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BF9E9B6E-947E-40E3-956F-AE6A82D5C237}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BF9E9B6E-947E-40E3-956F-AE6A82D5C237}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F253BA49-993B-4119-8226-A6C6DF0B556D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F253BA49-993B-4119-8226-A6C6DF0B556D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F253BA49-993B-4119-8226-A6C6DF0B556D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F253BA49-993B-4119-8226-A6C6DF0B556D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4AD06BC1-F944-41E8-AAF8-3AA02642E18C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4AD06BC1-F944-41E8-AAF8-3AA02642E18C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4AD06BC1-F944-41E8-AAF8-3AA02642E18C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4AD06BC1-F944-41E8-AAF8-3AA02642E18C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CFC3DABB-CC74-4B7E-A434-B0F3DD621DE8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CFC3DABB-CC74-4B7E-A434-B0F3DD621DE8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CFC3DABB-CC74-4B7E-A434-B0F3DD621DE8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CFC3DABB-CC74-4B7E-A434-B0F3DD621DE8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{07F55E9A-ACF2-4F93-AD03-9E6F41FF78A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{07F55E9A-ACF2-4F93-AD03-9E6F41FF78A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{07F55E9A-ACF2-4F93-AD03-9E6F41FF78A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{07F55E9A-ACF2-4F93-AD03-9E6F41FF78A2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{556ADC0D-074D-4B8F-9E45-1275342FCB74}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{556ADC0D-074D-4B8F-9E45-1275342FCB74}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{556ADC0D-074D-4B8F-9E45-1275342FCB74}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{556ADC0D-074D-4B8F-9E45-1275342FCB74}.Release|Any CPU.Build.0 = Release|Any CPU
 		{374C6338-57B4-44CD-9A40-B13EBC25BCF6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{374C6338-57B4-44CD-9A40-B13EBC25BCF6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{374C6338-57B4-44CD-9A40-B13EBC25BCF6}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -84,21 +59,53 @@ Global
 		{279378EB-73AF-450C-909C-7145DBE463E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{279378EB-73AF-450C-909C-7145DBE463E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{279378EB-73AF-450C-909C-7145DBE463E0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CD9A0992-9687-41A1-8C02-DE4063F489DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CD9A0992-9687-41A1-8C02-DE4063F489DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CD9A0992-9687-41A1-8C02-DE4063F489DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CD9A0992-9687-41A1-8C02-DE4063F489DF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{71E13772-CD99-44F7-8F5A-BC7E96300280}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{71E13772-CD99-44F7-8F5A-BC7E96300280}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{71E13772-CD99-44F7-8F5A-BC7E96300280}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{71E13772-CD99-44F7-8F5A-BC7E96300280}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9FFDC3AE-B0B2-403E-AA1E-C1CB04A2F5BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9FFDC3AE-B0B2-403E-AA1E-C1CB04A2F5BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9FFDC3AE-B0B2-403E-AA1E-C1CB04A2F5BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9FFDC3AE-B0B2-403E-AA1E-C1CB04A2F5BE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D19AFEC7-0EF0-4442-9AB8-2ECFCA2D6246}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D19AFEC7-0EF0-4442-9AB8-2ECFCA2D6246}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D19AFEC7-0EF0-4442-9AB8-2ECFCA2D6246}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D19AFEC7-0EF0-4442-9AB8-2ECFCA2D6246}.Release|Any CPU.Build.0 = Release|Any CPU
+		{18BB06F4-F9B5-4999-8FC5-D5D479FEA82B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{18BB06F4-F9B5-4999-8FC5-D5D479FEA82B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{18BB06F4-F9B5-4999-8FC5-D5D479FEA82B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{18BB06F4-F9B5-4999-8FC5-D5D479FEA82B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{289BE06C-D071-4620-B7A7-E119F34A40A6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{289BE06C-D071-4620-B7A7-E119F34A40A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{289BE06C-D071-4620-B7A7-E119F34A40A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{289BE06C-D071-4620-B7A7-E119F34A40A6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BF3D8F4C-743B-4F9F-A227-2763BF8DA2A6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF3D8F4C-743B-4F9F-A227-2763BF8DA2A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF3D8F4C-743B-4F9F-A227-2763BF8DA2A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF3D8F4C-743B-4F9F-A227-2763BF8DA2A6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F283CA88-BE8D-4A89-8402-357B375877B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F283CA88-BE8D-4A89-8402-357B375877B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F283CA88-BE8D-4A89-8402-357B375877B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F283CA88-BE8D-4A89-8402-357B375877B8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{44D2509D-D267-4416-92FB-FDE8381A3F46} = {9F0623CB-4463-40FE-874F-4A18D1871A91}
-		{45A5E2D9-97E5-49FA-8066-9FEA4609A312} = {9F0623CB-4463-40FE-874F-4A18D1871A91}
-		{BF9E9B6E-947E-40E3-956F-AE6A82D5C237} = {9F0623CB-4463-40FE-874F-4A18D1871A91}
-		{F253BA49-993B-4119-8226-A6C6DF0B556D} = {9F0623CB-4463-40FE-874F-4A18D1871A91}
-		{4AD06BC1-F944-41E8-AAF8-3AA02642E18C} = {9F0623CB-4463-40FE-874F-4A18D1871A91}
-		{CFC3DABB-CC74-4B7E-A434-B0F3DD621DE8} = {F82A6A7E-4551-4667-9E0A-57036E1B5117}
-		{07F55E9A-ACF2-4F93-AD03-9E6F41FF78A2} = {9F0623CB-4463-40FE-874F-4A18D1871A91}
-		{556ADC0D-074D-4B8F-9E45-1275342FCB74} = {9F0623CB-4463-40FE-874F-4A18D1871A91}
 		{374C6338-57B4-44CD-9A40-B13EBC25BCF6} = {96596E23-0DAC-46B7-AEE2-24F55C837AFF}
 		{279378EB-73AF-450C-909C-7145DBE463E0} = {96596E23-0DAC-46B7-AEE2-24F55C837AFF}
+		{CD9A0992-9687-41A1-8C02-DE4063F489DF} = {9F0623CB-4463-40FE-874F-4A18D1871A91}
+		{71E13772-CD99-44F7-8F5A-BC7E96300280} = {9F0623CB-4463-40FE-874F-4A18D1871A91}
+		{9FFDC3AE-B0B2-403E-AA1E-C1CB04A2F5BE} = {9F0623CB-4463-40FE-874F-4A18D1871A91}
+		{D19AFEC7-0EF0-4442-9AB8-2ECFCA2D6246} = {9F0623CB-4463-40FE-874F-4A18D1871A91}
+		{18BB06F4-F9B5-4999-8FC5-D5D479FEA82B} = {74DC6FDD-D550-4185-9635-1201508E8F22}
+		{289BE06C-D071-4620-B7A7-E119F34A40A6} = {CFADCDB7-1278-42ED-A25C-9B3FBB58C520}
+		{BF3D8F4C-743B-4F9F-A227-2763BF8DA2A6} = {CFADCDB7-1278-42ED-A25C-9B3FBB58C520}
+		{F283CA88-BE8D-4A89-8402-357B375877B8} = {F82A6A7E-4551-4667-9E0A-57036E1B5117}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0B507B2E-EC45-4DDA-94DD-B7CD5A2B8CF3}

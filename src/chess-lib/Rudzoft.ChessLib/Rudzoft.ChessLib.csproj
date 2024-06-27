@@ -18,7 +18,6 @@
         <Title>Rudzoft.ChessLib</Title>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageTags>chess bitboard datastructure movegeneration magicbb</PackageTags>
-        <PackageIcon>ChessLib.png</PackageIcon>
         <PackageId>Rudzoft.ChessLib</PackageId>
         <RepositoryUrl>https://github.com/rudzen/ChessLib</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
@@ -36,17 +35,12 @@
         <PackageReference Include="Microsoft.Extensions.Options"/>
         <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions"/>
     </ItemGroup>
+
     <ItemGroup>
-        <Folder Include="Protocol\"/>
-    </ItemGroup>
-    <ItemGroup>
-        <None Include="..\..\README.md">
-            <Pack>True</Pack>
-            <PackagePath>\</PackagePath>
-        </None>
-        <None Include="..\..\LICENSE">
-            <Pack>True</Pack>
-            <PackagePath></PackagePath>
+        <None Include="..\..\..\icon\ChessLib.png">
+          <Pack>True</Pack>
+          <PackagePath></PackagePath>
+          <Link>ChessLib.png</Link>
         </None>
         <None Include="Icon\ChessLib.png" Pack="true" PackagePath=""/>
     </ItemGroup>
