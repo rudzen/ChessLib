@@ -30,8 +30,9 @@
     </PackageVersion>
   </ItemGroup>
   <ItemGroup Label="Perft">
-    <PackageVersion Include="Akka" Version="1.5.25" />
-    <PackageVersion Include="Akka.DependencyInjection" Version="1.5.25" />
+    <PackageVersion Include="Akka" Version="1.5.26" />
+    <PackageVersion Include="Akka.DependencyInjection" Version="1.5.26" />
+    <PackageVersion Include="Akka.Hosting" Version="1.5.25" />
     <PackageVersion Include="CommandLineParser" Version="2.9.1" />
     <PackageVersion Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
     <PackageVersion Include="Serilog" Version="4.0.0" />
