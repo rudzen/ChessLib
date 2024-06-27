@@ -1158,8 +1158,8 @@ public sealed class Position : IPosition
 
     private void SetupPieces(ReadOnlySpan<char> fenChunk)
     {
-        var f = 1; // file (column)
-        var r = 8; // rank (row)
+        var f = File.FileA;
+        var r = Rank.Rank8;
 
         ref var fenChunkSpace = ref MemoryMarshal.GetReference(fenChunk);
         for (var i = 0; i < fenChunk.Length; i++)
@@ -1170,7 +1170,7 @@ public sealed class Position : IPosition
             else if (c == '/')
             {
                 r--;
-                f = 1;
+                f = File.FileA;
             }
             else
             {
@@ -1180,7 +1180,7 @@ public sealed class Position : IPosition
                     throw new InvalidFenException("Invalid char detected");
 
                 var us = new Color(char.IsLower(PieceExtensions.PieceChars[pieceIndex]));
-                var square = new Square(r - 1, f - 1);
+                var square = new Square(r, f);
                 var pt = new PieceType(pieceIndex);
                 var pc = pt.MakePiece(us);
 
