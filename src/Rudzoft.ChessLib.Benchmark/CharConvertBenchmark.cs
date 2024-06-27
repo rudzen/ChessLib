@@ -46,7 +46,7 @@ public class CharConvertBenchmark
     [ArgumentsSource(nameof(FileParams))]
     public string StringFromCreate(File f)
     {
-        return string.Create(1, f.Value, static (span, v) => span[0] = (char)('a' + v));
+        return string.Create(1, f.Value, static (span, v) => span[0] = (char)('a' + (int)v));
     }
 
     [Benchmark]
@@ -55,7 +55,7 @@ public class CharConvertBenchmark
     {
         return new string((char)('a' + f.AsInt()), 1);
     }
-    
+
     [Benchmark]
     [ArgumentsSource(nameof(FileParams))]
     public string StringFromChar(File f)

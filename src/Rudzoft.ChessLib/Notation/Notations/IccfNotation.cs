@@ -52,9 +52,9 @@ public sealed class IccfNotation : Notation
         Span<char> re = stackalloc char[5];
         var i = 0;
 
-        re[i++] = (char)('1' + from.File.Value);
+        re[i++] = (char)('1' + (int)from.File.Value);
         re[i++] = (char)('1' + from.Rank.Value);
-        re[i++] = (char)('1' + to.File.Value);
+        re[i++] = (char)('1' + (int)to.File.Value);
         re[i++] = (char)('1' + to.Rank.Value);
 
         // ReSharper disable once InvertIf

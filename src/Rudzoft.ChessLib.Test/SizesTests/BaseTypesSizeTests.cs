@@ -67,7 +67,7 @@ public sealed class BaseTypesSizeTests
     [Fact]
     public void FileSize()
     {
-        const int expected = 4;
+        const int expected = 1;
         var actual = Unsafe.SizeOf<File>();
         Assert.Equal(expected, actual);
     }
