@@ -1514,6 +1514,7 @@ public sealed class Position : IPosition
     /// </summary>
     /// <param name="stm"></param>
     /// <param name="rookFrom"></param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void SetCastlingRight(Color stm, Square rookFrom)
     {
         var kingFrom = GetKingSquare(stm);
@@ -1533,6 +1534,7 @@ public sealed class Position : IPosition
         _castleRookPath[cr.AsInt()] = (kingPath | (rookFrom.BitboardBetween(rookTo) | rookTo)) & ~(kingFrom | rookFrom);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void SetCheckInfo(in State state)
     {
         (state.BlockersForKing[Color.White], state.Pinners[Color.Black]) =
@@ -1555,6 +1557,7 @@ public sealed class Position : IPosition
     private void CopyState(in State newState)
         => State = State.CopyTo(newState);
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void SetState(State state)
     {
         state.MaterialKey = HashKey.Empty;
@@ -1591,6 +1594,7 @@ public sealed class Position : IPosition
         }
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void SetupCastle(ReadOnlySpan<char> castle)
     {
         foreach (var ca in castle)
@@ -1622,6 +1626,7 @@ public sealed class Position : IPosition
         return targetSq;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private (BitBoard, BitBoard) SliderBlockers(in BitBoard sliders, Square s)
     {
         var result = (blockers: BitBoard.Empty, pinners: BitBoard.Empty);

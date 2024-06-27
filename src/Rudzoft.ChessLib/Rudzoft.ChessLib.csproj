@@ -24,6 +24,7 @@
         <RepositoryType>git</RepositoryType>
         <Product>Rudzoft.ChessLib</Product>
         <IsPackable>true</IsPackable>
+        <PublishAot>true</PublishAot>
     </PropertyGroup>
 
     <ItemGroup>
