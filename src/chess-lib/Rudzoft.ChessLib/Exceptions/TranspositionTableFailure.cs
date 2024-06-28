@@ -24,8 +24,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System.Runtime.Serialization;
-
 namespace Rudzoft.ChessLib.Exceptions;
 
 [Serializable]
@@ -40,12 +38,6 @@ public sealed class TranspositionTableFailure : ArgumentException
     }
 
     public TranspositionTableFailure(string message, Exception inner) : base(message, inner)
-    {
-    }
-
-    public TranspositionTableFailure(
-        SerializationInfo info,
-        StreamingContext context) : base(info, context)
     {
     }
 }

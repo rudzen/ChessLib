@@ -618,13 +618,6 @@ public sealed class Position : IPosition
         var occupied = Board.Pieces(them, PieceType.Rook, PieceType.Queen);
 
         return (attacks & occupied).IsEmpty;
-
-        static (Square, Direction) GetRookSquareAndDirection(Square toSq, Square fromSq, Color us)
-        {
-            return toSq > fromSq
-                ? (Square.G1.Relative(us), Direction.West)
-                : (Square.C1.Relative(us), Direction.East);
-        }
     }
 
     private bool IsEnPassantMoveLegal(Square to, Color us, Square from, Square ksq)

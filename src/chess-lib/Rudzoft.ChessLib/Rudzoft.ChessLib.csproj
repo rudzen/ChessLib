@@ -21,7 +21,6 @@
         <RepositoryType>git</RepositoryType>
         <Product>Rudzoft.ChessLib</Product>
         <IsPackable>true</IsPackable>
-        <PublishAot>true</PublishAot>
         <PackageIcon>ChessLib.png</PackageIcon>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageLicenseFile>LICENSE</PackageLicenseFile>

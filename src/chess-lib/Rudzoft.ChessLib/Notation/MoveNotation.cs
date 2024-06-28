@@ -57,7 +57,7 @@ public sealed class MoveNotation(IServiceProvider sp) : IMoveNotation
         var notation = _notations[(int)moveNotation];
 
         if (notation == null)
-            throw new InvalidMove("Invalid move notation detected.");
+            throw new InvalidMoveException("Invalid move notation detected.");
 
         return notation;
     }

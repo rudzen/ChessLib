@@ -24,10 +24,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System.Runtime.Serialization;
-
 namespace Rudzoft.ChessLib.Exceptions;
 
+[Serializable]
 public sealed class InvalidFenException : ArgumentException
 {
     public InvalidFenException()
@@ -38,7 +37,4 @@ public sealed class InvalidFenException : ArgumentException
 
     public InvalidFenException(string message, Exception innerException)
         : base(message, innerException) { }
-
-    public InvalidFenException(SerializationInfo info, StreamingContext context)
-        : base(info, context) { }
 }

@@ -24,22 +24,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System.Runtime.Serialization;
-
 namespace Rudzoft.ChessLib.Exceptions;
 
-public sealed class InvalidSquare : InvalidOperationException
+[Serializable]
+public sealed class InvalidSquareException : InvalidOperationException
 {
-    public InvalidSquare()
+    public InvalidSquareException()
     {
     }
 
-    public InvalidSquare(string message)
+    public InvalidSquareException(string message)
         : base(message) { }
 
-    public InvalidSquare(string message, Exception innerException)
+    public InvalidSquareException(string message, Exception innerException)
         : base(message, innerException) { }
-
-    public InvalidSquare(SerializationInfo info, StreamingContext context)
-        : base(info, context) { }
 }
