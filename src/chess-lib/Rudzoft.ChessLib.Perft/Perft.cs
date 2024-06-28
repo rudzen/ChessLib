@@ -50,17 +50,23 @@ Result	5	64,921.2 us	1,310.703 us	1,402.437 us
 Result	6	1,912,300.6 us	3,551.167 us	3,148.017 us
      */
 
-public sealed class Perft(IGame game, IEnumerable<PerftPosition> positions) : IPerft
+public sealed class Perft : IPerft
 {
+    public Perft(IGame game, IEnumerable<PerftPosition> positions)
+    {
+        Positions = positions.ToList();
+        Game = game;
+    }
+
     public Action<string>? BoardPrintCallback { get; set; }
 
     /// <summary>
     /// The positional data for the run
     /// </summary>
-    public List<PerftPosition> Positions { get; set; } = positions.ToList();
+    public List<PerftPosition> Positions { get; set; }
 
-    public IGame   Game     { get; set; } = game;
-    public int     Depth    { get; set; }
+    public IGame Game { get; set; }
+    public int Depth { get; set; }
     public UInt128 Expected { get; set; }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -76,7 +82,7 @@ public sealed class Perft(IGame game, IEnumerable<PerftPosition> positions) : IP
         foreach (var fd in Positions.Select(static perftPosition => new FenData(perftPosition.Fen)))
         {
             Game.Pos.Set(in fd, ChessMode.Normal, in state);
-            var baseKey = game.Pos.State.PositionKey;
+            var baseKey = Game.Pos.State.PositionKey;
             var result = Game.Perft(in baseKey, depth);
             yield return result;
         }
@@ -84,7 +90,7 @@ public sealed class Perft(IGame game, IEnumerable<PerftPosition> positions) : IP
 
     public UInt128 DoPerftSimple(int depth)
     {
-        var baseKey = game.Pos.State.PositionKey;
+        var baseKey = Game.Pos.State.PositionKey;
         return Game.Perft(in baseKey, depth);
     }
 
@@ -95,7 +101,7 @@ public sealed class Perft(IGame game, IEnumerable<PerftPosition> positions) : IP
     {
         var fp = new FenData(pp.Fen);
         var state = new State();
-        game.Pos.Set(in fp, ChessMode.Normal, in state);
+        Game.Pos.Set(in fp, ChessMode.Normal, in state);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

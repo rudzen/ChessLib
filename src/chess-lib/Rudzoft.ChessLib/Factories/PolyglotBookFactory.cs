@@ -26,7 +26,6 @@ SOFTWARE.
 
 using System.Runtime.CompilerServices;
 using Microsoft.Extensions.ObjectPool;
-using Microsoft.Extensions.Options;
 using Rudzoft.ChessLib.MoveGeneration;
 using Rudzoft.ChessLib.Polyglot;
 
@@ -37,10 +36,9 @@ public sealed class PolyglotBookFactory : IPolyglotBookFactory
     private readonly string _path;
     private readonly ObjectPool<MoveList> _objectPool;
 
-    public PolyglotBookFactory(IOptions<PolyglotBookConfiguration> options, ObjectPool<MoveList> objectPool)
+    public PolyglotBookFactory(PolyglotBookConfiguration configuration, ObjectPool<MoveList> objectPool)
     {
-        var config = options.Value;
-        _path = string.IsNullOrWhiteSpace(config.BookPath) ? string.Empty : config.BookPath;
+        _path = string.IsNullOrWhiteSpace(configuration.BookPath) ? string.Empty : configuration.BookPath;
         _objectPool = objectPool;
     }
 

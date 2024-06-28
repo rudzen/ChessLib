@@ -22,11 +22,6 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\chess-lib\Rudzoft.ChessLib\Rudzoft.ChessLib.csproj" />
-      <ProjectReference Include="..\Rudzoft.ChessLib\Rudzoft.ChessLib.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\Rudzoft.ChessLib\Rudzoft.ChessLib.csproj" />
     </ItemGroup>
 
 </Project>

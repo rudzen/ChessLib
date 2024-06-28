@@ -1,6 +1,7 @@
-﻿using System.Collections.Frozen;
-using Akka.Actor;
+﻿using Akka.Actor;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Rudzoft.ChessLib.Polyglot;
 using Rudzoft.Perft.Domain;
 using Rudzoft.Perft.Options;
 using Rudzoft.Perft.Services;
@@ -18,8 +19,10 @@ public sealed class PerftActor : ReceiveActor
         _perftRunner = sp.GetRequiredService<IPerftRunner>();
         var props = Props.Create<OutputActor>();
 
+        var polyConfig = sp.GetRequiredService<PolyglotBookConfiguration>();
+
         var optionsFactory = sp.GetRequiredService<IOptionsFactory>();
-        var options = optionsFactory.Parse().ToFrozenSet();
+        var options = optionsFactory.Parse();
 
         foreach (var option in options)
         {

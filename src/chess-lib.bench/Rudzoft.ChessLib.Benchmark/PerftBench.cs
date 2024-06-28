@@ -62,8 +62,7 @@ public class PerftBench
             ]);
 
         var ttConfig = new TranspositionTableConfiguration { DefaultSize = 1 };
-        var options = Options.Create(ttConfig);
-        var tt = new TranspositionTable(options);
+        var tt = new TranspositionTable(ttConfig);
 
         var provider = new DefaultObjectPoolProvider();
         var policy = new DefaultPooledObjectPolicy<MoveList>();

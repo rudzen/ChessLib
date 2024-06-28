@@ -28,6 +28,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.ObjectPool;
+using Microsoft.Extensions.Options;
 using Rudzoft.ChessLib.Evaluation;
 using Rudzoft.ChessLib.Factories;
 using Rudzoft.ChessLib.Hash;
@@ -57,19 +58,7 @@ public static class ChessLibServiceCollectionExtensions
             serviceCollection.AddSingleton(configuration);
         }
 
-        // TODO : Add configuration "manually" to avoid IL2026 warning
-        serviceCollection.AddOptions<TranspositionTableConfiguration>().Configure<IConfiguration>(
-            static (settings, configuration)
-                => configuration
-                   .GetSection(TranspositionTableConfiguration.Section)
-                   .Bind(settings));
-
-        // TODO : Add configuration "manually" to avoid IL2026 warning
-        serviceCollection.AddOptions<PolyglotBookConfiguration>().Configure<IConfiguration>(
-            static (settings, configuration)
-                => configuration
-                   .GetSection(PolyglotBookConfiguration.Section)
-                   .Bind(settings));
+        serviceCollection.BindConfigurations(configuration);
 
         serviceCollection.TryAddSingleton<ITranspositionTable, TranspositionTable>();
         serviceCollection.TryAddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>();
@@ -104,9 +93,31 @@ public static class ChessLibServiceCollectionExtensions
                .AddNotationServices();
     }
 
+    private static void BindConfigurations(this IServiceCollection serviceCollection, IConfiguration configuration)
+    {
+        var transpositionConfigurationSection = configuration.GetSection(TranspositionTableConfiguration.Section);
+        serviceCollection.Configure<TranspositionTableConfiguration>(transpositionConfigurationSection);
+
+        var polyglotBookConfiguration = configuration.GetSection(PolyglotBookConfiguration.Section);
+        serviceCollection.Configure<PolyglotBookConfiguration>(polyglotBookConfiguration);
+
+        serviceCollection.AddSingleton(provider =>
+        {
+            var ttOptions = provider.GetRequiredService<IOptions<TranspositionTableConfiguration>>();
+            return ttOptions.Value;
+        });
+
+        serviceCollection.AddSingleton(provider =>
+        {
+            var polyOptions = provider.GetRequiredService<IOptions<PolyglotBookConfiguration>>();
+            return polyOptions.Value;
+        });
+
+    }
+
     private static IConfigurationRoot LoadConfiguration(string file)
     {
-        var configurationFile     = string.IsNullOrWhiteSpace(file) ? "chesslib.json" : file;
+        var configurationFile     = string.IsNullOrWhiteSpace(file) ? "appsettings.json" : file;
         var configurationFilePath = Path.Combine(AppContext.BaseDirectory, configurationFile);
         return new ConfigurationBuilder()
                .AddJsonFile(configurationFilePath, optional: true, reloadOnChange: true)

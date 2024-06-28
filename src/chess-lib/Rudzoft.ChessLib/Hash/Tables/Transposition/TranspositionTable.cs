@@ -26,7 +26,6 @@ SOFTWARE.
 
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using Microsoft.Extensions.Options;
 using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Hash.Tables.Transposition;
@@ -43,10 +42,9 @@ public sealed class TranspositionTable : ITranspositionTable
     private uint _sizeMask;
     private byte _generation; // Size must be not bigger then TTEntry::generation8
 
-    public TranspositionTable(IOptions<TranspositionTableConfiguration> options)
+    public TranspositionTable(TranspositionTableConfiguration configuration)
     {
-        var config = options.Value;
-        SetSize(config.DefaultSize);
+        SetSize(configuration.DefaultSize);
     }
 
     public ulong Hits { get; private set; }
@@ -141,7 +139,7 @@ public sealed class TranspositionTable : ITranspositionTable
             {
                 if (tte.generation8 == _generation || tte.bound == Bound.Exact)
                 {
-                    // +2 
+                    // +2
                     if (tte.depth16 < replaceTte.depth16) // +1
                         replacePos = ttePos;
                 }
