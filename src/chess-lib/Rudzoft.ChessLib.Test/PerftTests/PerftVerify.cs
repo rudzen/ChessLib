@@ -17,10 +17,9 @@ public abstract class PerftVerify
     protected PerftVerify()
     {
         var ttConfig = new TranspositionTableConfiguration { DefaultSize = 1 };
-        var ttOptions = Options.Create(ttConfig);
 
         _serviceProvider = new ServiceCollection()
-            .AddSingleton(ttOptions)
+            .AddSingleton(ttConfig)
             .AddTransient<IBoard, Board>()
             .AddSingleton<IValues, Values>()
             .AddSingleton<IRKiss, RKiss>()

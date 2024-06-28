@@ -48,11 +48,10 @@ public sealed class PolyglotTests : IClassFixture<BookFixture>
     public PolyglotTests(BookFixture fixture)
     {
         var polyConfig = new PolyglotBookConfiguration { BookPath = string.Empty };
-        var polyOptions = Options.Create(polyConfig);
 
         _fixture = fixture;
         _serviceProvider = new ServiceCollection()
-            .AddSingleton(polyOptions)
+            .AddSingleton(polyConfig)
             .AddTransient<IBoard, Board>()
             .AddSingleton<IValues, Values>()
             .AddSingleton<IRKiss, RKiss>()
