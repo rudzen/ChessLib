@@ -1342,7 +1342,7 @@ public sealed class Position : IPosition
                 {
                     captureSquare -= us.PawnPushDistance();
 
-                    Debug.Assert(GetPiece(to).Type() == PieceType.Pawn);
+                    Debug.Assert(!IsOccupied(to));
                     Debug.Assert(to == State.Previous.EnPassantSquare);
                     Debug.Assert(to.RelativeRank(us) == Ranks.Rank6);
                     Debug.Assert(!IsOccupied(captureSquare));
