@@ -26,7 +26,6 @@ SOFTWARE.
 
 namespace Rudzoft.ChessLib.Exceptions;
 
-[Serializable]
 public sealed class InvalidMoveException : InvalidOperationException
 {
     public InvalidMoveException()

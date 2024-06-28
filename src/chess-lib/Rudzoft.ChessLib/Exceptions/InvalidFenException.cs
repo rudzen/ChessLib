@@ -26,7 +26,6 @@ SOFTWARE.
 
 namespace Rudzoft.ChessLib.Exceptions;
 
-[Serializable]
 public sealed class InvalidFenException : ArgumentException
 {
     public InvalidFenException()

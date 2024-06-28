@@ -26,7 +26,6 @@ SOFTWARE.
 
 namespace Rudzoft.ChessLib.Exceptions;
 
-[Serializable]
 public sealed class TranspositionTableFailure : ArgumentException
 {
     public TranspositionTableFailure()
