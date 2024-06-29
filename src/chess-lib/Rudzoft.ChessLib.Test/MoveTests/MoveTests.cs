@@ -44,21 +44,21 @@ public sealed class MoveTests
     public MoveTests()
     {
         _serviceProvider = new ServiceCollection()
-            .AddTransient<IBoard, Board>()
-            .AddSingleton<IValues, Values>()
-            .AddSingleton<IRKiss, RKiss>()
-            .AddSingleton<IZobrist, Zobrist>()
-            .AddSingleton<ICuckoo, Cuckoo>()
-            .AddSingleton<IPositionValidator, PositionValidator>()
-            .AddTransient<IPosition, Position>()
-            .AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>()
-            .AddSingleton(static serviceProvider =>
-            {
-                var provider = serviceProvider.GetRequiredService<ObjectPoolProvider>();
-                var policy = new DefaultPooledObjectPolicy<MoveList>();
-                return provider.Create(policy);
-            })
-            .BuildServiceProvider();
+                           .AddTransient<IBoard, Board>()
+                           .AddSingleton<IValues, Values>()
+                           .AddSingleton<IRKiss, RKiss>()
+                           .AddSingleton<IZobrist, Zobrist>()
+                           .AddSingleton<ICuckoo, Cuckoo>()
+                           .AddSingleton<IPositionValidator, PositionValidator>()
+                           .AddTransient<IPosition, Position>()
+                           .AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>()
+                           .AddSingleton(static serviceProvider =>
+                           {
+                               var provider = serviceProvider.GetRequiredService<ObjectPoolProvider>();
+                               var policy = new DefaultPooledObjectPolicy<MoveList>();
+                               return provider.Create(policy);
+                           })
+                           .BuildServiceProvider();
     }
 
     [Fact]
@@ -67,7 +67,7 @@ public sealed class MoveTests
         var bb = BitBoards.AllSquares;
         while (bb)
         {
-            var expectedFrom =  BitBoards.PopLsb(ref bb);
+            var expectedFrom = BitBoards.PopLsb(ref bb);
             var bb2 = bb;
             while (bb2)
             {
@@ -122,29 +122,32 @@ public sealed class MoveTests
     [Fact]
     public void MoveToString()
     {
-        var moves = new List<Move>(3528);
-        var movesString = new List<MoveStrings>(3528);
+        var result = new StringBuilder(128);
 
-        var tmp = new StringBuilder(8);
+        var allSquares = Square.All.AsSpan();
+        var allSquares2 = allSquares[1..];
 
-        // build move list and expected result
-        for (Square s1 = Squares.a1; s1 <= Squares.h8; s1++)
+        var moves = new List<Move>(allSquares.Length * allSquares2.Length);
+        var movesString = new List<string>(allSquares.Length * allSquares2.Length);
+
+        //build move list and expected result
+        foreach (var s1 in allSquares)
         {
-            for (Square s2 = Squares.a2; s2 <= Squares.h8; s2++)
+            foreach (var s2 in allSquares2)
             {
                 if (s1 == s2)
                     continue;
 
                 moves.Add(Move.Create(s1, s2));
-                tmp.Clear();
-                tmp.Append(' ');
-                tmp.Append(s1.ToString());
-                tmp.Append(s2.ToString());
-                movesString.Add(new MoveStrings(tmp.ToString()));
+                result.Clear();
+                result.Append(' ');
+                result.Append(s1.ToString());
+                result.Append(s2.ToString());
+                movesString.Add(result.ToString());
             }
         }
 
-        var result = new StringBuilder(128);
+        result.Clear();
 
         var pos = _serviceProvider.GetRequiredService<IPosition>();
         var fenData = new FenData(Fen.Fen.StartPositionFen);
@@ -152,13 +155,14 @@ public sealed class MoveTests
         pos.Set(in fenData, ChessMode.Normal, state);
 
         var i = 0;
-        foreach (var move in CollectionsMarshal.AsSpan(moves))
+
+        var movesSpan = CollectionsMarshal.AsSpan(moves);
+        foreach (var move in movesSpan)
         {
             result.Clear();
             result.Append(' ');
             pos.MoveToString(move, in result);
-            Assert.Equal(result.ToString(), movesString[i++].ToString());
-
+            Assert.Equal(result.ToString(), movesString[i++]);
         }
     }
 
@@ -194,22 +198,13 @@ public sealed class MoveTests
         var state = new State();
         pos.Set(in fenData, ChessMode.Normal, state);
 
-        // generate a bitch string for them all.
-        foreach (var move in CollectionsMarshal.AsSpan(moves))
+        var movesSpan = CollectionsMarshal.AsSpan(moves);
+        foreach (var move in movesSpan)
         {
             result.Append(' ');
             pos.MoveToString(move, result);
         }
 
         Assert.Equal(expected.ToString(), result.ToString());
-    }
-
-    private readonly struct MoveStrings
-    {
-        private readonly string _s;
-
-        public MoveStrings(string s) => _s = s;
-
-        public override string ToString() => _s;
     }
 }
