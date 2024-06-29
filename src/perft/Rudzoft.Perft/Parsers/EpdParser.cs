@@ -88,10 +88,9 @@ public sealed class EpdParser : IEpdParser
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static PerftPositionValue ParsePerftLines(string perftData)
     {
-        var s = perftData.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-        var result = (depth: 0, count: ulong.MinValue);
-        Maths.ToIntegral(s[0], out result.depth);
-        Maths.ToIntegral(s[1], out result.count);
-        return new(result.depth, result.count);
+        var s = perftData.Split(' ', 2, StringSplitOptions.RemoveEmptyEntries);
+        Maths.ToIntegral(s[0], out int depth);
+        Maths.ToIntegral(s[1], out ulong count);
+        return new(depth, count);
     }
 }

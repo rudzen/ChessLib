@@ -44,9 +44,9 @@ namespace Rudzoft.Perft.Services;
 
 public sealed class PerftRunner : IPerftRunner
 {
-    private static readonly ILogger Log = Serilog.Log.ForContext<PerftRunner>();
+    private const string Line = "-----------------------------------------------------------------";
 
-    private static readonly string Line = new('-', 65);
+    private static readonly ILogger Log = Serilog.Log.ForContext<PerftRunner>();
 
     private static string CurrentDirectory => Environment.CurrentDirectory;
 
