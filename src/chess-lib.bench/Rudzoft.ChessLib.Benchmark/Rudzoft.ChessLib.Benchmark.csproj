@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <Platforms>AnyCPU</Platforms>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="BenchmarkDotNet"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\chess-lib\Rudzoft.ChessLib.Perft.Interfaces\Rudzoft.ChessLib.Perft.Interfaces.csproj" />
+        <ProjectReference Include="..\..\chess-lib\Rudzoft.ChessLib.Perft\Rudzoft.ChessLib.Perft.csproj" />
+        <ProjectReference Include="..\..\chess-lib\Rudzoft.ChessLib\Rudzoft.ChessLib.csproj" />
+    </ItemGroup>
+
+</Project>

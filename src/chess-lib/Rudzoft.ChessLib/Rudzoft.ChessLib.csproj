@@ -1,0 +1,59 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <Platforms>AnyCPU</Platforms>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <PackageVersion>0.0.4</PackageVersion>
+        <Authors>Rudy Alex Kohn</Authors>
+        <Company>None</Company>
+        <Version>0.0.4</Version>
+        <Description>Chess library with data structures and move generation.</Description>
+        <Copyright>(C) 2017-2024 Rudy Alex Kohn</Copyright>
+        <AssemblyVersion>0.0.4</AssemblyVersion>
+        <FileVersion>0.0.4</FileVersion>
+        <PackageProjectUrl>https://github.com/rudzen/ChessLib</PackageProjectUrl>
+        <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+        <EnforceCodeStyleInBuild>False</EnforceCodeStyleInBuild>
+        <Title>Rudzoft.ChessLib</Title>
+        <PackageTags>chess bitboard datastructure movegeneration magicbb</PackageTags>
+        <PackageId>Rudzoft.ChessLib</PackageId>
+        <RepositoryUrl>https://github.com/rudzen/ChessLib</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <Product>Rudzoft.ChessLib</Product>
+        <IsPackable>true</IsPackable>
+        <PackageIcon>ChessLib.png</PackageIcon>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    </PropertyGroup>
+
+    <PropertyGroup Label="Configuration">
+        <EnableConfigurationBindingGenerator>true</EnableConfigurationBindingGenerator>
+    </PropertyGroup>
+    
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions"/>
+        <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables"/>
+        <PackageReference Include="Microsoft.Extensions.Configuration.Json"/>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions"/>
+        <PackageReference Include="Microsoft.Extensions.ObjectPool"/>
+        <PackageReference Include="Microsoft.Extensions.Options"/>
+        <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="..\..\..\icon\ChessLib.png">
+          <Pack>True</Pack>
+          <PackagePath>\</PackagePath>
+          <Link>ChessLib.png</Link>
+        </None>
+        <None Include="..\..\..\README.md">
+            <Pack>True</Pack>
+            <PackagePath>\</PackagePath>
+        </None>
+        <None Include="..\..\..\LICENSE">
+            <Pack>True</Pack>
+            <PackagePath>\</PackagePath>
+        </None>
+    </ItemGroup>
+    
+</Project>

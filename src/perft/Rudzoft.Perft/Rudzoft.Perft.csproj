@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Akka"/>
+      <PackageReference Include="Akka.DependencyInjection"/>
+      <PackageReference Include="Akka.Hosting" />
+      <PackageReference Include="CommandLineParser"/>
+      <PackageReference Include="Serilog"/>
+      <PackageReference Include="Serilog.Sinks.Console"/>
+      <PackageReference Include="Serilog.Sinks.File"/>
+      <PackageReference Include="Serilog.Settings.Configuration"/>
+      <PackageReference Include="Serilog.Enrichers.Thread"/>
+      <PackageReference Include="Microsoft.Extensions.Hosting"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\chess-lib\Rudzoft.ChessLib.Perft.Interfaces\Rudzoft.ChessLib.Perft.Interfaces.csproj" />
+      <ProjectReference Include="..\..\chess-lib\Rudzoft.ChessLib.Perft\Rudzoft.ChessLib.Perft.csproj" />
+      <ProjectReference Include="..\..\chess-lib\Rudzoft.ChessLib\Rudzoft.ChessLib.csproj" />
+      <ProjectReference Include="..\Rudzoft.Perft.Domain\Rudzoft.Perft.Domain.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Remove="appsettings.json"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Content Include="appsettings.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+    </ItemGroup>
+
+</Project>

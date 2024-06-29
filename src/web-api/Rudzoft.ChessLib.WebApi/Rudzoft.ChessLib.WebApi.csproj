@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <Nullable>enable</Nullable>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Extensions.ApiDescription.Server">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Microsoft.Extensions.Caching.Memory"/>
+        <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks"/>
+        <PackageReference Include="Microsoft.Extensions.Options"/>
+        <PackageReference Include="Microsoft.OpenApi"/>
+        <PackageReference Include="Swashbuckle.AspNetCore"/>
+        <PackageReference Include="Swashbuckle.AspNetCore.Swagger"/>
+        <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen"/>
+        <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\chess-lib\Rudzoft.ChessLib\Rudzoft.ChessLib.csproj" />
+    </ItemGroup>
+
+</Project>
