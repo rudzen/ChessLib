@@ -2,8 +2,6 @@
 
     <PropertyGroup>
         <Nullable>enable</Nullable>
-        <ServerGarbageCollection>true</ServerGarbageCollection>
-        <GarbageCollectionAdaptationMode>1</GarbageCollectionAdaptationMode>
     </PropertyGroup>
 
     <ItemGroup>
