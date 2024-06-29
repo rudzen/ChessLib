@@ -498,8 +498,7 @@ public static class BitBoards
         var idx = line.Length;
         span[idx++] = '\n';
 
-        var t = title.Length > 64 ? title.AsSpan()[..64] : title.AsSpan();
-        t.CopyTo(span[idx..]);
+        title.AsSpan(0, Math.Min(64, title.Length)).CopyTo(span[idx..]);
 
         Span<char> rank = stackalloc char[4] { '|', ' ', ' ', ' ' };
         for (var r = Ranks.Rank8; r >= Ranks.Rank1; --r)
