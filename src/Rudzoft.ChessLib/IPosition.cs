@@ -28,6 +28,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Rudzoft.ChessLib.Enums;
+using Rudzoft.ChessLib.Events;
 using Rudzoft.ChessLib.Fen;
 using Rudzoft.ChessLib.Types;
 using Rudzoft.ChessLib.Validation;
@@ -38,7 +39,9 @@ public interface IPosition : IEnumerable<Piece>
 {
     bool IsProbing { get; set; }
 
-    Action<IPieceSquare> PieceUpdated { get; set; }
+    public event PieceAddedEvent PieceAdded;
+    public event PieceMovedEvent PieceMoved;
+    public event PieceRemovedEvent PieceRemoved;
 
     ChessMode ChessMode { get; set; }
 

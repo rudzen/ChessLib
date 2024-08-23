@@ -57,8 +57,6 @@ public sealed class Game : IGame
         Uci = new Uci();
     }
 
-    public Action<IPieceSquare> PieceUpdated => _pos.PieceUpdated;
-
     public int MoveNumber => 0; //(PositionIndex - 1) / 2 + 1;
 
     public BitBoard Occupied => Pos.Pieces();
