@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2023 Rudy Alex Kohn
+Copyright (c) 2017-2025 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -209,10 +209,10 @@ public sealed class SearchParameters() : ISearchParameters
 
         if (MoveTime > ulong.MinValue)
         {
-            Span<char> moveTimeText = stackalloc char[]
-            {
+            Span<char> moveTimeText =
+            [
                 ' ', 'm', 'o', 'v', 'e', 't', 'i', 'm', 'e', ' '
-            };
+            ];
             moveTimeText.TryCopyTo(destination[index..]);
             index += moveTimeText.Length;
             index = destination.Append(in _moveTime, index);

@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2023 Rudy Alex Kohn
+Copyright (c) 2017-2025 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -25,15 +25,13 @@ SOFTWARE.
 */
 
 using Microsoft.Extensions.ObjectPool;
-using Microsoft.Extensions.Options;
 using Rudzoft.ChessLib.Hash;
 using Rudzoft.ChessLib.Hash.Tables.Transposition;
 using Rudzoft.ChessLib.MoveGeneration;
-using Rudzoft.ChessLib.Perft;
-using Rudzoft.ChessLib.Perft.Interfaces;
 using Rudzoft.ChessLib.Protocol.UCI;
 using Rudzoft.ChessLib.Types;
 using Rudzoft.ChessLib.Validation;
+using Rudzoft.Perft.Services;
 
 namespace Rudzoft.ChessLib.Benchmark;
 
@@ -84,7 +82,7 @@ public class PerftBench
         var pos = new Position(board, values, zobrist, cuckoo, validator, moveListObjectPool);
 
         var game = new Game(tt, uci, cpu, sp, pos, moveListObjectPool);
-        _perft = new Perft.Perft(game, new[] { pp });
+        _perft = new Perft.Services.Perft(game, [pp]);
     }
 
     [Benchmark]

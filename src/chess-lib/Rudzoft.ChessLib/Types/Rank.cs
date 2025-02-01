@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2023 Rudy Alex Kohn
+Copyright (c) 2017-2025 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,8 +24,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using System.Numerics;
 using System.Runtime.CompilerServices;
 using Rudzoft.ChessLib.Extensions;
+
 // ReSharper disable UnusedMember.Global
 
 namespace Rudzoft.ChessLib.Types;
@@ -51,7 +53,15 @@ public static class RanksExtensions
     public static int AsInt(this Ranks r) => (int)r;
 }
 
-public readonly record struct Rank(Ranks Value) : ISpanFormattable, IValidationType
+public readonly record struct Rank(Ranks Value) : ISpanFormattable,
+    IValidationType,
+    IComparisonOperators<Rank, Rank, bool>,
+    IAdditionOperators<Rank, int, Rank>,
+    ISubtractionOperators<Rank, int, Rank>,
+    IUnaryPlusOperators<Rank, Rank>,
+    IUnaryNegationOperators<Rank, Rank>,
+    IIncrementOperators<Rank>,
+    IDecrementOperators<Rank>
 {
     private static readonly string[] RankStrings = ["1", "2", "3", "4", "5", "6", "7", "8"];
 
@@ -117,6 +127,12 @@ public readonly record struct Rank(Ranks Value) : ISpanFormattable, IValidationT
     public static Rank operator -(Rank left, Ranks right) => new(left.AsInt() - (int)right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Rank operator +(Rank value) => value.Value + 1;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Rank operator -(Rank value) => value.Value - 1;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Rank operator ++(Rank r) => new(r.Value + 1);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -141,7 +157,7 @@ public readonly record struct Rank(Ranks Value) : ISpanFormattable, IValidationT
     public static BitBoard operator ~(Rank left) => ~left.BitBoardRank();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static int operator >>(Rank left, int right) => left.AsInt() >> right;
+    public static int operator >> (Rank left, int right) => left.AsInt() >> right;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool operator >=(Rank left, Rank right) => left.Value >= right.Value;
@@ -181,7 +197,8 @@ public readonly record struct Rank(Ranks Value) : ISpanFormattable, IValidationT
         => string.Format(formatProvider, format, ToString());
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider provider)
+    public bool TryFormat(
+        Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider provider)
     {
         destination[0] = Char;
         charsWritten = 1;

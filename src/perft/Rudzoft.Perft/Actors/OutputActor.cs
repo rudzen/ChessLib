@@ -1,25 +1,43 @@
-﻿using Akka.Actor;
+﻿using System.Runtime.CompilerServices;
+using System.Text.Json;
+using Akka.Actor;
+using Rudzoft.Perft.Models;
 using Serilog;
 
 namespace Rudzoft.Perft.Actors;
 
-public sealed class OutputActor : UntypedActor
+public sealed class OutputActor : ReceiveActor
 {
     private static readonly ILogger Log = Serilog.Log.ForContext<OutputActor>();
 
-    public sealed record Output(string Out);
+    private readonly bool _saveResult;
 
-
-
-    protected override void OnReceive(object message)
+    public OutputActor(IServiceProvider sp)
     {
-        if (message is Output output)
-        {
-            Console.WriteLine(output.Out);
-        }
-        else
-        {
-            throw new NotImplementedException();
-        }
+        _saveResult = true;
+        ReceiveAsync<PerftResult>(Result);
+    }
+
+    private async Task Result(PerftResult perftResult)
+    {
+        Log.Information("{PerftResult}", perftResult);
+        var baseFileName = _saveResult
+            ? Path.Combine(Environment.CurrentDirectory, $"{FixFileName(perftResult.Fen)}[")
+            : string.Empty;
+
+        await WriteOutput(perftResult, baseFileName);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static string FixFileName(string input)
+        => input.Replace('/', '_');
+
+    private static async Task WriteOutput(
+        PerftResult result,
+        string baseFileName)
+    {
+        var outputFileName = Path.Combine(Environment.CurrentDirectory, $"{baseFileName}{result.Depth}].json");
+        await using var outStream = File.OpenWrite(outputFileName);
+        await JsonSerializer.SerializeAsync(outStream, result);
     }
 }

@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2023 Rudy Alex Kohn
+Copyright (c) 2017-2025 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -59,6 +59,7 @@ public sealed class NonRegexPgnParser : IPgnParser
         using var streamReader = new StreamReader(stream);
 
         var currentGameTags = new Dictionary<string, string>();
+        var currentGameTagsLookup = currentGameTags.GetAlternateLookup<ReadOnlySpan<char>>();
         var currentGameMoves = new List<PgnMove>();
         var inMoveSection = false;
 
@@ -94,7 +95,7 @@ public sealed class NonRegexPgnParser : IPgnParser
                              word.Contains('*'))
                     {
                         yield return new(currentGameTags, currentGameMoves);
-                        currentGameTags = new();
+                        currentGameTags.Clear();
                         currentGameMoves = [];
                         inMoveSection = false;
                     }
@@ -113,12 +114,12 @@ public sealed class NonRegexPgnParser : IPgnParser
                                          || lastQuoteIndex <= firstQuoteIndex)
                     continue;
 
-                var tagName = line.Substring(1, firstSpaceIndex - 1).Trim();
+                var tagName = line.AsSpan(1, firstSpaceIndex - 1).Trim();
                 var tagValue = line
                                .Substring(firstQuoteIndex + 1, lastQuoteIndex - firstQuoteIndex - 1)
                                .Trim();
 
-                currentGameTags[tagName] = tagValue;
+                currentGameTagsLookup[tagName] = tagValue;
             }
         }
 

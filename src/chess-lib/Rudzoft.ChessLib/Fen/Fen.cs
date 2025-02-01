@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2023 Rudy Alex Kohn
+Copyright (c) 2017-2025 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -105,7 +105,7 @@ public static class Fen
 
         var mainSection = s[..spaceIndex];
 
-        Span<int> limits = stackalloc int[] { 32, 8, 10, 10, 10, 9, 1 };
+        Span<int> limits = [32, 8, 10, 10, 10, 9, 1];
 
         // piece count storage, using index 0 = '/' count
         Span<int> pieceCount = stackalloc int[Pieces.PieceNb.AsInt()];

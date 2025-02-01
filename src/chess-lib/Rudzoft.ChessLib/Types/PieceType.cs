@@ -16,7 +16,19 @@ public enum PieceTypes : byte
     AllPieces = NoPieceType
 }
 
-public readonly record struct PieceType(PieceTypes Value) : IMinMaxValue<PieceType>
+public readonly record struct PieceType(PieceTypes Value) :
+    IMinMaxValue<PieceType>,
+    IComparisonOperators<PieceType, PieceType, bool>,
+    IAdditionOperators<PieceType, Color, Piece>
+    // ,
+    // ISubtractionOperators<PieceType, int, PieceType>,
+    // IMultiplyOperators<PieceType, int, PieceType>,
+    // IDivisionOperators<PieceType, int, PieceType>,
+    // IUnaryPlusOperators<PieceType, PieceType>,
+    // IUnaryNegationOperators<PieceType, PieceType>,
+    // IIncrementOperators<PieceType>,
+    // IDecrementOperators<PieceType>
+
 {
     public PieceType(int pt) : this((PieceTypes)pt) { }
 
@@ -47,6 +59,21 @@ public readonly record struct PieceType(PieceTypes Value) : IMinMaxValue<PieceTy
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator PieceType(PieceTypes pt) => new(pt);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool operator >(PieceType left, PieceType right) => left.Value > right.Value;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool operator >=(PieceType left, PieceType right) => left.Value >= right.Value;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool operator <(PieceType left, PieceType right) => left.Value < right.Value;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool operator <=(PieceType left, PieceType right) => left.Value <= right.Value;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Piece operator +(PieceType left, Color right) => left.MakePiece(right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool operator ==(PieceType left, PieceTypes right) => left.Value == right;

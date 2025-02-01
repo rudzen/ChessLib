@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2023 Rudy Alex Kohn
+Copyright (c) 2017-2025 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,12 +24,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using System.Numerics;
 using System.Runtime.CompilerServices;
 using Rudzoft.ChessLib.Extensions;
 
 namespace Rudzoft.ChessLib.Types;
 
-public enum Depths
+public enum Depths : short
 {
     Zero = 0,
 #pragma warning disable CA1069
@@ -48,13 +49,20 @@ public static class DepthsExtensions
     public static int AsInt(this Depths @this) => (int)@this;
 }
 
-public struct Depth : IEquatable<Depth>
+public readonly record struct Depth(int Value) :
+    IComparisonOperators<Depth, Depth, bool>,
+    IAdditionOperators<Depth, int, Depth>,
+    ISubtractionOperators<Depth, int, Depth>,
+    IMultiplyOperators<Depth, int, Depth>,
+    IDivisionOperators<Depth, int, Depth>,
+    IUnaryPlusOperators<Depth, Depth>,
+    IUnaryNegationOperators<Depth, Depth>,
+    IIncrementOperators<Depth>,
+    IDecrementOperators<Depth>
 {
-    private Depth(int depth) => Value = depth;
-
-    private Depth(Depths depth) => Value = (int)depth;
-
-    public int Value { get; set; }
+    private Depth(Depths depth) : this(depth.AsInt())
+    {
+    }
 
     public static Depth Zero => new(Depths.Zero);
 
@@ -81,12 +89,6 @@ public struct Depth : IEquatable<Depth>
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator Depth(byte value) => new(value);
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator ==(Depth left, Depth right) => left.Value == right.Value;
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator !=(Depth left, Depth right) => left.Value != right.Value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool operator <=(Depth left, Depth right) => left.Value <= right.Value;
@@ -122,10 +124,25 @@ public struct Depth : IEquatable<Depth>
     public static bool operator !=(Depth left, Depths right) => left.Value != right.AsInt();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Depth operator *(Depth left, int right) => new(left.Value * right);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Equals(Depth other) => Value == other.Value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override bool Equals(object obj) => obj is Depth other && Equals(other);
+    public static Depth operator +(Depth value) => new(value.Value + 1);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Depth operator +(Depth left, int right) => new(left.Value + right);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Depth operator -(Depth left, int right) => new(left.Value - right);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Depth operator /(Depth left, int right) => new(left.Value / right);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Depth operator -(Depth value) => new(value.Value - 1);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override int GetHashCode() => Value;

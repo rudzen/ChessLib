@@ -1,8 +1,13 @@
 using System.Runtime.CompilerServices;
+using BenchmarkDotNet.Diagnosers;
 
 namespace Rudzoft.ChessLib.Benchmark;
 
 [MemoryDiagnoser]
+[HardwareCounters(
+    HardwareCounter.BranchMispredictions,
+    HardwareCounter.BranchInstructions)]
+[MarkdownExporterAttribute.Default]
 public class InBetweenBenchmark
 {
     [Params(10000, 50000)] public int N;

@@ -3,7 +3,7 @@ using Akka.Actor;
 using Akka.Hosting;
 using Microsoft.Extensions.Hosting;
 using Rudzoft.Perft.Actors;
-using Rudzoft.Perft.Domain;
+using Rudzoft.Perft.Messages;
 using Serilog;
 
 namespace Rudzoft.Perft.Services;
@@ -32,7 +32,7 @@ public sealed class PerftService : IHostedService
     {
         Log.Information("ChessLib Perft test program {Version}", Version);
         Log.Information("High timer resolution : {HighRes}", Stopwatch.IsHighResolution);
-        Log.Information("Initializing..");
+        Log.Information("Initialized");
 
         var perftActor = await _perftActor.GetAsync(cancellationToken);
 

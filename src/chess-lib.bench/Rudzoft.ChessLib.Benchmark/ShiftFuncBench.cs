@@ -4,6 +4,7 @@ using Rudzoft.ChessLib.Types;
 namespace Rudzoft.ChessLib.Benchmark;
 
 [MemoryDiagnoser]
+[DisassemblyDiagnoser]
 // ReSharper disable once ClassCanBeSealed.Global
 public class ShiftFuncBench
 {
@@ -54,9 +55,21 @@ public class ShiftFuncBench
     }
 
     [Benchmark]
+    public BitBoard NorthFillSIMD()
+    {
+        return BitBoards.PawnSquares.NorthFillSIMD();
+    }
+
+    [Benchmark]
     public BitBoard SouthFillRegular()
     {
         return BitBoards.PawnSquares.SouthFill();
+    }
+
+    [Benchmark]
+    public BitBoard SouthFillSIMD()
+    {
+        return BitBoards.PawnSquares.SouthFillSIMD();
     }
 
     private static BitBoard ShiftF(in BitBoard bb, Direction direction)

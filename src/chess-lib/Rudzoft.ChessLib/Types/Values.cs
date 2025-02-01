@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2023 Rudy Alex Kohn
+Copyright (c) 2017-2025 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -156,7 +156,7 @@ public sealed class Values : IValues
         for (var index = 0; index < PieceValues.Length; index++)
             PieceValues[index] = new DefaultPieceValues[6];
 
-        Span<Phases> phases = stackalloc Phases[] { Phases.Mg, Phases.Eg };
+        Span<Phases> phases = [Phases.Mg, Phases.Eg];
 
         foreach (var phase in phases)
             SetPieceValues(_defaults[(int)phase], phase);
@@ -164,8 +164,8 @@ public sealed class Values : IValues
         var sum = Value.ValueZero;
         var sumNoPawns = Value.ValueZero;
 
-        Span<PieceType> pieceTypes = stackalloc PieceType[]
-            { PieceType.Pawn, PieceType.Knight, PieceType.Bishop, PieceType.Rook, PieceType.Queen };
+        Span<PieceType> pieceTypes =
+            [PieceType.Pawn, PieceType.Knight, PieceType.Bishop, PieceType.Rook, PieceType.Queen];
 
         foreach (var pt in pieceTypes)
         {

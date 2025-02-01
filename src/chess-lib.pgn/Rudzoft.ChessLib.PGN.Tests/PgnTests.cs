@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2023 Rudy Alex Kohn
+Copyright (c) 2017-2025 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -27,7 +27,7 @@ SOFTWARE.
 using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Rudzoft.ChessLib.PGN.Test.PgnTests;
+namespace Rudzoft.ChessLib.PGN.Tests;
 
 public sealed class PgnTests
 {
@@ -38,7 +38,7 @@ public sealed class PgnTests
                                                          .AddPgnParser(static () => true)
                                                          .BuildServiceProvider();
 
-    [Fact]
+    [Test]
     public async Task ParseFile_WithTestContent_ReturnsCorrectGamesAndMoves()
     {
         var parser = _serviceProvider.GetRequiredService<IPgnParser>();
@@ -53,17 +53,17 @@ public sealed class PgnTests
 
         var g = JsonSerializer.Serialize(game1);
 
-        Assert.NotEmpty(g);
-        Assert.Equal(ExpectedGameCount, games.Count);
+        await Assert.That(g).IsNotEmpty();
+        await Assert.That(games.Count).IsEqualTo(ExpectedGameCount);
 
-        Assert.Equal("Test event", game1.Tags["Event"]);
-        Assert.Equal(3, game1.Moves.Count);
-        Assert.Equal("e4", game1.Moves[0].WhiteMove);
-        Assert.Equal("e5", game1.Moves[0].BlackMove);
+        await Assert.That(game1.Tags["Event"]).IsEqualTo("Test event");
+        await Assert.That(game1.Moves.Count).IsEqualTo(3);
+        await Assert.That(game1.Moves[0].WhiteMove).IsEqualTo("e4");
+        await Assert.That(game1.Moves[0].BlackMove).IsEqualTo("e5");
 
-        Assert.Equal("Test event 2", game2.Tags["Event"]);
-        Assert.Equal(3, game2.Moves.Count);
-        Assert.Equal("d4", game2.Moves[0].WhiteMove);
-        Assert.Equal("d5", game2.Moves[0].BlackMove);
+        await Assert.That(game2.Tags["Event"]).IsEqualTo("Test event 2");
+        await Assert.That(game2.Moves.Count).IsEqualTo(3);
+        await Assert.That(game2.Moves[0].WhiteMove).IsEqualTo("d4");
+        await Assert.That(game2.Moves[0].BlackMove).IsEqualTo("d5");
     }
 }

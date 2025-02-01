@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2023 Rudy Alex Kohn
+Copyright (c) 2017-2025 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -46,12 +46,14 @@ public class Uci : IUci
 
     private readonly ObjectPool<StringBuilder> _pvPool;
     private readonly Dictionary<string, IOption> _options;
+    private readonly Dictionary<string, IOption>.AlternateLookup<ReadOnlySpan<char>> _optionsLookup;
 
     public Uci(ObjectPool<MoveList> moveListPool)
     {
         var policy = new StringBuilderPooledObjectPolicy();
         _pvPool = new DefaultObjectPool<StringBuilder>(policy, 128);
-        _options = new();
+        _options = [];
+        _optionsLookup = _options.GetAlternateLookup<ReadOnlySpan<char>>();
         MoveListPool = moveListPool;
     }
 
@@ -81,12 +83,12 @@ public class Uci : IUci
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void AddOption(string name, IOption option) => _options[name] = option;
+    public void AddOption(ReadOnlySpan<char> name, IOption option) => _optionsLookup[name] = option;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool TryGetOption(string name, out IOption option)
+    public bool TryGetOption(ReadOnlySpan<char> name, out IOption option)
     {
-        ref var opt = ref CollectionsMarshal.GetValueRefOrNullRef(_options, name);
+        ref var opt = ref CollectionsMarshal.GetValueRefOrNullRef(_optionsLookup, name);
         var result = !Unsafe.IsNullRef(ref opt);
         option = result ? opt : default;
         return result;
@@ -94,13 +96,13 @@ public class Uci : IUci
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public ulong Nps(in ulong nodes, in TimeSpan time)
-        => (ulong)(nodes * 1000.0 / time.Milliseconds);
+        => (ulong)(nodes * 1000.0 / time.TotalMilliseconds);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public ulong Nps(in UInt128 nodes, in TimeSpan time)
     {
         var t    = nodes * 1000;
-        var d = new UInt128(ulong.MinValue, (ulong)time.Milliseconds + 1);
+        var d = new UInt128(ulong.MinValue, (ulong)time.TotalMilliseconds + 1);
         return (ulong)(t / d);
     }
 

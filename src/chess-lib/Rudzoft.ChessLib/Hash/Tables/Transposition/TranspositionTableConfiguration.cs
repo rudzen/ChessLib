@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2023 Rudy Alex Kohn
+Copyright (c) 2017-2025 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -31,7 +31,7 @@ namespace Rudzoft.ChessLib.Hash.Tables.Transposition;
 public sealed class TranspositionTableConfiguration
 {
     public const string Section = "TranspositionTable";
-    
+
     [Range(1, int.MaxValue, ErrorMessage = "Default size for TT: {0} must be between {1} and {2}.")]
     public int DefaultSize { get; init; }
 }

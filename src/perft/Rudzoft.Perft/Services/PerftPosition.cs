@@ -3,7 +3,7 @@ Perft, a chess perft test library
 
 MIT License
 
-Copyright (c) 2017-2023 Rudy Alex Kohn
+Copyright (c) 2017-2025 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,31 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudzoft.ChessLib.Perft.Interfaces;
+namespace Rudzoft.Perft.Services;
 
-public interface IPerft
-{
-    Action<string> BoardPrintCallback { get; set; }
+public record struct PerftPositionValue(int Depth, ulong MoveCount);
 
-    List<PerftPosition> Positions { get; set; }
-
-    int Depth { get; set; }
-
-    UInt128 Expected { get; set; }
-
-    public IGame Game { get; set; }
-
-    IAsyncEnumerable<UInt128> DoPerft(int depth);
-
-    UInt128 DoPerftSimple(int depth);
-
-    void ClearPositions();
-
-    string GetBoard();
-
-    void SetGamePosition(PerftPosition pp);
-
-    void AddPosition(PerftPosition pp);
-
-    ulong GetPositionCount(int index, int depth);
-}
+public sealed record PerftPosition(string Id, string Fen, List<PerftPositionValue> Value);

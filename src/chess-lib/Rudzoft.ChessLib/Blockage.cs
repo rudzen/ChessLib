@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2023 Rudy Alex Kohn
+Copyright (c) 2017-2025 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -303,8 +303,7 @@ public sealed class Blockage : IBlockage
 
         var them = ~us;
 
-        Span<Direction> directions = stackalloc Direction[]
-            { us.PawnPushDistance(), Directions.East, them.PawnPushDistance() };
+        Span<Direction> directions = [us.PawnPushDistance(), Directions.East, them.PawnPushDistance()];
 
         ref var directionSpace = ref MemoryMarshal.GetReference(directions);
         for (var i = 0; i < directions.Length; ++i)

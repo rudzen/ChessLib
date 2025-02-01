@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2023 Rudy Alex Kohn
+Copyright (c) 2017-2025 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -32,10 +32,8 @@ using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Notation.Notations;
 
-public sealed class SanNotation : Notation
+public sealed class SanNotation(ObjectPool<MoveList> moveLists) : Notation(moveLists)
 {
-    public SanNotation(ObjectPool<MoveList> moveLists) : base(moveLists) { }
-
     /// <summary>
     /// <para>Converts a move to SAN notation.</para>
     /// </summary>
@@ -59,8 +57,7 @@ public sealed class SanNotation : Notation
         if (pt != PieceType.Pawn)
         {
             re[i++] = pos.GetPiece(from).GetPgnChar();
-            foreach (var amb in Disambiguation(pos, move, from))
-                re[i++] = amb;
+            i += Disambiguation(pos, move, from, re[i..]);
         }
 
         if (move.IsEnPassantMove())

@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2023 Rudy Alex Kohn
+Copyright (c) 2017-2025 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -30,7 +30,7 @@ namespace Rudzoft.ChessLib.Tables;
 
 public abstract class HashTable<T> : IHashTable<T> where T : ITableEntry
 {
-    private T[] _table = Array.Empty<T>();
+    private T[] _table = [];
 
     public int Count => _table.Length;
 

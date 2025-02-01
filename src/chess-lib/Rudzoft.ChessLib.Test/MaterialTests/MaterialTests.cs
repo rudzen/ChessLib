@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2023 Rudy Alex Kohn
+Copyright (c) 2017-2025 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,6 +24,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using Rudzoft.Perft.Settings.Settings;
+using JsonSerializer = System.Text.Json.JsonSerializer;
+
 namespace Rudzoft.ChessLib.Test.MaterialTests;
 
 public sealed class MaterialTests
@@ -33,6 +36,22 @@ public sealed class MaterialTests
     [Fact]
     public void MaterialValueTest()
     {
+        var values = Enumerable.Range(1, 2).Select(x => new DepthValues() { Depth = x, ExpectedMoveCount = 0 }).ToArray();
+        var f = new FenSettings()
+        {
+            Entries = Enumerable.Range(1, 2).Select(x => new FenEntry() { Fen = "fen" + x, Depths = values }).ToArray()
+        };
+
+        var s = JsonSerializer.Serialize(f);
+
+
+        var f2 = new EpdSettings()
+        {
+            Files = Enumerable.Range(1, 2).Select(x => x.ToString()).ToArray()
+        };
+
+        var s2 = JsonSerializer.Serialize(f2);
+
         Assert.True(true);
         //    var pos = new Position();
         //    var game = new Game(pos);

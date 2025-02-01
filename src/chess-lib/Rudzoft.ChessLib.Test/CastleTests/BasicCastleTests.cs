@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2023 Rudy Alex Kohn
+Copyright (c) 2017-2025 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -89,7 +89,7 @@ public sealed class BasicCastleTests
     [InlineData("r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 1", CastleRights.WhiteQueen, false)]
     [InlineData("r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 1", CastleRights.BlackKing, false)]
     [InlineData("r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 1", CastleRights.BlackQueen, false)]
-    public void IsCastleImpeeded(string fen, CastleRights cr, bool expected)
+    public void IsCastleImpeded(string fen, CastleRights cr, bool expected)
     {
         var pos = _serviceProvider.GetRequiredService<IPosition>();
         var fenData = new FenData(fen);

@@ -26,7 +26,7 @@ SOFTWARE.
 
 using System.Runtime.CompilerServices;
 using Rudzoft.ChessLib.Extensions;
-using Rudzoft.ChessLib.Perft.Interfaces;
+using Rudzoft.Perft.Services;
 
 namespace Rudzoft.Perft.Parsers;
 

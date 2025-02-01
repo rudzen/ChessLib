@@ -28,22 +28,28 @@ using System.Diagnostics;
 using System.Runtime;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.ObjectPool;
 using Rudzoft.ChessLib.Extensions;
+using Rudzoft.ChessLib.Fen;
 using Rudzoft.ChessLib.Hash.Tables.Transposition;
-using Rudzoft.ChessLib.Perft;
-using Rudzoft.ChessLib.Perft.Interfaces;
 using Rudzoft.ChessLib.Protocol.UCI;
 using Rudzoft.Perft.Models;
-using Rudzoft.Perft.Options;
 using Rudzoft.Perft.Parsers;
+using Rudzoft.Perft.Settings.Settings;
 using Serilog;
 
 namespace Rudzoft.Perft.Services;
 
 public sealed class PerftRunner : IPerftRunner
 {
+    [Flags]
+    private enum PerftTypes
+    {
+        None = 0,
+        Epd = 1,
+        Fen = 2
+    }
+
     private const string Line = "-----------------------------------------------------------------";
 
     private static readonly ILogger Log = Serilog.Log.ForContext<PerftRunner>();
@@ -62,17 +68,26 @@ public sealed class PerftRunner : IPerftRunner
 
     private readonly IUci _uci;
 
+    private readonly EpdSettings _epdSettings;
+
+    private readonly FenSettings _fenSettings;
+
+    private readonly TranspositionTableSettings _ttSettings;
+
     private readonly Cpu _cpu;
 
-    private bool _usingEpd;
+    private PerftTypes _parsers;
 
     public PerftRunner(
         IEpdParser parser,
         IPerft perft,
-        IConfiguration configuration,
         ITranspositionTable transpositionTable,
         ObjectPool<PerftResult> resultPool,
-        IUci uci)
+        IUci uci,
+        EpdSettings epdSettings,
+        FenSettings fenSettings,
+        TranspositionTableSettings ttSettings
+    )
     {
         _epdParser = parser;
         _perft = perft;
@@ -80,53 +95,79 @@ public sealed class PerftRunner : IPerftRunner
         _transpositionTable = transpositionTable;
         _resultPool = resultPool;
         _uci = uci;
-        _runners = [ParseEpd, ParseFen];
+        _epdSettings = epdSettings;
+        _fenSettings = fenSettings;
+        _ttSettings = ttSettings;
 
-        configuration.Bind("TranspositionTable", TranspositionTableOptions);
+        _runners = [ParseEpd, ParseFen];
 
         _cpu = new();
     }
 
     public bool SaveResults { get; set; }
 
-    public IPerftOptions Options { get; set; }
-
-    public IPerftOptions TranspositionTableOptions { get; set; }
-
     public Task<int> Run(CancellationToken cancellationToken = default) => InternalRun(cancellationToken);
 
     private async Task<int> InternalRun(CancellationToken cancellationToken = default)
     {
-        InternalRunArgumentCheck(Options);
-
-        if (TranspositionTableOptions is TTOptions { Use: true } ttOptions)
-            _transpositionTable.SetSize(ttOptions.Size);
+        if (_ttSettings.Use)
+            _transpositionTable.SetSize(_ttSettings.Size);
 
         var errors = 0;
-        var runnerIndex = (Options is FenOptions).AsByte();
-        _usingEpd = runnerIndex == 0;
-        var positions = _runners[runnerIndex].Invoke(cancellationToken);
 
         _perft.Positions = [];
 
         GCSettings.LatencyMode = GCLatencyMode.SustainedLowLatency;
 
-        await foreach (var position in positions.WithCancellation(cancellationToken).ConfigureAwait(false))
+        _parsers = PerftTypes.None;
+
+        if (_epdSettings.Files.Length > 0)
+            _parsers |= PerftTypes.Epd;
+
+        if (_fenSettings.Entries.Length > 0)
+            _parsers |= PerftTypes.Fen;
+
+        if ((_parsers & PerftTypes.Epd) != 0)
         {
-            _perft.AddPosition(position);
-            try
+            await foreach (var position in ParseEpd(cancellationToken).ConfigureAwait(false))
             {
-                var result = await ComputePerft(cancellationToken).ConfigureAwait(false);
-                Interlocked.Add(ref errors, result.Errors);
-                if (errors != 0)
-                    Log.Error("Parsing failed for Id={Id}", position.Id);
-                _resultPool.Return(result);
+                _perft.AddPosition(position);
+                try
+                {
+                    var result = await ComputePerft(cancellationToken).ConfigureAwait(false);
+                    Interlocked.Add(ref errors, result.Errors);
+                    if (errors != 0)
+                        Log.Error("Parsing failed for Id={Id}", position.Id);
+                    _resultPool.Return(result);
+                }
+                catch (AggregateException e)
+                {
+                    Log.Error(e.GetBaseException(), "Cancel requested");
+                    Interlocked.Increment(ref errors);
+                    break;
+                }
             }
-            catch (AggregateException e)
+        }
+
+        if ((_parsers & PerftTypes.Fen) != 0)
+        {
+            await foreach (var position in ParseFen(cancellationToken).ConfigureAwait(false))
             {
-                Log.Error(e.GetBaseException(), "Cancel requested");
-                Interlocked.Increment(ref errors);
-                break;
+                _perft.AddPosition(position);
+                try
+                {
+                    var result = await ComputePerft(cancellationToken).ConfigureAwait(false);
+                    Interlocked.Add(ref errors, result.Errors);
+                    if (errors != 0)
+                        Log.Error("Parsing failed for Id={Id}", position.Id);
+                    _resultPool.Return(result);
+                }
+                catch (AggregateException e)
+                {
+                    Log.Error(e.GetBaseException(), "Cancel requested");
+                    Interlocked.Increment(ref errors);
+                    break;
+                }
             }
         }
 
@@ -135,23 +176,10 @@ public sealed class PerftRunner : IPerftRunner
         return errors;
     }
 
-    private static void InternalRunArgumentCheck(IPerftOptions options)
-    {
-        if (options == null)
-            throw new ArgumentNullException(nameof(options), "Cannot be null");
-    }
-
-    private IAsyncEnumerable<PerftPosition> ParseEpd(CancellationToken cancellationToken)
-    {
-        var options = Options as EpdOptions;
-        return ParseEpd(options, cancellationToken);
-    }
-
     private async IAsyncEnumerable<PerftPosition> ParseEpd(
-        EpdOptions options,
         [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        foreach (var epd in options.Epds)
+        foreach (var epd in _epdSettings.Files)
         {
             var start = Stopwatch.GetTimestamp();
 
@@ -174,29 +202,18 @@ public sealed class PerftRunner : IPerftRunner
         }
     }
 
-    private IAsyncEnumerable<PerftPosition> ParseFen(CancellationToken cancellationToken)
-    {
-        var options = Options as FenOptions;
-        return ParseFen(options, cancellationToken);
-    }
-
-#pragma warning disable 1998
-    private static async IAsyncEnumerable<PerftPosition> ParseFen(
-        FenOptions options,
-        [EnumeratorCancellation] CancellationToken cancellationToken)
-#pragma warning restore 1998
+    private async IAsyncEnumerable<PerftPosition> ParseFen([EnumeratorCancellation] CancellationToken cancellationToken)
     {
         const ulong zero = ulong.MinValue;
 
-        var depths = options.Depths.Select(static d => new PerftPositionValue(d, zero)).ToList();
-
-        var perftPositions =
-            options.Fens.Select(f => PerftPositionFactory.Create(Guid.NewGuid().ToString(), f, depths));
-
-        foreach (var perftPosition in perftPositions)
+        foreach (var fenEntry in _fenSettings.Entries)
         {
             if (cancellationToken.IsCancellationRequested)
                 yield break;
+
+            var fen = string.Equals("startpos", fenEntry.Fen, StringComparison.OrdinalIgnoreCase) ? Fen.StartPositionFen : fenEntry.Fen;
+            var ppValues = fenEntry.Depths.Select(x => new PerftPositionValue(x.Depth, x.ExpectedMoveCount)).ToList();
+            var perftPosition = PerftPositionFactory.Create(Guid.NewGuid().ToString(), fen, ppValues);
             yield return perftPosition;
         }
     }
@@ -239,7 +256,7 @@ public sealed class PerftRunner : IPerftRunner
             await WriteOutput(result, baseFileName, cancellationToken).ConfigureAwait(ConfigureAwaitOptions.None);
         }
 
-        Log.Information("{Info} parsing complete. Encountered {Errors} errors", _usingEpd ? "EPD" : "FEN", errors);
+        Log.Information("{Info} parsing complete. Encountered {Errors} errors", _parsers.ToString(), errors);
 
         result.Errors = errors;
 
@@ -278,7 +295,7 @@ public sealed class PerftRunner : IPerftRunner
     {
         Log.Information("Time passed : {Elapsed}", result.Elapsed);
         Log.Information("Nps         : {Nps}", result.Nps);
-        if (_usingEpd)
+        if ((_parsers & PerftTypes.Epd) != 0)
         {
             Log.Information("Result      : {Result} - should be {Expected}", result.Result, result.CorrectResult);
             if (result.Result != result.CorrectResult)
@@ -294,7 +311,7 @@ public sealed class PerftRunner : IPerftRunner
 
         var error = 0;
 
-        if (!_usingEpd)
+        if ((_parsers & PerftTypes.Fen) == 0)
             return error;
 
         if (result.CorrectResult == result.Result)

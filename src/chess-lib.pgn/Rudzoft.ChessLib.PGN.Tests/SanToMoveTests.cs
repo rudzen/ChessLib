@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2023 Rudy Alex Kohn
+Copyright (c) 2017-2025 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -32,7 +32,7 @@ using Rudzoft.ChessLib.Notation;
 using Rudzoft.ChessLib.Notation.Notations;
 using Rudzoft.ChessLib.Types;
 
-namespace Rudzoft.ChessLib.PGN.Test.PgnMoveNotationTests;
+namespace Rudzoft.ChessLib.PGN.Tests;
 
 public sealed class SanToMoveTests
 {
@@ -49,7 +49,7 @@ public sealed class SanToMoveTests
             .BuildServiceProvider();
     }
 
-    [Fact]
+    [Test]
     public async Task BasicSanConvert()
     {
         var pos = _serviceProvider.GetRequiredService<IPosition>();
@@ -83,12 +83,12 @@ public sealed class SanToMoveTests
         foreach (var move in chessMoves)
             pos.MakeMove(move, in state);
 
-        Assert.Equal(ExpectedGameCount, games.Count);
-        Assert.NotEmpty(games);
-        Assert.Equal(sanMoves.Count - 1, pos.Ply);
+        await Assert.That(games.Count).IsEqualTo(ExpectedGameCount);
+        await Assert.That(games).IsNotEmpty();
+        await Assert.That(sanMoves.Count - 1).IsEqualTo(pos.Ply);
     }
 
-    [Fact]
+    [Test]
     public async Task AllAtOnceConvert()
     {
         var pos = _serviceProvider.GetRequiredService<IPosition>();
@@ -117,9 +117,9 @@ public sealed class SanToMoveTests
 
         var actualMoves = converter.FromNotation(pos, sanMoves, notation);
 
-        Assert.Equal(ExpectedGameCount, games.Count);
-        Assert.NotEmpty(games);
-        Assert.Equal(sanMoves.Count - 1, actualMoves.Count);
-        Assert.Equal(sanMoves.Count - 1, pos.Ply);
+        await Assert.That(games.Count).IsEqualTo(ExpectedGameCount);
+        await Assert.That(games).IsNotEmpty();
+        await Assert.That(sanMoves.Count - 1).IsEqualTo(pos.Ply);
+        await Assert.That(sanMoves.Count - 1).IsEqualTo(actualMoves.Count);
     }
 }

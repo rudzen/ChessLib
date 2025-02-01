@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2023 Rudy Alex Kohn
+Copyright (c) 2017-2025 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -43,7 +43,9 @@ public enum PlayerTypes
     Human = 1
 }
 
-public readonly record struct Color(byte Side) : ISpanFormattable, IMinMaxValue<Color>
+public readonly record struct Color(byte Side) :
+    ISpanFormattable,
+    IMinMaxValue<Color>
 {
     private static readonly Direction[] PawnPushDist = [Direction.North, Direction.South];
     private static readonly Direction[] PawnDoublePushDist = [Direction.NorthDouble, Direction.SouthDouble];

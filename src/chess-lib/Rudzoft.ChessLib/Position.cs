@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2023 Rudy Alex Kohn
+Copyright (c) 2017-2025 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -360,7 +360,7 @@ public sealed class Position : IPosition
 
         fen[length++] = space;
 
-        Span<char> format = stackalloc char[1] { 'D' };
+        Span<char> format = ['D'];
 
         State.ClockPly.TryFormat(fen[length..], out var written, format);
 

@@ -3,7 +3,7 @@ Perft, a chess perft test library
 
 MIT License
 
-Copyright (c) 2017-2023 Rudy Alex Kohn
+Copyright (c) 2017-2025 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,10 +24,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using Rudzoft.ChessLib.Types;
 using System.Runtime.CompilerServices;
+using Rudzoft.ChessLib.Types;
 
-namespace Rudzoft.ChessLib.Perft;
+namespace Rudzoft.Perft.Services;
 
 internal static class PerftTable
 {
@@ -41,7 +41,7 @@ internal static class PerftTable
         TtSize = (ulong)(HashMemory * 1024 * 1024 / entrySize);
         Table = new PerftHashEntry[TtSize];
     }
-    
+
     private struct PerftHashEntry
     {
         public HashKey Hash;

@@ -24,15 +24,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using Rudzoft.Perft.Options;
-
 namespace Rudzoft.Perft.Services;
 
 public interface IPerftRunner
 {
     bool SaveResults { get; set; }
-    IPerftOptions Options { get; set; }
-    IPerftOptions TranspositionTableOptions { get; set; }
 
     Task<int> Run(CancellationToken cancellationToken = default);
 }

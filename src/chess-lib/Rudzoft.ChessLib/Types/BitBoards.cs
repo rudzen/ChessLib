@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2023 Rudy Alex Kohn
+Copyright (c) 2017-2025 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -31,6 +31,8 @@ SOFTWARE.
 using System.Diagnostics;
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using System.Runtime.Intrinsics;
+using System.Runtime.Intrinsics.X86;
 
 namespace Rudzoft.ChessLib.Types;
 
@@ -242,7 +244,7 @@ public static class BitBoards
         }
 
         // mini local helpers
-        Span<PieceType> validMagicPieces = stackalloc PieceType[] { PieceType.Bishop, PieceType.Rook };
+        Span<PieceType> validMagicPieces = [PieceType.Bishop, PieceType.Rook];
 
         // Pseudo attacks for all pieces
         foreach (var sq1 in squares)
@@ -500,7 +502,7 @@ public static class BitBoards
 
         title.AsSpan(0, Math.Min(64, title.Length)).CopyTo(span[idx..]);
 
-        Span<char> rank = stackalloc char[4] { '|', ' ', ' ', ' ' };
+        Span<char> rank = ['|', ' ', ' ', ' '];
         for (var r = Ranks.Rank8; r >= Ranks.Rank1; --r)
         {
             rank[2] = (char)('0' + (int)r + 1);
@@ -597,6 +599,39 @@ public static class BitBoards
         return bb;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static BitBoard NorthFillSIMD(this BitBoard bb)
+    {
+        if (Sse2.IsSupported)
+        {
+            var vector = Vector128.Create(bb.Value);
+            vector = Sse2.Or(vector, Sse2.ShiftLeftLogical(vector, 8));
+            vector = Sse2.Or(vector, Sse2.ShiftLeftLogical(vector, 16));
+            vector = Sse2.Or(vector, Sse2.ShiftLeftLogical(vector, 32));
+            return new BitBoard(vector.ToScalar());
+        }
+        else
+        {
+            return bb.NorthFill();
+        }
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static BitBoard SouthFillSIMD(this BitBoard bb)
+    {
+        if (Sse2.IsSupported)
+        {
+            var vector = Vector128.Create(bb.Value);
+            vector = Sse2.Or(vector, Sse2.ShiftRightLogical(vector, 8));
+            vector = Sse2.Or(vector, Sse2.ShiftRightLogical(vector, 16));
+            vector = Sse2.Or(vector, Sse2.ShiftRightLogical(vector, 32));
+            return new BitBoard(vector.ToScalar());
+        }
+        else
+        {
+            return bb.SouthFill();
+        }
+    }
     /// <summary>
     /// Shorthand method for north or south fill of bitboard depending on color
     /// </summary>

@@ -47,13 +47,12 @@ public static class MagicBB
     {
         var start = Stopwatch.GetTimestamp();
 
-        Span<Direction> rookDeltas = stackalloc Direction[]
-            { Direction.North, Direction.East, Direction.South, Direction.West };
+        Span<Direction> rookDeltas = [Direction.North, Direction.East, Direction.South, Direction.West];
 
-        Span<Direction> bishopDeltas = stackalloc Direction[]
-            { Direction.NorthEast, Direction.SouthEast, Direction.SouthWest, Direction.NorthWest };
+        Span<Direction> bishopDeltas =
+            [Direction.NorthEast, Direction.SouthEast, Direction.SouthWest, Direction.NorthWest];
 
-        var rookTable = new BitBoard[0x19000]; // To store rook attacks
+        var rookTable = new BitBoard[0x19000];  // To store rook attacks
         var bishopTable = new BitBoard[0x1480]; // To store bishop attacks
         var epochs = new int[0x1000];
         var occupancy = new BitBoard[0x1000];
@@ -144,7 +143,7 @@ public static class MagicBB
             // Given a square 's', the mask is the bitboard of sliding attacks from
             // 's' computed on an empty board. The index must be big enough to contain
             // all the attacks for each possible subset of the mask and so is 2 power
-            // the number of 1s of the mask. Hence we deduce the size of the shift to
+            // the number of 1s of the mask. Hence, we deduce the size of the shift to
             // apply to the 64 or 32 bits word to get the index.
             ref var m = ref Unsafe.Add(ref magicsRef, s);
             m = new()

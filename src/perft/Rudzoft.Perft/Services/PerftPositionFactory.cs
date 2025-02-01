@@ -1,9 +1,9 @@
 ﻿/*
-Perft, a chess perft testing application
+Perft, a chess perft test library
 
 MIT License
 
-Copyright (c) 2019-2023 Rudy Alex Kohn
+Copyright (c) 2017-2025 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,16 +24,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using CommandLine;
+using System.Runtime.CompilerServices;
 
-namespace Rudzoft.Perft.Options;
+namespace Rudzoft.Perft.Services;
 
-[Verb("epd", HelpText = "Add parsing of an epd file containing perft information")]
-public sealed class EpdOptions : IPerftOptions
+public static class PerftPositionFactory
 {
-    [Option('f', "files", Required = true, HelpText = "List of epd files to parse.")]
-    public IEnumerable<string> Epds { get; set; }
-
-    [Option('h', "help", Required = false, HelpText = "Show more detailed help for epd file format")]
-    public bool Help { get; set; }
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static PerftPosition Create(string id, string fen, List<PerftPositionValue> values)
+        => new(id, fen, values);
 }

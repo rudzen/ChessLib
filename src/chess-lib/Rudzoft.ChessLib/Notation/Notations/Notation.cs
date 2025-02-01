@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2023 Rudy Alex Kohn
+Copyright (c) 2017-2025 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -32,14 +32,9 @@ using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Notation.Notations;
 
-public abstract class Notation : INotation
+public abstract class Notation(ObjectPool<MoveList> moveLists) : INotation
 {
-    protected readonly ObjectPool<MoveList> MoveLists;
-
-    protected Notation(ObjectPool<MoveList> moveLists)
-    {
-        MoveLists = moveLists;
-    }
+    protected readonly ObjectPool<MoveList> MoveLists = moveLists;
 
     public abstract string Convert(IPosition pos, Move move);
 
@@ -95,31 +90,37 @@ public abstract class Notation : INotation
     /// <para>If we have more then one piece with destination 'to'.</para>
     /// <para>Note that for pawns is not needed because starting file is explicit.</para>
     /// </summary>
+    /// <param name="pos">The current chess position</param>
     /// <param name="move">The move to check</param>
-    /// <param name="from">The from square</param>
+    /// <param name="from">The "from" square</param>
+    /// <param name="output">The output buffer to write to</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    protected static IEnumerable<char> Disambiguation(IPosition pos, Move move, Square from)
+    protected static int Disambiguation(IPosition pos, Move move, Square from, Span<char> output)
     {
         var similarAttacks = GetSimilarAttacks(pos, move);
         var ambiguity = Ambiguity(pos, from, similarAttacks);
+        var p = 0;
 
         if (!ambiguity.HasFlagFast(MoveAmbiguities.Move))
-            yield break;
+            return p;
 
         if (!ambiguity.HasFlagFast(MoveAmbiguities.File))
-            yield return from.FileChar;
+            output[p++] = from.FileChar;
         else if (!ambiguity.HasFlagFast(MoveAmbiguities.Rank))
-            yield return from.RankChar;
+            output[p++] = from.RankChar;
         else
         {
-            yield return from.FileChar;
-            yield return from.RankChar;
+            output[p++] = from.FileChar;
+            output[p++] = from.RankChar;
         }
+
+        return p;
     }
 
     /// <summary>
     /// Get similar attacks based on the move
     /// </summary>
+    /// <param name="pos">The current chess position</param>
     /// <param name="move">The move to get similar attacks from</param>
     /// <returns>Squares for all similar attacks without the moves from square</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

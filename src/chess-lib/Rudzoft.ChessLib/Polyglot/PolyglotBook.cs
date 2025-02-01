@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2023 Rudy Alex Kohn
+Copyright (c) 2017-2025 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -118,7 +118,7 @@ public sealed class PolyglotBook : IPolyglotBook
             if (sum > 0 && _rnd.Next() % sum < e.Count || pickBest && e.Count == best)
                 polyMove = e.Move;
 
-            // Stop if we wan't the top pick and move exists
+            // Stop if we want the top pick and move exists
             if (pickBest && polyMove != ushort.MinValue)
                 break;
         }

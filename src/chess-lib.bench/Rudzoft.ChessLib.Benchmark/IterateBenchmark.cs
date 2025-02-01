@@ -10,7 +10,7 @@ public class IterateBenchmark
     [Benchmark(Description = "Stackalloc")]
     public void IterateOne()
     {
-        Span<Color> players = stackalloc Color[] { Color.White, Color.Black };
+        Span<Color> players = [Color.White, Color.Black];
 
         var res = 0;
         for (var i = 0; i < N; ++i)

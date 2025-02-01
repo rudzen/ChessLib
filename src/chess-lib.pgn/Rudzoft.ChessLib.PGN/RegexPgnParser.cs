@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2023 Rudy Alex Kohn
+Copyright (c) 2017-2025 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -68,6 +68,7 @@ public sealed partial class RegexPgnParser : IPgnParser
 
         using var streamReader = new StreamReader(stream);
         var currentGameTags = new Dictionary<string, string>(DefaultTagCapacity);
+        var currentGameTagsLookup = currentGameTags.GetAlternateLookup<ReadOnlySpan<char>>();
         var currentGameMoves = new List<PgnMove>(DefaultMoveListCapacity);
         var inMoveSection = false;
 
@@ -87,12 +88,13 @@ public sealed partial class RegexPgnParser : IPgnParser
                 {
                     yield return new(currentGameTags, currentGameMoves);
                     currentGameTags = new(DefaultTagCapacity);
+                    currentGameTagsLookup = currentGameTags.GetAlternateLookup<ReadOnlySpan<char>>();
                     currentGameMoves = new(DefaultMoveListCapacity);
                     inMoveSection = false;
                 }
             }
             else
-                ParseTag(line, currentGameTags);
+                ParseTag(line, currentGameTagsLookup);
 
             line = await streamReader.ReadLineAsync(cancellationToken);
         }
@@ -105,29 +107,28 @@ public sealed partial class RegexPgnParser : IPgnParser
     {
         var trimmedLine = line.TrimEnd();
 
-        if (trimmedLine.EndsWith(stackalloc char[] { '*' }, StringComparison.InvariantCultureIgnoreCase))
+        if (trimmedLine.EndsWith(['*'], StringComparison.OrdinalIgnoreCase))
             return true;
 
-        if (trimmedLine.EndsWith(stackalloc char[] { '1', '-', '0' }, StringComparison.InvariantCultureIgnoreCase))
+        if (trimmedLine.EndsWith(['1', '-', '0'], StringComparison.OrdinalIgnoreCase))
             return true;
 
-        if (trimmedLine.EndsWith(stackalloc char[] { '0', '-', '1' }, StringComparison.InvariantCultureIgnoreCase))
+        if (trimmedLine.EndsWith(['0', '-', '1'], StringComparison.OrdinalIgnoreCase))
             return true;
 
-        return trimmedLine.EndsWith(stackalloc char[] { '1', '/', '2', '-', '1', '/', '2' },
-            StringComparison.InvariantCultureIgnoreCase);
+        return trimmedLine.EndsWith(['1', '/', '2', '-', '1', '/', '2'],
+            StringComparison.OrdinalIgnoreCase);
     }
 
-    private static void ParseTag(string line, IDictionary<string, string> currentGameTags)
+    private static void ParseTag(string line, Dictionary<string, string>.AlternateLookup<ReadOnlySpan<char>> currentGameTags)
     {
         var tagMatch = TagPairRegex().Match(line);
 
         if (!tagMatch.Success)
             return;
 
-        var tagName = tagMatch.Groups["tagName"].Value;
-        var tagValue = tagMatch.Groups["tagValue"].Value;
-        currentGameTags[tagName] = tagValue;
+        var tagName = tagMatch.Groups["tagName"].ValueSpan;
+        currentGameTags[tagName] = tagMatch.Groups["tagValue"].Value;
     }
 
     private static IEnumerable<PgnMove> ParseMovesLine(string line)
@@ -140,7 +141,7 @@ public sealed partial class RegexPgnParser : IPgnParser
             var blackMove = x.Groups["blackMove"].Value;
 
             if (string.IsNullOrWhiteSpace(blackMove))
-                return EmptyPgnMove with { MoveNumber = moveNumber, WhiteMove = whiteMove };
+                return new PgnMove(moveNumber, whiteMove, string.Empty);
 
             return new(moveNumber, whiteMove, blackMove);
         });

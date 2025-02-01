@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2023 Rudy Alex Kohn
+Copyright (c) 2017-2025 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -34,21 +34,15 @@ public sealed class Cpu : ICpu
 
     private const double DefaultOverflow = double.MinValue;
 
-    private readonly Process _currentProcessName;
+    private readonly Process _currentProcessName = Process.GetCurrentProcess();
 
-    private readonly int _numProcessors;
+    private readonly int _numProcessors = Environment.ProcessorCount;
 
     private DateTime _lastCpu;
 
     private TimeSpan _lastSysCpu;
 
     private TimeSpan _lastUserCpu;
-
-    public Cpu()
-    {
-        _currentProcessName = Process.GetCurrentProcess();
-        _numProcessors = Environment.ProcessorCount;
-    }
 
     public double CpuUse => Usage();
 

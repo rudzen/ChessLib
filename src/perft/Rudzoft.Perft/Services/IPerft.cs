@@ -1,9 +1,9 @@
 ﻿/*
-Perft, a chess perft testing application
+Perft, a chess perft test library
 
 MIT License
 
-Copyright (c) 2019-2023 Rudy Alex Kohn
+Copyright (c) 2017-2025 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,16 +24,33 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using CommandLine;
+using Rudzoft.ChessLib;
 
-namespace Rudzoft.Perft.Options;
+namespace Rudzoft.Perft.Services;
 
-[Verb("tt", HelpText = "Configuration for transposition table")]
-public class TTOptions : IPerftOptions
+public interface IPerft
 {
-    [Option('u', "use", Required = false, Default = true, HelpText = "Dis/En-able use of transposition table")]
-    public bool Use { get; set; }
+    Action<string> BoardPrintCallback { get; set; }
 
-    [Option('s', "size", Required = false, Default = 32, HelpText = "Set the size of the transposition table in mb")]
-    public int Size { get; set; }
+    List<PerftPosition> Positions { get; set; }
+
+    int Depth { get; set; }
+
+    UInt128 Expected { get; set; }
+
+    public IGame Game { get; set; }
+
+    IAsyncEnumerable<UInt128> DoPerft(int depth);
+
+    UInt128 DoPerftSimple(int depth);
+
+    void ClearPositions();
+
+    string GetBoard();
+
+    void SetGamePosition(PerftPosition pp);
+
+    void AddPosition(PerftPosition pp);
+
+    ulong GetPositionCount(int index, int depth);
 }

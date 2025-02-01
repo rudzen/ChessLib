@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2023 Rudy Alex Kohn
+Copyright (c) 2017-2025 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -31,26 +31,20 @@ using Rudzoft.ChessLib.Polyglot;
 
 namespace Rudzoft.ChessLib.Factories;
 
-public sealed class PolyglotBookFactory : IPolyglotBookFactory
+public sealed class PolyglotBookFactory(PolyglotBookConfiguration configuration, ObjectPool<MoveList> objectPool)
+    : IPolyglotBookFactory
 {
-    private readonly string _path;
-    private readonly ObjectPool<MoveList> _objectPool;
-
-    public PolyglotBookFactory(PolyglotBookConfiguration configuration, ObjectPool<MoveList> objectPool)
-    {
-        _path = string.IsNullOrWhiteSpace(configuration.BookPath) ? string.Empty : configuration.BookPath;
-        _objectPool = objectPool;
-    }
+    private readonly string _path = string.IsNullOrWhiteSpace(configuration.BookPath) ? string.Empty : configuration.BookPath;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public IPolyglotBook Create(string bookFile)
     {
-        return PolyglotBook.Create(_objectPool, _path, bookFile);
+        return PolyglotBook.Create(objectPool, _path, bookFile);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public IPolyglotBook Create()
     {
-        return PolyglotBook.Create(_objectPool);
+        return PolyglotBook.Create(objectPool);
     }
 }

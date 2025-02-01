@@ -3,7 +3,7 @@ ChessLib, a chess data structure library
 
 MIT License
 
-Copyright (c) 2017-2023 Rudy Alex Kohn
+Copyright (c) 2017-2025 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -40,9 +40,9 @@ public interface IUci
 
     void Initialize(int maxThreads = 128);
 
-    void AddOption(string name, IOption option);
+    void AddOption(ReadOnlySpan<char> name, IOption option);
 
-    bool TryGetOption(string name, out IOption option);
+    bool TryGetOption(ReadOnlySpan<char> name, out IOption option);
 
     ulong Nps(in ulong nodes, in TimeSpan time);
 

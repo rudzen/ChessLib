@@ -6,29 +6,28 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.ObjectPool;
 using Rudzoft.ChessLib.Extensions;
-using Rudzoft.ChessLib.Perft;
-using Rudzoft.ChessLib.Perft.Interfaces;
 using Rudzoft.Perft.Actors;
 using Rudzoft.Perft.Models;
-using Rudzoft.Perft.Options;
 using Rudzoft.Perft.Parsers;
 using Rudzoft.Perft.Services;
+using Rudzoft.Perft.Settings.Extensions;
 using Serilog;
 
 var host = new HostBuilder()
-           .ConfigureServices((_, services) =>
+           .ConfigureAppConfiguration(Configure)
+           .ConfigureServices((context, services) =>
            {
-               var configuration = ConfigurationBuilder().Build();
-               services.AddSingleton(configuration);
-               services.AddSingleton(new CommandLineArgs(args));
+               services.RegisterEpdSettings();
+               services.RegisterFenSettings();
+               services.RegisterTranspositionTableSettings();
+               services.RegisterPolyglotBookSettings();
 
-               services.AddChessLib(configuration);
+               services.AddChessLib(context.Configuration);
 
-               services.AddSingleton(ConfigureLogger(configuration));
+               services.AddSingleton(ConfigureLogger(context.Configuration));
 
                services.AddTransient<IPerft, Perft>();
                services.AddTransient<IPerftRunner, PerftRunner>();
-               services.AddSingleton<IOptionsFactory, OptionsFactory>();
 
                services.AddSingleton<IEpdParserSettings, EpdParserSettings>();
                services.AddTransient<IEpdSet, EpdSet>();
@@ -44,6 +43,10 @@ var host = new HostBuilder()
 
                services.AddAkka("perft-system", (builder, sp) =>
                {
+                   // const string postgresql
+                   //     = "Host=localhost; Database=chesslib-perft; Username=postgres; Password=rudz; Include Error Detail=true";
+                   // builder.WithPostgreSqlPersistence(postgresql, autoInitialize: true);
+
                    builder.WithActors((system, registry) =>
                    {
                        var props = Props.Create<PerftActor>(sp);
@@ -71,17 +74,16 @@ static ILogger ConfigureLogger(IConfiguration configuration)
     return Log.Logger;
 }
 
-static IConfigurationBuilder ConfigurationBuilder()
+static void Configure(IConfigurationBuilder builder)
 {
 #if RELEASE
     const string envName = "Production";
 #else
     const string envName = "Development";
 #endif
-    // Create our configuration sources
-    return new ConfigurationBuilder()
-           // Add environment variables
-           .AddEnvironmentVariables()
+
+    // Add environment variables
+    builder.AddEnvironmentVariables()
            // Set base path for Json files as the startup location of the application
            .SetBasePath(Directory.GetCurrentDirectory())
            // Add application settings json files

@@ -3,7 +3,7 @@ Perft, a chess perft test library
 
 MIT License
 
-Copyright (c) 2017-2023 Rudy Alex Kohn
+Copyright (c) 2017-2025 Rudy Alex Kohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -25,11 +25,11 @@ SOFTWARE.
 */
 
 using System.Runtime.CompilerServices;
+using Rudzoft.ChessLib;
 using Rudzoft.ChessLib.Enums;
 using Rudzoft.ChessLib.Fen;
-using Rudzoft.ChessLib.Perft.Interfaces;
 
-namespace Rudzoft.ChessLib.Perft;
+namespace Rudzoft.Perft.Services;
 
 /*
 // (first version)
@@ -50,22 +50,16 @@ Result	5	64,921.2 us	1,310.703 us	1,402.437 us
 Result	6	1,912,300.6 us	3,551.167 us	3,148.017 us
      */
 
-public sealed class Perft : IPerft
+public sealed class Perft(IGame game, IEnumerable<PerftPosition> positions) : IPerft
 {
-    public Perft(IGame game, IEnumerable<PerftPosition> positions)
-    {
-        Positions = positions.ToList();
-        Game = game;
-    }
-
     public Action<string>? BoardPrintCallback { get; set; }
 
     /// <summary>
     /// The positional data for the run
     /// </summary>
-    public List<PerftPosition> Positions { get; set; }
+    public List<PerftPosition> Positions { get; set; } = positions.ToList();
 
-    public IGame Game { get; set; }
+    public IGame Game { get; set; } = game;
     public int Depth { get; set; }
     public UInt128 Expected { get; set; }
 
