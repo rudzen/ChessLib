@@ -1,6 +1,6 @@
 ﻿using Rudzoft.ChessLib.Protocol.UCI;
 
-namespace Rudzoft.ChessLib.Test.ProtocolTests;
+namespace Rudzoft.ChessLib.Test.UciTests;
 
 public sealed class SearchParameterTests
 {

@@ -55,10 +55,10 @@ public sealed class PolyglotTests : IClassFixture<BookFixture>
             .AddSingleton<IValues, Values>()
             .AddSingleton<IRKiss, RKiss>()
             .AddSingleton<IZobrist, Zobrist>()
-            .AddSingleton<ICuckoo, Cuckoo>()
-            .AddSingleton<IPositionValidator, PositionValidator>()
+            .AddSingleton<Cuckoo>()
+            .AddSingleton<PositionValidator>()
             .AddTransient<IPosition, Position>()
-            .AddSingleton<IPolyglotBookFactory, PolyglotBookFactory>()
+            .AddSingleton<PolyglotBookFactory>()
             .AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>()
             .AddSingleton(static serviceProvider =>
             {
@@ -79,7 +79,7 @@ public sealed class PolyglotTests : IClassFixture<BookFixture>
     [Fact]
     public void UnsetBookFileYieldsEmptyMove()
     {
-        const string fen = Fen.Fen.StartPositionFen;
+        const string fen = FenData.StartPositionFen;
 
         var pos = _serviceProvider.GetRequiredService<IPosition>();
 
@@ -89,7 +89,7 @@ public sealed class PolyglotTests : IClassFixture<BookFixture>
         pos.Set(in fenData, ChessMode.Normal, in state);
 
         var book = _serviceProvider
-            .GetRequiredService<IPolyglotBookFactory>()
+            .GetRequiredService<PolyglotBookFactory>()
             .Create();
 
         var bookMove = book.Probe(pos);
@@ -102,7 +102,7 @@ public sealed class PolyglotTests : IClassFixture<BookFixture>
     [Fact]
     public void BookFileLoadsCorrectly()
     {
-        const string fen = Fen.Fen.StartPositionFen;
+        const string fen = FenData.StartPositionFen;
 
         var bookPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
@@ -119,7 +119,7 @@ public sealed class PolyglotTests : IClassFixture<BookFixture>
         pos.Set(in fenData, ChessMode.Normal, state);
 
         var book = _serviceProvider
-            .GetRequiredService<IPolyglotBookFactory>()
+            .GetRequiredService<PolyglotBookFactory>()
             .Create(path);
 
         Assert.NotNull(book.BookFile);
@@ -135,7 +135,7 @@ public sealed class PolyglotTests : IClassFixture<BookFixture>
     public void BookStartPositionCorrectlyCalculatesPolyglotHash()
     {
         const ulong expected = 5060803636482931868UL;
-        const string fen = Fen.Fen.StartPositionFen;
+        const string fen = FenData.StartPositionFen;
 
         var pos = _serviceProvider.GetRequiredService<IPosition>();
 
@@ -145,7 +145,7 @@ public sealed class PolyglotTests : IClassFixture<BookFixture>
         pos.Set(in fenData, ChessMode.Normal, state);
 
         var book = _serviceProvider
-            .GetRequiredService<IPolyglotBookFactory>()
+            .GetRequiredService<PolyglotBookFactory>()
             .Create();
 
         var actual = book.ComputePolyglotKey(pos).Key;
@@ -165,7 +165,7 @@ public sealed class PolyglotTests : IClassFixture<BookFixture>
     [InlineData(new[] { "a2a4", "b7b5", "h2h4", "b5b4", "c2c4", "b4c3", "a1a3" }, 6647202560273257824UL)]
     public void HashKeyFromInitialPositionIsComputedCorrectly(string[] uciMoves, ulong expected)
     {
-        const string fen = Fen.Fen.StartPositionFen;
+        const string fen = FenData.StartPositionFen;
 
         var pos = _serviceProvider.GetRequiredService<IPosition>();
 
@@ -177,7 +177,7 @@ public sealed class PolyglotTests : IClassFixture<BookFixture>
         var uci = _serviceProvider.GetRequiredService<IUci>();
 
         var book = _serviceProvider
-            .GetRequiredService<IPolyglotBookFactory>()
+            .GetRequiredService<PolyglotBookFactory>()
             .Create();
 
         foreach (var m in uciMoves.Select(uciMove => uci.MoveFromUci(pos, uciMove)))

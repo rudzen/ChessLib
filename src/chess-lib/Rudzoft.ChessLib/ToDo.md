@@ -23,7 +23,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 # Improve
-- Move notation functionality (add more notaion variation, including humanoid readable)
+- Move notation functionality (add more notation variation, including humanoid readable)
 
 # Unit Tests
 - Cuckoo

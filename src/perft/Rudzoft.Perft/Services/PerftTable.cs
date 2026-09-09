@@ -34,6 +34,7 @@ internal static class PerftTable
     private const int HashMemory = 256;
     private static readonly ulong TtSize;
     private static readonly PerftHashEntry[] Table;
+    private static ushort _generation;
 
     static PerftTable()
     {
@@ -47,6 +48,7 @@ internal static class PerftTable
         public HashKey Hash;
         public ulong Count;
         public int Depth;
+        public ushort Generation;
     }
 
     public static void Store(in HashKey key, int depth, in ulong childCount)
@@ -56,19 +58,25 @@ internal static class PerftTable
         entry.Hash = key;
         entry.Count = childCount;
         entry.Depth = depth;
+        entry.Generation = _generation;
     }
 
     public static bool Retrieve(in HashKey key, int depth, out ulong childCount)
     {
         var slot = (int)(key.Key % TtSize);
         ref var entry = ref Table[slot];
-        var match = entry.Depth == depth && entry.Hash == key;
+        var match = entry.Depth == depth && entry.Hash == key && entry.Generation == _generation;
         childCount = match ? entry.Count : 0;
         return match;
     }
 
     public static void Clear()
     {
-        Array.Clear(Table, 0, (int)TtSize);
+        _generation++;
+        if (_generation == 0)
+        {
+            Array.Clear(Table, 0, (int)TtSize);
+            _generation = 1;
+        }
     }
 }

@@ -26,28 +26,35 @@ SOFTWARE.
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.ObjectPool;
+using Microsoft.Extensions.Options;
 using Rudzoft.ChessLib.Enums;
 using Rudzoft.ChessLib.Fen;
 using Rudzoft.ChessLib.Hash;
+using Rudzoft.ChessLib.Hash.Tables.Transposition;
 using Rudzoft.ChessLib.MoveGeneration;
+using Rudzoft.ChessLib.Protocol.UCI;
 using Rudzoft.ChessLib.Types;
 using Rudzoft.ChessLib.Validation;
 
-namespace Rudzoft.ChessLib.Test.PositionTests;
+namespace Rudzoft.ChessLib.Test.UciTests;
 
-public sealed class EnPassantFenTests
+public sealed class UciTests
 {
     private readonly IServiceProvider _serviceProvider;
 
-    public EnPassantFenTests()
+    public UciTests()
     {
+        var transpositionTableConfiguration = new TranspositionTableConfiguration { DefaultSize = 1 };
+        var options = Options.Create(transpositionTableConfiguration);
+
         _serviceProvider = new ServiceCollection()
-            .AddTransient<IBoard, Board>()
+            .AddSingleton(options)
             .AddSingleton<IValues, Values>()
             .AddSingleton<IRKiss, RKiss>()
             .AddSingleton<IZobrist, Zobrist>()
-            .AddSingleton<ICuckoo, Cuckoo>()
-            .AddSingleton<IPositionValidator, PositionValidator>()
+            .AddSingleton<Cuckoo>()
+            .AddSingleton<PositionValidator>()
+            .AddTransient<IBoard, Board>()
             .AddTransient<IPosition, Position>()
             .AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>()
             .AddSingleton(static serviceProvider =>
@@ -56,30 +63,47 @@ public sealed class EnPassantFenTests
                 var policy = new DefaultPooledObjectPolicy<MoveList>();
                 return provider.Create(policy);
             })
+            .AddSingleton(static sp =>
+            {
+                var pool = sp.GetRequiredService<ObjectPool<MoveList>>();
+                IUci uci = new Uci(pool);
+                uci.Initialize();
+                return uci;
+            })
             .BuildServiceProvider();
     }
 
-    [Theory]
-    [InlineData("rnbkqbnr/pp1pp1pp/5p2/2pP4/8/8/PPP1PPPP/RNBKQBNR w KQkq c6 0 1", Squares.c6)] // valid
-    [InlineData("rnbkqbnr/pp1pp1pp/5p2/2pP4/8/8/PPP1PPPP/RNBKQBNR w KQkq c7 0 1", Squares.none)] // invalid rank
-    [InlineData("rnbkqbnr/pp1pp1pp/5p2/2pP4/8/8/PPP1PPPP/RNBKQBNR w KQkq - 0 1", Squares.none)] // no square set
-    [InlineData("rnbkqbnr/pp1pp1pp/5p2/2pP4/8/8/PPP1PPPP/RNBKQBNR w KQkq c 0 1", Squares.none)] // only file set
-    [InlineData("rnbqkbnr/pppppp2/7p/8/3PP1pP/5P2/PPP3P1/RNBQKBNR b KQkq h3 0 1", Squares.h3)] // valid
-    [InlineData("rnbqkbnr/pppppp2/7p/8/3PP1pP/5P2/PPP3P1/RNBQKBNR b KQkq h4 0 1", Squares.none)] // invalid rank
-    [InlineData("rnbqkbnr/pppppp2/7p/8/3PP1pP/5P2/PPP3P1/RNBQKBNR b KQkq - 0 1", Squares.none)] // no square set
-    [InlineData("rnbqkbnr/pppppp2/7p/8/3PP1pP/5P2/PPP3P1/RNBQKBNR b KQkq -- 0 1", Squares.none)] // invalid format
-    [InlineData("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq c6 0 1", Squares.none)] // start pos with ep square
-    [InlineData("rnbqkbnr/2pppp2/p6p/1p2PB2/3P2pP/5P2/PPP3P1/RNBQK1NR b KQkq h3 0 1", Squares.h3)] // valid
-    public void EnPassantSquare(string fen, Squares expected)
+    [Fact]
+    public void NpsSimple()
     {
+        const ulong expected = 1000UL;
+        const ulong nodes = 1000UL;
+
+        var ts = TimeSpan.FromSeconds(1);
+
+        var uci = _serviceProvider.GetRequiredService<IUci>();
+
+        var actual = uci.Nps(nodes, in ts);
+
+        Assert.Equal(expected, actual);
+    }
+
+    [Fact]
+    public void MoveFromUciBasic()
+    {
+        const string uciMove = "a2a3";
+        var expected = Move.Create(Square.A2, Square.A3);
+
+        var uci = _serviceProvider.GetRequiredService<IUci>();
         var pos = _serviceProvider.GetRequiredService<IPosition>();
 
-        var fenData = new FenData(fen);
+        var fenData = new FenData(FenData.StartPositionFen);
         var state = new State();
 
         pos.Set(in fenData, ChessMode.Normal, state);
 
-        var actual = pos.EnPassantSquare;
-        Assert.Equal(expected, actual.Value);
+        var actual = uci.MoveFromUci(pos, uciMove);
+
+        Assert.Equal(expected, actual);
     }
 }

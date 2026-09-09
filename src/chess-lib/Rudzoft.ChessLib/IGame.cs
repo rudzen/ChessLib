@@ -49,7 +49,7 @@ public interface IGame : IEnumerable<Piece>
 
     public ICpu Cpu { get; }
 
-    void NewGame(string fen = Fen.Fen.StartPositionFen);
+    void NewGame(string fen = FenData.StartPositionFen);
 
     FenData GetFen();
 

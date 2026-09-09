@@ -87,22 +87,25 @@ public static class MagicBB
         Console.WriteLine($"MagicBB init took: {end}");
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard RookAttacks(this Square s, in BitBoard occ)
+    extension(Square s)
     {
-        return RookMagics[s].Attacks[RookMagics[s].Index(in occ)];
-    }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public BitBoard RookAttacks(in BitBoard occ)
+        {
+            return RookMagics[s].Attacks[RookMagics[s].Index(in occ)];
+        }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard BishopAttacks(this Square s, in BitBoard occ)
-    {
-        return BishopMagics[s].Attacks[BishopMagics[s].Index(in occ)];
-    }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public BitBoard BishopAttacks(in BitBoard occ)
+        {
+            return BishopMagics[s].Attacks[BishopMagics[s].Index(in occ)];
+        }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard QueenAttacks(this Square s, in BitBoard occ)
-    {
-        return RookAttacks(s, in occ) | BishopAttacks(s, in occ);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public BitBoard QueenAttacks(in BitBoard occ)
+        {
+            return RookAttacks(s, in occ) | BishopAttacks(s, in occ);
+        }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

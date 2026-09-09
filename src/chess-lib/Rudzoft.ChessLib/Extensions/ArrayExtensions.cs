@@ -31,13 +31,16 @@ namespace Rudzoft.ChessLib.Extensions;
 
 public static class ArrayExtensions
 {
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void Fill<T>(this T[] arr, in T value)
+    extension<T>(T[] arr)
     {
-        Debug.Assert(arr != null);
-        Array.Fill(arr, value);
-    }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Fill(in T value)
+        {
+            Debug.Assert(arr != null);
+            Array.Fill(arr, value);
+        }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void Clear<T>(this T[] arr) => Array.Clear(arr, 0, arr.Length);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Clear() => Array.Clear(arr, 0, arr.Length);
+    }
 }

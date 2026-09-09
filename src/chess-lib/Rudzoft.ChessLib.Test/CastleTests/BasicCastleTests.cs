@@ -46,8 +46,8 @@ public sealed class BasicCastleTests
             .AddSingleton<IValues, Values>()
             .AddSingleton<IRKiss, RKiss>()
             .AddSingleton<IZobrist, Zobrist>()
-            .AddSingleton<ICuckoo, Cuckoo>()
-            .AddSingleton<IPositionValidator, PositionValidator>()
+            .AddSingleton<Cuckoo>()
+            .AddSingleton<PositionValidator>()
             .AddTransient<IPosition, Position>()
             .AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>()
             .AddSingleton(static serviceProvider =>
@@ -60,7 +60,7 @@ public sealed class BasicCastleTests
     }
 
     [Theory]
-    [InlineData(Fen.Fen.StartPositionFen, CastleRights.None, false)]
+    [InlineData(FenData.StartPositionFen, CastleRights.None, false)]
     [InlineData("rnbqk2r/pppppppp/8/8/8/8/PPPPPPPP/RNBQK2R w KQkq - 0 1", CastleRights.King, true)]
     [InlineData("rnbqk2r/pppppppp/8/8/8/8/PPPPPPPP/RNBQK2R w KQkq - 0 1", CastleRights.Queen, true)]
     [InlineData("r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 1", CastleRights.King, true)]
@@ -77,10 +77,10 @@ public sealed class BasicCastleTests
     }
 
     [Theory]
-    [InlineData(Fen.Fen.StartPositionFen, CastleRights.WhiteKing, true)]
-    [InlineData(Fen.Fen.StartPositionFen, CastleRights.WhiteQueen, true)]
-    [InlineData(Fen.Fen.StartPositionFen, CastleRights.BlackKing, true)]
-    [InlineData(Fen.Fen.StartPositionFen, CastleRights.BlackQueen, true)]
+    [InlineData(FenData.StartPositionFen, CastleRights.WhiteKing, true)]
+    [InlineData(FenData.StartPositionFen, CastleRights.WhiteQueen, true)]
+    [InlineData(FenData.StartPositionFen, CastleRights.BlackKing, true)]
+    [InlineData(FenData.StartPositionFen, CastleRights.BlackQueen, true)]
     [InlineData("rnbqk2r/pppppppp/8/8/8/8/PPPPPPPP/RNBQK2R w KQkq - 0 1", CastleRights.WhiteKing, false)]
     [InlineData("rnbqk2r/pppppppp/8/8/8/8/PPPPPPPP/RNBQK2R w KQkq - 0 1", CastleRights.WhiteQueen, true)]
     [InlineData("rnbqk2r/pppppppp/8/8/8/8/PPPPPPPP/RNBQK2R w KQkq - 0 1", CastleRights.BlackKing, false)]

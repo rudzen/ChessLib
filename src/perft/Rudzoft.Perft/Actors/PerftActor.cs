@@ -17,7 +17,7 @@ public sealed class PerftActor : ReceiveActor
     private readonly IEpdParser _epdParser;
 
     private readonly IPerftRunner _perftRunner;
-    private readonly IActorRef _outputActor;
+    // private readonly IActorRef _outputActor;
     private readonly IActorRef _peftRunnerActor;
 
     private readonly EpdSettings _epdSettings;
@@ -30,8 +30,8 @@ public sealed class PerftActor : ReceiveActor
         _epdSettings = sp.GetRequiredService<EpdSettings>();
         _fenSettings = sp.GetRequiredService<FenSettings>();
 
-        var outputProps = Props.Create<OutputActor>();
-        _outputActor = Context.ActorOf(outputProps, "output-actor");
+        // var outputProps = Props.Create<OutputActor>(sp);
+        // _outputActor = Context.ActorOf(outputProps, "output-actor");
 
         var runnerProps = Props.Create<PerftRunnerActor>(sp);
         _peftRunnerActor = Context.ActorOf(runnerProps, "perft-runner-actor");
@@ -95,7 +95,7 @@ public sealed class PerftActor : ReceiveActor
     private static PerftPosition ParseFen(FenEntry fenEntry)
     {
         var fen = string.Equals("startpos", fenEntry.Fen, StringComparison.OrdinalIgnoreCase)
-            ? Fen.StartPositionFen
+            ? FenData.StartPositionFen
             : fenEntry.Fen;
         var ppValues = fenEntry.Depths.Select(x => new PerftPositionValue(x.Depth, x.ExpectedMoveCount)).ToList();
         return PerftPositionFactory.Create(Guid.NewGuid().ToString(), fen, ppValues);

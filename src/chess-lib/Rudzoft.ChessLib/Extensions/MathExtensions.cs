@@ -66,14 +66,17 @@ public static class MathExtensions
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int ModPow2(int input, int ceil) => input & (ceil - 1);
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static int Pow2(this int value) => 1 << BitBoards.Msb(value);
+    extension(int value)
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public int Pow2() => 1 << BitBoards.Msb(value);
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool IsEven(this int value) => (value & 1) == 0;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool IsEven() => (value & 1) == 0;
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool IsOdd(this int value) => !value.IsEven();
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool IsOdd() => !value.IsEven();
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static long MidPoint(this long @this, long that) => (@this + that) >> 1;

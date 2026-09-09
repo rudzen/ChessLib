@@ -27,13 +27,14 @@ SOFTWARE.
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.ObjectPool;
 using Rudzoft.ChessLib.Enums;
+using Rudzoft.ChessLib.Fen;
 using Rudzoft.ChessLib.Hash;
 using Rudzoft.ChessLib.MoveGeneration;
 using Rudzoft.ChessLib.Types;
 using Rudzoft.ChessLib.Validation;
 using File = Rudzoft.ChessLib.Types.File;
 
-namespace Rudzoft.ChessLib.Test.ZobristTests;
+namespace Rudzoft.ChessLib.Test;
 
 public sealed class ZobristHashTests
 {
@@ -46,8 +47,8 @@ public sealed class ZobristHashTests
             .AddSingleton<IValues, Values>()
             .AddSingleton<IRKiss, RKiss>()
             .AddSingleton<IZobrist, Zobrist>()
-            .AddSingleton<ICuckoo, Cuckoo>()
-            .AddSingleton<IPositionValidator, PositionValidator>()
+            .AddSingleton<Cuckoo>()
+            .AddSingleton<PositionValidator>()
             .AddTransient<IPosition, Position>()
             .AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>()
             .AddSingleton(static serviceProvider =>
@@ -60,9 +61,9 @@ public sealed class ZobristHashTests
     }
 
     [Theory]
-    [InlineData(Fen.Fen.StartPositionFen, Squares.a2, Squares.a4)]
-    [InlineData(Fen.Fen.StartPositionFen, Squares.a2, Squares.a3)]
-    [InlineData(Fen.Fen.StartPositionFen, Squares.b1, Squares.c3)]
+    [InlineData(FenData.StartPositionFen, Squares.a2, Squares.a4)]
+    [InlineData(FenData.StartPositionFen, Squares.a2, Squares.a3)]
+    [InlineData(FenData.StartPositionFen, Squares.b1, Squares.c3)]
     public void BackAndForthBasicMoves(string fen, Squares from, Squares to)
     {
         var pos = _serviceProvider.GetRequiredService<IPosition>();

@@ -39,7 +39,9 @@ public static class PieceExtensions
 
     public const string BookPieceNames = "pPnNbBrRqQkK";
 
-    private static readonly string[] PieceStrings = [" ", "P", "N", "B", "R", "Q", "K", " ", " ", "p", "n", "b", "r", "q", "k"
+    private static readonly string[] PieceStrings =
+    [
+        " ", "P", "N", "B", "R", "Q", "K", " ", " ", "p", "n", "b", "r", "q", "k"
     ];
 
     private static readonly string[] PieceNames = ["None", "Pawn", "Knight", "Bishop", "Rook", "Queen", "King"];
@@ -47,43 +49,49 @@ public static class PieceExtensions
     private static readonly char[] PieceUnicodeChar =
     [
         ' ',
-        '\u2659',   //  ♙   U+2659  &#9817;
-        '\u2658',   //  ♘   U+2658  &#9816;
-        '\u2657',   //  ♗   U+2657  &#9815;
-        '\u2656',   //  ♖   U+2656  &#9814;
-        '\u2655',   //  ♕   U+2655  &#9813;
-        '\u2654',   //  ♔   U+2654  &#9812;
+        '\u2659', //  ♙   U+2659  &#9817;
+        '\u2658', //  ♘   U+2658  &#9816;
+        '\u2657', //  ♗   U+2657  &#9815;
+        '\u2656', //  ♖   U+2656  &#9814;
+        '\u2655', //  ♕   U+2655  &#9813;
+        '\u2654', //  ♔   U+2654  &#9812;
         ' ',
         ' ',
-        '\u265F',   //  ♟   U+265F  &#9823;
-        '\u265E',   //  ♞   U+265E  &#9822;
-        '\u265D',   //  ♝   U+265D  &#9821;
-        '\u265C',   //  ♜   U+265C  &#9820;
-        '\u265B',   //  ♛   U+265B  &#9819;
-        '\u265A',   //  ♚   U+265A  &#9818;
+        '\u265F', //  ♟   U+265F  &#9823;
+        '\u265E', //  ♞   U+265E  &#9822;
+        '\u265D', //  ♝   U+265D  &#9821;
+        '\u265C', //  ♜   U+265C  &#9820;
+        '\u265B', //  ♛   U+265B  &#9819;
+        '\u265A', //  ♚   U+265A  &#9818;
         ' '
     ];
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static char GetPieceChar(this Piece pc) => PieceChars[pc];
+    extension(Piece pc)
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public string GetPieceString() => PieceStrings[pc];
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static char GetPieceChar(this PieceType pt) => PieceChars[pt];
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public string GetName() => PieceNames[pc.Type()];
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static string GetPieceString(this Piece pc) => PieceStrings[pc];
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public char GetPgnChar() => PgnPieceChars[pc.Type()];
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static string GetName(this Piece pc) => PieceNames[pc.Type()];
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public char GetUnicodeChar() => PieceUnicodeChar[pc];
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static char GetPromotionChar(this PieceType pt) => PromotionPieceNotation[pt];
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public char GetPieceChar() => PieceChars[pc];
+    }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static char GetPgnChar(this Piece pc) => PgnPieceChars[pc.Type()];
+    extension(PieceType pt)
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public char GetPieceChar() => PieceChars[pt];
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static char GetUnicodeChar(this Piece pc) => PieceUnicodeChar[pc];
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public char GetPromotionChar() => PromotionPieceNotation[pt];
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int AsInt(this Pieces pc) => (int)pc;

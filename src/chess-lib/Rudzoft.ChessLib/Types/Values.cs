@@ -72,7 +72,6 @@ public sealed class Values : IValues
 
     private Value _valueMateInMaxPly;
     private Value _valueMatedInMaxPly;
-    private Value _valueMate;
 
     public Values()
     {
@@ -128,13 +127,13 @@ public sealed class Values : IValues
 
     public Value ValueMate
     {
-        get => _valueMate;
+        get;
         set
         {
-            if (_valueMate == value)
+            if (field == value)
                 return;
 
-            _valueMate = value;
+            field = value;
             _valueMateInMaxPly = value - 2 * MaxPly;
             _valueMatedInMaxPly = value + 2 * MaxPly;
         }

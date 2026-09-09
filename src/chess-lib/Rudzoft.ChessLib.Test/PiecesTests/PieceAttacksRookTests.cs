@@ -42,10 +42,10 @@ public sealed class PieceAttacksRookTests : PieceAttacks
         _serviceProvider = new ServiceCollection()
             .AddTransient<IBoard, Board>()
             .AddSingleton<IValues, Values>()
-            .AddSingleton<ICuckoo, Cuckoo>()
+            .AddSingleton<Cuckoo>()
             .AddSingleton<IRKiss, RKiss>()
             .AddSingleton<IZobrist, Zobrist>()
-            .AddSingleton<IPositionValidator, PositionValidator>()
+            .AddSingleton<PositionValidator>()
             .AddTransient<IPosition, Position>()
             .AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>()
             .AddSingleton(static serviceProvider =>

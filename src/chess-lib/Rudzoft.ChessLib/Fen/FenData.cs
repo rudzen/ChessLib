@@ -39,9 +39,10 @@ namespace Rudzoft.ChessLib.Fen;
 [DebuggerDisplay("Fen='{Fen.ToString()}', Chunks={_splitPoints.Count}")]
 public sealed class FenData : EventArgs, IFenData
 {
-    private record struct SplitPoint(int Begin, int End);
+    public const string StartPositionFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+    public const int MaxFenLen = 128;
 
-    private readonly Queue<SplitPoint> _splitPoints = new(6);
+    private readonly Queue<Range> _splitPoints = new(6);
 
     public FenData(ReadOnlyMemory<char> fen)
     {
@@ -99,11 +100,9 @@ public sealed class FenData : EventArgs, IFenData
         _splitPoints.Enqueue(new(start, s.Length));
     }
 
-    public FenData(char[] fen) : this(fen.AsMemory())
-    { }
+    public FenData(char[] fen) : this(fen.AsMemory()) { }
 
-    public FenData(string fen) : this(fen.AsMemory())
-    { }
+    public FenData(string fen) : this(fen.AsMemory()) { }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator FenData(string value)
@@ -121,7 +120,7 @@ public sealed class FenData : EventArgs, IFenData
         // ReSharper disable once InlineOutVariableDeclaration
         Index++;
         return _splitPoints.TryDequeue(out var splitPoint)
-            ? Fen.Span[splitPoint.Begin..splitPoint.End]
+            ? Fen.Span[splitPoint]
             : ReadOnlySpan<char>.Empty;
     }
 

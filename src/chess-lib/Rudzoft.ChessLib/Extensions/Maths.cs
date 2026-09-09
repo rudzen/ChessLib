@@ -40,7 +40,7 @@ public static class Maths
     public static int ToIntegral(ReadOnlySpan<char> str)
     {
         if (str.IsEmpty || str.IsWhiteSpace())
-            return default;
+            return 0;
 
         var x = 0;
         var neg = false;

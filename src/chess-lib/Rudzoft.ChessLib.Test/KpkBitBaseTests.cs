@@ -27,28 +27,30 @@ SOFTWARE.
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.ObjectPool;
 using Rudzoft.ChessLib.Enums;
+using Rudzoft.ChessLib.Evaluation;
 using Rudzoft.ChessLib.Fen;
 using Rudzoft.ChessLib.Hash;
 using Rudzoft.ChessLib.MoveGeneration;
 using Rudzoft.ChessLib.Types;
 using Rudzoft.ChessLib.Validation;
 
-namespace Rudzoft.ChessLib.Test.PositionTests;
+namespace Rudzoft.ChessLib.Test;
 
-public sealed class ValidationTests
+public sealed class KpkBitBaseTests
 {
     private readonly IServiceProvider _serviceProvider;
 
-    public ValidationTests()
+    public KpkBitBaseTests()
     {
         _serviceProvider = new ServiceCollection()
             .AddTransient<IBoard, Board>()
             .AddSingleton<IValues, Values>()
             .AddSingleton<IRKiss, RKiss>()
             .AddSingleton<IZobrist, Zobrist>()
-            .AddSingleton<ICuckoo, Cuckoo>()
-            .AddSingleton<IPositionValidator, PositionValidator>()
+            .AddSingleton<Cuckoo>()
+            .AddSingleton<PositionValidator>()
             .AddTransient<IPosition, Position>()
+            .AddSingleton<IKpkBitBase, KpkBitBase>()
             .AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>()
             .AddSingleton(static serviceProvider =>
             {
@@ -59,51 +61,33 @@ public sealed class ValidationTests
             .BuildServiceProvider();
     }
 
-    [Fact]
-    public void ValidationKingsNegative()
+    // theory data layout:
+    // fen, player, expected win by strong side
+    [Theory]
+    [InlineData("2k5/8/8/8/1PK5/8/8/8 w - - 0 1", Colors.White, true)]
+    [InlineData("5k2/8/6KP/8/8/8/8/8 b - - 0 1", Colors.White, true)]
+    [InlineData("8/8/8/K7/P2k4/8/8/8 w - - 0 1", Colors.White, true)]
+    [InlineData("8/8/8/K7/P2k4/8/8/8 b - - 0 1", Colors.White, true)]
+    public void KpkWin(string fen, Colors rawColor, bool expected)
     {
-        const PositionValidationTypes type = PositionValidationTypes.Kings;
-        var expectedErrorMsg = $"king count for player {Color.White} was 2";
-
         var pos = _serviceProvider.GetRequiredService<IPosition>();
-
-        var fenData = new FenData(Fen.Fen.StartPositionFen);
-        var state = new State();
-
-        pos.Set(in fenData, ChessMode.Normal, state);
-
-        var pc = PieceType.King.MakePiece(Color.White);
-
-        pos.AddPiece(pc, Square.E4);
-
-        var (ok, actualErrorMessage) = pos.Validate(type);
-
-        Assert.NotNull(actualErrorMessage);
-        Assert.NotEmpty(actualErrorMessage);
-        Assert.Equal(expectedErrorMsg, actualErrorMessage);
-        Assert.False(ok);
-    }
-
-    [Fact]
-    public void ValidateCastle()
-    {
-        // position only has pawns, rooks and kings
-        const string fen = "r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 1";
-        const PositionValidationTypes validationType = PositionValidationTypes.Castle;
-
-        var pos = _serviceProvider.GetRequiredService<IPosition>();
-
         var fenData = new FenData(fen);
         var state = new State();
-
         pos.Set(in fenData, ChessMode.Normal, state);
 
-        var validator = pos.Validate(validationType);
+        Color strongSide = rawColor;
+        var weakSide = ~strongSide;
 
-        Assert.True(validator.Ok);
-        Assert.NotNull(validator.Errors);
-        Assert.Empty(validator.Errors);
+        var kpkBitBase = _serviceProvider.GetRequiredService<IKpkBitBase>();
+
+        var strongKing = kpkBitBase.Normalize(pos, strongSide,  pos.GetPieceSquare(PieceType.King, strongSide));
+        var strongPawn = kpkBitBase.Normalize(pos, strongSide, pos.GetPieceSquare(PieceType.Pawn, strongSide));
+        var weakKing = kpkBitBase.Normalize(pos, strongSide, pos.GetPieceSquare(PieceType.King, weakSide));
+
+        var us = strongSide == pos.SideToMove ? Color.White : Color.Black;
+
+        var won = !kpkBitBase.Probe(strongKing, strongPawn, weakKing, us);
+
+        Assert.Equal(expected, won);
     }
-
-    // TODO : Add tests for the rest of the validations
 }

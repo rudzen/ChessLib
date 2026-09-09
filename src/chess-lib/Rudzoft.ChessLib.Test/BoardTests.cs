@@ -36,7 +36,7 @@ using Rudzoft.ChessLib.MoveGeneration;
 using Rudzoft.ChessLib.Types;
 using Rudzoft.ChessLib.Validation;
 
-namespace Rudzoft.ChessLib.Test.BoardTests;
+namespace Rudzoft.ChessLib.Test;
 
 public sealed class BoardTestsTheoryData : TheoryData<string, PieceType, Color, int>
 {
@@ -82,8 +82,8 @@ public sealed class BoardTests
                            .AddSingleton<IValues, Values>()
                            .AddSingleton<IRKiss, RKiss>()
                            .AddSingleton<IZobrist, Zobrist>()
-                           .AddSingleton<ICuckoo, Cuckoo>()
-                           .AddSingleton<IPositionValidator, PositionValidator>()
+                           .AddSingleton<Cuckoo>()
+                           .AddSingleton<PositionValidator>()
                            .AddTransient<IPosition, Position>()
                            .AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>()
                            .AddSingleton(static serviceProvider =>

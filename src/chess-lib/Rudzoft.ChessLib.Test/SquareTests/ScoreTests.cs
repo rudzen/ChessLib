@@ -26,7 +26,7 @@ SOFTWARE.
 
 using Rudzoft.ChessLib.Types;
 
-namespace Rudzoft.ChessLib.Test.ScoreTests;
+namespace Rudzoft.ChessLib.Test.SquareTests;
 
 public sealed class ScoreTests
 {

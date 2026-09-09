@@ -54,18 +54,18 @@ public sealed class Position : IPosition
     private readonly CastleRight[] _castlingRightsMask;
     private readonly Square[] _castlingRookSquare;
     private readonly Value[] _nonPawnMaterial;
-    private readonly ICuckoo _cuckoo;
+    private readonly Cuckoo _cuckoo;
     private readonly ObjectPool<StringBuilder> _outputObjectPool;
     private readonly ObjectPool<MoveList> _moveListPool;
-    private readonly IPositionValidator _positionValidator;
+    private readonly PositionValidator _positionValidator;
     private Color _sideToMove;
 
     public Position(
         IBoard board,
         IValues values,
         IZobrist zobrist,
-        ICuckoo cuckoo,
-        IPositionValidator positionValidator,
+        Cuckoo cuckoo,
+        PositionValidator positionValidator,
         ObjectPool<MoveList> moveListPool)
     {
         _castleKingPath = new BitBoard[CastleRight.Count];
@@ -287,7 +287,7 @@ public sealed class Position : IPosition
         const char slash = '/';
         const char dash = '-';
 
-        Span<char> fen = stackalloc char[Fen.Fen.MaxFenLen];
+        Span<char> fen = stackalloc char[FenData.MaxFenLen];
         var length = 0;
 
         for (var rank = Ranks.Rank8; rank >= Ranks.Rank1; rank--)
@@ -1039,7 +1039,7 @@ public sealed class Position : IPosition
 
     public bool SeeGe(Move m, Value threshold)
     {
-        Debug.Assert(m.IsNullMove());
+        Debug.Assert(!m.IsNullMove());
 
         // Only deal with normal moves, assume others pass a simple see
         if (m.MoveType() != MoveTypes.Normal)
@@ -1250,7 +1250,7 @@ public sealed class Position : IPosition
         in FenData fenData, ChessMode chessMode, in State state, bool validate = false, int searcher = 0)
     {
         if (validate)
-            Fen.Fen.Validate(fenData.Fen.ToString());
+            fenData.Validate();
 
         Clear();
 
@@ -1441,9 +1441,6 @@ public sealed class Position : IPosition
 
         return movePositionKey;
     }
-
-    public PositionValidationResult Validate(PositionValidationTypes type = PositionValidationTypes.Basic)
-        => _positionValidator.Validate(this, type);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static CastleRights OrCastlingRight(Color c, bool isKingSide)

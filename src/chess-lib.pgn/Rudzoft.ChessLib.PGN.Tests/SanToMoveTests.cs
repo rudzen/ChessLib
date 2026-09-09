@@ -53,7 +53,7 @@ public sealed class SanToMoveTests
     public async Task BasicSanConvert()
     {
         var pos = _serviceProvider.GetRequiredService<IPosition>();
-        var fenData = new FenData(Fen.Fen.StartPositionFen);
+        var fenData = new FenData(FenData.StartPositionFen);
         var state = new State();
         pos.Set(in fenData, ChessMode.Normal, in state);
 
@@ -92,7 +92,7 @@ public sealed class SanToMoveTests
     public async Task AllAtOnceConvert()
     {
         var pos = _serviceProvider.GetRequiredService<IPosition>();
-        var fenData = new FenData(Fen.Fen.StartPositionFen);
+        var fenData = new FenData(FenData.StartPositionFen);
         var state = new State();
         pos.Set(in fenData, ChessMode.Normal, in state);
 

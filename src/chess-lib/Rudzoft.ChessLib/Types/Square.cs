@@ -24,6 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using System.Buffers;
 using System.Runtime.CompilerServices;
 using Rudzoft.ChessLib.Extensions;
 
@@ -56,8 +57,8 @@ public static class SquaresExtensions
 /// </summary>
 public readonly record struct Square(Squares Value) : ISpanFormattable, IComparable<Square>
 {
-    private static readonly string[] SquareStrings = Enum
-        .GetValues(typeof(Squares))
+    public static readonly string[] SquareStrings = Enum
+        .GetValues<Squares>()
         .Cast<Squares>()
         .Take(64)
         .Select(static x => x.ToString())

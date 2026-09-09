@@ -38,7 +38,7 @@ namespace Rudzoft.ChessLib;
 /// https://elidavid.com/pubs/blockage2.pdf
 /// https://pdfs.semanticscholar.org/31c2/d37c80ea1aef0676ba30393bc46c0ccc70e9.pdf
 /// </summary>
-public sealed class Blockage : IBlockage
+public static class Blockage
 {
     private record struct MarkedPawns(BitBoard Fixed, BitBoard Marked, BitBoard Dynamic);
 
@@ -47,7 +47,7 @@ public sealed class Blockage : IBlockage
 
     /// <inheritdoc />
     [SkipLocalsInit]
-    public bool IsBlocked(in IPosition pos)
+    public static bool IsBlocked(this IPosition pos)
     {
         // Quick check if there is only pawns and kings on the board
         // It might be possible to have a minor piece and exchange it into a passing pawn
@@ -229,6 +229,7 @@ public sealed class Blockage : IBlockage
     /// <summary>
     /// Computes the fence ranks
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void ComputeFenceRanks(Span<Rank> fenceRank, in BitBoard fence)
     {
         var covered = fence;
@@ -320,9 +321,11 @@ public sealed class Blockage : IBlockage
         return false;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static Square NextFenceRankSquare(Span<Rank> fenceRank, File f, Color them)
         => new Square(fenceRank[f] * 8 + f.AsInt()) + them.PawnPushDistance();
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static bool FormFence(in BitBoard marked, ref BitBoard fence, ref BitBoard processed, Color us)
     {
         var bb = PawnFileASquares;
@@ -367,7 +370,9 @@ public sealed class Blockage : IBlockage
         return result;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static File NextFile(File f) => f + 1;
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static File PreviousFile(File f) => f - 1;
 }

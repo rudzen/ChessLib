@@ -76,27 +76,30 @@ public static class StringExtensions
         return q;
     }
 
-    public static IEnumerable<int> GetLocations(this string @this, char token = ' ')
+    extension(string @this)
     {
-        var pos = 0;
-        do
+        public IEnumerable<int> GetLocations(char token = ' ')
         {
-            var index = @this.IndexOf(token, pos);
-            if (index == -1)
-                yield break;
-            yield return index;
-            pos = index + 1;
-        } while (true);
+            var pos = 0;
+            do
+            {
+                var index = @this.IndexOf(token, pos);
+                if (index == -1)
+                    yield break;
+                yield return index;
+                pos = index + 1;
+            } while (true);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public MemoryStream GenerateStream() => new(Encoding.UTF8.GetBytes(@this ?? string.Empty));
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool IsNullOrEmpty() => string.IsNullOrEmpty(@this);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool IsNullOrWhiteSpace() => string.IsNullOrWhiteSpace(@this);
     }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static MemoryStream GenerateStream(this string @this) => new(Encoding.UTF8.GetBytes(@this ?? string.Empty));
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool IsNullOrEmpty(this string @this) => string.IsNullOrEmpty(@this);
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool IsNullOrWhiteSpace(this string @this) => string.IsNullOrWhiteSpace(@this);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static char FlipCase(this char c)

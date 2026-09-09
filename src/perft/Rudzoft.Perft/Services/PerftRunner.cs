@@ -211,7 +211,7 @@ public sealed class PerftRunner : IPerftRunner
             if (cancellationToken.IsCancellationRequested)
                 yield break;
 
-            var fen = string.Equals("startpos", fenEntry.Fen, StringComparison.OrdinalIgnoreCase) ? Fen.StartPositionFen : fenEntry.Fen;
+            var fen = string.Equals("startpos", fenEntry.Fen, StringComparison.OrdinalIgnoreCase) ? FenData.StartPositionFen : fenEntry.Fen;
             var ppValues = fenEntry.Depths.Select(x => new PerftPositionValue(x.Depth, x.ExpectedMoveCount)).ToList();
             var perftPosition = PerftPositionFactory.Create(Guid.NewGuid().ToString(), fen, ppValues);
             yield return perftPosition;
@@ -288,7 +288,7 @@ public sealed class PerftRunner : IPerftRunner
         results.Nps = _uci.Nps(in result, results.Elapsed);
         results.CorrectResult = expected;
         results.Passed = expected == result;
-        results.TableHits = _transpositionTable.Hits;
+        results.TableHits = 0;
     }
 
     private int LogResults(PerftResult result)
@@ -306,8 +306,6 @@ public sealed class PerftRunner : IPerftRunner
         }
         else
             Log.Information("Result      : {Result}", result.Result);
-
-        Log.Information("TT hits     : {Hits}", _transpositionTable.Hits);
 
         var error = 0;
 

@@ -27,7 +27,6 @@ SOFTWARE.
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.ObjectPool;
 using Rudzoft.ChessLib.Enums;
-using Rudzoft.ChessLib.Exceptions;
 using Rudzoft.ChessLib.Fen;
 using Rudzoft.ChessLib.Hash;
 using Rudzoft.ChessLib.MoveGeneration;
@@ -43,25 +42,25 @@ public sealed class FenTests
     public FenTests()
     {
         _serviceProvider = new ServiceCollection()
-            .AddTransient<IBoard, Board>()
-            .AddSingleton<IValues, Values>()
-            .AddSingleton<IRKiss, RKiss>()
-            .AddSingleton<IZobrist, Zobrist>()
-            .AddSingleton<ICuckoo, Cuckoo>()
-            .AddSingleton<IPositionValidator, PositionValidator>()
-            .AddTransient<IPosition, Position>()
-            .AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>()
-            .AddSingleton(static serviceProvider =>
-            {
-                var provider = serviceProvider.GetRequiredService<ObjectPoolProvider>();
-                var policy = new DefaultPooledObjectPolicy<MoveList>();
-                return provider.Create(policy);
-            })
-            .BuildServiceProvider();
+                           .AddTransient<IBoard, Board>()
+                           .AddSingleton<IValues, Values>()
+                           .AddSingleton<IRKiss, RKiss>()
+                           .AddSingleton<IZobrist, Zobrist>()
+                           .AddSingleton<Cuckoo>()
+                           .AddSingleton<PositionValidator>()
+                           .AddTransient<IPosition, Position>()
+                           .AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>()
+                           .AddSingleton(static serviceProvider =>
+                           {
+                               var provider = serviceProvider.GetRequiredService<ObjectPoolProvider>();
+                               var policy = new DefaultPooledObjectPolicy<MoveList>();
+                               return provider.Create(policy);
+                           })
+                           .BuildServiceProvider();
     }
 
     [Theory]
-    [InlineData(Fen.Fen.StartPositionFen)]
+    [InlineData(FenData.StartPositionFen)]
     [InlineData("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1")]
     [InlineData("8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - 0 1")]
     [InlineData("r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1")]
@@ -80,20 +79,18 @@ public sealed class FenTests
     }
 
     [Theory]
-    [InlineData("z3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1", typeof(InvalidFenException))]
-    [InlineData("r3k2r/p1ppqpb1/bn2pnp1/3PN3/ip2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1", typeof(InvalidFenException))]
-    [InlineData("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/lPPBBPPP/R3K2R w KQkq - 0 1", typeof(InvalidFenException))]
-    public void Validate(string fen, Type expectedException)
+    [InlineData("z3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1", "Invalid char detected")]
+    [InlineData("r3k2r/p1ppqpb1/bn2pnp1/3PN3/ip2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1", "Invalid char detected")]
+    [InlineData("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/lPPBBPPP/R3K2R w KQkq - 0 1", "Invalid char detected")]
+    [InlineData("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/lPPBBPPP/R3K2R x KQkq - 0 1", "Invalid char detected")]
+    [InlineData("8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - 0 2444", "Invalid fen, full move count exceeds limit")]
+    [InlineData("8/2p5/3p4/KP5r/1R3p1k/8/4P1P1//8 w - - 0 1", "Invalid format for fen ")]
+    [InlineData("8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - 321312 1", "Invalid fen, half move count exceeds limit")]
+    [InlineData("8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - 0 1 a", "Invalid format for fen ")]
+    public void Validate(string fen, string startsWith)
     {
-        var pos = _serviceProvider.GetRequiredService<IPosition>();
-
-        var exception = Assert.Throws(expectedException, () =>
-        {
-            var fenData = new FenData(fen);
-            var state = new State();
-            pos.Set(in fenData, ChessMode.Normal, state);
-        });
-        Assert.NotNull(exception.Message);
-        Assert.StartsWith("Invalid char detected", exception.Message);
+        var result = FenValidator.Validate(fen);
+        Assert.StartsWith(startsWith, result.Error);
+        Assert.False(result.IsSuccess);
     }
 }

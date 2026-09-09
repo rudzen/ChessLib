@@ -42,8 +42,6 @@ public sealed class HiResTimer : IHiResTimer, IEquatable<HiResTimer>
 
     private readonly object _intervalLock;
 
-    private float _interval;
-
     private CancellationTokenSource _cancellationTokenSource;
 
     private Task _executer;
@@ -75,7 +73,7 @@ public sealed class HiResTimer : IHiResTimer, IEquatable<HiResTimer>
         get
         {
             lock (_intervalLock)
-                return _interval;
+                return field;
         }
 
         set
@@ -83,7 +81,7 @@ public sealed class HiResTimer : IHiResTimer, IEquatable<HiResTimer>
             if (value is < 0f or float.NaN)
                 throw new ArgumentOutOfRangeException(nameof(value));
             lock (_intervalLock)
-                _interval = value;
+                field = value;
         }
     }
 

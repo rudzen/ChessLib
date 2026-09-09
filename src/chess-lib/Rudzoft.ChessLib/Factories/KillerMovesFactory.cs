@@ -28,11 +28,13 @@ using Rudzoft.ChessLib.Tables.KillerMoves;
 
 namespace Rudzoft.ChessLib.Factories;
 
-public sealed class KillerMovesFactory : IKillerMovesFactory
+public sealed class KillerMovesFactory : IServiceFactory<IKillerMoves>
 {
+    private const int DefaultDepth = 64;
+
     public IKillerMoves Create()
     {
-        return Create(IKillerMovesFactory.DefaultDepth);
+        return Create(DefaultDepth);
     }
 
     public IKillerMoves Create(int depth)

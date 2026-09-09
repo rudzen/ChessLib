@@ -33,21 +33,21 @@ using Rudzoft.ChessLib.MoveGeneration;
 using Rudzoft.ChessLib.Types;
 using Rudzoft.ChessLib.Validation;
 
-namespace Rudzoft.ChessLib.Test.PositionTests;
+namespace Rudzoft.ChessLib.Test;
 
-public sealed class PositionTests
+public sealed class ValidationTests
 {
     private readonly IServiceProvider _serviceProvider;
 
-    public PositionTests()
+    public ValidationTests()
     {
         _serviceProvider = new ServiceCollection()
             .AddTransient<IBoard, Board>()
             .AddSingleton<IValues, Values>()
             .AddSingleton<IRKiss, RKiss>()
             .AddSingleton<IZobrist, Zobrist>()
-            .AddSingleton<ICuckoo, Cuckoo>()
-            .AddSingleton<IPositionValidator, PositionValidator>()
+            .AddSingleton<Cuckoo>()
+            .AddSingleton<PositionValidator>()
             .AddTransient<IPosition, Position>()
             .AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>()
             .AddSingleton(static serviceProvider =>
@@ -60,78 +60,52 @@ public sealed class PositionTests
     }
 
     [Fact]
-    public void AddPieceTest()
+    public void ValidationKingsNegative()
     {
-        const string expectedFen = "rnbqkbnr/Pppppppp/8/8/8/8/PPP1PPPP/RNBQKBNR w KQkq - 0 1";
-        var pos = _serviceProvider.GetRequiredService<IPosition>();
+        const PositionValidationTypes type = PositionValidationTypes.Kings;
+        var expectedErrorMsg = $"king count for player {Color.White} was 2";
 
-        var fenData = new FenData("rnbqkbnr/pppppppp/8/8/8/8/PPP1PPPP/RNBQKBNR w KQkq - 0 1");
+        var pos = _serviceProvider.GetRequiredService<IPosition>();
+        var posValidator = _serviceProvider.GetRequiredService<PositionValidator>();
+
+        var fenData = new FenData(FenData.StartPositionFen);
         var state = new State();
 
         pos.Set(in fenData, ChessMode.Normal, state);
 
-        var square = Square.A7;
-        pos.AddPiece(Piece.WhitePawn, square);
+        var pc = PieceType.King.MakePiece(Color.White);
 
-        var actualFen = pos.FenNotation;
+        pos.AddPiece(pc, Square.E4);
 
-        Assert.Equal(expectedFen, actualFen);
+        var (ok, actualErrorMessage) = posValidator.Validate(pos, type);
 
-        var piece = pos.GetPiece(square);
-        Assert.Equal(Piece.WhitePawn, piece);
+        Assert.NotNull(actualErrorMessage);
+        Assert.NotEmpty(actualErrorMessage);
+        Assert.Equal(expectedErrorMsg, actualErrorMessage);
+        Assert.False(ok);
     }
 
     [Fact]
-    public void KingBlocker()
+    public void ValidateCastle()
     {
-        // black has an absolute pinned piece at e6
-        const string fen = "1rk5/8/4n3/5B2/1N6/8/8/1Q1K4 b - - 3 53";
-
-        const int expected = 1;
-        var expectedSquare = new Square(Ranks.Rank6, Files.FileE);
+        // position only has pawns, rooks and kings
+        const string fen = "r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 1";
+        const PositionValidationTypes validationType = PositionValidationTypes.Castle;
 
         var pos = _serviceProvider.GetRequiredService<IPosition>();
+        var posValidator = _serviceProvider.GetRequiredService<PositionValidator>();
 
         var fenData = new FenData(fen);
         var state = new State();
 
         pos.Set(in fenData, ChessMode.Normal, state);
 
-        var b = pos.KingBlockers(Color.Black);
+        var validator = posValidator.Validate(pos, validationType);
 
-        // b must contain one square at this point
-        var pinnedCount = b.Count;
-
-        Assert.Equal(expected, pinnedCount);
-
-        // test for correct square
-        var actual = b.Lsb();
-
-        Assert.Equal(expectedSquare, actual);
+        Assert.True(validator.Ok);
+        Assert.NotNull(validator.Errors);
+        Assert.Empty(validator.Errors);
     }
 
-    [Theory]
-    [InlineData("KPK", "k7/8/8/8/8/8/8/KP6 w - - 0 10")]
-    [InlineData("KNNK", "k7/8/8/8/8/8/8/KNN5 w - - 0 10")]
-    [InlineData("KBNK", "k7/8/8/8/8/8/8/KBN5 w - - 0 10")]
-    public void SetByCodeCreatesSameMaterialKey(string code, string fen)
-    {
-        var pos = _serviceProvider.GetRequiredService<IPosition>();
-
-        var fenData = new FenData(fen);
-        var state = new State();
-
-        pos.Set(in fenData, ChessMode.Normal, state);
-
-        var materialKey = pos.State.MaterialKey;
-
-        var posCode = pos.Set(code, Color.White, in state);
-        var codeMaterialKey = posCode.State.MaterialKey;
-
-        Assert.Equal(materialKey, codeMaterialKey);
-
-        var codeFen = pos.GenerateFen().ToString();
-
-        Assert.Equal(fen, codeFen);
-    }
+    // TODO : Add tests for the rest of the validations
 }

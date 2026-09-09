@@ -33,21 +33,21 @@ using Rudzoft.ChessLib.MoveGeneration;
 using Rudzoft.ChessLib.Types;
 using Rudzoft.ChessLib.Validation;
 
-namespace Rudzoft.ChessLib.Test.GameplayTests;
+namespace Rudzoft.ChessLib.Test;
 
-public sealed class FoolsCheckMateTests
+public sealed class PositionTests
 {
     private readonly IServiceProvider _serviceProvider;
 
-    public FoolsCheckMateTests()
+    public PositionTests()
     {
         _serviceProvider = new ServiceCollection()
             .AddTransient<IBoard, Board>()
             .AddSingleton<IValues, Values>()
             .AddSingleton<IRKiss, RKiss>()
             .AddSingleton<IZobrist, Zobrist>()
-            .AddSingleton<ICuckoo, Cuckoo>()
-            .AddSingleton<IPositionValidator, PositionValidator>()
+            .AddSingleton<Cuckoo>()
+            .AddSingleton<PositionValidator>()
             .AddTransient<IPosition, Position>()
             .AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>()
             .AddSingleton(static serviceProvider =>
@@ -60,31 +60,78 @@ public sealed class FoolsCheckMateTests
     }
 
     [Fact]
-    public void FoolsCheckMate()
+    public void AddPieceTest()
     {
-        // generate moves
-        var moves = new[]
-        {
-            Move.Create(Square.F2, Square.F3),
-            Move.Create(Square.E7, Square.E5),
-            Move.Create(Square.G2, Square.G4),
-            Move.Create(Square.D8, Square.H4)
-        };
-
+        const string expectedFen = "rnbqkbnr/Pppppppp/8/8/8/8/PPP1PPPP/RNBQKBNR w KQkq - 0 1";
         var pos = _serviceProvider.GetRequiredService<IPosition>();
-        var fenData = new FenData(Fen.Fen.StartPositionFen);
+
+        var fenData = new FenData("rnbqkbnr/pppppppp/8/8/8/8/PPP1PPPP/RNBQKBNR w KQkq - 0 1");
         var state = new State();
+
         pos.Set(in fenData, ChessMode.Normal, state);
 
-        // make the moves necessary to create a mate
-        foreach (var move in moves)
-            pos.MakeMove(move, in state);
+        var square = Square.A7;
+        pos.AddPiece(Piece.WhitePawn, square);
 
-        // verify in check is actually true
-        Assert.True(pos.InCheck);
+        var actualFen = pos.FenNotation;
 
-        var isMate = pos.IsMate;
+        Assert.Equal(expectedFen, actualFen);
 
-        Assert.True(isMate);
+        var piece = pos.GetPiece(square);
+        Assert.Equal(Piece.WhitePawn, piece);
+    }
+
+    [Fact]
+    public void KingBlocker()
+    {
+        // black has an absolute pinned piece at e6
+        const string fen = "1rk5/8/4n3/5B2/1N6/8/8/1Q1K4 b - - 3 53";
+
+        const int expected = 1;
+        var expectedSquare = new Square(Ranks.Rank6, Files.FileE);
+
+        var pos = _serviceProvider.GetRequiredService<IPosition>();
+
+        var fenData = new FenData(fen);
+        var state = new State();
+
+        pos.Set(in fenData, ChessMode.Normal, state);
+
+        var b = pos.KingBlockers(Color.Black);
+
+        // b must contain one square at this point
+        var pinnedCount = b.Count;
+
+        Assert.Equal(expected, pinnedCount);
+
+        // test for correct square
+        var actual = b.Lsb();
+
+        Assert.Equal(expectedSquare, actual);
+    }
+
+    [Theory]
+    [InlineData("KPK", "k7/8/8/8/8/8/8/KP6 w - - 0 10")]
+    [InlineData("KNNK", "k7/8/8/8/8/8/8/KNN5 w - - 0 10")]
+    [InlineData("KBNK", "k7/8/8/8/8/8/8/KBN5 w - - 0 10")]
+    public void SetByCodeCreatesSameMaterialKey(string code, string fen)
+    {
+        var pos = _serviceProvider.GetRequiredService<IPosition>();
+
+        var fenData = new FenData(fen);
+        var state = new State();
+
+        pos.Set(in fenData, ChessMode.Normal, state);
+
+        var materialKey = pos.State.MaterialKey;
+
+        var posCode = pos.Set(code, Color.White, in state);
+        var codeMaterialKey = posCode.State.MaterialKey;
+
+        Assert.Equal(materialKey, codeMaterialKey);
+
+        var codeFen = pos.GenerateFen().ToString();
+
+        Assert.Equal(fen, codeFen);
     }
 }

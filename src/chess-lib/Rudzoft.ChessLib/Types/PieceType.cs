@@ -20,15 +20,6 @@ public readonly record struct PieceType(PieceTypes Value) :
     IMinMaxValue<PieceType>,
     IComparisonOperators<PieceType, PieceType, bool>,
     IAdditionOperators<PieceType, Color, Piece>
-    // ,
-    // ISubtractionOperators<PieceType, int, PieceType>,
-    // IMultiplyOperators<PieceType, int, PieceType>,
-    // IDivisionOperators<PieceType, int, PieceType>,
-    // IUnaryPlusOperators<PieceType, PieceType>,
-    // IUnaryNegationOperators<PieceType, PieceType>,
-    // IIncrementOperators<PieceType>,
-    // IDecrementOperators<PieceType>
-
 {
     public PieceType(int pt) : this((PieceTypes)pt) { }
 

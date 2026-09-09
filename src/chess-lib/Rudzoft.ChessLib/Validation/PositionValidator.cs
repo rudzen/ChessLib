@@ -44,44 +44,48 @@ public enum PositionValidationTypes
     All = Basic | Castle | Kings | Pawns | PieceConsistency | PieceCount | PieceTypes | State
 }
 
+public sealed record PositionValidationResult(bool Ok, string Errors);
+
 public static class PositionValidationTypesExtensions
 {
     public static bool HasFlagFast(this PositionValidationTypes @this, PositionValidationTypes flag)
         => (@this & flag) != PositionValidationTypes.None;
 }
 
-public sealed class PositionValidator(IZobrist zobrist) : IPositionValidator
+public sealed class PositionValidator(IZobrist zobrist)
 {
     public PositionValidationResult Validate(in IPosition pos, PositionValidationTypes type = PositionValidationTypes.All)
     {
-        var errors = new List<string>();
+        IEnumerable<string> errors = [];
 
         if (type.HasFlagFast(PositionValidationTypes.Basic))
-            errors.AddRange(ValidateBasic(pos));
+            errors = errors.Concat(ValidateBasic(pos));
 
         if (type.HasFlagFast(PositionValidationTypes.Castle))
-            errors.AddRange(ValidateCastle(pos));
+            errors = errors.Concat(ValidateCastle(pos));
 
         if (type.HasFlagFast(PositionValidationTypes.Kings))
-            errors.AddRange(ValidateKings(pos));
+            errors = errors.Concat(ValidateKings(pos));
 
         if (type.HasFlagFast(PositionValidationTypes.Pawns))
-            errors.AddRange(ValidatePawns(pos));
+            errors = errors.Concat(ValidatePawns(pos));
 
         if (type.HasFlagFast(PositionValidationTypes.PieceConsistency))
-            errors.AddRange(ValidatePieceConsistency(pos));
+            errors = errors.Concat(ValidatePieceConsistency(pos));
 
         if (type.HasFlagFast(PositionValidationTypes.PieceCount))
-            errors.AddRange(ValidatePieceCount(pos));
+            errors = errors.Concat(ValidatePieceCount(pos));
 
         if (type.HasFlagFast(PositionValidationTypes.PieceTypes))
-            errors.AddRange(ValidatePieceTypes(pos));
+            errors = errors.Concat(ValidatePieceTypes(pos));
 
         if (type.HasFlagFast(PositionValidationTypes.State))
-            errors.AddRange(ValidateState(pos));
+            errors = errors.Concat(ValidateState(pos));
 
-        var ok = errors.Count == 0;
-        return new(ok, ok ? string.Empty : string.Join('\n', errors));
+        var errorsList = errors.ToArray();
+
+        var ok = errorsList.Length == 0;
+        return new(ok, ok ? string.Empty : string.Join('\n', errorsList));
     }
 
     private static IEnumerable<string> ValidateBasic(IPosition pos)

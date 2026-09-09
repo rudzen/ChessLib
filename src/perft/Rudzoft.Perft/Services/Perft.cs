@@ -116,12 +116,16 @@ public sealed class Perft(IGame game, IEnumerable<PerftPosition> positions) : IP
         if (pos.Value.Count == 0)
             return false;
 
-        var depthValue = pos.Value.Find(v => v.Depth == depth && v.MoveCount > 0);
+        var depthValue = pos.Value.Find(v => v.Depth == depth);
 
-        return !depthValue.Equals(default);
+        return depthValue.MoveCount > 0;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public ulong GetPositionCount(int index, int depth)
-        => Positions[index].Value[depth - 1].MoveCount;
+    {
+        var pos = Positions[index];
+        var depthValue = pos.Value.Find(v => v.Depth == depth);
+        return depthValue.MoveCount;
+    }
 }

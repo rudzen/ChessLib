@@ -1,4 +1,4 @@
-/*
+﻿/*
 ChessLib, a chess data structure library
 
 MIT License
@@ -33,23 +33,22 @@ using Rudzoft.ChessLib.MoveGeneration;
 using Rudzoft.ChessLib.Types;
 using Rudzoft.ChessLib.Validation;
 
-namespace Rudzoft.ChessLib.Test.FenceTests;
+namespace Rudzoft.ChessLib.Test.FENTests;
 
-public sealed class FenceTests
+public sealed class EnPassantFenTests
 {
     private readonly IServiceProvider _serviceProvider;
 
-    public FenceTests()
+    public EnPassantFenTests()
     {
         _serviceProvider = new ServiceCollection()
             .AddTransient<IBoard, Board>()
             .AddSingleton<IValues, Values>()
             .AddSingleton<IRKiss, RKiss>()
             .AddSingleton<IZobrist, Zobrist>()
-            .AddSingleton<ICuckoo, Cuckoo>()
-            .AddSingleton<IPositionValidator, PositionValidator>()
+            .AddSingleton<Cuckoo>()
+            .AddSingleton<PositionValidator>()
             .AddTransient<IPosition, Position>()
-            .AddSingleton<IBlockage, Blockage>()
             .AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>()
             .AddSingleton(static serviceProvider =>
             {
@@ -61,22 +60,26 @@ public sealed class FenceTests
     }
 
     [Theory]
-    [InlineData("8/8/k7/p1p1p1p1/P1P1P1P1/8/8/4K3 w - - 0 1", true)]
-    [InlineData("4k3/5p2/1p1p1P1p/1P1P1P1P/3P4/8/4K3/8 w - - 0 1", true)]
-    [InlineData("5k2/8/8/p1p1pPp1/P1P1P1P1/8/8/4K3 w - - 0 1", true)]
-    [InlineData("8/8/k7/p1p1pPp1/P1P1P1P1/8/8/4K3 w - - 0 1", false)] // white pawn cannot be blocked by the black king
-    [InlineData("5k2/8/8/pPp1pPp1/P1P1P1P1/8/8/4K3 w - - 0 1", false)]
-    [InlineData("8/2p5/kp2p1p1/p1p1P1P1/P1P2P2/1P4K1/8/8 w - - 0 1", false)]
-    public void Blocked(string fen, bool expected)
+    [InlineData("rnbkqbnr/pp1pp1pp/5p2/2pP4/8/8/PPP1PPPP/RNBKQBNR w KQkq c6 0 1", Squares.c6)] // valid
+    [InlineData("rnbkqbnr/pp1pp1pp/5p2/2pP4/8/8/PPP1PPPP/RNBKQBNR w KQkq c7 0 1", Squares.none)] // invalid rank
+    [InlineData("rnbkqbnr/pp1pp1pp/5p2/2pP4/8/8/PPP1PPPP/RNBKQBNR w KQkq - 0 1", Squares.none)] // no square set
+    [InlineData("rnbkqbnr/pp1pp1pp/5p2/2pP4/8/8/PPP1PPPP/RNBKQBNR w KQkq c 0 1", Squares.none)] // only file set
+    [InlineData("rnbqkbnr/pppppp2/7p/8/3PP1pP/5P2/PPP3P1/RNBQKBNR b KQkq h3 0 1", Squares.h3)] // valid
+    [InlineData("rnbqkbnr/pppppp2/7p/8/3PP1pP/5P2/PPP3P1/RNBQKBNR b KQkq h4 0 1", Squares.none)] // invalid rank
+    [InlineData("rnbqkbnr/pppppp2/7p/8/3PP1pP/5P2/PPP3P1/RNBQKBNR b KQkq - 0 1", Squares.none)] // no square set
+    [InlineData("rnbqkbnr/pppppp2/7p/8/3PP1pP/5P2/PPP3P1/RNBQKBNR b KQkq -- 0 1", Squares.none)] // invalid format
+    [InlineData("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq c6 0 1", Squares.none)] // start pos with ep square
+    [InlineData("rnbqkbnr/2pppp2/p6p/1p2PB2/3P2pP/5P2/PPP3P1/RNBQK1NR b KQkq h3 0 1", Squares.h3)] // valid
+    public void EnPassantSquare(string fen, Squares expected)
     {
         var pos = _serviceProvider.GetRequiredService<IPosition>();
+
         var fenData = new FenData(fen);
         var state = new State();
+
         pos.Set(in fenData, ChessMode.Normal, state);
 
-        var blockage = _serviceProvider.GetRequiredService<IBlockage>();
-        var actual = blockage.IsBlocked(in pos);
-
-        Assert.Equal(expected, actual);
+        var actual = pos.EnPassantSquare;
+        Assert.Equal(expected, actual.Value);
     }
 }

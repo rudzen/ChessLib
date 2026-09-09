@@ -25,6 +25,7 @@ SOFTWARE.
 */
 
 using Microsoft.Extensions.ObjectPool;
+using Rudzoft.ChessLib.Fen;
 using Rudzoft.ChessLib.Hash;
 using Rudzoft.ChessLib.Hash.Tables.Transposition;
 using Rudzoft.ChessLib.MoveGeneration;
@@ -49,7 +50,7 @@ public class PerftBench
     {
         var pp = PerftPositionFactory.Create(
             Guid.NewGuid().ToString(),
-            Fen.Fen.StartPositionFen,
+            FenData.StartPositionFen,
             [
                 new(1, 20),
                 new(2, 400),

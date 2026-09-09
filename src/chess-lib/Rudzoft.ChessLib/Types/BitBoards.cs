@@ -172,7 +172,8 @@ public static class BitBoards
         FileFBB | FileHBB, FileGBB
     ];
 
-    private static readonly int[][] SquareDistance = new int[Square.Count][]; // chebyshev distance
+    // chebyshev distance
+    private static readonly int[][] SquareDistance = new int[Square.Count][];
 
     private static readonly BitBoard[][] DistanceRingBB = new BitBoard[Square.Count][];
 
@@ -192,20 +193,30 @@ public static class BitBoards
         for (var i = 0; i < PseudoAttacksBB.Length; i++)
             PseudoAttacksBB[i] = new BitBoard[Square.Count];
 
-        PawnAttackSpanBB[0] = new BitBoard[Square.Count];
-        PawnAttackSpanBB[1] = new BitBoard[Square.Count];
+        PawnAttackSpanBB = [
+            new BitBoard[Square.Count],
+            new BitBoard[Square.Count]
+        ];
 
-        PassedPawnMaskBB[0] = new BitBoard[Square.Count];
-        PassedPawnMaskBB[1] = new BitBoard[Square.Count];
+        PassedPawnMaskBB = [
+            new BitBoard[Square.Count],
+            new BitBoard[Square.Count]
+        ];
 
-        ForwardRanksBB[0] = new BitBoard[Square.Count];
-        ForwardRanksBB[1] = new BitBoard[Square.Count];
+        ForwardRanksBB = [
+            new BitBoard[Square.Count],
+            new BitBoard[Square.Count]
+        ];
 
-        ForwardFileBB[0] = new BitBoard[Square.Count];
-        ForwardFileBB[1] = new BitBoard[Square.Count];
+        ForwardFileBB = [
+            new BitBoard[Square.Count],
+            new BitBoard[Square.Count]
+        ];
 
-        KingRingBB[0] = new BitBoard[Square.Count];
-        KingRingBB[1] = new BitBoard[Square.Count];
+        KingRingBB = [
+            new BitBoard[Square.Count],
+            new BitBoard[Square.Count]
+        ];
 
         for (var i = 0; i < BetweenBB.Length; i++)
         {
@@ -365,28 +376,30 @@ public static class BitBoards
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static BitBoard PseudoAttacks(this PieceType pt, Square sq) => PseudoAttacksBB[pt][sq];
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard KnightAttacks(this Square sq) => PseudoAttacksBB[PieceType.Knight][sq];
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard KingAttacks(this Square sq) => PseudoAttacksBB[PieceType.King][sq];
-
-    /// <summary>
-    /// Attack for pawn.
-    /// </summary>
     /// <param name="sq">The square</param>
-    /// <param name="c">The player side</param>
-    /// <returns>ref to bitboard of attack</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard PawnAttack(this Square sq, Color c) => PseudoAttacksBB[c][sq];
+    extension(Square sq)
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public BitBoard KnightAttacks() => PseudoAttacksBB[PieceType.Knight][sq];
 
-    /// <summary>
-    /// Returns the bitboard representation of the rank of which the square is located.
-    /// </summary>
-    /// <param name="sq">The square</param>
-    /// <returns>The bitboard of square rank</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard BitBoardRank(this Square sq) => sq.Rank.BitBoardRank();
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public BitBoard KingAttacks() => PseudoAttacksBB[PieceType.King][sq];
+
+        /// <summary>
+        /// Attack for pawn.
+        /// </summary>
+        /// <param name="c">The player side</param>
+        /// <returns>ref to bitboard of attack</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public BitBoard PawnAttack(Color c) => PseudoAttacksBB[c][sq];
+
+        /// <summary>
+        /// Returns the bitboard representation of the rank of which the square is located.
+        /// </summary>
+        /// <returns>The bitboard of square rank</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public BitBoard BitBoardRank() => sq.Rank.BitBoardRank();
+    }
 
     /// <summary>
     /// Returns the bitboard representation of a rank.
@@ -731,11 +744,14 @@ public static class BitBoards
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int PopCount(in BitBoard bb) => BitOperations.PopCount(bb.Value);
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard Rank7(this Color c) => Ranks7BB[c];
+    extension(Color c)
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public BitBoard Rank7() => Ranks7BB[c];
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BitBoard Rank3(this Color c) => Ranks3BB[c];
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public BitBoard Rank3() => Ranks3BB[c];
+    }
 
     /// <summary>
     /// Generate a bitboard based on a square.

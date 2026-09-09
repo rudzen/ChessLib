@@ -27,7 +27,7 @@ SOFTWARE.
 using Rudzoft.Perft.Settings.Settings;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
-namespace Rudzoft.ChessLib.Test.MaterialTests;
+namespace Rudzoft.ChessLib.Test;
 
 public sealed class MaterialTests
 {

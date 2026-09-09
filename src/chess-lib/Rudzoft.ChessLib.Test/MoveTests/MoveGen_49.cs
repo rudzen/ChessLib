@@ -45,9 +45,9 @@ public sealed class MoveGen_49
             .AddTransient<IBoard, Board>()
             .AddSingleton<IRKiss, RKiss>()
             .AddSingleton<IValues, Values>()
-            .AddSingleton<ICuckoo, Cuckoo>()
+            .AddSingleton<Cuckoo>()
             .AddSingleton<IZobrist, Zobrist>()
-            .AddSingleton<IPositionValidator, PositionValidator>()
+            .AddSingleton<PositionValidator>()
             .AddTransient<IPosition, Position>()
             .AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>()
             .AddSingleton(static serviceProvider =>

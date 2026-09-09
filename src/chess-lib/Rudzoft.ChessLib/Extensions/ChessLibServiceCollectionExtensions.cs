@@ -45,74 +45,76 @@ namespace Rudzoft.ChessLib.Extensions;
 
 public static class ChessLibServiceCollectionExtensions
 {
-    public static IServiceCollection AddChessLib(
-        this IServiceCollection serviceCollection,
-        IConfiguration configuration = null,
-        string configurationFile = null)
+    extension(IServiceCollection serviceCollection)
     {
-        ArgumentNullException.ThrowIfNull(serviceCollection);
-
-        if (configuration == null)
+        public IServiceCollection AddChessLib(
+            IConfiguration configuration = null,
+            string configurationFile = null)
         {
-            configuration = LoadConfiguration(configurationFile);
-            serviceCollection.AddSingleton(configuration);
+            ArgumentNullException.ThrowIfNull(serviceCollection);
+
+            if (configuration == null)
+            {
+                configuration = LoadConfiguration(configurationFile);
+                serviceCollection.AddSingleton(configuration);
+            }
+
+            serviceCollection.BindConfigurations(configuration);
+
+            serviceCollection.TryAddSingleton<ITranspositionTable, TranspositionTable>();
+            serviceCollection.TryAddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>();
+            serviceCollection.TryAddSingleton(static serviceProvider =>
+            {
+                var provider = serviceProvider.GetRequiredService<ObjectPoolProvider>();
+                var policy = new DefaultPooledObjectPolicy<MoveList>();
+                return provider.Create(policy);
+            });
+
+            return serviceCollection
+                   .AddSingleton(static sp =>
+                   {
+                       var  pool = sp.GetRequiredService<ObjectPool<MoveList>>();
+                       IUci uci  = new Uci(pool);
+                       uci.Initialize();
+                       return uci;
+                   })
+                   .AddSingleton<Cuckoo>()
+                   .AddSingleton<IRKiss, RKiss>()
+                   .AddSingleton<IZobrist, Zobrist>()
+                   .AddTransient<KillerMovesFactory>()
+                   .AddSingleton<ISearchParameters, SearchParameters>()
+                   .AddSingleton<IValues, Values>()
+                   .AddSingleton<IKpkBitBase, KpkBitBase>()
+                   .AddTransient<IBoard, Board>()
+                   .AddSingleton<PositionValidator>()
+                   .AddTransient<IPosition, Position>()
+                   .AddTransient<IGame, Game>()
+                   .AddSingleton<PolyglotBookFactory>()
+                   .AddSingleton<ICpu, Cpu>()
+                   .AddNotationServices();
         }
 
-        serviceCollection.BindConfigurations(configuration);
-
-        serviceCollection.TryAddSingleton<ITranspositionTable, TranspositionTable>();
-        serviceCollection.TryAddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>();
-        serviceCollection.TryAddSingleton(static serviceProvider =>
+        private void BindConfigurations(IConfiguration configuration)
         {
-            var provider = serviceProvider.GetRequiredService<ObjectPoolProvider>();
-            var policy = new DefaultPooledObjectPolicy<MoveList>();
-            return provider.Create(policy);
-        });
+            var transpositionConfigurationSection = configuration.GetSection(TranspositionTableConfiguration.Section);
+            serviceCollection.Configure<TranspositionTableConfiguration>(transpositionConfigurationSection);
 
-        return serviceCollection
-               .AddSingleton(static sp =>
-               {
-                   var  pool = sp.GetRequiredService<ObjectPool<MoveList>>();
-                   IUci uci  = new Uci(pool);
-                   uci.Initialize();
-                   return uci;
-               })
-               .AddSingleton<ICuckoo, Cuckoo>()
-               .AddSingleton<IRKiss, RKiss>()
-               .AddSingleton<IZobrist, Zobrist>()
-               .AddTransient<IKillerMovesFactory, KillerMovesFactory>()
-               .AddSingleton<ISearchParameters, SearchParameters>()
-               .AddSingleton<IValues, Values>()
-               .AddSingleton<IKpkBitBase, KpkBitBase>()
-               .AddTransient<IBoard, Board>()
-               .AddSingleton<IPositionValidator, PositionValidator>()
-               .AddTransient<IPosition, Position>()
-               .AddTransient<IGame, Game>()
-               .AddSingleton<IPolyglotBookFactory, PolyglotBookFactory>()
-               .AddSingleton<ICpu, Cpu>()
-               .AddNotationServices();
-    }
+            var polyglotBookConfiguration = configuration.GetSection(PolyglotBookConfiguration.Section);
+            serviceCollection.Configure<PolyglotBookConfiguration>(polyglotBookConfiguration);
 
-    private static void BindConfigurations(this IServiceCollection serviceCollection, IConfiguration configuration)
-    {
-        var transpositionConfigurationSection = configuration.GetSection(TranspositionTableConfiguration.Section);
-        serviceCollection.Configure<TranspositionTableConfiguration>(transpositionConfigurationSection);
+            serviceCollection.AddSingleton(provider =>
+            {
+                var ttOptions = provider.GetRequiredService<IOptions<TranspositionTableConfiguration>>();
+                return ttOptions.Value;
+            });
 
-        var polyglotBookConfiguration = configuration.GetSection(PolyglotBookConfiguration.Section);
-        serviceCollection.Configure<PolyglotBookConfiguration>(polyglotBookConfiguration);
+            serviceCollection.AddSingleton(provider =>
+            {
+                var polyOptions = provider.GetRequiredService<IOptions<PolyglotBookConfiguration>>();
+                return polyOptions.Value;
+            });
 
-        serviceCollection.AddSingleton(provider =>
-        {
-            var ttOptions = provider.GetRequiredService<IOptions<TranspositionTableConfiguration>>();
-            return ttOptions.Value;
-        });
-
-        serviceCollection.AddSingleton(provider =>
-        {
-            var polyOptions = provider.GetRequiredService<IOptions<PolyglotBookConfiguration>>();
-            return polyOptions.Value;
-        });
-
+        }
     }
 
     private static IConfigurationRoot LoadConfiguration(string file)
@@ -125,27 +127,30 @@ public static class ChessLibServiceCollectionExtensions
                .Build();
     }
 
-    public static void AddFactory<TService, TImplementation>(this IServiceCollection services)
-        where TService : class
-        where TImplementation : class, TService
+    extension(IServiceCollection services)
     {
-        services.AddTransient<TService, TImplementation>();
-        services.AddSingleton<Func<TService>>(static x => () => x.GetService<TService>()!);
-        services.AddSingleton<IServiceFactory<TService>, ServiceFactory<TService>>();
-    }
+        public void AddFactory<TService, TImplementation>()
+            where TService : class
+            where TImplementation : class, TService
+        {
+            services.AddTransient<TService, TImplementation>();
+            services.AddSingleton<Func<TService>>(static x => () => x.GetService<TService>()!);
+            services.AddSingleton<IServiceFactory<TService>, ServiceFactory<TService>>();
+        }
 
-    private static IServiceCollection AddNotationServices(this IServiceCollection services)
-    {
-        return services
-               .AddSingleton<INotationToMove, NotationToMove>()
-               .AddSingleton<IMoveNotation, MoveNotation>()
-               .AddKeyedSingleton<INotation, CoordinateNotation>(MoveNotations.Coordinate)
-               .AddKeyedSingleton<INotation, FanNotation>(MoveNotations.Fan)
-               .AddKeyedSingleton<INotation, IccfNotation>(MoveNotations.ICCF)
-               .AddKeyedSingleton<INotation, LanNotation>(MoveNotations.Lan)
-               .AddKeyedSingleton<INotation, RanNotation>(MoveNotations.Ran)
-               .AddKeyedSingleton<INotation, SanNotation>(MoveNotations.San)
-               .AddKeyedSingleton<INotation, SmithNotation>(MoveNotations.Smith)
-               .AddKeyedSingleton<INotation, UciNotation>(MoveNotations.Uci);
+        private IServiceCollection AddNotationServices()
+        {
+            return services
+                   .AddSingleton<INotationToMove, NotationToMove>()
+                   .AddSingleton<IMoveNotation, MoveNotation>()
+                   .AddKeyedSingleton<INotation, CoordinateNotation>(MoveNotations.Coordinate)
+                   .AddKeyedSingleton<INotation, FanNotation>(MoveNotations.Fan)
+                   .AddKeyedSingleton<INotation, IccfNotation>(MoveNotations.ICCF)
+                   .AddKeyedSingleton<INotation, LanNotation>(MoveNotations.Lan)
+                   .AddKeyedSingleton<INotation, RanNotation>(MoveNotations.Ran)
+                   .AddKeyedSingleton<INotation, SanNotation>(MoveNotations.San)
+                   .AddKeyedSingleton<INotation, SmithNotation>(MoveNotations.Smith)
+                   .AddKeyedSingleton<INotation, UciNotation>(MoveNotations.Uci);
+        }
     }
 }

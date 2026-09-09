@@ -71,16 +71,16 @@ public static class CastleExtensions
     public static CastleRights Without(this CastleRights @this, CastleRights remove) => @this & ~remove;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static CastleRights MakeCastleRights(this CastleRights cs, Color c)
+    public static CastleRight MakeCastleRights(this CastleRights cs, Color c)
     {
         var isQueen = cs == CastleRights.Queen;
         if (c.IsWhite)
             return isQueen
-                ? CastleRights.WhiteQueen
-                : CastleRights.WhiteKing;
+                ? CastleRight.WhiteQueen
+                : CastleRight.WhiteKing;
         return isQueen
-            ? CastleRights.BlackQueen
-            : CastleRights.BlackKing;
+            ? CastleRight.BlackQueen
+            : CastleRight.BlackKing;
     }
 }
 

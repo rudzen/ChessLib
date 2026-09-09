@@ -24,11 +24,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using Rudzoft.ChessLib.Fen;
+
 namespace Rudzoft.ChessLib.Test.PerftTests;
 
 public sealed class PerftOneTest : PerftVerify
 {
-    private static readonly string[] Fens = Enumerable.Repeat(Fen.Fen.StartPositionFen, 6).ToArray();
+    private static readonly string[] Fens = Enumerable.Repeat(FenData.StartPositionFen, 6).ToArray();
 
     private static readonly int[] Depths =
     [

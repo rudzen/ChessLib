@@ -28,7 +28,7 @@ using Rudzoft.ChessLib.Types;
 
 namespace Rudzoft.ChessLib.Test.SquareTests;
 
-public sealed class DistanceTests
+public sealed class SquareDistanceTests
 {
     [Theory]
     [InlineData(Squares.a1, Squares.a2, 1)]

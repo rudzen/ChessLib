@@ -38,15 +38,17 @@ public enum InputOutputMutex
 
 internal static class InputOutputMutexExtensions
 {
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool IsReleasable(this InputOutputMutex @this) =>
-        @this.InBetween(InputOutputMutex.Acquire, InputOutputMutex.Atomic);
+    extension(InputOutputMutex mutex)
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool IsReleasable() => mutex.InBetween(InputOutputMutex.Acquire, InputOutputMutex.Atomic);
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool IsWaitable(this InputOutputMutex @this) =>
-        @this.InBetween(InputOutputMutex.Atomic, InputOutputMutex.Relax);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool IsWaitable() =>
+            mutex.InBetween(InputOutputMutex.Atomic, InputOutputMutex.Relax);
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static bool InBetween(this InputOutputMutex v, InputOutputMutex min, InputOutputMutex max) =>
-        (uint)v - (uint)min <= (uint)max - (uint)min;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private bool InBetween(InputOutputMutex min, InputOutputMutex max) =>
+            (uint)mutex - (uint)min <= (uint)max - (uint)min;
+    }
 }

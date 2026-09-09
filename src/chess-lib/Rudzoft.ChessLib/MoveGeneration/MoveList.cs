@@ -75,7 +75,6 @@ public sealed class MoveList : IResettable
     public void Clear()
     {
         _cur = Length = 0;
-        _moves[0] = ValMove.Empty;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

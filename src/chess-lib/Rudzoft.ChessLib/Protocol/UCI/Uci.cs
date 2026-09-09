@@ -90,7 +90,7 @@ public class Uci : IUci
     {
         ref var opt = ref CollectionsMarshal.GetValueRefOrNullRef(_optionsLookup, name);
         var result = !Unsafe.IsNullRef(ref opt);
-        option = result ? opt : default;
+        option = result ? opt : null;
         return result;
     }
 

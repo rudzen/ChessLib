@@ -51,7 +51,7 @@ public sealed class Game(
 
     public Action<IPieceSquare> PieceUpdated => pos.PieceUpdated;
 
-    public int MoveNumber => 1 + (Pos.Ply - Pos.SideToMove.IsBlack.AsByte() / 2);
+    public int MoveNumber => 1 + (Pos.Ply - Pos.SideToMove.IsBlack.AsByte()) / 2;
 
     public BitBoard Occupied => Pos.Pieces();
 
@@ -70,7 +70,7 @@ public sealed class Game(
     public bool IsRepetition => pos.IsRepetition;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void NewGame(string fen = Fen.Fen.StartPositionFen)
+    public void NewGame(string fen = FenData.StartPositionFen)
     {
         var fenData = new FenData(fen);
         var state = new State();
@@ -118,6 +118,11 @@ public sealed class Game(
 
     public UInt128 Perft(in HashKey baseKey, int depth, bool root = true)
     {
+        var currentKey = pos.State.PositionKey;
+
+        if (_perftTable.Get(in currentKey, depth) is (var ttNodes, true))
+            return ttNodes;
+
         var tot = UInt128.MinValue;
         var ml = moveListPool.Get();
         ml.Generate(in pos);
@@ -127,15 +132,16 @@ public sealed class Game(
         {
             tot = (ulong)moves.Length;
             moveListPool.Return(ml);
+            _perftTable.Set(in currentKey, (byte)depth, in tot);
             return tot;
         }
 
         ref var movesSpace = ref MemoryMarshal.GetReference(moves);
 
+        var state = new State();
         for (var i = 0; i < moves.Length; ++i)
         {
             var m = Unsafe.Add(ref movesSpace, i).Move;
-            var state = new State();
 
             pos.MakeMove(m, in state);
 
@@ -148,7 +154,7 @@ public sealed class Game(
             }
             else
             {
-                var next = Perft(in baseKey, depth - 1, false);
+                var next = Perft(in currentKey, depth - 1, false);
                 tot += next;
             }
 
@@ -156,6 +162,8 @@ public sealed class Game(
         }
 
         moveListPool.Return(ml);
+
+        _perftTable.Set(in currentKey, (byte)depth, in tot);
 
         return tot;
     }

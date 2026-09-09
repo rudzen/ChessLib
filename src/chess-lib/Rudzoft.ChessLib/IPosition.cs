@@ -218,6 +218,4 @@ public interface IPosition : IEnumerable<Piece>
     Value NonPawnMaterial();
 
     HashKey MovePositionKey(Move m);
-
-    PositionValidationResult Validate(PositionValidationTypes type = PositionValidationTypes.Basic);
 }

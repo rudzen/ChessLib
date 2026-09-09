@@ -24,9 +24,40 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Rudzoft.ChessLib.Validation;
+using Rudzoft.ChessLib.Tables.KillerMoves;
+using Rudzoft.ChessLib.Types;
 
-public interface IPositionValidator
+namespace Rudzoft.ChessLib.Test;
+
+public sealed class KillerMovesTests
 {
-    PositionValidationResult Validate(in IPosition pos, PositionValidationTypes type = PositionValidationTypes.All);
+    [Fact]
+    public void BaseAddMove()
+    {
+        var km = KillerMoves.Create(128);
+        const int depth = 1;
+        var move = Move.Create(Square.A2, Square.A3);
+        var pc = PieceType.Pawn.MakePiece(Color.White);
+
+        km.UpdateValue(depth, move, pc);
+
+        var value = km.GetValue(depth, move, pc);
+
+        Assert.Equal(2, value);
+    }
+
+    [Fact]
+    public void GetValueWithWrongDepthYieldsZero()
+    {
+        var km = KillerMoves.Create(128);
+        const int depth = 1;
+        var move = Move.Create(Square.A2, Square.A3);
+        var pc = PieceType.Pawn.MakePiece(Color.White);
+
+        km.UpdateValue(depth, move, pc);
+
+        var value = km.GetValue(depth + 1, move, pc);
+
+        Assert.Equal(0, value);
+    }
 }

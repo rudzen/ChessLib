@@ -47,10 +47,13 @@ public enum Ranks
 
 public static class RanksExtensions
 {
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Rank RelativeRank(this Ranks r, Color c) => new((Ranks)(r.AsInt() ^ (c * 7)));
+    extension(Ranks r)
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Rank RelativeRank(Color c) => new((Ranks)(r.AsInt() ^ (c * 7)));
 
-    public static int AsInt(this Ranks r) => (int)r;
+        public int AsInt() => (int)r;
+    }
 }
 
 public readonly record struct Rank(Ranks Value) : ISpanFormattable,

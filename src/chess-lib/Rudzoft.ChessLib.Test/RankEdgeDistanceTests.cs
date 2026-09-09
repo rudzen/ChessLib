@@ -26,7 +26,7 @@ SOFTWARE.
 
 using Rudzoft.ChessLib.Types;
 
-namespace Rudzoft.ChessLib.Test.RankTests;
+namespace Rudzoft.ChessLib.Test;
 
 public sealed class RankEdgeDistanceTests
 {

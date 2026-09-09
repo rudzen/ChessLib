@@ -19,6 +19,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Directory.Build.props = Directory.Build.props
 		Directory.Packages.props = Directory.Packages.props
 		global.json = global.json
+		..\.kilo\plans\1788928436794-chesslib-perft-analysis.md = ..\.kilo\plans\1788928436794-chesslib-perft-analysis.md
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rudzoft.Perft", "perft\Rudzoft.Perft\Rudzoft.Perft.csproj", "{279378EB-73AF-450C-909C-7145DBE463E0}"
@@ -29,8 +30,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "chess-lib.pgn", "chess-lib.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rudzoft.ChessLib", "chess-lib\Rudzoft.ChessLib\Rudzoft.ChessLib.csproj", "{CD9A0992-9687-41A1-8C02-DE4063F489DF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rudzoft.ChessLib.Test", "chess-lib\Rudzoft.ChessLib.Test\Rudzoft.ChessLib.Test.csproj", "{71E13772-CD99-44F7-8F5A-BC7E96300280}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rudzoft.ChessLib.Benchmark", "chess-lib.bench\Rudzoft.ChessLib.Benchmark\Rudzoft.ChessLib.Benchmark.csproj", "{18BB06F4-F9B5-4999-8FC5-D5D479FEA82B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rudzoft.ChessLib.PGN", "chess-lib.pgn\Rudzoft.ChessLib.PGN\Rudzoft.ChessLib.PGN.csproj", "{289BE06C-D071-4620-B7A7-E119F34A40A6}"
@@ -40,6 +39,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rudzoft.Perft.Settings", "perft\Rudzoft.Perft.Settings\Rudzoft.Perft.Settings.csproj", "{21BFD77B-0485-4A36-BAD8-ED72A77CCDE1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rudzoft.ChessLib.PGN.Tests", "chess-lib.pgn\Rudzoft.ChessLib.PGN.Tests\Rudzoft.ChessLib.PGN.Tests.csproj", "{EB85EAA6-07FC-42F0-B435-13A37423E762}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rudzoft.ChessLib.Test", "chess-lib\Rudzoft.ChessLib.Test\Rudzoft.ChessLib.Test.csproj", "{C54A64BD-1EA9-454A-B5B2-D9BB3448B913}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -55,10 +56,6 @@ Global
 		{CD9A0992-9687-41A1-8C02-DE4063F489DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CD9A0992-9687-41A1-8C02-DE4063F489DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CD9A0992-9687-41A1-8C02-DE4063F489DF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{71E13772-CD99-44F7-8F5A-BC7E96300280}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{71E13772-CD99-44F7-8F5A-BC7E96300280}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{71E13772-CD99-44F7-8F5A-BC7E96300280}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{71E13772-CD99-44F7-8F5A-BC7E96300280}.Release|Any CPU.Build.0 = Release|Any CPU
 		{18BB06F4-F9B5-4999-8FC5-D5D479FEA82B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{18BB06F4-F9B5-4999-8FC5-D5D479FEA82B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{18BB06F4-F9B5-4999-8FC5-D5D479FEA82B}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -79,6 +76,10 @@ Global
 		{EB85EAA6-07FC-42F0-B435-13A37423E762}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EB85EAA6-07FC-42F0-B435-13A37423E762}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EB85EAA6-07FC-42F0-B435-13A37423E762}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C54A64BD-1EA9-454A-B5B2-D9BB3448B913}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C54A64BD-1EA9-454A-B5B2-D9BB3448B913}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C54A64BD-1EA9-454A-B5B2-D9BB3448B913}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C54A64BD-1EA9-454A-B5B2-D9BB3448B913}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -86,12 +87,12 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{279378EB-73AF-450C-909C-7145DBE463E0} = {96596E23-0DAC-46B7-AEE2-24F55C837AFF}
 		{CD9A0992-9687-41A1-8C02-DE4063F489DF} = {9F0623CB-4463-40FE-874F-4A18D1871A91}
-		{71E13772-CD99-44F7-8F5A-BC7E96300280} = {9F0623CB-4463-40FE-874F-4A18D1871A91}
 		{18BB06F4-F9B5-4999-8FC5-D5D479FEA82B} = {74DC6FDD-D550-4185-9635-1201508E8F22}
 		{289BE06C-D071-4620-B7A7-E119F34A40A6} = {CFADCDB7-1278-42ED-A25C-9B3FBB58C520}
 		{F283CA88-BE8D-4A89-8402-357B375877B8} = {F82A6A7E-4551-4667-9E0A-57036E1B5117}
 		{21BFD77B-0485-4A36-BAD8-ED72A77CCDE1} = {96596E23-0DAC-46B7-AEE2-24F55C837AFF}
 		{EB85EAA6-07FC-42F0-B435-13A37423E762} = {CFADCDB7-1278-42ED-A25C-9B3FBB58C520}
+		{C54A64BD-1EA9-454A-B5B2-D9BB3448B913} = {9F0623CB-4463-40FE-874F-4A18D1871A91}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0B507B2E-EC45-4DDA-94DD-B7CD5A2B8CF3}

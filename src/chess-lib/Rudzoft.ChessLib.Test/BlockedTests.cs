@@ -1,4 +1,4 @@
-﻿/*
+/*
 ChessLib, a chess data structure library
 
 MIT License
@@ -26,35 +26,28 @@ SOFTWARE.
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.ObjectPool;
-using Microsoft.Extensions.Options;
 using Rudzoft.ChessLib.Enums;
 using Rudzoft.ChessLib.Fen;
 using Rudzoft.ChessLib.Hash;
-using Rudzoft.ChessLib.Hash.Tables.Transposition;
 using Rudzoft.ChessLib.MoveGeneration;
-using Rudzoft.ChessLib.Protocol.UCI;
 using Rudzoft.ChessLib.Types;
 using Rudzoft.ChessLib.Validation;
 
-namespace Rudzoft.ChessLib.Test.ProtocolTests;
+namespace Rudzoft.ChessLib.Test;
 
-public sealed class UciTests
+public sealed class BlockedTests
 {
     private readonly IServiceProvider _serviceProvider;
 
-    public UciTests()
+    public BlockedTests()
     {
-        var transpositionTableConfiguration = new TranspositionTableConfiguration { DefaultSize = 1 };
-        var options = Options.Create(transpositionTableConfiguration);
-
         _serviceProvider = new ServiceCollection()
-            .AddSingleton(options)
+            .AddTransient<IBoard, Board>()
             .AddSingleton<IValues, Values>()
             .AddSingleton<IRKiss, RKiss>()
             .AddSingleton<IZobrist, Zobrist>()
-            .AddSingleton<ICuckoo, Cuckoo>()
-            .AddSingleton<IPositionValidator, PositionValidator>()
-            .AddTransient<IBoard, Board>()
+            .AddSingleton<Cuckoo>()
+            .AddSingleton<PositionValidator>()
             .AddTransient<IPosition, Position>()
             .AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>()
             .AddSingleton(static serviceProvider =>
@@ -63,46 +56,24 @@ public sealed class UciTests
                 var policy = new DefaultPooledObjectPolicy<MoveList>();
                 return provider.Create(policy);
             })
-            .AddSingleton(static sp =>
-            {
-                var pool = sp.GetRequiredService<ObjectPool<MoveList>>();
-                IUci uci = new Uci(pool);
-                uci.Initialize();
-                return uci;
-            })
             .BuildServiceProvider();
     }
 
-    [Fact]
-    public void NpsSimple()
+    [Theory]
+    [InlineData("8/8/k7/p1p1p1p1/P1P1P1P1/8/8/4K3 w - - 0 1", true)]
+    [InlineData("4k3/5p2/1p1p1P1p/1P1P1P1P/3P4/8/4K3/8 w - - 0 1", true)]
+    [InlineData("5k2/8/8/p1p1pPp1/P1P1P1P1/8/8/4K3 w - - 0 1", true)]
+    [InlineData("8/8/k7/p1p1pPp1/P1P1P1P1/8/8/4K3 w - - 0 1", false)] // white pawn cannot be blocked by the black king
+    [InlineData("5k2/8/8/pPp1pPp1/P1P1P1P1/8/8/4K3 w - - 0 1", false)]
+    [InlineData("8/2p5/kp2p1p1/p1p1P1P1/P1P2P2/1P4K1/8/8 w - - 0 1", false)]
+    public void Blocked(string fen, bool expected)
     {
-        const ulong expected = 1000UL;
-        const ulong nodes = 1000UL;
-
-        var ts = TimeSpan.FromSeconds(1);
-
-        var uci = _serviceProvider.GetRequiredService<IUci>();
-
-        var actual = uci.Nps(nodes, in ts);
-
-        Assert.Equal(expected, actual);
-    }
-
-    [Fact]
-    public void MoveFromUciBasic()
-    {
-        const string uciMove = "a2a3";
-        var expected = Move.Create(Square.A2, Square.A3);
-
-        var uci = _serviceProvider.GetRequiredService<IUci>();
         var pos = _serviceProvider.GetRequiredService<IPosition>();
-
-        var fenData = new FenData(Fen.Fen.StartPositionFen);
+        var fenData = new FenData(fen);
         var state = new State();
-
         pos.Set(in fenData, ChessMode.Normal, state);
 
-        var actual = uci.MoveFromUci(pos, uciMove);
+        var actual = pos.IsBlocked();
 
         Assert.Equal(expected, actual);
     }

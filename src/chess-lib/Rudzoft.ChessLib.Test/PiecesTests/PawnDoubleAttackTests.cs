@@ -46,8 +46,8 @@ public sealed class PawnDoubleAttackTests
             .AddSingleton<IValues, Values>()
             .AddSingleton<IRKiss, RKiss>()
             .AddSingleton<IZobrist, Zobrist>()
-            .AddSingleton<ICuckoo, Cuckoo>()
-            .AddSingleton<IPositionValidator, PositionValidator>()
+            .AddSingleton<Cuckoo>()
+            .AddSingleton<PositionValidator>()
             .AddTransient<IPosition, Position>()
             .AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>()
             .AddSingleton(static serviceProvider =>
@@ -64,7 +64,7 @@ public sealed class PawnDoubleAttackTests
     {
         var pos = _serviceProvider.GetRequiredService<IPosition>();
 
-        var fenData = new FenData(Fen.Fen.StartPositionFen);
+        var fenData = new FenData(FenData.StartPositionFen);
         var state = new State();
 
         pos.Set(in fenData, ChessMode.Normal, state);
