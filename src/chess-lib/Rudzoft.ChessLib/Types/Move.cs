@@ -1,4 +1,4 @@
-﻿/*
+/*
 ChessLib, a chess data structure library
 
 MIT License
@@ -194,20 +194,11 @@ public readonly record struct Move(ushort Data) : ISpanFormattable
                 charsWritten = 4;
                 return true;
             case MoveTypes.Castling:
-                destination[0] = 'O';
-                destination[1] = '-';
-                destination[2] = 'O';
-
-                if (to >= from)
-                {
-                    charsWritten = 3;
-                    return true;
-                }
-
-                destination[3] = '-';
-                destination[4] = 'O';
-                charsWritten = MaxMoveStringSize;
-
+                destination[0] = from.FileChar;
+                destination[1] = from.RankChar;
+                destination[2] = to > from ? 'g' : 'c';
+                destination[3] = from.RankChar;
+                charsWritten = 4;
                 return true;
             case MoveTypes.Promotion:
                 destination[0] = from.FileChar;
