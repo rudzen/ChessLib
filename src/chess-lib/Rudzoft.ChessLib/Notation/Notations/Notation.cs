@@ -63,7 +63,7 @@ public abstract class Notation : INotation
     {
         var ambiguity = MoveAmbiguities.None;
         var c = pos.SideToMove;
-        var pinned = pos.PinnedPieces(c);
+        var pinned = pos.KingBlockers(c);
 
         while (similarTypeAttacks)
         {
