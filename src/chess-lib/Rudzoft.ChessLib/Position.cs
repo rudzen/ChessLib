@@ -367,7 +367,7 @@ public sealed class Position : IPosition
         length += written;
         fen[length++] = space;
 
-        var ply = 1 + (Ply - _sideToMove.IsBlack.AsByte() / 2);
+        var ply = 1 + Ply / 2;
         ply.TryFormat(fen[length..], out written, format);
 
         length += written;
@@ -1234,7 +1234,7 @@ public sealed class Position : IPosition
         }
 
         State.ClockPly = halfMoveNum;
-        Ply = moveNum;
+        Ply = 2 * moveNum + _sideToMove.IsBlack.AsByte();
     }
 
     /// <summary>

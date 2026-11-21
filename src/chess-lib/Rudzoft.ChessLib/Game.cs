@@ -51,7 +51,7 @@ public sealed class Game(
 
     public Action<IPieceSquare> PieceUpdated => pos.PieceUpdated;
 
-    public int MoveNumber => 1 + (Pos.Ply - Pos.SideToMove.IsBlack.AsByte() / 2);
+    public int MoveNumber => 1 + Pos.Ply / 2;
 
     public BitBoard Occupied => Pos.Pieces();
 
